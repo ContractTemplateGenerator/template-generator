@@ -114,6 +114,105 @@
             position: relative;
         }
         
+        /* Paywall overlay styles */
+        .paywall-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10;
+            backdrop-filter: blur(2px); /* Slight blur effect */
+            user-select: none; /* Prevent text selection */
+        }
+        
+        .paywall-message {
+            background-color: rgba(44, 62, 80, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            max-width: 80%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .paywall-message h3 {
+            margin-bottom: 10px;
+        }
+        
+        .paywall-message p {
+            margin-bottom: 15px;
+        }
+        
+        /* PayPal button styles */
+        .pp-ND34QUSW8KAJA {
+            text-align: center;
+            border: none;
+            border-radius: 0.25rem;
+            min-width: 11.625rem;
+            padding: 0 2rem;
+            height: 2.625rem;
+            font-weight: bold;
+            background-color: #FFD140;
+            color: #000000;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 1rem;
+            line-height: 1.25rem;
+            cursor: pointer;
+            margin-bottom: 10px;
+        }
+        
+        /* Fallback unlock form */
+        .transaction-id-form {
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .transaction-id-input {
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 200px;
+            margin-right: 5px;
+        }
+        
+        .unlock-btn {
+            padding: 8px 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .unlock-btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .locked-preview {
+            user-select: none; /* Prevent text selection */
+            filter: blur(0.6px); /* Light blur for clarity but protection */
+            pointer-events: none; /* Prevent interaction */
+        }
+        
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 72px;
+            color: rgba(44, 62, 80, 0.1);
+            font-weight: bold;
+            text-transform: uppercase;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        
         .form-section {
             margin-bottom: 18px;
             padding-bottom: 15px;
@@ -328,6 +427,11 @@
             background-color: #2980b9;
         }
         
+        .btn-copy:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+        
         .btn-download {
             background-color: var(--accent-color);
             color: white;
@@ -335,6 +439,11 @@
         
         .btn-download:hover {
             background-color: #219653;
+        }
+        
+        .btn-download:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
         }
         
         .copy-message {
@@ -360,38 +469,6 @@
         
         .btn-consult:hover {
             background-color: #1e2a37;
-        }
-        
-        /* Document styles */
-        .document-template {
-            font-family: "Times New Roman", Times, serif;
-        }
-        
-        .document-title {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        
-        .document-section {
-            margin-bottom: 20px;
-        }
-        
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .field-label {
-            font-weight: bold;
-            display: inline;
-        }
-        
-        /* Highlight effect */
-        .highlight {
-            background-color: var(--highlight-color);
-            transition: background-color 0.5s ease;
         }
         
         /* Compact accordion styles */
@@ -439,6 +516,38 @@
             border-top: none;
             border-radius: 0 0 6px 6px;
             margin-bottom: 8px;
+        }
+        
+        /* Document styles */
+        .document-template {
+            font-family: "Times New Roman", Times, serif;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .document-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            display: inline;
+        }
+        
+        /* Highlight effect */
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s ease;
         }
         
         @media (max-width: 1024px) {
@@ -491,7 +600,9 @@
             .header, 
             .form-actions, 
             .preview-header,
-            .btn-consult {
+            .btn-consult,
+            .paywall-overlay,
+            .watermark {
                 display: none;
             }
             
@@ -508,6 +619,12 @@
                 overflow: visible;
                 border: none;
                 padding: 0;
+            }
+            
+            .locked-preview {
+                user-select: auto;
+                filter: none;
+                pointer-events: auto;
             }
         }
     </style>
@@ -795,9 +912,9 @@
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
-                            <button type="button" id="copyBtn" class="btn btn-copy" onclick="copyAmendment()">Copy Amendment</button>
+                            <button type="button" id="copyBtn" class="btn btn-copy" disabled>Copy Amendment</button>
                             <span id="copyMessage" class="copy-message">Amendment copied!</span>
-                            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadAmendment()">Download as DOCX</button>
+                            <button type="button" id="downloadBtn" class="btn btn-download" disabled>Download as DOCX</button>
                         </div>
                         <button type="reset" class="btn btn-reset" onclick="resetForm()">Reset Form</button>
                     </div>
@@ -816,7 +933,33 @@
                 </div>
                 
                 <div class="preview-box">
-                    <div class="document-template" id="amendmentPreview">
+                    <!-- Paywall overlay -->
+                    <div class="paywall-overlay" id="paywallOverlay">
+                        <div class="paywall-message">
+                            <h3>Unlock Full Access</h3>
+                            <p>Preview your amendment for free, customize it to your needs, then unlock to copy or download.</p>
+                            
+                            <!-- PayPal button -->
+                            <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;" onsubmit="saveStateBeforePayment()">
+                                <input class="pp-ND34QUSW8KAJA" type="submit" value="Buy Now" />
+                                <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+                                <section style="font-size: 0.75rem;">
+                                    Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/>
+                                </section>
+                            </form>
+                            
+                            <!-- Fallback for manual unlock -->
+                            <div class="transaction-id-form">
+                                <p style="font-size: 12px; margin-bottom: 10px;">Already paid? Enter your PayPal transaction ID:</p>
+                                <input type="text" id="transactionId" class="transaction-id-input" placeholder="Transaction ID">
+                                <button type="button" class="unlock-btn" onclick="manualUnlock()">Unlock</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="watermark" id="previewWatermark">PREVIEW</div>
+                    
+                    <div class="document-template locked-preview" id="amendmentPreview">
                         <!-- Amendment will be populated here by JavaScript -->
                     </div>
                 </div>
@@ -832,11 +975,16 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Check for payment status on page load
+            checkPaymentStatus();
+            
             // Initialize form elements
             const form = document.getElementById('amendmentForm');
             const preview = document.getElementById('amendmentPreview');
             const copyMessage = document.getElementById('copyMessage');
             const previewBox = document.querySelector('.preview-box');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
             
             // Add hint tooltips to form elements
             addTooltips();
@@ -856,6 +1004,143 @@
                     content.style.display = this.classList.contains('active') ? 'block' : 'none';
                 });
             });
+            
+            // Functions for payment handling
+            
+            // Check if payment is completed
+            function checkPaymentStatus() {
+                // Check URL for payment success parameter
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.has('payment354785') && urlParams.get('payment354785') === 'success') {
+                    unlockGenerator();
+                    restoreFormState();
+                }
+                
+                // Check if we have a stored unlock status in localStorage
+                if (localStorage.getItem('contractGenUnlocked') === 'true') {
+                    unlockGenerator();
+                    restoreFormState();
+                }
+            }
+            
+            // Save form state before payment
+            window.saveStateBeforePayment = function() {
+                const formData = {};
+                
+                // Save all input values
+                document.querySelectorAll('#amendmentForm .form-input').forEach(input => {
+                    formData[input.id] = input.value;
+                });
+                
+                // Save radio button states
+                document.querySelectorAll('#amendmentForm input[type="radio"]').forEach(radio => {
+                    if (radio.checked) {
+                        formData[radio.name] = radio.value;
+                    }
+                });
+                
+                // Save to localStorage
+                localStorage.setItem('contractGenFormData', JSON.stringify(formData));
+                localStorage.setItem('contractGenSaveTime', Date.now().toString());
+            };
+            
+            // Restore form state after payment
+            function restoreFormState() {
+                const savedData = localStorage.getItem('contractGenFormData');
+                if (!savedData) return;
+                
+                try {
+                    const formData = JSON.parse(savedData);
+                    
+                    // Restore input values
+                    for (const [id, value] of Object.entries(formData)) {
+                        const element = document.getElementById(id);
+                        if (element && element.tagName.toLowerCase() !== 'input' || element?.type !== 'radio') {
+                            if (element) element.value = value;
+                        }
+                    }
+                    
+                    // Restore radio buttons
+                    for (const [name, value] of Object.entries(formData)) {
+                        if (name.includes('Type')) {
+                            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
+                            if (radio) {
+                                radio.checked = true;
+                                
+                                // Update styling for radio options
+                                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+                                    const option = r.closest('.radio-option');
+                                    if (option) {
+                                        option.classList.toggle('selected', r.checked);
+                                    }
+                                });
+                                
+                                // Handle extension type toggling
+                                if (name === 'extensionType') {
+                                    toggleExtensionDetails(value);
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Handle specific display toggles
+                    if (formData.extensionLength === 'custom') {
+                        document.getElementById('custom-extension-group').style.display = 'block';
+                    }
+                    
+                    if (formData.terminationNotice === 'custom') {
+                        document.getElementById('custom-termination-group').style.display = 'block';
+                    }
+                    
+                    if (formData.originalTerms === 'custom') {
+                        document.getElementById('custom-terms-group').style.display = 'block';
+                    }
+                    
+                    // Update the preview
+                    updatePreview();
+                    
+                } catch (error) {
+                    console.error('Error restoring form state:', error);
+                }
+            }
+            
+            // Unlock the generator
+            function unlockGenerator() {
+                // Hide the paywall overlay
+                document.getElementById('paywallOverlay').style.display = 'none';
+                
+                // Remove the watermark
+                document.getElementById('previewWatermark').style.display = 'none';
+                
+                // Enable the copy and download buttons
+                copyBtn.disabled = false;
+                downloadBtn.disabled = false;
+                
+                // Remove the locked-preview class
+                preview.classList.remove('locked-preview');
+                
+                // Save unlock status to localStorage
+                localStorage.setItem('contractGenUnlocked', 'true');
+            }
+            
+            // Manual unlock with transaction ID
+            window.manualUnlock = function() {
+                const transactionId = document.getElementById('transactionId').value;
+                
+                // Accept any non-empty transaction ID
+                if (transactionId && transactionId.trim().length > 0) {
+                    unlockGenerator();
+                    restoreFormState();
+                    
+                    // Add a small delay before scrolling to ensure the form is fully restored
+                    setTimeout(() => {
+                        // Scroll to the form section for better UX
+                        document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
+                    }, 100);
+                } else {
+                    alert('Please enter a transaction ID');
+                }
+            };
             
             // Function to add tooltips and help text
             function addTooltips() {
@@ -1577,17 +1862,17 @@
                                     <p><strong>FIRST PARTY:</strong></p>
                                     <p>${firstParty}</p>
                                     <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p style="margin-top: 20px;">Name: _____________________________</p>
-                                    <p style="margin-top: 20px;">Title: ______________________________</p>
-                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                    <p>Name: _____________________________</p>
+                                    <p>Title: ______________________________</p>
+                                    <p>Date: ______________________________</p>
                                 </td>
                                 <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                                     <p><strong>SECOND PARTY:</strong></p>
                                     <p>${secondParty}</p>
                                     <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p style="margin-top: 20px;">Name: _____________________________</p>
-                                    <p style="margin-top: 20px;">Title: ______________________________</p>
-                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                    <p>Name: _____________________________</p>
+                                    <p>Title: ______________________________</p>
+                                    <p>Date: ______________________________</p>
                                 </td>
                             </tr>
                         </table>
@@ -1600,6 +1885,11 @@
                 // If a specific field was changed, highlight the relevant content
                 if (changedField) {
                     highlightChangedContent(changedField);
+                }
+                
+                // Save form state to localStorage (for auto-recovery)
+                if (localStorage.getItem('contractGenUnlocked') === 'true') {
+                    saveStateBeforePayment();
                 }
             }
             
@@ -1814,8 +2104,7 @@
                     
                     // Find the first section after "1. AMENDMENTS" and highlight it
                     const relevantSection = findFirstAmendmentSection();
-                    if (relevantSection) {
-                        relevantSection.classList.add('highlight');
+                    if (relevantSection) {relevantSection.classList.add('highlight');
                         scrollToElement(relevantSection);
                         
                         // Set timeout to clear highlight
@@ -1969,63 +2258,34 @@
             
             // Copy amendment function
             window.copyAmendment = function() {
+                // Only allow copying if unlocked
+                if (localStorage.getItem('contractGenUnlocked') !== 'true') {
+                    alert('Please purchase the generator to enable copying');
+                    return;
+                }
+                
                 const amendmentText = preview.innerText;
                 
-                // Modern clipboard method
-                try {
-                    // First try using the Clipboard API
-                    navigator.clipboard.writeText(amendmentText).then(function() {
-                        copyMessage.style.display = 'inline-block';
-                        
-                        setTimeout(() => {
-                            copyMessage.style.display = 'none';
-                        }, 3000);
-                    }).catch(function(err) {
-                        // If Clipboard API fails, try fallback method
-                        fallbackCopyTextToClipboard(amendmentText);
-                    });
-                } catch (err) {
-                    // If modern API not available, try fallback
-                    fallbackCopyTextToClipboard(amendmentText);
-                }
+                navigator.clipboard.writeText(amendmentText).then(function() {
+                    copyMessage.style.display = 'inline-block';
+                    
+                    setTimeout(() => {
+                        copyMessage.style.display = 'none';
+                    }, 3000);
+                }).catch(function(err) {
+                    console.error('Could not copy text: ', err);
+                    alert('Failed to copy amendment. Please try selecting and copying the text manually.');
+                });
             };
-            
-            // Fallback copy method for browsers that don't support clipboard API
-            function fallbackCopyTextToClipboard(text) {
-                try {
-                    // Create temporary element
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    
-                    // Make the textarea out of viewport
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-999999px";
-                    textArea.style.top = "-999999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    
-                    // Execute copy command
-                    const successful = document.execCommand('copy');
-                    
-                    // Remove temporary element
-                    document.body.removeChild(textArea);
-                    
-                    if (successful) {
-                        copyMessage.style.display = 'inline-block';
-                        setTimeout(() => {
-                            copyMessage.style.display = 'none';
-                        }, 3000);
-                    } else {
-                        alert('Failed to copy amendment. Please select and copy the text manually.');
-                    }
-                } catch (err) {
-                    alert('Failed to copy amendment. Please select and copy the text manually.');
-                }
-            }
             
             // Download as DOCX function
             window.downloadAmendment = function() {
+                // Only allow downloading if unlocked
+                if (localStorage.getItem('contractGenUnlocked') !== 'true') {
+                    alert('Please purchase the generator to enable downloading');
+                    return;
+                }
+                
                 try {
                     // Access docx library
                     const docx = window.docx;
@@ -2038,14 +2298,10 @@
                     const originalTitle = document.getElementById('originalTitle').value;
                     const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
                     
-                    // Get first party and second party for signature
-                    const firstParty = document.getElementById('firstParty').value;
-                    const secondParty = document.getElementById('secondParty').value;
-                    
                     // Create document sections
                     const paragraphs = [];
                     
-                    // Add title with same size as text (11pt)
+                    // Add title
                     paragraphs.push(
                         new docx.Paragraph({
                             alignment: docx.AlignmentType.CENTER,
@@ -2057,33 +2313,18 @@
                                 new docx.TextRun({
                                     text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
                                     bold: true,
-                                    size: 22 // 11pt font size (in half-points)
+                                    size: 28
                                 })
                             ]
                         })
                     );
                     
-                    // Get all paragraphs from the preview but exclude signature section
-                    // We'll handle that specially with a table
-                    const previewParagraphs = preview.querySelectorAll('p:not([style*="margin-top"])');
+                    // Get all paragraphs from the preview
+                    const previewParagraphs = preview.querySelectorAll('p');
                     
                     previewParagraphs.forEach(p => {
-                    // Skip duplicate witness statement
-                    if (p.textContent.includes("IN WITNESS WHEREOF") && 
-                        p.textContent.includes("Amendment as of the Amendment Effective Date")) {
-                        // Skip this paragraph as we'll add a single witness statement at the end
-                        return;
-                    }
-                        
-                        // Skip paragraphs that are part of the signature block
-                        if (p.textContent.includes("FIRST PARTY:") || 
-                            p.textContent.includes("SECOND PARTY:") ||
-                            p.textContent.includes("By:") ||
-                            p.textContent.includes("Name:") ||
-                            p.textContent.includes("Title:") ||
-                            p.textContent.includes("Date:")) {
-                            return;
-                        }
+                        // Skip empty paragraphs
+                        if (!p.textContent.trim()) return;
                         
                         paragraphs.push(
                             new docx.Paragraph({
@@ -2096,18 +2337,12 @@
                         );
                     });
                     
-                    // Get all section titles but process them to avoid duplication
+                    // Get all section titles
                     const sectionTitles = preview.querySelectorAll('.section-title');
-                    const processedTitles = new Set();
                     
                     sectionTitles.forEach(title => {
+                        // Find the index where this title should go
                         const titleText = title.textContent;
-                        
-                        // Skip if we've already processed this title
-                        if (processedTitles.has(titleText)) return;
-                        processedTitles.add(titleText);
-                        
-                        // Find the appropriate position for the title
                         let insertIndex = paragraphs.length;
                         
                         // Find where to insert this section title
@@ -2115,7 +2350,7 @@
                             if (previewParagraphs[i].textContent.includes(titleText)) {
                                 // Find the corresponding paragraph in our paragraphs array
                                 for (let j = 0; j < paragraphs.length; j++) {
-                                    if (paragraphs[j].text && paragraphs[j].text.includes(previewParagraphs[i].textContent)) {
+                                    if (paragraphs[j].text === previewParagraphs[i].textContent) {
                                         insertIndex = j;
                                         break;
                                     }
@@ -2124,14 +2359,14 @@
                             }
                         }
                         
-                        // Insert the section title - keep size consistent with text
+                        // Insert the section title
                         paragraphs.splice(insertIndex, 0, 
                             new docx.Paragraph({
                                 children: [
                                     new docx.TextRun({
                                         text: titleText,
                                         bold: true,
-                                        size: 22 // 11pt
+                                        size: 24
                                     })
                                 ],
                                 spacing: {
@@ -2142,142 +2377,13 @@
                         );
                     });
                     
-                    // Add signature table at the end
-                    paragraphs.push(
-                        new docx.Paragraph({
-                            text: "IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.",
-                            spacing: {
-                                before: 240,
-                                after: 240
-                            }
-                        })
-                    );
-                    
-                    // Create signature table - transparent borders
-                    const signatureTable = new docx.Table({
-                        rows: [
-                            new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({
-                                        children: [
-                                            new docx.Paragraph({
-                                                text: "FIRST PARTY:",
-                                                bold: true
-                                            }),
-                                            new docx.Paragraph({
-                                                text: firstParty
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "By: ________________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Name: _____________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Title: ______________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Date: ______________________________"
-                                            })
-                                        ],
-                                        width: {
-                                            size: 50,
-                                            type: docx.WidthType.PERCENTAGE
-                                        },
-                                        borders: {
-                                            top: { style: docx.BorderStyle.NONE },
-                                            bottom: { style: docx.BorderStyle.NONE },
-                                            left: { style: docx.BorderStyle.NONE },
-                                            right: { style: docx.BorderStyle.NONE }
-                                        }
-                                    }),
-                                    new docx.TableCell({
-                                        children: [
-                                            new docx.Paragraph({
-                                                text: "SECOND PARTY:",
-                                                bold: true
-                                            }),
-                                            new docx.Paragraph({
-                                                text: secondParty
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "By: ________________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Name: _____________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Title: ______________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Date: ______________________________"
-                                            })
-                                        ],
-                                        width: {
-                                            size: 50,
-                                            type: docx.WidthType.PERCENTAGE
-                                        },
-                                        borders: {
-                                            top: { style: docx.BorderStyle.NONE },
-                                            bottom: { style: docx.BorderStyle.NONE },
-                                            left: { style: docx.BorderStyle.NONE },
-                                            right: { style: docx.BorderStyle.NONE }
-                                        }
-                                    })
-                                ]
-                            })
-                        ],
-                        width: {
-                            size: 100,
-                            type: docx.WidthType.PERCENTAGE,
-                        },
-                        borders: {
-                            top: { style: docx.BorderStyle.NONE },
-                            bottom: { style: docx.BorderStyle.NONE },
-                            left: { style: docx.BorderStyle.NONE },
-                            right: { style: docx.BorderStyle.NONE }
-                        }
-                    });
-                    
-                    paragraphs.push(signatureTable);
-                    
                     // Create document with proper settings
                     const doc = new docx.Document({
                         styles: {
                             default: {
                                 document: {
                                     run: {
-                                        size: 22, // 11pt font size (in half-points)
+                                        size: 11 * 2, // 11pt font size (in half-points)
                                         font: "Times New Roman"
                                     },
                                     paragraph: {
