@@ -170,6 +170,63 @@
             margin-top: 3px;
         }
         
+        /* Tooltip and warning styles */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .tooltip .icon {
+            color: #3498db;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #2c3e50;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .tooltip .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2c3e50 transparent transparent transparent;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .date-warning {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+        
         .radio-options {
             display: flex;
             flex-direction: column;
@@ -476,7 +533,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="originalDate">Original Contract Date</label>
+                            <label for="originalDate">Original Contract Date <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">The date when the original contract was signed. This should typically be a date in the past.</span></span></label>
                             <div class="date-select">
                                 <select id="originalMonth" class="form-input">
                                     <option value="January">January</option>
@@ -526,11 +583,15 @@
                                     <option value="31">31</option>
                                 </select>
                                 <select id="originalYear" class="form-input">
+                                    <option value="2020">2020</option>
+                                    <option value="2021">2021</option>
+                                    <option value="2022">2022</option>
                                     <option value="2023">2023</option>
                                     <option value="2024" selected>2024</option>
                                     <option value="2025">2025</option>
                                 </select>
                             </div>
+                            <div id="originalDateWarning" class="date-warning">Warning: You've selected a future date for the original contract. Typically, the original contract date should be in the past.</div>
                         </div>
                         
                         <div class="form-group">
@@ -560,7 +621,7 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="amendmentDate">Amendment Effective Date</label>
+                            <label for="amendmentDate">Amendment Effective Date <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">The date when this amendment becomes effective. This is typically today's date or a future date when the amendment will be signed.</span></span></label>
                             <div class="date-select">
                                 <select id="amendmentMonth" class="form-input">
                                     <option value="January">January</option>
@@ -613,12 +674,14 @@
                                     <option value="2023">2023</option>
                                     <option value="2024">2024</option>
                                     <option value="2025" selected>2025</option>
+                                    <option value="2026">2026</option>
                                 </select>
                             </div>
+                            <div id="amendmentDateWarning" class="date-warning">Warning: The amendment date should typically be after the original contract date.</div>
                         </div>
                         
                         <div class="form-group">
-                            <label for="amendmentPurpose">Purpose of Amendment</label>
+                            <label for="amendmentPurpose">Purpose of Amendment <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">Select the primary reason for this amendment. This will determine what specific information needs to be provided in the next section.</span></span></label>
                             <select id="amendmentPurpose" class="form-input">
                                 <option value="extend" selected>Extend Contract Term</option>
                                 <option value="modify">Modify Pricing/Payment Terms</option>
@@ -627,6 +690,7 @@
                                 <option value="update-contact">Update Contact Information</option>
                                 <option value="custom">Custom Amendment</option>
                             </select>
+                            <div class="form-helper">Choose the main purpose of this amendment. This will determine what fields appear in the Amendment Details section below.</div>
                         </div>
                     </div>
                     
@@ -658,7 +722,7 @@
                                 
                                 <div id="fixed-extension-details">
                                     <div class="form-group">
-                                        <label for="extensionLength">Extension Length</label>
+                                        <label for="extensionLength">Extension Length <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">The period of time by which the contract will be extended, starting from the amendment effective date.</span></span></label>
                                         <select id="extensionLength" class="form-input">
                                             <option value="3 months">3 months</option>
                                             <option value="6 months" selected>6 months</option>
@@ -666,6 +730,7 @@
                                             <option value="2 years">2 years</option>
                                             <option value="custom">Custom period</option>
                                         </select>
+                                        <div class="form-helper">Select a standard extension period or choose "Custom period" to specify your own timeframe.</div>
                                     </div>
                                     
                                     <div id="custom-extension-group" style="display: none;">
@@ -703,18 +768,19 @@
                         <div class="accordion-header" id="additionalTermsHeader">Additional Terms</div>
                         <div class="accordion-content" id="additionalTermsSection">
                             <div class="form-group">
-                                <label for="additionalTerms">Additional Terms & Conditions (Optional)</label>
+                                <label for="additionalTerms">Additional Terms & Conditions (Optional) <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">Include any additional terms that aren't covered by the main amendment purpose. These will appear in a separate section of the amendment.</span></span></label>
                                 <textarea id="additionalTerms" class="form-input" placeholder="Enter any additional terms and conditions that apply to this amendment"></textarea>
-                                <div class="form-helper">Leave blank if there are no additional terms to include</div>
+                                <div class="form-helper">Leave blank if there are no additional terms to include. This field supports specific language or provisions you want to add to the amendment besides the main purpose.</div>
                             </div>
                             
                             <div class="form-group">
-                                <label for="originalTerms">Original Terms Status</label>
+                                <label for="originalTerms">Original Terms Status <span class="tooltip"><span class="icon">?</span><span class="tooltip-text">Determines how this amendment affects the other terms in the original agreement. Typically, all other terms remain in effect unless specifically changed in this amendment.</span></span></label>
                                 <select id="originalTerms" class="form-input">
                                     <option value="remain" selected>All other terms remain in full force and effect</option>
                                     <option value="supersede">This amendment supersedes all previous terms</option>
                                     <option value="custom">Custom statement</option>
                                 </select>
+                                <div class="form-helper">Choose how to handle the original contract terms that are not directly amended by this document.</div>
                             </div>
                             
                             <div id="custom-terms-group" style="display: none;">
@@ -772,6 +838,9 @@
             const copyMessage = document.getElementById('copyMessage');
             const previewBox = document.querySelector('.preview-box');
             
+            // Add hint tooltips to form elements
+            addTooltips();
+            
             // Variables to track highlighting
             let highlightTimeout;
             
@@ -787,6 +856,50 @@
                     content.style.display = this.classList.contains('active') ? 'block' : 'none';
                 });
             });
+            
+            // Function to add tooltips and help text
+            function addTooltips() {
+                // Add date validation for original contract date
+                document.getElementById('originalYear').addEventListener('change', checkDates);
+                document.getElementById('originalMonth').addEventListener('change', checkDates);
+                document.getElementById('originalDay').addEventListener('change', checkDates);
+                
+                // Add date validation for amendment date
+                document.getElementById('amendmentYear').addEventListener('change', checkDates);
+                document.getElementById('amendmentMonth').addEventListener('change', checkDates);
+                document.getElementById('amendmentDay').addEventListener('change', checkDates);
+            }
+            
+            // Function to check dates and show warnings
+            function checkDates() {
+                const originalMonth = document.getElementById('originalMonth').value;
+                const originalDay = document.getElementById('originalDay').value;
+                const originalYear = document.getElementById('originalYear').value;
+                const originalDate = new Date(`${originalMonth} ${originalDay}, ${originalYear}`);
+                
+                const amendmentMonth = document.getElementById('amendmentMonth').value;
+                const amendmentDay = document.getElementById('amendmentDay').value;
+                const amendmentYear = document.getElementById('amendmentYear').value;
+                const amendmentDate = new Date(`${amendmentMonth} ${amendmentDay}, ${amendmentYear}`);
+                
+                const currentDate = new Date();
+                
+                // Check if original date is in the future
+                const originalDateWarning = document.getElementById('originalDateWarning');
+                if (originalDate > currentDate) {
+                    originalDateWarning.style.display = 'block';
+                } else {
+                    originalDateWarning.style.display = 'none';
+                }
+                
+                // Check if amendment date is before original date
+                const amendmentDateWarning = document.getElementById('amendmentDateWarning');
+                if (amendmentDate < originalDate) {
+                    amendmentDateWarning.style.display = 'block';
+                } else {
+                    amendmentDateWarning.style.display = 'none';
+                }
+            }
             
             // Add event listeners to form elements
             document.querySelectorAll('.form-input, input[type="radio"]').forEach(input => {
@@ -1858,17 +1971,58 @@
             window.copyAmendment = function() {
                 const amendmentText = preview.innerText;
                 
-                navigator.clipboard.writeText(amendmentText).then(function() {
-                    copyMessage.style.display = 'inline-block';
-                    
-                    setTimeout(() => {
-                        copyMessage.style.display = 'none';
-                    }, 3000);
-                }).catch(function(err) {
-                    console.error('Could not copy text: ', err);
-                    alert('Failed to copy amendment. Please try selecting and copying the text manually.');
-                });
+                // Modern clipboard method
+                try {
+                    // First try using the Clipboard API
+                    navigator.clipboard.writeText(amendmentText).then(function() {
+                        copyMessage.style.display = 'inline-block';
+                        
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    }).catch(function(err) {
+                        // If Clipboard API fails, try fallback method
+                        fallbackCopyTextToClipboard(amendmentText);
+                    });
+                } catch (err) {
+                    // If modern API not available, try fallback
+                    fallbackCopyTextToClipboard(amendmentText);
+                }
             };
+            
+            // Fallback copy method for browsers that don't support clipboard API
+            function fallbackCopyTextToClipboard(text) {
+                try {
+                    // Create temporary element
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    
+                    // Make the textarea out of viewport
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    // Execute copy command
+                    const successful = document.execCommand('copy');
+                    
+                    // Remove temporary element
+                    document.body.removeChild(textArea);
+                    
+                    if (successful) {
+                        copyMessage.style.display = 'inline-block';
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert('Failed to copy amendment. Please select and copy the text manually.');
+                    }
+                } catch (err) {
+                    alert('Failed to copy amendment. Please select and copy the text manually.');
+                }
+            }
             
             // Download as DOCX function
             window.downloadAmendment = function() {
@@ -1884,10 +2038,14 @@
                     const originalTitle = document.getElementById('originalTitle').value;
                     const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
                     
+                    // Get first party and second party for signature
+                    const firstParty = document.getElementById('firstParty').value;
+                    const secondParty = document.getElementById('secondParty').value;
+                    
                     // Create document sections
                     const paragraphs = [];
                     
-                    // Add title
+                    // Add title with same size as text (11pt)
                     paragraphs.push(
                         new docx.Paragraph({
                             alignment: docx.AlignmentType.CENTER,
@@ -1899,18 +2057,29 @@
                                 new docx.TextRun({
                                     text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
                                     bold: true,
-                                    size: 28
+                                    size: 22 // 11pt font size (in half-points)
                                 })
                             ]
                         })
                     );
                     
-                    // Get all paragraphs from the preview
-                    const previewParagraphs = preview.querySelectorAll('p');
+                    // Get all paragraphs from the preview but exclude signature section
+                    // We'll handle that specially with a table
+                    const previewParagraphs = preview.querySelectorAll('p:not([style*="margin-top"])');
                     
                     previewParagraphs.forEach(p => {
                         // Skip empty paragraphs
                         if (!p.textContent.trim()) return;
+                        
+                        // Skip paragraphs that are part of the signature block
+                        if (p.textContent.includes("FIRST PARTY:") || 
+                            p.textContent.includes("SECOND PARTY:") ||
+                            p.textContent.includes("By:") ||
+                            p.textContent.includes("Name:") ||
+                            p.textContent.includes("Title:") ||
+                            p.textContent.includes("Date:")) {
+                            return;
+                        }
                         
                         paragraphs.push(
                             new docx.Paragraph({
@@ -1923,12 +2092,18 @@
                         );
                     });
                     
-                    // Get all section titles
+                    // Get all section titles but process them to avoid duplication
                     const sectionTitles = preview.querySelectorAll('.section-title');
+                    const processedTitles = new Set();
                     
                     sectionTitles.forEach(title => {
-                        // Find the index where this title should go
                         const titleText = title.textContent;
+                        
+                        // Skip if we've already processed this title
+                        if (processedTitles.has(titleText)) return;
+                        processedTitles.add(titleText);
+                        
+                        // Find the appropriate position for the title
                         let insertIndex = paragraphs.length;
                         
                         // Find where to insert this section title
@@ -1936,7 +2111,7 @@
                             if (previewParagraphs[i].textContent.includes(titleText)) {
                                 // Find the corresponding paragraph in our paragraphs array
                                 for (let j = 0; j < paragraphs.length; j++) {
-                                    if (paragraphs[j].text === previewParagraphs[i].textContent) {
+                                    if (paragraphs[j].text && paragraphs[j].text.includes(previewParagraphs[i].textContent)) {
                                         insertIndex = j;
                                         break;
                                     }
@@ -1945,14 +2120,14 @@
                             }
                         }
                         
-                        // Insert the section title
+                        // Insert the section title - keep size consistent with text
                         paragraphs.splice(insertIndex, 0, 
                             new docx.Paragraph({
                                 children: [
                                     new docx.TextRun({
                                         text: titleText,
                                         bold: true,
-                                        size: 24
+                                        size: 22 // 11pt
                                     })
                                 ],
                                 spacing: {
@@ -1963,13 +2138,142 @@
                         );
                     });
                     
+                    // Add signature table at the end
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            text: "IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.",
+                            spacing: {
+                                before: 240,
+                                after: 240
+                            }
+                        })
+                    );
+                    
+                    // Create signature table - transparent borders
+                    const signatureTable = new docx.Table({
+                        rows: [
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "FIRST PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: firstParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    }),
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "SECOND PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: secondParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    })
+                                ]
+                            })
+                        ],
+                        width: {
+                            size: 100,
+                            type: docx.WidthType.PERCENTAGE,
+                        },
+                        borders: {
+                            top: { style: docx.BorderStyle.NONE },
+                            bottom: { style: docx.BorderStyle.NONE },
+                            left: { style: docx.BorderStyle.NONE },
+                            right: { style: docx.BorderStyle.NONE }
+                        }
+                    });
+                    
+                    paragraphs.push(signatureTable);
+                    
                     // Create document with proper settings
                     const doc = new docx.Document({
                         styles: {
                             default: {
                                 document: {
                                     run: {
-                                        size: 11 * 2, // 11pt font size (in half-points)
+                                        size: 22, // 11pt font size (in half-points)
                                         font: "Times New Roman"
                                     },
                                     paragraph: {
