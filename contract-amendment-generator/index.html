@@ -114,10 +114,37 @@
             position: relative;
         }
         
-        /* No-copy overlay for preview box (before payment) */
+        /* No-copy protection for preview box (before payment) */
         .preview-box.locked {
             user-select: none;
             position: relative;
+        }
+        
+        /* Semi-transparent payment banner instead of full overlay */
+        .payment-banner {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            z-index: 100;
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .payment-banner-heading {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .payment-banner-text {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
         }
         
         .form-section {
@@ -452,35 +479,36 @@
             margin-bottom: 8px;
         }
         
-        /* Paywall styles */
+        /* Paywall styles - converted to bottom banner instead of full overlay */
         .paywall-overlay {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.95);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             z-index: 100;
-            padding: 20px;
+            padding: 15px;
             text-align: center;
-            border-radius: var(--border-radius);
+            border-top: 1px solid var(--border-color);
+            box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.1);
+            max-height: 50%; /* Limit to at most half the preview height */
+            overflow-y: auto;
         }
         
         .paywall-heading {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #2c3e50;
         }
         
         .paywall-text {
-            font-size: 15px;
+            font-size: 14px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             max-width: 500px;
         }
         
@@ -1168,6 +1196,11 @@
             }
         }
         
+        /* Add some padding to the bottom of the preview to ensure content isn't hidden behind the paywall banner */
+        .preview-box.locked .document-template {
+            padding-bottom: 200px; /* Adjust based on the height of your paywall banner */
+        }
+        
         @media print {
             .form-container, 
             .header, 
@@ -1191,6 +1224,10 @@
                 overflow: visible;
                 border: none;
                 padding: 0;
+            }
+            
+            .preview-box.locked .document-template {
+                padding-bottom: 0; /* Remove padding during print */
             }
         }
     </style>
@@ -1643,10 +1680,10 @@
                         <!-- Amendment will be populated here by JavaScript -->
                     </div>
                     
-                    <!-- Paywall Overlay -->
+                    <!-- Paywall Banner (bottom of preview instead of full overlay) -->
                     <div class="paywall-overlay" id="paywallOverlay">
                         <h2 class="paywall-heading">Unlock Full Features</h2>
-                        <p class="paywall-text">To download or copy this amendment, please complete your purchase. The preview shows exactly how your document will look.</p>
+                        <p class="paywall-text">To download or copy this amendment, please complete your purchase.</p>
                         
                         <!-- Transaction ID Verification -->
                         <div class="transaction-verification">
