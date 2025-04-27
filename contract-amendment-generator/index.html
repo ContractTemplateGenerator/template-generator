@@ -39,6 +39,7 @@
             border-radius: var(--border-radius);
             box-shadow: var(--shadow);
             overflow: hidden;
+            position: relative;
         }
         
         .header {
@@ -114,103 +115,45 @@
             position: relative;
         }
         
-        /* Paywall overlay styles */
-        .paywall-overlay {
+        /* Paywall overlay for preview */
+        .preview-paywall {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             z-index: 10;
-            backdrop-filter: blur(2px); /* Slight blur effect */
-            user-select: none; /* Prevent text selection */
+            transition: opacity 0.3s ease;
+        }
+        
+        .preview-paywall.unlocked {
+            opacity: 0;
+            pointer-events: none;
         }
         
         .paywall-message {
-            background-color: rgba(44, 62, 80, 0.9);
-            color: white;
+            background: white;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             text-align: center;
-            max-width: 80%;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            max-width: 90%;
+            margin-bottom: 20px;
         }
         
         .paywall-message h3 {
+            color: #2c3e50;
             margin-bottom: 10px;
         }
         
         .paywall-message p {
             margin-bottom: 15px;
-        }
-        
-        /* PayPal button styles */
-        .pp-ND34QUSW8KAJA {
-            text-align: center;
-            border: none;
-            border-radius: 0.25rem;
-            min-width: 11.625rem;
-            padding: 0 2rem;
-            height: 2.625rem;
-            font-weight: bold;
-            background-color: #FFD140;
-            color: #000000;
-            font-family: "Helvetica Neue", Arial, sans-serif;
-            font-size: 1rem;
-            line-height: 1.25rem;
-            cursor: pointer;
-            margin-bottom: 10px;
-        }
-        
-        /* Fallback unlock form */
-        .transaction-id-form {
-            margin-top: 15px;
-            text-align: center;
-        }
-        
-        .transaction-id-input {
-            padding: 8px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            width: 200px;
-            margin-right: 5px;
-        }
-        
-        .unlock-btn {
-            padding: 8px 10px;
-            background-color: #3498db;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        
-        .unlock-btn:hover {
-            background-color: #2980b9;
-        }
-        
-        .locked-preview {
-            user-select: none; /* Prevent text selection */
-            filter: blur(0.3px); /* Reduced blur for better visibility while still protected */
-            pointer-events: none; /* Prevent interaction */
-        }
-        
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 72px;
-            color: rgba(44, 62, 80, 0.1);
-            font-weight: bold;
-            text-transform: uppercase;
-            white-space: nowrap;
-            pointer-events: none;
         }
         
         .form-section {
@@ -427,9 +370,14 @@
             background-color: #2980b9;
         }
         
-        .btn-copy:disabled {
-            background-color: #bdc3c7;
+        .btn-locked {
+            background-color: #cccccc;
+            color: #888888;
             cursor: not-allowed;
+        }
+        
+        .btn-locked:hover {
+            background-color: #cccccc;
         }
         
         .btn-download {
@@ -439,11 +387,6 @@
         
         .btn-download:hover {
             background-color: #219653;
-        }
-        
-        .btn-download:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
         }
         
         .copy-message {
@@ -469,6 +412,71 @@
         
         .btn-consult:hover {
             background-color: #1e2a37;
+        }
+        
+        /* Manual unlock section */
+        .manual-unlock {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .manual-unlock h4 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #2c3e50;
+        }
+        
+        .manual-unlock input {
+            width: 70%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-right: 5px;
+        }
+        
+        .manual-unlock button {
+            padding: 8px 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Document styles */
+        .document-template {
+            font-family: "Times New Roman", Times, serif;
+            user-select: none;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .document-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            display: inline;
+        }
+        
+        /* Highlight effect */
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s ease;
         }
         
         /* Compact accordion styles */
@@ -517,37 +525,27 @@
             border-radius: 0 0 6px 6px;
             margin-bottom: 8px;
         }
-        
-        /* Document styles */
-        .document-template {
-            font-family: "Times New Roman", Times, serif;
-        }
-        
-        .document-title {
+
+        /* PayPal button styling */
+        .pp-button-container {
+            margin-top: 15px;
             text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 20px;
         }
-        
-        .document-section {
-            margin-bottom: 20px;
+
+        .pp-button-container .cards-img {
+            margin: 8px 0;
+            max-width: 200px;
         }
-        
-        .section-title {
-            font-weight: bold;
-            margin-bottom: 10px;
+
+        .pp-powered {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
         }
-        
-        .field-label {
-            font-weight: bold;
-            display: inline;
-        }
-        
-        /* Highlight effect */
-        .highlight {
-            background-color: var(--highlight-color);
-            transition: background-color 0.5s ease;
+
+        .pp-powered img {
+            height: 14px;
+            vertical-align: middle;
         }
         
         @media (max-width: 1024px) {
@@ -600,9 +598,7 @@
             .header, 
             .form-actions, 
             .preview-header,
-            .btn-consult,
-            .paywall-overlay,
-            .watermark {
+            .btn-consult {
                 display: none;
             }
             
@@ -619,12 +615,6 @@
                 overflow: visible;
                 border: none;
                 padding: 0;
-            }
-            
-            .locked-preview {
-                user-select: auto;
-                filter: none;
-                pointer-events: auto;
             }
         }
     </style>
@@ -912,11 +902,30 @@
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
-                            <button type="button" id="copyBtn" class="btn btn-copy" onclick="copyAmendment()">Copy Amendment</button>
+                            <button type="button" id="copyBtn" class="btn btn-locked" disabled>Copy Amendment</button>
                             <span id="copyMessage" class="copy-message">Amendment copied!</span>
-                            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadAmendment()">Download as DOCX</button>
+                            <button type="button" id="downloadBtn" class="btn btn-locked" disabled>Download as DOCX</button>
                         </div>
                         <button type="reset" class="btn btn-reset" onclick="resetForm()">Reset Form</button>
+                    </div>
+                    
+                    <!-- Payment section -->
+                    <div class="pp-button-container">
+                        <style>.pp-ND34QUSW8KAJA{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+                        <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+                            <input class="pp-ND34QUSW8KAJA" type="submit" value="Buy Now" />
+                            <img class="cards-img" src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
+                            <section class="pp-powered">
+                                Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/>
+                            </section>
+                        </form>
+                    </div>
+                    
+                    <!-- Manual unlock section -->
+                    <div class="manual-unlock">
+                        <h4>Already paid? Enter PayPal transaction ID</h4>
+                        <input type="text" id="transactionId" placeholder="e.g., 1AB23456CD789012E">
+                        <button onclick="manualUnlock()">Unlock</button>
                     </div>
                     
                     <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
@@ -934,39 +943,15 @@
                 
                 <div class="preview-box">
                     <!-- Paywall overlay -->
-                    <div class="paywall-overlay" id="paywallOverlay">
+                    <div id="previewPaywall" class="preview-paywall">
                         <div class="paywall-message">
                             <h3>Unlock Full Access</h3>
-                            <p>Preview your amendment for free, customize it to your needs, then unlock to copy or download.</p>
-                            
-                            <!-- PayPal button -->
-                            <div id="paypal-container-KF5Z5KXL2RCHJ"></div>
-                            <script 
-                                src="https://www.paypal.com/sdk/js?client-id=BAAgTb2uhmcrPfZVsUbREYsqOgos8TI_UzVWxMmC1Gj0D8ek_GK7qHVAL9UgpBIVLXnUaPAo3scmaTKX5U&components=hosted-buttons&enable-funding=venmo&currency=USD">
-                            </script>
-                            <script>
-                                paypal.HostedButtons({
-                                    hostedButtonId: "KF5Z5KXL2RCHJ",
-                                    onApprove: function(data) {
-                                        console.log("Payment completed!");
-                                        localStorage.setItem('contractGenUnlocked', 'true');
-                                        unlockGenerator();
-                                    }
-                                }).render("#paypal-container-KF5Z5KXL2RCHJ");
-                            </script>
-                            
-                            <!-- Fallback for manual unlock -->
-                            <div class="transaction-id-form">
-                                <p style="font-size: 12px; margin-bottom: 10px;">Already paid? Enter your PayPal transaction ID:</p>
-                                <input type="text" id="transactionId" class="transaction-id-input" placeholder="Transaction ID">
-                                <button type="button" class="unlock-btn" onclick="manualUnlock()">Unlock</button>
-                            </div>
+                            <p>Preview is available, but copying, downloading and selection are locked.</p>
+                            <p>Purchase to unlock all features and generate your document.</p>
                         </div>
                     </div>
                     
-                    <div class="watermark" id="previewWatermark">PREVIEW</div>
-                    
-                    <div class="document-template locked-preview" id="amendmentPreview">
+                    <div class="document-template" id="amendmentPreview">
                         <!-- Amendment will be populated here by JavaScript -->
                     </div>
                 </div>
@@ -982,9 +967,6 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Check for payment status on page load
-            checkPaymentStatus();
-            
             // Initialize form elements
             const form = document.getElementById('amendmentForm');
             const preview = document.getElementById('amendmentPreview');
@@ -992,12 +974,19 @@
             const previewBox = document.querySelector('.preview-box');
             const copyBtn = document.getElementById('copyBtn');
             const downloadBtn = document.getElementById('downloadBtn');
+            const previewPaywall = document.getElementById('previewPaywall');
             
             // Add hint tooltips to form elements
             addTooltips();
             
+            // Check if the user has already paid
+            checkPaymentStatus();
+            
             // Variables to track highlighting
             let highlightTimeout;
+            
+            // Save form data in localStorage
+            let formData = {};
             
             // Initialize preview
             updatePreview();
@@ -1012,85 +1001,121 @@
                 });
             });
             
-            // Functions for payment handling
-            
-            // Check if payment is completed
+            // Function to check payment status
             function checkPaymentStatus() {
-                // Check URL for payment success parameter
+                // Check URL parameters for payment success
                 const urlParams = new URLSearchParams(window.location.search);
-                if (urlParams.has('payment354785') && urlParams.get('payment354785') === 'success') {
+                if (urlParams.get('payment354785') === 'success') {
                     unlockGenerator();
-                    restoreFormState();
+                    
+                    // Load previously saved form data if available
+                    loadFormData();
+                    return;
                 }
                 
-                // Check if we have a stored unlock status in localStorage
-                if (localStorage.getItem('contractGenUnlocked') === 'true') {
+                // Check if a transaction ID has been previously saved
+                const savedTransactionId = localStorage.getItem('amendmentGeneratorTransactionId');
+                if (savedTransactionId) {
                     unlockGenerator();
-                    restoreFormState();
+                    
+                    // Load previously saved form data if available
+                    loadFormData();
+                    return;
                 }
             }
             
-            // Save form state before payment
-            window.saveStateBeforePayment = function() {
-                const formData = {};
+            // Unlock generator function
+            function unlockGenerator() {
+                previewPaywall.classList.add('unlocked');
                 
-                // Save all input values
-                document.querySelectorAll('#amendmentForm .form-input').forEach(input => {
-                    formData[input.id] = input.value;
-                });
+                // Enable copy and download buttons
+                copyBtn.classList.remove('btn-locked');
+                copyBtn.classList.add('btn-copy');
+                copyBtn.disabled = false;
                 
-                // Save radio button states
-                document.querySelectorAll('#amendmentForm input[type="radio"]').forEach(radio => {
-                    if (radio.checked) {
-                        formData[radio.name] = radio.value;
+                downloadBtn.classList.remove('btn-locked');
+                downloadBtn.classList.add('btn-download');
+                downloadBtn.disabled = false;
+                
+                // Make preview selectable
+                document.querySelector('.document-template').style.userSelect = 'text';
+            }
+            
+            // Manual unlock function
+            window.manualUnlock = function() {
+                const transactionId = document.getElementById('transactionId').value.trim();
+                
+                if (transactionId.length > 0) {
+                    // Save the transaction ID in localStorage
+                    localStorage.setItem('amendmentGeneratorTransactionId', transactionId);
+                    
+                    // Unlock the generator
+                    unlockGenerator();
+                    
+                    // Load saved form data if available
+                    loadFormData();
+                    
+                    alert('Generator unlocked successfully!');
+                } else {
+                    alert('Please enter a transaction ID');
+                }
+            };
+            
+            // Function to save form data to localStorage
+            function saveFormData() {
+                // Collect all form input values
+                const formInputs = form.querySelectorAll('input, select, textarea');
+                formInputs.forEach(input => {
+                    if (input.type === 'radio') {
+                        if (input.checked) {
+                            formData[input.name] = input.value;
+                        }
+                    } else {
+                        formData[input.id] = input.value;
                     }
                 });
                 
                 // Save to localStorage
-                localStorage.setItem('contractGenFormData', JSON.stringify(formData));
-                localStorage.setItem('contractGenSaveTime', Date.now().toString());
-            };
+                localStorage.setItem('amendmentGeneratorFormData', JSON.stringify(formData));
+            }
             
-            // Restore form state after payment
-            function restoreFormState() {
-                const savedData = localStorage.getItem('contractGenFormData');
+            // Function to load form data from localStorage
+            function loadFormData() {
+                const savedData = localStorage.getItem('amendmentGeneratorFormData');
                 if (!savedData) return;
                 
                 try {
-                    const formData = JSON.parse(savedData);
+                    formData = JSON.parse(savedData);
                     
-                    // Restore input values
-                    for (const [id, value] of Object.entries(formData)) {
-                        const element = document.getElementById(id);
-                        if (element && element.tagName.toLowerCase() !== 'input' || element?.type !== 'radio') {
-                            if (element) element.value = value;
-                        }
-                    }
-                    
-                    // Restore radio buttons
-                    for (const [name, value] of Object.entries(formData)) {
-                        if (name.includes('Type')) {
-                            const radio = document.querySelector(`input[name="${name}"][value="${value}"]`);
-                            if (radio) {
-                                radio.checked = true;
-                                
-                                // Update styling for radio options
-                                document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
-                                    const option = r.closest('.radio-option');
-                                    if (option) {
-                                        option.classList.toggle('selected', r.checked);
-                                    }
-                                });
-                                
-                                // Handle extension type toggling
-                                if (name === 'extensionType') {
-                                    toggleExtensionDetails(value);
-                                }
+                    // Populate form fields
+                    for (const [key, value] of Object.entries(formData)) {
+                        const element = document.getElementById(key);
+                        if (element) {
+                            if (element.type === 'radio') {
+                                element.checked = (element.value === value);
+                            } else {
+                                element.value = value;
                             }
                         }
+                        
+                        // Handle radio buttons by name
+                        if (key.includes('Type')) {
+                            const radios = document.querySelectorAll(`input[name="${key}"]`);
+                            radios.forEach(radio => {
+                                if (radio.value === value) {
+                                    radio.checked = true;
+                                    // Trigger change event to update UI
+                                    const changeEvent = new Event('change', { bubbles: true });
+                                    radio.dispatchEvent(changeEvent);
+                                }
+                            });
+                        }
                     }
                     
-                    // Handle specific display toggles
+                    // Update the preview with the loaded data
+                    updatePreview();
+                    
+                    // Handle special cases like showing/hiding custom fields
                     if (formData.extensionLength === 'custom') {
                         document.getElementById('custom-extension-group').style.display = 'block';
                     }
@@ -1103,54 +1128,14 @@
                         document.getElementById('custom-terms-group').style.display = 'block';
                     }
                     
-                    // Update the preview
-                    updatePreview();
-                    
+                    // Load appropriate amendment details section
+                    if (formData.amendmentPurpose) {
+                        loadAmendmentDetailsSection(formData.amendmentPurpose);
+                    }
                 } catch (error) {
-                    console.error('Error restoring form state:', error);
+                    console.error('Error loading saved form data:', error);
                 }
             }
-            
-            // Unlock the generator
-            function unlockGenerator() {
-                // Hide the paywall overlay
-                document.getElementById('paywallOverlay').style.display = 'none';
-                
-                // Remove the watermark
-                document.getElementById('previewWatermark').style.display = 'none';
-                
-                // Enable the copy and download buttons
-                copyBtn.disabled = false;
-                downloadBtn.disabled = false;
-                
-                // Remove the locked-preview class
-                preview.classList.remove('locked-preview');
-                
-                // Save unlock status to localStorage
-                localStorage.setItem('contractGenUnlocked', 'true');
-            }
-            
-            // Manual unlock with transaction ID - requires PayPal transaction ID format
-            window.manualUnlock = function() {
-                const transactionId = document.getElementById('transactionId').value;
-                
-                // PayPal transaction IDs typically have this format: alphanumeric, often 17 characters
-                // e.g., "1AB23456CD789012E"
-                const paypalTxnIdRegex = /^[A-Za-z0-9]{10,20}$/;
-                
-                if (transactionId && paypalTxnIdRegex.test(transactionId)) {
-                    unlockGenerator();
-                    restoreFormState();
-                    
-                    // Add a small delay before scrolling to ensure the form is fully restored
-                    setTimeout(() => {
-                        // Scroll to the form section for better UX
-                        document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
-                    }, 100);
-                } else {
-                    alert('Please enter a valid PayPal transaction ID');
-                }
-            };
             
             // Function to add tooltips and help text
             function addTooltips() {
@@ -1216,6 +1201,9 @@
                         // Update preview
                         updatePreview(this.name);
                         copyMessage.style.display = 'none';
+                        
+                        // Save form data
+                        saveFormData();
                     });
                 } else {
                     // Regular input event
@@ -1245,6 +1233,9 @@
                         if (this.id === 'amendmentPurpose') {
                             loadAmendmentDetailsSection(this.value);
                         }
+                        
+                        // Save form data
+                        saveFormData();
                     });
                     
                     // For select elements, we need change event
@@ -1275,6 +1266,9 @@
                             if (this.id === 'amendmentPurpose') {
                                 loadAmendmentDetailsSection(this.value);
                             }
+                            
+                            // Save form data
+                            saveFormData();
                         });
                     }
                 }
@@ -1612,17 +1606,26 @@
                                 
                                 // Update preview
                                 updatePreview(this.name);
+                                
+                                // Save form data
+                                saveFormData();
                             });
                         } else {
                             // Regular input event
                             input.addEventListener('input', function() {
                                 updatePreview(this.id);
+                                
+                                // Save form data
+                                saveFormData();
                             });
                             
                             // For select elements
                             if (input.tagName.toLowerCase() === 'select') {
                                 input.addEventListener('change', function() {
                                     updatePreview(this.id);
+                                    
+                                    // Save form data
+                                    saveFormData();
                                 });
                             }
                         }
@@ -1871,18 +1874,18 @@
                                 <td style="width: 50%; vertical-align: top; padding-right: 20px;">
                                     <p><strong>FIRST PARTY:</strong></p>
                                     <p>${firstParty}</p>
-                                    <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p style="margin-top: 20px;">Name: _____________________________</p>
-                                    <p style="margin-top: 20px;">Title: ______________________________</p>
-                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                    <p style="margin-top: 25px;">By: ________________________________</p>
+                                    <p style="margin-top: 15px;">Name: _____________________________</p>
+                                    <p style="margin-top: 15px;">Title: ______________________________</p>
+                                    <p style="margin-top: 15px;">Date: ______________________________</p>
                                 </td>
                                 <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                                     <p><strong>SECOND PARTY:</strong></p>
                                     <p>${secondParty}</p>
-                                    <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p style="margin-top: 20px;">Name: _____________________________</p>
-                                    <p style="margin-top: 20px;">Title: ______________________________</p>
-                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                    <p style="margin-top: 25px;">By: ________________________________</p>
+                                    <p style="margin-top: 15px;">Name: _____________________________</p>
+                                    <p style="margin-top: 15px;">Title: ______________________________</p>
+                                    <p style="margin-top: 15px;">Date: ______________________________</p>
                                 </td>
                             </tr>
                         </table>
@@ -1895,11 +1898,6 @@
                 // If a specific field was changed, highlight the relevant content
                 if (changedField) {
                     highlightChangedContent(changedField);
-                }
-                
-                // Save form state to localStorage (for auto-recovery)
-                if (localStorage.getItem('contractGenUnlocked') === 'true') {
-                    saveStateBeforePayment();
                 }
             }
             
@@ -2070,4 +2068,540 @@
                     case 'originalLanguage':
                     case 'newLanguage':
                         // For custom amendment fields
-                        if (changedField === '
+                        if (changedField === 'clauseToAmend') {
+                            const clauseToAmend = document.getElementById('clauseToAmend')?.value || '';
+                            applyHighlightToMatches(clauseToAmend);
+                        } else if (changedField === 'originalLanguage') {
+                            const originalLanguage = document.getElementById('originalLanguage')?.value || '';
+                            applyHighlightToMatches(originalLanguage);
+                        } else if (changedField === 'newLanguage') {
+                            const newLanguage = document.getElementById('newLanguage')?.value || '';
+                            applyHighlightToMatches(newLanguage);
+                        }
+                        break;
+                    
+                    case 'additionalTerms':
+                        // For additional terms
+                        const additionalTerms = document.getElementById('additionalTerms')?.value || '';
+                        if (additionalTerms) {
+                            applyHighlightToMatches(additionalTerms);
+                        }
+                        break;
+                    
+                    case 'originalTerms':
+                    case 'customTermsStatement':
+                        // For original terms statement
+                        const originalTermsStatus = document.getElementById('originalTerms').value;
+                        let originalTermsText = '';
+                        
+                        if (originalTermsStatus === 'remain') {
+                            originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
+                        } else if (originalTermsStatus === 'supersede') {
+                            originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
+                        } else if (originalTermsStatus === 'custom') {
+                            originalTermsText = document.getElementById('customTermsStatement').value || '';
+                        }
+                        
+                        applyHighlightToMatches(originalTermsText);
+                        break;
+                }
+                
+                // For amendment purpose changes, which requires a more specific approach
+                if (changedField === 'amendmentPurpose') {
+                    const purpose = document.getElementById('amendmentPurpose').value;
+                    
+                    // Find the first section after "1. AMENDMENTS" and highlight it
+                    const relevantSection = findFirstAmendmentSection();
+                    if (relevantSection) {
+                        relevantSection.classList.add('highlight');
+                        scrollToElement(relevantSection);
+                        
+                        // Set timeout to clear highlight
+                        highlightTimeout = setTimeout(() => {
+                            relevantSection.classList.remove('highlight');
+                        }, 5000);
+                    }
+                }
+            }
+            
+            // Helper function to find the first content after "1. AMENDMENTS"
+            function findFirstAmendmentSection() {
+                const sectionTitles = document.querySelectorAll('.section-title');
+                for (const title of sectionTitles) {
+                    if (title.textContent.includes('1. AMENDMENTS')) {
+                        let nextElement = title.nextElementSibling;
+                        while (nextElement && nextElement.tagName.toLowerCase() !== 'p') {
+                            nextElement = nextElement.nextElementSibling;
+                        }
+                        return nextElement;
+                    }
+                }
+                return null;
+            }
+            
+            // Function to apply highlights to matching text and scroll if needed
+            function applyHighlightToMatches(text) {
+                if (!text || text.trim() === '') return;
+                
+                // Clean the text for safe regex use
+                const cleanedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\                        highlightTimeout = setTimeout(() => {
+                            relevantSection.classList');
+                
+                // Find all text nodes in the preview
+                const textNodes = [];
+                const walk = document.createTreeWalker(
+                    preview,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+                
+                let node;
+                let highlighted = false;
+                
+                while (node = walk.nextNode()) {
+                    if (node.nodeValue.includes(text)) {
+                        // Get the parent element
+                        const parentElement = node.parentElement;
+                        
+                        // Get the current content
+                        const currentText = node.nodeValue;
+                        
+                        // Create a new HTML content with the matched text wrapped in a highlight span
+                        const newHtml = currentText.replace(
+                            new RegExp(cleanedText, 'g'), 
+                            '<span class="highlight">                        highlightTimeout = setTimeout(() => {
+                            relevantSection.classList</span>'
+                        );
+                        
+                        // Create a temporary element
+                        const tempElement = document.createElement('div');
+                        tempElement.innerHTML = newHtml;
+                        
+                        // Get the highlight element for scrolling later
+                        const highlightSpan = tempElement.querySelector('.highlight');
+                        
+                        // Replace the text node with the new HTML
+                        const range = document.createRange();
+                        range.selectNode(node);
+                        range.deleteContents();
+                        
+                        // Insert the new nodes
+                        const fragment = document.createDocumentFragment();
+                        let child;
+                        while (child = tempElement.firstChild) {
+                            fragment.appendChild(child);
+                        }
+                        range.insertNode(fragment);
+                        
+                        // Find the newly inserted highlight span for scrolling
+                        const insertedHighlight = parentElement.querySelector('.highlight');
+                        if (insertedHighlight && !highlighted) {
+                            scrollToElement(insertedHighlight);
+                            highlighted = true;
+                            
+                            // Set timeout to clear highlight
+                            highlightTimeout = setTimeout(() => {
+                                document.querySelectorAll('.highlight').forEach(el => {
+                                    const parent = el.parentNode;
+                                    if (parent) {
+                                        parent.replaceChild(document.createTextNode(el.textContent), el);
+                                        parent.normalize();
+                                    }
+                                });
+                            }, 5000);
+                        }
+                        
+                        break; // Only highlight the first occurrence to avoid multiple scrolling
+                    }
+                }
+            }
+            
+            // Function to scroll to an element
+            function scrollToElement(element) {
+                if (!element) return;
+                
+                const elementRect = element.getBoundingClientRect();
+                const previewRect = previewBox.getBoundingClientRect();
+                
+                if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
+            }
+            
+            // Reset form function
+            window.resetForm = function() {
+                form.reset();
+                
+                // Reset radio options
+                document.querySelectorAll('.radio-option').forEach(option => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio) {
+                        option.classList.toggle('selected', radio.checked);
+                    }
+                });
+                
+                // Reset accordions
+                document.getElementById('amendmentDetailsHeader').classList.add('active');
+                document.getElementById('amendmentDetailsSection').style.display = 'block';
+                document.getElementById('additionalTermsHeader').classList.remove('active');
+                document.getElementById('additionalTermsSection').style.display = 'none';
+                
+                // Reset conditional sections
+                document.getElementById('fixed-extension-details').style.display = 'block';
+                document.getElementById('indefinite-extension-details').style.display = 'none';
+                document.getElementById('custom-extension-group').style.display = 'none';
+                document.getElementById('custom-termination-group').style.display = 'none';
+                document.getElementById('custom-terms-group').style.display = 'none';
+                
+                // Reset to default amendment purpose
+                document.getElementById('amendmentPurpose').value = 'extend';
+                loadAmendmentDetailsSection('extend');
+                
+                // Clear any highlights and update the preview
+                clearAllHighlights();
+                updatePreview();
+                copyMessage.style.display = 'none';
+                
+                // Clear saved form data
+                localStorage.removeItem('amendmentGeneratorFormData');
+                formData = {};
+            };
+            
+            // Copy amendment function
+            window.copyAmendment = function() {
+                // Check if generator is unlocked
+                if (copyBtn.classList.contains('btn-locked')) {
+                    alert('Please purchase to unlock copying feature.');
+                    return;
+                }
+                
+                const amendmentText = preview.innerText;
+                
+                // Modern clipboard method
+                try {
+                    // First try using the Clipboard API
+                    navigator.clipboard.writeText(amendmentText).then(function() {
+                        copyMessage.style.display = 'inline-block';
+                        
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    }).catch(function(err) {
+                        // If Clipboard API fails, try fallback method
+                        fallbackCopyTextToClipboard(amendmentText);
+                    });
+                } catch (err) {
+                    // If modern API not available, try fallback
+                    fallbackCopyTextToClipboard(amendmentText);
+                }
+            };
+            
+            // Fallback copy method for browsers that don't support clipboard API
+            function fallbackCopyTextToClipboard(text) {
+                try {
+                    // Create temporary element
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    
+                    // Make the textarea out of viewport
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    // Execute copy command
+                    const successful = document.execCommand('copy');
+                    
+                    // Remove temporary element
+                    document.body.removeChild(textArea);
+                    
+                    if (successful) {
+                        copyMessage.style.display = 'inline-block';
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert('Failed to copy amendment. Please select and copy the text manually.');
+                    }
+                } catch (err) {
+                    alert('Failed to copy amendment. Please select and copy the text manually.');
+                }
+            }
+            
+            // Download as DOCX function
+            window.downloadAmendment = function() {
+                // Check if generator is unlocked
+                if (downloadBtn.classList.contains('btn-locked')) {
+                    alert('Please purchase to unlock download feature.');
+                    return;
+                }
+                
+                try {
+                    // Access docx library
+                    const docx = window.docx;
+                    if (!docx) {
+                        throw new Error("DOCX library not loaded");
+                    }
+                    
+                    // Get amendment details for filename
+                    const amendmentNumber = document.getElementById('amendmentNumber').value;
+                    const originalTitle = document.getElementById('originalTitle').value;
+                    const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
+                    
+                    // Get first party and second party for signature
+                    const firstParty = document.getElementById('firstParty').value;
+                    const secondParty = document.getElementById('secondParty').value;
+                    
+                    // Create document sections
+                    const paragraphs = [];
+                    
+                    // Add title with same size as text (11pt)
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: {
+                                before: 240,
+                                after: 240
+                            },
+                            children: [
+                                new docx.TextRun({
+                                    text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
+                                    bold: true,
+                                    size: 22 // 11pt font size (in half-points)
+                                })
+                            ]
+                        })
+                    );
+                    
+                    // Get all paragraphs from the preview but exclude signature section
+                    // We'll handle that specially with a table
+                    const previewParagraphs = preview.querySelectorAll('p:not([style*="margin-top"])');
+                    
+                    previewParagraphs.forEach(p => {
+                        // Skip empty paragraphs
+                        if (!p.textContent.trim()) return;
+                        
+                        // Skip paragraphs that are part of the signature block
+                        if (p.textContent.includes("FIRST PARTY:") || 
+                            p.textContent.includes("SECOND PARTY:") ||
+                            p.textContent.includes("By:") ||
+                            p.textContent.includes("Name:") ||
+                            p.textContent.includes("Title:") ||
+                            p.textContent.includes("Date:")) {
+                            return;
+                        }
+                        
+                        paragraphs.push(
+                            new docx.Paragraph({
+                                text: p.textContent,
+                                spacing: {
+                                    before: 120,
+                                    after: 120
+                                }
+                            })
+                        );
+                    });
+                    
+                    // Get all section titles but process them to avoid duplication
+                    const sectionTitles = preview.querySelectorAll('.section-title');
+                    const processedTitles = new Set();
+                    
+                    sectionTitles.forEach(title => {
+                        const titleText = title.textContent;
+                        
+                        // Skip if we've already processed this title
+                        if (processedTitles.has(titleText)) return;
+                        processedTitles.add(titleText);
+                        
+                        // Find the appropriate position for the title
+                        let insertIndex = paragraphs.length;
+                        
+                        // Find where to insert this section title
+                        for (let i = 0; i < previewParagraphs.length; i++) {
+                            if (previewParagraphs[i].textContent.includes(titleText)) {
+                                // Find the corresponding paragraph in our paragraphs array
+                                for (let j = 0; j < paragraphs.length; j++) {
+                                    if (paragraphs[j].text && paragraphs[j].text.includes(previewParagraphs[i].textContent)) {
+                                        insertIndex = j;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        
+                        // Insert the section title - keep size consistent with text
+                        paragraphs.splice(insertIndex, 0, 
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.TextRun({
+                                        text: titleText,
+                                        bold: true,
+                                        size: 22 // 11pt
+                                    })
+                                ],
+                                spacing: {
+                                    before: 240,
+                                    after: 120
+                                }
+                            })
+                        );
+                    });
+                    
+                    // Add signature table at the end
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            text: "IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.",
+                            spacing: {
+                                before: 240,
+                                after: 240
+                            }
+                        })
+                    );
+                    
+                    // Create signature table - transparent borders
+                    const signatureTable = new docx.Table({
+                        rows: [
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "FIRST PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: firstParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    }),
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "SECOND PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: secondParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    })
+                                ]
+                            })
+                        ],
+                        width: {
+                            size: 100,
+                            type: docx.WidthType.PERCENTAGE,
+                        },
+                        borders: {
+                            top: { style: docx.BorderStyle.NONE },
+                            bottom: { style: docx.BorderStyle.NONE },
+                            left: { style: docx.BorderStyle.NONE },
+                            right: { style: docx.BorderStyle.NONE }
+                        }
+                    });
+                    
+                    paragraphs.push(signatureTable);
+                    
+                    // Create document with proper settings
+                    const doc = new docx.Document({
+                        styles: {
+                            default: {
+                                document: {
+                                    run: {
+                                        size: 22, // 11pt font size (in half-points)
+                                        font: "Times New Roman"
+                                    },
+                                    paragraph: {
+                                        spacing: {
+                                            line: 276, // 1.15x line spacing
+                                            before: 0,
+                                            after: 0
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        sections: [{
+                            properties: {
+                                page: {
+                                    margin: {
+                                        top: 1440, // 1 inch in twips
+                                        right: 1440,
+                                        bottom: 1440,
+                                        left: 1440
+                                    }
+                                }
+                            },
+                            children: paragraphs
+                        }]
+                    });
+                    
+                    // Generate and save document
+                    docx.Packer.toBlob(doc)
+                        .then(blob => {
+                            window.saveAs(blob, filename);
+                        })
+                        .catch(error => {
+                            console.error("Error saving DOCX:", error);
+                            alert("Unable to download. Please try using the copy button instead.");
+                        });
+                } catch (error) {
+                    console.error("DOCX generation error:", error);
+                    alert("Unable to download. Please try using the copy button instead.");
+                }
+            };
+        });
+    </script>
+</body>
+</html>
