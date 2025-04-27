@@ -196,7 +196,7 @@
         
         .locked-preview {
             user-select: none; /* Prevent text selection */
-            filter: blur(0.6px); /* Light blur for clarity but protection */
+            filter: blur(0.3px); /* Reduced blur for better visibility while still protected */
             pointer-events: none; /* Prevent interaction */
         }
         
@@ -912,9 +912,9 @@
                     <!-- Form Actions -->
                     <div class="form-actions">
                         <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
-                            <button type="button" id="copyBtn" class="btn btn-copy" disabled>Copy Amendment</button>
+                            <button type="button" id="copyBtn" class="btn btn-copy" onclick="copyAmendment()">Copy Amendment</button>
                             <span id="copyMessage" class="copy-message">Amendment copied!</span>
-                            <button type="button" id="downloadBtn" class="btn btn-download" disabled>Download as DOCX</button>
+                            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadAmendment()">Download as DOCX</button>
                         </div>
                         <button type="reset" class="btn btn-reset" onclick="resetForm()">Reset Form</button>
                     </div>
@@ -940,13 +940,20 @@
                             <p>Preview your amendment for free, customize it to your needs, then unlock to copy or download.</p>
                             
                             <!-- PayPal button -->
-                            <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;" onsubmit="saveStateBeforePayment()">
-                                <input class="pp-ND34QUSW8KAJA" type="submit" value="Buy Now" />
-                                <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
-                                <section style="font-size: 0.75rem;">
-                                    Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/>
-                                </section>
-                            </form>
+                            <div id="paypal-container-KF5Z5KXL2RCHJ"></div>
+                            <script 
+                                src="https://www.paypal.com/sdk/js?client-id=BAAgTb2uhmcrPfZVsUbREYsqOgos8TI_UzVWxMmC1Gj0D8ek_GK7qHVAL9UgpBIVLXnUaPAo3scmaTKX5U&components=hosted-buttons&enable-funding=venmo&currency=USD">
+                            </script>
+                            <script>
+                                paypal.HostedButtons({
+                                    hostedButtonId: "KF5Z5KXL2RCHJ",
+                                    onApprove: function(data) {
+                                        console.log("Payment completed!");
+                                        localStorage.setItem('contractGenUnlocked', 'true');
+                                        unlockGenerator();
+                                    }
+                                }).render("#paypal-container-KF5Z5KXL2RCHJ");
+                            </script>
                             
                             <!-- Fallback for manual unlock -->
                             <div class="transaction-id-form">
@@ -1123,12 +1130,15 @@
                 localStorage.setItem('contractGenUnlocked', 'true');
             }
             
-            // Manual unlock with transaction ID
+            // Manual unlock with transaction ID - requires PayPal transaction ID format
             window.manualUnlock = function() {
                 const transactionId = document.getElementById('transactionId').value;
                 
-                // Accept any non-empty transaction ID
-                if (transactionId && transactionId.trim().length > 0) {
+                // PayPal transaction IDs typically have this format: alphanumeric, often 17 characters
+                // e.g., "1AB23456CD789012E"
+                const paypalTxnIdRegex = /^[A-Za-z0-9]{10,20}$/;
+                
+                if (transactionId && paypalTxnIdRegex.test(transactionId)) {
                     unlockGenerator();
                     restoreFormState();
                     
@@ -1138,7 +1148,7 @@
                         document.querySelector('.form-section').scrollIntoView({ behavior: 'smooth' });
                     }, 100);
                 } else {
-                    alert('Please enter a transaction ID');
+                    alert('Please enter a valid PayPal transaction ID');
                 }
             };
             
@@ -1862,17 +1872,17 @@
                                     <p><strong>FIRST PARTY:</strong></p>
                                     <p>${firstParty}</p>
                                     <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p>Name: _____________________________</p>
-                                    <p>Title: ______________________________</p>
-                                    <p>Date: ______________________________</p>
+                                    <p style="margin-top: 20px;">Name: _____________________________</p>
+                                    <p style="margin-top: 20px;">Title: ______________________________</p>
+                                    <p style="margin-top: 20px;">Date: ______________________________</p>
                                 </td>
                                 <td style="width: 50%; vertical-align: top; padding-left: 20px;">
                                     <p><strong>SECOND PARTY:</strong></p>
                                     <p>${secondParty}</p>
                                     <p style="margin-top: 30px;">By: ________________________________</p>
-                                    <p>Name: _____________________________</p>
-                                    <p>Title: ______________________________</p>
-                                    <p>Date: ______________________________</p>
+                                    <p style="margin-top: 20px;">Name: _____________________________</p>
+                                    <p style="margin-top: 20px;">Title: ______________________________</p>
+                                    <p style="margin-top: 20px;">Date: ______________________________</p>
                                 </td>
                             </tr>
                         </table>
@@ -2060,372 +2070,4 @@
                     case 'originalLanguage':
                     case 'newLanguage':
                         // For custom amendment fields
-                        if (changedField === 'clauseToAmend') {
-                            const clauseToAmend = document.getElementById('clauseToAmend')?.value || '';
-                            applyHighlightToMatches(clauseToAmend);
-                        } else if (changedField === 'originalLanguage') {
-                            const originalLanguage = document.getElementById('originalLanguage')?.value || '';
-                            applyHighlightToMatches(originalLanguage);
-                        } else if (changedField === 'newLanguage') {
-                            const newLanguage = document.getElementById('newLanguage')?.value || '';
-                            applyHighlightToMatches(newLanguage);
-                        }
-                        break;
-                    
-                    case 'additionalTerms':
-                        // For additional terms
-                        const additionalTerms = document.getElementById('additionalTerms')?.value || '';
-                        if (additionalTerms) {
-                            applyHighlightToMatches(additionalTerms);
-                        }
-                        break;
-                    
-                    case 'originalTerms':
-                    case 'customTermsStatement':
-                        // For original terms statement
-                        const originalTermsStatus = document.getElementById('originalTerms').value;
-                        let originalTermsText = '';
-                        
-                        if (originalTermsStatus === 'remain') {
-                            originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
-                        } else if (originalTermsStatus === 'supersede') {
-                            originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
-                        } else if (originalTermsStatus === 'custom') {
-                            originalTermsText = document.getElementById('customTermsStatement').value || '';
-                        }
-                        
-                        applyHighlightToMatches(originalTermsText);
-                        break;
-                }
-                
-                // For amendment purpose changes, which requires a more specific approach
-                if (changedField === 'amendmentPurpose') {
-                    const purpose = document.getElementById('amendmentPurpose').value;
-                    
-                    // Find the first section after "1. AMENDMENTS" and highlight it
-                    const relevantSection = findFirstAmendmentSection();
-                    if (relevantSection) {relevantSection.classList.add('highlight');
-                        scrollToElement(relevantSection);
-                        
-                        // Set timeout to clear highlight
-                        highlightTimeout = setTimeout(() => {
-                            relevantSection.classList.remove('highlight');
-                        }, 5000);
-                    }
-                }
-            }
-            
-            // Helper function to find the first content after "1. AMENDMENTS"
-            function findFirstAmendmentSection() {
-                const sectionTitles = document.querySelectorAll('.section-title');
-                for (const title of sectionTitles) {
-                    if (title.textContent.includes('1. AMENDMENTS')) {
-                        let nextElement = title.nextElementSibling;
-                        while (nextElement && nextElement.tagName.toLowerCase() !== 'p') {
-                            nextElement = nextElement.nextElementSibling;
-                        }
-                        return nextElement;
-                    }
-                }
-                return null;
-            }
-            
-            // Function to apply highlights to matching text and scroll if needed
-            function applyHighlightToMatches(text) {
-                if (!text || text.trim() === '') return;
-                
-                // Clean the text for safe regex use
-                const cleanedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                
-                // Find all text nodes in the preview
-                const textNodes = [];
-                const walk = document.createTreeWalker(
-                    preview,
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                );
-                
-                let node;
-                let highlighted = false;
-                
-                while (node = walk.nextNode()) {
-                    if (node.nodeValue.includes(text)) {
-                        // Get the parent element
-                        const parentElement = node.parentElement;
-                        
-                        // Get the current content
-                        const currentText = node.nodeValue;
-                        
-                        // Create a new HTML content with the matched text wrapped in a highlight span
-                        const newHtml = currentText.replace(
-                            new RegExp(cleanedText, 'g'), 
-                            '<span class="highlight">$&</span>'
-                        );
-                        
-                        // Create a temporary element
-                        const tempElement = document.createElement('div');
-                        tempElement.innerHTML = newHtml;
-                        
-                        // Get the highlight element for scrolling later
-                        const highlightSpan = tempElement.querySelector('.highlight');
-                        
-                        // Replace the text node with the new HTML
-                        const range = document.createRange();
-                        range.selectNode(node);
-                        range.deleteContents();
-                        
-                        // Insert the new nodes
-                        const fragment = document.createDocumentFragment();
-                        let child;
-                        while (child = tempElement.firstChild) {
-                            fragment.appendChild(child);
-                        }
-                        range.insertNode(fragment);
-                        
-                        // Find the newly inserted highlight span for scrolling
-                        const insertedHighlight = parentElement.querySelector('.highlight');
-                        if (insertedHighlight && !highlighted) {
-                            scrollToElement(insertedHighlight);
-                            highlighted = true;
-                            
-                            // Set timeout to clear highlight
-                            highlightTimeout = setTimeout(() => {
-                                document.querySelectorAll('.highlight').forEach(el => {
-                                    const parent = el.parentNode;
-                                    if (parent) {
-                                        parent.replaceChild(document.createTextNode(el.textContent), el);
-                                        parent.normalize();
-                                    }
-                                });
-                            }, 5000);
-                        }
-                        
-                        break; // Only highlight the first occurrence to avoid multiple scrolling
-                    }
-                }
-            }
-            
-            // Function to scroll to an element
-            function scrollToElement(element) {
-                if (!element) return;
-                
-                const elementRect = element.getBoundingClientRect();
-                const previewRect = previewBox.getBoundingClientRect();
-                
-                if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
-                    element.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }
-            
-            // Reset form function
-            window.resetForm = function() {
-                form.reset();
-                
-                // Reset radio options
-                document.querySelectorAll('.radio-option').forEach(option => {
-                    const radio = option.querySelector('input[type="radio"]');
-                    if (radio) {
-                        option.classList.toggle('selected', radio.checked);
-                    }
-                });
-                
-                // Reset accordions
-                document.getElementById('amendmentDetailsHeader').classList.add('active');
-                document.getElementById('amendmentDetailsSection').style.display = 'block';
-                document.getElementById('additionalTermsHeader').classList.remove('active');
-                document.getElementById('additionalTermsSection').style.display = 'none';
-                
-                // Reset conditional sections
-                document.getElementById('fixed-extension-details').style.display = 'block';
-                document.getElementById('indefinite-extension-details').style.display = 'none';
-                document.getElementById('custom-extension-group').style.display = 'none';
-                document.getElementById('custom-termination-group').style.display = 'none';
-                document.getElementById('custom-terms-group').style.display = 'none';
-                
-                // Reset to default amendment purpose
-                document.getElementById('amendmentPurpose').value = 'extend';
-                loadAmendmentDetailsSection('extend');
-                
-                // Clear highlights and update the preview
-                clearAllHighlights();
-                updatePreview();
-                copyMessage.style.display = 'none';
-            };
-            
-            // Copy amendment function
-            window.copyAmendment = function() {
-                // Only allow copying if unlocked
-                if (localStorage.getItem('contractGenUnlocked') !== 'true') {
-                    alert('Please purchase the generator to enable copying');
-                    return;
-                }
-                
-                const amendmentText = preview.innerText;
-                
-                navigator.clipboard.writeText(amendmentText).then(function() {
-                    copyMessage.style.display = 'inline-block';
-                    
-                    setTimeout(() => {
-                        copyMessage.style.display = 'none';
-                    }, 3000);
-                }).catch(function(err) {
-                    console.error('Could not copy text: ', err);
-                    alert('Failed to copy amendment. Please try selecting and copying the text manually.');
-                });
-            };
-            
-            // Download as DOCX function
-            window.downloadAmendment = function() {
-                // Only allow downloading if unlocked
-                if (localStorage.getItem('contractGenUnlocked') !== 'true') {
-                    alert('Please purchase the generator to enable downloading');
-                    return;
-                }
-                
-                try {
-                    // Access docx library
-                    const docx = window.docx;
-                    if (!docx) {
-                        throw new Error("DOCX library not loaded");
-                    }
-                    
-                    // Get amendment details for filename
-                    const amendmentNumber = document.getElementById('amendmentNumber').value;
-                    const originalTitle = document.getElementById('originalTitle').value;
-                    const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
-                    
-                    // Create document sections
-                    const paragraphs = [];
-                    
-                    // Add title
-                    paragraphs.push(
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.CENTER,
-                            spacing: {
-                                before: 240,
-                                after: 240
-                            },
-                            children: [
-                                new docx.TextRun({
-                                    text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
-                                    bold: true,
-                                    size: 28
-                                })
-                            ]
-                        })
-                    );
-                    
-                    // Get all paragraphs from the preview
-                    const previewParagraphs = preview.querySelectorAll('p');
-                    
-                    previewParagraphs.forEach(p => {
-                        // Skip empty paragraphs
-                        if (!p.textContent.trim()) return;
-                        
-                        paragraphs.push(
-                            new docx.Paragraph({
-                                text: p.textContent,
-                                spacing: {
-                                    before: 120,
-                                    after: 120
-                                }
-                            })
-                        );
-                    });
-                    
-                    // Get all section titles
-                    const sectionTitles = preview.querySelectorAll('.section-title');
-                    
-                    sectionTitles.forEach(title => {
-                        // Find the index where this title should go
-                        const titleText = title.textContent;
-                        let insertIndex = paragraphs.length;
-                        
-                        // Find where to insert this section title
-                        for (let i = 0; i < previewParagraphs.length; i++) {
-                            if (previewParagraphs[i].textContent.includes(titleText)) {
-                                // Find the corresponding paragraph in our paragraphs array
-                                for (let j = 0; j < paragraphs.length; j++) {
-                                    if (paragraphs[j].text === previewParagraphs[i].textContent) {
-                                        insertIndex = j;
-                                        break;
-                                    }
-                                }
-                                break;
-                            }
-                        }
-                        
-                        // Insert the section title
-                        paragraphs.splice(insertIndex, 0, 
-                            new docx.Paragraph({
-                                children: [
-                                    new docx.TextRun({
-                                        text: titleText,
-                                        bold: true,
-                                        size: 24
-                                    })
-                                ],
-                                spacing: {
-                                    before: 240,
-                                    after: 120
-                                }
-                            })
-                        );
-                    });
-                    
-                    // Create document with proper settings
-                    const doc = new docx.Document({
-                        styles: {
-                            default: {
-                                document: {
-                                    run: {
-                                        size: 11 * 2, // 11pt font size (in half-points)
-                                        font: "Times New Roman"
-                                    },
-                                    paragraph: {
-                                        spacing: {
-                                            line: 276, // 1.15x line spacing
-                                            before: 0,
-                                            after: 0
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        sections: [{
-                            properties: {
-                                page: {
-                                    margin: {
-                                        top: 1440, // 1 inch in twips
-                                        right: 1440,
-                                        bottom: 1440,
-                                        left: 1440
-                                    }
-                                }
-                            },
-                            children: paragraphs
-                        }]
-                    });
-                    
-                    // Generate and save document
-                    docx.Packer.toBlob(doc)
-                        .then(blob => {
-                            window.saveAs(blob, filename);
-                        })
-                        .catch(error => {
-                            console.error("Error saving DOCX:", error);
-                            alert("Unable to download. Please try using the copy button instead.");
-                        });
-                } catch (error) {
-                    console.error("DOCX generation error:", error);
-                    alert("Unable to download. Please try using the copy button instead.");
-                }
-            };
-        });
-    </script>
-</body>
-</html>
+                        if (changedField === '
