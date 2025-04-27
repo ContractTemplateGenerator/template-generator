@@ -1,0 +1,1933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Contract Amendment Generator</title>
+    <style>
+        :root {
+            --accent-color: #27ae60;
+            --bg-color: #f9fafb;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --highlight-color: #ffff8d;
+            --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --border-radius: 8px;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+        
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .form-container {
+            flex: 1;
+            padding: 25px;
+            border-right: 1px solid var(--border-color);
+            overflow-y: auto;
+        }
+        
+        .preview-container {
+            flex: 1;
+            padding: 25px;
+            position: relative;
+        }
+        
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .preview-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .preview-box {
+            height: 600px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 25px;
+            background-color: white;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+            position: relative;
+        }
+        
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text-primary);
+            background-color: white;
+            transition: var(--transition);
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        
+        textarea.form-input {
+            min-height: 80px;
+            resize: vertical;
+        }
+        
+        .form-helper {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+        
+        .radio-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            background-color: #f8f9fa;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .radio-option:hover {
+            background-color: #f1f3f5;
+            border-color: #d0d0d0;
+        }
+        
+        .radio-option.selected {
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+        }
+        
+        .radio-option input[type="radio"] {
+            margin-right: 10px;
+            margin-top: 3px;
+        }
+        
+        .radio-label {
+            flex: 1;
+        }
+        
+        .radio-label-title {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 14px;
+        }
+        
+        .radio-label-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        .date-select {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .date-select select {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 25px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-align: center;
+        }
+        
+        .btn-reset {
+            background-color: #f1f1f1;
+            color: var(--text-primary);
+        }
+        
+        .btn-reset:hover {
+            background-color: #e4e4e4;
+        }
+        
+        .btn-copy {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-copy:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-download {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background-color: #219653;
+        }
+        
+        .copy-message {
+            display: none;
+            font-size: 14px;
+            color: #27ae60;
+            margin-left: 10px;
+        }
+        
+        .btn-consult {
+            display: block;
+            width: 100%;
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #2c3e50;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .btn-consult:hover {
+            background-color: #1e2a37;
+        }
+        
+        /* Document styles */
+        .document-template {
+            font-family: "Times New Roman", Times, serif;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        
+        .document-section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .field-label {
+            font-weight: bold;
+            display: inline;
+        }
+        
+        /* Highlight effect */
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s ease;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .form-container {
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+            }
+            
+            .preview-box {
+                height: 500px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .copy-message {
+                margin-left: 0;
+                margin-top: 5px;
+                text-align: center;
+            }
+        }
+        
+        @media print {
+            .form-container, 
+            .header, 
+            .form-actions, 
+            .preview-header,
+            .btn-consult {
+                display: none;
+            }
+            
+            .content {
+                display: block;
+            }
+            
+            .preview-container {
+                padding: 0;
+            }
+            
+            .preview-box {
+                height: auto;
+                overflow: visible;
+                border: none;
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Contract Amendment Generator</h1>
+            <p>Create a professional contract amendment document in minutes</p>
+        </div>
+        
+        <div class="content">
+            <!-- Form Container -->
+            <div class="form-container">
+                <form id="amendmentForm">
+                    <!-- Original Contract Information -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">Original Contract Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="originalTitle">Original Contract Title</label>
+                            <input type="text" id="originalTitle" class="form-input" placeholder="e.g., Service Agreement" value="Software Development Agreement">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="originalDate">Original Contract Date</label>
+                            <div class="date-select">
+                                <select id="originalMonth" class="form-input">
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March" selected>March</option>
+                                    <option value="April">April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                                <select id="originalDay" class="form-input">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15" selected>15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                </select>
+                                <select id="originalYear" class="form-input">
+                                    <option value="2023">2023</option>
+                                    <option value="2024" selected>2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="firstParty">First Party (Company/Individual)</label>
+                            <input type="text" id="firstParty" class="form-input" placeholder="Enter name of first party" value="Acme Technology Solutions, Inc.">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="secondParty">Second Party (Company/Individual)</label>
+                            <input type="text" id="secondParty" class="form-input" placeholder="Enter name of second party" value="XYZ Software Development, LLC">
+                        </div>
+                    </div>
+                    
+                    <!-- Amendment Information -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">Amendment Information</h2>
+                        
+                        <div class="form-group">
+                            <label for="amendmentNumber">Amendment Number</label>
+                            <select id="amendmentNumber" class="form-input">
+                                <option value="First" selected>First Amendment</option>
+                                <option value="Second">Second Amendment</option>
+                                <option value="Third">Third Amendment</option>
+                                <option value="Fourth">Fourth Amendment</option>
+                                <option value="Fifth">Fifth Amendment</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amendmentDate">Amendment Effective Date</label>
+                            <div class="date-select">
+                                <select id="amendmentMonth" class="form-input">
+                                    <option value="January">January</option>
+                                    <option value="February">February</option>
+                                    <option value="March">March</option>
+                                    <option value="April" selected>April</option>
+                                    <option value="May">May</option>
+                                    <option value="June">June</option>
+                                    <option value="July">July</option>
+                                    <option value="August">August</option>
+                                    <option value="September">September</option>
+                                    <option value="October">October</option>
+                                    <option value="November">November</option>
+                                    <option value="December">December</option>
+                                </select>
+                                <select id="amendmentDay" class="form-input">
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25" selected>25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                </select>
+                                <select id="amendmentYear" class="form-input">
+                                    <option value="2023">2023</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025" selected>2025</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="amendmentPurpose">Purpose of Amendment</label>
+                            <select id="amendmentPurpose" class="form-input">
+                                <option value="extend" selected>Extend Contract Term</option>
+                                <option value="modify">Modify Pricing/Payment Terms</option>
+                                <option value="change-scope">Change Scope of Work</option>
+                                <option value="add-services">Add Services or Deliverables</option>
+                                <option value="update-contact">Update Contact Information</option>
+                                <option value="custom">Custom Amendment</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Amendment Details (changes based on purpose) -->
+                    <div class="form-section" id="amendmentDetailsSection">
+                        <h2 class="form-section-title">Amendment Details</h2>
+                        
+                        <!-- Dynamic content will load here based on purpose selection -->
+                        
+                        <!-- Extend Term (default) -->
+                        <div id="extend-details">
+                            <div class="form-group">
+                                <label for="extensionType">Extension Type</label>
+                                <div class="radio-options">
+                                    <label class="radio-option selected">
+                                        <input type="radio" name="extensionType" value="fixed" checked>
+                                        <div class="radio-label">
+                                            <span class="radio-label-title">Fixed Period Extension</span>
+                                            <span class="radio-label-desc">Extend the contract for a specific time period</span>
+                                        </div>
+                                    </label>
+                                    <label class="radio-option">
+                                        <input type="radio" name="extensionType" value="indefinite">
+                                        <div class="radio-label">
+                                            <span class="radio-label-title">Indefinite Extension</span>
+                                            <span class="radio-label-desc">Extend until terminated by either party</span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div id="fixed-extension-details">
+                                <div class="form-group">
+                                    <label for="extensionLength">Extension Length</label>
+                                    <select id="extensionLength" class="form-input">
+                                        <option value="3 months">3 months</option>
+                                        <option value="6 months" selected>6 months</option>
+                                        <option value="1 year">1 year</option>
+                                        <option value="2 years">2 years</option>
+                                        <option value="custom">Custom period</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="custom-extension-group" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="customExtension">Custom Extension Period</label>
+                                        <input type="text" id="customExtension" class="form-input" placeholder="e.g., 9 months">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="indefinite-extension-details" style="display: none;">
+                                <div class="form-group">
+                                    <label for="terminationNotice">Termination Notice Period</label>
+                                    <select id="terminationNotice" class="form-input">
+                                        <option value="30 days">30 days</option>
+                                        <option value="60 days" selected>60 days</option>
+                                        <option value="90 days">90 days</option>
+                                        <option value="custom">Custom period</option>
+                                    </select>
+                                </div>
+                                
+                                <div id="custom-termination-group" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="customTermination">Custom Termination Notice</label>
+                                        <input type="text" id="customTermination" class="form-input" placeholder="e.g., 45 days">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Other amendment types will be loaded dynamically -->
+                    </div>
+                    
+                    <!-- Additional Terms -->
+                    <div class="form-section">
+                        <h2 class="form-section-title">Additional Terms</h2>
+                        
+                        <div class="form-group">
+                            <label for="additionalTerms">Additional Terms & Conditions (Optional)</label>
+                            <textarea id="additionalTerms" class="form-input" placeholder="Enter any additional terms and conditions that apply to this amendment"></textarea>
+                            <div class="form-helper">Leave blank if there are no additional terms to include</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="originalTerms">Original Terms Status</label>
+                            <select id="originalTerms" class="form-input">
+                                <option value="remain" selected>All other terms remain in full force and effect</option>
+                                <option value="supersede">This amendment supersedes all previous terms</option>
+                                <option value="custom">Custom statement</option>
+                            </select>
+                        </div>
+                        
+                        <div id="custom-terms-group" style="display: none;">
+                            <div class="form-group">
+                                <label for="customTermsStatement">Custom Terms Statement</label>
+                                <textarea id="customTermsStatement" class="form-input" placeholder="Enter custom statement about original terms"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Form Actions -->
+                    <div class="form-actions">
+                        <div style="display: flex; gap: 10px;">
+                            <button type="button" id="copyBtn" class="btn btn-copy" onclick="copyAmendment()">Copy Amendment</button>
+                            <span id="copyMessage" class="copy-message">Amendment copied!</span>
+                            <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadAmendment()">Download as DOCX</button>
+                        </div>
+                        <button type="reset" class="btn btn-reset" onclick="resetForm()">Reset Form</button>
+                    </div>
+                    
+                    <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+                        Schedule Legal Consultation
+                    </a>
+                </form>
+            </div>
+            
+            <!-- Preview Container -->
+            <div class="preview-container">
+                <div class="preview-header">
+                    <div class="preview-title">Amendment Preview</div>
+                    <div class="preview-note">Updates as you complete the form</div>
+                </div>
+                
+                <div class="preview-box">
+                    <div class="document-template" id="amendmentPreview">
+                        <!-- Amendment will be populated here by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Libraries and Scripts -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize form elements
+            const form = document.getElementById('amendmentForm');
+            const preview = document.getElementById('amendmentPreview');
+            const copyMessage = document.getElementById('copyMessage');
+            const previewBox = document.querySelector('.preview-box');
+            
+            // Variables to track highlighting
+            let highlightedElements = [];
+            let highlightTimeout;
+            
+            // Initialize preview
+            updatePreview();
+            
+            // Add event listeners to form elements
+            document.querySelectorAll('.form-input, input[type="radio"]').forEach(input => {
+                if (input.type === 'radio') {
+                    input.addEventListener('change', function() {
+                        // Update radio option styling
+                        document.querySelectorAll(`input[name="${this.name}"]`).forEach(radio => {
+                            const option = radio.closest('.radio-option');
+                            if (option) {
+                                option.classList.toggle('selected', radio.checked);
+                            }
+                        });
+                        
+                        // Handle specific radio groups
+                        if (this.name === 'extensionType') {
+                            toggleExtensionDetails(this.value);
+                        }
+                        
+                        // Clear highlights and update preview
+                        clearHighlights();
+                        updatePreview(this.name);
+                        copyMessage.style.display = 'none';
+                    });
+                } else {
+                    // Regular input event
+                    input.addEventListener('input', function() {
+                        clearHighlights();
+                        updatePreview(this.id);
+                        copyMessage.style.display = 'none';
+                        
+                        // Handle specific inputs
+                        if (this.id === 'extensionLength' && this.value === 'custom') {
+                            document.getElementById('custom-extension-group').style.display = 'block';
+                        } else if (this.id === 'extensionLength') {
+                            document.getElementById('custom-extension-group').style.display = 'none';
+                        }
+                        
+                        if (this.id === 'terminationNotice' && this.value === 'custom') {
+                            document.getElementById('custom-termination-group').style.display = 'block';
+                        } else if (this.id === 'terminationNotice') {
+                            document.getElementById('custom-termination-group').style.display = 'none';
+                        }
+                        
+                        if (this.id === 'originalTerms' && this.value === 'custom') {
+                            document.getElementById('custom-terms-group').style.display = 'block';
+                        } else if (this.id === 'originalTerms') {
+                            document.getElementById('custom-terms-group').style.display = 'none';
+                        }
+                        
+                        if (this.id === 'amendmentPurpose') {
+                            loadAmendmentDetailsSection(this.value);
+                        }
+                    });
+                    
+                    // For select elements, we need change event
+                    if (input.tagName.toLowerCase() === 'select') {
+                        input.addEventListener('change', function() {
+                            clearHighlights();
+                            updatePreview(this.id);
+                            copyMessage.style.display = 'none';
+                            
+                            // Handle specific selects
+                            if (this.id === 'extensionLength' && this.value === 'custom') {
+                                document.getElementById('custom-extension-group').style.display = 'block';
+                            } else if (this.id === 'extensionLength') {
+                                document.getElementById('custom-extension-group').style.display = 'none';
+                            }
+                            
+                            if (this.id === 'terminationNotice' && this.value === 'custom') {
+                                document.getElementById('custom-termination-group').style.display = 'block';
+                            } else if (this.id === 'terminationNotice') {
+                                document.getElementById('custom-termination-group').style.display = 'none';
+                            }
+                            
+                            if (this.id === 'originalTerms' && this.value === 'custom') {
+                                document.getElementById('custom-terms-group').style.display = 'block';
+                            } else if (this.id === 'originalTerms') {
+                                document.getElementById('custom-terms-group').style.display = 'none';
+                            }
+                            
+                            if (this.id === 'amendmentPurpose') {
+                                loadAmendmentDetailsSection(this.value);
+                            }
+                        });
+                    }
+                }
+            });
+            
+            // Make radio options clickable
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.addEventListener('click', function(e) {
+                    // If the user clicked directly on the radio, let the regular handler do its job
+                    if (e.target.type === 'radio') return;
+                    
+                    // Otherwise, click the radio button
+                    const radio = this.querySelector('input[type="radio"]');
+                    if (radio) {
+                        radio.checked = true;
+                        
+                        // Trigger change event
+                        const changeEvent = new Event('change', { bubbles: true });
+                        radio.dispatchEvent(changeEvent);
+                    }
+                });
+            });
+            
+            // Function to toggle extension details based on selected type
+            function toggleExtensionDetails(type) {
+                const fixedDetails = document.getElementById('fixed-extension-details');
+                const indefiniteDetails = document.getElementById('indefinite-extension-details');
+                
+                if (type === 'fixed') {
+                    fixedDetails.style.display = 'block';
+                    indefiniteDetails.style.display = 'none';
+                } else if (type === 'indefinite') {
+                    fixedDetails.style.display = 'none';
+                    indefiniteDetails.style.display = 'block';
+                }
+            }
+            
+            // Function to load appropriate amendment details section
+            function loadAmendmentDetailsSection(purpose) {
+                const detailsSection = document.getElementById('amendmentDetailsSection');
+                const currentDetails = document.getElementById(`${purpose}-details`);
+                
+                // If section already exists, just show it
+                if (currentDetails) {
+                    document.querySelectorAll('[id$="-details"]').forEach(section => {
+                        section.style.display = 'none';
+                    });
+                    currentDetails.style.display = 'block';
+                    return;
+                }
+                
+                // Otherwise, create the appropriate details section
+                let detailsHTML = '';
+                
+                switch(purpose) {
+                    case 'modify':
+                        detailsHTML = `
+                            <div id="modify-details">
+                                <div class="form-group">
+                                    <label for="modifyType">Pricing Modification Type</label>
+                                    <div class="radio-options">
+                                        <label class="radio-option selected">
+                                            <input type="radio" name="modifyType" value="increase" checked>
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Price Increase</span>
+                                                <span class="radio-label-desc">Increase the contract price</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="modifyType" value="decrease">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Price Decrease</span>
+                                                <span class="radio-label-desc">Decrease the contract price</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="modifyType" value="restructure">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Payment Restructure</span>
+                                                <span class="radio-label-desc">Change payment terms or structure</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div id="pricing-details">
+                                    <div class="form-group">
+                                        <label for="originalPrice">Original Price/Rate</label>
+                                        <input type="text" id="originalPrice" class="form-input" placeholder="e.g., $5,000" value="$10,000">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="newPrice">New Price/Rate</label>
+                                        <input type="text" id="newPrice" class="form-input" placeholder="e.g., $5,500" value="$12,000">
+                                    </div>
+                                </div>
+                                
+                                <div id="payment-details" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="paymentDetails">Payment Term Changes</label>
+                                        <textarea id="paymentDetails" class="form-input" placeholder="Describe the changes to payment terms"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'change-scope':
+                        detailsHTML = `
+                            <div id="change-scope-details">
+                                <div class="form-group">
+                                    <label for="scopeChangeType">Scope Change Type</label>
+                                    <div class="radio-options">
+                                        <label class="radio-option selected">
+                                            <input type="radio" name="scopeChangeType" value="expand" checked>
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Expand Scope</span>
+                                                <span class="radio-label-desc">Add to the contract scope</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="scopeChangeType" value="reduce">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Reduce Scope</span>
+                                                <span class="radio-label-desc">Remove items from the contract scope</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="scopeChangeType" value="modify">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Modify Scope</span>
+                                                <span class="radio-label-desc">Change existing scope items</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="originalScopeReference">Original Scope Reference</label>
+                                    <input type="text" id="originalScopeReference" class="form-input" placeholder="e.g., Section 2.1 of the Agreement" value="Exhibit A, Section 3">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="scopeChanges">Scope Changes</label>
+                                    <textarea id="scopeChanges" class="form-input" placeholder="Describe the changes to the scope">Add mobile application development services to the existing web application development scope.</textarea>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'add-services':
+                        detailsHTML = `
+                            <div id="add-services-details">
+                                <div class="form-group">
+                                    <label for="servicesDescription">New Services/Deliverables Description</label>
+                                    <textarea id="servicesDescription" class="form-input" placeholder="Describe the new services or deliverables">Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="servicesPricing">Pricing for New Services</label>
+                                    <input type="text" id="servicesPricing" class="form-input" placeholder="e.g., $2,000 per month" value="$3,500 per month">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="servicesTimeline">Timeline for New Services</label>
+                                    <input type="text" id="servicesTimeline" class="form-input" placeholder="e.g., Starting May 1, 2023" value="Starting May 1, 2025">
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'update-contact':
+                        detailsHTML = `
+                            <div id="update-contact-details">
+                                <div class="form-group">
+                                    <label for="partyToUpdate">Party to Update</label>
+                                    <div class="radio-options">
+                                        <label class="radio-option selected">
+                                            <input type="radio" name="partyToUpdate" value="first" checked>
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">First Party</span>
+                                                <span class="radio-label-desc">Update contact information for the first party</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="partyToUpdate" value="second">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Second Party</span>
+                                                <span class="radio-label-desc">Update contact information for the second party</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="partyToUpdate" value="both">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Both Parties</span>
+                                                <span class="radio-label-desc">Update contact information for both parties</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div id="first-party-contact">
+                                    <div class="form-group">
+                                        <label for="firstPartyNewAddress">New Address</label>
+                                        <input type="text" id="firstPartyNewAddress" class="form-input" placeholder="Enter new address" value="123 Tech Boulevard, Suite 500, San Francisco, CA 94107">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="firstPartyNewContact">New Contact Person</label>
+                                        <input type="text" id="firstPartyNewContact" class="form-input" placeholder="Enter new contact person" value="Sarah Johnson, VP of Operations">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="firstPartyNewEmail">New Email</label>
+                                        <input type="email" id="firstPartyNewEmail" class="form-input" placeholder="Enter new email" value="sjohnson@acmetech.example.com">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="firstPartyNewPhone">New Phone</label>
+                                        <input type="tel" id="firstPartyNewPhone" class="form-input" placeholder="Enter new phone" value="(555) 123-4567">
+                                    </div>
+                                </div>
+                                
+                                <div id="second-party-contact" style="display: none;">
+                                    <div class="form-group">
+                                        <label for="secondPartyNewAddress">New Address</label>
+                                        <input type="text" id="secondPartyNewAddress" class="form-input" placeholder="Enter new address">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="secondPartyNewContact">New Contact Person</label>
+                                        <input type="text" id="secondPartyNewContact" class="form-input" placeholder="Enter new contact person">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="secondPartyNewEmail">New Email</label>
+                                        <input type="email" id="secondPartyNewEmail" class="form-input" placeholder="Enter new email">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="secondPartyNewPhone">New Phone</label>
+                                        <input type="tel" id="secondPartyNewPhone" class="form-input" placeholder="Enter new phone">
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    case 'custom':
+                        detailsHTML = `
+                            <div id="custom-details">
+                                <div class="form-group">
+                                    <label for="clauseToAmend">Clause/Section to Amend</label>
+                                    <input type="text" id="clauseToAmend" class="form-input" placeholder="e.g., Section 8.2, Confidentiality" value="Section 5.3, Intellectual Property Rights">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="originalLanguage">Original Language (Optional)</label>
+                                    <textarea id="originalLanguage" class="form-input" placeholder="Enter the original language of the clause to be amended">All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.</textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="newLanguage">New Language</label>
+                                    <textarea id="newLanguage" class="form-input" placeholder="Enter the new language that will replace or modify the original clause">All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.</textarea>
+                                </div>
+                            </div>
+                        `;
+                        break;
+                    
+                    default:
+                        // For extend purpose (already loaded)
+                        return;
+                }
+                
+                // Remove any existing details sections
+                document.querySelectorAll('[id$="-details"]').forEach(section => {
+                    if (!section.closest('.form-section')) { // Only remove top-level sections
+                        section.remove();
+                    }
+                });
+                
+                // Append the new details HTML
+                document.getElementById('amendmentDetailsSection').insertAdjacentHTML('beforeend', detailsHTML);
+                
+                // Add event listeners to the new elements
+                const newDetails = document.getElementById(`${purpose}-details`);
+                if (newDetails) {
+                    newDetails.querySelectorAll('.form-input, input[type="radio"]').forEach(input => {
+                        if (input.type === 'radio') {
+                            input.addEventListener('change', function() {
+                                // Update radio option styling
+                                document.querySelectorAll(`input[name="${this.name}"]`).forEach(radio => {
+                                    const option = radio.closest('.radio-option');
+                                    if (option) {
+                                        option.classList.toggle('selected', radio.checked);
+                                    }
+                                });
+                                
+                                // Handle specific radio groups
+                                if (this.name === 'modifyType') {
+                                    const pricingDetails = document.getElementById('pricing-details');
+                                    const paymentDetails = document.getElementById('payment-details');
+                                    
+                                    if (this.value === 'restructure') {
+                                        pricingDetails.style.display = 'none';
+                                        paymentDetails.style.display = 'block';
+                                    } else {
+                                        pricingDetails.style.display = 'block';
+                                        paymentDetails.style.display = 'none';
+                                    }
+                                }
+                                
+                                if (this.name === 'partyToUpdate') {
+                                    const firstPartyContact = document.getElementById('first-party-contact');
+                                    const secondPartyContact = document.getElementById('second-party-contact');
+                                    
+                                    if (this.value === 'first') {
+                                        firstPartyContact.style.display = 'block';
+                                        secondPartyContact.style.display = 'none';
+                                    } else if (this.value === 'second') {
+                                        firstPartyContact.style.display = 'none';
+                                        secondPartyContact.style.display = 'block';
+                                    } else if (this.value === 'both') {
+                                        firstPartyContact.style.display = 'block';
+                                        secondPartyContact.style.display = 'block';
+                                    }
+                                }
+                                
+                                // Clear highlights and update preview
+                                clearHighlights();
+                                updatePreview(this.name);
+                            });
+                        } else {
+                            // Regular input event
+                            input.addEventListener('input', function() {
+                                clearHighlights();
+                                updatePreview(this.id);
+                            });
+                            
+                            // For select elements
+                            if (input.tagName.toLowerCase() === 'select') {
+                                input.addEventListener('change', function() {
+                                    clearHighlights();
+                                    updatePreview(this.id);
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Make radio options clickable
+                    newDetails.querySelectorAll('.radio-option').forEach(option => {
+                        option.addEventListener('click', function(e) {
+                            // If the user clicked directly on the radio, let the regular handler do its job
+                            if (e.target.type === 'radio') return;
+                            
+                            // Otherwise, click the radio button
+                            const radio = this.querySelector('input[type="radio"]');
+                            if (radio) {
+                                radio.checked = true;
+                                
+                                // Trigger change event
+                                const changeEvent = new Event('change', { bubbles: true });
+                                radio.dispatchEvent(changeEvent);
+                            }
+                        });
+                    });
+                }
+                
+                // Update preview
+                updatePreview('amendmentPurpose');
+            }
+            
+            // Function to clear highlights
+            function clearHighlights() {
+                if (highlightTimeout) {
+                    clearTimeout(highlightTimeout);
+                }
+                
+                highlightedElements.forEach(element => {
+                    element.classList.remove('highlight');
+                });
+                highlightedElements = [];
+            }
+            
+            // Update Amendment Preview
+            function updatePreview(changedField = null) {
+                // Get form values
+                const originalTitle = document.getElementById('originalTitle').value;
+                const firstParty = document.getElementById('firstParty').value;
+                const secondParty = document.getElementById('secondParty').value;
+                
+                // Get dates
+                const originalMonth = document.getElementById('originalMonth').value;
+                const originalDay = document.getElementById('originalDay').value;
+                const originalYear = document.getElementById('originalYear').value;
+                const originalDate = `${originalMonth} ${originalDay}, ${originalYear}`;
+                
+                const amendmentMonth = document.getElementById('amendmentMonth').value;
+                const amendmentDay = document.getElementById('amendmentDay').value;
+                const amendmentYear = document.getElementById('amendmentYear').value;
+                const amendmentDate = `${amendmentMonth} ${amendmentDay}, ${amendmentYear}`;
+                
+                // Get amendment details
+                const amendmentNumber = document.getElementById('amendmentNumber').value;
+                const amendmentPurpose = document.getElementById('amendmentPurpose').value;
+                const additionalTerms = document.getElementById('additionalTerms').value;
+                
+                // Original terms status
+                const originalTermsStatus = document.getElementById('originalTerms').value;
+                let originalTermsText = '';
+                
+                if (originalTermsStatus === 'remain') {
+                    originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
+                } else if (originalTermsStatus === 'supersede') {
+                    originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
+                } else if (originalTermsStatus === 'custom') {
+                    originalTermsText = document.getElementById('customTermsStatement').value || 'All other terms and conditions not specifically modified by this Amendment shall remain unchanged.';
+                }
+                
+                // Start building the amendment HTML
+                let amendmentHTML = `
+                    <div class="document-title">${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}</div>
+                    
+                    <div class="document-section">
+                        <p>This ${amendmentNumber} Amendment (this "Amendment") to the ${originalTitle} dated ${originalDate} (the "Agreement") is entered into as of ${amendmentDate} (the "Amendment Effective Date"), by and between ${firstParty} ("First Party") and ${secondParty} ("Second Party").</p>
+                        <p>WHEREAS, the Parties entered into the Agreement on ${originalDate}; and</p>
+                        <p>WHEREAS, the Parties desire to amend the Agreement as set forth herein;</p>
+                        <p>NOW, THEREFORE, in consideration of the mutual covenants and promises herein contained, the Parties agree as follows:</p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <div class="section-title">1. AMENDMENTS</div>
+                `;
+                
+                // Add amendment details based on purpose
+                switch(amendmentPurpose) {
+                    case 'extend':
+                        const extensionType = document.querySelector('input[name="extensionType"]:checked').value;
+                        
+                        if (extensionType === 'fixed') {
+                            let extensionLength = document.getElementById('extensionLength').value;
+                            if (extensionLength === 'custom') {
+                                extensionLength = document.getElementById('customExtension').value || '6 months';
+                            }
+                            
+                            amendmentHTML += `
+                                <p>The term of the Agreement is hereby extended for an additional period of ${extensionLength} from the Amendment Effective Date.</p>
+                            `;
+                        } else if (extensionType === 'indefinite') {
+                            let terminationNotice = document.getElementById('terminationNotice').value;
+                            if (terminationNotice === 'custom') {
+                                terminationNotice = document.getElementById('customTermination').value || '60 days';
+                            }
+                            
+                            amendmentHTML += `
+                                <p>The term of the Agreement is hereby extended indefinitely, until terminated by either Party upon ${terminationNotice} prior written notice to the other Party.</p>
+                            `;
+                        }
+                        break;
+                    
+                    case 'modify':
+                        const modifyType = document.querySelector('input[name="modifyType"]:checked')?.value || 'increase';
+                        
+                        if (modifyType === 'increase' || modifyType === 'decrease') {
+                            const originalPrice = document.getElementById('originalPrice')?.value || '$10,000';
+                            const newPrice = document.getElementById('newPrice')?.value || '$12,000';
+                            
+                            amendmentHTML += `
+                                <p>The pricing terms of the Agreement are hereby amended to ${modifyType === 'increase' ? 'increase' : 'decrease'} from ${originalPrice} to ${newPrice}.</p>
+                            `;
+                        } else if (modifyType === 'restructure') {
+                            const paymentDetails = document.getElementById('paymentDetails')?.value || 'Payment terms are restructured from net 30 to net 15 days from invoice date.';
+                            
+                            amendmentHTML += `
+                                <p>The payment terms of the Agreement are hereby amended as follows: ${paymentDetails}</p>
+                            `;
+                        }
+                        break;
+                    
+                    case 'change-scope':
+                        const scopeChangeType = document.querySelector('input[name="scopeChangeType"]:checked')?.value || 'expand';
+                        const originalScopeReference = document.getElementById('originalScopeReference')?.value || 'Exhibit A, Section 3';
+                        const scopeChanges = document.getElementById('scopeChanges')?.value || 'Add mobile application development services to the existing web application development scope.';
+                        
+                        let scopeVerb = '';
+                        if (scopeChangeType === 'expand') scopeVerb = 'expanded to include';
+                        else if (scopeChangeType === 'reduce') scopeVerb = 'reduced to exclude';
+                        else scopeVerb = 'modified as follows';
+                        
+                        amendmentHTML += `
+                            <p>${originalScopeReference} of the Agreement is hereby ${scopeVerb}: ${scopeChanges}</p>
+                        `;
+                        break;
+                    
+                    case 'add-services':
+                        const servicesDescription = document.getElementById('servicesDescription')?.value || 'Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.';
+                        const servicesPricing = document.getElementById('servicesPricing')?.value || '$3,500 per month';
+                        const servicesTimeline = document.getElementById('servicesTimeline')?.value || 'Starting May 1, 2025';
+                        
+                        amendmentHTML += `
+                            <p>1.1 Additional Services. The following services are hereby added to the Agreement: ${servicesDescription}</p>
+                            <p>1.2 Pricing for Additional Services. The pricing for the additional services shall be ${servicesPricing}.</p>
+                            <p>1.3 Timeline. The additional services shall commence ${servicesTimeline}.</p>
+                        `;
+                        break;
+                    
+                    case 'update-contact':
+                        const partyToUpdate = document.querySelector('input[name="partyToUpdate"]:checked')?.value || 'first';
+                        
+                        if (partyToUpdate === 'first' || partyToUpdate === 'both') {
+                            const firstPartyNewAddress = document.getElementById('firstPartyNewAddress')?.value || '123 Tech Boulevard, Suite 500, San Francisco, CA 94107';
+                            const firstPartyNewContact = document.getElementById('firstPartyNewContact')?.value || 'Sarah Johnson, VP of Operations';
+                            const firstPartyNewEmail = document.getElementById('firstPartyNewEmail')?.value || 'sjohnson@acmetech.example.com';
+                            const firstPartyNewPhone = document.getElementById('firstPartyNewPhone')?.value || '(555) 123-4567';
+                            
+                            amendmentHTML += `
+                                <p>1.1 First Party Contact Information. The contact information for First Party is hereby updated as follows:</p>
+                                <p>Address: ${firstPartyNewAddress}</p>
+                                <p>Contact Person: ${firstPartyNewContact}</p>
+                                <p>Email: ${firstPartyNewEmail}</p>
+                                <p>Phone: ${firstPartyNewPhone}</p>
+                            `;
+                        }
+                        
+                        if (partyToUpdate === 'second' || partyToUpdate === 'both') {
+                            const secondPartyNewAddress = document.getElementById('secondPartyNewAddress')?.value || '';
+                            const secondPartyNewContact = document.getElementById('secondPartyNewContact')?.value || '';
+                            const secondPartyNewEmail = document.getElementById('secondPartyNewEmail')?.value || '';
+                            const secondPartyNewPhone = document.getElementById('secondPartyNewPhone')?.value || '';
+                            
+                            if (partyToUpdate === 'both') {
+                                amendmentHTML += `
+                                    <p>1.2 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:</p>
+                                `;
+                            } else {
+                                amendmentHTML += `
+                                    <p>1.1 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:</p>
+                                `;
+                            }
+                            
+                            amendmentHTML += `
+                                <p>Address: ${secondPartyNewAddress || '[Second Party Address]'}</p>
+                                <p>Contact Person: ${secondPartyNewContact || '[Second Party Contact Person]'}</p>
+                                <p>Email: ${secondPartyNewEmail || '[Second Party Email]'}</p>
+                                <p>Phone: ${secondPartyNewPhone || '[Second Party Phone]'}</p>
+                            `;
+                        }
+                        break;
+                    
+                    case 'custom':
+                        const clauseToAmend = document.getElementById('clauseToAmend')?.value || 'Section 5.3, Intellectual Property Rights';
+                        const originalLanguage = document.getElementById('originalLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.';
+                        const newLanguage = document.getElementById('newLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.';
+                        
+                        amendmentHTML += `
+                            <p>1.1 ${clauseToAmend} of the Agreement is hereby amended as follows:</p>
+                        `;
+                        
+                        if (originalLanguage) {
+                            amendmentHTML += `
+                                <p>Original language: "${originalLanguage}"</p>
+                            `;
+                        }
+                        
+                        amendmentHTML += `
+                            <p>Amended language: "${newLanguage}"</p>
+                        `;
+                        break;
+                }
+                
+                // Add additional terms if provided
+                if (additionalTerms && additionalTerms.trim() !== '') {
+                    amendmentHTML += `
+                        <div class="section-title">2. ADDITIONAL TERMS</div>
+                        <p>${additionalTerms}</p>
+                    `;
+                }
+                
+                // Add original terms statement
+                amendmentHTML += `
+                    <div class="section-title">${additionalTerms ? '3' : '2'}. MISCELLANEOUS</div>
+                    <p>${originalTermsText}</p>
+                    <p>This Amendment may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.</p>
+                    <p>IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.</p>
+                    
+                    <div class="document-section" style="margin-top: 40px;">
+                        <table style="width: 100%;">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top; padding-right: 20px;">
+                                    <p><strong>FIRST PARTY:</strong></p>
+                                    <p>${firstParty}</p>
+                                    <p style="margin-top: 30px;">By: ________________________________</p>
+                                    <p style="margin-top: 20px;">Name: _____________________________</p>
+                                    <p style="margin-top: 20px;">Title: ______________________________</p>
+                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                </td>
+                                <td style="width: 50%; vertical-align: top; padding-left: 20px;">
+                                    <p><strong>SECOND PARTY:</strong></p>
+                                    <p>${secondParty}</p>
+                                    <p style="margin-top: 30px;">By: ________________________________</p>
+                                    <p style="margin-top: 20px;">Name: _____________________________</p>
+                                    <p style="margin-top: 20px;">Title: ______________________________</p>
+                                    <p style="margin-top: 20px;">Date: ______________________________</p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                `;
+                
+                // Update the preview
+                preview.innerHTML = amendmentHTML;
+                
+                // If a specific field was changed, highlight the relevant content
+                if (changedField) {
+                    highlightChangedContent(changedField);
+                }
+            }
+            
+            // Function to highlight changed content and scroll if needed
+            function highlightChangedContent(changedField) {
+                // First clear any existing highlights
+                clearHighlights();
+                
+                // Define text to search for based on field
+                let searchText = '';
+                let elementToHighlight = null;
+                
+                // Map fields to search text
+                switch(changedField) {
+                    case 'originalTitle':
+                        searchText = document.getElementById('originalTitle').value.toUpperCase();
+                        break;
+                    case 'originalMonth':
+                    case 'originalDay':
+                    case 'originalYear':
+                        searchText = `${document.getElementById('originalMonth').value} ${document.getElementById('originalDay').value}, ${document.getElementById('originalYear').value}`;
+                        break;
+                    case 'firstParty':
+                        searchText = document.getElementById('firstParty').value;
+                        break;
+                    case 'secondParty':
+                        searchText = document.getElementById('secondParty').value;
+                        break;
+                    case 'amendmentNumber':
+                        searchText = document.getElementById('amendmentNumber').value;
+                        break;
+                    case 'amendmentMonth':
+                    case 'amendmentDay':
+                    case 'amendmentYear':
+                        searchText = `${document.getElementById('amendmentMonth').value} ${document.getElementById('amendmentDay').value}, ${document.getElementById('amendmentYear').value}`;
+                        break;
+                    case 'extensionType':
+                    case 'extensionLength':
+                    case 'customExtension':
+                    case 'terminationNotice':
+                    case 'customTermination':
+                        // Find the paragraph in the first section that discusses extension
+                        const paragraphs = document.querySelectorAll('.document-section p');
+                        for (const p of paragraphs) {
+                            if (p.textContent.includes('term of the Agreement is hereby extended')) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'modifyType':
+                    case 'originalPrice':
+                    case 'newPrice':
+                    case 'paymentDetails':
+                        // Find the paragraph in the first section that discusses pricing
+                        const pricingParagraphs = document.querySelectorAll('.document-section p');
+                        for (const p of pricingParagraphs) {
+                            if (p.textContent.includes('pricing terms') || p.textContent.includes('payment terms')) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'scopeChangeType':
+                    case 'originalScopeReference':
+                    case 'scopeChanges':
+                        // Find the paragraph that discusses scope changes
+                        const scopeParagraphs = document.querySelectorAll('.document-section p');
+                        for (const p of scopeParagraphs) {
+                            if (p.textContent.includes('reduced to exclude') || 
+                                p.textContent.includes('expanded to include') ||
+                                p.textContent.includes('modified as follows')) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'servicesDescription':
+                    case 'servicesPricing':
+                    case 'servicesTimeline':
+                        // For services, find the relevant paragraph based on field
+                        const servicesParagraphs = document.querySelectorAll('.document-section p');
+                        for (const p of servicesParagraphs) {
+                            if (changedField === 'servicesDescription' && p.textContent.includes('Additional Services')) {
+                                elementToHighlight = p;
+                                break;
+                            } else if (changedField === 'servicesPricing' && p.textContent.includes('Pricing for Additional Services')) {
+                                elementToHighlight = p;
+                                break;
+                            } else if (changedField === 'servicesTimeline' && p.textContent.includes('Timeline')) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'partyToUpdate':
+                    case 'firstPartyNewAddress':
+                    case 'firstPartyNewContact':
+                    case 'firstPartyNewEmail':
+                    case 'firstPartyNewPhone':
+                        // For first party contact updates
+                        if (changedField === 'partyToUpdate') {
+                            const contactParagraphs = document.querySelectorAll('.document-section p');
+                            for (const p of contactParagraphs) {
+                                if (p.textContent.includes('Contact Information')) {
+                                    elementToHighlight = p;
+                                    break;
+                                }
+                            }
+                        } else {
+                            const specificField = changedField.replace('firstPartyNew', '');
+                            const contactParagraphs = document.querySelectorAll('.document-section p');
+                            for (const p of contactParagraphs) {
+                                if (p.textContent.includes(specificField + ':')) {
+                                    elementToHighlight = p;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 'secondPartyNewAddress':
+                    case 'secondPartyNewContact':
+                    case 'secondPartyNewEmail':
+                    case 'secondPartyNewPhone':
+                        // For second party contact updates
+                        const specificField = changedField.replace('secondPartyNew', '');
+                        const secondPartyParagraphs = document.querySelectorAll('.document-section p');
+                        let secondPartySection = false;
+                        for (const p of secondPartyParagraphs) {
+                            if (p.textContent.includes('Second Party Contact Information')) {
+                                secondPartySection = true;
+                                continue;
+                            }
+                            if (secondPartySection && p.textContent.includes(specificField + ':')) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'clauseToAmend':
+                    case 'originalLanguage':
+                    case 'newLanguage':
+                        // For custom amendment
+                        if (changedField === 'clauseToAmend') {
+                            const clauseParagraphs = document.querySelectorAll('.document-section p');
+                            for (const p of clauseParagraphs) {
+                                if (p.textContent.includes('of the Agreement is hereby amended')) {
+                                    elementToHighlight = p;
+                                    break;
+                                }
+                            }
+                        } else if (changedField === 'originalLanguage') {
+                            const clauseParagraphs = document.querySelectorAll('.document-section p');
+                            for (const p of clauseParagraphs) {
+                                if (p.textContent.includes('Original language:')) {
+                                    elementToHighlight = p;
+                                    break;
+                                }
+                            }
+                        } else if (changedField === 'newLanguage') {
+                            const clauseParagraphs = document.querySelectorAll('.document-section p');
+                            for (const p of clauseParagraphs) {
+                                if (p.textContent.includes('Amended language:')) {
+                                    elementToHighlight = p;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 'additionalTerms':
+                        // For additional terms
+                        if (document.getElementById('additionalTerms').value.trim() !== '') {
+                            const sectionTitles = document.querySelectorAll('.section-title');
+                            for (const title of sectionTitles) {
+                                if (title.textContent.includes('ADDITIONAL TERMS')) {
+                                    elementToHighlight = title.nextElementSibling;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    case 'originalTerms':
+                    case 'customTermsStatement':
+                        // For original terms statement
+                        const miscParagraphs = document.querySelectorAll('.document-section p');
+                        for (const p of miscParagraphs) {
+                            if ((document.getElementById('originalTerms').value === 'remain' && p.textContent.includes('remain in full force and effect')) ||
+                                (document.getElementById('originalTerms').value === 'supersede' && p.textContent.includes('supersedes all previous')) ||
+                                (document.getElementById('originalTerms').value === 'custom' && document.getElementById('customTermsStatement').value && 
+                                 p.textContent.includes(document.getElementById('customTermsStatement').value))) {
+                                elementToHighlight = p;
+                                break;
+                            }
+                        }
+                        break;
+                    case 'amendmentPurpose':
+                        // When amendment purpose changes, highlight the relevant section
+                        const purposeValue = document.getElementById('amendmentPurpose').value;
+                        const allParagraphs = document.querySelectorAll('.document-section p');
+                        
+                        switch(purposeValue) {
+                            case 'extend':
+                                // Find paragraph about term extension
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('term of the Agreement is hereby extended')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 'modify':
+                                // Find paragraph about pricing
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('pricing terms') || p.textContent.includes('payment terms')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 'change-scope':
+                                // Find paragraph about scope changes
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('expanded to include') || 
+                                        p.textContent.includes('reduced to exclude') || 
+                                        p.textContent.includes('modified as follows')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 'add-services':
+                                // Find first paragraph about additional services
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('Additional Services')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 'update-contact':
+                                // Find first paragraph about contact information
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('Contact Information')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                            case 'custom':
+                                // Find first paragraph about custom amendment
+                                for (const p of allParagraphs) {
+                                    if (p.textContent.includes('of the Agreement is hereby amended')) {
+                                        elementToHighlight = p;
+                                        break;
+                                    }
+                                }
+                                break;
+                        }
+                        break;
+                }
+                
+                // If we have an element to highlight, do so
+                if (elementToHighlight) {
+                    elementToHighlight.classList.add('highlight');
+                    highlightedElements.push(elementToHighlight);
+                    
+                    // Scroll to the element if it's not visible
+                    const elementRect = elementToHighlight.getBoundingClientRect();
+                    const previewRect = previewBox.getBoundingClientRect();
+                    
+                    if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+                        elementToHighlight.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'center'
+                        });
+                    }
+                } 
+                // If we have search text instead, find and highlight elements containing it
+                else if (searchText) {
+                    const textNodes = [];
+                    const walk = document.createTreeWalker(
+                        preview,
+                        NodeFilter.SHOW_TEXT,
+                        null,
+                        false
+                    );
+                    
+                    let node;
+                    while (node = walk.nextNode()) {
+                        if (node.nodeValue.includes(searchText)) {
+                            textNodes.push(node);
+                        }
+                    }
+                    
+                    if (textNodes.length > 0) {
+                        // We'll highlight the parent element of the first occurrence
+                        const firstNode = textNodes[0];
+                        const highlightElement = firstNode.parentElement;
+                        
+                        highlightElement.classList.add('highlight');
+                        highlightedElements.push(highlightElement);
+                        
+                        // Scroll to the element if it's not visible
+                        const elementRect = highlightElement.getBoundingClientRect();
+                        const previewRect = previewBox.getBoundingClientRect();
+                        
+                        if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+                            highlightElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+                    }
+                }
+                
+                // Set a timeout to clear the highlights after 5 seconds
+                highlightTimeout = setTimeout(() => {
+                    clearHighlights();
+                }, 5000);
+            }
+            
+            // Reset form function
+            window.resetForm = function() {
+                form.reset();
+                
+                // Reset radio options
+                document.querySelectorAll('.radio-option').forEach(option => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio) {
+                        option.classList.toggle('selected', radio.checked);
+                    }
+                });
+                
+                // Reset conditional sections
+                document.getElementById('fixed-extension-details').style.display = 'block';
+                document.getElementById('indefinite-extension-details').style.display = 'none';
+                document.getElementById('custom-extension-group').style.display = 'none';
+                document.getElementById('custom-termination-group').style.display = 'none';
+                document.getElementById('custom-terms-group').style.display = 'none';
+                
+                // Reset to default amendment purpose
+                document.getElementById('amendmentPurpose').value = 'extend';
+                loadAmendmentDetailsSection('extend');
+                
+                // Clear any highlights and update the preview
+                clearHighlights();
+                updatePreview();
+                copyMessage.style.display = 'none';
+            };
+            
+            // Copy amendment function
+            window.copyAmendment = function() {
+                const amendmentText = preview.innerText;
+                
+                navigator.clipboard.writeText(amendmentText).then(function() {
+                    copyMessage.style.display = 'inline-block';
+                    
+                    setTimeout(() => {
+                        copyMessage.style.display = 'none';
+                    }, 3000);
+                }).catch(function(err) {
+                    console.error('Could not copy text: ', err);
+                    alert('Failed to copy amendment. Please try selecting and copying the text manually.');
+                });
+            };
+            
+            // Download as DOCX function
+            window.downloadAmendment = function() {
+                try {
+                    // Access docx library
+                    const docx = window.docx;
+                    if (!docx) {
+                        throw new Error("DOCX library not loaded");
+                    }
+                    
+                    // Get amendment details for filename
+                    const amendmentNumber = document.getElementById('amendmentNumber').value;
+                    const originalTitle = document.getElementById('originalTitle').value;
+                    const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
+                    
+                    // Create document sections
+                    const paragraphs = [];
+                    
+                    // Add title
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: {
+                                before: 240,
+                                after: 240
+                            },
+                            children: [
+                                new docx.TextRun({
+                                    text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
+                                    bold: true,
+                                    size: 28
+                                })
+                            ]
+                        })
+                    );
+                    
+                    // Get all paragraphs from the preview
+                    const previewParagraphs = preview.querySelectorAll('p');
+                    
+                    previewParagraphs.forEach(p => {
+                        // Skip empty paragraphs
+                        if (!p.textContent.trim()) return;
+                        
+                        paragraphs.push(
+                            new docx.Paragraph({
+                                text: p.textContent,
+                                spacing: {
+                                    before: 120,
+                                    after: 120
+                                }
+                            })
+                        );
+                    });
+                    
+                    // Get all section titles
+                    const sectionTitles = preview.querySelectorAll('.section-title');
+                    
+                    sectionTitles.forEach(title => {
+                        // Find the index where this title should go
+                        const titleText = title.textContent;
+                        let insertIndex = paragraphs.length;
+                        
+                        // Find where to insert this section title
+                        for (let i = 0; i < previewParagraphs.length; i++) {
+                            if (previewParagraphs[i].textContent.includes(titleText)) {
+                                // Find the corresponding paragraph in our paragraphs array
+                                for (let j = 0; j < paragraphs.length; j++) {
+                                    if (paragraphs[j].text === previewParagraphs[i].textContent) {
+                                        insertIndex = j;
+                                        break;
+                                    }
+                                }
+                                break;
+                            }
+                        }
+                        
+                        // Insert the section title
+                        paragraphs.splice(insertIndex, 0, 
+                            new docx.Paragraph({
+                                children: [
+                                    new docx.TextRun({
+                                        text: titleText,
+                                        bold: true,
+                                        size: 24
+                                    })
+                                ],
+                                spacing: {
+                                    before: 240,
+                                    after: 120
+                                }
+                            })
+                        );
+                    });
+                    
+                    // Create document with proper settings
+                    const doc = new docx.Document({
+                        styles: {
+                            default: {
+                                document: {
+                                    run: {
+                                        size: 11 * 2, // 11pt font size (in half-points)
+                                        font: "Times New Roman"
+                                    },
+                                    paragraph: {
+                                        spacing: {
+                                            line: 276, // 1.15x line spacing
+                                            before: 0,
+                                            after: 0
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        sections: [{
+                            properties: {
+                                page: {
+                                    margin: {
+                                        top: 1440, // 1 inch in twips
+                                        right: 1440,
+                                        bottom: 1440,
+                                        left: 1440
+                                    }
+                                }
+                            },
+                            children: paragraphs
+                        }]
+                    });
+                    
+                    // Generate and save document
+                    docx.Packer.toBlob(doc)
+                        .then(blob => {
+                            window.saveAs(blob, filename);
+                        })
+                        .catch(error => {
+                            console.error("Error saving DOCX:", error);
+                            alert("Unable to download. Please try using the copy button instead.");
+                        });
+                } catch (error) {
+                    console.error("DOCX generation error:", error);
+                    alert("Unable to download. Please try using the copy button instead.");
+                }
+            };
+        });
+    </script>
+</body>
+</html>
