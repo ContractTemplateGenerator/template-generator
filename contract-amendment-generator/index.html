@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Contract Amendment Generator</title>
+    <title>Contract Amendment Generator</title>
     <style>
         :root {
             --accent-color: #27ae60;
@@ -44,44 +44,49 @@
         .header {
             background-color: #2c3e50;
             color: white;
-            padding: 25px;
+            padding: 18px;
             text-align: center;
         }
         
         .header h1 {
             font-size: 24px;
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
         }
         
         .header p {
-            font-size: 16px;
+            font-size: 15px;
             opacity: 0.9;
         }
         
         .content {
             display: flex;
             min-height: 600px;
+            max-height: 85vh;
         }
         
         .form-container {
             flex: 1;
-            padding: 25px;
+            padding: 20px;
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
+            max-height: 100%;
         }
         
         .preview-container {
             flex: 1;
-            padding: 25px;
+            padding: 20px;
             position: relative;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
         }
         
         .preview-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
         
         .preview-title {
@@ -97,11 +102,11 @@
         }
         
         .preview-box {
-            height: 600px;
+            flex: 1;
             overflow-y: auto;
             border: 1px solid var(--border-color);
             border-radius: var(--border-radius);
-            padding: 25px;
+            padding: 20px;
             background-color: white;
             font-size: 14px;
             line-height: 1.6;
@@ -110,8 +115,8 @@
         }
         
         .form-section {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
+            margin-bottom: 18px;
+            padding-bottom: 15px;
             border-bottom: 1px solid var(--border-color);
         }
         
@@ -120,25 +125,26 @@
         }
         
         .form-section-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: #2c3e50;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
         
         .form-group label {
             display: block;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
+            font-size: 14px;
         }
         
         .form-input {
             width: 100%;
-            padding: 10px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
@@ -154,21 +160,21 @@
         }
         
         textarea.form-input {
-            min-height: 80px;
+            min-height: 70px;
             resize: vertical;
         }
         
         .form-helper {
             font-size: 12px;
             color: var(--text-secondary);
-            margin-top: 4px;
+            margin-top: 3px;
         }
         
         .radio-options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 8px;
+            gap: 8px;
+            margin-top: 5px;
         }
         
         .radio-option {
@@ -177,7 +183,7 @@
             background-color: #f8f9fa;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            padding: 12px;
+            padding: 8px 10px;
             cursor: pointer;
             transition: var(--transition);
         }
@@ -193,7 +199,7 @@
         }
         
         .radio-option input[type="radio"] {
-            margin-right: 10px;
+            margin-right: 8px;
             margin-top: 3px;
         }
         
@@ -204,24 +210,24 @@
         .radio-label-title {
             font-weight: 600;
             display: block;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
             font-size: 14px;
         }
         
         .radio-label-desc {
             font-size: 12px;
             color: var(--text-secondary);
-            line-height: 1.4;
+            line-height: 1.3;
         }
         
         .date-select {
             display: flex;
-            gap: 10px;
+            gap: 8px;
         }
         
         .date-select select {
             flex: 1;
-            padding: 10px;
+            padding: 8px 10px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
             font-size: 14px;
@@ -231,13 +237,13 @@
         .form-actions {
             display: flex;
             justify-content: space-between;
-            margin-top: 25px;
+            margin-top: 20px;
             flex-wrap: wrap;
             gap: 10px;
         }
         
         .btn {
-            padding: 10px 16px;
+            padding: 8px 14px;
             border-radius: 4px;
             font-size: 14px;
             font-weight: 500;
@@ -285,7 +291,7 @@
             display: block;
             width: 100%;
             margin-top: 15px;
-            padding: 12px;
+            padding: 10px;
             background-color: #2c3e50;
             color: white;
             text-decoration: none;
@@ -331,9 +337,61 @@
             transition: background-color 0.5s ease;
         }
         
+        /* Compact accordion styles */
+        .accordion-header {
+            padding: 10px;
+            background-color: #f8f9fa;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            position: relative;
+            transition: var(--transition);
+        }
+        
+        .accordion-header:hover {
+            background-color: #f1f3f5;
+        }
+        
+        .accordion-header.active {
+            border-radius: 6px 6px 0 0;
+            background-color: #e3f2fd;
+            border-color: #90caf9;
+            margin-bottom: 0;
+        }
+        
+        .accordion-header::after {
+            content: '+';
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            transition: var(--transition);
+        }
+        
+        .accordion-header.active::after {
+            content: '−';
+        }
+        
+        .accordion-content {
+            display: none;
+            padding: 12px;
+            border: 1px solid #90caf9;
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            margin-bottom: 8px;
+        }
+        
         @media (max-width: 1024px) {
             .content {
                 flex-direction: column;
+                max-height: none;
+            }
+            
+            .form-container, .preview-container {
+                max-height: none;
             }
             
             .form-container {
@@ -353,7 +411,7 @@
             }
             
             .header {
-                padding: 20px;
+                padding: 15px;
             }
             
             .form-actions {
@@ -572,107 +630,105 @@
                         </div>
                     </div>
                     
-                    <!-- Amendment Details (changes based on purpose) -->
-                    <div class="form-section" id="amendmentDetailsSection">
-                        <h2 class="form-section-title">Amendment Details</h2>
-                        
-                        <!-- Dynamic content will load here based on purpose selection -->
-                        
-                        <!-- Extend Term (default) -->
-                        <div id="extend-details">
-                            <div class="form-group">
-                                <label for="extensionType">Extension Type</label>
-                                <div class="radio-options">
-                                    <label class="radio-option selected">
-                                        <input type="radio" name="extensionType" value="fixed" checked>
-                                        <div class="radio-label">
-                                            <span class="radio-label-title">Fixed Period Extension</span>
-                                            <span class="radio-label-desc">Extend the contract for a specific time period</span>
-                                        </div>
-                                    </label>
-                                    <label class="radio-option">
-                                        <input type="radio" name="extensionType" value="indefinite">
-                                        <div class="radio-label">
-                                            <span class="radio-label-title">Indefinite Extension</span>
-                                            <span class="radio-label-desc">Extend until terminated by either party</span>
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div id="fixed-extension-details">
+                    <!-- Amendment Details (changes based on purpose) - Using Accordion to save space -->
+                    <div class="form-section">
+                        <div class="accordion-header active" id="amendmentDetailsHeader">Amendment Details</div>
+                        <div class="accordion-content" id="amendmentDetailsSection" style="display: block;">
+                            <!-- Extend Term (default) -->
+                            <div id="extend-details">
                                 <div class="form-group">
-                                    <label for="extensionLength">Extension Length</label>
-                                    <select id="extensionLength" class="form-input">
-                                        <option value="3 months">3 months</option>
-                                        <option value="6 months" selected>6 months</option>
-                                        <option value="1 year">1 year</option>
-                                        <option value="2 years">2 years</option>
-                                        <option value="custom">Custom period</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="custom-extension-group" style="display: none;">
-                                    <div class="form-group">
-                                        <label for="customExtension">Custom Extension Period</label>
-                                        <input type="text" id="customExtension" class="form-input" placeholder="e.g., 9 months">
+                                    <label for="extensionType">Extension Type</label>
+                                    <div class="radio-options">
+                                        <label class="radio-option selected">
+                                            <input type="radio" name="extensionType" value="fixed" checked>
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Fixed Period Extension</span>
+                                                <span class="radio-label-desc">Extend for a specific time period</span>
+                                            </div>
+                                        </label>
+                                        <label class="radio-option">
+                                            <input type="radio" name="extensionType" value="indefinite">
+                                            <div class="radio-label">
+                                                <span class="radio-label-title">Indefinite Extension</span>
+                                                <span class="radio-label-desc">Extend until terminated</span>
+                                            </div>
+                                        </label>
                                     </div>
                                 </div>
-                            </div>
-                            
-                            <div id="indefinite-extension-details" style="display: none;">
-                                <div class="form-group">
-                                    <label for="terminationNotice">Termination Notice Period</label>
-                                    <select id="terminationNotice" class="form-input">
-                                        <option value="30 days">30 days</option>
-                                        <option value="60 days" selected>60 days</option>
-                                        <option value="90 days">90 days</option>
-                                        <option value="custom">Custom period</option>
-                                    </select>
+                                
+                                <div id="fixed-extension-details">
+                                    <div class="form-group">
+                                        <label for="extensionLength">Extension Length</label>
+                                        <select id="extensionLength" class="form-input">
+                                            <option value="3 months">3 months</option>
+                                            <option value="6 months" selected>6 months</option>
+                                            <option value="1 year">1 year</option>
+                                            <option value="2 years">2 years</option>
+                                            <option value="custom">Custom period</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="custom-extension-group" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="customExtension">Custom Extension Period</label>
+                                            <input type="text" id="customExtension" class="form-input" placeholder="e.g., 9 months">
+                                        </div>
+                                    </div>
                                 </div>
                                 
-                                <div id="custom-termination-group" style="display: none;">
+                                <div id="indefinite-extension-details" style="display: none;">
                                     <div class="form-group">
-                                        <label for="customTermination">Custom Termination Notice</label>
-                                        <input type="text" id="customTermination" class="form-input" placeholder="e.g., 45 days">
+                                        <label for="terminationNotice">Termination Notice Period</label>
+                                        <select id="terminationNotice" class="form-input">
+                                            <option value="30 days">30 days</option>
+                                            <option value="60 days" selected>60 days</option>
+                                            <option value="90 days">90 days</option>
+                                            <option value="custom">Custom period</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div id="custom-termination-group" style="display: none;">
+                                        <div class="form-group">
+                                            <label for="customTermination">Custom Termination Notice</label>
+                                            <input type="text" id="customTermination" class="form-input" placeholder="e.g., 45 days">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Other amendment types will be loaded dynamically -->
                     </div>
                     
-                    <!-- Additional Terms -->
+                    <!-- Additional Terms - Using Accordion -->
                     <div class="form-section">
-                        <h2 class="form-section-title">Additional Terms</h2>
-                        
-                        <div class="form-group">
-                            <label for="additionalTerms">Additional Terms & Conditions (Optional)</label>
-                            <textarea id="additionalTerms" class="form-input" placeholder="Enter any additional terms and conditions that apply to this amendment"></textarea>
-                            <div class="form-helper">Leave blank if there are no additional terms to include</div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="originalTerms">Original Terms Status</label>
-                            <select id="originalTerms" class="form-input">
-                                <option value="remain" selected>All other terms remain in full force and effect</option>
-                                <option value="supersede">This amendment supersedes all previous terms</option>
-                                <option value="custom">Custom statement</option>
-                            </select>
-                        </div>
-                        
-                        <div id="custom-terms-group" style="display: none;">
+                        <div class="accordion-header" id="additionalTermsHeader">Additional Terms</div>
+                        <div class="accordion-content" id="additionalTermsSection">
                             <div class="form-group">
-                                <label for="customTermsStatement">Custom Terms Statement</label>
-                                <textarea id="customTermsStatement" class="form-input" placeholder="Enter custom statement about original terms"></textarea>
+                                <label for="additionalTerms">Additional Terms & Conditions (Optional)</label>
+                                <textarea id="additionalTerms" class="form-input" placeholder="Enter any additional terms and conditions that apply to this amendment"></textarea>
+                                <div class="form-helper">Leave blank if there are no additional terms to include</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="originalTerms">Original Terms Status</label>
+                                <select id="originalTerms" class="form-input">
+                                    <option value="remain" selected>All other terms remain in full force and effect</option>
+                                    <option value="supersede">This amendment supersedes all previous terms</option>
+                                    <option value="custom">Custom statement</option>
+                                </select>
+                            </div>
+                            
+                            <div id="custom-terms-group" style="display: none;">
+                                <div class="form-group">
+                                    <label for="customTermsStatement">Custom Terms Statement</label>
+                                    <textarea id="customTermsStatement" class="form-input" placeholder="Enter custom statement about original terms"></textarea>
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <!-- Form Actions -->
                     <div class="form-actions">
-                        <div style="display: flex; gap: 10px;">
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; flex: 1;">
                             <button type="button" id="copyBtn" class="btn btn-copy" onclick="copyAmendment()">Copy Amendment</button>
                             <span id="copyMessage" class="copy-message">Amendment copied!</span>
                             <button type="button" id="downloadBtn" class="btn btn-download" onclick="downloadAmendment()">Download as DOCX</button>
@@ -717,11 +773,20 @@
             const previewBox = document.querySelector('.preview-box');
             
             // Variables to track highlighting
-            let highlightedElements = [];
             let highlightTimeout;
             
             // Initialize preview
             updatePreview();
+            
+            // Initialize accordions
+            const accordionHeaders = document.querySelectorAll('.accordion-header');
+            accordionHeaders.forEach(header => {
+                header.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    content.style.display = this.classList.contains('active') ? 'block' : 'none';
+                });
+            });
             
             // Add event listeners to form elements
             document.querySelectorAll('.form-input, input[type="radio"]').forEach(input => {
@@ -740,15 +805,13 @@
                             toggleExtensionDetails(this.value);
                         }
                         
-                        // Clear highlights and update preview
-                        clearHighlights();
+                        // Update preview
                         updatePreview(this.name);
                         copyMessage.style.display = 'none';
                     });
                 } else {
                     // Regular input event
                     input.addEventListener('input', function() {
-                        clearHighlights();
                         updatePreview(this.id);
                         copyMessage.style.display = 'none';
                         
@@ -779,7 +842,6 @@
                     // For select elements, we need change event
                     if (input.tagName.toLowerCase() === 'select') {
                         input.addEventListener('change', function() {
-                            clearHighlights();
                             updatePreview(this.id);
                             copyMessage.style.display = 'none';
                             
@@ -844,7 +906,14 @@
             
             // Function to load appropriate amendment details section
             function loadAmendmentDetailsSection(purpose) {
-                const detailsSection = document.getElementById('amendmentDetailsSection');
+                // Ensure the accordion is open for the amendment details
+                const header = document.getElementById('amendmentDetailsHeader');
+                const content = document.getElementById('amendmentDetailsSection');
+                if (!header.classList.contains('active')) {
+                    header.classList.add('active');
+                    content.style.display = 'block';
+                }
+                
                 const currentDetails = document.getElementById(`${purpose}-details`);
                 
                 // If section already exists, just show it
@@ -870,21 +939,21 @@
                                             <input type="radio" name="modifyType" value="increase" checked>
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Price Increase</span>
-                                                <span class="radio-label-desc">Increase the contract price</span>
+                                                <span class="radio-label-desc">Increase contract price</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="modifyType" value="decrease">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Price Decrease</span>
-                                                <span class="radio-label-desc">Decrease the contract price</span>
+                                                <span class="radio-label-desc">Decrease contract price</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="modifyType" value="restructure">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Payment Restructure</span>
-                                                <span class="radio-label-desc">Change payment terms or structure</span>
+                                                <span class="radio-label-desc">Change payment terms</span>
                                             </div>
                                         </label>
                                     </div>
@@ -905,7 +974,7 @@
                                 <div id="payment-details" style="display: none;">
                                     <div class="form-group">
                                         <label for="paymentDetails">Payment Term Changes</label>
-                                        <textarea id="paymentDetails" class="form-input" placeholder="Describe the changes to payment terms"></textarea>
+                                        <textarea id="paymentDetails" class="form-input" placeholder="Describe payment term changes"></textarea>
                                     </div>
                                 </div>
                             </div>
@@ -922,21 +991,21 @@
                                             <input type="radio" name="scopeChangeType" value="expand" checked>
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Expand Scope</span>
-                                                <span class="radio-label-desc">Add to the contract scope</span>
+                                                <span class="radio-label-desc">Add to contract scope</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="scopeChangeType" value="reduce">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Reduce Scope</span>
-                                                <span class="radio-label-desc">Remove items from the contract scope</span>
+                                                <span class="radio-label-desc">Remove from scope</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="scopeChangeType" value="modify">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Modify Scope</span>
-                                                <span class="radio-label-desc">Change existing scope items</span>
+                                                <span class="radio-label-desc">Change existing scope</span>
                                             </div>
                                         </label>
                                     </div>
@@ -944,12 +1013,12 @@
                                 
                                 <div class="form-group">
                                     <label for="originalScopeReference">Original Scope Reference</label>
-                                    <input type="text" id="originalScopeReference" class="form-input" placeholder="e.g., Section 2.1 of the Agreement" value="Exhibit A, Section 3">
+                                    <input type="text" id="originalScopeReference" class="form-input" placeholder="e.g., Section 2.1" value="Exhibit A, Section 3">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="scopeChanges">Scope Changes</label>
-                                    <textarea id="scopeChanges" class="form-input" placeholder="Describe the changes to the scope">Add mobile application development services to the existing web application development scope.</textarea>
+                                    <textarea id="scopeChanges" class="form-input" placeholder="Describe scope changes">Add mobile application development services to the existing web application development scope.</textarea>
                                 </div>
                             </div>
                         `;
@@ -959,8 +1028,8 @@
                         detailsHTML = `
                             <div id="add-services-details">
                                 <div class="form-group">
-                                    <label for="servicesDescription">New Services/Deliverables Description</label>
-                                    <textarea id="servicesDescription" class="form-input" placeholder="Describe the new services or deliverables">Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.</textarea>
+                                    <label for="servicesDescription">New Services Description</label>
+                                    <textarea id="servicesDescription" class="form-input" placeholder="Describe new services or deliverables">Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.</textarea>
                                 </div>
                                 
                                 <div class="form-group">
@@ -986,21 +1055,21 @@
                                             <input type="radio" name="partyToUpdate" value="first" checked>
                                             <div class="radio-label">
                                                 <span class="radio-label-title">First Party</span>
-                                                <span class="radio-label-desc">Update contact information for the first party</span>
+                                                <span class="radio-label-desc">Update first party info</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="partyToUpdate" value="second">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Second Party</span>
-                                                <span class="radio-label-desc">Update contact information for the second party</span>
+                                                <span class="radio-label-desc">Update second party info</span>
                                             </div>
                                         </label>
                                         <label class="radio-option">
                                             <input type="radio" name="partyToUpdate" value="both">
                                             <div class="radio-label">
                                                 <span class="radio-label-title">Both Parties</span>
-                                                <span class="radio-label-desc">Update contact information for both parties</span>
+                                                <span class="radio-label-desc">Update both parties info</span>
                                             </div>
                                         </label>
                                     </div>
@@ -1058,17 +1127,17 @@
                             <div id="custom-details">
                                 <div class="form-group">
                                     <label for="clauseToAmend">Clause/Section to Amend</label>
-                                    <input type="text" id="clauseToAmend" class="form-input" placeholder="e.g., Section 8.2, Confidentiality" value="Section 5.3, Intellectual Property Rights">
+                                    <input type="text" id="clauseToAmend" class="form-input" placeholder="e.g., Section 8.2" value="Section 5.3, Intellectual Property Rights">
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="originalLanguage">Original Language (Optional)</label>
-                                    <textarea id="originalLanguage" class="form-input" placeholder="Enter the original language of the clause to be amended">All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.</textarea>
+                                    <textarea id="originalLanguage" class="form-input" placeholder="Enter original language">All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.</textarea>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="newLanguage">New Language</label>
-                                    <textarea id="newLanguage" class="form-input" placeholder="Enter the new language that will replace or modify the original clause">All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.</textarea>
+                                    <textarea id="newLanguage" class="form-input" placeholder="Enter new language">All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.</textarea>
                                 </div>
                             </div>
                         `;
@@ -1081,7 +1150,7 @@
                 
                 // Remove any existing details sections
                 document.querySelectorAll('[id$="-details"]').forEach(section => {
-                    if (!section.closest('.form-section')) { // Only remove top-level sections
+                    if (!section.closest('.accordion-content')) { // Only remove top-level sections
                         section.remove();
                     }
                 });
@@ -1133,21 +1202,18 @@
                                     }
                                 }
                                 
-                                // Clear highlights and update preview
-                                clearHighlights();
+                                // Update preview
                                 updatePreview(this.name);
                             });
                         } else {
                             // Regular input event
                             input.addEventListener('input', function() {
-                                clearHighlights();
                                 updatePreview(this.id);
                             });
                             
                             // For select elements
                             if (input.tagName.toLowerCase() === 'select') {
                                 input.addEventListener('change', function() {
-                                    clearHighlights();
                                     updatePreview(this.id);
                                 });
                             }
@@ -1177,20 +1243,21 @@
                 updatePreview('amendmentPurpose');
             }
             
-            // Function to clear highlights
-            function clearHighlights() {
+            // Function to clear all highlights
+            function clearAllHighlights() {
                 if (highlightTimeout) {
                     clearTimeout(highlightTimeout);
                 }
-                
-                highlightedElements.forEach(element => {
+                document.querySelectorAll('.highlight').forEach(element => {
                     element.classList.remove('highlight');
                 });
-                highlightedElements = [];
             }
             
             // Update Amendment Preview
             function updatePreview(changedField = null) {
+                // Clear any existing highlights
+                clearAllHighlights();
+                
                 // Get form values
                 const originalTitle = document.getElementById('originalTitle').value;
                 const firstParty = document.getElementById('firstParty').value;
@@ -1423,322 +1490,333 @@
                 }
             }
             
-            // Function to highlight changed content and scroll if needed
+            // Function to highlight changed content specifically
             function highlightChangedContent(changedField) {
-                // First clear any existing highlights
-                clearHighlights();
-                
-                // Define text to search for based on field
+                // Define what to highlight based on field changed
+                let highlightTarget = null;
                 let searchText = '';
-                let elementToHighlight = null;
                 
-                // Map fields to search text
+                // Map fields to their corresponding text in the document
                 switch(changedField) {
                     case 'originalTitle':
-                        searchText = document.getElementById('originalTitle').value.toUpperCase();
+                        // Find both the title in uppercase and references in regular casing
+                        applyHighlightToMatches(originalTitle.toUpperCase());
+                        applyHighlightToMatches(originalTitle);
                         break;
+                    
                     case 'originalMonth':
                     case 'originalDay':
                     case 'originalYear':
-                        searchText = `${document.getElementById('originalMonth').value} ${document.getElementById('originalDay').value}, ${document.getElementById('originalYear').value}`;
+                        // Format current original date
+                        const originalDateText = `${document.getElementById('originalMonth').value} ${document.getElementById('originalDay').value}, ${document.getElementById('originalYear').value}`;
+                        applyHighlightToMatches(originalDateText);
                         break;
-                    case 'firstParty':
-                        searchText = document.getElementById('firstParty').value;
-                        break;
-                    case 'secondParty':
-                        searchText = document.getElementById('secondParty').value;
-                        break;
-                    case 'amendmentNumber':
-                        searchText = document.getElementById('amendmentNumber').value;
-                        break;
+                    
                     case 'amendmentMonth':
                     case 'amendmentDay':
                     case 'amendmentYear':
-                        searchText = `${document.getElementById('amendmentMonth').value} ${document.getElementById('amendmentDay').value}, ${document.getElementById('amendmentYear').value}`;
+                        // Format current amendment date
+                        const amendmentDateText = `${document.getElementById('amendmentMonth').value} ${document.getElementById('amendmentDay').value}, ${document.getElementById('amendmentYear').value}`;
+                        applyHighlightToMatches(amendmentDateText);
                         break;
+                    
+                    case 'firstParty':
+                        // Highlight first party name and "First Party" references
+                        const firstPartyValue = document.getElementById('firstParty').value;
+                        applyHighlightToMatches(firstPartyValue);
+                        break;
+                    
+                    case 'secondParty':
+                        // Highlight second party name and "Second Party" references
+                        const secondPartyValue = document.getElementById('secondParty').value;
+                        applyHighlightToMatches(secondPartyValue);
+                        break;
+                    
+                    case 'amendmentNumber':
+                        // Highlight the amendment number
+                        const amendmentNumberValue = document.getElementById('amendmentNumber').value;
+                        applyHighlightToMatches(amendmentNumberValue);
+                        break;
+                    
                     case 'extensionType':
                     case 'extensionLength':
                     case 'customExtension':
                     case 'terminationNotice':
                     case 'customTermination':
-                        // Find the paragraph in the first section that discusses extension
-                        const paragraphs = document.querySelectorAll('.document-section p');
-                        for (const p of paragraphs) {
-                            if (p.textContent.includes('term of the Agreement is hereby extended')) {
-                                elementToHighlight = p;
-                                break;
+                        // For extension-related fields, highlight the specific extension text
+                        const extensionType = document.querySelector('input[name="extensionType"]:checked').value;
+                        
+                        if (extensionType === 'fixed') {
+                            let extensionLength = document.getElementById('extensionLength').value;
+                            if (extensionLength === 'custom') {
+                                extensionLength = document.getElementById('customExtension').value || '6 months';
                             }
+                            applyHighlightToMatches(extensionLength);
+                        } else if (extensionType === 'indefinite') {
+                            let terminationNotice = document.getElementById('terminationNotice').value;
+                            if (terminationNotice === 'custom') {
+                                terminationNotice = document.getElementById('customTermination').value || '60 days';
+                            }
+                            applyHighlightToMatches(terminationNotice);
+                            applyHighlightToMatches('extended indefinitely');
                         }
                         break;
+                    
                     case 'modifyType':
                     case 'originalPrice':
                     case 'newPrice':
                     case 'paymentDetails':
-                        // Find the paragraph in the first section that discusses pricing
-                        const pricingParagraphs = document.querySelectorAll('.document-section p');
-                        for (const p of pricingParagraphs) {
-                            if (p.textContent.includes('pricing terms') || p.textContent.includes('payment terms')) {
-                                elementToHighlight = p;
-                                break;
+                        // For pricing modification fields
+                        const modifyType = document.querySelector('input[name="modifyType"]:checked')?.value || 'increase';
+                        
+                        if (modifyType === 'increase' || modifyType === 'decrease') {
+                            const originalPrice = document.getElementById('originalPrice')?.value || '$10,000';
+                            const newPrice = document.getElementById('newPrice')?.value || '$12,000';
+                            
+                            if (changedField === 'modifyType') {
+                                applyHighlightToMatches(modifyType === 'increase' ? 'increase' : 'decrease');
+                            } else if (changedField === 'originalPrice') {
+                                applyHighlightToMatches(originalPrice);
+                            } else if (changedField === 'newPrice') {
+                                applyHighlightToMatches(newPrice);
+                            }
+                        } else if (modifyType === 'restructure' && changedField === 'paymentDetails') {
+                            const paymentDetails = document.getElementById('paymentDetails')?.value || '';
+                            if (paymentDetails) {
+                                applyHighlightToMatches(paymentDetails);
                             }
                         }
                         break;
+                    
                     case 'scopeChangeType':
                     case 'originalScopeReference':
                     case 'scopeChanges':
-                        // Find the paragraph that discusses scope changes
-                        const scopeParagraphs = document.querySelectorAll('.document-section p');
-                        for (const p of scopeParagraphs) {
-                            if (p.textContent.includes('reduced to exclude') || 
-                                p.textContent.includes('expanded to include') ||
-                                p.textContent.includes('modified as follows')) {
-                                elementToHighlight = p;
-                                break;
-                            }
+                        // For scope change fields
+                        const scopeChangeType = document.querySelector('input[name="scopeChangeType"]:checked')?.value || 'expand';
+                        const originalScopeReference = document.getElementById('originalScopeReference')?.value || '';
+                        const scopeChanges = document.getElementById('scopeChanges')?.value || '';
+                        
+                        if (changedField === 'scopeChangeType') {
+                            let scopeVerb = '';
+                            if (scopeChangeType === 'expand') scopeVerb = 'expanded to include';
+                            else if (scopeChangeType === 'reduce') scopeVerb = 'reduced to exclude';
+                            else scopeVerb = 'modified as follows';
+                            applyHighlightToMatches(scopeVerb);
+                        } else if (changedField === 'originalScopeReference') {
+                            applyHighlightToMatches(originalScopeReference);
+                        } else if (changedField === 'scopeChanges') {
+                            applyHighlightToMatches(scopeChanges);
                         }
                         break;
+                    
                     case 'servicesDescription':
                     case 'servicesPricing':
                     case 'servicesTimeline':
-                        // For services, find the relevant paragraph based on field
-                        const servicesParagraphs = document.querySelectorAll('.document-section p');
-                        for (const p of servicesParagraphs) {
-                            if (changedField === 'servicesDescription' && p.textContent.includes('Additional Services')) {
-                                elementToHighlight = p;
-                                break;
-                            } else if (changedField === 'servicesPricing' && p.textContent.includes('Pricing for Additional Services')) {
-                                elementToHighlight = p;
-                                break;
-                            } else if (changedField === 'servicesTimeline' && p.textContent.includes('Timeline')) {
-                                elementToHighlight = p;
-                                break;
-                            }
+                        // For service addition fields
+                        if (changedField === 'servicesDescription') {
+                            const servicesDescription = document.getElementById('servicesDescription')?.value || '';
+                            applyHighlightToMatches(servicesDescription);
+                        } else if (changedField === 'servicesPricing') {
+                            const servicesPricing = document.getElementById('servicesPricing')?.value || '';
+                            applyHighlightToMatches(servicesPricing);
+                        } else if (changedField === 'servicesTimeline') {
+                            const servicesTimeline = document.getElementById('servicesTimeline')?.value || '';
+                            applyHighlightToMatches(servicesTimeline);
                         }
                         break;
+                    
                     case 'partyToUpdate':
                     case 'firstPartyNewAddress':
                     case 'firstPartyNewContact':
                     case 'firstPartyNewEmail':
                     case 'firstPartyNewPhone':
-                        // For first party contact updates
-                        if (changedField === 'partyToUpdate') {
-                            const contactParagraphs = document.querySelectorAll('.document-section p');
-                            for (const p of contactParagraphs) {
-                                if (p.textContent.includes('Contact Information')) {
-                                    elementToHighlight = p;
-                                    break;
-                                }
-                            }
-                        } else {
-                            const specificField = changedField.replace('firstPartyNew', '');
-                            const contactParagraphs = document.querySelectorAll('.document-section p');
-                            for (const p of contactParagraphs) {
-                                if (p.textContent.includes(specificField + ':')) {
-                                    elementToHighlight = p;
-                                    break;
-                                }
-                            }
-                        }
-                        break;
                     case 'secondPartyNewAddress':
                     case 'secondPartyNewContact':
                     case 'secondPartyNewEmail':
                     case 'secondPartyNewPhone':
-                        // For second party contact updates
-                        const specificField = changedField.replace('secondPartyNew', '');
-                        const secondPartyParagraphs = document.querySelectorAll('.document-section p');
-                        let secondPartySection = false;
-                        for (const p of secondPartyParagraphs) {
-                            if (p.textContent.includes('Second Party Contact Information')) {
-                                secondPartySection = true;
-                                continue;
+                        // For contact information updates
+                        if (changedField === 'partyToUpdate') {
+                            const partyToUpdate = document.querySelector('input[name="partyToUpdate"]:checked')?.value || 'first';
+                            if (partyToUpdate === 'first') {
+                                applyHighlightToMatches('First Party Contact Information');
+                            } else if (partyToUpdate === 'second') {
+                                applyHighlightToMatches('Second Party Contact Information');
                             }
-                            if (secondPartySection && p.textContent.includes(specificField + ':')) {
-                                elementToHighlight = p;
-                                break;
-                            }
+                        } else if (changedField.startsWith('firstPartyNew')) {
+                            const fieldId = changedField;
+                            const fieldValue = document.getElementById(fieldId)?.value || '';
+                            applyHighlightToMatches(fieldValue);
+                        } else if (changedField.startsWith('secondPartyNew')) {
+                            const fieldId = changedField;
+                            const fieldValue = document.getElementById(fieldId)?.value || '';
+                            applyHighlightToMatches(fieldValue);
                         }
                         break;
+                    
                     case 'clauseToAmend':
                     case 'originalLanguage':
                     case 'newLanguage':
-                        // For custom amendment
+                        // For custom amendment fields
                         if (changedField === 'clauseToAmend') {
-                            const clauseParagraphs = document.querySelectorAll('.document-section p');
-                            for (const p of clauseParagraphs) {
-                                if (p.textContent.includes('of the Agreement is hereby amended')) {
-                                    elementToHighlight = p;
-                                    break;
-                                }
-                            }
+                            const clauseToAmend = document.getElementById('clauseToAmend')?.value || '';
+                            applyHighlightToMatches(clauseToAmend);
                         } else if (changedField === 'originalLanguage') {
-                            const clauseParagraphs = document.querySelectorAll('.document-section p');
-                            for (const p of clauseParagraphs) {
-                                if (p.textContent.includes('Original language:')) {
-                                    elementToHighlight = p;
-                                    break;
-                                }
-                            }
+                            const originalLanguage = document.getElementById('originalLanguage')?.value || '';
+                            applyHighlightToMatches(originalLanguage);
                         } else if (changedField === 'newLanguage') {
-                            const clauseParagraphs = document.querySelectorAll('.document-section p');
-                            for (const p of clauseParagraphs) {
-                                if (p.textContent.includes('Amended language:')) {
-                                    elementToHighlight = p;
-                                    break;
-                                }
-                            }
+                            const newLanguage = document.getElementById('newLanguage')?.value || '';
+                            applyHighlightToMatches(newLanguage);
                         }
                         break;
+                    
                     case 'additionalTerms':
                         // For additional terms
-                        if (document.getElementById('additionalTerms').value.trim() !== '') {
-                            const sectionTitles = document.querySelectorAll('.section-title');
-                            for (const title of sectionTitles) {
-                                if (title.textContent.includes('ADDITIONAL TERMS')) {
-                                    elementToHighlight = title.nextElementSibling;
-                                    break;
-                                }
-                            }
+                        const additionalTerms = document.getElementById('additionalTerms')?.value || '';
+                        if (additionalTerms) {
+                            applyHighlightToMatches(additionalTerms);
                         }
                         break;
+                    
                     case 'originalTerms':
                     case 'customTermsStatement':
                         // For original terms statement
-                        const miscParagraphs = document.querySelectorAll('.document-section p');
-                        for (const p of miscParagraphs) {
-                            if ((document.getElementById('originalTerms').value === 'remain' && p.textContent.includes('remain in full force and effect')) ||
-                                (document.getElementById('originalTerms').value === 'supersede' && p.textContent.includes('supersedes all previous')) ||
-                                (document.getElementById('originalTerms').value === 'custom' && document.getElementById('customTermsStatement').value && 
-                                 p.textContent.includes(document.getElementById('customTermsStatement').value))) {
-                                elementToHighlight = p;
-                                break;
-                            }
-                        }
-                        break;
-                    case 'amendmentPurpose':
-                        // When amendment purpose changes, highlight the relevant section
-                        const purposeValue = document.getElementById('amendmentPurpose').value;
-                        const allParagraphs = document.querySelectorAll('.document-section p');
+                        const originalTermsStatus = document.getElementById('originalTerms').value;
+                        let originalTermsText = '';
                         
-                        switch(purposeValue) {
-                            case 'extend':
-                                // Find paragraph about term extension
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('term of the Agreement is hereby extended')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
-                            case 'modify':
-                                // Find paragraph about pricing
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('pricing terms') || p.textContent.includes('payment terms')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
-                            case 'change-scope':
-                                // Find paragraph about scope changes
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('expanded to include') || 
-                                        p.textContent.includes('reduced to exclude') || 
-                                        p.textContent.includes('modified as follows')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
-                            case 'add-services':
-                                // Find first paragraph about additional services
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('Additional Services')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
-                            case 'update-contact':
-                                // Find first paragraph about contact information
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('Contact Information')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
-                            case 'custom':
-                                // Find first paragraph about custom amendment
-                                for (const p of allParagraphs) {
-                                    if (p.textContent.includes('of the Agreement is hereby amended')) {
-                                        elementToHighlight = p;
-                                        break;
-                                    }
-                                }
-                                break;
+                        if (originalTermsStatus === 'remain') {
+                            originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
+                        } else if (originalTermsStatus === 'supersede') {
+                            originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
+                        } else if (originalTermsStatus === 'custom') {
+                            originalTermsText = document.getElementById('customTermsStatement').value || '';
                         }
+                        
+                        applyHighlightToMatches(originalTermsText);
                         break;
                 }
                 
-                // If we have an element to highlight, do so
-                if (elementToHighlight) {
-                    elementToHighlight.classList.add('highlight');
-                    highlightedElements.push(elementToHighlight);
+                // For amendment purpose changes, which requires a more specific approach
+                if (changedField === 'amendmentPurpose') {
+                    const purpose = document.getElementById('amendmentPurpose').value;
                     
-                    // Scroll to the element if it's not visible
-                    const elementRect = elementToHighlight.getBoundingClientRect();
-                    const previewRect = previewBox.getBoundingClientRect();
-                    
-                    if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
-                        elementToHighlight.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'center'
-                        });
-                    }
-                } 
-                // If we have search text instead, find and highlight elements containing it
-                else if (searchText) {
-                    const textNodes = [];
-                    const walk = document.createTreeWalker(
-                        preview,
-                        NodeFilter.SHOW_TEXT,
-                        null,
-                        false
-                    );
-                    
-                    let node;
-                    while (node = walk.nextNode()) {
-                        if (node.nodeValue.includes(searchText)) {
-                            textNodes.push(node);
-                        }
-                    }
-                    
-                    if (textNodes.length > 0) {
-                        // We'll highlight the parent element of the first occurrence
-                        const firstNode = textNodes[0];
-                        const highlightElement = firstNode.parentElement;
+                    // Find the first section after "1. AMENDMENTS" and highlight it
+                    const relevantSection = findFirstAmendmentSection();
+                    if (relevantSection) {
+                        relevantSection.classList.add('highlight');
+                        scrollToElement(relevantSection);
                         
-                        highlightElement.classList.add('highlight');
-                        highlightedElements.push(highlightElement);
-                        
-                        // Scroll to the element if it's not visible
-                        const elementRect = highlightElement.getBoundingClientRect();
-                        const previewRect = previewBox.getBoundingClientRect();
-                        
-                        if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
-                            highlightElement.scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                        }
+                        // Set timeout to clear highlight
+                        highlightTimeout = setTimeout(() => {
+                            relevantSection.classList.remove('highlight');
+                        }, 5000);
                     }
                 }
+            }
+            
+            // Helper function to find the first content after "1. AMENDMENTS"
+            function findFirstAmendmentSection() {
+                const sectionTitles = document.querySelectorAll('.section-title');
+                for (const title of sectionTitles) {
+                    if (title.textContent.includes('1. AMENDMENTS')) {
+                        let nextElement = title.nextElementSibling;
+                        while (nextElement && nextElement.tagName.toLowerCase() !== 'p') {
+                            nextElement = nextElement.nextElementSibling;
+                        }
+                        return nextElement;
+                    }
+                }
+                return null;
+            }
+            
+            // Function to apply highlights to matching text and scroll if needed
+            function applyHighlightToMatches(text) {
+                if (!text || text.trim() === '') return;
                 
-                // Set a timeout to clear the highlights after 5 seconds
-                highlightTimeout = setTimeout(() => {
-                    clearHighlights();
-                }, 5000);
+                // Clean the text for safe regex use
+                const cleanedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                
+                // Find all text nodes in the preview
+                const textNodes = [];
+                const walk = document.createTreeWalker(
+                    preview,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+                
+                let node;
+                let highlighted = false;
+                
+                while (node = walk.nextNode()) {
+                    if (node.nodeValue.includes(text)) {
+                        // Get the parent element
+                        const parentElement = node.parentElement;
+                        
+                        // Get the current content
+                        const currentText = node.nodeValue;
+                        
+                        // Create a new HTML content with the matched text wrapped in a highlight span
+                        const newHtml = currentText.replace(
+                            new RegExp(cleanedText, 'g'), 
+                            '<span class="highlight">$&</span>'
+                        );
+                        
+                        // Create a temporary element
+                        const tempElement = document.createElement('div');
+                        tempElement.innerHTML = newHtml;
+                        
+                        // Get the highlight element for scrolling later
+                        const highlightSpan = tempElement.querySelector('.highlight');
+                        
+                        // Replace the text node with the new HTML
+                        const range = document.createRange();
+                        range.selectNode(node);
+                        range.deleteContents();
+                        
+                        // Insert the new nodes
+                        const fragment = document.createDocumentFragment();
+                        let child;
+                        while (child = tempElement.firstChild) {
+                            fragment.appendChild(child);
+                        }
+                        range.insertNode(fragment);
+                        
+                        // Find the newly inserted highlight span for scrolling
+                        const insertedHighlight = parentElement.querySelector('.highlight');
+                        if (insertedHighlight && !highlighted) {
+                            scrollToElement(insertedHighlight);
+                            highlighted = true;
+                            
+                            // Set timeout to clear highlight
+                            highlightTimeout = setTimeout(() => {
+                                document.querySelectorAll('.highlight').forEach(el => {
+                                    const parent = el.parentNode;
+                                    if (parent) {
+                                        parent.replaceChild(document.createTextNode(el.textContent), el);
+                                        parent.normalize();
+                                    }
+                                });
+                            }, 5000);
+                        }
+                        
+                        break; // Only highlight the first occurrence to avoid multiple scrolling
+                    }
+                }
+            }
+            
+            // Function to scroll to an element
+            function scrollToElement(element) {
+                if (!element) return;
+                
+                const elementRect = element.getBoundingClientRect();
+                const previewRect = previewBox.getBoundingClientRect();
+                
+                if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+                    element.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+                }
             }
             
             // Reset form function
@@ -1753,6 +1831,12 @@
                     }
                 });
                 
+                // Reset accordions
+                document.getElementById('amendmentDetailsHeader').classList.add('active');
+                document.getElementById('amendmentDetailsSection').style.display = 'block';
+                document.getElementById('additionalTermsHeader').classList.remove('active');
+                document.getElementById('additionalTermsSection').style.display = 'none';
+                
                 // Reset conditional sections
                 document.getElementById('fixed-extension-details').style.display = 'block';
                 document.getElementById('indefinite-extension-details').style.display = 'none';
@@ -1764,8 +1848,8 @@
                 document.getElementById('amendmentPurpose').value = 'extend';
                 loadAmendmentDetailsSection('extend');
                 
-                // Clear any highlights and update the preview
-                clearHighlights();
+                // Clear highlights and update the preview
+                clearAllHighlights();
                 updatePreview();
                 copyMessage.style.display = 'none';
             };
