@@ -101,6 +101,14 @@
             font-style: italic;
         }
         
+        /* Ensure the amendment preview content is visible */
+        #amendmentPreview {
+            min-height: 100px;
+            visibility: visible !important;
+            display: block !important;
+        }
+        
+        /* Ensure the preview box shows content */
         .preview-box {
             flex: 1;
             overflow-y: auto;
@@ -112,6 +120,7 @@
             line-height: 1.6;
             color: var(--text-primary);
             position: relative;
+            min-height: 400px; /* Ensure there's space for content */
         }
         
         /* No-copy protection for preview box (before payment) */
@@ -1727,8 +1736,13 @@
             // Check localStorage for saved form data
             loadFormData();
             
-            // Initialize preview
+            // Initialize preview - Force immediate update with default values
             updatePreview();
+            
+            // Set a small delay to ensure preview renders after page load
+            setTimeout(() => {
+                updatePreview();
+            }, 100);
             
             // Save form data on any change
             form.addEventListener('input', saveFormData);
@@ -2434,7 +2448,7 @@
                 } else if (originalTermsStatus === 'supersede') {
                     originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
                 } else if (originalTermsStatus === 'custom') {
-                    originalTermsText = document.getElementById('customTermsStatement').value || 'All other terms and conditions not specifically modified by this Amendment shall remain unchanged.';
+                    originalTermsText = document.getElementById('customTermsStatement')?.value || 'All other terms and conditions not specifically modified by this Amendment shall remain unchanged.';
                 }
                 
                 // Start building the amendment HTML
@@ -2639,8 +2653,17 @@
                     </div>
                 `;
                 
-                // Update the preview
+                // Update the preview - force direct DOM update to ensure content appears
                 preview.innerHTML = amendmentHTML;
+                
+                // Ensure preview is visible by explicitly showing contents
+                preview.style.display = 'block';
+                
+                // If using Firefox or Safari, sometimes we need to force a repaint
+                preview.style.opacity = '0.99';
+                setTimeout(() => {
+                    preview.style.opacity = '1';
+                }, 10);
                 
                 // If a specific field was changed, highlight the relevant content
                 if (changedField) {
