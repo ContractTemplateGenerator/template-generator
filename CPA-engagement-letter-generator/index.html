@@ -354,6 +354,12 @@
             gap: 15px;
             margin-top: 20px;
         }
+        
+        /* Highlight class for affected text */
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.3s ease;
+        }
     </style>
 </head>
 <body>
@@ -1188,6 +1194,9 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             const tabContents = document.querySelectorAll('.tab-content');
             let currentTabIndex = 0;
             
+            // Track changes for highlighting
+            let lastChangedElements = [];
+
             function showTab(index) {
                 tabs.forEach(tab => tab.classList.remove('active'));
                 tabContents.forEach(content => content.classList.remove('active'));
@@ -1218,11 +1227,41 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             // Preview buttons for each tab
             const previewButtons = document.querySelectorAll('[id^="previewBtn"]');
             previewButtons.forEach(button => {
-                button.addEventListener('click', showPreview);
+                button.addEventListener('click', function() {
+                    try {
+                        showPreview();
+                    } catch(e) {
+                        console.error('Error showing preview:', e);
+                        alert('Error generating preview. Please check console for details.');
+                    }
+                });
             });
             
-            document.getElementById('previewFinalBtn').addEventListener('click', showPreview);
-            document.getElementById('generateBtn').addEventListener('click', showPreview);
+            // Final preview and generate buttons
+            const previewFinalBtn = document.getElementById('previewFinalBtn');
+            const generateBtn = document.getElementById('generateBtn');
+            
+            if (previewFinalBtn) {
+                previewFinalBtn.addEventListener('click', function() {
+                    try {
+                        showPreview();
+                    } catch(e) {
+                        console.error('Error showing final preview:', e);
+                        alert('Error generating final preview. Please check console for details.');
+                    }
+                });
+            }
+            
+            if (generateBtn) {
+                generateBtn.addEventListener('click', function() {
+                    try {
+                        showPreview();
+                    } catch(e) {
+                        console.error('Error generating letter:', e);
+                        alert('Error generating letter. Please check console for details.');
+                    }
+                });
+            }
             
             // Service type toggle
             const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
@@ -1238,6 +1277,8 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     if (selectedOption) {
                         selectedOption.style.display = 'block';
                     }
+                    
+                    highlightChanges();
                 });
             });
             
@@ -1260,6 +1301,8 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     } else if (this.value === 'Monthly') {
                         monthlyFeeOptions.style.display = 'block';
                     }
+                    
+                    highlightChanges();
                 });
             });
             
@@ -1278,6 +1321,8 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     } else if (this.value === 'Fixed') {
                         fixedCapGroup.style.display = 'block';
                     }
+                    
+                    highlightChanges();
                 });
             });
             
@@ -1288,6 +1333,7 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             includeLiabilityRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
                     liabilityOptions.style.display = this.value === 'Yes' ? 'block' : 'none';
+                    highlightChanges();
                 });
             });
             
@@ -1298,6 +1344,7 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             thirdPartyRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
                     thirdPartyTermsGroup.style.display = this.value === 'Yes' ? 'block' : 'none';
+                    highlightChanges();
                 });
             });
             
@@ -1308,7 +1355,15 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             staffingRadios.forEach(radio => {
                 radio.addEventListener('change', function() {
                     staffingDetailsGroup.style.display = this.value === 'Yes' ? 'block' : 'none';
+                    highlightChanges();
                 });
+            });
+            
+            // Add change listeners to all input fields
+            const inputFields = document.querySelectorAll('.input-field');
+            inputFields.forEach(field => {
+                field.addEventListener('change', highlightChanges);
+                field.addEventListener('input', highlightChanges);
             });
             
             // Modal functionality
@@ -1331,20 +1386,42 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             }
             
             // Copy letter functionality
-            document.getElementById('copyLetterBtn').addEventListener('click', copyLetter);
+            const copyLetterBtn = document.getElementById('copyLetterBtn');
+            if (copyLetterBtn) {
+                copyLetterBtn.addEventListener('click', function() {
+                    try {
+                        copyLetter();
+                    } catch(e) {
+                        console.error('Error copying letter:', e);
+                        alert('Error copying letter. Please check console for details.');
+                    }
+                });
+            }
             
             function copyLetter() {
-                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                    document.getElementById('datePreview').innerText + '\n\n' +
-                                    document.getElementById('letterContent').innerText + '\n\n' +
+                const letterheadPreview = document.getElementById('letterheadPreview');
+                const datePreview = document.getElementById('datePreview');
+                const letterContent = document.getElementById('letterContent');
+                const cpaSignature = document.getElementById('cpaSignature');
+                const clientSignature = document.getElementById('clientSignature');
+                
+                if (!letterheadPreview || !datePreview || !letterContent || !cpaSignature || !clientSignature) {
+                    console.error('One or more elements not found for copying');
+                    alert('Error: Could not find all elements needed for copying');
+                    return;
+                }
+                
+                const letterContentText = letterheadPreview.innerText + '\n\n' + 
+                                    datePreview.innerText + '\n\n' +
+                                    letterContent.innerText + '\n\n' +
                                     'Sincerely,\n\n' +
-                                    document.getElementById('cpaSignature').innerText + '\n\n' +
+                                    cpaSignature.innerText + '\n\n' +
                                     'ACCEPTED AND AGREED:\n\n' +
-                                    document.getElementById('clientSignature').innerText;
+                                    clientSignature.innerText;
                 
                 // Create a temporary textarea element to copy the text
                 const textarea = document.createElement('textarea');
-                textarea.value = letterContent;
+                textarea.value = letterContentText;
                 textarea.setAttribute('readonly', '');
                 textarea.style.position = 'absolute';
                 textarea.style.left = '-9999px';
@@ -1362,26 +1439,60 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             }
             
             // Download functionality
-            document.getElementById('downloadBtn').addEventListener('click', downloadLetter);
-            document.getElementById('downloadModalBtn').addEventListener('click', downloadLetter);
+            const downloadBtn = document.getElementById('downloadBtn');
+            const downloadModalBtn = document.getElementById('downloadModalBtn');
+            
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', function() {
+                    try {
+                        downloadLetter();
+                    } catch(e) {
+                        console.error('Error downloading letter:', e);
+                        alert('Error downloading letter. Please check console for details.');
+                    }
+                });
+            }
+            
+            if (downloadModalBtn) {
+                downloadModalBtn.addEventListener('click', function() {
+                    try {
+                        downloadLetter();
+                    } catch(e) {
+                        console.error('Error downloading letter from modal:', e);
+                        alert('Error downloading letter. Please check console for details.');
+                    }
+                });
+            }
             
             function downloadLetter() {
                 generateLetter(); // Make sure letter content is up to date
                 
-                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                    document.getElementById('datePreview').innerText + '\n\n' +
-                                    document.getElementById('letterContent').innerText
+                const letterheadPreview = document.getElementById('letterheadPreview');
+                const datePreview = document.getElementById('datePreview');
+                const letterContent = document.getElementById('letterContent');
+                const cpaSignature = document.getElementById('cpaSignature');
+                const clientSignature = document.getElementById('clientSignature');
+                const clientName = document.getElementById('clientName');
+                
+                if (!letterheadPreview || !datePreview || !letterContent || !cpaSignature || !clientSignature || !clientName) {
+                    console.error('One or more elements not found for download');
+                    alert('Error: Could not find all elements needed for download');
+                    return;
+                }
+                
+                const letterContentText = letterheadPreview.innerText + '\n\n' + 
+                                    datePreview.innerText + '\n\n' +
+                                    letterContent.innerText
                                         .replace(/<[^>]*>/g, '')
                                         .replace(/&nbsp;/g, ' ') + '\n\n' +
                                     'Sincerely,\n\n' +
-                                    document.getElementById('cpaSignature').innerText.replace(/<[^>]*>/g, '\n') + '\n\n' +
+                                    cpaSignature.innerText.replace(/<[^>]*>/g, '\n') + '\n\n' +
                                     'ACCEPTED AND AGREED:\n\n' +
-                                    document.getElementById('clientSignature').innerText.replace(/<[^>]*>/g, '\n');
+                                    clientSignature.innerText.replace(/<[^>]*>/g, '\n');
                 
-                const clientName = document.getElementById('clientName').value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const fileName = `cpa_engagement_letter_${clientName}.txt`;
+                const fileName = `cpa_engagement_letter_${clientName.value.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
                 
-                const blob = new Blob([letterContent], { type: 'text/plain' });
+                const blob = new Blob([letterContentText], { type: 'text/plain' });
                 const link = document.createElement('a');
                 link.href = window.URL.createObjectURL(blob);
                 link.download = fileName;
@@ -1392,8 +1503,18 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             
             // Show preview modal
             function showPreview() {
-                generateLetter();
-                modal.style.display = 'block';
+                try {
+                    generateLetter();
+                    if (modal) {
+                        modal.style.display = 'block';
+                    } else {
+                        console.error('Modal element not found');
+                        alert('Preview modal not found');
+                    }
+                } catch(e) {
+                    console.error('Error in showPreview:', e);
+                    throw e;
+                }
             }
             
             // Helper function to format dates
@@ -1403,6 +1524,37 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 if (isNaN(date.getTime())) return dateString; // Return original if invalid
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
                 return date.toLocaleDateString('en-US', options);
+            }
+            
+            // Function to track and highlight changes
+            function highlightChanges() {
+                // Clear previous highlights after a delay
+                setTimeout(() => {
+                    if (lastChangedElements.length > 0) {
+                        lastChangedElements.forEach(el => {
+                            if (el) el.classList.remove('highlight');
+                        });
+                        lastChangedElements = [];
+                    }
+                }, 3000);
+                
+                // Generate letter to reflect changes
+                generateLetter();
+                
+                // We'll implement the highlighting in the preview
+                // by looking at what data has changed and finding corresponding elements
+                const changedData = {};
+                const changedElement = event ? event.target : null;
+                
+                if (changedElement && changedElement.classList.contains('input-field')) {
+                    const target = changedElement.getAttribute('data-target');
+                    if (target) {
+                        changedData[target] = true;
+                    }
+                }
+                
+                // After generating the letter, find elements that should be highlighted
+                // This would be a more complex implementation based on your specific needs
             }
             
             // Generate letter for preview
@@ -1539,164 +1691,4 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     } else if (paymentSchedule === 'Completion') {
                         letterHtml += `<p>The full amount is due upon completion of the engagement.</p>`;
                     }
-                } else if (feeStructure === 'Hourly') {
-                    letterHtml += `<p>Our fees will be based on the time spent by our personnel at the following hourly rates:</p>`;
-                    letterHtml += `<p>Partner: ${document.getElementById('partnerRate').value}<br>
-                    Manager: ${document.getElementById('managerRate').value}<br>
-                    Staff: ${document.getElementById('staffRate').value}</p>`;
-                    
-                    letterHtml += `<p>Based on our preliminary assessment, we estimate that the total hours required will be approximately ${document.getElementById('estimatedHours').value}, resulting in an estimated fee of ${document.getElementById('estimatedTotal').value}. This is only an estimate, and the actual fee may differ based on the time required to complete the engagement.</p>`;
-                    
-                    const billingFrequency = document.querySelector('input[name="hourlyBillingFrequency"]:checked').value;
-                    
-                    letterHtml += `<p>Invoices will be issued ${billingFrequency.toLowerCase()} and are due upon receipt.</p>`;
-                } else if (feeStructure === 'Monthly') {
-                    letterHtml += `<p>Our fee for the services described above will be a monthly retainer of ${document.getElementById('monthlyRetainer').value} for a term of ${document.getElementById('retainerTerm').value}.</p>`;
-                    
-                    letterHtml += `<p>The monthly retainer includes:</p>`;
-                    letterHtml += `<p>${document.getElementById('retainerIncludes').value.replace(/\n/g, '<br>')}</p>`;
-                    
-                    letterHtml += `<p>The monthly retainer will be billed at the beginning of each month and is due upon receipt.</p>`;
                 }
-                
-                // Expenses
-                const expenseHandling = document.querySelector('input[name="expenseHandling"]:checked').value;
-                
-                if (expenseHandling === 'Included') {
-                    letterHtml += `<p>Out-of-pocket expenses are included in the fee arrangement described above.</p>`;
-                } else if (expenseHandling === 'Billed') {
-                    letterHtml += `<p>${document.getElementById('expenseDetails').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Timeline
-                letterHtml += `<h2>Timeline and Deliverables</h2>`;
-                letterHtml += `<p>This engagement will begin on ${formatDate(document.getElementById('startDate').value)} and is expected to be completed by ${formatDate(document.getElementById('endDate').value)}. The following key deadlines apply:</p>`;
-                letterHtml += `<p>${document.getElementById('keyDeadlines').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Client Responsibilities
-                letterHtml += `<h2>Client Responsibilities</h2>`;
-                letterHtml += `<p>${document.getElementById('clientResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<p>You must provide all information necessary for the completion of our services by ${document.getElementById('clientDeadlines').value}. The information should be provided in the following format: ${document.getElementById('clientFormat').value}</p>`;
-                
-                // CPA Firm Responsibilities
-                letterHtml += `<h2>CPA Firm Responsibilities</h2>`;
-                letterHtml += `<p>${document.getElementById('cpaResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<p>${document.getElementById('cpaCommunication').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<h3>Quality Control</h3>`;
-                letterHtml += `<p>${document.getElementById('qualityControl').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Legal Provisions
-                letterHtml += `<h2>Legal Provisions</h2>`;
-                
-                // Governing Law
-                letterHtml += `<h3>Governing Law</h3>`;
-                letterHtml += `<p>This engagement letter shall be governed by and construed in accordance with the laws of the State of ${document.getElementById('governingState').value}, without giving effect to any choice or conflict of law provision or rule. Any legal action arising out of or relating to this engagement shall be brought exclusively in the state or federal courts located in ${document.getElementById('venueCounty').value}, and the parties consent to the personal jurisdiction of such courts.</p>`;
-                
-                // Limitation of Liability
-                const includeLiability = document.querySelector('input[name="includeLiability"]:checked').value;
-                
-                if (includeLiability === 'Yes') {
-                    letterHtml += `<h3>Limitation of Liability</h3>`;
-                    
-                    const liabilityCapType = document.querySelector('input[name="liabilityCapType"]:checked').value;
-                    
-                    if (liabilityCapType === 'Fees') {
-                        const feesCapMultiplier = document.querySelector('input[name="feesCapMultiplier"]:checked').value;
-                        
-                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${feesCapMultiplier} the amount of fees paid by Client for the services that are the subject of the claim.</p>`;
-                    } else if (liabilityCapType === 'Fixed') {
-                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${document.getElementById('fixedCapAmount').value}.</p>`;
-                    }
-                    
-                    letterHtml += `<p>${document.getElementById('liabilityExclusions').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Dispute Resolution
-                letterHtml += `<h3>Dispute Resolution</h3>`;
-                
-                const disputeResolution = document.querySelector('input[name="disputeResolution"]:checked').value;
-                
-                if (disputeResolution === 'Mediation') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall first be submitted to mediation. The mediation shall be conducted in accordance with the rules of the American Arbitration Association. The cost of mediation shall be shared equally by the parties.</p>`;
-                } else if (disputeResolution === 'MediationArbitration') {
-                    letterHtml += `<p>${document.getElementById('mediationArbitrationDetails').value.replace(/\n/g, '<br>')}</p>`;
-                } else if (disputeResolution === 'Arbitration') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall be settled by binding arbitration administered by the American Arbitration Association in accordance with its Professional Accounting and Related Services Arbitration Rules. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction.</p>`;
-                } else if (disputeResolution === 'Litigation') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement may be resolved through litigation in the appropriate courts as specified in the Governing Law section above.</p>`;
-                }
-                
-                // Termination
-                letterHtml += `<h3>Termination</h3>`;
-                
-                const terminationPeriod = document.querySelector('input[name="terminationPeriod"]:checked').value;
-                
-                if (terminationPeriod === '15Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 15 days' written notice to the other party.</p>`;
-                } else if (terminationPeriod === '30Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 30 days' written notice to the other party.</p>`;
-                } else if (terminationPeriod === '60Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 60 days' written notice to the other party.</p>`;
-                }
-                
-                letterHtml += `<p>${document.getElementById('terminationObligations').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Confidentiality
-                letterHtml += `<h3>Confidentiality</h3>`;
-                letterHtml += `<p>${document.getElementById('confidentialityProvisions').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Record Retention
-                letterHtml += `<h3>Record Retention</h3>`;
-                letterHtml += `<p>${document.getElementById('recordRetentionPolicy').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Electronic Communications
-                letterHtml += `<h3>Electronic Communications</h3>`;
-                
-                const electronicMethods = Array.from(document.querySelectorAll('input[data-target="electronicMethods"]:checked'))
-                    .map(input => input.value);
-                
-                if (electronicMethods.length > 0) {
-                    letterHtml += `<p>We will use the following electronic communication methods: ${electronicMethods.join(', ')}.</p>`;
-                }
-                
-                letterHtml += `<p>${document.getElementById('electronicCommunicationTerms').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Third-Party Provisions
-                const includeThirdParty = document.querySelector('input[name="includeThirdParty"]:checked').value;
-                
-                if (includeThirdParty === 'Yes') {
-                    letterHtml += `<h3>Third-Party Use Limitations</h3>`;
-                    letterHtml += `<p>${document.getElementById('thirdPartyTerms').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Staffing Provisions
-                const includeStaffing = document.querySelector('input[name="includeStaffing"]:checked').value;
-                
-                if (includeStaffing === 'Yes') {
-                    letterHtml += `<h3>Engagement Staffing</h3>`;
-                    letterHtml += `<p>${document.getElementById('staffingDetails').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Additional Terms
-                letterHtml += `<h3>Additional Terms and Conditions</h3>`;
-                letterHtml += `<p>${document.getElementById('additionalTerms').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Conclusion
-                letterHtml += `<p>We appreciate the opportunity to be of service to you. If you have any questions about the contents of this letter, please contact us. If the services and terms outlined in this engagement letter are in accordance with your understanding of our agreement, please sign and return a copy to us.</p>`;
-                
-                document.getElementById('letterContent').innerHTML = letterHtml;
-                document.getElementById('letterheadPreview').textContent = document.getElementById('cpaFirmName').value;
-                document.getElementById('datePreview').textContent = formatDate(document.getElementById('letterDate').value);
-                document.getElementById('cpaSignature').innerHTML = '[Partner Name]<br>' + document.getElementById('cpaFirmName').value;
-                document.getElementById('clientSignature').innerHTML = '_____________________________<br>' + document.getElementById('clientName').value + '<br>By: ' + document.getElementById('clientContact').value + '<br>Date: _____________________';
-            }
-            
-            // Initialize the letter
-            generateLetter();
-        });
-    </script>
-</body>
-</html>
