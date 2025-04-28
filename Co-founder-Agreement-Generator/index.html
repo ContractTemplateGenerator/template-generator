@@ -1,0 +1,1856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Co-founder Agreement Generator</title>
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #e74c3c;
+      --light-gray: #f5f7fa;
+      --medium-gray: #e0e0e0;
+      --dark-gray: #718096;
+      --text-color: #333333;
+      --border-radius: 6px;
+      --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    
+    body {
+      color: var(--text-color);
+      line-height: 1.6;
+      background-color: #f9fafb;
+      padding: 20px;
+    }
+    
+    /* Container Styles */
+    .generator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: white;
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
+    }
+    
+    /* Header Styles */
+    .generator-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .generator-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .generator-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Progress Bar */
+    .progress-container {
+      padding: 0 25px;
+      background-color: white;
+    }
+    
+    .progress-bar-outer {
+      height: 6px;
+      background-color: #e0e0e0;
+      border-radius: 3px;
+      margin: 15px 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar-inner {
+      height: 100%;
+      background-color: var(--accent-color);
+      width: 14.28%;
+      transition: width 0.3s ease;
+    }
+    
+    /* Content Layout */
+    .generator-content {
+      display: flex;
+      padding: 0;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      flex: 1;
+      padding: 25px;
+      border-right: 1px solid var(--medium-gray);
+    }
+    
+    .step {
+      display: none;
+    }
+    
+    .step.active {
+      display: block;
+    }
+    
+    .step-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .step-description {
+      color: var(--dark-gray);
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+    
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group input[type="email"],
+    .form-group input[type="number"],
+    .form-group textarea,
+    .form-group select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      color: var(--text-color);
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .form-group input:focus,
+    .form-group textarea:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    .form-hint {
+      font-size: 12px;
+      color: var(--dark-gray);
+      margin-top: 4px;
+    }
+    
+    /* Navigation Buttons */
+    .form-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+    }
+    
+    .btn {
+      padding: 10px 20px;
+      border-radius: var(--border-radius);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      text-align: center;
+    }
+    
+    .btn-back {
+      background-color: #e2e8f0;
+      color: var(--text-color);
+    }
+    
+    .btn-back:hover:not(:disabled) {
+      background-color: #cbd5e0;
+    }
+    
+    .btn-back:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    .btn-next {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-next:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-copy {
+      background-color: var(--accent-color);
+      color: white;
+      margin-right: 10px;
+    }
+    
+    .btn-copy:hover {
+      background-color: #c0392b;
+    }
+    
+    .btn-download {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #1a2533;
+    }
+    
+    .btn-consult {
+      display: block;
+      width: 100%;
+      background-color: #4a5568;
+      color: white;
+      padding: 12px 16px;
+      text-align: center;
+      margin-top: 20px;
+      text-decoration: none;
+      border-radius: var(--border-radius);
+    }
+    
+    .btn-consult:hover {
+      background-color: #2d3748;
+    }
+    
+    /* Radio Options */
+    .radio-options {
+      margin-top: 10px;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      padding: 12px;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .radio-option:hover {
+      background-color: var(--light-gray);
+    }
+    
+    .radio-option.selected {
+      background-color: #fef2f2;
+      border-color: #fecaca;
+    }
+    
+    .radio-option input {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    
+    .radio-label {
+      flex: 1;
+    }
+    
+    .radio-title {
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 2px;
+    }
+    
+    .radio-description {
+      font-size: 13px;
+      color: var(--dark-gray);
+    }
+    
+    /* Cofounder Field Container */
+    .cofounder-container {
+      background-color: var(--light-gray);
+      padding: 15px;
+      border-radius: var(--border-radius);
+      margin-bottom: 15px;
+    }
+    
+    .cofounder-container h3 {
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: var(--primary-color);
+    }
+    
+    .add-cofounder-btn {
+      padding: 8px 16px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      margin-bottom: 15px;
+    }
+    
+    .add-cofounder-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    .remove-cofounder-btn {
+      padding: 4px 8px;
+      background-color: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+    
+    .remove-cofounder-btn:hover {
+      background-color: #c0392b;
+    }
+    
+    /* Range Slider */
+    .range-container {
+      position: relative;
+      width: 100%;
+      margin: 15px 0;
+    }
+    
+    .range-slider {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .range-value {
+      text-align: center;
+      font-weight: 500;
+      margin-top: 5px;
+    }
+    
+    /* Preview Styles */
+    .preview-container {
+      flex: 1;
+      padding: 25px;
+      max-width: 50%;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .preview-description {
+      font-size: 12px;
+      color: var(--dark-gray);
+      font-style: italic;
+    }
+    
+    .preview-box {
+      height: 600px;
+      overflow-y: auto;
+      border: 1px solid var(--medium-gray);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      background-color: white;
+      position: relative;
+    }
+    
+    .agreement-document {
+      font-family: "Times New Roman", Times, serif;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    
+    .document-title {
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .document-date {
+      margin-bottom: 30px;
+    }
+    
+    .document-section {
+      margin-bottom: 20px;
+    }
+    
+    .document-section h4 {
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    
+    .document-paragraph {
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    
+    .document-signature {
+      margin-top: 40px;
+    }
+    
+    .signature-line {
+      border-top: 1px solid black;
+      width: 60%;
+      margin: 30px 0 5px;
+      display: inline-block;
+    }
+    
+    /* Spinner Styles */
+    .spinner-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+    
+    .spinner {
+      border: 4px solid rgba(0, 0, 0, 0.1);
+      border-left-color: var(--secondary-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Copy Message */
+    .copy-message {
+      margin-left: 10px;
+      color: var(--accent-color);
+      font-size: 14px;
+      display: none;
+    }
+    
+    /* Final Step */
+    .final-step {
+      text-align: center;
+    }
+    
+    .final-description {
+      margin-bottom: 20px;
+    }
+    
+    .final-actions {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    
+    /* Highlight for modified content */
+    .highlight {
+      background-color: #ffffa0;
+      transition: background-color 0.5s ease;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 980px) {
+      .generator-content {
+        flex-direction: column;
+      }
+      
+      .form-container, .preview-container {
+        max-width: 100%;
+      }
+      
+      .form-container {
+        border-right: none;
+        border-bottom: 1px solid var(--medium-gray);
+      }
+      
+      .preview-box {
+        height: 400px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .form-navigation {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .final-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .preview-box {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="generator-container">
+    <div class="generator-header">
+      <h1>Co-founder Agreement Generator</h1>
+      <p>Create a customized agreement to establish clear expectations and legal protections with your co-founders</p>
+    </div>
+    
+    <div class="progress-container">
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="progress-bar"></div>
+      </div>
+    </div>
+    
+    <div class="generator-content">
+      <!-- Form Container -->
+      <div class="form-container">
+        <!-- Step 1: Company Information -->
+        <div id="step1" class="step active">
+          <h2 class="step-title">Step 1: Company Information</h2>
+          <p class="step-description">Provide basic information about your company or the company you're forming.</p>
+          
+          <div class="form-group">
+            <label for="company-name">Company Name</label>
+            <input type="text" id="company-name" value="Acme Technologies, Inc." onchange="updatePreview()" onkeyup="updatePreview()">
+          </div>
+          
+          <div class="form-group">
+            <label for="company-type">Company Type</label>
+            <select id="company-type" onchange="updatePreview()">
+              <option value="corporation">Corporation</option>
+              <option value="llc">Limited Liability Company (LLC)</option>
+              <option value="partnership">Partnership</option>
+              <option value="not-formed">Not Yet Formed</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="company-state">State of Formation/Incorporation</label>
+            <select id="company-state" onchange="updatePreview(); showHideOtherState()">
+              <option value="Delaware">Delaware</option>
+              <option value="California">California</option>
+              <option value="New York">New York</option>
+              <option value="Texas">Texas</option>
+              <option value="Florida">Florida</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          
+          <div class="form-group" id="other-state-group" style="display: none;">
+            <label for="other-state">Specify State</label>
+            <input type="text" id="other-state" onchange="updatePreview()" onkeyup="updatePreview()">
+          </div>
+          
+          <div class="form-group">
+            <label for="company-address">Company Address</label>
+            <input type="text" id="company-address" value="123 Innovation Street, Suite 500" onchange="updatePreview()" onkeyup="updatePreview()">
+          </div>
+          
+          <div class="form-group">
+            <label for="company-city">City</label>
+            <input type="text" id="company-city" value="San Francisco" onchange="updatePreview()" onkeyup="updatePreview()">
+          </div>
+          
+          <div class="form-group">
+            <label for="company-zip">Zip/Postal Code</label>
+            <input type="text" id="company-zip" value="94103" onchange="updatePreview()" onkeyup="updatePreview()">
+          </div>
+          
+          <div class="form-group">
+            <label for="business-description">Business Description</label>
+            <textarea id="business-description" rows="3" onchange="updatePreview()" onkeyup="updatePreview()">A technology company developing innovative software solutions for the healthcare industry.</textarea>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" disabled>Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step1').style.display='none'; document.getElementById('step2').style.display='block'; document.getElementById('progress-bar').style.width='28.56%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 2: Co-founder Information -->
+        <div id="step2" class="step">
+          <h2 class="step-title">Step 2: Co-founder Information</h2>
+          <p class="step-description">Provide information about all co-founders, starting with yourself.</p>
+          
+          <div id="cofounders-container">
+            <!-- Co-founder 1 (You) -->
+            <div class="cofounder-container" id="cofounder-1">
+              <h3>Co-founder 1 (You)</h3>
+              
+              <div class="form-group">
+                <label for="cofounder-1-name">Full Legal Name</label>
+                <input type="text" id="cofounder-1-name" value="Jane Smith" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-1-email">Email Address</label>
+                <input type="email" id="cofounder-1-email" value="jane.smith@example.com" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-1-address">Home Address</label>
+                <input type="text" id="cofounder-1-address" value="456 Founder Avenue, Apt 3B" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-1-city">City</label>
+                <input type="text" id="cofounder-1-city" value="San Francisco" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-1-state">State</label>
+                <input type="text" id="cofounder-1-state" value="California" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-1-zip">Zip/Postal Code</label>
+                <input type="text" id="cofounder-1-zip" value="94102" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+            </div>
+            
+            <!-- Co-founder 2 -->
+            <div class="cofounder-container" id="cofounder-2">
+              <h3>Co-founder 2</h3>
+              
+              <div class="form-group">
+                <label for="cofounder-2-name">Full Legal Name</label>
+                <input type="text" id="cofounder-2-name" value="John Doe" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-2-email">Email Address</label>
+                <input type="email" id="cofounder-2-email" value="john.doe@example.com" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-2-address">Home Address</label>
+                <input type="text" id="cofounder-2-address" value="789 Startup Road" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-2-city">City</label>
+                <input type="text" id="cofounder-2-city" value="San Francisco" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-2-state">State</label>
+                <input type="text" id="cofounder-2-state" value="California" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="cofounder-2-zip">Zip/Postal Code</label>
+                <input type="text" id="cofounder-2-zip" value="94105" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <button type="button" class="remove-cofounder-btn" onclick="removeCofounder(2)">Remove Co-founder</button>
+            </div>
+          </div>
+          
+          <button type="button" class="add-cofounder-btn" onclick="addCofounder()">+ Add Another Co-founder</button>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step2').style.display='none'; document.getElementById('step1').style.display='block'; document.getElementById('progress-bar').style.width='14.28%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step2').style.display='none'; document.getElementById('step3').style.display='block'; document.getElementById('progress-bar').style.width='42.84%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 3: Roles and Responsibilities -->
+        <div id="step3" class="step">
+          <h2 class="step-title">Step 3: Roles and Responsibilities</h2>
+          <p class="step-description">Define the roles and responsibilities of each co-founder.</p>
+          
+          <div id="roles-container">
+            <!-- Role for Co-founder 1 -->
+            <div class="cofounder-container" id="role-1">
+              <h3 id="role-1-name">Jane Smith's Role</h3>
+              
+              <div class="form-group">
+                <label for="role-1-title">Job Title</label>
+                <input type="text" id="role-1-title" value="Chief Executive Officer (CEO)" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="role-1-commitment">Time Commitment</label>
+                <select id="role-1-commitment" onchange="updatePreview()">
+                  <option value="full-time">Full-time (40+ hours/week)</option>
+                  <option value="part-time-30">Part-time (30+ hours/week)</option>
+                  <option value="part-time-20">Part-time (20+ hours/week)</option>
+                  <option value="part-time-10">Part-time (10+ hours/week)</option>
+                  <option value="as-needed">As needed/advisory</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="role-1-responsibilities">Key Responsibilities</label>
+                <textarea id="role-1-responsibilities" rows="3" onchange="updatePreview()" onkeyup="updatePreview()">Overall company leadership, fundraising, strategic planning, and external relationships.</textarea>
+              </div>
+            </div>
+            
+            <!-- Role for Co-founder 2 -->
+            <div class="cofounder-container" id="role-2">
+              <h3 id="role-2-name">John Doe's Role</h3>
+              
+              <div class="form-group">
+                <label for="role-2-title">Job Title</label>
+                <input type="text" id="role-2-title" value="Chief Technology Officer (CTO)" onchange="updatePreview()" onkeyup="updatePreview()">
+              </div>
+              
+              <div class="form-group">
+                <label for="role-2-commitment">Time Commitment</label>
+                <select id="role-2-commitment" onchange="updatePreview()">
+                  <option value="full-time">Full-time (40+ hours/week)</option>
+                  <option value="part-time-30">Part-time (30+ hours/week)</option>
+                  <option value="part-time-20">Part-time (20+ hours/week)</option>
+                  <option value="part-time-10">Part-time (10+ hours/week)</option>
+                  <option value="as-needed">As needed/advisory</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="role-2-responsibilities">Key Responsibilities</label>
+                <textarea id="role-2-responsibilities" rows="3" onchange="updatePreview()" onkeyup="updatePreview()">Technology leadership, product development, technical staffing, and infrastructure decisions.</textarea>
+              </div>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="decision-making">Decision Making Process</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="decisions-unanimous" onclick="selectRadio('decisions-unanimous', 'decision-making'); updatePreview()">
+                <input type="radio" id="decisions-unanimous" name="decision-making" value="unanimous" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Unanimous Consent</div>
+                  <div class="radio-description">All co-founders must agree on major decisions</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="decisions-majority" onclick="selectRadio('decisions-majority', 'decision-making'); updatePreview()">
+                <input type="radio" id="decisions-majority" name="decision-making" value="majority">
+                <div class="radio-label">
+                  <div class="radio-title">Majority Vote</div>
+                  <div class="radio-description">Decisions made by a majority of co-founders</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="decisions-proportional" onclick="selectRadio('decisions-proportional', 'decision-making'); updatePreview()">
+                <input type="radio" id="decisions-proportional" name="decision-making" value="proportional">
+                <div class="radio-label">
+                  <div class="radio-title">Equity Proportional</div>
+                  <div class="radio-description">Voting power based on equity percentage</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step3').style.display='none'; document.getElementById('step2').style.display='block'; document.getElementById('progress-bar').style.width='28.56%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step3').style.display='none'; document.getElementById('step4').style.display='block'; document.getElementById('progress-bar').style.width='57.12%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 4: Equity Distribution -->
+        <div id="step4" class="step">
+          <h2 class="step-title">Step 4: Equity Distribution</h2>
+          <p class="step-description">Define how equity will be divided among co-founders.</p>
+          
+          <div class="form-group">
+            <label for="equity-structure">Equity Structure</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="equity-fixed" onclick="selectRadio('equity-fixed', 'equity-structure'); toggleEquityOptions(); updatePreview()">
+                <input type="radio" id="equity-fixed" name="equity-structure" value="fixed" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Fixed Percentages</div>
+                  <div class="radio-description">Set specific equity percentages for each co-founder</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="equity-dynamic" onclick="selectRadio('equity-dynamic', 'equity-structure'); toggleEquityOptions(); updatePreview()">
+                <input type="radio" id="equity-dynamic" name="equity-structure" value="dynamic">
+                <div class="radio-label">
+                  <div class="radio-title">Dynamic Allocation</div>
+                  <div class="radio-description">Equity allocated based on milestones or contributions</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div id="fixed-equity-container">
+            <div id="equity-allocation-container">
+              <!-- Equity for Co-founder 1 -->
+              <div class="cofounder-container" id="equity-1">
+                <h3 id="equity-1-name">Jane Smith's Equity</h3>
+                
+                <div class="range-container">
+                  <label for="equity-1-percentage">Equity Percentage</label>
+                  <input type="range" id="equity-1-percentage" class="range-slider" min="0" max="100" value="60" oninput="updateEquityPercentage(1)">
+                  <div class="range-value" id="equity-1-value">60%</div>
+                </div>
+              </div>
+              
+              <!-- Equity for Co-founder 2 -->
+              <div class="cofounder-container" id="equity-2">
+                <h3 id="equity-2-name">John Doe's Equity</h3>
+                
+                <div class="range-container">
+                  <label for="equity-2-percentage">Equity Percentage</label>
+                  <input type="range" id="equity-2-percentage" class="range-slider" min="0" max="100" value="40" oninput="updateEquityPercentage(2)">
+                  <div class="range-value" id="equity-2-value">40%</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <div id="total-equity-display">Total: 100%</div>
+            </div>
+          </div>
+          
+          <div id="dynamic-equity-container" style="display: none;">
+            <div class="form-group">
+              <label for="dynamic-equity-description">Dynamic Equity Allocation Description</label>
+              <textarea id="dynamic-equity-description" rows="4" onchange="updatePreview()" onkeyup="updatePreview()">Explain how equity will be allocated over time based on contributions, milestones achieved, or other criteria.</textarea>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="vesting-schedule">Vesting Schedule</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="vesting-standard" onclick="selectRadio('vesting-standard', 'vesting-schedule'); toggleVestingOptions(); updatePreview()">
+                <input type="radio" id="vesting-standard" name="vesting-schedule" value="standard" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Standard 4-Year Vesting with 1-Year Cliff</div>
+                  <div class="radio-description">25% vests after 1 year, then monthly installments over the next 3 years</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="vesting-accelerated" onclick="selectRadio('vesting-accelerated', 'vesting-schedule'); toggleVestingOptions(); updatePreview()">
+                <input type="radio" id="vesting-accelerated" name="vesting-schedule" value="accelerated">
+                <div class="radio-label">
+                  <div class="radio-title">Accelerated 3-Year Vesting with 6-Month Cliff</div>
+                  <div class="radio-description">25% vests after 6 months, then monthly installments over the next 2.5 years</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="vesting-custom" onclick="selectRadio('vesting-custom', 'vesting-schedule'); toggleVestingOptions(); updatePreview()">
+                <input type="radio" id="vesting-custom" name="vesting-schedule" value="custom">
+                <div class="radio-label">
+                  <div class="radio-title">Custom Vesting Schedule</div>
+                  <div class="radio-description">Define your own vesting terms</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group" id="custom-vesting-container" style="display: none;">
+            <label for="custom-vesting-description">Custom Vesting Description</label>
+            <textarea id="custom-vesting-description" rows="3" onchange="updatePreview()" onkeyup="updatePreview()"></textarea>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step4').style.display='none'; document.getElementById('step3').style.display='block'; document.getElementById('progress-bar').style.width='42.84%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step4').style.display='none'; document.getElementById('step5').style.display='block'; document.getElementById('progress-bar').style.width='71.4%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 5: Intellectual Property -->
+        <div id="step5" class="step">
+          <h2 class="step-title">Step 5: Intellectual Property</h2>
+          <p class="step-description">Define how intellectual property will be handled.</p>
+          
+          <div class="form-group">
+            <label for="ip-assignment">Intellectual Property Assignment</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="ip-company" onclick="selectRadio('ip-company', 'ip-assignment'); updatePreview()">
+                <input type="radio" id="ip-company" name="ip-assignment" value="company" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Assign All IP to Company</div>
+                  <div class="radio-description">All intellectual property created by co-founders is owned by the company</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="ip-limited" onclick="selectRadio('ip-limited', 'ip-assignment'); updatePreview()">
+                <input type="radio" id="ip-limited" name="ip-assignment" value="limited">
+                <div class="radio-label">
+                  <div class="radio-title">Limited IP Assignment</div>
+                  <div class="radio-description">Only IP related to company business is assigned, personal projects remain separate</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="prior-ip">Pre-existing Intellectual Property</label>
+            <p class="form-hint">List any pre-existing IP that any co-founder is bringing to the company.</p>
+            <textarea id="prior-ip" rows="4" onchange="updatePreview()" onkeyup="updatePreview()">Jane Smith: Content management algorithm developed prior to company formation.
+John Doe: Database optimization tool developed in previous employment (with permission to use).</textarea>
+          </div>
+          
+          <div class="form-group">
+            <label for="ip-exclusions">Intellectual Property Exclusions</label>
+            <p class="form-hint">List any projects or ideas that co-founders will work on separately from the company.</p>
+            <textarea id="ip-exclusions" rows="4" onchange="updatePreview()" onkeyup="updatePreview()"></textarea>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step5').style.display='none'; document.getElementById('step4').style.display='block'; document.getElementById('progress-bar').style.width='57.12%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step5').style.display='none'; document.getElementById('step6').style.display='block'; document.getElementById('progress-bar').style.width='85.68%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 6: Exit and Termination -->
+        <div id="step6" class="step">
+          <h2 class="step-title">Step 6: Exit and Termination</h2>
+          <p class="step-description">Define terms for co-founder departures, terminations, and company exit.</p>
+          
+          <div class="form-group">
+            <label for="voluntary-departure">Voluntary Departure</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="departure-forfeit" onclick="selectRadio('departure-forfeit', 'voluntary-departure'); updatePreview()">
+                <input type="radio" id="departure-forfeit" name="voluntary-departure" value="forfeit" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Forfeit Unvested Equity</div>
+                  <div class="radio-description">Departing co-founder keeps vested shares but forfeits unvested shares</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="departure-repurchase" onclick="selectRadio('departure-repurchase', 'voluntary-departure'); updatePreview()">
+                <input type="radio" id="departure-repurchase" name="voluntary-departure" value="repurchase">
+                <div class="radio-label">
+                  <div class="radio-title">Company Repurchase Option</div>
+                  <div class="radio-description">Company has the option to repurchase vested shares at fair market value</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="termination-cause">Termination for Cause</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="termination-forfeit-all" onclick="selectRadio('termination-forfeit-all', 'termination-cause'); updatePreview()">
+                <input type="radio" id="termination-forfeit-all" name="termination-cause" value="forfeit-all" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Forfeit All Equity</div>
+                  <div class="radio-description">Co-founder forfeits all equity, vested and unvested</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="termination-keep-vested" onclick="selectRadio('termination-keep-vested', 'termination-cause'); updatePreview()">
+                <input type="radio" id="termination-keep-vested" name="termination-cause" value="keep-vested">
+                <div class="radio-label">
+                  <div class="radio-title">Keep Vested Equity</div>
+                  <div class="radio-description">Co-founder keeps vested shares but forfeits unvested shares</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label for="non-compete">Non-Compete Provision</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="non-compete-yes" onclick="selectRadio('non-compete-yes', 'non-compete'); toggleNonCompete(); updatePreview()">
+                <input type="radio" id="non-compete-yes" name="non-compete" value="yes" checked>
+                <div class="radio-label">
+                  <div class="radio-title">Include Non-Compete</div>
+                  <div class="radio-description">Co-founders agree not to compete with the company for a specified period after departure</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="non-compete-no" onclick="selectRadio('non-compete-no', 'non-compete'); toggleNonCompete(); updatePreview()">
+                <input type="radio" id="non-compete-no" name="non-compete" value="no">
+                <div class="radio-label">
+                  <div class="radio-title">No Non-Compete</div>
+                  <div class="radio-description">No restrictions on competition after departure</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group" id="non-compete-term-container">
+            <label for="non-compete-term">Non-Compete Term</label>
+            <select id="non-compete-term" onchange="updatePreview()">
+              <option value="6-months">6 months</option>
+              <option value="12-months" selected>12 months</option>
+              <option value="18-months">18 months</option>
+              <option value="24-months">24 months</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label for="sale-company">Sale of Company</label>
+            <div class="radio-options">
+              <label class="radio-option selected" for="sale-all-consent" onclick="selectRadio('sale-all-consent', 'sale-company'); updatePreview()">
+                <input type="radio" id="sale-all-consent" name="sale-company" value="all-consent" checked>
+                <div class="radio-label">
+                  <div class="radio-title">All Co-founders Must Consent</div>
+                  <div class="radio-description">Sale of company requires consent from all co-founders</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="sale-majority" onclick="selectRadio('sale-majority', 'sale-company'); updatePreview()">
+                <input type="radio" id="sale-majority" name="sale-company" value="majority">
+                <div class="radio-label">
+                  <div class="radio-title">Majority Vote</div>
+                  <div class="radio-description">Sale of company requires majority approval</div>
+                </div>
+              </label>
+              
+              <label class="radio-option" for="sale-proportional" onclick="selectRadio('sale-proportional', 'sale-company'); updatePreview()">
+                <input type="radio" id="sale-proportional" name="sale-company" value="proportional">
+                <div class="radio-label">
+                  <div class="radio-title">Proportional to Equity</div>
+                  <div class="radio-description">Sale approval weighted by equity ownership</div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step6').style.display='none'; document.getElementById('step5').style.display='block'; document.getElementById('progress-bar').style.width='71.4%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step6').style.display='none'; document.getElementById('step7').style.display='block'; document.getElementById('progress-bar').style.width='100%';">Continue</button>
+          </div>
+        </div>
+        
+        <!-- Step 7: Finalize Agreement -->
+        <div id="step7" class="step final-step">
+          <h2 class="step-title">Your Co-founder Agreement is Ready!</h2>
+          <p class="final-description">
+            Your customized Co-founder Agreement has been generated based on your inputs. Review the document carefully before signing.
+            <br><br>
+            <strong>Important:</strong> This agreement should be signed by all co-founders. Consider having it reviewed by an attorney before execution.
+          </p>
+          
+          <div class="final-actions">
+            <button class="btn btn-copy" onclick="copyAgreement()">Copy Text</button>
+            <span class="copy-message" id="copy-message">Copied successfully!</span>
+            <button class="btn btn-download" onclick="downloadAgreement()">Download as PDF</button>
+          </div>
+          
+          <div class="form-navigation">
+            <button class="btn btn-back" onclick="document.getElementById('step7').style.display='none'; document.getElementById('step6').style.display='block'; document.getElementById('progress-bar').style.width='85.68%';">Back</button>
+            <button class="btn btn-next" onclick="document.getElementById('step1').style.display='block'; document.getElementById('step7').style.display='none'; document.getElementById('progress-bar').style.width='14.28%';">Start Over</button>
+          </div>
+          
+          <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+            Schedule a Consultation to Review Your Co-founder Agreement
+          </a>
+        </div>
+      </div>
+      
+      <!-- Preview Container -->
+      <div class="preview-container">
+        <div class="preview-header">
+          <div class="preview-title">Agreement Preview</div>
+          <div class="preview-description">Updates as you complete the form</div>
+        </div>
+        
+        <div class="preview-box">
+          <div class="agreement-document" id="agreement-preview">
+            <!-- Document content will be updated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Calendly integration -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  
+  <script>
+    // Variables to track state
+    let cofounderCount = 2;
+    let highlightedElements = [];
+    let highlightTimeout;
+    
+    // Initialize the form on page load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Generate initial preview
+      updatePreview();
+    });
+    
+    // Function to select a radio option
+    function selectRadio(id, name) {
+      // Get all radio options with the same name
+      const options = document.querySelectorAll(`input[name="${name}"]`);
+      
+      // Unselect all options
+      options.forEach(option => {
+        option.checked = false;
+        const optionCard = option.closest('.radio-option');
+        if (optionCard) optionCard.classList.remove('selected');
+      });
+      
+      // Select the clicked option
+      const selectedOption = document.getElementById(id);
+      if (selectedOption) {
+        selectedOption.checked = true;
+        const optionCard = selectedOption.closest('.radio-option');
+        if (optionCard) optionCard.classList.add('selected');
+      }
+    }
+    
+    // Function to show/hide other state field
+    function showHideOtherState() {
+      const stateSelect = document.getElementById('company-state');
+      const otherStateGroup = document.getElementById('other-state-group');
+      
+      if (stateSelect.value === 'other') {
+        otherStateGroup.style.display = 'block';
+      } else {
+        otherStateGroup.style.display = 'none';
+      }
+    }
+    
+    // Function to toggle equity options
+    function toggleEquityOptions() {
+      const fixedContainer = document.getElementById('fixed-equity-container');
+      const dynamicContainer = document.getElementById('dynamic-equity-container');
+      const equityFixed = document.getElementById('equity-fixed');
+      
+      if (equityFixed && equityFixed.checked) {
+        fixedContainer.style.display = 'block';
+        dynamicContainer.style.display = 'none';
+      } else {
+        fixedContainer.style.display = 'none';
+        dynamicContainer.style.display = 'block';
+      }
+    }
+    
+    // Function to toggle vesting options
+    function toggleVestingOptions() {
+      const customContainer = document.getElementById('custom-vesting-container');
+      const vestingCustom = document.getElementById('vesting-custom');
+      
+      if (vestingCustom && vestingCustom.checked) {
+        customContainer.style.display = 'block';
+      } else {
+        customContainer.style.display = 'none';
+      }
+    }
+    
+    // Function to toggle non-compete term
+    function toggleNonCompete() {
+      const termContainer = document.getElementById('non-compete-term-container');
+      const nonCompeteYes = document.getElementById('non-compete-yes');
+      
+      if (nonCompeteYes && nonCompeteYes.checked) {
+        termContainer.style.display = 'block';
+      } else {
+        termContainer.style.display = 'none';
+      }
+    }
+    
+    // Function to add a new co-founder
+    function addCofounder() {
+      cofounderCount++;
+      
+      // Create new co-founder div
+      const newCofounderDiv = document.createElement('div');
+      newCofounderDiv.className = 'cofounder-container';
+      newCofounderDiv.id = `cofounder-${cofounderCount}`;
+      
+      newCofounderDiv.innerHTML = `
+        <h3>Co-founder ${cofounderCount}</h3>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-name">Full Legal Name</label>
+          <input type="text" id="cofounder-${cofounderCount}-name" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-email">Email Address</label>
+          <input type="email" id="cofounder-${cofounderCount}-email" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-address">Home Address</label>
+          <input type="text" id="cofounder-${cofounderCount}-address" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-city">City</label>
+          <input type="text" id="cofounder-${cofounderCount}-city" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-state">State</label>
+          <input type="text" id="cofounder-${cofounderCount}-state" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="cofounder-${cofounderCount}-zip">Zip/Postal Code</label>
+          <input type="text" id="cofounder-${cofounderCount}-zip" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <button type="button" class="remove-cofounder-btn" onclick="removeCofounder(${cofounderCount})">Remove Co-founder</button>
+      `;
+      
+      // Add the new co-founder div to the container
+      document.getElementById('cofounders-container').appendChild(newCofounderDiv);
+      
+      // Add role section for new co-founder in step 3
+      const newRoleDiv = document.createElement('div');
+      newRoleDiv.className = 'cofounder-container';
+      newRoleDiv.id = `role-${cofounderCount}`;
+      
+      newRoleDiv.innerHTML = `
+        <h3 id="role-${cofounderCount}-name">Co-founder ${cofounderCount}'s Role</h3>
+        
+        <div class="form-group">
+          <label for="role-${cofounderCount}-title">Job Title</label>
+          <input type="text" id="role-${cofounderCount}-title" value="" onchange="updatePreview()" onkeyup="updatePreview()">
+        </div>
+        
+        <div class="form-group">
+          <label for="role-${cofounderCount}-commitment">Time Commitment</label>
+          <select id="role-${cofounderCount}-commitment" onchange="updatePreview()">
+            <option value="full-time">Full-time (40+ hours/week)</option>
+            <option value="part-time-30">Part-time (30+ hours/week)</option>
+            <option value="part-time-20">Part-time (20+ hours/week)</option>
+            <option value="part-time-10">Part-time (10+ hours/week)</option>
+            <option value="as-needed">As needed/advisory</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="role-${cofounderCount}-responsibilities">Key Responsibilities</label>
+          <textarea id="role-${cofounderCount}-responsibilities" rows="3" onchange="updatePreview()" onkeyup="updatePreview()"></textarea>
+        </div>
+      `;
+      
+      // Add the new role div to the container
+      document.getElementById('roles-container').appendChild(newRoleDiv);
+      
+      // Add equity section for new co-founder in step 4
+      const newEquityDiv = document.createElement('div');
+      newEquityDiv.className = 'cofounder-container';
+      newEquityDiv.id = `equity-${cofounderCount}`;
+      
+      newEquityDiv.innerHTML = `
+        <h3 id="equity-${cofounderCount}-name">Co-founder ${cofounderCount}'s Equity</h3>
+        
+        <div class="range-container">
+          <label for="equity-${cofounderCount}-percentage">Equity Percentage</label>
+          <input type="range" id="equity-${cofounderCount}-percentage" class="range-slider" min="0" max="100" value="0" oninput="updateEquityPercentage(${cofounderCount})">
+          <div class="range-value" id="equity-${cofounderCount}-value">0%</div>
+        </div>
+      `;
+      
+      // Add the new equity div to the container
+      document.getElementById('equity-allocation-container').appendChild(newEquityDiv);
+      
+      // Recalculate equity percentages
+      updateAllEquityPercentages();
+      
+      // Update the agreement preview
+      updatePreview();
+    }
+    
+    // Function to remove a co-founder
+    function removeCofounder(index) {
+      // Remove co-founder information
+      const cofounderDiv = document.getElementById(`cofounder-${index}`);
+      if (cofounderDiv) {
+        cofounderDiv.remove();
+      }
+      
+      // Remove role information
+      const roleDiv = document.getElementById(`role-${index}`);
+      if (roleDiv) {
+        roleDiv.remove();
+      }
+      
+      // Remove equity information
+      const equityDiv = document.getElementById(`equity-${index}`);
+      if (equityDiv) {
+        equityDiv.remove();
+      }
+      
+      // Recalculate equity percentages
+      updateAllEquityPercentages();
+      
+      // Update the agreement preview
+      updatePreview();
+    }
+    
+    // Function to update equity percentage
+    function updateEquityPercentage(index) {
+      // Get the slider value
+      const slider = document.getElementById(`equity-${index}-percentage`);
+      const value = slider.value;
+      
+      // Update the displayed value
+      const valueDisplay = document.getElementById(`equity-${index}-value`);
+      valueDisplay.textContent = `${value}%`;
+      
+      // Update total equity display
+      updateTotalEquity();
+      
+      // Update the agreement preview
+      updatePreview(`equity-${index}-percentage`);
+    }
+    
+    // Function to update all equity percentages (redistribute)
+    function updateAllEquityPercentages() {
+      // Get all equity sliders
+      const sliders = document.querySelectorAll('[id^="equity-"][id$="-percentage"]');
+      
+      // Calculate equal distribution
+      const equalPercentage = Math.floor(100 / sliders.length);
+      let remaining = 100 - (equalPercentage * sliders.length);
+      
+      // Set values for each slider
+      sliders.forEach((slider, index) => {
+        let value = equalPercentage;
+        if (index === 0 && remaining > 0) {
+          value += remaining;
+        }
+        
+        slider.value = value;
+        
+        // Update displayed value
+        const id = slider.id.match(/equity-(\d+)-percentage/)[1];
+        const valueDisplay = document.getElementById(`equity-${id}-value`);
+        valueDisplay.textContent = `${value}%`;
+      });
+      
+      // Update total equity display
+      updateTotalEquity();
+    }
+    
+    // Function to update total equity display
+    function updateTotalEquity() {
+      // Get all equity sliders
+      const sliders = document.querySelectorAll('[id^="equity-"][id$="-percentage"]');
+      
+      // Calculate total
+      let total = 0;
+      sliders.forEach(slider => {
+        total += parseInt(slider.value);
+      });
+      
+      // Update display
+      const totalDisplay = document.getElementById('total-equity-display');
+      totalDisplay.textContent = `Total: ${total}%`;
+      
+      // Highlight if not 100%
+      if (total !== 100) {
+        totalDisplay.style.color = 'red';
+      } else {
+        totalDisplay.style.color = 'green';
+      }
+    }
+    
+    // Function to update the agreement preview
+    function updatePreview(changedField = null) {
+      // Clear any existing highlight timeout
+      if (highlightTimeout) {
+        clearTimeout(highlightTimeout);
+      }
+      
+      // Clear previous highlights
+      clearHighlights();
+      
+      // Get company information
+      const companyName = document.getElementById('company-name').value;
+      const companyTypeSelect = document.getElementById('company-type');
+      const companyType = companyTypeSelect.options[companyTypeSelect.selectedIndex].text;
+      const companyState = document.getElementById('company-state').value === 'other' ? 
+                        document.getElementById('other-state').value : 
+                        document.getElementById('company-state').value;
+      const companyAddress = document.getElementById('company-address').value;
+      const companyCity = document.getElementById('company-city').value;
+      const companyZip = document.getElementById('company-zip').value;
+      const businessDescription = document.getElementById('business-description').value;
+      
+      // Get co-founder information
+      const cofounders = [];
+      for (let i = 1; i <= cofounderCount; i++) {
+        const cofounderDiv = document.getElementById(`cofounder-${i}`);
+        if (cofounderDiv) {
+          const name = document.getElementById(`cofounder-${i}-name`)?.value || '';
+          const email = document.getElementById(`cofounder-${i}-email`)?.value || '';
+          const address = document.getElementById(`cofounder-${i}-address`)?.value || '';
+          const city = document.getElementById(`cofounder-${i}-city`)?.value || '';
+          const state = document.getElementById(`cofounder-${i}-state`)?.value || '';
+          const zip = document.getElementById(`cofounder-${i}-zip`)?.value || '';
+          
+          // Update role name if available
+          const roleNameEl = document.getElementById(`role-${i}-name`);
+          if (roleNameEl && name) {
+            roleNameEl.textContent = `${name}'s Role`;
+          }
+          
+          // Update equity name if available
+          const equityNameEl = document.getElementById(`equity-${i}-name`);
+          if (equityNameEl && name) {
+            equityNameEl.textContent = `${name}'s Equity`;
+          }
+          
+          cofounders.push({
+            name,
+            email,
+            address,
+            city,
+            state,
+            zip
+          });
+        }
+      }
+      
+      // Get roles information
+      const roles = [];
+      for (let i = 1; i <= cofounderCount; i++) {
+        const roleDiv = document.getElementById(`role-${i}`);
+        if (roleDiv) {
+          const title = document.getElementById(`role-${i}-title`)?.value || '';
+          const commitmentSelect = document.getElementById(`role-${i}-commitment`);
+          const commitment = commitmentSelect?.options[commitmentSelect.selectedIndex]?.text || '';
+          const responsibilities = document.getElementById(`role-${i}-responsibilities`)?.value || '';
+          
+          roles.push({
+            title,
+            commitment,
+            responsibilities
+          });
+        }
+      }
+      
+      // Get decision making process
+      let decisionMaking = '';
+      const decisionOptions = document.getElementsByName('decision-making');
+      for (const option of decisionOptions) {
+        if (option.checked) {
+          decisionMaking = option.value;
+          break;
+        }
+      }
+      
+      // Get equity information
+      const equityStructure = document.querySelector('input[name="equity-structure"]:checked').value;
+      const dynamicEquityDescription = document.getElementById('dynamic-equity-description').value;
+      
+      const equityPercentages = [];
+      for (let i = 1; i <= cofounderCount; i++) {
+        const equityDiv = document.getElementById(`equity-${i}`);
+        if (equityDiv) {
+          const percentage = document.getElementById(`equity-${i}-percentage`)?.value || 0;
+          equityPercentages.push(percentage);
+        }
+      }
+      
+      // Get vesting information
+      const vestingSchedule = document.querySelector('input[name="vesting-schedule"]:checked').value;
+      const customVestingDescription = document.getElementById('custom-vesting-description')?.value || '';
+      
+      // Get IP information
+      const ipAssignment = document.querySelector('input[name="ip-assignment"]:checked').value;
+      const priorIp = document.getElementById('prior-ip').value;
+      const ipExclusions = document.getElementById('ip-exclusions').value;
+      
+      // Get exit and termination information
+      const voluntaryDeparture = document.querySelector('input[name="voluntary-departure"]:checked').value;
+      const terminationCause = document.querySelector('input[name="termination-cause"]:checked').value;
+      const nonCompete = document.querySelector('input[name="non-compete"]:checked').value;
+      const nonCompeteTermSelect = document.getElementById('non-compete-term');
+      const nonCompeteTerm = nonCompeteTermSelect?.options[nonCompeteTermSelect.selectedIndex]?.text || '';
+      const saleCompany = document.querySelector('input[name="sale-company"]:checked').value;
+      
+      // Format decision making text
+      let decisionMakingText = '';
+      if (decisionMaking === 'unanimous') {
+        decisionMakingText = 'All major business decisions require unanimous consent of all Co-founders.';
+      } else if (decisionMaking === 'majority') {
+        decisionMakingText = 'Major business decisions require approval by a majority of Co-founders.';
+      } else if (decisionMaking === 'proportional') {
+        decisionMakingText = 'Voting power for major business decisions is proportional to each Co-founder\'s equity percentage.';
+      }
+      
+      // Format equity structure text
+      let equityText = '';
+      if (equityStructure === 'fixed') {
+        equityText = 'The equity of the Company is allocated among the Co-founders as follows:';
+        cofounders.forEach((founder, index) => {
+          if (founder.name) {
+            equityText += `\n${founder.name}: ${equityPercentages[index]}%`;
+          }
+        });
+      } else if (equityStructure === 'dynamic') {
+        equityText = dynamicEquityDescription;
+      }
+      
+      // Format vesting text
+      let vestingText = '';
+      if (vestingSchedule === 'standard') {
+        vestingText = 'The equity of each Co-founder shall vest over a period of four (4) years, with 25% vesting after twelve (12) months from the Effective Date (the "cliff"), and the remainder vesting in equal monthly installments over the following thirty-six (36) months.';
+      } else if (vestingSchedule === 'accelerated') {
+        vestingText = 'The equity of each Co-founder shall vest over a period of three (3) years, with 25% vesting after six (6) months from the Effective Date (the "cliff"), and the remainder vesting in equal monthly installments over the following thirty (30) months.';
+      } else if (vestingSchedule === 'custom') {
+        vestingText = customVestingDescription;
+      }
+      
+      // Format IP assignment text
+      let ipAssignmentText = '';
+      if (ipAssignment === 'company') {
+        ipAssignmentText = 'Each Co-founder hereby assigns to the Company all right, title, and interest in and to any and all inventions, original works of authorship, developments, concepts, improvements, designs, drawings, discoveries, algorithms, formulas, computer code, ideas, trademarks, or trade secrets, whether or not patentable or registrable under patent, copyright or similar laws, that such Co-founder solely or jointly conceives, develops or reduces to practice, or causes to be conceived, developed or reduced to practice.';
+      } else if (ipAssignment === 'limited') {
+        ipAssignmentText = 'Each Co-founder hereby assigns to the Company all right, title, and interest in and to any and all inventions, original works of authorship, developments, concepts, improvements, designs, drawings, discoveries, algorithms, formulas, computer code, ideas, trademarks, or trade secrets, whether or not patentable or registrable under patent, copyright or similar laws, that such Co-founder solely or jointly conceives, develops or reduces to practice, or causes to be conceived, developed or reduced to practice, that relate to the Company\'s business or actual or demonstrably anticipated research or development.';
+      }
+      
+      // Format voluntary departure text
+      let voluntaryDepartureText = '';
+      if (voluntaryDeparture === 'forfeit') {
+        voluntaryDepartureText = 'In the event that a Co-founder voluntarily terminates their relationship with the Company, such Co-founder shall retain all vested equity and forfeit all unvested equity as of the date of departure.';
+      } else if (voluntaryDeparture === 'repurchase') {
+        voluntaryDepartureText = 'In the event that a Co-founder voluntarily terminates their relationship with the Company, the Company shall have the option, but not the obligation, to repurchase all or any portion of such Co-founder\'s vested equity at fair market value within ninety (90) days of the date of departure. The Co-founder shall forfeit all unvested equity.';
+      }
+      
+      // Format termination for cause text
+      let terminationCauseText = '';
+      if (terminationCause === 'forfeit-all') {
+        terminationCauseText = 'In the event that a Co-founder is terminated for Cause, such Co-founder shall forfeit all equity, whether vested or unvested, as of the date of termination.';
+      } else if (terminationCause === 'keep-vested') {
+        terminationCauseText = 'In the event that a Co-founder is terminated for Cause, such Co-founder shall retain all vested equity and forfeit all unvested equity as of the date of termination.';
+      }
+      
+      // Format non-compete text
+      let nonCompeteText = '';
+      if (nonCompete === 'yes') {
+        nonCompeteText = `Each Co-founder agrees that during the term of their relationship with the Company and for a period of ${nonCompeteTerm} thereafter, such Co-founder will not, directly or indirectly, engage in or prepare to engage in, or otherwise be employed by, any business that is competitive with the Company in any state or country where the Company conducts business.`;
+      } else if (nonCompete === 'no') {
+        nonCompeteText = 'The Co-founders acknowledge and agree that they shall not be bound by any non-competition restrictions following the termination of their relationship with the Company.';
+      }
+      
+      // Format sale of company text
+      let saleCompanyText = '';
+      if (saleCompany === 'all-consent') {
+        saleCompanyText = 'Any sale, merger, or other change of control of the Company shall require the consent of all Co-founders.';
+      } else if (saleCompany === 'majority') {
+        saleCompanyText = 'Any sale, merger, or other change of control of the Company shall require the consent of a majority of Co-founders.';
+      } else if (saleCompany === 'proportional') {
+        saleCompanyText = 'Any sale, merger, or other change of control of the Company shall require the consent of Co-founders holding a majority of the equity in the Company.';
+      }
+      
+      // Build the agreement HTML
+      let agreementHTML = `
+        <div class="document-title">CO-FOUNDER AGREEMENT</div>
+        
+        <div class="document-section" id="preamble">
+          <div class="document-paragraph">
+            This Co-Founder Agreement (the "Agreement") is made and entered into as of ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} (the "Effective Date") by and among the following individuals (each a "Co-founder" and collectively the "Co-founders"):
+          </div>
+          
+          <div class="document-paragraph" id="cofounders-list">
+            ${cofounders.map(founder => founder.name ? `${founder.name}, residing at ${founder.address}, ${founder.city}, ${founder.state} ${founder.zip}` : '').filter(x => x).join('; ')}
+          </div>
+          
+          <div class="document-paragraph">
+            The Co-founders are forming or have formed ${companyName} (the "Company"), a ${companyType.toLowerCase()} organized under the laws of the State of ${companyState}, with its principal place of business at ${companyAddress}, ${companyCity}, ${companyState} ${companyZip}.
+          </div>
+        </div>
+        
+        <div class="document-section" id="recitals">
+          <h4>1. RECITALS</h4>
+          
+          <div class="document-paragraph">
+            WHEREAS, the Co-founders desire to establish and document their respective rights and obligations with respect to the Company's governance, ownership, operations, and their relationship with one another;
+          </div>
+          
+          <div class="document-paragraph">
+            WHEREAS, the Co-founders desire to set forth certain agreements regarding management and ownership of the Company;
+          </div>
+          
+          <div class="document-paragraph">
+            NOW, THEREFORE, in consideration of the mutual covenants, promises, and conditions contained herein, and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the Co-founders agree as follows:
+          </div>
+        </div>
+        
+        <div class="document-section" id="company-description">
+          <h4>2. COMPANY DESCRIPTION</h4>
+          
+          <div class="document-paragraph" id="business-desc">
+            The Company's business purpose is: ${businessDescription}
+          </div>
+        </div>
+        
+        <div class="document-section" id="roles-responsibilities">
+          <h4>3. ROLES AND RESPONSIBILITIES</h4>
+          
+          <div class="document-paragraph" id="roles-desc">
+            Each Co-founder shall have the roles, responsibilities, and time commitments as set forth below:
+          </div>
+          
+          ${cofounders.map((founder, index) => founder.name ? `
+            <div class="document-paragraph" id="role-desc-${index + 1}">
+              <strong>${founder.name}:</strong> ${roles[index]?.title || 'TBD'} - ${roles[index]?.commitment || 'TBD'}<br>
+              Responsibilities: ${roles[index]?.responsibilities || 'To be determined.'}
+            </div>
+          ` : '').join('')}
+        </div>
+        
+        <div class="document-section" id="decision-making">
+          <h4>4. DECISION MAKING</h4>
+          
+          <div class="document-paragraph" id="decisions-desc">
+            ${decisionMakingText}
+          </div>
+        </div>
+        
+        <div class="document-section" id="equity-allocation">
+          <h4>5. EQUITY ALLOCATION</h4>
+          
+          <div class="document-paragraph" id="equity-desc">
+            ${equityText}
+          </div>
+          
+          <div class="document-paragraph" id="vesting-desc">
+            <strong>Vesting Schedule:</strong> ${vestingText}
+          </div>
+        </div>
+        
+        <div class="document-section" id="intellectual-property">
+          <h4>6. INTELLECTUAL PROPERTY</h4>
+          
+          <div class="document-paragraph" id="ip-assignment-desc">
+            ${ipAssignmentText}
+          </div>
+          
+          ${priorIp ? `
+            <div class="document-paragraph" id="prior-ip-desc">
+              <strong>Pre-Existing Intellectual Property:</strong> The following intellectual property was developed by the Co-founders prior to their relationship with the Company and is not assigned to the Company:<br>
+              ${priorIp}
+            </div>
+          ` : ''}
+          
+          ${ipExclusions ? `
+            <div class="document-paragraph" id="ip-exclusions-desc">
+              <strong>Intellectual Property Exclusions:</strong> The following projects or ideas are specifically excluded from assignment to the Company:<br>
+              ${ipExclusions}
+            </div>
+          ` : ''}
+        </div>
+        
+        <div class="document-section" id="confidentiality">
+          <h4>7. CONFIDENTIALITY</h4>
+          
+          <div class="document-paragraph">
+            Each Co-founder agrees to keep all non-public information pertaining to the Company's business confidential and not to disclose such information to any third party without the prior written consent of all Co-founders, except as required by law or as necessary for the ordinary course of business.
+          </div>
+        </div>
+        
+        <div class="document-section" id="departure-termination">
+          <h4>8. DEPARTURE AND TERMINATION</h4>
+          
+          <div class="document-paragraph" id="voluntary-departure-desc">
+            <strong>Voluntary Departure:</strong> ${voluntaryDepartureText}
+          </div>
+          
+          <div class="document-paragraph" id="termination-cause-desc">
+            <strong>Termination for Cause:</strong> ${terminationCauseText}
+          </div>
+          
+          <div class="document-paragraph" id="non-compete-desc">
+            <strong>Non-Compete:</strong> ${nonCompeteText}
+          </div>
+        </div>
+        
+        <div class="document-section" id="company-sale">
+          <h4>9. SALE OF COMPANY</h4>
+          
+          <div class="document-paragraph" id="sale-desc">
+            ${saleCompanyText}
+          </div>
+        </div>
+        
+        <div class="document-section" id="miscellaneous">
+          <h4>10. MISCELLANEOUS</h4>
+          
+          <div class="document-paragraph">
+            <strong>Entire Agreement:</strong> This Agreement constitutes the entire agreement among the Co-founders with respect to the subject matter hereof and supersedes all prior agreements and understandings, both written and oral, among the Co-founders with respect to the subject matter hereof.
+          </div>
+          
+          <div class="document-paragraph">
+            <strong>Amendment:</strong> This Agreement may be amended or modified only by a written instrument executed by all Co-founders.
+          </div>
+          
+          <div class="document-paragraph">
+            <strong>Governing Law:</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of ${companyState} without giving effect to any choice or conflict of law provision or rule.
+          </div>
+          
+          <div class="document-paragraph">
+            <strong>Counterparts:</strong> This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall be deemed to be one and the same agreement.
+          </div>
+        </div>
+        
+        <div class="document-section" id="signatures">
+          <div class="document-paragraph">
+            IN WITNESS WHEREOF, the parties have executed this Co-Founder Agreement as of the Effective Date.
+          </div>
+          
+          <div class="document-signature">
+            ${cofounders.map(founder => founder.name ? `
+              <div style="margin-top: 40px;">
+                <div class="signature-line"></div>
+                ${founder.name}<br>
+                Date:
+              </div>
+            ` : '').join('')}
+          </div>
+        </div>
+      `;
+      
+      // Update the preview
+      document.getElementById('agreement-preview').innerHTML = agreementHTML;
+      
+      // Highlight changed content if a specific field was changed
+      if (changedField) {
+        highlightChangedContent(changedField);
+      }
+    }
+    
+    // Function to clear all highlights
+    function clearHighlights() {
+      highlightedElements.forEach(el => {
+        el.classList.remove('highlight');
+      });
+      highlightedElements = [];
+    }
+    
+    // Function to highlight changed content
+    function highlightChangedContent(changedField) {
+      let sectionId = '';
+      
+      // Determine which section to highlight based on the changed field
+      if (changedField.startsWith('company-')) {
+        if (changedField === 'company-name' || changedField === 'company-type' || changedField === 'company-state' || 
+            changedField === 'company-address' || changedField === 'company-city' || changedField === 'company-zip' || 
+            changedField === 'other-state') {
+          sectionId = 'preamble';
+        } else if (changedField === 'business-description') {
+          sectionId = 'business-desc';
+        }
+      } else if (changedField.startsWith('cofounder-')) {
+        const matches = changedField.match(/cofounder-(\d+)/);
+        if (matches) {
+          const founderIndex = parseInt(matches[1]);
+          sectionId = 'cofounders-list';
+        }
+      } else if (changedField.startsWith('role-')) {
+        const matches = changedField.match(/role-(\d+)/);
+        if (matches) {
+          const founderIndex = parseInt(matches[1]);
+          sectionId = `role-desc-${founderIndex}`;
+        }
+      } else if (changedField === 'decision-making') {
+        sectionId = 'decisions-desc';
+      } else if (changedField.startsWith('equity-') || changedField === 'dynamic-equity-description') {
+        sectionId = 'equity-desc';
+      } else if (changedField.includes('vesting')) {
+        sectionId = 'vesting-desc';
+      } else if (changedField.startsWith('ip-') || changedField === 'prior-ip') {
+        if (changedField === 'ip-assignment') {
+          sectionId = 'ip-assignment-desc';
+        } else if (changedField === 'prior-ip') {
+          sectionId = 'prior-ip-desc';
+        } else if (changedField === 'ip-exclusions') {
+          sectionId = 'ip-exclusions-desc';
+        }
+      } else if (changedField === 'voluntary-departure') {
+        sectionId = 'voluntary-departure-desc';
+      } else if (changedField === 'termination-cause') {
+        sectionId = 'termination-cause-desc';
+      } else if (changedField.includes('non-compete')) {
+        sectionId = 'non-compete-desc';
+      } else if (changedField === 'sale-company') {
+        sectionId = 'sale-desc';
+      }
+      
+      // Find and highlight the element
+      if (sectionId) {
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.classList.add('highlight');
+          highlightedElements.push(element);
+          
+          // Ensure the highlighted element is visible
+          ensureVisibility(element);
+        }
+      }
+    }
+    
+    // Function to ensure an element is visible in the preview
+    function ensureVisibility(element) {
+      const previewBox = document.querySelector('.preview-box');
+      const elementPosition = element.getBoundingClientRect().top;
+      const containerPosition = previewBox.getBoundingClientRect().top;
+      const relativePosition = elementPosition - containerPosition;
+      
+      // If the element is not visible or only partially visible
+      if (relativePosition < 0 || relativePosition > previewBox.clientHeight - element.clientHeight) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+    
+    // Function to copy the agreement
+    function copyAgreement() {
+      const agreementText = document.getElementById('agreement-preview').innerText;
+      
+      // Create a temporary textarea element to copy from
+      const tempTextArea = document.createElement('textarea');
+      tempTextArea.value = agreementText;
+      tempTextArea.setAttribute('readonly', '');
+      tempTextArea.style.position = 'absolute';
+      tempTextArea.style.left = '-9999px';
+      document.body.appendChild(tempTextArea);
+      
+      // Select and copy the text
+      tempTextArea.select();
+      document.execCommand('copy');
+      
+      // Remove the temporary element
+      document.body.removeChild(tempTextArea);
+      
+      // Show success message
+      const copyMessage = document.getElementById('copy-message');
+      copyMessage.style.display = 'inline';
+      
+      // Hide message after a delay
+      setTimeout(() => {
+        copyMessage.style.display = 'none';
+      }, 3000);
+    }
+    
+    // Function to download agreement as PDF
+    function downloadAgreement() {
+      alert("In a real implementation, this would generate and download a PDF document. You would need to integrate a PDF generation library like jsPDF or use server-side PDF generation.");
+    }
+  </script>
+</body>
+</html>
