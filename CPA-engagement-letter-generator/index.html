@@ -228,17 +228,6 @@
             top: 20px;
             right: 20px;
             background-color: var(--primary-color);
-            color: white;
-            padding: 8px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            z-index: 100;
-        }
-        
-        .copy-button:hover {
-            background-color: #1a2735;
         }
         
         .notification {
@@ -974,6 +963,7 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
     <div class="notification" id="notification">Letter copied to clipboard!</div>
     
     <script>
+        // Wait for DOM to fully load before initializing
         document.addEventListener('DOMContentLoaded', function() {
             // Tab functionality
             const tabs = document.querySelectorAll('.tab');
@@ -993,9 +983,6 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 prevTabButton.disabled = currentTabIndex === 0;
                 nextTabButton.disabled = currentTabIndex === tabs.length - 1;
                 nextTabButton.textContent = currentTabIndex === tabs.length - 1 ? 'Finish' : 'Next';
-                
-                // Update the letter preview whenever a new tab is shown
-                updateLetter();
             }
             
             tabs.forEach((tab, index) => {
@@ -1111,6 +1098,15 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     updateLetter();
                 });
             });
+            
+            // Helper function to format dates
+            function formatDate(dateString) {
+                if (!dateString) return '';
+                const date = new Date(dateString);
+                if (isNaN(date.getTime())) return dateString; // Return original if invalid
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
             
             // Update letter preview function
             function updateLetter() {
@@ -1400,13 +1396,6 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 document.getElementById('clientSignature').innerHTML = '_____________________________<br>' + document.getElementById('clientName').value + '<br>By: ' + document.getElementById('clientContact').value + '<br>Date: _____________________';
             }
             
-            // Helper function to format dates
-            function formatDate(dateString) {
-                const date = new Date(dateString);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return date.toLocaleDateString('en-US', options);
-            }
-            
             // Highlight changes in the preview
             function highlightChange(element) {
                 const dataTarget = element.dataset.target;
@@ -1423,14 +1412,6 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 } else {
                     return; // Skip unchecked checkboxes and radios
                 }
-                
-                // Reset previous highlights
-                const highlights = document.querySelectorAll('.highlight');
-                highlights.forEach(highlight => {
-                    const parent = highlight.parentNode;
-                    parent.replaceChild(document.createTextNode(highlight.textContent), highlight);
-                    parent.normalize();
-                });
                 
                 // Find text in the preview containing the new value
                 const letterContent = document.getElementById('letterContent');
@@ -1450,124 +1431,63 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 
                 let found = false;
                 
-                // First try to find exact matches for the value
-                if (newValue && newValue.length > 2) { // Only highlight if value is more than 2 characters
-                    for (let i = 0; i < textNodes.length; i++) {
-                        const node = textNodes[i];
-                        const text = node.nodeValue;
-                        
-                        if (text && text.includes(newValue)) {
-                            const index = text.indexOf(newValue);
-                            if (index >= 0) {
-                                // Split the text node into three parts
-                                const before = text.substring(0, index);
-                                const highlight = text.substring(index, index + newValue.length);
-                                const after = text.substring(index + newValue.length);
-                                
-                                const fragment = document.createDocumentFragment();
-                                
-                                if (before) {
-                                    fragment.appendChild(document.createTextNode(before));
-                                }
-                                
-                                const span = document.createElement('span');
-                                span.className = 'highlight';
-                                span.textContent = highlight;
-                                fragment.appendChild(span);
-                                
-                                if (after) {
-                                    fragment.appendChild(document.createTextNode(after));
-                                }
-                                
-                                node.parentNode.replaceChild(fragment, node);
-                                
-                                // Scroll to the highlighted element if it's not visible
-                                const rect = span.getBoundingClientRect();
-                                const isVisible = (
-                                    rect.top >= 0 &&
-                                    rect.left >= 0 &&
-                                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-                                );
-                                
-                                if (!isVisible) {
-                                    span.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                                
-                                found = true;
-                                break;
+                for (let i = 0; i < textNodes.length; i++) {
+                    const node = textNodes[i];
+                    const text = node.nodeValue;
+                    
+                    if (text && text.includes(newValue) && newValue.length > 3) { // Only highlight if value is more than 3 characters
+                        const index = text.indexOf(newValue);
+                        if (index >= 0) {
+                            // Split the text node into three parts
+                            const before = text.substring(0, index);
+                            const highlight = text.substring(index, index + newValue.length);
+                            const after = text.substring(index + newValue.length);
+                            
+                            const fragment = document.createDocumentFragment();
+                            
+                            if (before) {
+                                fragment.appendChild(document.createTextNode(before));
                             }
+                            
+                            const span = document.createElement('span');
+                            span.className = 'highlight';
+                            span.textContent = highlight;
+                            fragment.appendChild(span);
+                            
+                            if (after) {
+                                fragment.appendChild(document.createTextNode(after));
+                            }
+                            
+                            node.parentNode.replaceChild(fragment, node);
+                            
+                            // Scroll to the highlighted element if it's not visible
+                            span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            
+                            found = true;
+                            break;
                         }
                     }
                 }
                 
-                // If no direct match found, try to find content related to the data target
                 if (!found && dataTarget) {
-                    // Create patterns for common data targets
-                    let patterns = [];
+                    // Try to find elements that might contain the data target
+                    const regex = new RegExp(dataTarget, 'i');
                     
-                    switch(dataTarget) {
-                        case 'clientName':
-                            patterns.push(new RegExp(`${newValue}\\s*\\(`));
-                            patterns.push(new RegExp(`Client:\\s*${newValue}`));
-                            break;
-                        case 'serviceType':
-                            patterns.push(new RegExp(`${newValue}\\s*service`));
-                            break;
-                        case 'governingState':
-                            patterns.push(new RegExp(`laws of the State of ${newValue}`));
-                            break;
-                        case 'feeStructure':
-                            if (newValue === 'Fixed') {
-                                patterns.push(/our fee for the services described above will be/i);
-                            } else if (newValue === 'Hourly') {
-                                patterns.push(/our fees will be based on the time spent/i);
-                            } else if (newValue === 'Monthly') {
-                                patterns.push(/monthly retainer of/i);
-                            }
-                            break;
-                        case 'disputeResolution':
-                            if (newValue === 'Mediation') {
-                                patterns.push(/shall first be submitted to mediation/i);
-                            } else if (newValue === 'Arbitration') {
-                                patterns.push(/shall be settled by binding arbitration/i);
-                            }
-                            break;
-                        default:
-                            patterns.push(new RegExp(dataTarget.replace(/([A-Z])/g, ' $1').toLowerCase(), 'i'));
-                    }
-                    
-                    // Try each pattern
-                    for (const pattern of patterns) {
-                        for (let i = 0; i < textNodes.length; i++) {
-                            const node = textNodes[i];
-                            const text = node.nodeValue;
+                    for (let i = 0; i < textNodes.length; i++) {
+                        const node = textNodes[i];
+                        const text = node.nodeValue;
+                        
+                        if (text && regex.test(text) && text.length > 0) {
+                            const span = document.createElement('span');
+                            span.className = 'highlight';
+                            span.textContent = text;
                             
-                            if (text && pattern.test(text)) {
-                                const span = document.createElement('span');
-                                span.className = 'highlight';
-                                span.textContent = text;
-                                
-                                node.parentNode.replaceChild(span, node);
-                                
-                                // Scroll to the highlighted element
-                                const rect = span.getBoundingClientRect();
-                                const isVisible = (
-                                    rect.top >= 0 &&
-                                    rect.left >= 0 &&
-                                    rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
-                                    rect.right <= (window.innerWidth || document.documentElement.clientWidth)
-                                );
-                                
-                                if (!isVisible) {
-                                    span.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }
-                                
-                                found = true;
-                                break;
-                            }
+                            node.parentNode.replaceChild(span, node);
+                            
+                            // Scroll to the highlighted element
+                            span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            break;
                         }
-                        if (found) break;
                     }
                 }
             }
@@ -1607,19 +1527,15 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                                     'ACCEPTED AND AGREED:\n\n' +
                                     document.getElementById('clientSignature').innerText;
                 
-                // Create a temporary textarea element
+                // Create a temporary textarea element to copy the text
                 const textarea = document.createElement('textarea');
                 textarea.value = letterContent;
-                textarea.setAttribute('readonly', '');
+                textarea.setAttribute('readonly', ''); // Make it readonly to be tamper-proof
                 textarea.style.position = 'absolute';
-                textarea.style.left = '-9999px';
+                textarea.style.left = '-9999px'; // Move outside the screen to make it invisible
                 document.body.appendChild(textarea);
-                
-                // Select the text and copy it
                 textarea.select();
                 document.execCommand('copy');
-                
-                // Remove the textarea
                 document.body.removeChild(textarea);
                 
                 // Show notification
@@ -1630,7 +1546,7 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 }, 2000);
             });
             
-            // Initialize letter
+            // Initialize letter on page load
             updateLetter();
         });
     </script>
