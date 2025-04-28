@@ -571,601 +571,6 @@
                 max-height: none;
             }
             
-            // Download as DOCX function
-            window.downloadAmendment = function() {
-                // Check if premium features are unlocked
-                if (!isPaid) {
-                    alert('Please purchase to enable downloading. You can see a preview of your amendment but downloading requires payment.');
-                    return;
-                }
-                
-                try {
-                    // Access docx library
-                    const docx = window.docx;
-                    if (!docx) {
-                        throw new Error("DOCX library not loaded");
-                    }
-                    
-                    // Get amendment details for filename
-                    const amendmentNumber = document.getElementById('amendmentNumber').value;
-                    const originalTitle = document.getElementById('originalTitle').value;
-                    const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
-                    
-                    // Get first party and second party for signature
-                    const firstParty = document.getElementById('firstParty').value;
-                    const secondParty = document.getElementById('secondParty').value;
-                    
-                    // Create document sections
-                    const paragraphs = [];
-                    
-                    // Add title
-                    paragraphs.push(
-                        new docx.Paragraph({
-                            alignment: docx.AlignmentType.CENTER,
-                            spacing: {
-                                before: 240,
-                                after: 240
-                            },
-                            children: [
-                                new docx.TextRun({
-                                    text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
-                                    bold: true,
-                                    size: 28
-                                })
-                            ]
-                        })
-                    );
-                    
-                    // Get form values for the content
-                    const originalMonth = document.getElementById('originalMonth').value;
-                    const originalDay = document.getElementById('originalDay').value;
-                    const originalYear = document.getElementById('originalYear').value;
-                    const originalDate = `${originalMonth} ${originalDay}, ${originalYear}`;
-                    
-                    const amendmentMonth = document.getElementById('amendmentMonth').value;
-                    const amendmentDay = document.getElementById('amendmentDay').value;
-                    const amendmentYear = document.getElementById('amendmentYear').value;
-                    const amendmentDate = `${amendmentMonth} ${amendmentDay}, ${amendmentYear}`;
-                    
-                    // Add introduction paragraphs
-                    paragraphs.push(
-                        new docx.Paragraph({
-                            text: `This ${amendmentNumber} Amendment (this "Amendment") to the ${originalTitle} dated ${originalDate} (the "Agreement") is entered into as of ${amendmentDate} (the "Amendment Effective Date"), by and between ${firstParty} ("First Party") and ${secondParty} ("Second Party").`,
-                            spacing: { before: 120, after: 120 }
-                        }),
-                        new docx.Paragraph({
-                            text: `WHEREAS, the Parties entered into the Agreement on ${originalDate}; and`,
-                            spacing: { before: 120, after: 120 }
-                        }),
-                        new docx.Paragraph({
-                            text: `WHEREAS, the Parties desire to amend the Agreement as set forth herein;`,
-                            spacing: { before: 120, after: 120 }
-                        }),
-                        new docx.Paragraph({
-                            text: `NOW, THEREFORE, in consideration of the mutual covenants and promises herein contained, the Parties agree as follows:`,
-                            spacing: { before: 120, after: 240 }
-                        })
-                    );
-                    
-                    // Add amendment details based on purpose
-                    const amendmentPurpose = document.getElementById('amendmentPurpose').value;
-                    
-                    switch(amendmentPurpose) {
-                        case 'extend':
-                            const extensionType = document.querySelector('input[name="extensionType"]:checked').value;
-                            
-                            if (extensionType === 'fixed') {
-                                let extensionLength = document.getElementById('extensionLength').value;
-                                if (extensionLength === 'custom') {
-                                    extensionLength = document.getElementById('customExtension').value || '6 months';
-                                }
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `The term of the Agreement is hereby extended for an additional period of ${extensionLength} from the Amendment Effective Date.`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            } else if (extensionType === 'indefinite') {
-                                let terminationNotice = document.getElementById('terminationNotice').value;
-                                if (terminationNotice === 'custom') {
-                                    terminationNotice = document.getElementById('customTermination').value || '60 days';
-                                }
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `The term of the Agreement is hereby extended indefinitely, until terminated by either Party upon ${terminationNotice} prior written notice to the other Party.`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            }
-                            break;
-                        
-                        case 'modify':
-                            const modifyType = document.querySelector('input[name="modifyType"]:checked')?.value || 'increase';
-                            
-                            if (modifyType === 'increase' || modifyType === 'decrease') {
-                                const originalPrice = document.getElementById('originalPrice')?.value || '$10,000';
-                                const newPrice = document.getElementById('newPrice')?.value || '$12,000';
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `The pricing terms of the Agreement are hereby amended to ${modifyType === 'increase' ? 'increase' : 'decrease'} from ${originalPrice} to ${newPrice}.`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            } else if (modifyType === 'restructure') {
-                                const paymentDetails = document.getElementById('paymentDetails')?.value || 'Payment terms are restructured from net 30 to net 15 days from invoice date.';
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `The payment terms of the Agreement are hereby amended as follows: ${paymentDetails}`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            }
-                            break;
-                        
-                        case 'change-scope':
-                            const scopeChangeType = document.querySelector('input[name="scopeChangeType"]:checked')?.value || 'expand';
-                            const originalScopeReference = document.getElementById('originalScopeReference')?.value || 'Exhibit A, Section 3';
-                            const scopeChanges = document.getElementById('scopeChanges')?.value || 'Add mobile application development services to the existing web application development scope.';
-                            
-                            let scopeVerb = '';
-                            if (scopeChangeType === 'expand') scopeVerb = 'expanded to include';
-                            else if (scopeChangeType === 'reduce') scopeVerb = 'reduced to exclude';
-                            else scopeVerb = 'modified as follows';
-                            
-                            paragraphs.push(
-                                new docx.Paragraph({
-                                    text: `${originalScopeReference} of the Agreement is hereby ${scopeVerb}: ${scopeChanges}`,
-                                    spacing: { before: 120, after: 120 }
-                                })
-                            );
-                            break;
-                        
-                        case 'add-services':
-                            const servicesDescription = document.getElementById('servicesDescription')?.value || 'Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.';
-                            const servicesPricing = document.getElementById('servicesPricing')?.value || '$3,500 per month';
-                            const servicesTimeline = document.getElementById('servicesTimeline')?.value || 'Starting May 1, 2025';
-                            
-                            paragraphs.push(
-                                new docx.Paragraph({
-                                    text: `1.1 Additional Services. The following services are hereby added to the Agreement: ${servicesDescription}`,
-                                    spacing: { before: 120, after: 120 }
-                                }),
-                                new docx.Paragraph({
-                                    text: `1.2 Pricing for Additional Services. The pricing for the additional services shall be ${servicesPricing}.`,
-                                    spacing: { before: 120, after: 120 }
-                                }),
-                                new docx.Paragraph({
-                                    text: `1.3 Timeline. The additional services shall commence ${servicesTimeline}.`,
-                                    spacing: { before: 120, after: 120 }
-                                })
-                            );
-                            break;
-                        
-                        case 'update-contact':
-                            const partyToUpdate = document.querySelector('input[name="partyToUpdate"]:checked')?.value || 'first';
-                            
-                            if (partyToUpdate === 'first' || partyToUpdate === 'both') {
-                                const firstPartyNewAddress = document.getElementById('firstPartyNewAddress')?.value || '123 Tech Boulevard, Suite 500, San Francisco, CA 94107';
-                                const firstPartyNewContact = document.getElementById('firstPartyNewContact')?.value || 'Sarah Johnson, VP of Operations';
-                                const firstPartyNewEmail = document.getElementById('firstPartyNewEmail')?.value || 'sjohnson@acmetech.example.com';
-                                const firstPartyNewPhone = document.getElementById('firstPartyNewPhone')?.value || '(555) 123-4567';
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `1.1 First Party Contact Information. The contact information for First Party is hereby updated as follows:`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Address: ${firstPartyNewAddress}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Contact Person: ${firstPartyNewContact}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Email: ${firstPartyNewEmail}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Phone: ${firstPartyNewPhone}`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            }
-                            
-                            if (partyToUpdate === 'second' || partyToUpdate === 'both') {
-                                const secondPartyNewAddress = document.getElementById('secondPartyNewAddress')?.value || '';
-                                const secondPartyNewContact = document.getElementById('secondPartyNewContact')?.value || '';
-                                const secondPartyNewEmail = document.getElementById('secondPartyNewEmail')?.value || '';
-                                const secondPartyNewPhone = document.getElementById('secondPartyNewPhone')?.value || '';
-                                
-                                if (partyToUpdate === 'both') {
-                                    paragraphs.push(
-                                        new docx.Paragraph({
-                                            text: `1.2 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:`,
-                                            spacing: { before: 120, after: 120 }
-                                        })
-                                    );
-                                } else {
-                                    paragraphs.push(
-                                        new docx.Paragraph({
-                                            text: `1.1 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:`,
-                                            spacing: { before: 120, after: 120 }
-                                        })
-                                    );
-                                }
-                                
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `Address: ${secondPartyNewAddress || '[Second Party Address]'}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Contact Person: ${secondPartyNewContact || '[Second Party Contact Person]'}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Email: ${secondPartyNewEmail || '[Second Party Email]'}`,
-                                        spacing: { before: 120, after: 120 }
-                                    }),
-                                    new docx.Paragraph({
-                                        text: `Phone: ${secondPartyNewPhone || '[Second Party Phone]'}`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            }
-                            break;
-                        
-                        case 'custom':
-                            const clauseToAmend = document.getElementById('clauseToAmend')?.value || 'Section 5.3, Intellectual Property Rights';
-                            const originalLanguage = document.getElementById('originalLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.';
-                            const newLanguage = document.getElementById('newLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.';
-                            
-                            paragraphs.push(
-                                new docx.Paragraph({
-                                    text: `1.1 ${clauseToAmend} of the Agreement is hereby amended as follows:`,
-                                    spacing: { before: 120, after: 120 }
-                                })
-                            );
-                            
-                            if (originalLanguage) {
-                                paragraphs.push(
-                                    new docx.Paragraph({
-                                        text: `Original language: "${originalLanguage}"`,
-                                        spacing: { before: 120, after: 120 }
-                                    })
-                                );
-                            }
-                            
-                            paragraphs.push(
-                                new docx.Paragraph({
-                                    text: `Amended language: "${newLanguage}"`,
-                                    spacing: { before: 120, after: 120 }
-                                })
-                            );
-                            break;
-                    }
-                    
-                    // Add additional terms if provided
-                    const additionalTerms = document.getElementById('additionalTerms').value;
-                    if (additionalTerms && additionalTerms.trim() !== '') {
-                        paragraphs.push(
-                            new docx.Paragraph({
-                                text: 'ADDITIONAL TERMS',
-                                bold: true,
-                                spacing: { before: 240, after: 120 }
-                            }),
-                            new docx.Paragraph({
-                                text: additionalTerms,
-                                spacing: { before: 120, after: 120 }
-                            })
-                        );
-                    }
-                    
-                    // Add original terms statement and signature
-                    const originalTermsStatus = document.getElementById('originalTerms').value;
-                    let originalTermsText = '';
-                    
-                    if (originalTermsStatus === 'remain') {
-                        originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
-                    } else if (originalTermsStatus === 'supersede') {
-                        originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
-                    } else if (originalTermsStatus === 'custom') {
-                        originalTermsText = document.getElementById('customTermsStatement').value || 'All other terms and conditions not specifically modified by this Amendment shall remain unchanged.';
-                    }
-                    
-                    paragraphs.push(
-                        new docx.Paragraph({
-                            text: originalTermsText,
-                            spacing: { before: 240, after: 120 }
-                        }),
-                        new docx.Paragraph({
-                            text: 'This Amendment may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.',
-                            spacing: { before: 120, after: 120 }
-                        }),
-                        new docx.Paragraph({
-                            text: 'IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.',
-                            spacing: { before: 120, after: 240 }
-                        })
-                    );
-                    
-                    // Create signature table - transparent borders
-                    const signatureTable = new docx.Table({
-                        rows: [
-                            new docx.TableRow({
-                                children: [
-                                    new docx.TableCell({
-                                        children: [
-                                            new docx.Paragraph({
-                                                text: "FIRST PARTY:",
-                                                bold: true
-                                            }),
-                                            new docx.Paragraph({
-                                                text: firstParty
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "By: ________________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Name: _____________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Title: ______________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Date: ______________________________"
-                                            })
-                                        ],
-                                        width: {
-                                            size: 50,
-                                            type: docx.WidthType.PERCENTAGE
-                                        },
-                                        borders: {
-                                            top: { style: docx.BorderStyle.NONE },
-                                            bottom: { style: docx.BorderStyle.NONE },
-                                            left: { style: docx.BorderStyle.NONE },
-                                            right: { style: docx.BorderStyle.NONE }
-                                        }
-                                    }),
-                                    new docx.TableCell({
-                                        children: [
-                                            new docx.Paragraph({
-                                                text: "SECOND PARTY:",
-                                                bold: true
-                                            }),
-                                            new docx.Paragraph({
-                                                text: secondParty
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "By: ________________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Name: _____________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Title: ______________________________"
-                                            }),
-                                            new docx.Paragraph({
-                                                text: " "
-                                            }),
-                                            new docx.Paragraph({
-                                                text: "Date: ______________________________"
-                                            })
-                                        ],
-                                        width: {
-                                            size: 50,
-                                            type: docx.WidthType.PERCENTAGE
-                                        },
-                                        borders: {
-                                            top: { style: docx.BorderStyle.NONE },
-                                            bottom: { style: docx.BorderStyle.NONE },
-                                            left: { style: docx.BorderStyle.NONE },
-                                            right: { style: docx.BorderStyle.NONE }
-                                        }
-                                    })
-                                ]
-                            })
-                        ],
-                        width: {
-                            size: 100,
-                            type: docx.WidthType.PERCENTAGE,
-                        },
-                        borders: {
-                            top: { style: docx.BorderStyle.NONE },
-                            bottom: { style: docx.BorderStyle.NONE },
-                            left: { style: docx.BorderStyle.NONE },
-                            right: { style: docx.BorderStyle.NONE }
-                        }
-                    });
-                    
-                    paragraphs.push(signatureTable);
-                    
-                    // Create document with proper settings
-                    const doc = new docx.Document({
-                        styles: {
-                            default: {
-                                document: {
-                                    run: {
-                                        size: 22, // 11pt font size (in half-points)
-                                        font: "Times New Roman"
-                                    },
-                                    paragraph: {
-                                        spacing: {
-                                            line: 276, // 1.15x line spacing
-                                            before: 0,
-                                            after: 0
-                                        }
-                                    }
-                                }
-                            }
-                        },
-                        sections: [{
-                            properties: {
-                                page: {
-                                    margin: {
-                                        top: 1440, // 1 inch in twips
-                                        right: 1440,
-                                        bottom: 1440,
-                                        left: 1440
-                                    }
-                                }
-                            },
-                            children: paragraphs
-                        }]
-                    });
-                    
-                    // Generate and save document
-                    docx.Packer.toBlob(doc)
-                        .then(blob => {
-                            window.saveAs(blob, filename);
-                        })
-                        .catch(error => {
-                            console.error("Error saving DOCX:", error);
-                            alert("Unable to download. Please try using the copy button instead.");
-                        });
-                } catch (error) {
-                    console.error("DOCX generation error:", error);
-                    alert("Unable to download. Please try using the copy button instead.");
-                }
-            };
-        });
-    </script>
-</body>
-</html>
-            
-            // Reset form function
-            window.resetForm = function() {
-                form.reset();
-                
-                // Reset radio options
-                document.querySelectorAll('.radio-option').forEach(option => {
-                    const radio = option.querySelector('input[type="radio"]');
-                    if (radio) {
-                        option.classList.toggle('selected', radio.checked);
-                    }
-                });
-                
-                // Reset accordions
-                document.getElementById('amendmentDetailsHeader').classList.add('active');
-                document.getElementById('amendmentDetailsSection').style.display = 'block';
-                document.getElementById('additionalTermsHeader').classList.remove('active');
-                document.getElementById('additionalTermsSection').style.display = 'none';
-                
-                // Reset conditional sections
-                document.getElementById('fixed-extension-details').style.display = 'block';
-                document.getElementById('indefinite-extension-details').style.display = 'none';
-                document.getElementById('custom-extension-group').style.display = 'none';
-                document.getElementById('custom-termination-group').style.display = 'none';
-                document.getElementById('custom-terms-group').style.display = 'none';
-                
-                // Reset to default amendment purpose
-                document.getElementById('amendmentPurpose').value = 'extend';
-                loadAmendmentDetailsSection('extend');
-                
-                // Clear local storage
-                localStorage.removeItem('amendmentFormData');
-                
-                // Clear highlights and update the preview
-                clearAllHighlights();
-                updatePreview();
-                copyMessage.style.display = 'none';
-            };
-            
-            // Copy amendment function
-            window.copyAmendment = function() {
-                // Check if premium features are unlocked
-                if (!isPaid) {
-                    alert('Please purchase to enable copying. You can see a preview of your amendment but copying requires payment.');
-                    return;
-                }
-                
-                const amendmentText = preview.innerText;
-                
-                // Modern clipboard method
-                try {
-                    // First try using the Clipboard API
-                    navigator.clipboard.writeText(amendmentText).then(function() {
-                        copyMessage.style.display = 'inline-block';
-                        
-                        setTimeout(() => {
-                            copyMessage.style.display = 'none';
-                        }, 3000);
-                    }).catch(function(err) {
-                        // If Clipboard API fails, try fallback method
-                        fallbackCopyTextToClipboard(amendmentText);
-                    });
-                } catch (err) {
-                    // If modern API not available, try fallback
-                    fallbackCopyTextToClipboard(amendmentText);
-                }
-            };
-            
-            // Fallback copy method for browsers that don't support clipboard API
-            function fallbackCopyTextToClipboard(text) {
-                try {
-                    // Create temporary element
-                    const textArea = document.createElement("textarea");
-                    textArea.value = text;
-                    
-                    // Make the textarea out of viewport
-                    textArea.style.position = "fixed";
-                    textArea.style.left = "-999999px";
-                    textArea.style.top = "-999999px";
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    
-                    // Execute copy command
-                    const successful = document.execCommand('copy');
-                    
-                    // Remove temporary element
-                    document.body.removeChild(textArea);
-                    
-                    if (successful) {
-                        copyMessage.style.display = 'inline-block';
-                        setTimeout(() => {
-                            copyMessage.style.display = 'none';
-                        }, 3000);
-                    } else {
-                        alert('Failed to copy amendment. Please select and copy the text manually.');
-                    }
-                } catch (err) {
-                    alert('Failed to copy amendment. Please select and copy the text manually.');
-                }
-            }
-            
             .form-container, .preview-container {
                 max-height: none;
             }
@@ -1208,6 +613,36 @@
         /* Add some padding to the bottom of the preview to ensure content isn't hidden behind the paywall banner */
         .preview-box.locked .document-template {
             padding-bottom: 200px; /* Adjust based on the height of your paywall banner */
+        }
+        
+        /* Success notification */
+        .success-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #27ae60;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            display: none;
+        }
+        
+        /* Payment badge for premium users */
+        .payment-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background-color: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            z-index: 101;
+            display: none;
         }
         
         @media print {
@@ -1533,142 +968,18 @@
                     
                     <!-- PayPal Button -->
                     <div class="paypal-container">
-                        <style>
-                            .pp-ND34QUSW8KAJA {
-                                text-align: center;
-                                border: none;
-                                border-radius: 0.25rem;
-                                min-width: 11.625rem;
-                                padding: 0 2rem;
-                                height: 2.625rem;
-                                font-weight: bold;
-                                background-color: #FFD140;
-                                color: #000000;
-                                font-family: "Helvetica Neue", Arial, sans-serif;
-                                font-size: 1rem;
-                                line-height: 1.25rem;
-                                cursor: pointer;
-                            }
-                
-                // For amendment purpose changes, which requires a more specific approach
-                if (changedField === 'amendmentPurpose') {
-                    const purpose = document.getElementById('amendmentPurpose').value;
-                    
-                    // Find the relevant section based on purpose and highlight it
-                    const documentSections = document.querySelectorAll('.document-section');
-                    if (documentSections.length > 1) {
-                        // The actual amendment content is in the second document section
-                        const amendmentSection = documentSections[1];
-                        if (amendmentSection) {
-                            amendmentSection.classList.add('highlight');
-                            scrollToElement(amendmentSection);
-                            
-                            // Set timeout to clear highlight
-                            highlightTimeout = setTimeout(() => {
-                                amendmentSection.classList.remove('highlight');
-                            }, 5000);
-                        }
-                    }
-                }
-            }
-            
-            // Function to apply highlights to matching text and scroll if needed
-            function applyHighlightToMatches(text) {
-                if (!text || text.trim() === '') return;
-                
-                // Clean the text for safe regex use
-                const cleanedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\                }
-');
-                
-                // Find all text nodes in the preview
-                const textNodes = [];
-                const walk = document.createTreeWalker(
-                    preview,
-                    NodeFilter.SHOW_TEXT,
-                    null,
-                    false
-                );
-                
-                let node;
-                let highlighted = false;
-                
-                while (node = walk.nextNode()) {
-                    if (node.nodeValue.includes(text)) {
-                        // Get the parent element
-                        const parentElement = node.parentElement;
-                        
-                        // Get the current content
-                        const currentText = node.nodeValue;
-                        
-                        // Create a new HTML content with the matched text wrapped in a highlight span
-                        const newHtml = currentText.replace(
-                            new RegExp(cleanedText, 'g'), 
-                            '<span class="highlight">                }
-</span>'
-                        );
-                        
-                        // Create a temporary element
-                        const tempElement = document.createElement('div');
-                        tempElement.innerHTML = newHtml;
-                        
-                        // Replace the text node with the new HTML
-                        const range = document.createRange();
-                        range.selectNode(node);
-                        range.deleteContents();
-                        
-                        // Insert the new nodes
-                        const fragment = document.createDocumentFragment();
-                        let child;
-                        while (child = tempElement.firstChild) {
-                            fragment.appendChild(child);
-                        }
-                        range.insertNode(fragment);
-                        
-                        // Find the newly inserted highlight span for scrolling
-                        const insertedHighlight = parentElement.querySelector('.highlight');
-                        if (insertedHighlight && !highlighted) {
-                            scrollToElement(insertedHighlight);
-                            highlighted = true;
-                            
-                            // Set timeout to clear highlight
-                            highlightTimeout = setTimeout(() => {
-                                document.querySelectorAll('.highlight').forEach(el => {
-                                    const parent = el.parentNode;
-                                    if (parent) {
-                                        parent.replaceChild(document.createTextNode(el.textContent), el);
-                                        parent.normalize();
-                                    }
-                                });
-                            }, 5000);
-                        }
-                        
-                        break; // Only highlight the first occurrence to avoid multiple scrolling
-                    }
-                }
-            }
-            
-            // Function to scroll to an element
-            function scrollToElement(element) {
-                if (!element) return;
-                
-                const elementRect = element.getBoundingClientRect();
-                const previewRect = previewBox.getBoundingClientRect();
-                
-                if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
-                    element.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'center'
-                    });
-                }
-            }
-                        </style>
-                        <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+                        <style>.pp-ND34QUSW8KAJA{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+                        <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;" id="paypalForm">
+                            <input type="hidden" name="return" value="https://terms.law/2025/02/23/contract-amendment-generator/?payment354785=success">
                             <input class="pp-ND34QUSW8KAJA" type="submit" value="Buy Now" />
                             <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
                             <section style="font-size: 0.75rem;">
                                 Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/>
                             </section>
                         </form>
+                        <p style="font-size: 12px; color: #666; margin-top: 8px;">
+                            On mobile devices: After payment, you may need to manually return to this page.
+                        </p>
                     </div>
                     
                     <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
@@ -1685,6 +996,9 @@
                 </div>
                 
                 <div class="preview-box locked" id="previewBox">
+                    <!-- Payment badge for premium users -->
+                    <div class="payment-badge" id="paymentBadge">Premium Unlocked</div>
+                    
                     <div class="document-template" id="amendmentPreview">
                         <!-- Amendment will be populated here by JavaScript -->
                     </div>
@@ -1709,6 +1023,11 @@
         </div>
     </div>
     
+    <!-- Success notification -->
+    <div class="success-notification" id="successNotification">
+        Payment successful! Your premium features are now unlocked.
+    </div>
+    
     <!-- Libraries and Scripts -->
     <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
@@ -1725,6 +1044,13 @@
             const copyBtn = document.getElementById('copyBtn');
             const downloadBtn = document.getElementById('downloadBtn');
             const paywallOverlay = document.getElementById('paywallOverlay');
+            const paymentBadge = document.getElementById('paymentBadge');
+            const successNotification = document.getElementById('successNotification');
+            const paypalForm = document.getElementById('paypalForm');
+            
+            // Keys for localStorage
+            const FORM_DATA_KEY = 'amendmentFormData';
+            const PAYMENT_STATUS_KEY = 'amendmentGeneratorPaid';
             
             // Variables to track highlighting and payment
             let highlightTimeout;
@@ -1743,6 +1069,13 @@
             setTimeout(() => {
                 updatePreview();
             }, 100);
+            
+            // Save form data before PayPal redirect
+            if (paypalForm) {
+                paypalForm.addEventListener('submit', function() {
+                    saveFormData();
+                });
+            }
             
             // Save form data on any change
             form.addEventListener('input', saveFormData);
@@ -1768,17 +1101,30 @@
                     unlockFeatures();
                     
                     // Store payment status in localStorage
-                    localStorage.setItem('amendmentGeneratorPaid', 'true');
+                    localStorage.setItem(PAYMENT_STATUS_KEY, 'true');
+                    
+                    // Show success notification
+                    showSuccessNotification();
                     
                     // Clean up URL to remove parameter
                     const newUrl = window.location.href.split('?')[0];
                     window.history.replaceState({}, document.title, newUrl);
                 } else {
                     // Check localStorage for previous payment
-                    if (localStorage.getItem('amendmentGeneratorPaid') === 'true') {
+                    if (localStorage.getItem(PAYMENT_STATUS_KEY) === 'true') {
                         unlockFeatures();
                     }
                 }
+            }
+            
+            // Function to show success notification
+            function showSuccessNotification() {
+                successNotification.style.display = 'block';
+                
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    successNotification.style.display = 'none';
+                }, 5000);
             }
             
             // Function to unlock premium features
@@ -1793,6 +1139,10 @@
                 
                 if (previewBox) {
                     previewBox.classList.remove('locked');
+                }
+                
+                if (paymentBadge) {
+                    paymentBadge.style.display = 'block';
                 }
             }
             
@@ -1811,7 +1161,10 @@
                     unlockFeatures();
                     
                     // Store in localStorage
-                    localStorage.setItem('amendmentGeneratorPaid', 'true');
+                    localStorage.setItem(PAYMENT_STATUS_KEY, 'true');
+                    
+                    // Show success notification
+                    showSuccessNotification();
                     
                     // Hide error if shown
                     transactionError.style.display = 'none';
@@ -1836,12 +1189,15 @@
                 });
                 
                 // Save to localStorage
-                localStorage.setItem('amendmentFormData', JSON.stringify(formData));
+                localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
+                
+                // Update preview
+                updatePreview();
             }
             
             // Function to load form data from localStorage
             function loadFormData() {
-                const savedData = localStorage.getItem('amendmentFormData');
+                const savedData = localStorage.getItem(FORM_DATA_KEY);
                 
                 if (savedData) {
                     const formData = JSON.parse(savedData);
@@ -2653,17 +2009,8 @@
                     </div>
                 `;
                 
-                // Update the preview - force direct DOM update to ensure content appears
+                // Update the preview with the amendment HTML
                 preview.innerHTML = amendmentHTML;
-                
-                // Ensure preview is visible by explicitly showing contents
-                preview.style.display = 'block';
-                
-                // If using Firefox or Safari, sometimes we need to force a repaint
-                preview.style.opacity = '0.99';
-                setTimeout(() => {
-                    preview.style.opacity = '1';
-                }, 10);
                 
                 // If a specific field was changed, highlight the relevant content
                 if (changedField) {
@@ -2681,8 +2028,8 @@
                 switch(changedField) {
                     case 'originalTitle':
                         // Find both the title in uppercase and references in regular casing
-                        applyHighlightToMatches(originalTitle.toUpperCase());
-                        applyHighlightToMatches(originalTitle);
+                        applyHighlightToMatches(document.getElementById('originalTitle').value.toUpperCase());
+                        applyHighlightToMatches(document.getElementById('originalTitle').value);
                         break;
                     
                     case 'originalMonth':
@@ -2752,9 +2099,7 @@
                         
                         if (modifyType === 'increase' || modifyType === 'decrease') {
                             const originalPrice = document.getElementById('originalPrice')?.value || '$10,000';
-                            const newPrice = document.getElementById('newPrice')?.value || '$12,000';
-                            
-                            if (changedField === 'modifyType') {
+                            const newPrice = document.getElementById('newPrice')?.value || '$12,000';if (changedField === 'modifyType') {
                                 applyHighlightToMatches(modifyType === 'increase' ? 'increase' : 'decrease');
                             } else if (changedField === 'originalPrice') {
                                 applyHighlightToMatches(originalPrice);
@@ -2869,9 +2214,719 @@
                         } else if (originalTermsStatus === 'supersede') {
                             originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
                         } else if (originalTermsStatus === 'custom') {
-                            originalTermsText = document.getElementById('customTermsStatement').value || '';
+                            originalTermsText = document.getElementById('customTermsStatement')?.value || '';
                         }
                         
                         applyHighlightToMatches(originalTermsText);
                         break;
                 }
+            }
+            
+            // Function to apply highlights to matching text and scroll if needed
+            function applyHighlightToMatches(text) {
+                if (!text || text.trim() === '') return;
+                
+                // Clean the text for safe regex use
+                const cleanedText = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                
+                // Find all text nodes in the preview
+                const textNodes = [];
+                const walk = document.createTreeWalker(
+                    preview,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+                
+                let node;
+                let highlighted = false;
+                
+                while (node = walk.nextNode()) {
+                    if (node.nodeValue.includes(text)) {
+                        // Get the parent element
+                        const parentElement = node.parentElement;
+                        
+                        // Get the current content
+                        const currentText = node.nodeValue;
+                        
+                        // Create a new HTML content with the matched text wrapped in a highlight span
+                        const newHtml = currentText.replace(
+                            new RegExp(cleanedText, 'g'), 
+                            '<span class="highlight">$&</span>'
+                        );
+                        
+                        // Create a temporary element
+                        const tempElement = document.createElement('div');
+                        tempElement.innerHTML = newHtml;
+                        
+                        // Replace the text node with the new HTML
+                        const range = document.createRange();
+                        range.selectNode(node);
+                        range.deleteContents();
+                        
+                        // Insert the new nodes
+                        const fragment = document.createDocumentFragment();
+                        let child;
+                        while (child = tempElement.firstChild) {
+                            fragment.appendChild(child);
+                        }
+                        range.insertNode(fragment);
+                        
+                        // Find the newly inserted highlight span for scrolling
+                        const insertedHighlight = parentElement.querySelector('.highlight');
+                        if (insertedHighlight && !highlighted) {
+                            scrollToElement(insertedHighlight);
+                            highlighted = true;
+                            
+                            // Set timeout to clear highlight
+                            highlightTimeout = setTimeout(() => {
+                                document.querySelectorAll('.highlight').forEach(el => {
+                                    const parent = el.parentNode;
+                                    if (parent) {
+                                        parent.replaceChild(document.createTextNode(el.textContent), el);
+                                        parent.normalize();
+                                    }
+                                });
+                            }, 5000);
+                        }
+                        
+                        break; // Only highlight the first occurrence to avoid multiple scrolling
+                    }
+                }
+            }
+            
+            // Function to scroll to an element
+            function scrollToElement(element) {
+                if (!element) return;
+                
+                const previewBoxRect = previewBox.getBoundingClientRect();
+                const elementRect = element.getBoundingClientRect();
+                const paywallRect = paywallOverlay.getBoundingClientRect();
+                
+                // Calculate if element is visible in the viewport, considering the paywall
+                const isElementVisible = 
+                    elementRect.top >= previewBoxRect.top && 
+                    elementRect.bottom <= (paywallOverlay.style.display !== 'none' ? paywallRect.top : previewBoxRect.bottom);
+                
+                if (!isElementVisible) {
+                    // Calculate scroll position to make the element visible above the paywall
+                    let scrollPosition;
+                    
+                    if (paywallOverlay.style.display !== 'none') {
+                        // If paywall is visible, position element above it
+                        const paywallHeight = paywallRect.height;
+                        const previewBoxHeight = previewBoxRect.height;
+                        const elementHeight = elementRect.height;
+                        
+                        // Calculate position that ensures element is visible above paywall
+                        scrollPosition = Math.min(
+                            element.offsetTop - (previewBoxHeight - paywallHeight) / 2,
+                            previewBox.scrollHeight - previewBoxHeight
+                        );
+                    } else {
+                        // If no paywall, center the element
+                        scrollPosition = element.offsetTop - previewBox.clientHeight / 2;
+                    }
+                    
+                    // Apply smooth scrolling
+                    previewBox.scrollTo({
+                        top: Math.max(0, scrollPosition),
+                        behavior: 'smooth'
+                    });
+                }
+            }
+            
+            // Reset form function
+            window.resetForm = function() {
+                form.reset();
+                
+                // Reset radio options
+                document.querySelectorAll('.radio-option').forEach(option => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio) {
+                        option.classList.toggle('selected', radio.checked);
+                    }
+                });
+                
+                // Reset accordions
+                document.getElementById('amendmentDetailsHeader').classList.add('active');
+                document.getElementById('amendmentDetailsSection').style.display = 'block';
+                document.getElementById('additionalTermsHeader').classList.remove('active');
+                document.getElementById('additionalTermsSection').style.display = 'none';
+                
+                // Reset conditional sections
+                document.getElementById('fixed-extension-details').style.display = 'block';
+                document.getElementById('indefinite-extension-details').style.display = 'none';
+                document.getElementById('custom-extension-group').style.display = 'none';
+                document.getElementById('custom-termination-group').style.display = 'none';
+                document.getElementById('custom-terms-group').style.display = 'none';
+                
+                // Reset to default amendment purpose
+                document.getElementById('amendmentPurpose').value = 'extend';
+                loadAmendmentDetailsSection('extend');
+                
+                // Clear local storage
+                localStorage.removeItem(FORM_DATA_KEY);
+                
+                // Clear highlights and update the preview
+                clearAllHighlights();
+                updatePreview();
+                copyMessage.style.display = 'none';
+            };
+            
+            // Copy amendment function
+            window.copyAmendment = function() {
+                // Check if premium features are unlocked
+                if (!isPaid) {
+                    alert('Please purchase to enable copying. You can see a preview of your amendment but copying requires payment.');
+                    return;
+                }
+                
+                const amendmentText = preview.innerText;
+                
+                // Modern clipboard method
+                try {
+                    // First try using the Clipboard API
+                    navigator.clipboard.writeText(amendmentText).then(function() {
+                        copyMessage.style.display = 'inline-block';
+                        
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    }).catch(function(err) {
+                        // If Clipboard API fails, try fallback method
+                        fallbackCopyTextToClipboard(amendmentText);
+                    });
+                } catch (err) {
+                    // If modern API not available, try fallback
+                    fallbackCopyTextToClipboard(amendmentText);
+                }
+            };
+            
+            // Fallback copy method for browsers that don't support clipboard API
+            function fallbackCopyTextToClipboard(text) {
+                try {
+                    // Create temporary element
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    
+                    // Make the textarea out of viewport
+                    textArea.style.position = "fixed";
+                    textArea.style.left = "-999999px";
+                    textArea.style.top = "-999999px";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    
+                    // Execute copy command
+                    const successful = document.execCommand('copy');
+                    
+                    // Remove temporary element
+                    document.body.removeChild(textArea);
+                    
+                    if (successful) {
+                        copyMessage.style.display = 'inline-block';
+                        setTimeout(() => {
+                            copyMessage.style.display = 'none';
+                        }, 3000);
+                    } else {
+                        alert('Failed to copy amendment. Please select and copy the text manually.');
+                    }
+                } catch (err) {
+                    alert('Failed to copy amendment. Please select and copy the text manually.');
+                }
+            }
+            
+            // Download as DOCX function
+            window.downloadAmendment = function() {
+                // Check if premium features are unlocked
+                if (!isPaid) {
+                    alert('Please purchase to enable downloading. You can see a preview of your amendment but downloading requires payment.');
+                    return;
+                }
+                
+                try {
+                    // Access docx library
+                    const docx = window.docx;
+                    if (!docx) {
+                        throw new Error("DOCX library not loaded");
+                    }
+                    
+                    // Get amendment details for filename
+                    const amendmentNumber = document.getElementById('amendmentNumber').value;
+                    const originalTitle = document.getElementById('originalTitle').value;
+                    const filename = `${amendmentNumber}_Amendment_to_${originalTitle.replace(/[^a-z0-9]/gi, '_')}.docx`;
+                    
+                    // Get first party and second party for signature
+                    const firstParty = document.getElementById('firstParty').value;
+                    const secondParty = document.getElementById('secondParty').value;
+                    
+                    // Create document sections
+                    const paragraphs = [];
+                    
+                    // Add title
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            alignment: docx.AlignmentType.CENTER,
+                            spacing: {
+                                before: 240,
+                                after: 240
+                            },
+                            children: [
+                                new docx.TextRun({
+                                    text: `${amendmentNumber} AMENDMENT TO ${originalTitle.toUpperCase()}`,
+                                    bold: true,
+                                    size: 28
+                                })
+                            ]
+                        })
+                    );
+                    
+                    // Get form values for the content
+                    const originalMonth = document.getElementById('originalMonth').value;
+                    const originalDay = document.getElementById('originalDay').value;
+                    const originalYear = document.getElementById('originalYear').value;
+                    const originalDate = `${originalMonth} ${originalDay}, ${originalYear}`;
+                    
+                    const amendmentMonth = document.getElementById('amendmentMonth').value;
+                    const amendmentDay = document.getElementById('amendmentDay').value;
+                    const amendmentYear = document.getElementById('amendmentYear').value;
+                    const amendmentDate = `${amendmentMonth} ${amendmentDay}, ${amendmentYear}`;
+                    
+                    // Add introduction paragraphs
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            text: `This ${amendmentNumber} Amendment (this "Amendment") to the ${originalTitle} dated ${originalDate} (the "Agreement") is entered into as of ${amendmentDate} (the "Amendment Effective Date"), by and between ${firstParty} ("First Party") and ${secondParty} ("Second Party").`,
+                            spacing: { before: 120, after: 120 }
+                        }),
+                        new docx.Paragraph({
+                            text: `WHEREAS, the Parties entered into the Agreement on ${originalDate}; and`,
+                            spacing: { before: 120, after: 120 }
+                        }),
+                        new docx.Paragraph({
+                            text: `WHEREAS, the Parties desire to amend the Agreement as set forth herein;`,
+                            spacing: { before: 120, after: 120 }
+                        }),
+                        new docx.Paragraph({
+                            text: `NOW, THEREFORE, in consideration of the mutual covenants and promises herein contained, the Parties agree as follows:`,
+                            spacing: { before: 120, after: 240 }
+                        })
+                    );
+                    
+                    // Add amendment details based on purpose
+                    const amendmentPurpose = document.getElementById('amendmentPurpose').value;
+                    
+                    switch(amendmentPurpose) {
+                        case 'extend':
+                            const extensionType = document.querySelector('input[name="extensionType"]:checked').value;
+                            
+                            if (extensionType === 'fixed') {
+                                let extensionLength = document.getElementById('extensionLength').value;
+                                if (extensionLength === 'custom') {
+                                    extensionLength = document.getElementById('customExtension').value || '6 months';
+                                }
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `The term of the Agreement is hereby extended for an additional period of ${extensionLength} from the Amendment Effective Date.`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            } else if (extensionType === 'indefinite') {
+                                let terminationNotice = document.getElementById('terminationNotice').value;
+                                if (terminationNotice === 'custom') {
+                                    terminationNotice = document.getElementById('customTermination').value || '60 days';
+                                }
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `The term of the Agreement is hereby extended indefinitely, until terminated by either Party upon ${terminationNotice} prior written notice to the other Party.`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            }
+                            break;
+                        
+                        case 'modify':
+                            const modifyType = document.querySelector('input[name="modifyType"]:checked')?.value || 'increase';
+                            
+                            if (modifyType === 'increase' || modifyType === 'decrease') {
+                                const originalPrice = document.getElementById('originalPrice')?.value || '$10,000';
+                                const newPrice = document.getElementById('newPrice')?.value || '$12,000';
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `The pricing terms of the Agreement are hereby amended to ${modifyType === 'increase' ? 'increase' : 'decrease'} from ${originalPrice} to ${newPrice}.`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            } else if (modifyType === 'restructure') {
+                                const paymentDetails = document.getElementById('paymentDetails')?.value || 'Payment terms are restructured from net 30 to net 15 days from invoice date.';
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `The payment terms of the Agreement are hereby amended as follows: ${paymentDetails}`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            }
+                            break;
+                        
+                        case 'change-scope':
+                            const scopeChangeType = document.querySelector('input[name="scopeChangeType"]:checked')?.value || 'expand';
+                            const originalScopeReference = document.getElementById('originalScopeReference')?.value || 'Exhibit A, Section 3';
+                            const scopeChanges = document.getElementById('scopeChanges')?.value || 'Add mobile application development services to the existing web application development scope.';
+                            
+                            let scopeVerb = '';
+                            if (scopeChangeType === 'expand') scopeVerb = 'expanded to include';
+                            else if (scopeChangeType === 'reduce') scopeVerb = 'reduced to exclude';
+                            else scopeVerb = 'modified as follows';
+                            
+                            paragraphs.push(
+                                new docx.Paragraph({
+                                    text: `${originalScopeReference} of the Agreement is hereby ${scopeVerb}: ${scopeChanges}`,
+                                    spacing: { before: 120, after: 120 }
+                                })
+                            );
+                            break;
+                        
+                        case 'add-services':
+                            const servicesDescription = document.getElementById('servicesDescription')?.value || 'Additional data analytics and reporting services including monthly performance dashboards and quarterly trend analysis reports.';
+                            const servicesPricing = document.getElementById('servicesPricing')?.value || '$3,500 per month';
+                            const servicesTimeline = document.getElementById('servicesTimeline')?.value || 'Starting May 1, 2025';
+                            
+                            paragraphs.push(
+                                new docx.Paragraph({
+                                    text: `1.1 Additional Services. The following services are hereby added to the Agreement: ${servicesDescription}`,
+                                    spacing: { before: 120, after: 120 }
+                                }),
+                                new docx.Paragraph({
+                                    text: `1.2 Pricing for Additional Services. The pricing for the additional services shall be ${servicesPricing}.`,
+                                    spacing: { before: 120, after: 120 }
+                                }),
+                                new docx.Paragraph({
+                                    text: `1.3 Timeline. The additional services shall commence ${servicesTimeline}.`,
+                                    spacing: { before: 120, after: 120 }
+                                })
+                            );
+                            break;
+                        
+                        case 'update-contact':
+                            const partyToUpdate = document.querySelector('input[name="partyToUpdate"]:checked')?.value || 'first';
+                            
+                            if (partyToUpdate === 'first' || partyToUpdate === 'both') {
+                                const firstPartyNewAddress = document.getElementById('firstPartyNewAddress')?.value || '123 Tech Boulevard, Suite 500, San Francisco, CA 94107';
+                                const firstPartyNewContact = document.getElementById('firstPartyNewContact')?.value || 'Sarah Johnson, VP of Operations';
+                                const firstPartyNewEmail = document.getElementById('firstPartyNewEmail')?.value || 'sjohnson@acmetech.example.com';
+                                const firstPartyNewPhone = document.getElementById('firstPartyNewPhone')?.value || '(555) 123-4567';
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `1.1 First Party Contact Information. The contact information for First Party is hereby updated as follows:`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Address: ${firstPartyNewAddress}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Contact Person: ${firstPartyNewContact}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Email: ${firstPartyNewEmail}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Phone: ${firstPartyNewPhone}`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            }
+                            
+                            if (partyToUpdate === 'second' || partyToUpdate === 'both') {
+                                const secondPartyNewAddress = document.getElementById('secondPartyNewAddress')?.value || '';
+                                const secondPartyNewContact = document.getElementById('secondPartyNewContact')?.value || '';
+                                const secondPartyNewEmail = document.getElementById('secondPartyNewEmail')?.value || '';
+                                const secondPartyNewPhone = document.getElementById('secondPartyNewPhone')?.value || '';
+                                
+                                if (partyToUpdate === 'both') {
+                                    paragraphs.push(
+                                        new docx.Paragraph({
+                                            text: `1.2 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:`,
+                                            spacing: { before: 120, after: 120 }
+                                        })
+                                    );
+                                } else {
+                                    paragraphs.push(
+                                        new docx.Paragraph({
+                                            text: `1.1 Second Party Contact Information. The contact information for Second Party is hereby updated as follows:`,
+                                            spacing: { before: 120, after: 120 }
+                                        })
+                                    );
+                                }
+                                
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `Address: ${secondPartyNewAddress || '[Second Party Address]'}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Contact Person: ${secondPartyNewContact || '[Second Party Contact Person]'}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Email: ${secondPartyNewEmail || '[Second Party Email]'}`,
+                                        spacing: { before: 120, after: 120 }
+                                    }),
+                                    new docx.Paragraph({
+                                        text: `Phone: ${secondPartyNewPhone || '[Second Party Phone]'}`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            }
+                            break;
+                        
+                        case 'custom':
+                            const clauseToAmend = document.getElementById('clauseToAmend')?.value || 'Section 5.3, Intellectual Property Rights';
+                            const originalLanguage = document.getElementById('originalLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be the exclusive property of the First Party.';
+                            const newLanguage = document.getElementById('newLanguage')?.value || 'All intellectual property created during the term of this Agreement shall be jointly owned by both Parties, with each Party having an equal, undivided interest in such intellectual property.';
+                            
+                            paragraphs.push(
+                                new docx.Paragraph({
+                                    text: `1.1 ${clauseToAmend} of the Agreement is hereby amended as follows:`,
+                                    spacing: { before: 120, after: 120 }
+                                })
+                            );
+                            
+                            if (originalLanguage) {
+                                paragraphs.push(
+                                    new docx.Paragraph({
+                                        text: `Original language: "${originalLanguage}"`,
+                                        spacing: { before: 120, after: 120 }
+                                    })
+                                );
+                            }
+                            
+                            paragraphs.push(
+                                new docx.Paragraph({
+                                    text: `Amended language: "${newLanguage}"`,
+                                    spacing: { before: 120, after: 120 }
+                                })
+                            );
+                            break;
+                    }
+                    
+                    // Add additional terms if provided
+                    const additionalTerms = document.getElementById('additionalTerms').value;
+                    if (additionalTerms && additionalTerms.trim() !== '') {
+                        paragraphs.push(
+                            new docx.Paragraph({
+                                text: 'ADDITIONAL TERMS',
+                                bold: true,
+                                spacing: { before: 240, after: 120 }
+                            }),
+                            new docx.Paragraph({
+                                text: additionalTerms,
+                                spacing: { before: 120, after: 120 }
+                            })
+                        );
+                    }
+                    
+                    // Add original terms statement and signature
+                    const originalTermsStatus = document.getElementById('originalTerms').value;
+                    let originalTermsText = '';
+                    
+                    if (originalTermsStatus === 'remain') {
+                        originalTermsText = 'All other terms and conditions of the original Agreement shall remain in full force and effect.';
+                    } else if (originalTermsStatus === 'supersede') {
+                        originalTermsText = 'This Amendment supersedes all previous understandings or agreements regarding the subject matter hereof.';
+                    } else if (originalTermsStatus === 'custom') {
+                        originalTermsText = document.getElementById('customTermsStatement').value || 'All other terms and conditions not specifically modified by this Amendment shall remain unchanged.';
+                    }
+                    
+                    paragraphs.push(
+                        new docx.Paragraph({
+                            text: originalTermsText,
+                            spacing: { before: 240, after: 120 }
+                        }),
+                        new docx.Paragraph({
+                            text: 'This Amendment may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.',
+                            spacing: { before: 120, after: 120 }
+                        }),
+                        new docx.Paragraph({
+                            text: 'IN WITNESS WHEREOF, the Parties hereto have executed this Amendment as of the Amendment Effective Date.',
+                            spacing: { before: 120, after: 240 }
+                        })
+                    );
+                    
+                    // Create signature table - transparent borders
+                    const signatureTable = new docx.Table({
+                        rows: [
+                            new docx.TableRow({
+                                children: [
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "FIRST PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: firstParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    }),
+                                    new docx.TableCell({
+                                        children: [
+                                            new docx.Paragraph({
+                                                text: "SECOND PARTY:",
+                                                bold: true
+                                            }),
+                                            new docx.Paragraph({
+                                                text: secondParty
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "By: ________________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Name: _____________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Title: ______________________________"
+                                            }),
+                                            new docx.Paragraph({
+                                                text: " "
+                                            }),
+                                            new docx.Paragraph({
+                                                text: "Date: ______________________________"
+                                            })
+                                        ],
+                                        width: {
+                                            size: 50,
+                                            type: docx.WidthType.PERCENTAGE
+                                        },
+                                        borders: {
+                                            top: { style: docx.BorderStyle.NONE },
+                                            bottom: { style: docx.BorderStyle.NONE },
+                                            left: { style: docx.BorderStyle.NONE },
+                                            right: { style: docx.BorderStyle.NONE }
+                                        }
+                                    })
+                                ]
+                            })
+                        ],
+                        width: {
+                            size: 100,
+                            type: docx.WidthType.PERCENTAGE,
+                        },
+                        borders: {
+                            top: { style: docx.BorderStyle.NONE },
+                            bottom: { style: docx.BorderStyle.NONE },
+                            left: { style: docx.BorderStyle.NONE },
+                            right: { style: docx.BorderStyle.NONE }
+                        }
+                    });
+                    
+                    paragraphs.push(signatureTable);
+                    
+                    // Create document with proper settings
+                    const doc = new docx.Document({
+                        styles: {
+                            default: {
+                                document: {
+                                    run: {
+                                        size: 22, // 11pt font size (in half-points)
+                                        font: "Times New Roman"
+                                    },
+                                    paragraph: {
+                                        spacing: {
+                                            line: 276, // 1.15x line spacing
+                                            before: 0,
+                                            after: 0
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        sections: [{
+                            properties: {
+                                page: {
+                                    margin: {
+                                        top: 1440, // 1 inch in twips
+                                        right: 1440,
+                                        bottom: 1440,
+                                        left: 1440
+                                    }
+                                }
+                            },
+                            children: paragraphs
+                        }]
+                    });
+                    
+                    // Generate and save document
+                    docx.Packer.toBlob(doc)
+                        .then(blob => {
+                            window.saveAs(blob, filename);
+                        })
+                        .catch(error => {
+                            console.error("Error saving DOCX:", error);
+                            alert("Unable to download. Please try using the copy button instead.");
+                        });
+                } catch (error) {
+                    console.error("DOCX generation error:", error);
+                    alert("Unable to download. Please try using the copy button instead.");
+                }
+            };
+        });
+    </script>
+</body>
+</html>
