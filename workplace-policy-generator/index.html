@@ -1,0 +1,2556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Workplace Policy Generator</title>
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #27ae60;
+      --bg-color: #f8f9fa;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Container Styles */
+    .generator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    /* Header Styles */
+    .generator-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .generator-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .generator-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Content Layout */
+    .generator-content {
+      display: flex;
+      min-height: 600px;
+    }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 220px;
+      background-color: #f5f7fa;
+      border-right: 1px solid var(--border-color);
+      padding: 20px 0;
+    }
+    
+    .sidebar-nav {
+      list-style: none;
+    }
+    
+    .sidebar-nav-item {
+      padding: 12px 20px;
+      cursor: pointer;
+      border-left: 3px solid transparent;
+      transition: var(--transition);
+    }
+    
+    .sidebar-nav-item:hover {
+      background-color: #e9ecef;
+      border-left-color: var(--secondary-color);
+    }
+    
+    .sidebar-nav-item.active {
+      background-color: #e3f2fd;
+      border-left-color: var(--secondary-color);
+      font-weight: 500;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      flex: 1;
+      padding: 25px;
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      max-height: 800px;
+    }
+    
+    .form-section {
+      display: none;
+      margin-bottom: 25px;
+    }
+    
+    .form-section.active {
+      display: block;
+    }
+    
+    .form-section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--text-primary);
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea.form-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .form-helper {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* Radio and Checkbox Styles */
+    .options-group {
+      margin-bottom: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background-color: #f5f7fa;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .option-item:hover {
+      background-color: #eef2f7;
+    }
+    
+    .option-item.selected {
+      background-color: #e8f6f3;
+      border-color: var(--accent-color);
+    }
+    
+    .option-item input[type="radio"],
+    .option-item input[type="checkbox"] {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    
+    .option-content {
+      flex: 1;
+    }
+    
+    .option-label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .option-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Navigation */
+    .form-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .nav-btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .nav-btn-prev {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+    
+    .nav-btn-prev:hover {
+      background-color: #e1e1e1;
+    }
+    
+    .nav-btn-next {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .nav-btn-next:hover {
+      background-color: #2980b9;
+    }
+    
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border-color);
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      text-align: center;
+    }
+    
+    .btn-reset {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+    
+    .btn-reset:hover {
+      background-color: #e4e4e4;
+    }
+    
+    .btn-copy {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-download {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #219653;
+    }
+    
+    .copy-message {
+      display: none;
+      font-size: 14px;
+      color: #27ae60;
+      margin-left: 10px;
+    }
+    
+    .btn-consult {
+      display: block;
+      width: 100%;
+      margin-top: 20px;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-consult:hover {
+      background-color: #1e2a37;
+    }
+    
+    /* Preview Styles */
+    .preview-container {
+      flex: 1;
+      padding: 25px;
+      position: relative;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .preview-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    .preview-box {
+      height: 800px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      background-color: white;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    
+    /* Document Styles */
+    .document-template {
+      font-family: Arial, sans-serif;
+    }
+    
+    .document-title {
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .document-section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: bold;
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .section-subtitle {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 15px;
+      margin-bottom: 8px;
+    }
+    
+    .section-content {
+      margin-bottom: 15px;
+    }
+    
+    .section-content p {
+      margin-bottom: 10px;
+    }
+    
+    /* Highlight Effect */
+    .highlight {
+      background-color: #ffffc0;
+      transition: background-color 0.5s ease;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .generator-content {
+        flex-direction: column;
+      }
+      
+      .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        padding: 10px 20px;
+      }
+      
+      .sidebar-nav {
+        display: flex;
+        overflow-x: auto;
+        padding-bottom: 10px;
+      }
+      
+      .sidebar-nav-item {
+        padding: 8px 12px;
+        white-space: nowrap;
+        border-left: none;
+        border-bottom: 3px solid transparent;
+      }
+      
+      .sidebar-nav-item:hover,
+      .sidebar-nav-item.active {
+        border-left-color: transparent;
+        border-bottom-color: var(--secondary-color);
+      }
+      
+      .form-container {
+        border-right: none;
+        max-height: none;
+      }
+      
+      .preview-box {
+        height: 500px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .generator-container {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .generator-header {
+        padding: 20px;
+      }
+      
+      .preview-container {
+        padding: 15px;
+      }
+      
+      .preview-box {
+        padding: 15px;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .copy-message {
+        margin-left: 0;
+        margin-top: 5px;
+        text-align: center;
+      }
+    }
+    
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      
+      .generator-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      .generator-header,
+      .sidebar,
+      .form-container,
+      .preview-header,
+      .form-actions,
+      .btn-consult {
+        display: none;
+      }
+      
+      .generator-content {
+        display: block;
+      }
+      
+      .preview-container {
+        padding: 0;
+      }
+      
+      .preview-box {
+        height: auto;
+        overflow: visible;
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="generator-container">
+    <div class="generator-header">
+      <h1>Workplace Policy Generator</h1>
+      <p>Create a customized workplace policy handbook for your business</p>
+    </div>
+    
+    <div class="generator-content">
+      <!-- Sidebar Navigation -->
+      <div class="sidebar">
+        <ul class="sidebar-nav">
+          <li class="sidebar-nav-item active" data-section="company-info">Company Info</li>
+          <li class="sidebar-nav-item" data-section="employment">Employment</li>
+          <li class="sidebar-nav-item" data-section="conduct">Code of Conduct</li>
+          <li class="sidebar-nav-item" data-section="hours-comp">Hours & Compensation</li>
+          <li class="sidebar-nav-item" data-section="pto">PTO & Leave</li>
+          <li class="sidebar-nav-item" data-section="technology">Technology</li>
+          <li class="sidebar-nav-item" data-section="safety">Health & Safety</li>
+          <li class="sidebar-nav-item" data-section="performance">Performance</li>
+        </ul>
+      </div>
+      
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="policyForm">
+          <!-- Company Information Section -->
+          <div class="form-section active" id="section-company-info">
+            <h2 class="form-section-title">Company Information</h2>
+            
+            <div class="form-group">
+              <label for="companyName">Company Name</label>
+              <input type="text" id="companyName" class="form-input" placeholder="Enter company name" value="ABC Company">
+            </div>
+            
+            <div class="form-group">
+              <label for="effectiveDate">Policy Effective Date</label>
+              <input type="date" id="effectiveDate" class="form-input" value="2025-04-01">
+            </div>
+            
+            <div class="form-group">
+              <label for="companySize">Company Size</label>
+              <select id="companySize" class="form-input">
+                <option value="small">Small (1-49 employees)</option>
+                <option value="medium" selected>Medium (50-249 employees)</option>
+                <option value="large">Large (250+ employees)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="industry">Industry</label>
+              <select id="industry" class="form-input">
+                <option value="technology" selected>Technology</option>
+                <option value="healthcare">Healthcare</option>
+                <option value="retail">Retail</option>
+                <option value="manufacturing">Manufacturing</option>
+                <option value="financial">Financial Services</option>
+                <option value="education">Education</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="companyMission">Company Mission Statement (Optional)</label>
+              <textarea id="companyMission" class="form-input" placeholder="Enter your company's mission statement">At ABC Company, our mission is to provide innovative technology solutions that empower businesses to achieve their goals while maintaining the highest standards of quality and customer service.</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="policyPurpose">Policy Purpose Statement</label>
+              <textarea id="policyPurpose" class="form-input" placeholder="Why are you creating this policy">This Employee Handbook has been developed to provide employees with an understanding of the company's policies, procedures, and expectations. This handbook is not a contract of employment and does not create any contractual rights.</textarea>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" disabled>Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="employment">Next: Employment</button>
+            </div>
+          </div>
+          
+          <!-- Employment Section -->
+          <div class="form-section" id="section-employment">
+            <h2 class="form-section-title">Employment Policies</h2>
+            
+            <div class="form-group">
+              <label for="atWillStatus">Employment Status</label>
+              <select id="atWillStatus" class="form-input">
+                <option value="at-will" selected>At-Will Employment</option>
+                <option value="contract">Contract-Based Employment</option>
+                <option value="mixed">Mixed (At-Will and Contract)</option>
+              </select>
+              <div class="form-helper">Defines the legal relationship between employers and employees</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Equal Employment Opportunity Statement</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="radio" name="eeoPolicy" value="standard" checked>
+                  <div class="option-content">
+                    <span class="option-label">Standard EEO Policy</span>
+                    <span class="option-description">Basic equal opportunity statement covering legally protected characteristics</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="eeoPolicy" value="comprehensive">
+                  <div class="option-content">
+                    <span class="option-label">Comprehensive EEO Policy</span>
+                    <span class="option-description">Expanded equal opportunity statement with detailed procedures and additional protected characteristics</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Anti-Harassment and Non-Discrimination Policy</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="radio" name="antiHarassmentPolicy" value="standard" checked>
+                  <div class="option-content">
+                    <span class="option-label">Standard Policy</span>
+                    <span class="option-description">Basic anti-harassment and non-discrimination policy covering legally required elements</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="antiHarassmentPolicy" value="comprehensive">
+                  <div class="option-content">
+                    <span class="option-label">Comprehensive Policy</span>
+                    <span class="option-description">Detailed policy with examples, reporting procedures, and investigation process</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="probationPeriod">Probationary Period</label>
+              <select id="probationPeriod" class="form-input">
+                <option value="none">No Probationary Period</option>
+                <option value="30days">30 Days</option>
+                <option value="60days">60 Days</option>
+                <option value="90days" selected>90 Days</option>
+                <option value="180days">180 Days</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Employment Classifications</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="employmentClassifications" value="full-time" checked>
+                  <div class="option-content">
+                    <span class="option-label">Full-Time Employees</span>
+                    <span class="option-description">Employees who work a regular schedule of 40 or more hours per week</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="employmentClassifications" value="part-time" checked>
+                  <div class="option-content">
+                    <span class="option-label">Part-Time Employees</span>
+                    <span class="option-description">Employees who work less than 40 hours per week</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="employmentClassifications" value="temporary" checked>
+                  <div class="option-content">
+                    <span class="option-label">Temporary Employees</span>
+                    <span class="option-description">Employees hired for a specific period or project</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="employmentClassifications" value="seasonal">
+                  <div class="option-content">
+                    <span class="option-label">Seasonal Employees</span>
+                    <span class="option-description">Employees hired for a specific season or time of year</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="employmentClassifications" value="exempt" checked>
+                  <div class="option-content">
+                    <span class="option-label">Exempt Employees</span>
+                    <span class="option-description">Employees not entitled to overtime pay (typically salaried)</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="employmentClassifications" value="non-exempt" checked>
+                  <div class="option-content">
+                    <span class="option-label">Non-Exempt Employees</span>
+                    <span class="option-description">Employees entitled to overtime pay (typically hourly)</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="company-info">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="conduct">Next: Code of Conduct</button>
+            </div>
+          </div>
+          
+          <!-- Code of Conduct Section -->
+          <div class="form-section" id="section-conduct">
+            <h2 class="form-section-title">Code of Conduct</h2>
+            
+            <div class="form-group">
+              <label for="dressCode">Dress Code</label>
+              <select id="dressCode" class="form-input">
+                <option value="business">Business Professional</option>
+                <option value="business-casual" selected>Business Casual</option>
+                <option value="casual">Casual</option>
+                <option value="uniform">Uniform Required</option>
+                <option value="none">No Specific Dress Code</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="attendancePolicy">Attendance and Punctuality</label>
+              <select id="attendancePolicy" class="form-input">
+                <option value="strict">Strict (Formal tracking and consequences)</option>
+                <option value="standard" selected>Standard (Basic expectations with some flexibility)</option>
+                <option value="flexible">Flexible (Focus on results rather than time tracking)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Professional Behavior Policies</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="behaviorPolicies" value="respect" checked>
+                  <div class="option-content">
+                    <span class="option-label">Respectful Workplace Policy</span>
+                    <span class="option-description">Guidelines for maintaining a respectful workplace environment</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="behaviorPolicies" value="conflict" checked>
+                  <div class="option-content">
+                    <span class="option-label">Conflict Resolution</span>
+                    <span class="option-description">Procedures for addressing workplace conflicts</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="behaviorPolicies" value="ethics" checked>
+                  <div class="option-content">
+                    <span class="option-label">Ethical Standards</span>
+                    <span class="option-description">Guidelines for ethical decision-making and behavior</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="behaviorPolicies" value="gifts">
+                  <div class="option-content">
+                    <span class="option-label">Gifts and Entertainment</span>
+                    <span class="option-description">Rules regarding accepting gifts or entertainment from clients, vendors, etc.</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Conflicts of Interest</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="radio" name="conflictOfInterestPolicy" value="standard" checked>
+                  <div class="option-content">
+                    <span class="option-label">Standard Policy</span>
+                    <span class="option-description">Basic conflict of interest policy with disclosure requirements</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="conflictOfInterestPolicy" value="detailed">
+                  <div class="option-content">
+                    <span class="option-label">Detailed Policy</span>
+                    <span class="option-description">Comprehensive policy with examples and specific procedures</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="conflictOfInterestPolicy" value="minimal">
+                  <div class="option-content">
+                    <span class="option-label">Minimal Policy</span>
+                    <span class="option-description">Brief statement requiring disclosure of potential conflicts</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Confidentiality and Non-Disclosure</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="radio" name="confidentialityPolicy" value="standard" checked>
+                  <div class="option-content">
+                    <span class="option-label">Standard Policy</span>
+                    <span class="option-description">Basic confidentiality requirements with general guidelines</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="confidentialityPolicy" value="comprehensive">
+                  <div class="option-content">
+                    <span class="option-label">Comprehensive Policy</span>
+                    <span class="option-description">Detailed confidentiality policy with specific categories of protected information</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="confidentialityPolicy" value="specialized">
+                  <div class="option-content">
+                    <span class="option-label">Industry-Specific Policy</span>
+                    <span class="option-description">Tailored confidentiality policy based on industry requirements (e.g., HIPAA, financial, etc.)</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="employment">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="hours-comp">Next: Hours & Compensation</button>
+            </div>
+          </div>
+          
+          <!-- Hours and Compensation Section -->
+          <div class="form-section" id="section-hours-comp">
+            <h2 class="form-section-title">Work Hours and Compensation</h2>
+            
+            <div class="form-group">
+              <label for="workSchedule">Work Schedule</label>
+              <select id="workSchedule" class="form-input">
+                <option value="standard" selected>Standard (e.g., 9-5, Monday-Friday)</option>
+                <option value="flexible">Flexible Hours</option>
+                <option value="shifts">Shift Work</option>
+                <option value="compressed">Compressed Workweek</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="workLocation">Work Location</label>
+              <select id="workLocation" class="form-input">
+                <option value="onsite">Onsite Only</option>
+                <option value="remote">Remote Only</option>
+                <option value="hybrid" selected>Hybrid (Mix of Onsite and Remote)</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="remoteWorkGroup">
+              <label for="remoteWorkPolicy">Remote Work Policy</label>
+              <select id="remoteWorkPolicy" class="form-input">
+                <option value="standard" selected>Standard Remote Work Policy</option>
+                <option value="detailed">Detailed Remote Work Policy with Equipment and Security Requirements</option>
+                <option value="flexible">Flexible Remote Work Policy with Minimal Restrictions</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="overtimePolicy">Overtime Policy</label>
+              <select id="overtimePolicy" class="form-input">
+                <option value="standard" selected>Standard (1.5x pay for hours over 40 per week for non-exempt employees)</option>
+                <option value="enhanced">Enhanced (Additional overtime provisions beyond legal requirements)</option>
+                <option value="restricted">Restricted (Overtime must be pre-approved)</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="paySchedule">Pay Schedule</label>
+              <select id="paySchedule" class="form-input">
+                <option value="weekly">Weekly</option>
+                <option value="biweekly" selected>Bi-weekly</option>
+                <option value="semimonthly">Semi-monthly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="payDeductions">Pay Deductions</label>
+              <textarea id="payDeductions" class="form-input" placeholder="List standard payroll deductions">Standard deductions include federal, state, and local taxes, Social Security and Medicare contributions, health insurance premiums, retirement plan contributions, and any other deductions required by law or authorized by the employee.</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Meals and Break Periods</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="breakPeriods" value="meal" checked>
+                  <div class="option-content">
+                    <span class="option-label">Meal Breaks</span>
+                    <span class="option-description">30-60 minute meal periods</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="breakPeriods" value="rest" checked>
+                  <div class="option-content">
+                    <span class="option-label">Rest Breaks</span>
+                    <span class="option-description">10-15 minute rest periods</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="breakPeriods" value="nursing">
+                  <div class="option-content">
+                    <span class="option-label">Nursing Mother Breaks</span>
+                    <span class="option-description">Breaks for nursing mothers to express milk</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="conduct">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="pto">Next: PTO & Leave</button>
+            </div>
+          </div>
+          
+          <!-- PTO and Leave Section -->
+          <div class="form-section" id="section-pto">
+            <h2 class="form-section-title">PTO and Leave Policies</h2>
+            
+            <div class="form-group">
+              <label for="ptoPolicy">Paid Time Off (PTO) Approach</label>
+              <select id="ptoPolicy" class="form-input">
+                <option value="traditional">Traditional (Separate Vacation and Sick Leave)</option>
+                <option value="combined" selected>Combined PTO Bank</option>
+                <option value="unlimited">Unlimited PTO</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="ptoAccrualGroup">
+              <label for="ptoAccrual">PTO Accrual Method</label>
+              <select id="ptoAccrual" class="form-input">
+                <option value="annual">Annual Allocation</option>
+                <option value="monthly">Monthly Accrual</option>
+                <option value="pay-period" selected>Per Pay Period Accrual</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="ptoAmountGroup">
+              <label for="ptoAmount">Standard Annual PTO Amount</label>
+              <select id="ptoAmount" class="form-input">
+                <option value="10days">10 Days</option>
+                <option value="15days" selected>15 Days</option>
+                <option value="20days">20 Days</option>
+                <option value="25days">25 Days</option>
+                <option value="custom">Custom PTO Structure</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="ptoCustomGroup" style="display: none;">
+              <label for="ptoCustom">Custom PTO Structure</label>
+              <textarea id="ptoCustom" class="form-input" placeholder="Describe your custom PTO structure (e.g., based on tenure, position, etc.)"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="holidayPolicy">Paid Holidays</label>
+              <select id="holidayPolicy" class="form-input">
+                <option value="standard" selected>Standard Federal Holidays</option>
+                <option value="enhanced">Enhanced Holiday Schedule</option>
+                <option value="floating">Federal Holidays + Floating Holidays</option>
+                <option value="custom">Custom Holiday Schedule</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customHolidaysGroup" style="display: none;">
+              <label for="customHolidays">Custom Holiday Schedule</label>
+              <textarea id="customHolidays" class="form-input" placeholder="List your company's observed holidays"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Leave Types</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="leaveTypes" value="bereavement" checked>
+                  <div class="option-content">
+                    <span class="option-label">Bereavement Leave</span>
+                    <span class="option-description">Leave for the death of a family member</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="leaveTypes" value="jury" checked>
+                  <div class="option-content">
+                    <span class="option-label">Jury Duty Leave</span>
+                    <span class="option-description">Leave for jury service</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="leaveTypes" value="military" checked>
+                  <div class="option-content">
+                    <span class="option-label">Military Leave</span>
+                    <span class="option-description">Leave for military service</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="leaveTypes" value="parental" checked>
+                  <div class="option-content">
+                    <span class="option-label">Parental Leave</span>
+                    <span class="option-description">Leave for new parents</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="leaveTypes" value="sabbatical">
+                  <div class="option-content">
+                    <span class="option-label">Sabbatical Leave</span>
+                    <span class="option-description">Extended leave for personal or professional development</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="leaveTypes" value="volunteer">
+                  <div class="option-content">
+                    <span class="option-label">Volunteer Leave</span>
+                    <span class="option-description">Leave for volunteer activities</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="fmlaPolicy">Family and Medical Leave Act (FMLA) Policy</label>
+              <select id="fmlaPolicy" class="form-input">
+                <option value="standard" selected>Standard FMLA Policy</option>
+                <option value="enhanced">Enhanced FMLA Policy</option>
+                <option value="not-applicable">Not Applicable (Company Size < 50 Employees)</option>
+              </select>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="hours-comp">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="technology">Next: Technology</button>
+            </div>
+          </div>
+          
+          <!-- Technology Section -->
+          <div class="form-section" id="section-technology">
+            <h2 class="form-section-title">Technology and Communication</h2>
+            
+            <div class="form-group">
+              <label for="computerUsePolicy">Computer and Internet Use</label>
+              <select id="computerUsePolicy" class="form-input">
+                <option value="standard" selected>Standard Computer Use Policy</option>
+                <option value="restrictive">Restrictive Computer Use Policy</option>
+                <option value="permissive">Permissive Computer Use Policy</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="emailPolicy">Email Use</label>
+              <select id="emailPolicy" class="form-input">
+                <option value="standard" selected>Standard Email Use Policy</option>
+                <option value="restrictive">Restrictive Email Use Policy</option>
+                <option value="permissive">Permissive Email Use Policy</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="socialMediaPolicy">Social Media Policy</label>
+              <select id="socialMediaPolicy" class="form-input">
+                <option value="standard" selected>Standard Social Media Policy</option>
+                <option value="restrictive">Restrictive Social Media Policy</option>
+                <option value="encouraging">Social Media Advocacy Policy</option>
+                <option value="none">No Social Media Policy</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="byodPolicy">Personal Device (BYOD) Policy</label>
+              <select id="byodPolicy" class="form-input">
+                <option value="allowed" selected>BYOD Allowed with Restrictions</option>
+                <option value="not-allowed">BYOD Not Allowed</option>
+                <option value="required">BYOD Required</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Information Security Policies</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="securityPolicies" value="password" checked>
+                  <div class="option-content">
+                    <span class="option-label">Password Policy</span>
+                    <span class="option-description">Requirements for secure passwords</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="securityPolicies" value="data-protection" checked>
+                  <div class="option-content">
+                    <span class="option-label">Data Protection Policy</span>
+                    <span class="option-description">Guidelines for protecting sensitive data</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="securityPolicies" value="encryption">
+                  <div class="option-content">
+                    <span class="option-label">Encryption Policy</span>
+                    <span class="option-description">Requirements for data encryption</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="securityPolicies" value="incident-response" checked>
+                  <div class="option-content">
+                    <span class="option-label">Incident Response</span>
+                    <span class="option-description">Procedures for security incidents</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Communication Channels</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="communicationChannels" value="email" checked>
+                  <div class="option-content">
+                    <span class="option-label">Email</span>
+                    <span class="option-description">Policy on email communication</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="communicationChannels" value="messaging" checked>
+                  <div class="option-content">
+                    <span class="option-label">Instant Messaging</span>
+                    <span class="option-description">Policy on chat and messaging tools</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="communicationChannels" value="video" checked>
+                  <div class="option-content">
+                    <span class="option-label">Video Conferencing</span>
+                    <span class="option-description">Policy on video meetings</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="communicationChannels" value="social">
+                  <div class="option-content">
+                    <span class="option-label">Social Media</span>
+                    <span class="option-description">Policy on internal social media platforms</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="pto">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="safety">Next: Health & Safety</button>
+            </div>
+          </div>
+          
+          <!-- Health and Safety Section -->
+          <div class="form-section" id="section-safety">
+            <h2 class="form-section-title">Health and Safety</h2>
+            
+            <div class="form-group">
+              <label for="safetyPolicy">Workplace Safety Policy</label>
+              <select id="safetyPolicy" class="form-input">
+                <option value="standard" selected>Standard Safety Policy</option>
+                <option value="industry">Industry-Specific Safety Policy</option>
+                <option value="comprehensive">Comprehensive Safety Program</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="emergencyProcedures">Emergency Procedures</label>
+              <select id="emergencyProcedures" class="form-input">
+                <option value="basic" selected>Basic Emergency Procedures</option>
+                <option value="detailed">Detailed Emergency Procedures</option>
+                <option value="comprehensive">Comprehensive Emergency Management Plan</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="injuryIllness">Injury and Illness Reporting</label>
+              <select id="injuryIllness" class="form-input">
+                <option value="standard" selected>Standard Reporting Procedures</option>
+                <option value="detailed">Detailed Reporting and Investigation Procedures</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="drugAlcoholPolicy">Drug and Alcohol Policy</label>
+              <select id="drugAlcoholPolicy" class="form-input">
+                <option value="zero-tolerance">Zero Tolerance Policy</option>
+                <option value="standard" selected>Standard Prohibition Policy</option>
+                <option value="rehabilitation">Rehabilitation-Focused Policy</option>
+                <option value="none">No Specific Policy</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="smokingPolicy">Smoking Policy</label>
+              <select id="smokingPolicy" class="form-input">
+                <option value="prohibited" selected>Completely Prohibited on Company Property</option>
+                <option value="designated-areas">Allowed in Designated Areas Only</option>
+                <option value="unrestricted">No Specific Restrictions</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Workplace Violence Prevention</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="radio" name="violencePreventionPolicy" value="standard" checked>
+                  <div class="option-content">
+                    <span class="option-label">Standard Policy</span>
+                    <span class="option-description">Basic violence prevention policy with reporting procedures</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="violencePreventionPolicy" value="comprehensive">
+                  <div class="option-content">
+                    <span class="option-label">Comprehensive Policy</span>
+                    <span class="option-description">Detailed violence prevention program with risk assessment and training</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="radio" name="violencePreventionPolicy" value="minimal">
+                  <div class="option-content">
+                    <span class="option-label">Minimal Policy</span>
+                    <span class="option-description">Brief statement prohibiting workplace violence</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label>Mental Health Support</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="mentalHealthSupport" value="eap" checked>
+                  <div class="option-content">
+                    <span class="option-label">Employee Assistance Program (EAP)</span>
+                    <span class="option-description">Access to confidential counseling and support services</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="mentalHealthSupport" value="resources">
+                  <div class="option-content">
+                    <span class="option-label">Mental Health Resources</span>
+                    <span class="option-description">Information and resources for mental health support</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="mentalHealthSupport" value="training">
+                  <div class="option-content">
+                    <span class="option-label">Mental Health Training</span>
+                    <span class="option-description">Training for managers and employees on mental health awareness</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="technology">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="performance">Next: Performance</button>
+            </div>
+          </div>
+          
+          <!-- Performance Management Section -->
+          <div class="form-section" id="section-performance">
+            <h2 class="form-section-title">Performance Management</h2>
+            
+            <div class="form-group">
+              <label for="performanceReviews">Performance Review Process</label>
+              <select id="performanceReviews" class="form-input">
+                <option value="annual">Annual Performance Reviews</option>
+                <option value="biannual" selected>Bi-Annual Performance Reviews</option>
+                <option value="quarterly">Quarterly Performance Reviews</option>
+                <option value="continuous">Continuous Performance Feedback</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="trainingDevelopment">Training and Development</label>
+              <select id="trainingDevelopment" class="form-input">
+                <option value="standard" selected>Standard Training and Development Policy</option>
+                <option value="robust">Robust Professional Development Program</option>
+                <option value="minimal">Minimal Training Provisions</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="disciplinaryProcedures">Disciplinary Procedures</label>
+              <select id="disciplinaryProcedures" class="form-input">
+                <option value="progressive" selected>Progressive Discipline Approach</option>
+                <option value="immediate">Immediate Action Approach</option>
+                <option value="corrective">Corrective Action Approach</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Termination Policies</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="terminationPolicies" value="voluntary" checked>
+                  <div class="option-content">
+                    <span class="option-label">Voluntary Termination (Resignation)</span>
+                    <span class="option-description">Procedures for employee resignations</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="terminationPolicies" value="involuntary" checked>
+                  <div class="option-content">
+                    <span class="option-label">Involuntary Termination</span>
+                    <span class="option-description">Procedures for employee terminations</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="terminationPolicies" value="exit-interview" checked>
+                  <div class="option-content">
+                    <span class="option-label">Exit Interview</span>
+                    <span class="option-description">Process for conducting exit interviews</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="terminationPolicies" value="final-pay" checked>
+                  <div class="option-content">
+                    <span class="option-label">Final Pay</span>
+                    <span class="option-description">Policies regarding final paycheck and benefits</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="grievanceProcedure">Employee Grievance Procedure</label>
+              <select id="grievanceProcedure" class="form-input">
+                <option value="standard" selected>Standard Grievance Procedure</option>
+                <option value="detailed">Detailed Multi-Step Procedure</option>
+                <option value="informal">Informal Resolution Process</option>
+                <option value="none">No Formal Grievance Procedure</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="personalDataPolicy">Employee Personal Data</label>
+              <select id="personalDataPolicy" class="form-input">
+                <option value="standard" selected>Standard Personal Data Policy</option>
+                <option value="gdpr-compliant">GDPR-Compliant Personal Data Policy</option>
+                <option value="minimal">Minimal Personal Data Policy</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="miscPolicies">Additional Policies (Optional)</label>
+              <textarea id="miscPolicies" class="form-input" placeholder="Add any additional policies specific to your organization"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="acknowledgment">Employee Acknowledgment Statement</label>
+              <select id="acknowledgment" class="form-input">
+                <option value="standard" selected>Standard Acknowledgment</option>
+                <option value="detailed">Detailed Acknowledgment with Specific Provisions</option>
+                <option value="simple">Simple Acknowledgment</option>
+              </select>
+            </div>
+            
+            <div class="form-navigation">
+              <button type="button" class="nav-btn nav-btn-prev" data-prev="safety">Previous</button>
+              <button type="button" class="nav-btn nav-btn-next" data-next="review">Review & Generate</button>
+            </div>
+            
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <div>
+                <button type="button" id="copyBtn" class="btn btn-copy">Copy Policy</button>
+                <span id="copyMessage" class="copy-message">Policy copied!</span>
+              </div>
+              <button type="button" id="downloadBtn" class="btn btn-download">Download as DOCX</button>
+              <button type="reset" class="btn btn-reset">Reset Form</button>
+            </div>
+            
+            <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+              Schedule Legal Consultation
+            </a>
+          </div>
+        </form>
+      </div>
+      
+      <!-- Preview Container -->
+      <div class="preview-container">
+        <div class="preview-header">
+          <div class="preview-title">Policy Preview</div>
+          <div class="preview-note">Updates as you complete the form</div>
+        </div>
+        
+        <div class="preview-box">
+          <div class="document-template" id="policyPreview">
+            <!-- Document content will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Libraries for DOCX download -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  <!-- Calendly Integration -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('policyForm');
+      const preview = document.getElementById('policyPreview');
+      const copyBtn = document.getElementById('copyBtn');
+      const copyMessage = document.getElementById('copyMessage');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const previewBox = document.querySelector('.preview-box');
+      
+      // Initialize sidebar navigation
+      const sidebarItems = document.querySelectorAll('.sidebar-nav-item');
+      sidebarItems.forEach(item => {
+        item.addEventListener('click', function() {
+          // Remove active class from all items
+          sidebarItems.forEach(i => i.classList.remove('active'));
+          
+          // Add active class to clicked item
+          this.classList.add('active');
+          
+          // Get the section to show
+          const sectionId = this.getAttribute('data-section');
+          
+          // Hide all sections
+          document.querySelectorAll('.form-section').forEach(section => {
+            section.classList.remove('active');
+          });
+          
+          // Show the selected section
+          document.getElementById('section-' + sectionId).classList.add('active');
+        });
+      });
+      
+      // Initialize navigation buttons
+      const navButtons = document.querySelectorAll('.nav-btn');
+      navButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+          const prevSection = this.getAttribute('data-prev');
+          const nextSection = this.getAttribute('data-next');
+          
+          if (prevSection) {
+            // Show previous section
+            document.querySelectorAll('.form-section').forEach(section => {
+              section.classList.remove('active');
+            });
+            document.getElementById('section-' + prevSection).classList.add('active');
+            
+            // Update sidebar
+            sidebarItems.forEach(item => {
+              item.classList.remove('active');
+              if (item.getAttribute('data-section') === prevSection) {
+                item.classList.add('active');
+              }
+            });
+          } else if (nextSection) {
+            // Show next section
+            document.querySelectorAll('.form-section').forEach(section => {
+              section.classList.remove('active');
+            });
+            document.getElementById('section-' + nextSection).classList.add('active');
+            
+            // Update sidebar
+            sidebarItems.forEach(item => {
+              item.classList.remove('active');
+              if (item.getAttribute('data-section') === nextSection) {
+                item.classList.add('active');
+              }
+            });
+          }
+        });
+      });
+      
+      // Format date from YYYY-MM-DD to readable format
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+      
+      // Initialize preview
+      updatePreview();
+      
+      // Track currently highlighted elements
+      let highlightedElements = [];
+      let highlightTimeout;
+      
+      // Handle conditional form elements visibility
+      function handleFormDependencies() {
+        // PTO Custom Structure
+        const ptoAmount = document.getElementById('ptoAmount');
+        const ptoCustomGroup = document.getElementById('ptoCustomGroup');
+        
+        if (ptoAmount.value === 'custom') {
+          ptoCustomGroup.style.display = 'block';
+        } else {
+          ptoCustomGroup.style.display = 'none';
+        }
+        
+        // Unlimited PTO hides accrual and amount
+        const ptoPolicy = document.getElementById('ptoPolicy');
+        const ptoAccrualGroup = document.getElementById('ptoAccrualGroup');
+        const ptoAmountGroup = document.getElementById('ptoAmountGroup');
+        
+        if (ptoPolicy.value === 'unlimited') {
+          ptoAccrualGroup.style.display = 'none';
+          ptoAmountGroup.style.display = 'none';
+        } else {
+          ptoAccrualGroup.style.display = 'block';
+          ptoAmountGroup.style.display = 'block';
+        }
+        
+        // Custom Holiday Schedule
+        const holidayPolicy = document.getElementById('holidayPolicy');
+        const customHolidaysGroup = document.getElementById('customHolidaysGroup');
+        
+        if (holidayPolicy.value === 'custom') {
+          customHolidaysGroup.style.display = 'block';
+        } else {
+          customHolidaysGroup.style.display = 'none';
+        }
+        
+        // Remote Work Policy visibility
+        const workLocation = document.getElementById('workLocation');
+        const remoteWorkGroup = document.getElementById('remoteWorkGroup');
+        
+        if (workLocation.value === 'onsite') {
+          remoteWorkGroup.style.display = 'none';
+        } else {
+          remoteWorkGroup.style.display = 'block';
+        }
+      }
+      
+      // Initialize form dependencies
+      handleFormDependencies();
+      
+      // Update preview when form inputs change
+      form.addEventListener('input', function(e) {
+        clearHighlights();
+        updatePreview(e.target.id);
+        copyMessage.style.display = 'none';
+        
+        // Handle special form dependencies
+        handleFormDependencies();
+      });
+      
+      // Handle checkbox changes
+      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          // Toggle the selected class
+          this.closest('.option-item').classList.toggle('selected', this.checked);
+          
+          // Clear highlights and update preview
+          clearHighlights();
+          updatePreview(this.name);
+          copyMessage.style.display = 'none';
+        });
+      });
+      
+      // Handle radio button changes
+      document.querySelectorAll('input[type="radio"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+          // Remove selected class from all radio options in the same group
+          const name = this.getAttribute('name');
+          document.querySelectorAll(`input[name="${name}"]`).forEach(r => {
+            r.closest('.option-item').classList.remove('selected');
+          });
+          
+          // Add selected class to the checked radio option
+          if (this.checked) {
+            this.closest('.option-item').classList.add('selected');
+          }
+          
+          // Clear highlights and update preview
+          clearHighlights();
+          updatePreview(name);
+          copyMessage.style.display = 'none';
+        });
+      });
+      
+      // Make option items clickable
+      document.querySelectorAll('.option-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          // If the user clicked directly on the checkbox or radio, don't interfere
+          if (e.target.type === 'checkbox' || e.target.type === 'radio') return;
+          
+          // Find the input inside this option item
+          const input = this.querySelector('input');
+          if (input) {
+            // Toggle input state
+            input.checked = !input.checked;
+            
+            // For radio buttons, uncheck others in the same group
+            if (input.type === 'radio') {
+              document.querySelectorAll(`input[name="${input.name}"]`).forEach(r => {
+                if (r !== input) {
+                  r.checked = false;
+                  r.closest('.option-item').classList.remove('selected');
+                }
+              });
+            }
+            
+            // Toggle selected class
+            this.classList.toggle('selected', input.checked);
+            
+            // Clear highlights and update preview
+            clearHighlights();
+            updatePreview(input.name);
+            copyMessage.style.display = 'none';
+            
+            // Dispatch change event on input
+            const event = new Event('change', { bubbles: true });
+            input.dispatchEvent(event);
+          }
+        });
+      });
+      
+      // Handle form reset
+      form.addEventListener('reset', function() {
+        // Give time for the form to reset before updating preview
+        setTimeout(() => {
+          // Reset selected class on option items
+          document.querySelectorAll('.option-item').forEach(item => {
+            const input = item.querySelector('input');
+            if (input) {
+              item.classList.toggle('selected', input.checked);
+            }
+          });
+          
+          // Reinitialize dependencies
+          handleFormDependencies();
+          
+          clearHighlights();
+          updatePreview();
+          copyMessage.style.display = 'none';
+        }, 10);
+      });
+      
+      // Handle copy button click
+      copyBtn.addEventListener('click', function() {
+        const documentText = preview.innerText;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(documentText).then(function() {
+          copyMessage.style.display = 'inline-block';
+          
+          // Hide message after 3 seconds
+          setTimeout(() => {
+            copyMessage.style.display = 'none';
+          }, 3000);
+        }).catch(function(err) {
+          console.error('Could not copy text: ', err);
+          alert('Failed to copy policy. Please try selecting and copying the text manually.');
+        });
+      });
+      
+      // Handle download button click
+      downloadBtn.addEventListener('click', function() {
+        try {
+          // Access docx library
+          const docx = window.docx;
+          if (!docx) {
+            throw new Error("DOCX library not loaded");
+          }
+          
+          // Get company name for filename
+          const companyName = document.getElementById('companyName').value || 'Company';
+          const filename = `${companyName.replace(/[^a-z0-9]/gi, '_')}_Employee_Handbook.docx`;
+          
+          // Create document sections from preview content
+          const sections = [];
+          const sectionElements = document.querySelectorAll('.document-section');
+          
+          // Document title (single, centered)
+          const titleParagraph = new docx.Paragraph({
+            alignment: docx.AlignmentType.CENTER,
+            spacing: {
+              before: 300,
+              after: 300
+            },
+            children: [
+              new docx.TextRun({
+                text: document.querySelector('.document-title').textContent,
+                bold: true,
+                size: 32
+              })
+            ]
+          });
+          sections.push(titleParagraph);
+          
+          // Add spacing after title
+          sections.push(new docx.Paragraph({
+            text: "",
+            spacing: {
+              before: 120,
+              after: 120
+            }
+          }));
+          
+          // Add each section
+          sectionElements.forEach(sectionElement => {
+            // Get section title
+            const titleElement = sectionElement.querySelector('.section-title');
+            if (titleElement) {
+              // Add section title
+              const sectionTitle = new docx.Paragraph({
+                spacing: {
+                  before: 300,
+                  after: 120
+                },
+                children: [
+                  new docx.TextRun({
+                    text: titleElement.textContent,
+                    bold: true,
+                    size: 28
+                  })
+                ]
+              });
+              sections.push(sectionTitle);
+              
+              // Get subtitles
+              const subtitles = sectionElement.querySelectorAll('.section-subtitle');
+              const contentParagraphs = sectionElement.querySelectorAll('.section-content p');
+              
+              let contentIndex = 0;
+              
+              // Add subtitles and their content
+              subtitles.forEach(subtitle => {
+                // Add subtitle
+                sections.push(new docx.Paragraph({
+                  spacing: {
+                    before: 200,
+                    after: 80
+                  },
+                  children: [
+                    new docx.TextRun({
+                      text: subtitle.textContent,
+                      bold: true,
+                      size: 24
+                    })
+                  ]
+                }));
+                
+                // Find content paragraphs for this subtitle until next subtitle
+                let nextSubtitleFound = false;
+                while (contentIndex < contentParagraphs.length && !nextSubtitleFound) {
+                  const contentParagraph = contentParagraphs[contentIndex];
+                  
+                  // Check if this paragraph is before the next subtitle
+                  if (contentParagraph.compareDocumentPosition(subtitle.nextElementSibling) & Node.DOCUMENT_POSITION_FOLLOWING) {
+                    // Add content paragraph
+                    sections.push(new docx.Paragraph({
+                      text: contentParagraph.textContent,
+                      spacing: {
+                        before: 80,
+                        after: 80
+                      }
+                    }));
+                    contentIndex++;
+                  } else {
+                    nextSubtitleFound = true;
+                  }
+                }
+              });
+              
+              // Add any remaining content paragraphs
+              while (contentIndex < contentParagraphs.length) {
+                sections.push(new docx.Paragraph({
+                  text: contentParagraphs[contentIndex].textContent,
+                  spacing: {
+                    before: 80,
+                    after: 80
+                  }
+                }));
+                contentIndex++;
+              }
+            }
+          });
+          
+          // Create document
+          const doc = new docx.Document({
+            styles: {
+              default: {
+                document: {
+                  run: {
+                    size: 11 * 2, // 11pt font size (in half-points)
+                    font: "Calibri"
+                  },
+                  paragraph: {
+                    spacing: {
+                      line: 240, // 1.0x line spacing
+                      before: 0,
+                      after: 0,
+                      afterAutoSpacing: false,
+                      beforeAutoSpacing: false
+                    }
+                  }
+                }
+              }
+            },
+            sections: [{
+              properties: {
+                page: {
+                  margin: {
+                    top: 1440, // 1 inch in twips
+                    right: 1440,
+                    bottom: 1440,
+                    left: 1440
+                  }
+                }
+              },
+              children: sections
+            }]
+          });
+          
+          // Generate and save document
+          docx.Packer.toBlob(doc)
+            .then(blob => {
+              window.saveAs(blob, filename);
+            })
+            .catch(error => {
+              console.error("Error saving DOCX:", error);
+              alert("Unable to download. Please try using the copy button instead.");
+            });
+        } catch (error) {
+          console.error("DOCX generation error:", error);
+          alert("Unable to download. Please try using the copy button instead.");
+        }
+      });
+      
+      // Function to clear highlights
+      function clearHighlights() {
+        if (highlightTimeout) {
+          clearTimeout(highlightTimeout);
+        }
+        
+        highlightedElements.forEach(element => {
+          element.classList.remove('highlight');
+        });
+        highlightedElements = [];
+      }
+      
+      // Generate a unique ID for elements that need highlighting
+      function generateHighlightId(field) {
+        return 'highlight-' + field.replace(/[^a-zA-Z0-9]/g, '-');
+      }
+      
+      // Update the policy preview
+      function updatePreview(changedField = null) {
+        // Get form values
+        const companyName = document.getElementById('companyName').value;
+        const effectiveDate = formatDate(document.getElementById('effectiveDate').value);
+        const companySizeEl = document.getElementById('companySize');
+        const companySize = companySizeEl.options[companySizeEl.selectedIndex].text;
+        const industryEl = document.getElementById('industry');
+        const industry = industryEl.options[industryEl.selectedIndex].text;
+        const companyMission = document.getElementById('companyMission').value;
+        const policyPurpose = document.getElementById('policyPurpose').value;
+        
+        // At-Will Employment Status
+        const atWillStatusEl = document.getElementById('atWillStatus');
+        const atWillStatus = atWillStatusEl.options[atWillStatusEl.selectedIndex].text;
+        
+        // EEO Policy
+        const eeoPolicy = document.querySelector('input[name="eeoPolicy"]:checked').value;
+        
+        // Anti-Harassment Policy
+        const antiHarassmentPolicy = document.querySelector('input[name="antiHarassmentPolicy"]:checked').value;
+        
+        // Probation Period
+        const probationPeriodEl = document.getElementById('probationPeriod');
+        const probationPeriod = probationPeriodEl.options[probationPeriodEl.selectedIndex].text;
+        
+        // Employment Classifications
+        const selectedClassifications = [];
+        document.querySelectorAll('input[name="employmentClassifications"]:checked').forEach(checkbox => {
+          selectedClassifications.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Dress Code
+        const dressCodeEl = document.getElementById('dressCode');
+        const dressCode = dressCodeEl.options[dressCodeEl.selectedIndex].text;
+        
+        // Attendance Policy
+        const attendancePolicyEl = document.getElementById('attendancePolicy');
+        const attendancePolicy = attendancePolicyEl.options[attendancePolicyEl.selectedIndex].text;
+        
+        // Professional Behavior Policies
+        const selectedBehaviorPolicies = [];
+        document.querySelectorAll('input[name="behaviorPolicies"]:checked').forEach(checkbox => {
+          selectedBehaviorPolicies.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Conflict of Interest Policy
+        const conflictOfInterestPolicy = document.querySelector('input[name="conflictOfInterestPolicy"]:checked').value;
+        
+        // Confidentiality Policy
+        const confidentialityPolicy = document.querySelector('input[name="confidentialityPolicy"]:checked').value;
+        
+        // Work Schedule
+        const workScheduleEl = document.getElementById('workSchedule');
+        const workSchedule = workScheduleEl.options[workScheduleEl.selectedIndex].text;
+        
+        // Work Location
+        const workLocationEl = document.getElementById('workLocation');
+        const workLocation = workLocationEl.options[workLocationEl.selectedIndex].text;
+        
+        // Remote Work Policy
+        let remoteWorkPolicy = '';
+        if (workLocation !== 'Onsite Only') {
+          const remoteWorkPolicyEl = document.getElementById('remoteWorkPolicy');
+          remoteWorkPolicy = remoteWorkPolicyEl.options[remoteWorkPolicyEl.selectedIndex].text;
+        }
+        
+        // Overtime Policy
+        const overtimePolicyEl = document.getElementById('overtimePolicy');
+        const overtimePolicy = overtimePolicyEl.options[overtimePolicyEl.selectedIndex].text;
+        
+        // Pay Schedule
+        const payScheduleEl = document.getElementById('paySchedule');
+        const paySchedule = payScheduleEl.options[payScheduleEl.selectedIndex].text;
+        
+        // Pay Deductions
+        const payDeductions = document.getElementById('payDeductions').value;
+        
+        // Break Periods
+        const selectedBreakPeriods = [];
+        document.querySelectorAll('input[name="breakPeriods"]:checked').forEach(checkbox => {
+          selectedBreakPeriods.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // PTO Policy
+        const ptoPolicyEl = document.getElementById('ptoPolicy');
+        const ptoPolicy = ptoPolicyEl.options[ptoPolicyEl.selectedIndex].text;
+        
+        // PTO Accrual
+        let ptoAccrual = '';
+        if (ptoPolicy !== 'Unlimited PTO') {
+          const ptoAccrualEl = document.getElementById('ptoAccrual');
+          ptoAccrual = ptoAccrualEl.options[ptoAccrualEl.selectedIndex].text;
+        }
+        
+        // PTO Amount
+        let ptoAmount = '';
+        if (ptoPolicy !== 'Unlimited PTO') {
+          const ptoAmountEl = document.getElementById('ptoAmount');
+          ptoAmount = ptoAmountEl.options[ptoAmountEl.selectedIndex].text;
+          
+          if (ptoAmount === 'Custom PTO Structure') {
+            ptoAmount = document.getElementById('ptoCustom').value;
+          }
+        }
+        
+        // Holiday Policy
+        const holidayPolicyEl = document.getElementById('holidayPolicy');
+        const holidayPolicy = holidayPolicyEl.options[holidayPolicyEl.selectedIndex].text;
+        
+        // Custom Holidays
+        let customHolidays = '';
+        if (holidayPolicy === 'Custom Holiday Schedule') {
+          customHolidays = document.getElementById('customHolidays').value;
+        }
+        
+        // Leave Types
+        const selectedLeaveTypes = [];
+        document.querySelectorAll('input[name="leaveTypes"]:checked').forEach(checkbox => {
+          selectedLeaveTypes.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // FMLA Policy
+        const fmlaPolicyEl = document.getElementById('fmlaPolicy');
+        const fmlaPolicy = fmlaPolicyEl.options[fmlaPolicyEl.selectedIndex].text;
+        
+        // Computer Use Policy
+        const computerUsePolicyEl = document.getElementById('computerUsePolicy');
+        const computerUsePolicy = computerUsePolicyEl.options[computerUsePolicyEl.selectedIndex].text;
+        
+        // Email Use Policy
+        const emailPolicyEl = document.getElementById('emailPolicy');
+        const emailPolicy = emailPolicyEl.options[emailPolicyEl.selectedIndex].text;
+        
+        // Social Media Policy
+        const socialMediaPolicyEl = document.getElementById('socialMediaPolicy');
+        const socialMediaPolicy = socialMediaPolicyEl.options[socialMediaPolicyEl.selectedIndex].text;
+        
+        // BYOD Policy
+        const byodPolicyEl = document.getElementById('byodPolicy');
+        const byodPolicy = byodPolicyEl.options[byodPolicyEl.selectedIndex].text;
+        
+        // Security Policies
+        const selectedSecurityPolicies = [];
+        document.querySelectorAll('input[name="securityPolicies"]:checked').forEach(checkbox => {
+          selectedSecurityPolicies.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Communication Channels
+        const selectedCommunicationChannels = [];
+        document.querySelectorAll('input[name="communicationChannels"]:checked').forEach(checkbox => {
+          selectedCommunicationChannels.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Safety Policy
+        const safetyPolicyEl = document.getElementById('safetyPolicy');
+        const safetyPolicy = safetyPolicyEl.options[safetyPolicyEl.selectedIndex].text;
+        
+        // Emergency Procedures
+        const emergencyProceduresEl = document.getElementById('emergencyProcedures');
+        const emergencyProcedures = emergencyProceduresEl.options[emergencyProceduresEl.selectedIndex].text;
+        
+        // Injury and Illness Reporting
+        const injuryIllnessEl = document.getElementById('injuryIllness');
+        const injuryIllness = injuryIllnessEl.options[injuryIllnessEl.selectedIndex].text;
+        
+        // Drug and Alcohol Policy
+        const drugAlcoholPolicyEl = document.getElementById('drugAlcoholPolicy');
+        const drugAlcoholPolicy = drugAlcoholPolicyEl.options[drugAlcoholPolicyEl.selectedIndex].text;
+        
+        // Smoking Policy
+        const smokingPolicyEl = document.getElementById('smokingPolicy');
+        const smokingPolicy = smokingPolicyEl.options[smokingPolicyEl.selectedIndex].text;
+        
+        // Workplace Violence Prevention
+        const violencePreventionPolicy = document.querySelector('input[name="violencePreventionPolicy"]:checked').value;
+        
+        // Mental Health Support
+        const selectedMentalHealthSupport = [];
+        document.querySelectorAll('input[name="mentalHealthSupport"]:checked').forEach(checkbox => {
+          selectedMentalHealthSupport.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Performance Reviews
+        const performanceReviewsEl = document.getElementById('performanceReviews');
+        const performanceReviews = performanceReviewsEl.options[performanceReviewsEl.selectedIndex].text;
+        
+        // Training and Development
+        const trainingDevelopmentEl = document.getElementById('trainingDevelopment');
+        const trainingDevelopment = trainingDevelopmentEl.options[trainingDevelopmentEl.selectedIndex].text;
+        
+        // Disciplinary Procedures
+        const disciplinaryProceduresEl = document.getElementById('disciplinaryProcedures');
+        const disciplinaryProcedures = disciplinaryProceduresEl.options[disciplinaryProceduresEl.selectedIndex].text;
+        
+        // Termination Policies
+        const selectedTerminationPolicies = [];
+        document.querySelectorAll('input[name="terminationPolicies"]:checked').forEach(checkbox => {
+          selectedTerminationPolicies.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Grievance Procedure
+        const grievanceProcedureEl = document.getElementById('grievanceProcedure');
+        const grievanceProcedure = grievanceProcedureEl.options[grievanceProcedureEl.selectedIndex].text;
+        
+        // Personal Data Policy
+        const personalDataPolicyEl = document.getElementById('personalDataPolicy');
+        const personalDataPolicy = personalDataPolicyEl.options[personalDataPolicyEl.selectedIndex].text;
+        
+        // Additional Policies
+        const miscPolicies = document.getElementById('miscPolicies').value;
+        
+        // Acknowledgment
+        const acknowledgmentEl = document.getElementById('acknowledgment');
+        const acknowledgment = acknowledgmentEl.options[acknowledgmentEl.selectedIndex].text;
+        
+        // Build the policy HTML
+        let policyHtml = `
+          <div class="document-title">${companyName} EMPLOYEE HANDBOOK</div>
+          
+          <div class="document-section" id="section-intro">
+            <div class="section-title">INTRODUCTION</div>
+            <div class="section-content">
+              <p>Welcome to ${companyName}. This Employee Handbook ("Handbook") is effective as of ${effectiveDate} and supersedes all previously issued handbooks and policy statements.</p>
+              
+              <p>${policyPurpose}</p>
+              
+              ${companyMission ? `<p><span id="highlight-companyMission">Our Mission: ${companyMission}</span></p>` : ''}
+              
+              <p>This Handbook is not a contract of employment and does not create any contractual rights, either expressed or implied. The Company reserves the right to modify, revoke, suspend, terminate, or change any or all policies, procedures, or working conditions, in whole or in part, at any time, with or without notice.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-employment">
+            <div class="section-title">EMPLOYMENT POLICIES</div>
+            
+            <div class="section-subtitle">Employment Status</div>
+            <div class="section-content">
+              <p><span id="highlight-atWillStatus">Your employment with ${companyName} is ${atWillStatus}. ${atWillStatus === 'At-Will Employment' ? 'This means that either you or the Company may terminate the employment relationship at any time, with or without cause or notice. Nothing in this Handbook or any other Company document should be understood as creating a contract, guaranteed or continued employment, a right to termination only for specific reasons, or any other guarantee of continued benefits or employment.' : atWillStatus === 'Contract-Based Employment' ? 'Your specific terms and conditions of employment are governed by your employment contract. In the event of any conflict between this Handbook and your employment contract, the terms of your employment contract will prevail.' : 'Depending on your position, you may be employed either at-will or under a contract. Please refer to your specific employment documentation to understand your employment status.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Equal Employment Opportunity</div>
+            <div class="section-content">
+              <p><span id="highlight-eeoPolicy">${companyName} is an equal opportunity employer and complies with all applicable federal, state, and local fair employment practices laws. The Company prohibits discrimination and harassment against employees, applicants, or individuals providing services in the workplace on the basis of race, color, religion, sex, national origin, age, disability, veteran status, ${eeoPolicy === 'comprehensive' ? 'sexual orientation, gender identity or expression, marital status, genetic information, or any other status protected by applicable law' : 'or any other status protected by applicable law'}.</span></p>
+              
+              ${eeoPolicy === 'comprehensive' ? `<p>This policy applies to all aspects of employment, including hiring, promotion, demotion, transfer, recruitment, termination, discipline, compensation, benefits, and training. It is the responsibility of all employees to create and maintain a work environment free of discrimination and harassment.</p>
+              
+              <p>Any employee who believes they have experienced or witnessed discrimination or harassment should report the incident to their supervisor, Human Resources, or any member of management. All reports will be promptly investigated, and appropriate corrective action will be taken.</p>` : ''}
+            </div>
+            
+            <div class="section-subtitle">Anti-Harassment and Non-Discrimination</div>
+            <div class="section-content">
+              <p><span id="highlight-antiHarassmentPolicy">${companyName} is committed to maintaining a work environment free from all forms of harassment and discrimination, including sexual harassment. Harassment of any kind will not be tolerated.</span></p>
+              
+              <p>Harassment includes verbal, physical, or visual conduct that creates an intimidating, offensive, or hostile work environment or that interferes with work performance.</p>
+              
+              ${antiHarassmentPolicy === 'comprehensive' ? `<p>Examples of prohibited harassment include, but are not limited to:</p>
+              <p>- Verbal conduct such as epithets, derogatory jokes or comments, slurs, or unwanted sexual advances, invitations, or comments</p>
+              <p>- Visual displays such as derogatory and/or sexually oriented posters, photography, cartoons, drawings, or gestures</p>
+              <p>- Physical conduct including assault, unwanted touching, intentionally blocking normal movement, or interfering with work</p>
+              <p>- Threats or demands to submit to sexual requests as a condition of continued employment, or to avoid some other loss, and offers of employment benefits in return for sexual favors</p>
+              
+              <p>Reporting Procedure: If you believe you have experienced or witnessed harassment, report the incident immediately to your supervisor, Human Resources, or any member of management. All reports will be promptly investigated, and appropriate corrective action will be taken.</p>
+              
+              <p>Non-Retaliation: The Company prohibits retaliation against anyone who reports harassment or discrimination or participates in an investigation of such reports.</p>` : ''}
+            </div>
+            
+            ${probationPeriod !== 'No Probationary Period' ? `<div class="section-subtitle">Probationary Period</div>
+            <div class="section-content">
+              <p><span id="highlight-probationPeriod">All new employees will undergo a probationary period of ${probationPeriod} from their date of hire. During this period, you will be evaluated on your performance, attendance, attitude, and overall fit with the Company. At the end of the probationary period, a performance evaluation may be conducted to determine continued employment.</span></p>
+              
+              <p>The Company reserves the right to extend the probationary period if deemed necessary. Completion of the probationary period does not guarantee continued employment and does not change the at-will employment relationship.</p>
+            </div>` : ''}
+            
+            <div class="section-subtitle">Employment Classifications</div>
+            <div class="section-content">
+              <p><span id="highlight-employmentClassifications">The Company categorizes employees as follows:</span></p>
+              
+              ${selectedClassifications.includes('Full-Time Employees') ? `<p><strong>Full-Time Employees:</strong> Employees who work a regular schedule of 40 or more hours per week. Full-time employees are eligible for all Company benefits, subject to the terms and conditions of each benefit program.</p>` : ''}
+              
+              ${selectedClassifications.includes('Part-Time Employees') ? `<p><strong>Part-Time Employees:</strong> Employees who work less than 40 hours per week. Part-time employees may be eligible for some Company benefits on a prorated basis, depending on hours worked.</p>` : ''}
+              
+              ${selectedClassifications.includes('Temporary Employees') ? `<p><strong>Temporary Employees:</strong> Employees hired for a specific period or project. Temporary employees are not eligible for Company benefits unless required by law.</p>` : ''}
+              
+              ${selectedClassifications.includes('Seasonal Employees') ? `<p><strong>Seasonal Employees:</strong> Employees hired for a specific season or time of year. Seasonal employees are not eligible for Company benefits unless required by law.</p>` : ''}
+              
+              ${selectedClassifications.includes('Exempt Employees') ? `<p><strong>Exempt Employees:</strong> Employees who are exempt from overtime pay requirements under applicable wage and hour laws. Exempt employees are typically paid a salary and include executive, administrative, and professional employees.</p>` : ''}
+              
+              ${selectedClassifications.includes('Non-Exempt Employees') ? `<p><strong>Non-Exempt Employees:</strong> Employees who are entitled to overtime pay under applicable wage and hour laws. Non-exempt employees are typically paid on an hourly basis.</p>` : ''}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-conduct">
+            <div class="section-title">CODE OF CONDUCT</div>
+            
+            <div class="section-subtitle">Dress Code</div>
+            <div class="section-content">
+              <p><span id="highlight-dressCode">${companyName} maintains a ${dressCode} dress code. ${dressCode === 'Business Professional' ? 'Employees are expected to dress in formal business attire. This includes suits, dress shirts, ties, dress pants, and dress shoes for men, and business suits, dresses, blouses, dress pants, and dress shoes for women.' : dressCode === 'Business Casual' ? 'Employees are expected to present a clean and professional appearance. Business casual attire includes slacks, khakis, dress shirts, polo shirts, blouses, sweaters, and closed-toe shoes.' : dressCode === 'Casual' ? 'Employees may dress in comfortable, clean clothing such as jeans, t-shirts, and casual footwear, provided they present a neat appearance and their attire is not offensive or inappropriate.' : dressCode === 'Uniform Required' ? 'Employees are required to wear Company-provided or approved uniforms at all times during working hours.' : 'Employees are expected to use good judgment in their choice of work clothes and to maintain a professional, clean, and neat appearance at all times.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Attendance and Punctuality</div>
+            <div class="section-content">
+              <p><span id="highlight-attendancePolicy">${companyName} maintains a ${attendancePolicy.toLowerCase()} attendance policy. ${attendancePolicy === 'Strict (Formal tracking and consequences)' ? 'Regular attendance and punctuality are essential job functions. Employees are expected to report to work on time and as scheduled. Absences must be reported to your supervisor at least one hour before the start of your shift. Excessive absenteeism or tardiness may result in disciplinary action, up to and including termination.' : attendancePolicy === 'Standard (Basic expectations with some flexibility)' ? 'Regular attendance and punctuality are important to the efficient operation of the Company. Employees are expected to report to work on time and as scheduled. If you will be absent or late, notify your supervisor as soon as possible. Excessive absenteeism or tardiness may be subject to disciplinary action.' : 'While regular attendance is important, the Company recognizes the importance of work-life balance and focuses on results rather than strict time tracking. Employees are expected to complete their work responsibilities and communicate with their supervisors regarding any scheduling needs or concerns.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Professional Behavior</div>
+            <div class="section-content">
+              <p><span id="highlight-behaviorPolicies">The Company expects all employees to conduct themselves in a professional manner. This includes:</span></p>
+              
+              ${selectedBehaviorPolicies.includes('Respectful Workplace Policy') ? `<p><strong>Respectful Workplace:</strong> Employees must treat colleagues, customers, vendors, and visitors with respect, dignity, and professionalism. Disrespectful behavior, including but not limited to, abusive language, intimidation, or bullying, will not be tolerated.</p>` : ''}
+              
+              ${selectedBehaviorPolicies.includes('Conflict Resolution') ? `<p><strong>Conflict Resolution:</strong> Employees are expected to handle workplace conflicts in a constructive and professional manner. If conflicts cannot be resolved directly between the parties involved, employees should seek assistance from their supervisor or Human Resources.</p>` : ''}
+              
+              ${selectedBehaviorPolicies.includes('Ethical Standards') ? `<p><strong>Ethical Standards:</strong> Employees must maintain the highest ethical standards in all business dealings. This includes honesty, integrity, and fairness in relationships with colleagues, customers, vendors, and the public.</p>` : ''}
+              
+              ${selectedBehaviorPolicies.includes('Gifts and Entertainment') ? `<p><strong>Gifts and Entertainment:</strong> Employees may not accept or provide gifts, entertainment, or other benefits that might influence or appear to influence business decisions. Modest gifts or entertainment that conform to reasonable and ethical business practices may be acceptable, but must be disclosed to management.</p>` : ''}
+            </div>
+            
+            <div class="section-subtitle">Conflicts of Interest</div>
+            <div class="section-content">
+              <p><span id="highlight-conflictOfInterestPolicy">Employees must avoid situations that create an actual or potential conflict between their personal interests and the interests of the Company. ${conflictOfInterestPolicy === 'standard' ? 'A conflict of interest exists when an employee\'s loyalties or actions are divided between the Company\'s interests and those of another party, such as a competitor, supplier, or customer. Employees must disclose any potential conflicts of interest to management.' : conflictOfInterestPolicy === 'detailed' ? 'This includes, but is not limited to: working for a competitor, supplier, or customer; having a significant financial interest in a competitor, supplier, or customer; engaging in activities that compete with the Company; using Company resources for personal gain; and engaging in relationships with other employees that may affect objectivity or job performance. All potential conflicts must be disclosed to management for review and determination.' : 'Employees are required to disclose any situation that may create a conflict of interest to their supervisor or Human Resources.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Confidentiality and Non-Disclosure</div>
+            <div class="section-content">
+              <p><span id="highlight-confidentialityPolicy">Employees must maintain the confidentiality of all proprietary and sensitive information of the Company, its customers, and business partners. ${confidentialityPolicy === 'standard' ? 'Confidential information includes, but is not limited to, customer data, business strategies, financial information, trade secrets, and employee information. Employees must not disclose confidential information to anyone outside the Company without proper authorization.' : confidentialityPolicy === 'comprehensive' ? 'Confidential information includes, but is not limited to, customer lists and data, pricing information, financial data, strategic plans, marketing strategies, trade secrets, intellectual property, proprietary software, product development information, employee personnel information, and any information marked or designated as confidential. This information must be protected during and after employment with the Company. Employees must take appropriate measures to safeguard confidential information, including securing physical documents, protecting electronic data, and using discretion in discussions.' : 'Confidential information includes patient information, financial records, and other sensitive data as defined by industry regulations. Employees must adhere to all applicable laws and regulations regarding the protection of this information, including HIPAA, GLBA, or other industry-specific requirements.'}</span></p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-hours">
+            <div class="section-title">WORK HOURS AND COMPENSATION</div>
+            
+            <div class="section-subtitle">Work Schedule</div>
+            <div class="section-content">
+              <p><span id="highlight-workSchedule">${companyName} operates on a ${workSchedule.toLowerCase()} work schedule. ${workSchedule === 'Standard (e.g., 9-5, Monday-Friday)' ? 'Standard business hours are from 9:00 AM to 5:00 PM, Monday through Friday. Employees are expected to be at their workstations and ready to work at the beginning of their scheduled shift.' : workSchedule === 'Flexible Hours' ? 'The Company offers flexible work hours to accommodate various needs and work styles. Core hours, during which all employees must be present, are from 10:00 AM to 3:00 PM. Start and end times outside of core hours may be arranged with supervisor approval.' : workSchedule === 'Shifts' ? 'The Company operates multiple shifts to ensure continuous operations. Shift schedules will be determined by department needs and will be communicated to employees by their supervisors.' : 'The Company offers a compressed workweek option, allowing employees to work their full-time hours in fewer than five days. Common arrangements include four 10-hour days or working 80 hours over nine days with every other Friday off.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Work Location</div>
+            <div class="section-content">
+              <p><span id="highlight-workLocation">The Company has adopted a ${workLocation.toLowerCase()} work model. ${workLocation === 'Onsite Only' ? 'All employees are required to work onsite at Company facilities during scheduled work hours.' : workLocation === 'Remote Only' ? 'All employees work remotely from locations outside of Company facilities. Employees are responsible for maintaining appropriate work environments that allow them to fulfill their job responsibilities.' : 'Employees may work a combination of onsite and remote days, depending on job requirements, team needs, and individual arrangements approved by management.'}</span></p>
+              
+              ${workLocation !== 'Onsite Only' ? `<p><span id="highlight-remoteWorkPolicy">${remoteWorkPolicy === 'Standard Remote Work Policy' ? 'Remote work is subject to the following guidelines: Employees must be available and responsive during scheduled work hours; maintain a safe and productive work environment; ensure secure access to Company systems; and comply with all Company policies regardless of work location.' : remoteWorkPolicy === 'Detailed Remote Work Policy with Equipment and Security Requirements' ? 'Remote work is subject to detailed requirements including: Use of Company-approved secure equipment and software; maintenance of a dedicated, private workspace; compliance with all data security protocols; regular cybersecurity training; use of VPN for Company network access; and prohibition of public Wi-Fi for Company business.' : 'Remote work is offered with minimal restrictions, empowering employees to determine how and where they work most effectively. Employees must maintain productivity, attend scheduled meetings, and comply with basic security requirements.'}</span></p>` : ''}
+            </div>
+            
+            <div class="section-subtitle">Overtime</div>
+            <div class="section-content">
+              <p><span id="highlight-overtimePolicy">The Company's overtime policy is as follows: ${overtimePolicy === 'Standard (1.5x pay for hours over 40 per week for non-exempt employees)' ? 'Non-exempt employees will receive overtime pay at a rate of one and one-half times their regular hourly rate for all hours worked in excess of 40 hours in a workweek. All overtime must be accurately recorded in the Company\'s timekeeping system.' : overtimePolicy === 'Enhanced (Additional overtime provisions beyond legal requirements)' ? 'Non-exempt employees will receive overtime pay at a rate of one and one-half times their regular hourly rate for all hours worked in excess of 40 hours in a workweek. Additionally, the Company offers double-time pay for work performed on Sundays and Company-recognized holidays.' : 'Non-exempt employees will receive overtime pay at a rate of one and one-half times their regular hourly rate for all hours worked in excess of 40 hours in a workweek. All overtime must be pre-approved by the employee\'s supervisor before being worked. Unauthorized overtime may result in disciplinary action.'}</span></p>
+              
+              <p>Exempt employees are not eligible for overtime pay.</p>
+            </div>
+            
+            <div class="section-subtitle">Payroll</div>
+            <div class="section-content">
+              <p><span id="highlight-paySchedule">Employees are paid on a ${paySchedule.toLowerCase()} basis. ${paySchedule === 'Weekly' ? 'Payday is every Friday.' : paySchedule === 'Bi-weekly' ? 'Payday is every other Friday.' : paySchedule === 'Semi-monthly' ? 'Paydays are on the 15th and last day of each month. If a payday falls on a weekend or holiday, employees will be paid on the preceding business day.' : 'Payday is on the last business day of each month.'}</span></p>
+              
+              <p><span id="highlight-payDeductions">Standard payroll deductions include: ${payDeductions}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Meals and Break Periods</div>
+            <div class="section-content">
+              <p><span id="highlight-breakPeriods">The Company provides the following break periods:</span></p>
+              
+              ${selectedBreakPeriods.includes('Meal Breaks') ? `<p><strong>Meal Breaks:</strong> Non-exempt employees working more than 5 consecutive hours are provided with a 30-minute unpaid meal period. Employees must be fully relieved of their duties during meal breaks.</p>` : ''}
+              
+              ${selectedBreakPeriods.includes('Rest Breaks') ? `<p><strong>Rest Breaks:</strong> Non-exempt employees are provided with a 10-minute paid rest break for every 4 hours worked. Rest breaks should be taken approximately in the middle of each work period.</p>` : ''}
+              
+              ${selectedBreakPeriods.includes('Nursing Mother Breaks') ? `<p><strong>Nursing Mother Breaks:</strong> The Company provides reasonable break time for nursing mothers to express breast milk for their nursing child for up to one year after the child's birth. A private space, other than a bathroom, will be provided for this purpose.</p>` : ''}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-pto">
+            <div class="section-title">PTO AND LEAVE POLICIES</div>
+            
+            <div class="section-subtitle">Paid Time Off (PTO)</div>
+            <div class="section-content">
+              <p><span id="highlight-ptoPolicy">${companyName} offers a ${ptoPolicy} to eligible employees. ${ptoPolicy === 'Traditional (Separate Vacation and Sick Leave)' ? 'Vacation and sick leave are separate benefits with different accrual rates and usage guidelines.' : ptoPolicy === 'Combined PTO Bank' ? 'PTO combines vacation, sick leave, and personal time into a single bank of time that employees can use for any purpose.' : 'Employees are not limited to a specific number of paid days off. Instead, employees are encouraged to take time off as needed while ensuring that their work responsibilities are met.'}</span></p>
+              
+              ${ptoPolicy !== 'Unlimited PTO' ? `<p><span id="highlight-ptoAccrual">PTO is accrued based on a ${ptoAccrual.toLowerCase()} system. ${ptoAccrual === 'Annual Allocation' ? 'Eligible employees receive their full annual PTO allocation at the beginning of each calendar year or on their anniversary date.' : ptoAccrual === 'Monthly Accrual' ? 'Eligible employees accrue PTO on a monthly basis.' : 'Eligible employees accrue PTO each pay period based on their length of service and employment status.'}</span></p>
+              
+              <p><span id="highlight-ptoAmount">Standard PTO allocation: ${ptoAmount === 'Custom PTO Structure' ? ptoAmount : ptoAmount + ' per year for eligible full-time employees, prorated for part-time employees.'}</span></p>` : ''}
+              
+              <p>All time off requests must be submitted to and approved by your supervisor as far in advance as possible.</p>
+            </div>
+            
+            <div class="section-subtitle">Holidays</div>
+            <div class="section-content">
+              <p><span id="highlight-holidayPolicy">${companyName} observes the following paid holidays: ${holidayPolicy === 'Standard Federal Holidays' ? 'New Year\'s Day, Martin Luther King Jr. Day, Presidents\' Day, Memorial Day, Independence Day, Labor Day, Thanksgiving Day, and Christmas Day.' : holidayPolicy === 'Enhanced Holiday Schedule' ? 'New Year\'s Day, Martin Luther King Jr. Day, Presidents\' Day, Memorial Day, Juneteenth, Independence Day, Labor Day, Columbus Day/Indigenous Peoples\' Day, Veterans Day, Thanksgiving Day, Day after Thanksgiving, and Christmas Day.' : holidayPolicy === 'Federal Holidays + Floating Holidays' ? 'Standard federal holidays plus two floating holidays that may be used at the employee\'s discretion with supervisor approval.' : customHolidays}</span></p>
+              
+              <p>When a holiday falls on a weekend, it will be observed on the preceding Friday or following Monday, as determined by the Company.</p>
+            </div>
+            
+            <div class="section-subtitle">Leave Policies</div>
+            <div class="section-content">
+              <p><span id="highlight-leaveTypes">The Company provides the following types of leave:</span></p>
+              
+              ${selectedLeaveTypes.includes('Bereavement Leave') ? `<p><strong>Bereavement Leave:</strong> Employees may take up to 3 days of paid bereavement leave for the death of an immediate family member and 1 day for other relatives or close friends. Additional unpaid time may be granted at the Company's discretion.</p>` : ''}
+              
+              ${selectedLeaveTypes.includes('Jury Duty Leave') ? `<p><strong>Jury Duty Leave:</strong> Employees will be granted paid leave for jury duty. Employees must provide a copy of their jury duty summons to their supervisor as soon as possible after receiving it.</p>` : ''}
+              
+              ${selectedLeaveTypes.includes('Military Leave') ? `<p><strong>Military Leave:</strong> The Company provides military leave in accordance with applicable federal and state laws, including the Uniformed Services Employment and Reemployment Rights Act (USERRA).</p>` : ''}
+              
+              ${selectedLeaveTypes.includes('Parental Leave') ? `<p><strong>Parental Leave:</strong> Eligible employees may take up to 12 weeks of leave for the birth, adoption, or foster placement of a child. This leave may be paid, unpaid, or a combination, depending on available PTO and applicable policies.</p>` : ''}
+              
+              ${selectedLeaveTypes.includes('Sabbatical Leave') ? `<p><strong>Sabbatical Leave:</strong> Employees with at least 5 years of continuous service may be eligible for a sabbatical leave of up to 4 weeks, with approval from management.</p>` : ''}
+              
+              ${selectedLeaveTypes.includes('Volunteer Leave') ? `<p><strong>Volunteer Leave:</strong> Employees may take up to 2 days of paid leave per year to participate in volunteer activities for qualified nonprofit organizations.</p>` : ''}
+              
+              ${fmlaPolicy !== 'Not Applicable (Company Size < 50 Employees)' ? `<p><span id="highlight-fmlaPolicy"><strong>Family and Medical Leave Act (FMLA):</strong> ${fmlaPolicy === 'Standard FMLA Policy' ? 'Eligible employees may take up to 12 weeks of unpaid, job-protected leave in a 12-month period for specified family and medical reasons, including the employee\'s own serious health condition, the serious health condition of a family member, or for the birth, adoption, or foster placement of a child. Employees must have worked for the Company for at least 12 months and have worked at least 1,250 hours during the 12 months preceding the leave to be eligible.' : 'In addition to standard FMLA provisions, the Company offers enhanced benefits including partial pay continuation during FMLA leave, extended leave periods for certain conditions, and additional qualifying reasons for leave beyond those required by law.'}</span></p>` : ''}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-technology">
+            <div class="section-title">TECHNOLOGY AND COMMUNICATION</div>
+            
+            <div class="section-subtitle">Computer and Internet Use</div>
+            <div class="section-content">
+              <p><span id="highlight-computerUsePolicy">${companyName} provides computer and internet resources to support business operations. ${computerUsePolicy === 'Standard Computer Use Policy' ? 'These resources are provided for business purposes, and reasonable personal use is permitted as long as it does not interfere with job performance or business operations. All computer and internet usage must comply with applicable laws and Company policies.' : computerUsePolicy === 'Restrictive Computer Use Policy' ? 'These resources are provided exclusively for business purposes. Personal use of Company computers and internet is prohibited. The Company actively monitors computer usage, and violations of this policy may result in disciplinary action.' : 'These resources are provided for business purposes, but the Company recognizes the blending of work and personal life. Reasonable personal use is permitted, provided it does not violate any laws, compromise security, or interfere with business operations.'}</span></p>
+              
+              <p>All data created, stored, or transmitted using Company systems is considered Company property and may be accessed, monitored, or reviewed by authorized personnel.</p>
+            </div>
+            
+            <div class="section-subtitle">Email Use</div>
+            <div class="section-content">
+              <p><span id="highlight-emailPolicy">The Company's email system is a critical business tool and should be used accordingly. ${emailPolicy === 'Standard Email Use Policy' ? 'Email is provided primarily for business purposes, though limited personal use is permitted as long as it does not interfere with job duties. All email communications must be professional and appropriate.' : emailPolicy === 'Restrictive Email Use Policy' ? 'Email is provided exclusively for business purposes. Personal use of Company email is prohibited. All emails are subject to monitoring, and misuse may result in disciplinary action.' : 'Email is provided for business purposes, but reasonable personal use is permitted. Employees are trusted to use good judgment regarding appropriate usage.'}</span></p>
+              
+              <p>Employees should have no expectation of privacy in their use of Company email systems. All messages sent or received through the Company email system are the property of the Company.</p>
+            </div>
+            
+            <div class="section-subtitle">Social Media</div>
+            <div class="section-content">
+              <p><span id="highlight-socialMediaPolicy">${socialMediaPolicy === 'No Social Media Policy' ? 'The Company does not maintain a formal social media policy, but employees are expected to use good judgment and maintain professionalism in any social media activity that could be associated with the Company.' : socialMediaPolicy === 'Standard Social Media Policy' ? 'Employees are expected to use good judgment when posting on social media. Content that violates confidentiality, harassment, or other Company policies is prohibited. Employees should not speak on behalf of the Company without authorization and should clearly state that their views are personal when discussing matters related to the Company\'s business.' : socialMediaPolicy === 'Restrictive Social Media Policy' ? 'Employees are prohibited from posting any content related to the Company, its clients, products, or services without prior authorization. All social media activity that could be associated with the Company must comply with all Company policies, including confidentiality and non-disclosure agreements.' : 'The Company encourages employees to share positive company news and information on their personal social media accounts. When doing so, employees should identify themselves as Company employees, adhere to confidentiality policies, and maintain professionalism.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Personal Device (BYOD) Policy</div>
+            <div class="section-content">
+              <p><span id="highlight-byodPolicy">${byodPolicy === 'BYOD Allowed with Restrictions' ? 'Employees may use personal devices (computers, tablets, smartphones) for work purposes, subject to the following restrictions: Devices must have up-to-date security software; Company data must be password-protected; and employees must follow all security protocols. The Company reserves the right to remotely wipe Company data from personal devices if necessary.' : byodPolicy === 'BYOD Not Allowed' ? 'Employees are not permitted to use personal devices for work purposes. The Company will provide all necessary equipment to perform job duties.' : 'Employees are required to use their personal devices for work purposes. The Company will establish minimum device requirements and may provide a technology stipend to offset costs.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Information Security</div>
+            <div class="section-content">
+              <p><span id="highlight-securityPolicies">The Company maintains the following information security policies:</span></p>
+              
+              ${selectedSecurityPolicies.includes('Password Policy') ? `<p><strong>Password Policy:</strong> Employees must create strong passwords for all Company systems and accounts. Passwords should be at least 12 characters long, include a mix of uppercase and lowercase letters, numbers, and special characters, and must be changed every 90 days. Passwords should not be shared or reused across different systems.</p>` : ''}
+              
+              ${selectedSecurityPolicies.includes('Data Protection Policy') ? `<p><strong>Data Protection Policy:</strong> Sensitive Company and customer data must be protected from unauthorized access, disclosure, alteration, and destruction. Employees must follow established procedures for data handling, storage, and transmission, including the use of encryption where required.</p>` : ''}
+              
+              ${selectedSecurityPolicies.includes('Encryption Policy') ? `<p><strong>Encryption Policy:</strong> All sensitive data must be encrypted, both in transit and at rest. This includes email communications containing confidential information, mobile devices, laptops, and removable storage devices that contain Company data.</p>` : ''}
+              
+              ${selectedSecurityPolicies.includes('Incident Response') ? `<p><strong>Incident Response:</strong> Employees must immediately report any suspected or confirmed security incidents, including data breaches, unauthorized access, malware infections, or lost/stolen devices containing Company data, to their supervisor and the IT department.</p>` : ''}
+            </div>
+            
+            <div class="section-subtitle">Communication Channels</div>
+            <div class="section-content">
+              <p><span id="highlight-communicationChannels">The Company uses the following official communication channels:</span></p>
+              
+              ${selectedCommunicationChannels.includes('Email') ? `<p><strong>Email:</strong> The primary method of formal communication. Important announcements, policies, and official communications will be sent via email.</p>` : ''}
+              
+              ${selectedCommunicationChannels.includes('Instant Messaging') ? `<p><strong>Instant Messaging:</strong> Used for quick, informal communications and real-time collaboration. Employees should respond to messages in a timely manner during working hours.</p>` : ''}
+              
+              ${selectedCommunicationChannels.includes('Video Conferencing') ? `<p><strong>Video Conferencing:</strong> Used for meetings, presentations, and collaborative discussions. Employees should ensure they have appropriate equipment and a professional setting for video conferences.</p>` : ''}
+              
+              ${selectedCommunicationChannels.includes('Social Media') ? `<p><strong>Internal Social Media:</strong> Used for team building, knowledge sharing, and informal communications. All content must comply with Company policies and maintain professionalism.</p>` : ''}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-safety">
+            <div class="section-title">HEALTH AND SAFETY</div>
+            
+            <div class="section-subtitle">Workplace Safety</div>
+            <div class="section-content">
+              <p><span id="highlight-safetyPolicy">${companyName} is committed to providing a safe and healthy workplace for all employees. ${safetyPolicy === 'Standard Safety Policy' ? 'All employees are expected to follow basic safety rules, report unsafe conditions, and participate in safety training as required.' : safetyPolicy === 'Industry-Specific Safety Policy' ? 'Due to the nature of our industry, specific safety protocols and procedures must be followed at all times. These include proper use of protective equipment, adherence to industry safety standards, and compliance with all relevant regulations.' : 'The Company maintains a comprehensive safety program that includes regular safety audits, incident investigation, hazard assessments, safety committees, and ongoing safety training.'}</span></p>
+              
+              <p>Safety is everyone's responsibility. Employees should report all injuries, accidents, and unsafe conditions to their supervisor immediately.</p>
+            </div>
+            
+            <div class="section-subtitle">Emergency Procedures</div>
+            <div class="section-content">
+              <p><span id="highlight-emergencyProcedures">The Company has established ${emergencyProcedures.toLowerCase()} for various emergency situations. ${emergencyProcedures === 'Basic Emergency Procedures' ? 'These include evacuation routes, emergency contact information, and basic protocols for fire, medical emergencies, and natural disasters.' : emergencyProcedures === 'Detailed Emergency Procedures' ? 'These include specific protocols for various types of emergencies including fires, medical emergencies, natural disasters, workplace violence, and power outages. Detailed evacuation routes, assembly points, emergency contacts, and employee responsibilities are documented and regularly updated.' : 'The Company maintains a comprehensive emergency management plan that includes prevention, preparedness, response, and recovery components for all potential emergency situations. The plan is regularly tested through drills and exercises, and all employees receive regular training on their responsibilities during emergencies.'}</span></p>
+              
+              <p>Emergency procedure information is posted throughout the workplace. Employees should familiarize themselves with these procedures and participate in emergency drills.</p>
+            </div>
+            
+            <div class="section-subtitle">Injury and Illness Reporting</div>
+            <div class="section-content">
+              <p><span id="highlight-injuryIllness">${injuryIllness === 'Standard Reporting Procedures' ? 'All work-related injuries and illnesses, regardless of severity, must be reported immediately to your supervisor. Employees must complete an incident report for any work-related injury or illness.' : 'All work-related injuries and illnesses, regardless of severity, must be reported immediately to your supervisor. A detailed incident report must be completed, and an investigation will be conducted to determine causes and preventive measures. The Company follows all OSHA requirements for recording and reporting workplace injuries and illnesses.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Drug and Alcohol Policy</div>
+            <div class="section-content">
+              <p><span id="highlight-drugAlcoholPolicy">${drugAlcoholPolicy === 'Zero Tolerance Policy' ? 'The Company maintains a zero-tolerance policy regarding drugs and alcohol in the workplace. Employees are prohibited from possessing, using, or being under the influence of illegal drugs or alcohol while on Company premises or while conducting business-related activities. Violation of this policy will result in immediate termination.' : drugAlcoholPolicy === 'Standard Prohibition Policy' ? 'Employees are prohibited from possessing, using, or being under the influence of illegal drugs or alcohol while on Company premises or while conducting business-related activities. Violations of this policy may result in disciplinary action, up to and including termination.' : drugAlcoholPolicy === 'Rehabilitation-Focused Policy' ? 'While the Company prohibits the use of illegal drugs and alcohol in the workplace, we recognize that substance abuse is a treatable condition. Employees who voluntarily seek help for substance abuse problems will be supported in their efforts to get treatment. The Company may require successful completion of a rehabilitation program as a condition of continued employment.' : 'The Company expects employees to exercise good judgment regarding the use of drugs and alcohol, and to ensure that any use does not affect their job performance or create safety risks.'}</span></p>
+              
+              ${drugAlcoholPolicy !== 'None' && drugAlcoholPolicy !== 'Rehabilitation-Focused Policy' ? `<p>The Company reserves the right to conduct drug testing in accordance with applicable laws.</p>` : ''}
+            </div>
+            
+            <div class="section-subtitle">Smoking Policy</div>
+            <div class="section-content">
+              <p><span id="highlight-smokingPolicy">${smokingPolicy === 'Completely Prohibited on Company Property' ? 'Smoking, including the use of electronic cigarettes and vaping devices, is prohibited on all Company property, including buildings, vehicles, parking lots, and outdoor areas.' : smokingPolicy === 'Designated Areas Only' ? 'Smoking, including the use of electronic cigarettes and vaping devices, is permitted only in designated smoking areas. These areas are clearly marked and located away from building entrances, ventilation intakes, and high-traffic areas.' : 'While the Company encourages a smoke-free environment, there are no specific restrictions on smoking outside of those required by law.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Workplace Violence Prevention</div>
+            <div class="section-content">
+              <p><span id="highlight-violencePreventionPolicy">${violencePreventionPolicy === 'standard' ? 'The Company is committed to preventing workplace violence and maintaining a safe work environment. Violent behavior, threats, intimidation, or possession of weapons on Company property is strictly prohibited and will result in disciplinary action, up to and including termination and potential legal action. Employees should report any concerns about workplace violence to management immediately.' : violencePreventionPolicy === 'comprehensive' ? 'The Company maintains a comprehensive workplace violence prevention program that includes risk assessment, employee training, security measures, and response procedures. Prohibited behaviors include but are not limited to: physical assault, threatening behavior, harassment, intimidation, bullying, possession of weapons, vandalism, and reasonable suspicion of any of these behaviors. The Company conducts background checks, provides conflict resolution training, and maintains physical security measures to prevent violence.' : 'Workplace violence in any form is prohibited. Employees should report any concerns to management.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Mental Health Support</div>
+            <div class="section-content">
+              <p><span id="highlight-mentalHealthSupport">The Company provides the following mental health support resources:</span></p>
+              
+              ${selectedMentalHealthSupport.includes('Employee Assistance Program (EAP)') ? `<p><strong>Employee Assistance Program (EAP):</strong> Confidential counseling and support services are available to all employees and their household members. The EAP can help with a wide range of personal and work-related concerns, including stress, anxiety, depression, family issues, and substance abuse.</p>` : ''}
+              
+              ${selectedMentalHealthSupport.includes('Mental Health Resources') ? `<p><strong>Mental Health Resources:</strong> The Company provides access to mental health resources, including educational materials, self-assessment tools, and information about community resources and support groups.</p>` : ''}
+              
+              ${selectedMentalHealthSupport.includes('Mental Health Training') ? `<p><strong>Mental Health Training:</strong> The Company offers mental health awareness training for managers and employees to help recognize signs of mental health issues, reduce stigma, and effectively support individuals experiencing mental health challenges.</p>` : ''}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-performance">
+            <div class="section-title">PERFORMANCE MANAGEMENT</div>
+            
+            <div class="section-subtitle">Performance Reviews</div>
+            <div class="section-content">
+              <p><span id="highlight-performanceReviews">${companyName} conducts ${performanceReviews.toLowerCase()}. ${performanceReviews === 'Annual Performance Reviews' ? 'These reviews provide formal feedback on employee performance, establish goals for the coming year, and serve as a basis for compensation decisions.' : performanceReviews === 'Bi-Annual Performance Reviews' ? 'These reviews are conducted twice per year to provide regular feedback on employee performance, establish and review progress on goals, and serve as a basis for compensation decisions.' : performanceReviews === 'Quarterly Performance Reviews' ? 'These quarterly reviews provide frequent feedback on employee performance, allow for timely adjustment of goals, and create regular opportunities for communication between employees and managers.' : 'Rather than formal periodic reviews, the Company emphasizes ongoing feedback and communication between managers and employees. Regular one-on-one meetings, real-time feedback, and continuous goal-setting are central to this approach.'}</span></p>
+              
+              <p>Performance reviews are an opportunity for two-way communication and goal setting. Employees are encouraged to actively participate in the process by conducting self-evaluations and providing feedback.</p>
+            </div>
+            
+            <div class="section-subtitle">Training and Development</div>
+            <div class="section-content">
+              <p><span id="highlight-trainingDevelopment">${trainingDevelopment === 'Standard Training and Development Policy' ? 'The Company provides training and development opportunities to help employees enhance their skills and advance their careers. This includes onboarding training, job-specific training, and professional development resources as needed.' : trainingDevelopment === 'Robust Professional Development Program' ? 'The Company is committed to employee growth and development, offering a comprehensive program that includes: individual development plans, mentoring programs, tuition reimbursement, professional certification support, internal and external training opportunities, leadership development, and cross-training opportunities.' : 'The Company provides basic job-specific training as necessary for employees to perform their current roles. Additional professional development is primarily self-directed.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Disciplinary Procedures</div>
+            <div class="section-content">
+              <p><span id="highlight-disciplinaryProcedures">${disciplinaryProcedures === 'Progressive Discipline Approach' ? 'The Company follows a progressive discipline approach to address performance or conduct issues. This typically includes: verbal warning, written warning, final written warning, and termination. Some serious infractions may warrant immediate suspension or termination, bypassing the progressive steps.' : disciplinaryProcedures === 'Immediate Action Approach' ? 'The Company addresses performance or conduct issues promptly and directly. Serious infractions may result in immediate termination, while less severe issues may result in warnings or performance improvement plans at management\'s discretion.' : 'The Company focuses on corrective action rather than punishment when addressing performance or conduct issues. This approach emphasizes identifying root causes, providing coaching and support, and developing action plans to help employees improve.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Termination of Employment</div>
+            <div class="section-content">
+              <p><span id="highlight-terminationPolicies">The Company's termination policies include:</span></p>
+              
+              ${selectedTerminationPolicies.includes('Voluntary Termination (Resignation)') ? `<p><strong>Voluntary Termination (Resignation):</strong> Employees who choose to resign are requested to provide at least two weeks' written notice to their supervisor. Proper notice helps ensure a smooth transition and the transfer of duties and knowledge.</p>` : ''}
+              
+              ${selectedTerminationPolicies.includes('Involuntary Termination') ? `<p><strong>Involuntary Termination:</strong> Employment may be terminated by the Company for performance issues, policy violations, or other reasons at the Company's discretion, subject to applicable laws.</p>` : ''}
+              
+              ${selectedTerminationPolicies.includes('Exit Interview') ? `<p><strong>Exit Interview:</strong> Departing employees may be asked to participate in an exit interview to provide feedback on their employment experience.</p>` : ''}
+              
+              ${selectedTerminationPolicies.includes('Final Pay') ? `<p><strong>Final Pay:</strong> Final paychecks will be issued in accordance with applicable state laws. Any outstanding expense reimbursements will be processed according to standard procedures, and information regarding benefits continuation will be provided.</p>` : ''}
+              
+              <p>Upon termination, employees must return all Company property, including equipment, keys, documents, and other materials.</p>
+            </div>
+            
+            <div class="section-subtitle">Employee Grievance Procedure</div>
+            <div class="section-content">
+              <p><span id="highlight-grievanceProcedure">${grievanceProcedure === 'Standard Grievance Procedure' ? 'Employees who have work-related concerns or complaints should first discuss them with their immediate supervisor. If the issue is not resolved, employees may escalate their concerns to the next level of management or Human Resources.' : grievanceProcedure === 'Detailed Multi-Step Procedure' ? 'The Company maintains a detailed multi-step grievance procedure: Step 1: Informal discussion with immediate supervisor; Step 2: Formal written grievance to department manager; Step 3: Review by Human Resources; Step 4: Final review by executive management. Each step has specific timeframes for responses and appeals.' : grievanceProcedure === 'Informal Resolution Process' ? 'The Company encourages open communication and informal resolution of workplace concerns. Employees with concerns should discuss them with their supervisor or Human Resources, who will work with the employee to find a resolution.' : 'While the Company encourages open communication about workplace concerns, there is no formal grievance procedure. Employees may address concerns with their supervisor or appropriate management personnel.'}</span></p>
+            </div>
+            
+            <div class="section-subtitle">Employee Personal Data</div>
+            <div class="section-content">
+              <p><span id="highlight-personalDataPolicy">${personalDataPolicy === 'Standard Personal Data Policy' ? 'The Company maintains personnel files for each employee containing job-related information. Employees may request to review their personnel file by contacting Human Resources. Employee personal information is confidential and will be disclosed only as required by law or for legitimate business purposes with appropriate authorization.' : personalDataPolicy === 'GDPR-Compliant Personal Data Policy' ? 'The Company complies with applicable data protection regulations, including GDPR principles for employee data. Employees have rights regarding their personal data, including the right to access, correct, delete, restrict processing, and data portability. The Company collects and processes employee data only for specific, explicitly stated purposes with appropriate legal basis, retains data only as long as necessary, and implements appropriate security measures to protect personal data.' : 'The Company maintains basic employee records as required by law. Access to these records is limited to authorized personnel with a legitimate business need.'}</span></p>
+            </div>
+            
+            ${miscPolicies ? `<div class="section-subtitle">Additional Policies</div>
+            <div class="section-content">
+              <p><span id="highlight-miscPolicies">${miscPolicies}</span></p>
+            </div>` : ''}
+          </div>
+          
+          <div class="document-section" id="section-acknowledgment">
+            <div class="section-title">ACKNOWLEDGMENT OF RECEIPT</div>
+            <div class="section-content">
+              <p><span id="highlight-acknowledgment">${acknowledgment === 'Standard Acknowledgment' ? 'I acknowledge that I have received a copy of the ' + companyName + ' Employee Handbook. I understand that it is my responsibility to read and comply with the policies contained in this handbook and any revisions made to it. I understand that this handbook is not a contract of employment and does not create any contractual rights, either expressed or implied.' : acknowledgment === 'Detailed Acknowledgment with Specific Provisions' ? 'I acknowledge that I have received a copy of the ' + companyName + ' Employee Handbook and understand that it is my responsibility to read and comply with all policies and procedures outlined therein. I specifically acknowledge the at-will employment relationship, confidentiality requirements, anti-harassment policies, and acceptable use of company technology as detailed in this handbook. I understand that this handbook is not a contract of employment and does not create any contractual rights, either expressed or implied.' : 'I acknowledge receipt of the ' + companyName + ' Employee Handbook.'}</span></p>
+              
+              <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
+              <p style="margin-top: 5px; margin-bottom: 5px;">Employee Signature</p>
+              
+              <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
+              <p style="margin-top: 5px; margin-bottom: 5px;">Employee Name (Printed)</p>
+              
+              <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
+              <p style="margin-top: 5px; margin-bottom: 5px;">Date</p>
+            </div>
+          </div>
+        `;
+        
+        // Update the preview with the policy HTML
+        preview.innerHTML = policyHtml;
+        
+        // If a specific field was changed, highlight the relevant section
+        if (changedField) {
+          highlightChangedContent(changedField);
+        }
+      }
+      
+      // Function to highlight changed content in the preview
+      function highlightChangedContent(changedField) {
+        // Clear any existing highlights
+        clearHighlights();
+        
+        // Try to find an element with an ID that matches the field
+        let elementToHighlight = document.getElementById('highlight-' + changedField);
+        
+        // If no specific element, try to find section based on field category
+        if (!elementToHighlight) {
+          // Define field categories for highlighting
+          const fieldCategories = {
+            'companyInfo': ['companyName', 'effectiveDate', 'companySize', 'industry', 'companyMission', 'policyPurpose'],
+            'employment': ['atWillStatus', 'eeoPolicy', 'antiHarassmentPolicy', 'probationPeriod', 'employmentClassifications'],
+            'conduct': ['dressCode', 'attendancePolicy', 'behaviorPolicies', 'conflictOfInterestPolicy', 'confidentialityPolicy'],
+            'hours': ['workSchedule', 'workLocation', 'remoteWorkPolicy', 'overtimePolicy', 'paySchedule', 'payDeductions', 'breakPeriods'],
+            'pto': ['ptoPolicy', 'ptoAccrual', 'ptoAmount', 'ptoCustom', 'holidayPolicy', 'customHolidays', 'leaveTypes', 'fmlaPolicy'],
+            'technology': ['computerUsePolicy', 'emailPolicy', 'socialMediaPolicy', 'byodPolicy', 'securityPolicies', 'communicationChannels'],
+            'safety': ['safetyPolicy', 'emergencyProcedures', 'injuryIllness', 'drugAlcoholPolicy', 'smokingPolicy', 'violencePreventionPolicy', 'mentalHealthSupport'],
+            'performance': ['performanceReviews', 'trainingDevelopment', 'disciplinaryProcedures', 'terminationPolicies', 'grievanceProcedure', 'personalDataPolicy', 'miscPolicies', 'acknowledgment']
+          };
+          
+          // Find the category for this field
+          let fieldCategory = null;
+          for (const [category, fields] of Object.entries(fieldCategories)) {
+            if (fields.includes(changedField)) {
+              fieldCategory = category;
+              break;
+            }
+          }
+          
+          // If we found a category, highlight the section title
+          if (fieldCategory) {
+            const sectionElement = document.getElementById('section-' + fieldCategory);
+            if (sectionElement) {
+              elementToHighlight = sectionElement.querySelector('.section-title');
+            }
+          }
+        }
+        
+        // If we found an element to highlight, apply the highlight
+        if (elementToHighlight) {
+          // Add highlight class
+          elementToHighlight.classList.add('highlight');
+          highlightedElements.push(elementToHighlight);
+          
+          // Ensure the highlighted element is visible
+          const elementRect = elementToHighlight.getBoundingClientRect();
+          const previewRect = previewBox.getBoundingClientRect();
+          
+          // If element is not fully visible in the preview box
+          if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+            // Scroll to the element
+            elementToHighlight.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center'
+            });
+          }
+          
+          // Set timeout to remove highlight after some time (user's next click will clear this anyway)
+          highlightTimeout = setTimeout(() => {
+            clearHighlights();
+          }, 5000);
+        }
+      }
+    });
+  </script>
+</body>
+</html>
