@@ -967,20 +967,61 @@
                     </div>
                     
                     <!-- PayPal Button -->
-                    <div class="paypal-container">
-                        <style>.pp-ND34QUSW8KAJA{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
-                        <form action="https://www.paypal.com/ncp/payment/ND34QUSW8KAJA" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;" id="paypalForm">
-                            <input type="hidden" name="return" value="https://terms.law/2025/02/23/contract-amendment-generator/?payment354785=success">
-                            <input class="pp-ND34QUSW8KAJA" type="submit" value="Buy Now" />
-                            <img src="https://www.paypalobjects.com/images/Debit_Credit_APM.svg" alt="cards" />
-                            <section style="font-size: 0.75rem;">
-                                Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/>
-                            </section>
-                        </form>
-                        <p style="font-size: 12px; color: #666; margin-top: 8px;">
-                            On mobile devices: After payment, you may need to manually return to this page.
-                        </p>
-                    </div>
+                    <!-- Replace the entire PayPal Container section with this code -->
+<div class="paypal-container">
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id=BAAgTb2uhmcrPfZVsUbREYsqOgos8TI_UzVWxMmC1Gj0D8ek_GK7qHVAL9UgpBIVLXnUaPAo3scmaTKX5U&components=buttons&enable-funding=venmo&currency=USD">
+    </script>
+    
+    <div id="paypal-button-container"></div>
+    <script>
+        paypal.Buttons({
+            style: {
+                shape: 'rect',
+                color: 'gold',
+                layout: 'vertical',
+                label: 'buynow'
+            },
+            createOrder: function() {
+                // Save form data before redirect
+                saveFormData();
+                
+                // This is the specific order ID from your PayPal link
+                return 'ND34QUSW8KAJA';
+            },
+            onApprove: function(data, actions) {
+                // Redirect to success page
+                window.location.href = 'https://terms.law/2025/02/23/contract-amendment-generator/?payment354785=success';
+                return false;
+            }
+        }).render('#paypal-button-container');
+    </script>
+    
+    <p style="font-size: 12px; color: #666; margin-top: 8px;">
+        On mobile devices: After payment, you may need to manually return to this page.
+    </p>
+</div>
+
+<!-- Make sure the saveFormData function is properly defined elsewhere in your code -->
+<script>
+// Example of the saveFormData function (should already exist in your code)
+function saveFormData() {
+    const formData = {};
+    
+    // Save all inputs, selects, and textareas
+    document.querySelectorAll('.form-input').forEach(input => {
+        formData[input.id] = input.value;
+    });
+    
+    // Save radio buttons
+    document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+        formData[radio.name] = radio.value;
+    });
+    
+    // Save to localStorage
+    localStorage.setItem('amendmentFormData', JSON.stringify(formData));
+}
+</script>
                     
                     <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
                         Schedule Legal Consultation
