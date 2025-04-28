@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Consulting Agreement Generator</title>
+    <style>
+        :root {
+            --primary-color: #2a4d69;
+            --secondary-color: #4b86b4;
+            --accent-color: #adcbe3;
+            --light-color: #e7eff6;
+            --dark-color: #263238;
+            --success-color: #4caf50;
+            --warning-color: #ff9800;
+            --danger-color: #f44336;
+            --highlight-color: #ffff00;
+            --shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: row;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+            height: calc(100vh - 40px);
+        }
+        
+        .form-container {
+            flex: 1;
+            max-width: 50%;
+            overflow: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        .preview-container {
+            flex: 1;
+            position: relative;
+            overflow: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--accent-color);
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            margin: 15px 0;
+            font-size: 18px;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--accent-color);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            border-bottom: 3px solid transparent;
+            color: var(--dark-color);
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--secondary-color);
+            color: var(--secondary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 8px 16px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--primary-color);
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .preview-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .preview-content {
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            min-height: calc(100% - 80px);
+            overflow: auto;
+            white-space: pre-wrap;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s;
+        }
+        
+        .download-btn {
+            background-color: var(--success-color);
+        }
+        
+        .download-btn:hover {
+            background-color: #388e3c;
+        }
+        
+        .checkbox-container {
+            columns: 2;
+        }
+        
+        @media screen and (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .form-container, .preview-container {
+                max-width: 100%;
+                overflow: visible;
+            }
+            
+            .checkbox-container {
+                columns: 1;
+            }
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Real Estate Consulting Agreement Generator</h1>
+            
+            <div class="tabs">
+                <button class="tab active" data-tab="parties">Parties</button>
+                <button class="tab" data-tab="services">Services</button>
+                <button class="tab" data-tab="term">Term</button>
+                <button class="tab" data-tab="compensation">Compensation</button>
+                <button class="tab" data-tab="confidentiality">Confidentiality</button>
+                <button class="tab" data-tab="termination">Termination</button>
+                <button class="tab" data-tab="additional">Additional Terms</button>
+            </div>
+            
+            <form id="agreement-form">
+                <!-- Parties Tab -->
+                <div class="tab-content active" id="parties-tab">
+                    <h2>Consultant Information</h2>
+                    <div class="form-group">
+                        <label for="consultant-name">Consultant Name:</label>
+                        <input type="text" id="consultant-name" name="consultant-name" value="ABC Real Estate Consulting, LLC" data-target="consultant-name-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="consultant-address">Consultant Address:</label>
+                        <input type="text" id="consultant-address" name="consultant-address" value="123 Main Street, Suite 100, Los Angeles, CA 90001" data-target="consultant-address-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="consultant-phone">Consultant Phone:</label>
+                        <input type="text" id="consultant-phone" name="consultant-phone" value="(213) 555-1234" data-target="consultant-phone-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="consultant-email">Consultant Email:</label>
+                        <input type="email" id="consultant-email" name="consultant-email" value="info@abcrealestatecons.com" data-target="consultant-email-target">
+                    </div>
+                    
+                    <h2>Client Information</h2>
+                    <div class="form-group">
+                        <label for="client-name">Client Name:</label>
+                        <input type="text" id="client-name" name="client-name" value="XYZ Properties, Inc." data-target="client-name-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-address">Client Address:</label>
+                        <input type="text" id="client-address" name="client-address" value="456 Market Avenue, San Francisco, CA 94103" data-target="client-address-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-phone">Client Phone:</label>
+                        <input type="text" id="client-phone" name="client-phone" value="(415) 555-6789" data-target="client-phone-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-email">Client Email:</label>
+                        <input type="email" id="client-email" name="client-email" value="contact@xyzproperties.com" data-target="client-email-target">
+                    </div>
+                </div>
+                
+                <!-- Services Tab -->
+                <div class="tab-content" id="services-tab">
+                    <h2>Scope of Services</h2>
+                    <div class="form-group">
+                        <label>Select Services:</label>
+                        <div class="checkbox-container">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Market Analysis" checked data-target="market-analysis-target"> Market Analysis
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Property Valuation" checked data-target="property-valuation-target"> Property Valuation
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Investment Advisory" data-target="investment-advisory-target"> Investment Advisory
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Development Feasibility" data-target="development-feasibility-target"> Development Feasibility
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Portfolio Management" data-target="portfolio-management-target"> Portfolio Management
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Acquisition Due Diligence" data-target="acquisition-dd-target"> Acquisition Due Diligence
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Disposition Strategy" data-target="disposition-strategy-target"> Disposition Strategy
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="services" value="Leasing Strategy" data-target="leasing-strategy-target"> Leasing Strategy
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="additional-services">Additional Services (Optional):</label>
+                        <textarea id="additional-services" name="additional-services" rows="4" data-target="additional-services-target"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="project-description">Project Description:</label>
+                        <textarea id="project-description" name="project-description" rows="4" data-target="project-description-target">Analysis and valuation of commercial properties located in downtown San Francisco.</textarea>
+                    </div>
+                </div>
+                
+                <!-- Term Tab -->
+                <div class="tab-content" id="term-tab">
+                    <h2>Term of Agreement</h2>
+                    <div class="form-group">
+                        <label>Term Type:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="term-type" value="fixed" checked data-target="term-type-target"> Fixed Term
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="term-type" value="ongoing" data-target="term-type-target"> Ongoing (Until Terminated)
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group fixed-term-fields">
+                        <label for="start-date">Start Date:</label>
+                        <input type="date" id="start-date" name="start-date" value="2025-05-01" data-target="start-date-target">
+                    </div>
+                    <div class="form-group fixed-term-fields">
+                        <label for="end-date">End Date:</label>
+                        <input type="date" id="end-date" name="end-date" value="2025-10-31" data-target="end-date-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="extension-option">Extension Option:</label>
+                        <select id="extension-option" name="extension-option" data-target="extension-option-target">
+                            <option value="mutual">By mutual agreement</option>
+                            <option value="automatic">Automatic renewal for 3 months</option>
+                            <option value="client">Client option to extend</option>
+                            <option value="none">No extension option</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Compensation Tab -->
+                <div class="tab-content" id="compensation-tab">
+                    <h2>Compensation</h2>
+                    <div class="form-group">
+                        <label>Compensation Structure:</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="compensation-type" value="hourly" checked data-target="compensation-type-target"> Hourly Rate
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="compensation-type" value="fixed" data-target="compensation-type-target"> Fixed Fee
+                            </label>
+                        </div>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="radio" name="compensation-type" value="monthly" data-target="compensation-type-target"> Monthly Retainer
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group hourly-fields">
+                        <label for="hourly-rate">Hourly Rate (USD):</label>
+                        <input type="number" id="hourly-rate" name="hourly-rate" value="200" min="0" data-target="hourly-rate-target">
+                    </div>
+                    <div class="form-group fixed-fee-fields hidden">
+                        <label for="fixed-fee">Fixed Fee Amount (USD):</label>
+                        <input type="number" id="fixed-fee" name="fixed-fee" value="10000" min="0" data-target="fixed-fee-target">
+                    </div>
+                    <div class="form-group monthly-fields hidden">
+                        <label for="monthly-fee">Monthly Fee (USD):</label>
+                        <input type="number" id="monthly-fee" name="monthly-fee" value="5000" min="0" data-target="monthly-fee-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="payment-schedule">Payment Schedule:</label>
+                        <select id="payment-schedule" name="payment-schedule" data-target="payment-schedule-target">
+                            <option value="biweekly">Bi-weekly</option>
+                            <option value="monthly" selected>Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="completion">Upon Completion</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="expenses">Reimbursable Expenses:</label>
+                        <select id="expenses" name="expenses" data-target="expenses-target">
+                            <option value="none">No reimbursable expenses</option>
+                            <option value="all" selected>All reasonable business expenses</option>
+                            <option value="travel">Travel expenses only</option>
+                            <option value="specified">Only specified expenses</option>
+                        </select>
+                    </div>
+                    <div class="form-group specified-expenses-field hidden">
+                        <label for="specified-expenses">Specify Expenses:</label>
+                        <textarea id="specified-expenses" name="specified-expenses" rows="3" data-target="specified-expenses-target"></textarea>
+                    </div>
+                </div>
+                
+                <!-- Confidentiality Tab -->
+                <div class="tab-content" id="confidentiality-tab">
+                    <h2>Confidentiality</h2>
+                    <div class="form-group">
+                        <label for="confidentiality-term">Confidentiality Term:</label>
+                        <select id="confidentiality-term" name="confidentiality-term" data-target="confidentiality-term-target">
+                            <option value="1">1 year after termination</option>
+                            <option value="2" selected>2 years after termination</option>
+                            <option value="3">3 years after termination</option>
+                            <option value="5">5 years after termination</option>
+                            <option value="perpetual">Perpetual</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Exclusions from Confidential Information:</label>
+                        <div class="checkbox-container">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="confidentiality-exclusions" value="public-domain" checked data-target="public-domain-target"> Public domain information
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="confidentiality-exclusions" value="prior-knowledge" checked data-target="prior-knowledge-target"> Prior knowledge
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="confidentiality-exclusions" value="third-party" checked data-target="third-party-target"> Received from third parties
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="confidentiality-exclusions" value="independently-developed" checked data-target="independently-developed-target"> Independently developed
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="confidentiality-exclusions" value="legal-requirement" checked data-target="legal-requirement-target"> Required by law
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="consultant-work-product">Consultant Work Product Ownership:</label>
+                        <select id="consultant-work-product" name="consultant-work-product" data-target="consultant-work-product-target">
+                            <option value="client">Client owns all work product</option>
+                            <option value="consultant">Consultant retains ownership, grants license</option>
+                            <option value="joint" selected>Joint ownership</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Termination Tab -->
+                <div class="tab-content" id="termination-tab">
+                    <h2>Termination</h2>
+                    <div class="form-group">
+                        <label for="termination-notice">Termination Notice Period:</label>
+                        <select id="termination-notice" name="termination-notice" data-target="termination-notice-target">
+                            <option value="7">7 days</option>
+                            <option value="14">14 days</option>
+                            <option value="30" selected>30 days</option>
+                            <option value="60">60 days</option>
+                            <option value="90">90 days</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Termination Options:</label>
+                        <div class="checkbox-container">
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="termination-options" value="for-cause" checked data-target="for-cause-target"> For Cause
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="termination-options" value="without-cause" checked data-target="without-cause-target"> Without Cause
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="termination-options" value="breach" checked data-target="breach-target"> Material Breach
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="termination-options" value="bankruptcy" data-target="bankruptcy-target"> Bankruptcy/Insolvency
+                                </label>
+                            </div>
+                            <div class="checkbox-group">
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="termination-options" value="mutual" data-target="mutual-target"> Mutual Agreement
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="termination-payment">Payment Upon Termination:</label>
+                        <select id="termination-payment" name="termination-payment" data-target="termination-payment-target">
+                            <option value="services-rendered">Payment for services rendered only</option>
+                            <option value="partial" selected>Payment for services rendered plus partial payment for in-progress work</option>
+                            <option value="full">Full payment for all contracted services</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Additional Terms Tab -->
+                <div class="tab-content" id="additional-tab">
+                    <h2>Additional Terms</h2>
+                    <div class="form-group">
+                        <label for="governing-law">Governing Law (State):</label>
+                        <select id="governing-law" name="governing-law" data-target="governing-law-target">
+                            <option value="AL">Alabama</option>
+                            <option value="AK">Alaska</option>
+                            <option value="AZ">Arizona</option>
+                            <option value="AR">Arkansas</option>
+                            <option value="CA" selected>California</option>
+                            <!-- More states would be added here -->
+                            <option value="WY">Wyoming</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dispute-resolution">Dispute Resolution:</label>
+                        <select id="dispute-resolution" name="dispute-resolution" data-target="dispute-resolution-target">
+                            <option value="litigation">Litigation</option>
+                            <option value="arbitration" selected>Binding Arbitration</option>
+                            <option value="mediation-then-arbitration">Mediation, then Arbitration</option>
+                            <option value="mediation-then-litigation">Mediation, then Litigation</option>
+                        </select>
+                    </div>
+                    <div class="form-group arbitration-fields">
+                        <label for="arbitration-provider">Arbitration Provider:</label>
+                        <select id="arbitration-provider" name="arbitration-provider" data-target="arbitration-provider-target">
+                            <option value="AAA" selected>American Arbitration Association (AAA)</option>
+                            <option value="JAMS">JAMS</option>
+                            <option value="NAF">National Arbitration Forum</option>
+                            <option value="CPR">International Institute for Conflict Prevention & Resolution (CPR)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="indemnification">Indemnification:</label>
+                        <select id="indemnification" name="indemnification" data-target="indemnification-target">
+                            <option value="mutual" selected>Mutual Indemnification</option>
+                            <option value="consultant">Consultant Indemnifies Client</option>
+                            <option value="client">Client Indemnifies Consultant</option>
+                            <option value="none">No Indemnification</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="limitation-liability">Limitation of Liability:</label>
+                        <select id="limitation-liability" name="limitation-liability" data-target="limitation-liability-target">
+                            <option value="fees">Limited to Fees Paid</option>
+                            <option value="fixed" selected>Fixed Amount</option>
+                            <option value="insurance">Limited to Insurance Coverage</option>
+                            <option value="none">No Limitation</option>
+                        </select>
+                    </div>
+                    <div class="form-group liability-amount-field">
+                        <label for="liability-amount">Liability Limit Amount (USD):</label>
+                        <input type="number" id="liability-amount" name="liability-amount" value="50000" min="0" data-target="liability-amount-target">
+                    </div>
+                    <div class="form-group">
+                        <label for="insurance">Consultant Insurance Requirements:</label>
+                        <select id="insurance" name="insurance" data-target="insurance-target">
+                            <option value="none">None</option>
+                            <option value="general" selected>General Liability Insurance</option>
+                            <option value="professional">Professional Liability Insurance</option>
+                            <option value="both">Both General and Professional Liability</option>
+                        </select>
+                    </div>
+                    <div class="form-group insurance-amount-field">
+                        <label for="insurance-amount">Insurance Coverage Amount (USD):</label>
+                        <input type="number" id="insurance-amount" name="insurance-amount" value="1000000" min="0" data-target="insurance-amount-target">
+                    </div>
+                </div>
+                
+                <div class="navigation">
+                    <button type="button" id="prev-btn" disabled>Previous</button>
+                    <button type="button" id="next-btn">Next</button>
+                </div>
+            </form>
+        </div>
+        
+        <div class="preview-container">
+            <div class="preview-heading">
+                <h2>Agreement Preview</h2>
+                <button type="button" class="download-btn" id="download-btn">Download Agreement</button>
+            </div>
+            <div class="preview-content" id="agreement-preview">
+                <!-- The agreement preview will be inserted here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Tab navigation
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        let currentTabIndex = 0;
+        
+        // Initialize agreement template
+        const agreementPreview = document.getElementById('agreement-preview');
+        
+        // Function to update the agreement preview
+        function updateAgreementPreview() {
+            // Get all form values
+            const consultantName = document.getElementById('consultant-name').value;
+            const consultantAddress = document.getElementById('consultant-address').value;
+            const consultantPhone = document.getElementById('consultant-phone').value;
+            const consultantEmail = document.getElementById('consultant-email').value;
+            
+            const clientName = document.getElementById('client-name').value;
+            const clientAddress = document.getElementById('client-address').value;
+            const clientPhone = document.getElementById('client-phone').value;
+            const clientEmail = document.getElementById('client-email').value;
+            
+            // Services
+            const selectedServices = Array.from(document.querySelectorAll('input[name="services"]:checked')).map(checkbox => checkbox.value);
+            const additionalServices = document.getElementById('additional-services').value;
+            const projectDescription = document.getElementById('project-description').value;
+            
+            // Term
+            const termType = document.querySelector('input[name="term-type"]:checked').value;
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            const extensionOption = document.getElementById('extension-option').value;
+            
+            // Compensation
+            const compensationType = document.querySelector('input[name="compensation-type"]:checked').value;
+            const hourlyRate = document.getElementById('hourly-rate').value;
+            const fixedFee = document.getElementById('fixed-fee').value;
+            const monthlyFee = document.getElementById('monthly-fee').value;
+            const paymentSchedule = document.getElementById('payment-schedule').value;
+            const expenses = document.getElementById('expenses').value;
+            const specifiedExpenses = document.getElementById('specified-expenses').value;
+            
+            // Confidentiality
+            const confidentialityTerm = document.getElementById('confidentiality-term').value;
+            const confidentialityExclusions = Array.from(document.querySelectorAll('input[name="confidentiality-exclusions"]:checked')).map(checkbox => checkbox.value);
+            const consultantWorkProduct = document.getElementById('consultant-work-product').value;
+            
+            // Termination
+            const terminationNotice = document.getElementById('termination-notice').value;
+            const terminationOptions = Array.from(document.querySelectorAll('input[name="termination-options"]:checked')).map(checkbox => checkbox.value);
+            const terminationPayment = document.getElementById('termination-payment').value;
+            
+            // Additional Terms
+            const governingLaw = document.getElementById('governing-law').value;
+            const disputeResolution = document.getElementById('dispute-resolution').value;
+            const arbitrationProvider = document.getElementById('arbitration-provider').value;
+            const indemnification = document.getElementById('indemnification').value;
+            const limitationLiability = document.getElementById('limitation-liability').value;
+            const liabilityAmount = document.getElementById('liability-amount').value;
+            const insurance = document.getElementById('insurance').value;
+            const insuranceAmount = document.getElementById('insurance-amount').value;
+            
+            // Format date strings
+            const formattedStartDate = startDate ? new Date(startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+            const formattedEndDate = endDate ? new Date(endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
+            
+            // Convert payment schedule to readable format
+            let paymentScheduleText = '';
+            switch(paymentSchedule) {
+                case 'biweekly':
+                    paymentScheduleText = 'Bi-weekly';
+                    break;
+                case 'monthly':
+                    paymentScheduleText = 'Monthly';
+                    break;
+                case 'quarterly':
+                    paymentScheduleText = 'Quarterly';
+                    break;
+                case 'completion':
+                    paymentScheduleText = 'Upon Completion';
+                    break;
+            }
+            
+            // Convert expenses to readable format
+            let expensesText = '';
+            switch(expenses) {
+                case 'none':
+                    expensesText = 'No reimbursable expenses';
+                    break;
+                case 'all':
+                    expensesText = 'All reasonable business expenses';
+                    break;
+                case 'travel':
+                    expensesText = 'Travel expenses only';
+                    break;
+                case 'specified':
+                    expensesText = `Only the following specified expenses: ${specifiedExpenses}`;
+                    break;
+            }
+            
+            // Convert termination payment to readable format
+            let terminationPaymentText = '';
+            switch(terminationPayment) {
+                case 'services-rendered':
+                    terminationPaymentText = 'Payment for services rendered only';
+                    break;
+                case 'partial':
+                    terminationPaymentText = 'Payment for services rendered plus partial payment for in-progress work';
+                    break;
+                case 'full':
+                    terminationPaymentText = 'Full payment for all contracted services';
+                    break;
+            }
+            
+            // Create the agreement preview content
+            const agreementContent = `
+REAL ESTATE CONSULTING AGREEMENT
+
+This Real Estate Consulting Agreement (the "Agreement") is entered into as of ${formattedStartDate}, by and between:
+
+CONSULTANT: <span id="consultant-name-target">${consultantName}</span>
+Address: <span id="consultant-address-target">${consultantAddress}</span>
+Phone: <span id="consultant-phone-target">${consultantPhone}</span>
+Email: <span id="consultant-email-target">${consultantEmail}</span>
+
+and
+
+CLIENT: <span id="client-name-target">${clientName}</span>
+Address: <span id="client-address-target">${clientAddress}</span>
+Phone: <span id="client-phone-target">${clientPhone}</span>
+Email: <span id="client-email-target">${clientEmail}</span>
+
+1. SCOPE OF SERVICES
+The Consultant agrees to provide the following real estate consulting services to the Client:
+${selectedServices.includes('Market Analysis') ? '<span id="market-analysis-target">• Market Analysis</span>\n' : ''}${selectedServices.includes('Property Valuation') ? '<span id="property-valuation-target">• Property Valuation</span>\n' : ''}${selectedServices.includes('Investment Advisory') ? '<span id="investment-advisory-target">• Investment Advisory</span>\n' : ''}${selectedServices.includes('Development Feasibility') ? '<span id="development-feasibility-target">• Development Feasibility</span>\n' : ''}${selectedServices.includes('Portfolio Management') ? '<span id="portfolio-management-target">• Portfolio Management</span>\n' : ''}${selectedServices.includes('Acquisition Due Diligence') ? '<span id="acquisition-dd-target">• Acquisition Due Diligence</span>\n' : ''}${selectedServices.includes('Disposition Strategy') ? '<span id="disposition-strategy-target">• Disposition Strategy</span>\n' : ''}${selectedServices.includes('Leasing Strategy') ? '<span id="leasing-strategy-target">• Leasing Strategy</span>\n' : ''}
+${additionalServices ? `<span id="additional-services-target">Additional Services: ${additionalServices}</span>\n` : ''}
+
+Project Description: <span id="project-description-target">${projectDescription}</span>
+
+2. TERM
+<span id="term-type-target">This Agreement shall ${termType === 'fixed' ? `commence on ${formattedStartDate} and continue until ${formattedEndDate}, unless terminated earlier as provided herein` : 'continue indefinitely until terminated by either party as provided herein'}</span>.
+
+<span id="extension-option-target">Extension: ${
+    extensionOption === 'mutual' ? 'This Agreement may be extended by mutual written agreement of the parties.' :
+    extensionOption === 'automatic' ? 'This Agreement shall automatically renew for successive three (3) month terms unless either party provides written notice of non-renewal at least thirty (30) days prior to the end of the current term.' :
+    extensionOption === 'client' ? 'Client shall have the option to extend this Agreement for additional periods upon written notice to Consultant at least thirty (30) days prior to the end of the current term.' :
+    'This Agreement shall terminate on the end date with no option for extension.'
+}</span>
+
+3. COMPENSATION
+<span id="compensation-type-target">Compensation: ${
+    compensationType === 'hourly' ? `Consultant shall be compensated at an hourly rate of $<span id="hourly-rate-target">${hourlyRate}</span> per hour.` :
+    compensationType === 'fixed' ? `Consultant shall be paid a fixed fee of $<span id="fixed-fee-target">${fixedFee}</span> for the services described herein.` :
+    `Consultant shall be paid a monthly retainer of $<span id="monthly-fee-target">${monthlyFee}</span>.`
+}</span>
+
+<span id="payment-schedule-target">Payment Schedule: ${paymentScheduleText}</span>
+
+<span id="expenses-target">Expenses: ${expensesText}</span>
+
+4. CONFIDENTIALITY
+Consultant acknowledges that in the course of providing services to Client, Consultant may receive confidential information relating to Client, Client's business, or Client's properties. Consultant agrees to maintain the confidentiality of such information during the term of this Agreement and for <span id="confidentiality-term-target">${
+    confidentialityTerm === '1' ? 'one (1) year' :
+    confidentialityTerm === '2' ? 'two (2) years' :
+    confidentialityTerm === '3' ? 'three (3) years' :
+    confidentialityTerm === '5' ? 'five (5) years' :
+    'perpetuity'
+}</span> after the termination of this Agreement.
+
+Exclusions from Confidential Information:
+${confidentialityExclusions.includes('public-domain') ? '<span id="public-domain-target">• Information that is or becomes publicly available through no fault of Consultant</span>\n' : ''}${confidentialityExclusions.includes('prior-knowledge') ? '<span id="prior-knowledge-target">• Information that was known to Consultant prior to Client\'s disclosure</span>\n' : ''}${confidentialityExclusions.includes('third-party') ? '<span id="third-party-target">• Information rightfully received from a third party without a duty of confidentiality</span>\n' : ''}${confidentialityExclusions.includes('independently-developed') ? '<span id="independently-developed-target">• Information independently developed by Consultant without use of Client\'s confidential information</span>\n' : ''}${confidentialityExclusions.includes('legal-requirement') ? '<span id="legal-requirement-target">• Information required to be disclosed by law or court order</span>\n' : ''}
+
+<span id="consultant-work-product-target">Work Product Ownership: ${
+    consultantWorkProduct === 'client' ? 'Client shall own all work product, reports, analyses, and materials developed by Consultant under this Agreement.' :
+    consultantWorkProduct === 'consultant' ? 'Consultant shall retain ownership of all work product, reports, analyses, and materials developed by Consultant under this Agreement, but grants Client a perpetual, non-exclusive license to use such materials for Client\'s internal business purposes.' :
+    'Client and Consultant shall jointly own all work product, reports, analyses, and materials developed by Consultant under this Agreement.'
+}</span>
+
+5. TERMINATION
+Either party may terminate this Agreement with <span id="termination-notice-target">${terminationNotice}</span> days written notice to the other party.
+
+Termination Options:
+${terminationOptions.includes('for-cause') ? '<span id="for-cause-target">• Either party may terminate this Agreement immediately for cause</span>\n' : ''}${terminationOptions.includes('without-cause') ? '<span id="without-cause-target">• Either party may terminate this Agreement without cause upon the notice period specified above</span>\n' : ''}${terminationOptions.includes('breach') ? '<span id="breach-target">• Either party may terminate this Agreement upon material breach by the other party if such breach remains uncured for fifteen (15) days following written notice</span>\n' : ''}${terminationOptions.includes('bankruptcy') ? '<span id="bankruptcy-target">• Either party may terminate this Agreement immediately if the other party becomes insolvent, files for bankruptcy, or makes an assignment for the benefit of creditors</span>\n' : ''}${terminationOptions.includes('mutual') ? '<span id="mutual-target">• This Agreement may be terminated at any time by mutual written agreement of the parties</span>\n' : ''}
+
+<span id="termination-payment-target">Upon termination: ${terminationPaymentText}</span>
+
+6. INDEPENDENT CONTRACTOR STATUS
+Consultant is an independent contractor and not an employee of Client. Consultant shall be responsible for all taxes, insurance, and other expenses related to Consultant's business operations.
+
+7. DISPUTE RESOLUTION
+<span id="dispute-resolution-target">${
+    disputeResolution === 'litigation' ? 'Any dispute arising under or related to this Agreement shall be resolved through litigation in the courts of the applicable jurisdiction.' :
+    disputeResolution === 'arbitration' ? `Any dispute arising under or related to this Agreement shall be resolved through binding arbitration administered by the <span id="arbitration-provider-target">${
+        arbitrationProvider === 'AAA' ? 'American Arbitration Association' :
+        arbitrationProvider === 'JAMS' ? 'JAMS' :
+        arbitrationProvider === 'NAF' ? 'National Arbitration Forum' :
+        'International Institute for Conflict Prevention & Resolution'
+    }</span> in accordance with its commercial arbitration rules.` :
+    disputeResolution === 'mediation-then-arbitration' ? `Any dispute arising under or related to this Agreement shall first be submitted to mediation. If mediation is unsuccessful, the dispute shall be resolved through binding arbitration administered by the <span id="arbitration-provider-target">${
+        arbitrationProvider === 'AAA' ? 'American Arbitration Association' :
+        arbitrationProvider === 'JAMS' ? 'JAMS' :
+        arbitrationProvider === 'NAF' ? 'National Arbitration Forum' :
+        'International Institute for Conflict Prevention & Resolution'
+    }</span>.` :
+    'Any dispute arising under or related to this Agreement shall first be submitted to mediation. If mediation is unsuccessful, the dispute may be resolved through litigation in the courts of the applicable jurisdiction.'
+}</span>
+
+8. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of <span id="governing-law-target">${governingLaw}</span>, without giving effect to any choice of law or conflict of law provisions.
+
+9. INDEMNIFICATION
+<span id="indemnification-target">${
+    indemnification === 'mutual' ? 'Each party shall indemnify, defend, and hold harmless the other party from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys\' fees) arising from or relating to the indemnifying party\'s breach of this Agreement or negligence.' :
+    indemnification === 'consultant' ? 'Consultant shall indemnify, defend, and hold harmless Client from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys\' fees) arising from or relating to Consultant\'s breach of this Agreement or negligence.' :
+    indemnification === 'client' ? 'Client shall indemnify, defend, and hold harmless Consultant from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys\' fees) arising from or relating to Client\'s breach of this Agreement or negligence.' :
+    'Neither party shall be obligated to indemnify the other party.'
+}</span>
+
+10. LIMITATION OF LIABILITY
+<span id="limitation-liability-target">${
+    limitationLiability === 'fees' ? 'In no event shall Consultant\'s liability exceed the total amount of fees paid by Client under this Agreement.' :
+    limitationLiability === 'fixed' ? `In no event shall Consultant's liability exceed $<span id="liability-amount-target">${liabilityAmount}</span>.` :
+    limitationLiability === 'insurance' ? 'In no event shall Consultant\'s liability exceed the coverage limits of Consultant\'s applicable insurance policies.' :
+    'There shall be no limitation on Consultant\'s liability for claims arising under this Agreement.'
+}</span>
+
+11. INSURANCE
+<span id="insurance-target">${
+    insurance === 'none' ? 'Consultant is not required to maintain any specific insurance coverage.' :
+    insurance === 'general' ? `Consultant shall maintain general liability insurance with coverage limits of at least $<span id="insurance-amount-target">${insuranceAmount}</span> per occurrence.` :
+    insurance === 'professional' ? `Consultant shall maintain professional liability insurance with coverage limits of at least $<span id="insurance-amount-target">${insuranceAmount}</span> per claim.` :
+    `Consultant shall maintain both general liability and professional liability insurance with coverage limits of at least $<span id="insurance-amount-target">${insuranceAmount}</span> per occurrence/claim.`
+}</span>
+
+12. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior and contemporaneous agreements and understandings, whether oral or written.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+CONSULTANT:
+${consultantName}
+
+By: ____________________________
+Name: ________________________
+Title: _________________________
+Date: _________________________
+
+CLIENT:
+${clientName}
+
+By: ____________________________
+Name: ________________________
+Title: _________________________
+Date: _________________________
+`;
+            
+            // Update the preview content
+            agreementPreview.innerHTML = agreementContent;
+        }
+        
+        // Initialize the agreement preview
+        updateAgreementPreview();
+        
+        // Handle tab switching
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                // Hide all tab contents
+                tabContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                // Remove active class from all tabs
+                tabs.forEach(t => {
+                    t.classList.remove('active');
+                });
+                
+                // Show current tab content and add active class to tab
+                tabContents[index].classList.add('active');
+                tab.classList.add('active');
+                
+                // Update current tab index
+                currentTabIndex = index;
+                
+                // Update button states
+                updateButtonStates();
+            });
+        });
+        
+        // Handle next button click
+        nextBtn.addEventListener('click', () => {
+            if (currentTabIndex < tabs.length - 1) {
+                // Hide current tab content
+                tabContents[currentTabIndex].classList.remove('active');
+                tabs[currentTabIndex].classList.remove('active');
+                
+                // Show next tab content
+                currentTabIndex++;
+                tabContents[currentTabIndex].classList.add('active');
+                tabs[currentTabIndex].classList.add('active');
+                
+                // Update button states
+                updateButtonStates();
+            }
+        });
+        
+        // Handle previous button click
+        prevBtn.addEventListener('click', () => {
+            if (currentTabIndex > 0) {
+                // Hide current tab content
+                tabContents[currentTabIndex].classList.remove('active');
+                tabs[currentTabIndex].classList.remove('active');
+                
+                // Show previous tab content
+                currentTabIndex--;
+                tabContents[currentTabIndex].classList.add('active');
+                tabs[currentTabIndex].classList.add('active');
+                
+                // Update button states
+                updateButtonStates();
+            }
+        });
+        
+        // Update button states based on current tab index
+        function updateButtonStates() {
+            prevBtn.disabled = currentTabIndex === 0;
+            nextBtn.disabled = currentTabIndex === tabs.length - 1;
+        }
+        
+        // Handle term type radio buttons
+        const termTypeRadios = document.querySelectorAll('input[name="term-type"]');
+        const fixedTermFields = document.querySelectorAll('.fixed-term-fields');
+        
+        termTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                if (radio.value === 'fixed') {
+                    fixedTermFields.forEach(field => {
+                        field.classList.remove('hidden');
+                    });
+                } else {
+                    fixedTermFields.forEach(field => {
+                        field.classList.add('hidden');
+                    });
+                }
+                highlightChangedElement(document.getElementById('term-type-target'));
+                updateAgreementPreview();
+            });
+        });
+        
+        // Handle compensation type radio buttons
+        const compensationTypeRadios = document.querySelectorAll('input[name="compensation-type"]');
+        const hourlyFields = document.querySelectorAll('.hourly-fields');
+        const fixedFeeFields = document.querySelectorAll('.fixed-fee-fields');
+        const monthlyFields = document.querySelectorAll('.monthly-fields');
+        
+        compensationTypeRadios.forEach(radio => {
+            radio.addEventListener('change', () => {
+                hourlyFields.forEach(field => field.classList.add('hidden'));
+                fixedFeeFields.forEach(field => field.classList.add('hidden'));
+                monthlyFields.forEach(field => field.classList.add('hidden'));
+                
+                if (radio.value === 'hourly') {
+                    hourlyFields.forEach(field => field.classList.remove('hidden'));
+                } else if (radio.value === 'fixed') {
+                    fixedFeeFields.forEach(field => field.classList.remove('hidden'));
+                } else if (radio.value === 'monthly') {
+                    monthlyFields.forEach(field => field.classList.remove('hidden'));
+                }
+                
+                highlightChangedElement(document.getElementById('compensation-type-target'));
+                updateAgreementPreview();
+            });
+        });
+        
+        // Handle expenses select
+        const expensesSelect = document.getElementById('expenses');
+        const specifiedExpensesField = document.querySelector('.specified-expenses-field');
+        
+        expensesSelect.addEventListener('change', () => {
+            if (expensesSelect.value === 'specified') {
+                specifiedExpensesField.classList.remove('hidden');
+            } else {
+                specifiedExpensesField.classList.add('hidden');
+            }
+            
+            highlightChangedElement(document.getElementById('expenses-target'));
+            updateAgreementPreview();
+        });
+        
+        // Handle dispute resolution select
+        const disputeResolutionSelect = document.getElementById('dispute-resolution');
+        const arbitrationFields = document.querySelectorAll('.arbitration-fields');
+        
+        disputeResolutionSelect.addEventListener('change', () => {
+            if (disputeResolutionSelect.value === 'arbitration' || disputeResolutionSelect.value === 'mediation-then-arbitration') {
+                arbitrationFields.forEach(field => field.classList.remove('hidden'));
+            } else {
+                arbitrationFields.forEach(field => field.classList.add('hidden'));
+            }
+            
+            highlightChangedElement(document.getElementById('dispute-resolution-target'));
+            updateAgreementPreview();
+        });
+        
+        // Handle limitation of liability select
+        const limitationLiabilitySelect = document.getElementById('limitation-liability');
+        const liabilityAmountField = document.querySelector('.liability-amount-field');
+        
+        limitationLiabilitySelect.addEventListener('change', () => {
+            if (limitationLiabilitySelect.value === 'fixed') {
+                liabilityAmountField.classList.remove('hidden');
+            } else {
+                liabilityAmountField.classList.add('hidden');
+            }
+            
+            highlightChangedElement(document.getElementById('limitation-liability-target'));
+            updateAgreementPreview();
+        });
+        
+        // Handle insurance select
+        const insuranceSelect = document.getElementById('insurance');
+        const insuranceAmountField = document.querySelector('.insurance-amount-field');
+        
+        insuranceSelect.addEventListener('change', () => {
+            if (insuranceSelect.value === 'none') {
+                insuranceAmountField.classList.add('hidden');
+            } else {
+                insuranceAmountField.classList.remove('hidden');
+            }
+            
+            highlightChangedElement(document.getElementById('insurance-target'));
+            updateAgreementPreview();
+        });
+        
+        // Function to handle input changes and highlight the affected text
+        function setupInputChangeHandlers() {
+            // Handle all input elements
+            document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], input[type="number"], textarea, select').forEach(input => {
+                input.addEventListener('change', function() {
+                    const targetId = this.getAttribute('data-target');
+                    if (targetId) {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            highlightChangedElement(targetElement);
+                        }
+                    }
+                    updateAgreementPreview();
+                });
+            });
+            
+            // Handle checkbox changes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const targetId = this.getAttribute('data-target');
+                    if (targetId) {
+                        const targetElement = document.getElementById(targetId);
+                        if (targetElement) {
+                            if (this.checked) {
+                                targetElement.style.display = 'inline-block';
+                            } else {
+                                targetElement.style.display = 'none';
+                            }
+                            highlightChangedElement(targetElement);
+                        }
+                    }
+                    updateAgreementPreview();
+                });
+            });
+        }
+        
+        // Function to highlight changed elements
+        function highlightChangedElement(element) {
+            if (!element) return;
+            
+            // Check if element is in view, if not scroll to it
+            const container = document.querySelector('.preview-container');
+            const elementRect = element.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            // Add highlight class
+            element.classList.add('highlight');
+            
+            // Remove highlight after some time
+            setTimeout(() => {
+                element.classList.remove('highlight');
+            }, 3000);
+        }
+        
+        // Setup handlers for all input elements
+        setupInputChangeHandlers();
+        
+        // Handle download button
+        document.getElementById('download-btn').addEventListener('click', () => {
+            // Get the agreement content
+            const agreementHTML = document.getElementById('agreement-preview').innerHTML;
+            
+            // Convert HTML to plain text (simple approach)
+            let plainText = agreementHTML.replace(/<span[^>]*>/g, '').replace(/<\/span>/g, '');
+            plainText = plainText.replace(/<br>/g, '\n');
+            plainText = plainText.replace(/<[^>]*>/g, '');
+            
+            // Create a Blob with the text content
+            const blob = new Blob([plainText], { type: 'text/plain' });
+            
+            // Create a download link
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = 'Real_Estate_Consulting_Agreement.txt';
+            
+            // Trigger download
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        });
+    </script>
+</body>
+</html>
