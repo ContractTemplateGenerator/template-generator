@@ -1,0 +1,1910 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bachelor/Bachelorette Party NDA Generator</title>
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #1abc9c;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Container Styles */
+    .generator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    /* Header Styles */
+    .generator-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .generator-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .generator-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Content Layout */
+    .generator-content {
+      display: flex;
+      min-height: 600px;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      flex: 1;
+      padding: 25px;
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      max-height: 800px;
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--text-primary);
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea.form-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .form-helper {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* Radio and Checkbox Styles */
+    .options-group {
+      margin-bottom: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background-color: #f5f7fa;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .option-item:hover {
+      background-color: #eef2f7;
+    }
+    
+    .option-item.selected {
+      background-color: #e8f6f3;
+      border-color: var(--accent-color);
+    }
+    
+    .option-item input[type="radio"],
+    .option-item input[type="checkbox"] {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    
+    .option-content {
+      flex: 1;
+    }
+    
+    .option-label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .option-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      text-align: center;
+    }
+    
+    .btn-reset {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+    
+    .btn-reset:hover {
+      background-color: #e4e4e4;
+    }
+    
+    .btn-copy {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-download {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #219653;
+    }
+    
+    .copy-message {
+      display: none;
+      font-size: 14px;
+      color: #27ae60;
+      margin-left: 10px;
+    }
+    
+    .btn-consult {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-consult:hover {
+      background-color: #1e2a37;
+    }
+    
+    /* Preview Styles */
+    .preview-container {
+      flex: 1;
+      padding: 25px;
+      position: relative;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .preview-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    .preview-box {
+      height: 700px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      background-color: white;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    
+    /* Document Styles */
+    .document-template {
+      font-family: Arial, sans-serif;
+    }
+    
+    .document-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .document-section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .section-content {
+      margin-bottom: 15px;
+    }
+    
+    .field-label {
+      font-weight: bold;
+    }
+    
+    /* Highlight Effect */
+    .highlight {
+      background-color: #ffff8d;
+      transition: background-color 0.5s ease;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .generator-content {
+        flex-direction: column;
+      }
+      
+      .form-container {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        max-height: none;
+      }
+      
+      .preview-box {
+        height: 500px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .generator-container {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .generator-header {
+        padding: 20px;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .copy-message {
+        margin-left: 0;
+        margin-top: 5px;
+        text-align: center;
+      }
+    }
+    
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      
+      .generator-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      .generator-header,
+      .form-container,
+      .preview-header,
+      .form-actions,
+      .btn-consult {
+        display: none;
+      }
+      
+      .generator-content {
+        display: block;
+      }
+      
+      .preview-container {
+        padding: 0;
+      }
+      
+      .preview-box {
+        height: auto;
+        overflow: visible;
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="generator-container">
+    <div class="generator-header">
+      <h1>Bachelor/Bachelorette Party NDA Generator</h1>
+      <p>Create a legally-binding non-disclosure agreement for your bachelor or bachelorette party</p>
+    </div>
+    
+    <div class="generator-content">
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="ndaForm">
+          <!-- Party Information Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Party Information</h2>
+            
+            <div class="form-group">
+              <label for="eventType">Type of Event</label>
+              <select id="eventType" class="form-input" onchange="updatePreview('eventType')">
+                <option value="bachelor" selected>Bachelor Party</option>
+                <option value="bachelorette">Bachelorette Party</option>
+                <option value="both">Joint Bachelor/Bachelorette Party</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="partyDate">Date of Event</label>
+              <input type="date" id="partyDate" class="form-input" value="2025-04-15" onchange="updatePreview('partyDate')">
+              <div class="form-helper">When the event will take place</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="partyLocation">Location of Event</label>
+              <input type="text" id="partyLocation" class="form-input" placeholder="Enter location" value="Las Vegas, Nevada" oninput="updatePreview('partyLocation')">
+            </div>
+            
+            <div class="form-group">
+              <label for="primaryName">Name of Bride/Groom</label>
+              <input type="text" id="primaryName" class="form-input" placeholder="Enter name" value="John Doe" oninput="updatePreview('primaryName')">
+              <div class="form-helper">The person for whom the party is being held</div>
+            </div>
+            
+            <div class="form-group">
+              <label for="weddingDate">Wedding Date</label>
+              <input type="date" id="weddingDate" class="form-input" value="2025-06-15" onchange="updatePreview('weddingDate')">
+              <div class="form-helper">When the wedding will take place</div>
+            </div>
+          </div>
+          
+          <!-- Participant Information Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Participant Information</h2>
+            
+            <div class="form-group">
+              <label for="participantName">Your Full Legal Name</label>
+              <input type="text" id="participantName" class="form-input" placeholder="Enter your full name" value="Jane Smith" oninput="updatePreview('participantName')">
+            </div>
+            
+            <div class="form-group">
+              <label for="participantEmail">Your Email Address</label>
+              <input type="email" id="participantEmail" class="form-input" placeholder="Enter your email" value="jane.smith@example.com" oninput="updatePreview('participantEmail')">
+            </div>
+            
+            <div class="form-group">
+              <label for="participantPhone">Your Phone Number</label>
+              <input type="tel" id="participantPhone" class="form-input" placeholder="Enter your phone number" value="555-123-4567" oninput="updatePreview('participantPhone')">
+            </div>
+            
+            <div class="form-group">
+              <label for="relationship">Relationship to Bride/Groom</label>
+              <select id="relationship" class="form-input" onchange="updatePreview('relationship')">
+                <option value="friend" selected>Friend</option>
+                <option value="family">Family Member</option>
+                <option value="wedding-party">Wedding Party Member</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="otherRelationshipGroup" style="display: none;">
+              <label for="otherRelationship">Specify Relationship</label>
+              <input type="text" id="otherRelationship" class="form-input" placeholder="Specify your relationship" oninput="updatePreview('otherRelationship')">
+            </div>
+          </div>
+          
+          <!-- Confidentiality Terms Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Confidentiality Terms</h2>
+            
+            <div class="form-group">
+              <label for="confidentialityTerm">Duration of Confidentiality</label>
+              <select id="confidentialityTerm" class="form-input" onchange="updatePreview('confidentialityTerm')">
+                <option value="wedding" selected>Until the Wedding</option>
+                <option value="1year">1 Year from Event</option>
+                <option value="3years">3 Years from Event</option>
+                <option value="5years">5 Years from Event</option>
+                <option value="perpetual">Perpetual (Forever)</option>
+              </select>
+              <div class="form-helper">How long the confidentiality obligation lasts</div>
+            </div>
+            
+            <div class="form-group">
+              <label>Activities to Keep Confidential</label>
+              <div class="options-group">
+                <label class="option-item selected" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="all-activities" checked>
+                  <div class="option-content">
+                    <span class="option-label">All Activities</span>
+                    <span class="option-description">Everything that happens during the event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="photos-videos" checked>
+                  <div class="option-content">
+                    <span class="option-label">Photos and Videos</span>
+                    <span class="option-description">Any photos or videos taken during the event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="locations" checked>
+                  <div class="option-content">
+                    <span class="option-label">Locations Visited</span>
+                    <span class="option-description">Places visited during the event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="expenses" checked>
+                  <div class="option-content">
+                    <span class="option-label">Expenses and Costs</span>
+                    <span class="option-description">Amount spent during the event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="gifts" id="giftsCheckbox">
+                  <div class="option-content">
+                    <span class="option-label">Gifts Received</span>
+                    <span class="option-description">Gifts given or received during the event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item" onclick="toggleOption(this)">
+                  <input type="checkbox" name="confidentialActivities" value="entertainment" id="entertainmentCheckbox">
+                  <div class="option-content">
+                    <span class="option-label">Entertainment</span>
+                    <span class="option-description">Specific types of entertainment at the event</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label for="customActivities">Additional Confidential Activities</label>
+              <textarea id="customActivities" class="form-input" placeholder="Enter any additional activities that should be kept confidential" oninput="updatePreview('customActivities')"></textarea>
+            </div>
+          </div>
+          
+          <!-- Permitted Disclosures Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Permitted Disclosures</h2>
+            
+            <div class="form-group">
+              <label>Who Can Information Be Shared With</label>
+              <div class="options-group">
+                <label class="option-item selected" onclick="toggleOption(this)">
+                  <input type="checkbox" name="permittedDisclosures" value="participants" checked>
+                  <div class="option-content">
+                    <span class="option-label">Other Party Participants</span>
+                    <span class="option-description">Others who attended the same event</span>
+                  </div>
+                </label>
+                
+                <label class="option-item" onclick="toggleOption(this)">
+                  <input type="checkbox" name="permittedDisclosures" value="spouse">
+                  <div class="option-content">
+                    <span class="option-label">Your Spouse/Partner</span>
+                    <span class="option-description">Your own spouse or significant other</span>
+                  </div>
+                </label>
+                
+                <label class="option-item" onclick="toggleOption(this)">
+                  <input type="checkbox" name="permittedDisclosures" value="legal">
+                  <div class="option-content">
+                    <span class="option-label">Legal Counsel</span>
+                    <span class="option-description">Your attorney or legal advisor</span>
+                  </div>
+                </label>
+                
+                <label class="option-item" onclick="toggleOption(this)">
+                  <input type="checkbox" name="permittedDisclosures" value="law-enforcement">
+                  <div class="option-content">
+                    <span class="option-label">Law Enforcement</span>
+                    <span class="option-description">When legally required to disclose</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Remedies Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Remedies for Breach</h2>
+            
+            <div class="form-group">
+              <label for="penaltyType">Type of Penalty</label>
+              <select id="penaltyType" class="form-input" onchange="updatePreview('penaltyType')">
+                <option value="liquidated-damages" selected>Liquidated Damages (Fixed Amount)</option>
+                <option value="actual-damages">Actual Damages</option>
+                <option value="injunctive-relief">Injunctive Relief Only</option>
+                <option value="all-remedies">All Available Remedies</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="damageAmountGroup">
+              <label for="damageAmount">Liquidated Damages Amount</label>
+              <input type="text" id="damageAmount" class="form-input" placeholder="Enter amount" value="$1,000" oninput="updatePreview('damageAmount')">
+              <div class="form-helper">Fixed amount paid for breach of the agreement</div>
+            </div>
+          </div>
+          
+          <!-- Legal Terms Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Legal Terms</h2>
+            
+            <div class="form-group">
+              <label for="governingLaw">Governing Law (State)</label>
+              <select id="governingLaw" class="form-input" onchange="updatePreview('governingLaw')">
+                <option value="Alabama">Alabama</option>
+                <option value="Alaska">Alaska</option>
+                <option value="Arizona">Arizona</option>
+                <option value="Arkansas">Arkansas</option>
+                <option value="California" selected>California</option>
+                <option value="Colorado">Colorado</option>
+                <option value="Connecticut">Connecticut</option>
+                <option value="Delaware">Delaware</option>
+                <option value="Florida">Florida</option>
+                <option value="Georgia">Georgia</option>
+                <option value="Hawaii">Hawaii</option>
+                <option value="Idaho">Idaho</option>
+                <option value="Illinois">Illinois</option>
+                <option value="Indiana">Indiana</option>
+                <option value="Iowa">Iowa</option>
+                <option value="Kansas">Kansas</option>
+                <option value="Kentucky">Kentucky</option>
+                <option value="Louisiana">Louisiana</option>
+                <option value="Maine">Maine</option>
+                <option value="Maryland">Maryland</option>
+                <option value="Massachusetts">Massachusetts</option>
+                <option value="Michigan">Michigan</option>
+                <option value="Minnesota">Minnesota</option>
+                <option value="Mississippi">Mississippi</option>
+                <option value="Missouri">Missouri</option>
+                <option value="Montana">Montana</option>
+                <option value="Nebraska">Nebraska</option>
+                <option value="Nevada">Nevada</option>
+                <option value="New Hampshire">New Hampshire</option>
+                <option value="New Jersey">New Jersey</option>
+                <option value="New Mexico">New Mexico</option>
+                <option value="New York">New York</option>
+                <option value="North Carolina">North Carolina</option>
+                <option value="North Dakota">North Dakota</option>
+                <option value="Ohio">Ohio</option>
+                <option value="Oklahoma">Oklahoma</option>
+                <option value="Oregon">Oregon</option>
+                <option value="Pennsylvania">Pennsylvania</option>
+                <option value="Rhode Island">Rhode Island</option>
+                <option value="South Carolina">South Carolina</option>
+                <option value="South Dakota">South Dakota</option>
+                <option value="Tennessee">Tennessee</option>
+                <option value="Texas">Texas</option>
+                <option value="Utah">Utah</option>
+                <option value="Vermont">Vermont</option>
+                <option value="Virginia">Virginia</option>
+                <option value="Washington">Washington</option>
+                <option value="West Virginia">West Virginia</option>
+                <option value="Wisconsin">Wisconsin</option>
+                <option value="Wyoming">Wyoming</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="disputeResolution">Dispute Resolution</label>
+              <select id="disputeResolution" class="form-input" onchange="updatePreview('disputeResolution')">
+                <option value="court" selected>Court Litigation</option>
+                <option value="mediation-then-arbitration">Mediation then Arbitration</option>
+                <option value="arbitration">Binding Arbitration</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="additionalTerms">Additional Terms (Optional)</label>
+              <textarea id="additionalTerms" class="form-input" placeholder="Enter any additional terms you'd like to include" oninput="updatePreview('additionalTerms')"></textarea>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" class="btn btn-copy" onclick="copyAgreement()">Copy Agreement</button>
+            <span id="copyMessage" class="copy-message">Agreement copied!</span>
+            <button type="button" class="btn btn-download" onclick="downloadAgreement()">Download as DOCX</button>
+            <button type="reset" class="btn btn-reset" onclick="resetForm()">Reset Form</button>
+          </div>
+          
+          <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+            Schedule Legal Consultation
+          </a>
+        </form>
+      </div>
+      
+      <!-- Preview Container -->
+      <div class="preview-container">
+        <div class="preview-header">
+          <div class="preview-title">Agreement Preview</div>
+          <div class="preview-note">Updates as you complete the form</div>
+        </div>
+        
+        <div class="preview-box">
+          <div class="document-template" id="agreementPreview">
+            <!-- Document content will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Libraries for DOCX download -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  <!-- Calendly Integration -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  
+  <script>
+    // Format date from YYYY-MM-DD to readable format
+    function formatDate(dateString) {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    }
+    
+    // Toggle checkbox option
+    function toggleOption(element) {
+      // Find the checkbox
+      const checkbox = element.querySelector('input[type="checkbox"]');
+      if (checkbox) {
+        // Toggle checkbox state
+        checkbox.checked = !checkbox.checked;
+        
+        // Toggle selected class
+        element.classList.toggle('selected', checkbox.checked);
+        
+        // Update preview
+        updatePreview(checkbox.name);
+      }
+    }
+    
+    // Handle form dependencies
+    function handleFormDependencies() {
+      // Show/hide relationship field
+      const relationshipSelect = document.getElementById('relationship');
+      const otherRelationshipGroup = document.getElementById('otherRelationshipGroup');
+      otherRelationshipGroup.style.display = relationshipSelect.value === 'other' ? 'block' : 'none';
+      
+      // Show/hide damage amount field
+      const penaltyType = document.getElementById('penaltyType');
+      const damageAmountGroup = document.getElementById('damageAmountGroup');
+      damageAmountGroup.style.display = penaltyType.value === 'liquidated-damages' ? 'block' : 'none';
+    }
+    
+    // Track currently highlighted elements
+    let highlightedElements = [];
+    let highlightTimeout;
+    
+    // Clear highlights
+    function clearHighlights() {
+      if (highlightTimeout) {
+        clearTimeout(highlightTimeout);
+      }
+      
+      highlightedElements.forEach(element => {
+        element.classList.remove('highlight');
+      });
+      highlightedElements = [];
+    }
+    
+    // Reset form
+    function resetForm() {
+      // Clear highlights
+      clearHighlights();
+      
+      // Reset copy message
+      document.getElementById('copyMessage').style.display = 'none';
+      
+      // After form is reset, update dependencies and preview
+      setTimeout(() => {
+        // Reset all checkboxes and option items
+        document.querySelectorAll('.option-item').forEach(item => {
+          const checkbox = item.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            // If this is one of the default checked items
+            if (checkbox.name === 'confidentialActivities' && ['all-activities', 'photos-videos', 'locations', 'expenses'].includes(checkbox.value)) {
+              checkbox.checked = true;
+              item.classList.add('selected');
+            } else if (checkbox.name === 'permittedDisclosures' && checkbox.value === 'participants') {
+              checkbox.checked = true;
+              item.classList.add('selected');
+            } else {
+              checkbox.checked = false;
+              item.classList.remove('selected');
+            }
+          }
+        });
+        
+        handleFormDependencies();
+        updatePreview();
+      }, 10);
+    }
+    
+    // Copy agreement to clipboard
+    function copyAgreement() {
+      const agreementText = document.getElementById('agreementPreview').innerText;
+      
+      // Copy to clipboard
+      navigator.clipboard.writeText(agreementText).then(() => {
+        const copyMessage = document.getElementById('copyMessage');
+        copyMessage.style.display = 'inline-block';
+        
+        // Hide message after 3 seconds
+        setTimeout(() => {
+          copyMessage.style.display = 'none';
+        }, 3000);
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+        alert('Failed to copy agreement. Please try selecting and copying the text manually.');
+      });
+    }
+    
+    // Download agreement as DOCX
+    function downloadAgreement() {
+      try {
+        // Access docx library
+        const docx = window.docx;
+        if (!docx) {
+          throw new Error("DOCX library not loaded");
+        }
+        
+        // Get form values for filename
+        const primaryName = document.getElementById('primaryName').value || 'Party';
+        const eventType = document.getElementById('eventType').value;
+        const eventTypeText = eventType === 'bachelor' ? 'Bachelor' : eventType === 'bachelorette' ? 'Bachelorette' : 'Bachelor-Bachelorette';
+        
+        // Create filename
+        const filename = `${primaryName.replace(/[^a-z0-9]/gi, '_')}_${eventTypeText}_Party_NDA.docx`;
+        
+        // Create document sections from preview content
+        const sections = [];
+        
+        // Document title
+        sections.push(
+          new docx.Paragraph({
+            alignment: docx.AlignmentType.CENTER,
+            spacing: {
+              before: 240,
+              after: 240
+            },
+            children: [
+              new docx.TextRun({
+                text: "NON-DISCLOSURE AGREEMENT",
+                bold: true,
+                size: 28
+              })
+            ]
+          })
+        );
+        
+        // Add subtitle (type of event)
+        const eventTypeDisplay = document.getElementById('eventType').options[document.getElementById('eventType').selectedIndex].text;
+        sections.push(
+          new docx.Paragraph({
+            alignment: docx.AlignmentType.CENTER,
+            spacing: {
+              before: 120,
+              after: 240
+            },
+            children: [
+              new docx.TextRun({
+                text: `For ${eventTypeDisplay}`,
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        // Introduction paragraph
+        const primaryNameText = document.getElementById('primaryName').value;
+        const partyDateText = formatDate(document.getElementById('partyDate').value);
+        const partyLocationText = document.getElementById('partyLocation').value;
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 240
+            },
+            children: [
+              new docx.TextRun({
+                text: `This Non-Disclosure Agreement (the "Agreement") is entered into by and between ${primaryNameText} ("Disclosing Party") and the undersigned participant ("Recipient") in connection with the Disclosing Party's ${eventTypeDisplay.toLowerCase()} to be held on ${partyDateText} in ${partyLocationText}.`
+              })
+            ]
+          })
+        );
+        
+        // 1. Definitions
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "1. DEFINITIONS",
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "a. \"Confidential Information\" means any and all information related to the Disclosing Party's "
+              }),
+              new docx.TextRun({
+                text: eventTypeDisplay.toLowerCase(),
+                bold: true
+              }),
+              new docx.TextRun({
+                text: " including but not limited to activities, locations visited, expenses incurred, gifts received, entertainment provided, photos, videos, and any other occurrences during the event."
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "b. \"Recipient\" refers to any individual attending or participating in the event who is not the Disclosing Party."
+              })
+            ]
+          })
+        );
+        
+        // 2. Confidentiality Obligations
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "2. CONFIDENTIALITY OBLIGATIONS",
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        const confidentialActivities = [];
+        document.querySelectorAll('input[name="confidentialActivities"]:checked').forEach(checkbox => {
+          confidentialActivities.push(checkbox.value);
+        });
+        
+        const customActivitiesText = document.getElementById('customActivities').value;
+        
+        let activitiesText = "all activities that occur during the event";
+        if (confidentialActivities.length < 6 && !confidentialActivities.includes('all-activities')) {
+          const activityLabels = {
+            'photos-videos': 'photos and videos',
+            'locations': 'locations visited',
+            'expenses': 'expenses and costs',
+            'gifts': 'gifts received',
+            'entertainment': 'entertainment activities'
+          };
+          
+          const specificActivities = confidentialActivities
+            .filter(a => a !== 'all-activities')
+            .map(a => activityLabels[a] || a);
+            
+          if (customActivitiesText) {
+            specificActivities.push(customActivitiesText);
+          }
+          
+          activitiesText = specificActivities.join(', ');
+        } else if (customActivitiesText) {
+          activitiesText = `all activities that occur during the event, including but not limited to ${customActivitiesText}`;
+        }
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: `a. The Recipient agrees to maintain the confidentiality of all Confidential Information and shall not disclose, discuss, share, post, or otherwise reveal any information regarding ${activitiesText}.`
+              })
+            ]
+          })
+        );
+        
+        // Term of confidentiality
+        const confidentialityTerm = document.getElementById('confidentialityTerm').value;
+        let termText = "";
+        
+        if (confidentialityTerm === 'wedding') {
+          const weddingDate = formatDate(document.getElementById('weddingDate').value);
+          termText = `until after the wedding date of ${weddingDate}`;
+        } else if (confidentialityTerm === '1year') {
+          termText = "for a period of one (1) year from the date of the event";
+        } else if (confidentialityTerm === '3years') {
+          termText = "for a period of three (3) years from the date of the event";
+        } else if (confidentialityTerm === '5years') {
+          termText = "for a period of five (5) years from the date of the event";
+        } else if (confidentialityTerm === 'perpetual') {
+          termText = "in perpetuity (forever)";
+        }
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: `b. The confidentiality obligations under this Agreement shall remain in effect ${termText}.`
+              })
+            ]
+          })
+        );
+        
+        // Social media clause
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "c. The Recipient shall not post, share, or otherwise distribute any Confidential Information, including photographs or videos from the event, on any social media platform, messaging service, or other digital or print medium."
+              })
+            ]
+          })
+        );
+        
+        // 3. Permitted Disclosures
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "3. PERMITTED DISCLOSURES",
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        const permittedDisclosures = [];
+        document.querySelectorAll('input[name="permittedDisclosures"]:checked').forEach(checkbox => {
+          permittedDisclosures.push(checkbox.value);
+        });
+        
+        let disclosuresText = "No disclosures are permitted outside of the event participants";
+        
+        if (permittedDisclosures.length > 0) {
+          const disclosureLabels = {
+            'participants': 'other event participants',
+            'spouse': 'your spouse or significant other',
+            'legal': 'legal counsel on a need-to-know basis',
+            'law-enforcement': 'law enforcement or by court order'
+          };
+          
+          const specificDisclosures = permittedDisclosures.map(d => disclosureLabels[d] || d);
+          disclosuresText = `Confidential Information may only be disclosed to ${specificDisclosures.join(', ')}`;
+        }
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: `a. ${disclosuresText}.`
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "b. Disclosure of Confidential Information shall be permitted if required by law, regulation, or valid order of a court or other governmental authority, provided that the Recipient gives the Disclosing Party prompt written notice of such requirement."
+              })
+            ]
+          })
+        );
+        
+        // 4. Remedies
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "4. REMEDIES",
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        const penaltyType = document.getElementById('penaltyType').value;
+        let remediesText = "";
+        
+        if (penaltyType === 'liquidated-damages') {
+          const damageAmount = document.getElementById('damageAmount').value;
+          remediesText = `a. The Recipient acknowledges that a breach of this Agreement would cause irreparable harm to the Disclosing Party. In the event of a breach by the Recipient, the Recipient agrees to pay ${damageAmount} as liquidated damages. The parties agree that this amount represents a reasonable estimation of the damages that would be incurred, which are otherwise difficult to calculate precisely.`;
+        } else if (penaltyType === 'actual-damages') {
+          remediesText = "a. The Recipient acknowledges that a breach of this Agreement would cause irreparable harm to the Disclosing Party. In the event of a breach, the Recipient shall be liable for all actual damages suffered by the Disclosing Party, including but not limited to financial, reputational, and emotional damages.";
+        } else if (penaltyType === 'injunctive-relief') {
+          remediesText = "a. The Recipient acknowledges that a breach of this Agreement would cause irreparable harm to the Disclosing Party. In the event of a breach or threatened breach of this Agreement, the Disclosing Party shall be entitled to seek injunctive relief to prevent the unauthorized disclosure of Confidential Information, without the need to post a bond or other security.";
+        } else if (penaltyType === 'all-remedies') {
+          remediesText = "a. The Recipient acknowledges that a breach of this Agreement would cause irreparable harm to the Disclosing Party. In the event of a breach, the Disclosing Party shall be entitled to all remedies available at law and in equity, including monetary damages, injunctive relief, and specific performance.";
+        }
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: remediesText
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "b. The Recipient agrees to immediately cease and desist from any unauthorized disclosure of Confidential Information upon notice from the Disclosing Party."
+              })
+            ]
+          })
+        );
+        
+        // 5. General Provisions
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "5. GENERAL PROVISIONS",
+                bold: true,
+                size: 24
+              })
+            ]
+          })
+        );
+        
+        const governingLaw = document.getElementById('governingLaw').value;
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: `a. Governing Law: This Agreement shall be governed by and construed in accordance with the laws of the State of ${governingLaw}, without regard to its conflicts of law principles.`
+              })
+            ]
+          })
+        );
+        
+        const disputeResolution = document.getElementById('disputeResolution').value;
+        let disputeText = "";
+        
+        if (disputeResolution === 'court') {
+          disputeText = `b. Dispute Resolution: Any dispute arising out of or relating to this Agreement shall be resolved in the state or federal courts located in the State of ${governingLaw}.`;
+        } else if (disputeResolution === 'mediation-then-arbitration') {
+          disputeText = `b. Dispute Resolution: Any dispute arising out of or relating to this Agreement shall first be subject to mediation. If mediation is unsuccessful, the dispute shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association in the State of ${governingLaw}.`;
+        } else if (disputeResolution === 'arbitration') {
+          disputeText = `b. Dispute Resolution: Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association in the State of ${governingLaw}.`;
+        }
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: disputeText
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "c. Entire Agreement: This Agreement constitutes the entire understanding between the parties concerning the subject matter hereof and supersedes all prior agreements, understandings, or negotiations."
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "d. Severability: If any provision of this Agreement is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary so that this Agreement shall otherwise remain in full force and effect."
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "e. No Waiver: No failure or delay by the Disclosing Party in exercising any right under this Agreement shall operate as a waiver thereof."
+              })
+            ]
+          })
+        );
+        
+        // Additional terms if provided
+        const additionalTerms = document.getElementById('additionalTerms').value;
+        if (additionalTerms) {
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 120,
+                after: 120
+              },
+              children: [
+                new docx.TextRun({
+                  text: `f. Additional Terms: ${additionalTerms}`
+                })
+              ]
+            })
+          );
+        }
+        
+        // Signature section
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 360,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "IN WITNESS WHEREOF, the parties have executed this Agreement as of the date below."
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "RECIPIENT:"
+              })
+            ]
+          })
+        );
+        
+        const participantName = document.getElementById('participantName').value;
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 240,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: "__________________________________________"
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 0,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: "Signature"
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: participantName
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 0,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: "Printed Name"
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 120,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: "__________________________________________"
+              })
+            ]
+          })
+        );
+        
+        sections.push(
+          new docx.Paragraph({
+            spacing: {
+              before: 0,
+              after: 0
+            },
+            children: [
+              new docx.TextRun({
+                text: "Date"
+              })
+            ]
+          })
+        );
+        
+        // Create document
+        const doc = new docx.Document({
+          styles: {
+            default: {
+              document: {
+                run: {
+                  size: 24, // 12pt font size (in half-points)
+                  font: "Calibri"
+                },
+                paragraph: {
+                  spacing: {
+                    line: 340, // 1.4x line spacing
+                    before: 0,
+                    after: 0
+                  }
+                }
+              }
+            }
+          },
+          sections: [{
+            properties: {
+              page: {
+                margin: {
+                  top: 1440, // 1 inch in twips
+                  right: 1440,
+                  bottom: 1440,
+                  left: 1440
+                }
+              }
+            },
+            children: sections
+          }]
+        });
+        
+        // Generate and save document
+        docx.Packer.toBlob(doc)
+          .then(blob => {
+            window.saveAs(blob, filename);
+          })
+          .catch(error => {
+            console.error("Error saving DOCX:", error);
+            alert("Unable to download. Please try using the copy button instead.");
+          });
+      } catch (error) {
+        console.error("DOCX generation error:", error);
+        alert("Unable to download. Please try using the copy button instead.");
+      }
+    }
+    
+    // Update preview
+    function updatePreview(changedField = null) {
+      // Clear any existing highlights
+      clearHighlights();
+      
+      // Update form dependencies
+      handleFormDependencies();
+      
+      // Get values from the form
+      const eventType = document.getElementById('eventType').value;
+      const eventTypeDisplay = document.getElementById('eventType').options[document.getElementById('eventType').selectedIndex].text;
+      const partyDate = formatDate(document.getElementById('partyDate').value);
+      const partyLocation = document.getElementById('partyLocation').value;
+      const primaryName = document.getElementById('primaryName').value;
+      const weddingDate = formatDate(document.getElementById('weddingDate').value);
+      
+      const participantName = document.getElementById('participantName').value;
+      const participantEmail = document.getElementById('participantEmail').value;
+      const participantPhone = document.getElementById('participantPhone').value;
+      
+      const relationshipEl = document.getElementById('relationship');
+      let relationship = relationshipEl.options[relationshipEl.selectedIndex].text;
+      if (relationshipEl.value === 'other') {
+        const otherRelationship = document.getElementById('otherRelationship').value;
+        if (otherRelationship) {
+          relationship = otherRelationship;
+        }
+      }
+      
+      const confidentialityTermEl = document.getElementById('confidentialityTerm');
+      const confidentialityTerm = confidentialityTermEl.value;
+      let termText = "";
+      
+      if (confidentialityTerm === 'wedding') {
+        termText = `until after the wedding date of ${weddingDate}`;
+      } else if (confidentialityTerm === '1year') {
+        termText = "for a period of one (1) year from the date of the event";
+      } else if (confidentialityTerm === '3years') {
+        termText = "for a period of three (3) years from the date of the event";
+      } else if (confidentialityTerm === '5years') {
+        termText = "for a period of five (5) years from the date of the event";
+      } else if (confidentialityTerm === 'perpetual') {
+        termText = "in perpetuity (forever)";
+      }
+      
+      // Get selected confidential activities
+      const confidentialActivities = [];
+      document.querySelectorAll('input[name="confidentialActivities"]:checked').forEach(checkbox => {
+        confidentialActivities.push(checkbox.value);
+      });
+      
+      // Custom confidential activities
+      const customActivities = document.getElementById('customActivities').value;
+      
+      // Build confidential activities text
+      let activitiesText = "all activities that occur during the event";
+      if (confidentialActivities.length < 6 && !confidentialActivities.includes('all-activities')) {
+        const activityLabels = {
+          'photos-videos': 'photos and videos',
+          'locations': 'locations visited',
+          'expenses': 'expenses and costs',
+          'gifts': 'gifts received',
+          'entertainment': 'entertainment activities'
+        };
+        
+        const specificActivities = confidentialActivities
+          .filter(a => a !== 'all-activities')
+          .map(a => activityLabels[a] || a);
+          
+        if (customActivities) {
+          specificActivities.push(customActivities);
+        }
+        
+        activitiesText = specificActivities.join(', ');
+      } else if (customActivities) {
+        activitiesText = `all activities that occur during the event, including but not limited to ${customActivities}`;
+      }
+      
+      // Get permitted disclosures
+      const permittedDisclosures = [];
+      document.querySelectorAll('input[name="permittedDisclosures"]:checked').forEach(checkbox => {
+        permittedDisclosures.push(checkbox.value);
+      });
+      
+      // Build permitted disclosures text
+      let disclosuresText = "No disclosures are permitted outside of the event participants";
+      
+      if (permittedDisclosures.length > 0) {
+        const disclosureLabels = {
+          'participants': 'other event participants',
+          'spouse': 'your spouse or significant other',
+          'legal': 'legal counsel on a need-to-know basis',
+          'law-enforcement': 'law enforcement or by court order'
+        };
+        
+        const specificDisclosures = permittedDisclosures.map(d => disclosureLabels[d] || d);
+        disclosuresText = `Confidential Information may only be disclosed to ${specificDisclosures.join(', ')}`;
+      }
+      
+      // Get penalty type
+      const penaltyTypeEl = document.getElementById('penaltyType');
+      const penaltyType = penaltyTypeEl.value;
+      let penaltyText = "";
+      
+      if (penaltyType === 'liquidated-damages') {
+        const damageAmount = document.getElementById('damageAmount').value;
+        penaltyText = `the Recipient agrees to pay ${damageAmount} as liquidated damages. The parties agree that this amount represents a reasonable estimation of the damages that would be incurred, which are otherwise difficult to calculate precisely.`;
+      } else if (penaltyType === 'actual-damages') {
+        penaltyText = "the Recipient shall be liable for all actual damages suffered by the Disclosing Party, including but not limited to financial, reputational, and emotional damages.";
+      } else if (penaltyType === 'injunctive-relief') {
+        penaltyText = "the Disclosing Party shall be entitled to seek injunctive relief to prevent the unauthorized disclosure of Confidential Information, without the need to post a bond or other security.";
+      } else if (penaltyType === 'all-remedies') {
+        penaltyText = "the Disclosing Party shall be entitled to all remedies available at law and in equity, including monetary damages, injunctive relief, and specific performance.";
+      }
+      
+      // Get legal terms
+      const governingLawEl = document.getElementById('governingLaw');
+      const governingLaw = governingLawEl.value;
+      
+      const disputeResolutionEl = document.getElementById('disputeResolution');
+      const disputeResolution = disputeResolutionEl.value;
+      let disputeText = "";
+      
+      if (disputeResolution === 'court') {
+        disputeText = `Any dispute arising out of or relating to this Agreement shall be resolved in the state or federal courts located in the State of ${governingLaw}.`;
+      } else if (disputeResolution === 'mediation-then-arbitration') {
+        disputeText = `Any dispute arising out of or relating to this Agreement shall first be subject to mediation. If mediation is unsuccessful, the dispute shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association in the State of ${governingLaw}.`;
+      } else if (disputeResolution === 'arbitration') {
+        disputeText = `Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in accordance with the rules of the American Arbitration Association in the State of ${governingLaw}.`;
+      }
+      
+      // Additional terms
+      const additionalTerms = document.getElementById('additionalTerms').value;
+      
+      // Build the agreement HTML
+      let agreementHtml = `
+        <div class="document-title">NON-DISCLOSURE AGREEMENT</div>
+        <div class="document-title">For ${eventTypeDisplay}</div>
+        
+        <div class="document-section" id="section-intro">
+          <div class="section-content">
+            <p>This Non-Disclosure Agreement (the "Agreement") is entered into by and between ${primaryName} ("Disclosing Party") and the undersigned participant ("Recipient") in connection with the Disclosing Party's ${eventTypeDisplay.toLowerCase()} to be held on ${partyDate} in ${partyLocation}.</p>
+            
+            <p>Recipient Name: ${participantName}<br>
+            Recipient Email: ${participantEmail}<br>
+            Recipient Phone: ${participantPhone}<br>
+            Relationship to ${primaryName}: ${relationship}</p>
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-definitions">
+          <div class="section-title">1. DEFINITIONS</div>
+          <div class="section-content">
+            <p>a. "Confidential Information" means any and all information related to the Disclosing Party's ${eventTypeDisplay.toLowerCase()} including but not limited to activities, locations visited, expenses incurred, gifts received, entertainment provided, photos, videos, and any other occurrences during the event.</p>
+            
+            <p>b. "Recipient" refers to any individual attending or participating in the event who is not the Disclosing Party.</p>
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-obligations">
+          <div class="section-title">2. CONFIDENTIALITY OBLIGATIONS</div>
+          <div class="section-content">
+            <p>a. The Recipient agrees to maintain the confidentiality of all Confidential Information and shall not disclose, discuss, share, post, or otherwise reveal any information regarding ${activitiesText}.</p>
+            
+            <p>b. The confidentiality obligations under this Agreement shall remain in effect ${termText}.</p>
+            
+            <p>c. The Recipient shall not post, share, or otherwise distribute any Confidential Information, including photographs or videos from the event, on any social media platform, messaging service, or other digital or print medium.</p>
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-permitted">
+          <div class="section-title">3. PERMITTED DISCLOSURES</div>
+          <div class="section-content">
+            <p>a. ${disclosuresText}.</p>
+            
+            <p>b. Disclosure of Confidential Information shall be permitted if required by law, regulation, or valid order of a court or other governmental authority, provided that the Recipient gives the Disclosing Party prompt written notice of such requirement.</p>
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-remedies">
+          <div class="section-title">4. REMEDIES</div>
+          <div class="section-content">
+            <p>a. The Recipient acknowledges that a breach of this Agreement would cause irreparable harm to the Disclosing Party. In the event of a breach, ${penaltyText}</p>
+            
+            <p>b. The Recipient agrees to immediately cease and desist from any unauthorized disclosure of Confidential Information upon notice from the Disclosing Party.</p>
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-general">
+          <div class="section-title">5. GENERAL PROVISIONS</div>
+          <div class="section-content">
+            <p>a. <span class="field-label">Governing Law:</span> This Agreement shall be governed by and construed in accordance with the laws of the State of ${governingLaw}, without regard to its conflicts of law principles.</p>
+            
+            <p>b. <span class="field-label">Dispute Resolution:</span> ${disputeText}</p>
+            
+            <p>c. <span class="field-label">Entire Agreement:</span> This Agreement constitutes the entire understanding between the parties concerning the subject matter hereof and supersedes all prior agreements, understandings, or negotiations.</p>
+            
+            <p>d. <span class="field-label">Severability:</span> If any provision of this Agreement is found to be unenforceable or invalid, that provision shall be limited or eliminated to the minimum extent necessary so that this Agreement shall otherwise remain in full force and effect.</p>
+            
+            <p>e. <span class="field-label">No Waiver:</span> No failure or delay by the Disclosing Party in exercising any right under this Agreement shall operate as a waiver thereof.</p>
+            
+            ${additionalTerms ? `<p>f. <span class="field-label">Additional Terms:</span> ${additionalTerms}</p>` : ''}
+          </div>
+        </div>
+        
+        <div class="document-section" id="section-signature">
+          <div class="section-title">SIGNATURES</div>
+          <div class="section-content">
+            <p>IN WITNESS WHEREOF, the parties have executed this Agreement as of the date below.</p>
+            
+            <p>RECIPIENT:</p>
+            
+            <p>__________________________________________<br>
+            Signature</p>
+            
+            <p>${participantName}<br>
+            Printed Name</p>
+            
+            <p>__________________________________________<br>
+            Date</p>
+          </div>
+        </div>
+      `;
+      
+      // Update the preview with the agreement HTML
+      document.getElementById('agreementPreview').innerHTML = agreementHtml;
+      
+      // If a specific field was changed, highlight the relevant section
+      if (changedField) {
+        highlightChangedContent(changedField);
+      }
+    }
+    
+    // Function to highlight changed content in the preview
+    function highlightChangedContent(changedField) {
+      // Determine which section to highlight based on the changed field
+      let sectionId = '';
+      let textToFind = '';
+      
+      // Map fields to their corresponding sections and text to find
+      if (['eventType', 'partyDate', 'partyLocation', 'primaryName', 'weddingDate'].includes(changedField)) {
+        if (changedField === 'eventType') {
+          const eventTypeEl = document.getElementById('eventType');
+          textToFind = eventTypeEl.options[eventTypeEl.selectedIndex].text;
+          sectionId = 'section-intro';
+        } else if (changedField === 'partyDate') {
+          textToFind = formatDate(document.getElementById('partyDate').value);
+          sectionId = 'section-intro';
+        } else if (changedField === 'partyLocation') {
+          textToFind = document.getElementById('partyLocation').value;
+          sectionId = 'section-intro';
+        } else if (changedField === 'primaryName') {
+          textToFind = document.getElementById('primaryName').value;
+          sectionId = 'section-intro';
+        } else if (changedField === 'weddingDate') {
+          const confidentialityTermEl = document.getElementById('confidentialityTerm');
+          if (confidentialityTermEl.value === 'wedding') {
+            textToFind = formatDate(document.getElementById('weddingDate').value);
+            sectionId = 'section-obligations';
+          }
+        }
+      } else if (['participantName', 'participantEmail', 'participantPhone', 'relationship', 'otherRelationship'].includes(changedField)) {
+        if (changedField === 'participantName') {
+          textToFind = document.getElementById('participantName').value;
+          sectionId = 'section-intro';
+        } else if (changedField === 'participantEmail') {
+          textToFind = document.getElementById('participantEmail').value;
+          sectionId = 'section-intro';
+        } else if (changedField === 'participantPhone') {
+          textToFind = document.getElementById('participantPhone').value;
+          sectionId = 'section-intro';
+        } else if (changedField === 'relationship' || changedField === 'otherRelationship') {
+          const relationshipEl = document.getElementById('relationship');
+          let relationshipText = relationshipEl.options[relationshipEl.selectedIndex].text;
+          if (relationshipEl.value === 'other') {
+            const otherRelationship = document.getElementById('otherRelationship').value;
+            if (otherRelationship) {
+              relationshipText = otherRelationship;
+            }
+          }
+          textToFind = relationshipText;
+          sectionId = 'section-intro';
+        }
+      } else if (['confidentialityTerm', 'confidentialActivities', 'customActivities'].includes(changedField)) {
+        sectionId = 'section-obligations';
+        
+        if (changedField === 'confidentialityTerm') {
+          const confidentialityTermEl = document.getElementById('confidentialityTerm');
+          const confidentialityTerm = confidentialityTermEl.value;
+          
+          if (confidentialityTerm === 'wedding') {
+            textToFind = `until after the wedding date of ${formatDate(document.getElementById('weddingDate').value)}`;
+          } else if (confidentialityTerm === '1year') {
+            textToFind = "for a period of one (1) year from the date of the event";
+          } else if (confidentialityTerm === '3years') {
+            textToFind = "for a period of three (3) years from the date of the event";
+          } else if (confidentialityTerm === '5years') {
+            textToFind = "for a period of five (5) years from the date of the event";
+          } else if (confidentialityTerm === 'perpetual') {
+            textToFind = "in perpetuity (forever)";
+          }
+        } else if (changedField === 'confidentialActivities' || changedField === 'customActivities') {
+          // This is more complex - we'll highlight the paragraph containing the activities
+          const confidentialActivities = [];
+          document.querySelectorAll('input[name="confidentialActivities"]:checked').forEach(checkbox => {
+            confidentialActivities.push(checkbox.value);
+          });
+          
+          const customActivities = document.getElementById('customActivities').value;
+          
+          if (customActivities && changedField === 'customActivities') {
+            textToFind = customActivities;
+          } else {
+            // Just highlight the section as targeting specific text gets complicated
+            textToFind = null;
+          }
+        }
+      } else if (changedField === 'permittedDisclosures') {
+        sectionId = 'section-permitted';
+        textToFind = null; // Highlight the section
+      } else if (['penaltyType', 'damageAmount'].includes(changedField)) {
+        sectionId = 'section-remedies';
+        
+        if (changedField === 'damageAmount' && document.getElementById('penaltyType').value === 'liquidated-damages') {
+          textToFind = document.getElementById('damageAmount').value;
+        } else {
+          textToFind = null; // Highlight the section
+        }
+      } else if (['governingLaw', 'disputeResolution', 'additionalTerms'].includes(changedField)) {
+        sectionId = 'section-general';
+        
+        if (changedField === 'governingLaw') {
+          textToFind = document.getElementById('governingLaw').value;
+        } else if (changedField === 'additionalTerms') {
+          textToFind = document.getElementById('additionalTerms').value;
+          if (!textToFind) {
+            sectionId = null;
+          }
+        } else {
+          textToFind = null; // Highlight the section
+        }
+      }
+      
+      // If no specific section is found, don't highlight anything
+      if (!sectionId) {
+        return;
+      }
+      
+      // Find the section element
+      const sectionElement = document.getElementById(sectionId);
+      if (!sectionElement) {
+        return;
+      }
+      
+      // Find elements to highlight
+      let elementsToHighlight = [];
+      
+      if (textToFind) {
+        // Find paragraphs containing the text
+        const paragraphs = sectionElement.querySelectorAll('p');
+        
+        paragraphs.forEach(p => {
+          if (p.textContent.includes(textToFind)) {
+            elementsToHighlight.push(p);
+          }
+        });
+      }
+      
+      // If no specific elements found, highlight the whole section
+      if (elementsToHighlight.length === 0) {
+        elementsToHighlight = [sectionElement];
+      }
+      
+      // Apply highlight class to found elements
+      elementsToHighlight.forEach(element => {
+        element.classList.add('highlight');
+        highlightedElements.push(element);
+      });
+      
+      // Ensure the highlighted element is visible in the preview
+      if (elementsToHighlight.length > 0) {
+        const previewBox = document.querySelector('.preview-box');
+        const firstElement = elementsToHighlight[0];
+        
+        const elementTop = firstElement.offsetTop;
+        const elementBottom = elementTop + firstElement.offsetHeight;
+        
+        const visibleTop = previewBox.scrollTop;
+        const visibleBottom = visibleTop + previewBox.offsetHeight;
+        
+        // If element is not fully visible, scroll to it
+        if (elementTop < visibleTop || elementBottom > visibleBottom) {
+          previewBox.scrollTop = elementTop - 50; // Scroll with some margin at the top
+        }
+      }
+      
+      // Set timeout to remove highlight after 5 seconds (this will be cleared on next interaction)
+      highlightTimeout = setTimeout(() => {
+        clearHighlights();
+      }, 5000);
+    }
+    
+    // Initialize the form and preview
+    document.addEventListener('DOMContentLoaded', function() {
+      // Add event listeners to form inputs
+      document.querySelectorAll('form input, form select, form textarea').forEach(input => {
+        input.addEventListener('change', function() {
+          document.getElementById('copyMessage').style.display = 'none';
+        });
+      });
+      
+      // Initialize form dependencies
+      handleFormDependencies();
+      
+      // Initialize preview
+      updatePreview();
+    });
+  </script>
+</body>
+</html>
