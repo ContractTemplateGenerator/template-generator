@@ -1,0 +1,2016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Founders Agreement Generator</title>
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #27ae60;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Container Styles */
+    .generator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    /* Header Styles */
+    .generator-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .generator-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .generator-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Content Layout */
+    .generator-content {
+      display: flex;
+      min-height: 600px;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      flex: 1;
+      padding: 25px;
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      max-height: 800px;
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--text-primary);
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea.form-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .form-helper {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* Radio and Checkbox Styles */
+    .options-group {
+      margin-bottom: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background-color: #f5f7fa;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .option-item:hover {
+      background-color: #eef2f7;
+    }
+    
+    .option-item.selected {
+      background-color: #e8f6f3;
+      border-color: var(--accent-color);
+    }
+    
+    .option-item input[type="radio"],
+    .option-item input[type="checkbox"] {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    
+    .option-content {
+      flex: 1;
+    }
+    
+    .option-label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .option-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      text-align: center;
+    }
+    
+    .btn-reset {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+    
+    .btn-reset:hover {
+      background-color: #e4e4e4;
+    }
+    
+    .btn-copy {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-download {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #219653;
+    }
+    
+    .copy-message {
+      display: none;
+      font-size: 14px;
+      color: #27ae60;
+      margin-left: 10px;
+    }
+    
+    .btn-consult {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-consult:hover {
+      background-color: #1e2a37;
+    }
+    
+    /* Preview Styles */
+    .preview-container {
+      flex: 1;
+      padding: 25px;
+      position: relative;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .preview-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    .preview-box {
+      height: 700px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      background-color: white;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    
+    /* Document Styles */
+    .document-template {
+      font-family: Arial, sans-serif;
+    }
+    
+    .document-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .document-section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .section-content {
+      margin-bottom: 15px;
+    }
+    
+    .field-label {
+      font-weight: bold;
+      display: inline-block;
+      margin-right: 5px;
+    }
+    
+    /* Highlight Effect */
+    .highlight {
+      background-color: #ffff8d;
+      transition: background-color 0.5s ease;
+    }
+    
+    /* Add another founder button */
+    .add-founder-btn {
+      display: inline-flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding: 8px 12px;
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    .add-founder-btn:hover {
+      background-color: #2980b9;
+    }
+    
+    .add-founder-icon {
+      margin-right: 5px;
+      font-weight: bold;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .generator-content {
+        flex-direction: column;
+      }
+      
+      .form-container {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        max-height: none;
+      }
+      
+      .preview-box {
+        height: 500px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .generator-container {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .generator-header {
+        padding: 20px;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .copy-message {
+        margin-left: 0;
+        margin-top: 5px;
+        text-align: center;
+      }
+    }
+    
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      
+      .generator-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      .generator-header,
+      .form-container,
+      .preview-header,
+      .form-actions,
+      .btn-consult {
+        display: none;
+      }
+      
+      .generator-content {
+        display: block;
+      }
+      
+      .preview-container {
+        padding: 0;
+      }
+      
+      .preview-box {
+        height: auto;
+        overflow: visible;
+        border: none;
+        padding: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="generator-container">
+    <div class="generator-header">
+      <h1>Founders Agreement Generator</h1>
+      <p>Create a customized agreement to formalize the relationship between company founders</p>
+    </div>
+    
+    <div class="generator-content">
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="foundersForm">
+          <!-- Company Information Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Company Information</h2>
+            
+            <div class="form-group">
+              <label for="companyName">Company Name</label>
+              <input type="text" id="companyName" class="form-input" placeholder="Enter company name" value="New Venture, Inc.">
+            </div>
+            
+            <div class="form-group">
+              <label for="companyAddress">Company Address</label>
+              <input type="text" id="companyAddress" class="form-input" placeholder="Enter company address" value="123 Innovation Way, San Francisco, CA 94107">
+            </div>
+            
+            <div class="form-group">
+              <label for="businessPurpose">Business Purpose</label>
+              <textarea id="businessPurpose" class="form-input" placeholder="Describe the purpose of the company">To develop and market innovative software solutions for the healthcare industry.</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="incorporationStatus">Incorporation Status</label>
+              <select id="incorporationStatus" class="form-input">
+                <option value="notIncorporated" selected>Not Yet Incorporated</option>
+                <option value="llc">LLC</option>
+                <option value="cCorp">C Corporation</option>
+                <option value="sCorp">S Corporation</option>
+                <option value="benefit">Benefit Corporation</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="incorporationDateGroup" style="display: none;">
+              <label for="incorporationDate">Date of Incorporation</label>
+              <input type="date" id="incorporationDate" class="form-input" value="">
+            </div>
+            
+            <div class="form-group">
+              <label for="agreementDate">Agreement Date</label>
+              <input type="date" id="agreementDate" class="form-input" value="">
+            </div>
+            
+            <div class="form-group">
+              <label for="governingLaw">Governing Law (State)</label>
+              <select id="governingLaw" class="form-input">
+                <option value="california" selected>California</option>
+                <option value="delaware">Delaware</option>
+                <option value="new-york">New York</option>
+                <option value="texas">Texas</option>
+                <option value="florida">Florida</option>
+                <option value="massachusetts">Massachusetts</option>
+                <option value="other">Other State</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="otherStateGroup" style="display: none;">
+              <label for="otherState">Specify Other State</label>
+              <input type="text" id="otherState" class="form-input" placeholder="Enter state name">
+            </div>
+          </div>
+          
+          <!-- Founder Information Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Founder Information</h2>
+            
+            <div id="foundersContainer">
+              <!-- Founder 1 -->
+              <div class="founder-section" id="founder1Section">
+                <h3 style="font-size: 16px; color: var(--secondary-color); margin-bottom: 10px;">Founder 1</h3>
+                
+                <div class="form-group">
+                  <label for="founder1Name">Full Name</label>
+                  <input type="text" id="founder1Name" class="form-input" placeholder="Enter founder name" value="John Smith">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder1Address">Address</label>
+                  <input type="text" id="founder1Address" class="form-input" placeholder="Enter address" value="456 Tech Street, San Francisco, CA 94107">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder1Email">Email Address</label>
+                  <input type="email" id="founder1Email" class="form-input" placeholder="Enter email address" value="john@example.com">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder1Equity">Equity Percentage</label>
+                  <input type="number" id="founder1Equity" class="form-input" placeholder="Enter percentage" value="50" min="1" max="100">
+                  <div class="form-helper">Percentage of ownership in the company</div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder1Role">Role / Position</label>
+                  <input type="text" id="founder1Role" class="form-input" placeholder="Enter role" value="Chief Executive Officer">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder1Responsibilities">Key Responsibilities</label>
+                  <textarea id="founder1Responsibilities" class="form-input" placeholder="Describe responsibilities">Overall company strategy, fundraising, and business development.</textarea>
+                </div>
+              </div>
+              
+              <!-- Founder 2 -->
+              <div class="founder-section" id="founder2Section">
+                <h3 style="font-size: 16px; color: var(--secondary-color); margin-bottom: 10px;">Founder 2</h3>
+                
+                <div class="form-group">
+                  <label for="founder2Name">Full Name</label>
+                  <input type="text" id="founder2Name" class="form-input" placeholder="Enter founder name" value="Jane Doe">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder2Address">Address</label>
+                  <input type="text" id="founder2Address" class="form-input" placeholder="Enter address" value="789 Innovation Avenue, San Francisco, CA 94107">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder2Email">Email Address</label>
+                  <input type="email" id="founder2Email" class="form-input" placeholder="Enter email address" value="jane@example.com">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder2Equity">Equity Percentage</label>
+                  <input type="number" id="founder2Equity" class="form-input" placeholder="Enter percentage" value="50" min="1" max="100">
+                  <div class="form-helper">Percentage of ownership in the company</div>
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder2Role">Role / Position</label>
+                  <input type="text" id="founder2Role" class="form-input" placeholder="Enter role" value="Chief Technology Officer">
+                </div>
+                
+                <div class="form-group">
+                  <label for="founder2Responsibilities">Key Responsibilities</label>
+                  <textarea id="founder2Responsibilities" class="form-input" placeholder="Describe responsibilities">Product development, technology strategy, and engineering team management.</textarea>
+                </div>
+              </div>
+            </div>
+            
+            <button type="button" id="addFounderBtn" class="add-founder-btn">
+              <span class="add-founder-icon">+</span> Add Another Founder
+            </button>
+          </div>
+          
+          <!-- Equity & Vesting Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Equity & Vesting</h2>
+            
+            <div class="form-group">
+              <label for="equityForm">Equity Form</label>
+              <select id="equityForm" class="form-input">
+                <option value="commonStock" selected>Common Stock</option>
+                <option value="preferredStock">Preferred Stock</option>
+                <option value="membershipInterest">Membership Interest (LLC)</option>
+                <option value="future">Future Equity upon Incorporation</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label for="vestingSchedule">Vesting Schedule</label>
+              <select id="vestingSchedule" class="form-input">
+                <option value="none">No Vesting (Fully Vested)</option>
+                <option value="standard" selected>Standard 4-Year Vesting with 1-Year Cliff</option>
+                <option value="noCliff">4-Year Vesting without Cliff</option>
+                <option value="fastTrack">3-Year Vesting with 1-Year Cliff</option>
+                <option value="custom">Custom Schedule</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customVestingGroup" style="display: none;">
+              <label for="customVestingDescription">Custom Vesting Schedule</label>
+              <textarea id="customVestingDescription" class="form-input" placeholder="Describe the custom vesting schedule"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="acceleratedVesting">Accelerated Vesting</label>
+              <select id="acceleratedVesting" class="form-input">
+                <option value="none">No Acceleration</option>
+                <option value="singleTrigger" selected>Single Trigger (Change of Control)</option>
+                <option value="doubleTrigger">Double Trigger (Change of Control + Termination)</option>
+                <option value="custom">Custom Acceleration</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customAccelerationGroup" style="display: none;">
+              <label for="customAccelerationDescription">Custom Acceleration Terms</label>
+              <textarea id="customAccelerationDescription" class="form-input" placeholder="Describe the custom acceleration terms"></textarea>
+            </div>
+          </div>
+          
+          <!-- Roles & Commitment Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Roles & Commitment</h2>
+            
+            <div class="form-group">
+              <label for="decisionMaking">Decision Making</label>
+              <select id="decisionMaking" class="form-input">
+                <option value="majority" selected>Majority Vote</option>
+                <option value="unanimous">Unanimous Agreement</option>
+                <option value="weighted">Weighted by Equity</option>
+                <option value="ceo">CEO Final Authority</option>
+                <option value="custom">Custom Structure</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customDecisionGroup" style="display: none;">
+              <label for="customDecisionDescription">Custom Decision Making Structure</label>
+              <textarea id="customDecisionDescription" class="form-input" placeholder="Describe the custom decision making structure"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="timeCommitment">Time Commitment</label>
+              <select id="timeCommitment" class="form-input">
+                <option value="fullTime" selected>Full-Time (40+ hours/week)</option>
+                <option value="partTime">Part-Time (Specified Hours)</option>
+                <option value="flexible">Flexible Arrangement</option>
+                <option value="custom">Custom Time Commitment</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customTimeGroup" style="display: none;">
+              <label for="customTimeDescription">Custom Time Commitment</label>
+              <textarea id="customTimeDescription" class="form-input" placeholder="Describe the custom time commitment"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="salariesCompensation">Initial Salaries/Compensation</label>
+              <select id="salariesCompensation" class="form-input">
+                <option value="none" selected>No Initial Salary</option>
+                <option value="equal">Equal Salaries</option>
+                <option value="proportional">Proportional to Contribution</option>
+                <option value="role">Based on Role/Market Rate</option>
+                <option value="custom">Custom Compensation Plan</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customSalaryGroup" style="display: none;">
+              <label for="customSalaryDescription">Custom Compensation Details</label>
+              <textarea id="customSalaryDescription" class="form-input" placeholder="Describe the custom compensation details"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Major Decisions Requiring Special Approval</label>
+              <div class="options-group">
+                <label class="option-item selected">
+                  <input type="checkbox" name="majorDecisions" value="funding" checked>
+                  <div class="option-content">
+                    <span class="option-label">Fundraising & Financing</span>
+                    <span class="option-description">Decisions related to raising capital or taking on debt</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="majorDecisions" value="sale" checked>
+                  <div class="option-content">
+                    <span class="option-label">Sale of Company</span>
+                    <span class="option-description">Decisions about selling the company or substantial assets</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="majorDecisions" value="hiring" checked>
+                  <div class="option-content">
+                    <span class="option-label">Key Hiring & Firing</span>
+                    <span class="option-description">Decisions about executive/key personnel</span>
+                  </div>
+                </label>
+                
+                <label class="option-item selected">
+                  <input type="checkbox" name="majorDecisions" value="budget" checked>
+                  <div class="option-content">
+                    <span class="option-label">Budget Approval</span>
+                    <span class="option-description">Annual budget and significant deviations</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="majorDecisions" value="partnership">
+                  <div class="option-content">
+                    <span class="option-label">Strategic Partnerships</span>
+                    <span class="option-description">Major partnerships or joint ventures</span>
+                  </div>
+                </label>
+                
+                <label class="option-item">
+                  <input type="checkbox" name="majorDecisions" value="ip">
+                  <div class="option-content">
+                    <span class="option-label">IP Licensing/Sale</span>
+                    <span class="option-description">Licensing or selling company intellectual property</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Intellectual Property Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Intellectual Property</h2>
+            
+            <div class="form-group">
+              <label for="ipAssignment">IP Assignment</label>
+              <select id="ipAssignment" class="form-input">
+                <option value="full" selected>Full Assignment to Company</option>
+                <option value="limited">Limited Assignment (Specified IP Only)</option>
+                <option value="license">License to Company (Founder Retains Ownership)</option>
+                <option value="custom">Custom IP Arrangement</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customIpGroup" style="display: none;">
+              <label for="customIpDescription">Custom IP Arrangement</label>
+              <textarea id="customIpDescription" class="form-input" placeholder="Describe the custom IP arrangement"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="priorIp">Prior IP Exclusions</label>
+              <select id="priorIp" class="form-input">
+                <option value="none" selected>No Prior IP Exclusions</option>
+                <option value="specified">Specified Prior IP Exclusions</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="priorIpDetailsGroup" style="display: none;">
+              <label for="priorIpDetails">Prior IP Details</label>
+              <textarea id="priorIpDetails" class="form-input" placeholder="Describe any prior IP that is excluded from assignment to the company"></textarea>
+            </div>
+          </div>
+          
+          <!-- Restrictive Covenants Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Restrictive Covenants</h2>
+            
+            <div class="form-group">
+              <label for="nonCompete">Non-Compete Provision</label>
+              <select id="nonCompete" class="form-input">
+                <option value="none">No Non-Compete</option>
+                <option value="limited" selected>Limited Non-Compete</option>
+                <option value="extensive">Extensive Non-Compete</option>
+                <option value="custom">Custom Non-Compete</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="nonCompeteDetailsGroup">
+              <label for="nonCompeteDetails">Non-Compete Details</label>
+              <textarea id="nonCompeteDetails" class="form-input" placeholder="Specify non-compete terms">During the term of their involvement with the Company and for a period of one (1) year following separation, Founders shall not directly or indirectly engage in a business that competes with the Company within the same geographic regions where the Company operates.</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="confidentiality">Confidentiality Provision</label>
+              <select id="confidentiality" class="form-input">
+                <option value="standard" selected>Standard Confidentiality</option>
+                <option value="extensive">Extensive Confidentiality</option>
+                <option value="limited">Limited Confidentiality</option>
+                <option value="custom">Custom Confidentiality</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="confidentialityDetailsGroup" style="display: none;">
+              <label for="confidentialityDetails">Confidentiality Details</label>
+              <textarea id="confidentialityDetails" class="form-input" placeholder="Specify confidentiality terms"></textarea>
+            </div>
+          </div>
+          
+          <!-- Exit & Termination Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Exit & Termination</h2>
+            
+            <div class="form-group">
+              <label for="voluntaryExit">Voluntary Exit</label>
+              <select id="voluntaryExit" class="form-input">
+                <option value="stockRetention" selected>Retain Vested Stock Only</option>
+                <option value="companyRepurchase">Company Option to Repurchase</option>
+                <option value="foundersRepurchase">Other Founders Option to Purchase</option>
+                <option value="fullForfeiture">Full Forfeiture of Equity</option>
+                <option value="custom">Custom Exit Terms</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customExitGroup" style="display: none;">
+              <label for="customExitDescription">Custom Exit Terms</label>
+              <textarea id="customExitDescription" class="form-input" placeholder="Describe the custom exit terms"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="founderTermination">Founder Termination</label>
+              <select id="founderTermination" class="form-input">
+                <option value="majority" selected>By Majority of Other Founders</option>
+                <option value="supermajority">By Supermajority (e.g., 2/3) of Other Founders</option>
+                <option value="unanimous">By Unanimous Vote of Other Founders</option>
+                <option value="board">By Board Decision</option>
+                <option value="custom">Custom Termination Process</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customTerminationGroup" style="display: none;">
+              <label for="customTerminationDescription">Custom Termination Process</label>
+              <textarea id="customTerminationDescription" class="form-input" placeholder="Describe the custom termination process"></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label for="disputeResolution">Dispute Resolution</label>
+              <select id="disputeResolution" class="form-input">
+                <option value="mediation" selected>Mediation First, Then Binding Arbitration</option>
+                <option value="arbitration">Binding Arbitration</option>
+                <option value="courts">Courts Only</option>
+                <option value="custom">Custom Dispute Resolution</option>
+              </select>
+            </div>
+            
+            <div class="form-group" id="customDisputeGroup" style="display: none;">
+              <label for="customDisputeDescription">Custom Dispute Resolution</label>
+              <textarea id="customDisputeDescription" class="form-input" placeholder="Describe the custom dispute resolution process"></textarea>
+            </div>
+          </div>
+          
+          <!-- Additional Provisions Section -->
+          <div class="form-section">
+            <h2 class="form-section-title">Additional Provisions</h2>
+            
+            <div class="form-group">
+              <label for="additionalProvisions">Other Additional Provisions</label>
+              <textarea id="additionalProvisions" class="form-input" placeholder="Enter any additional provisions">1. The Company will reimburse reasonable business expenses incurred by the Founders.
+2. Each Founder agrees to comply with all applicable laws and regulations.
+3. This Agreement may only be amended with the written consent of all Founders.
+4. This Agreement constitutes the entire understanding among the Founders regarding the subject matter hereof.</textarea>
+            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="form-actions" style="flex-direction: column; align-items: center;">
+            <div style="display: flex; gap: 10px;">
+              <div>
+                <button type="button" id="copyBtn" class="btn btn-copy">Copy Agreement</button>
+                <span id="copyMessage" class="copy-message">Agreement copied!</span>
+              </div>
+              <button type="button" id="downloadBtn" class="btn btn-download">Download as DOCX</button>
+            </div>
+            <button type="reset" class="btn btn-reset" style="margin-top: 10px;">Reset Form</button>
+          </div>
+          
+          <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+            Schedule Legal Consultation
+          </a>
+        </form>
+      </div>
+      
+      <!-- Preview Container -->
+      <div class="preview-container">
+        <div class="preview-header">
+          <div class="preview-title">Agreement Preview</div>
+          <div class="preview-note">Updates as you complete the form</div>
+        </div>
+        
+        <div class="preview-box">
+          <div class="document-template" id="agreementPreview">
+            <!-- Document content will be populated by JavaScript -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Libraries for DOCX download -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  <!-- Calendly Integration -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('foundersForm');
+      const preview = document.getElementById('agreementPreview');
+      const copyBtn = document.getElementById('copyBtn');
+      const copyMessage = document.getElementById('copyMessage');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const previewBox = document.querySelector('.preview-box');
+      const addFounderBtn = document.getElementById('addFounderBtn');
+      const foundersContainer = document.getElementById('foundersContainer');
+      
+      // Current date for agreement
+      const today = new Date();
+      document.getElementById('agreementDate').value = today.toISOString().split('T')[0];
+      
+      // Counter for additional founders
+      let founderCount = 2;
+      
+      // Format date from YYYY-MM-DD to readable format
+      function formatDate(dateString) {
+        if (!dateString) return today.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+        
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
+        });
+      }
+      
+      // Add another founder
+      addFounderBtn.addEventListener('click', function() {
+        founderCount++;
+        
+        const newFounderSection = document.createElement('div');
+        newFounderSection.className = 'founder-section';
+        newFounderSection.id = `founder${founderCount}Section`;
+        newFounderSection.innerHTML = `
+          <h3 style="font-size: 16px; color: var(--secondary-color); margin-bottom: 10px;">Founder ${founderCount}</h3>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Name">Full Name</label>
+            <input type="text" id="founder${founderCount}Name" class="form-input" placeholder="Enter founder name" value="">
+          </div>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Address">Address</label>
+            <input type="text" id="founder${founderCount}Address" class="form-input" placeholder="Enter address" value="">
+          </div>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Email">Email Address</label>
+            <input type="email" id="founder${founderCount}Email" class="form-input" placeholder="Enter email address" value="">
+          </div>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Equity">Equity Percentage</label>
+            <input type="number" id="founder${founderCount}Equity" class="form-input" placeholder="Enter percentage" value="" min="1" max="100">
+            <div class="form-helper">Percentage of ownership in the company</div>
+          </div>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Role">Role / Position</label>
+            <input type="text" id="founder${founderCount}Role" class="form-input" placeholder="Enter role" value="">
+          </div>
+          
+          <div class="form-group">
+            <label for="founder${founderCount}Responsibilities">Key Responsibilities</label>
+            <textarea id="founder${founderCount}Responsibilities" class="form-input" placeholder="Describe responsibilities"></textarea>
+          </div>
+          
+          <div style="text-align: right; margin-bottom: 20px;">
+            <button type="button" class="btn btn-reset remove-founder-btn" data-founder="${founderCount}">Remove Founder</button>
+          </div>
+        `;
+        
+        foundersContainer.appendChild(newFounderSection);
+        
+        // Add event listeners to the new founder's inputs
+        newFounderSection.querySelectorAll('.form-input').forEach(input => {
+          input.addEventListener('input', function() {
+            clearHighlights();
+            updatePreview(this.id);
+            copyMessage.style.display = 'none';
+          });
+        });
+        
+        // Add event listener to remove button
+        newFounderSection.querySelector('.remove-founder-btn').addEventListener('click', function() {
+          const founderId = this.getAttribute('data-founder');
+          const founderSection = document.getElementById(`founder${founderId}Section`);
+          if (founderSection) {
+            founderSection.remove();
+            updatePreview();
+          }
+        });
+        
+        // Update equity percentages
+        updateEquityPercentages();
+        
+        // Update preview
+        updatePreview();
+      });
+      
+      // Update equity percentages based on number of founders
+      function updateEquityPercentages() {
+        const founderSections = document.querySelectorAll('.founder-section');
+        const equalPercentage = Math.floor(100 / founderSections.length);
+        let remainder = 100 - (equalPercentage * founderSections.length);
+        
+        founderSections.forEach((section, index) => {
+          const equityInput = section.querySelector('input[id$="Equity"]');
+          if (equityInput && equityInput.value === '') {
+            let percentage = equalPercentage;
+            if (index === 0 && remainder > 0) {
+              percentage += remainder;
+            }
+            equityInput.value = percentage;
+          }
+        });
+      }
+      
+      // Initialize preview
+      updatePreview();
+      
+      // Track currently highlighted elements
+      let highlightedElements = [];
+      let highlightTimeout;
+      
+      // Update preview when form inputs change
+      form.addEventListener('input', function(e) {
+        clearHighlights();
+        updatePreview(e.target.id);
+        copyMessage.style.display = 'none';
+        
+        // Handle special form dependencies
+        handleFormDependencies(e.target);
+      });
+      
+      // Handle conditional form elements visibility
+      function handleFormDependencies(target) {
+        if (!target) return;
+        
+        const id = target.id;
+        const value = target.value;
+        
+        // Company Information dependencies
+        if (id === 'incorporationStatus') {
+          document.getElementById('incorporationDateGroup').style.display = value !== 'notIncorporated' ? 'block' : 'none';
+        }
+        
+        if (id === 'governingLaw') {
+          document.getElementById('otherStateGroup').style.display = value === 'other' ? 'block' : 'none';
+        }
+        
+        // Equity & Vesting dependencies
+        if (id === 'vestingSchedule') {
+          document.getElementById('customVestingGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'acceleratedVesting') {
+          document.getElementById('customAccelerationGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        // Roles & Commitment dependencies
+        if (id === 'decisionMaking') {
+          document.getElementById('customDecisionGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'timeCommitment') {
+          document.getElementById('customTimeGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'salariesCompensation') {
+          document.getElementById('customSalaryGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        // Intellectual Property dependencies
+        if (id === 'ipAssignment') {
+          document.getElementById('customIpGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'priorIp') {
+          document.getElementById('priorIpDetailsGroup').style.display = value === 'specified' ? 'block' : 'none';
+        }
+        
+        // Restrictive Covenants dependencies
+        if (id === 'nonCompete') {
+          document.getElementById('nonCompeteDetailsGroup').style.display = value === 'none' ? 'none' : 'block';
+        }
+        
+        if (id === 'confidentiality') {
+          document.getElementById('confidentialityDetailsGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        // Exit & Termination dependencies
+        if (id === 'voluntaryExit') {
+          document.getElementById('customExitGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'founderTermination') {
+          document.getElementById('customTerminationGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        if (id === 'disputeResolution') {
+          document.getElementById('customDisputeGroup').style.display = value === 'custom' ? 'block' : 'none';
+        }
+        
+        // Update equity percentages when a founder's equity changes
+        if (id.endsWith('Equity')) {
+          balanceEquityPercentages(id);
+        }
+      }
+      
+      // Balance equity percentages to ensure they sum to 100%
+      function balanceEquityPercentages(changedId) {
+        // Get all equity inputs
+        const equityInputs = [];
+        let founderNumber = 1;
+        let founderInput = document.getElementById(`founder${founderNumber}Equity`);
+        
+        while (founderInput) {
+          equityInputs.push(founderInput);
+          founderNumber++;
+          founderInput = document.getElementById(`founder${founderNumber}Equity`);
+        }
+        
+        // Calculate total equity
+        let totalEquity = 0;
+        equityInputs.forEach(input => {
+          totalEquity += parseInt(input.value) || 0;
+        });
+        
+        // If total is over 100%, adjust other percentages
+        if (totalEquity > 100) {
+          const changedValue = parseInt(document.getElementById(changedId).value) || 0;
+          const otherInputs = equityInputs.filter(input => input.id !== changedId);
+          
+          if (otherInputs.length > 0) {
+            const totalOtherEquity = totalEquity - changedValue;
+            if (totalOtherEquity > 0) {
+              // Scale other values to fit within (100 - changedValue)
+              const availableEquity = 100 - changedValue;
+              const scaleFactor = availableEquity / totalOtherEquity;
+              
+              otherInputs.forEach(input => {
+                const currentValue = parseInt(input.value) || 0;
+                input.value = Math.floor(currentValue * scaleFactor);
+              });
+            } else {
+              // If all other inputs are 0, just set them to 0
+              otherInputs.forEach(input => {
+                input.value = 0;
+              });
+            }
+            
+            // Ensure the total is exactly 100%
+            const newTotal = parseInt(document.getElementById(changedId).value) || 0 + 
+                           otherInputs.reduce((sum, input) => sum + (parseInt(input.value) || 0), 0);
+            
+            if (newTotal < 100 && otherInputs.length > 0) {
+              // Add the remainder to the first other input
+              otherInputs[0].value = (parseInt(otherInputs[0].value) || 0) + (100 - newTotal);
+            }
+          } else {
+            // If there's only one input, cap it at 100%
+            document.getElementById(changedId).value = 100;
+          }
+        }
+      }
+      
+      // Handle checkbox changes
+      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          // Toggle the selected class
+          this.closest('.option-item').classList.toggle('selected', this.checked);
+          
+          // Clear highlights and update preview
+          clearHighlights();
+          updatePreview(this.name);
+          copyMessage.style.display = 'none';
+        });
+      });
+      
+      // Make option items clickable
+      document.querySelectorAll('.option-item').forEach(item => {
+        item.addEventListener('click', function(e) {
+          // If the user clicked directly on the checkbox, don't interfere
+          if (e.target.type === 'checkbox') return;
+          
+          // Find the checkbox inside this option item
+          const checkbox = this.querySelector('input[type="checkbox"]');
+          if (checkbox) {
+            // Toggle checkbox state
+            checkbox.checked = !checkbox.checked;
+            
+            // Toggle selected class
+            this.classList.toggle('selected', checkbox.checked);
+            
+            // Clear highlights and update preview
+            clearHighlights();
+            updatePreview(checkbox.name);
+            copyMessage.style.display = 'none';
+            
+            // Dispatch change event on checkbox
+            const event = new Event('change', { bubbles: true });
+            checkbox.dispatchEvent(event);
+          }
+        });
+      });
+      
+      // Initialize form dependencies
+      function initFormDependencies() {
+        // Call with each select element to set initial visibility
+        handleFormDependencies(document.getElementById('incorporationStatus'));
+        handleFormDependencies(document.getElementById('governingLaw'));
+        handleFormDependencies(document.getElementById('vestingSchedule'));
+        handleFormDependencies(document.getElementById('acceleratedVesting'));
+        handleFormDependencies(document.getElementById('decisionMaking'));
+        handleFormDependencies(document.getElementById('timeCommitment'));
+        handleFormDependencies(document.getElementById('salariesCompensation'));
+        handleFormDependencies(document.getElementById('ipAssignment'));
+        handleFormDependencies(document.getElementById('priorIp'));
+        handleFormDependencies(document.getElementById('nonCompete'));
+        handleFormDependencies(document.getElementById('confidentiality'));
+        handleFormDependencies(document.getElementById('voluntaryExit'));
+        handleFormDependencies(document.getElementById('founderTermination'));
+        handleFormDependencies(document.getElementById('disputeResolution'));
+      }
+      
+      // Initialize dependencies
+      initFormDependencies();
+      
+      // Handle form reset
+      form.addEventListener('reset', function() {
+        // Give time for the form to reset before updating preview
+        setTimeout(() => {
+          // Remove additional founders
+          const additionalFounders = document.querySelectorAll('.founder-section[id^="founder"]:not(#founder1Section):not(#founder2Section)');
+          additionalFounders.forEach(section => {
+            section.remove();
+          });
+          
+          // Reset to original founder count
+          founderCount = 2;
+          
+          // Reset selected class on option items
+          document.querySelectorAll('.option-item').forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+              item.classList.toggle('selected', checkbox.checked);
+            }
+          });
+          
+          // Reinitialize dependencies
+          initFormDependencies();
+          
+          clearHighlights();
+          updatePreview();
+          copyMessage.style.display = 'none';
+        }, 10);
+      });
+      
+      // Handle copy button click
+      copyBtn.addEventListener('click', function() {
+        const documentText = preview.innerText;
+        
+        // Copy to clipboard
+        navigator.clipboard.writeText(documentText).then(function() {
+          copyMessage.style.display = 'inline-block';
+          
+          // Hide message after 3 seconds
+          setTimeout(() => {
+            copyMessage.style.display = 'none';
+          }, 3000);
+        }).catch(function(err) {
+          console.error('Could not copy text: ', err);
+          alert('Failed to copy agreement. Please try selecting and copying the text manually.');
+        });
+      });
+      
+      // Handle download button click
+      downloadBtn.addEventListener('click', function() {
+        try {
+          // Access docx library
+          const docx = window.docx;
+          if (!docx) {
+            throw new Error("DOCX library not loaded");
+          }
+          
+          // Get company name for filename
+          const companyName = document.getElementById('companyName').value || 'Company';
+          const filename = `${companyName.replace(/[^a-z0-9]/gi, '_')}_Founders_Agreement.docx`;
+          
+          // Create document sections from preview content
+          const sections = [];
+          const sectionElements = document.querySelectorAll('.document-section');
+          
+          // Document title (single, centered)
+          const titleParagraph = new docx.Paragraph({
+            alignment: docx.AlignmentType.CENTER,
+            spacing: {
+              before: 300,
+              after: 300
+            },
+            children: [
+              new docx.TextRun({
+                text: "FOUNDERS AGREEMENT",
+                bold: true,
+                size: 28
+              })
+            ]
+          });
+          sections.push(titleParagraph);
+          
+          // Add spacing after title
+          sections.push(new docx.Paragraph({
+            text: "",
+            spacing: {
+              before: 120,
+              after: 120
+            }
+          }));
+          
+          // Add each section
+          sectionElements.forEach(sectionElement => {
+            // Get section title
+            const titleElement = sectionElement.querySelector('.section-title');
+            if (titleElement) {
+              // Add section title
+              const sectionTitle = new docx.Paragraph({
+                spacing: {
+                  before: 300,
+                  after: 120
+                },
+                children: [
+                  new docx.TextRun({
+                    text: titleElement.textContent,
+                    bold: true,
+                    size: 28
+                  })
+                ]
+              });
+              sections.push(sectionTitle);
+              
+              // Get content paragraphs
+              const contentElement = sectionElement.querySelector('.section-content');
+              if (contentElement) {
+                const paragraphs = contentElement.querySelectorAll('p');
+                paragraphs.forEach(p => {
+                  // Check if paragraph has a label
+                  const label = p.querySelector('.field-label');
+                  if (label) {
+                    const labelText = label.textContent;
+                    const valueText = p.textContent.replace(labelText, '').trim();
+                    
+                    // Create paragraph with bold label
+                    const paragraph = new docx.Paragraph({
+                      spacing: {
+                        before: 120,
+                        after: 120
+                      },
+                      children: [
+                        new docx.TextRun({
+                          text: labelText + " ",
+                          bold: true
+                        }),
+                        new docx.TextRun({
+                          text: valueText
+                        })
+                      ]
+                    });
+                    sections.push(paragraph);
+                  } else {
+                    // Regular paragraph without label
+                    const paragraph = new docx.Paragraph({
+                      text: p.textContent,
+                      spacing: {
+                        before: 120,
+                        after: 120
+                      }
+                    });
+                    sections.push(paragraph);
+                  }
+                });
+              }
+            }
+          });
+          
+          // Signature block
+          const signaturesTitle = new docx.Paragraph({
+            spacing: {
+              before: 300,
+              after: 120
+            },
+            children: [
+              new docx.TextRun({
+                text: "SIGNATURES",
+                bold: true,
+                size: 28
+              })
+            ]
+          });
+          sections.push(signaturesTitle);
+          
+          // Get all founders for signature lines
+          const founderElements = document.querySelectorAll('.founder-section');
+          const formattedDate = formatDate(document.getElementById('agreementDate').value);
+          
+          // Date text
+          const dateParagraph = new docx.Paragraph({
+            spacing: {
+              before: 200,
+              after: 200
+            },
+            children: [
+              new docx.TextRun({
+                text: `IN WITNESS WHEREOF, the parties have executed this Founders Agreement on ${formattedDate}.`
+              })
+            ]
+          });
+          sections.push(dateParagraph);
+          
+          // Add signature lines for each founder
+          founderElements.forEach((section) => {
+            const founderIdMatch = section.id.match(/founder(\d+)Section/);
+            if (founderIdMatch) {
+              const founderId = founderIdMatch[1];
+              const founderName = document.getElementById(`founder${founderId}Name`).value || `Founder ${founderId}`;
+              
+              // Signature line
+              sections.push(new docx.Paragraph({
+                spacing: {
+                  before: 300,
+                  after: 60
+                },
+                children: [
+                  new docx.TextRun({
+                    text: "________________________________",
+                  })
+                ]
+              }));
+              
+              // Founder name
+              sections.push(new docx.Paragraph({
+                spacing: {
+                  before: 60,
+                  after: 200
+                },
+                children: [
+                  new docx.TextRun({
+                    text: founderName,
+                    bold: true
+                  })
+                ]
+              }));
+            }
+          });
+          
+          // Create document
+          const doc = new docx.Document({
+            styles: {
+              default: {
+                document: {
+                  run: {
+                    size: 11 * 2, // 11pt font size (in half-points)
+                    font: "Calibri"
+                  },
+                  paragraph: {
+                    spacing: {
+                      line: 240, // 1.0x line spacing
+                      before: 0,
+                      after: 0,
+                      afterAutoSpacing: false,
+                      beforeAutoSpacing: false
+                    }
+                  }
+                }
+              }
+            },
+            sections: [{
+              properties: {
+                page: {
+                  margin: {
+                    top: 1440, // 1 inch in twips
+                    right: 1440,
+                    bottom: 1440,
+                    left: 1440
+                  }
+                }
+              },
+              children: sections
+            }]
+          });
+          
+          // Generate and save document
+          docx.Packer.toBlob(doc)
+            .then(blob => {
+              window.saveAs(blob, filename);
+            })
+            .catch(error => {
+              console.error("Error saving DOCX:", error);
+              alert("Unable to download. Please try using the copy button instead.");
+            });
+        } catch (error) {
+          console.error("DOCX generation error:", error);
+          alert("Unable to download. Please try using the copy button instead.");
+        }
+      });
+      
+      // Function to clear highlights
+      function clearHighlights() {
+        if (highlightTimeout) {
+          clearTimeout(highlightTimeout);
+        }
+        
+        highlightedElements.forEach(element => {
+          element.classList.remove('highlight');
+        });
+        highlightedElements = [];
+      }
+      
+      // Function to update the agreement preview
+      function updatePreview(changedField = null) {
+        // Get company information
+        const companyName = document.getElementById('companyName').value;
+        const companyAddress = document.getElementById('companyAddress').value;
+        const businessPurpose = document.getElementById('businessPurpose').value;
+        const incorporationStatusEl = document.getElementById('incorporationStatus');
+        const incorporationStatus = incorporationStatusEl.options[incorporationStatusEl.selectedIndex].text;
+        const incorporationDate = formatDate(document.getElementById('incorporationDate').value);
+        const agreementDate = formatDate(document.getElementById('agreementDate').value);
+        
+        // Get governing law
+        let governingLaw = '';
+        if (document.getElementById('governingLaw').value === 'other') {
+          governingLaw = document.getElementById('otherState').value;
+        } else {
+          const governingLawEl = document.getElementById('governingLaw');
+          governingLaw = governingLawEl.options[governingLawEl.selectedIndex].text;
+        }
+        
+        // Get founder information
+        const founderInfoHtml = getFoundersHtml();
+        
+        // Get equity and vesting information
+        const equityFormEl = document.getElementById('equityForm');
+        const equityForm = equityFormEl.options[equityFormEl.selectedIndex].text;
+        
+        const vestingScheduleEl = document.getElementById('vestingSchedule');
+        const vestingSchedule = vestingScheduleEl.options[vestingScheduleEl.selectedIndex].text;
+        const customVestingDescription = document.getElementById('customVestingDescription').value;
+        
+        const acceleratedVestingEl = document.getElementById('acceleratedVesting');
+        const acceleratedVesting = acceleratedVestingEl.options[acceleratedVestingEl.selectedIndex].text;
+        const customAccelerationDescription = document.getElementById('customAccelerationDescription').value;
+        
+        // Get roles and commitment information
+        const decisionMakingEl = document.getElementById('decisionMaking');
+        const decisionMaking = decisionMakingEl.options[decisionMakingEl.selectedIndex].text;
+        const customDecisionDescription = document.getElementById('customDecisionDescription').value;
+        
+        const timeCommitmentEl = document.getElementById('timeCommitment');
+        const timeCommitment = timeCommitmentEl.options[timeCommitmentEl.selectedIndex].text;
+        const customTimeDescription = document.getElementById('customTimeDescription').value;
+        
+        const salariesCompensationEl = document.getElementById('salariesCompensation');
+        const salariesCompensation = salariesCompensationEl.options[salariesCompensationEl.selectedIndex].text;
+        const customSalaryDescription = document.getElementById('customSalaryDescription').value;
+        
+        // Get selected major decisions
+        const selectedMajorDecisions = [];
+        document.querySelectorAll('input[name="majorDecisions"]:checked').forEach(checkbox => {
+          selectedMajorDecisions.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
+        });
+        
+        // Get IP information
+        const ipAssignmentEl = document.getElementById('ipAssignment');
+        const ipAssignment = ipAssignmentEl.options[ipAssignmentEl.selectedIndex].text;
+        const customIpDescription = document.getElementById('customIpDescription').value;
+        
+        const priorIpEl = document.getElementById('priorIp');
+        const priorIp = priorIpEl.options[priorIpEl.selectedIndex].text;
+        const priorIpDetails = document.getElementById('priorIpDetails').value;
+        
+        // Get restrictive covenants information
+        const nonCompeteEl = document.getElementById('nonCompete');
+        const nonCompete = nonCompeteEl.options[nonCompeteEl.selectedIndex].text;
+        const nonCompeteDetails = document.getElementById('nonCompeteDetails').value;
+        
+        const confidentialityEl = document.getElementById('confidentiality');
+        const confidentiality = confidentialityEl.options[confidentialityEl.selectedIndex].text;
+        const confidentialityDetails = document.getElementById('confidentialityDetails').value;
+        
+        // Get exit and termination information
+        const voluntaryExitEl = document.getElementById('voluntaryExit');
+        const voluntaryExit = voluntaryExitEl.options[voluntaryExitEl.selectedIndex].text;
+        const customExitDescription = document.getElementById('customExitDescription').value;
+        
+        const founderTerminationEl = document.getElementById('founderTermination');
+        const founderTermination = founderTerminationEl.options[founderTerminationEl.selectedIndex].text;
+        const customTerminationDescription = document.getElementById('customTerminationDescription').value;
+        
+        const disputeResolutionEl = document.getElementById('disputeResolution');
+        const disputeResolution = disputeResolutionEl.options[disputeResolutionEl.selectedIndex].text;
+        const customDisputeDescription = document.getElementById('customDisputeDescription').value;
+        
+        // Get additional provisions
+        const additionalProvisions = document.getElementById('additionalProvisions').value;
+        
+        // Build the agreement HTML
+        let agreementHtml = `
+          <div class="document-title">FOUNDERS AGREEMENT</div>
+          
+          <div class="document-section" id="section-intro">
+            <div class="section-content">
+              <p>This Founders Agreement (the "Agreement") is made and entered into on ${agreementDate} by and between the undersigned founders (collectively referred to as the "Founders" and individually as a "Founder") of ${companyName} (the "Company").</p>
+              
+              <p>WHEREAS, the Founders wish to formalize their business relationship and establish clear rights and responsibilities with respect to the Company;</p>
+              
+              <p>NOW, THEREFORE, in consideration of the mutual covenants and agreements set forth herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-company-info">
+            <div class="section-title">1. COMPANY INFORMATION</div>
+            <div class="section-content">
+              <p><span class="field-label">1.1 Company Name:</span> ${companyName}</p>
+              
+              <p><span class="field-label">1.2 Principal Place of Business:</span> ${companyAddress}</p>
+              
+              <p><span class="field-label">1.3 Business Purpose:</span> ${businessPurpose}</p>
+              
+              <p><span class="field-label">1.4 Incorporation Status:</span> The Company is ${incorporationStatus === 'Not Yet Incorporated' ? 'not yet incorporated but intends to incorporate as a suitable entity in the future' : `incorporated as a ${incorporationStatus} as of ${incorporationDate}`}.</p>
+              
+              <p><span class="field-label">1.5 Governing Law:</span> This Agreement shall be governed by and construed in accordance with the laws of the State of ${governingLaw}, without giving effect to any choice of law or conflict of law provisions.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-founders">
+            <div class="section-title">2. FOUNDERS</div>
+            <div class="section-content">
+              ${founderInfoHtml}
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-equity">
+            <div class="section-title">3. EQUITY & VESTING</div>
+            <div class="section-content">
+              <p><span class="field-label">3.1 Equity Form:</span> Each Founder's equity shall be in the form of ${equityForm}.</p>
+              
+              <p><span class="field-label">3.2 Vesting Schedule:</span> ${vestingSchedule === 'No Vesting (Fully Vested)' ? 'All equity interests shall be fully vested upon issuance.' : vestingSchedule === 'Custom Schedule' ? customVestingDescription : vestingSchedule === 'Standard 4-Year Vesting with 1-Year Cliff' ? 'The equity interests shall vest over a period of four (4) years, with a one-year cliff. This means that 25% of each Founder\'s equity will vest on the first anniversary of the vesting commencement date, and the remaining 75% will vest in equal monthly installments over the following three (3) years.' : vestingSchedule === '4-Year Vesting without Cliff' ? 'The equity interests shall vest over a period of four (4) years in equal monthly installments, with no cliff period.' : 'The equity interests shall vest over a period of three (3) years, with a one-year cliff. This means that 33.33% of each Founder\'s equity will vest on the first anniversary of the vesting commencement date, and the remaining 66.67% will vest in equal monthly installments over the following two (2) years.'}</p>
+              
+              <p><span class="field-label">3.3 Accelerated Vesting:</span> ${acceleratedVesting === 'No Acceleration' ? 'There shall be no accelerated vesting of equity under any circumstances.' : acceleratedVesting === 'Custom Acceleration' ? customAccelerationDescription : acceleratedVesting === 'Single Trigger (Change of Control)' ? 'In the event of a Change of Control of the Company (as defined below), all unvested equity interests of each Founder shall immediately vest in full.' : 'In the event of a Change of Control of the Company (as defined below) followed by the termination of a Founder without Cause or resignation for Good Reason within twelve (12) months of such event, all unvested equity interests of such Founder shall immediately vest in full.'}</p>
+              
+              <p><span class="field-label">3.4 Change of Control Definition:</span> For purposes of this Agreement, a "Change of Control" shall mean: (i) the acquisition of the Company by another entity by means of any transaction or series of related transactions (including, without limitation, any stock transfer, merger, or consolidation); (ii) a sale of all or substantially all of the assets of the Company; or (iii) any other transaction resulting in the effective transfer of the Company's decision-making authority to a third party.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-roles">
+            <div class="section-title">4. ROLES & COMMITMENT</div>
+            <div class="section-content">
+              <p><span class="field-label">4.1 Decision Making:</span> ${decisionMaking === 'Custom Structure' ? customDecisionDescription : decisionMaking === 'Majority Vote' ? 'Decisions regarding the Company\'s business shall be made by a majority vote of the Founders, with each Founder having one vote.' : decisionMaking === 'Unanimous Agreement' ? 'Decisions regarding the Company\'s business shall require unanimous agreement of all Founders.' : decisionMaking === 'Weighted by Equity' ? 'Decisions regarding the Company\'s business shall be made by a vote of the Founders weighted according to their respective equity percentages.' : 'The CEO shall have final decision-making authority on Company matters, after consultation with the other Founders.'}</p>
+              
+              <p><span class="field-label">4.2 Major Decisions:</span> Notwithstanding Section 4.1, the following major decisions shall require ${decisionMaking === 'Majority Vote' || decisionMaking === 'CEO Final Authority' ? 'a majority vote of all Founders' : decisionMaking === 'Unanimous Agreement' ? 'unanimous agreement of all Founders' : 'approval according to Section 4.1 above'}:</p>
+              
+              <p>${selectedMajorDecisions.map((decision, index) => `${String.fromCharCode(97 + index)}. ${decision}`).join('<br>')}</p>
+              
+              <p><span class="field-label">4.3 Time Commitment:</span> ${timeCommitment === 'Custom Time Commitment' ? customTimeDescription : timeCommitment === 'Full-Time (40+ hours/week)' ? 'Each Founder agrees to devote their full business time, attention, and efforts to the Company (defined as at least 40 hours per week).' : timeCommitment === 'Part-Time (Specified Hours)' ? 'Each Founder agrees to devote significant part-time efforts to the Company as specified in their individual role descriptions above.' : 'Each Founder shall devote such time and attention to the business of the Company as mutually agreed upon by the Founders, which may vary based on the needs of the Company and the individual circumstances of each Founder.'}</p>
+              
+              <p><span class="field-label">4.4 Initial Salaries/Compensation:</span> ${salariesCompensation === 'Custom Compensation Plan' ? customSalaryDescription : salariesCompensation === 'No Initial Salary' ? 'The Founders agree that they will not receive any salary or other monetary compensation until the Company has secured sufficient funding or generated adequate revenue, as determined by decision-making procedures outlined in Section 4.1.' : salariesCompensation === 'Equal Salaries' ? 'The Founders shall receive equal salaries once the Company has secured sufficient funding or generated adequate revenue.' : salariesCompensation === 'Proportional to Contribution' ? 'The Founders shall receive salaries proportional to their respective contributions, as determined by the decision-making procedures outlined in Section 4.1.' : 'The Founders shall receive salaries based on their respective roles and market rates for comparable positions, once the Company has secured sufficient funding or generated adequate revenue.'}</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-ip">
+            <div class="section-title">5. INTELLECTUAL PROPERTY</div>
+            <div class="section-content">
+              <p><span class="field-label">5.1 IP Assignment:</span> ${ipAssignment === 'Custom IP Arrangement' ? customIpDescription : ipAssignment === 'Full Assignment to Company' ? 'Each Founder hereby irrevocably assigns to the Company all right, title, and interest in and to all intellectual property, including but not limited to inventions, discoveries, designs, developments, improvements, copyrightable materials, trade secrets, and other intellectual property, conceived, developed, or reduced to practice by such Founder, either alone or in conjunction with others, during the term of their relationship with the Company and related to the Company\'s business or using the Company\'s resources.' : ipAssignment === 'Limited Assignment (Specified IP Only)' ? 'Each Founder hereby irrevocably assigns to the Company all right, title, and interest in and to intellectual property directly related to the Company\'s core business as specified in Section 1.3, conceived, developed, or reduced to practice by such Founder during the term of their relationship with the Company and using the Company\'s resources.' : 'Each Founder hereby grants to the Company an exclusive, worldwide, royalty-free, irrevocable license to use all intellectual property conceived, developed, or reduced to practice by such Founder, either alone or in conjunction with others, during the term of their relationship with the Company and related to the Company\'s business, but the Founder shall retain ownership of such intellectual property.'}</p>
+              
+              <p><span class="field-label">5.2 Prior IP Exclusions:</span> ${priorIp === 'No Prior IP Exclusions' ? 'The Founders represent that they have no prior intellectual property that they wish to exclude from assignment to the Company.' : `The following intellectual property owned by Founders prior to entering into this Agreement is excluded from assignment to the Company: ${priorIpDetails}`}</p>
+              
+              <p><span class="field-label">5.3 Further Assurances:</span> Each Founder agrees to execute all documents and take all actions as may be reasonably requested by the Company to accomplish the IP assignment and licensing provisions of this Agreement.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-covenants">
+            <div class="section-title">6. RESTRICTIVE COVENANTS</div>
+            <div class="section-content">
+              ${nonCompete === 'No Non-Compete' ? 
+                '<p><span class="field-label">6.1 Non-Compete:</span> This Agreement does not include a non-compete provision.</p>' : 
+                `<p><span class="field-label">6.1 Non-Compete:</span> ${nonCompeteDetails}</p>`
+              }
+              
+              <p><span class="field-label">6.2 Confidentiality:</span> ${confidentiality === 'Custom Confidentiality' ? confidentialityDetails : confidentiality === 'Standard Confidentiality' ? 'Each Founder agrees to maintain the confidentiality of all non-public information relating to the Company, including but not limited to business plans, financial information, customer data, trade secrets, and proprietary technology. This obligation shall continue during the Founder\'s relationship with the Company and for a period of two (2) years thereafter.' : confidentiality === 'Extensive Confidentiality' ? 'Each Founder agrees to maintain strict confidentiality of all non-public information relating to the Company, including but not limited to business plans, financial information, customer data, trade secrets, proprietary technology, marketing strategies, and any other information not generally known to the public. This obligation shall continue indefinitely, with no expiration date, even after the Founder\'s relationship with the Company has ended.' : 'Each Founder agrees to maintain the confidentiality of specifically designated confidential information relating to the Company\'s core trade secrets and proprietary technology. This obligation shall continue during the Founder\'s relationship with the Company and for a period of one (1) year thereafter.'}</p>
+              
+              <p><span class="field-label">6.3 Non-Solicitation:</span> Each Founder agrees that during their relationship with the Company and for a period of one (1) year thereafter, they will not directly or indirectly solicit, induce, recruit, or encourage any employee, contractor, or consultant of the Company to leave their position, nor will they solicit any customer, client, or business partner of the Company for the purpose of diminishing or otherwise interfering with the Company's relationship with such parties.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-exit">
+            <div class="section-title">7. EXIT & TERMINATION</div>
+            <div class="section-content">
+              <p><span class="field-label">7.1 Voluntary Exit:</span> ${voluntaryExit === 'Custom Exit Terms' ? customExitDescription : voluntaryExit === 'Retain Vested Stock Only' ? 'In the event that a Founder voluntarily exits the Company, such Founder shall retain only their vested equity as of the date of departure. Any unvested equity shall be forfeited and returned to the Company.' : voluntaryExit === 'Company Repurchase' ? 'In the event that a Founder voluntarily exits the Company, the Company shall have the right, but not the obligation, to repurchase all or a portion of the Founder\'s vested equity at Fair Market Value as determined by an independent valuation.' : voluntaryExit === 'Founders Repurchase' ? 'In the event that a Founder voluntarily exits the Company, the remaining Founders shall have the right, but not the obligation, to purchase all or a portion of the departing Founder\'s vested equity at Fair Market Value as determined by an independent valuation.' : 'In the event that a Founder voluntarily exits the Company, such Founder shall forfeit all equity, whether vested or unvested.'}</p>
+              
+              <p><span class="field-label">7.2 Founder Termination:</span> ${founderTermination === 'Custom Termination Process' ? customTerminationDescription : founderTermination === 'Majority of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company upon the affirmative vote of a majority of the other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : founderTermination === 'Supermajority (e.g., 2/3) of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company upon the affirmative vote of at least two-thirds (2/3) of the other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : founderTermination === 'Unanimous Vote of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company only upon the unanimous vote of all other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : 'A Founder may be terminated from their role and duties with the Company upon the decision of the Board of Directors. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.'}</p>
+              
+              <p><span class="field-label">7.3 Dispute Resolution:</span> ${disputeResolution === 'Custom Dispute Resolution' ? customDisputeDescription : disputeResolution === 'Mediation First, Then Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall first be submitted to confidential mediation in accordance with the rules of a mutually agreeable mediation service. If the dispute is not resolved through mediation within sixty (60) days from the date of submission to mediation, the dispute shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of mediation and arbitration shall be shared equally by the parties involved in the dispute.' : disputeResolution === 'Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of arbitration shall be shared equally by the parties involved in the dispute.' : 'Any dispute arising out of or relating to this Agreement shall be resolved exclusively through the federal and state courts located in the jurisdiction specified in Section 1.5, and each party hereby consents to the jurisdiction of such courts.'}</p>
+              
+              <p><span class="field-label">7.4 Death or Disability:</span> In the event of a Founder's death or disability (defined as the inability to perform their duties for a period of 180 consecutive days), such Founder or their estate shall retain all vested equity as of the date of death or disability determination. Any unvested equity shall be forfeited unless otherwise decided by the remaining Founders or Board of Directors.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-additional">
+            <div class="section-title">8. ADDITIONAL PROVISIONS</div>
+            <div class="section-content">
+              <p><span class="field-label">8.1 Additional Provisions:</span></p>
+              <p>${additionalProvisions}</p>
+              
+              <p><span class="field-label">8.2 Entire Agreement:</span> This Agreement constitutes the entire agreement among the Founders regarding the subject matter hereof and supersedes all prior agreements and understandings, whether written or oral.</p>
+              
+              <p><span class="field-label">8.3 Amendment:</span> This Agreement may be amended only by a written instrument executed by all Founders.</p>
+              
+              <p><span class="field-label">8.4 Severability:</span> If any provision of this Agreement is held to be invalid or unenforceable, such provision shall be struck, and the remaining provisions shall be enforced to the fullest extent possible.</p>
+              
+              <p><span class="field-label">8.5 Notices:</span> All notices required or permitted under this Agreement shall be in writing and shall be delivered to the addresses set forth above or to such other address as may be specified by any party in writing.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-signatures">
+            <div class="section-title">9. SIGNATURES</div>
+            <div class="section-content">
+              <p>IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</p>
+              
+              ${getFounderSignatureBlocks()}
+            </div>
+          </div>
+        `;
+        
+        // Update the preview with the agreement HTML
+        preview.innerHTML = agreementHtml;
+        
+        // If a specific field was changed, highlight the relevant section
+        if (changedField) {
+          highlightChangedContent(changedField);
+        }
+      }
+      
+      // Get HTML for all founders' information
+      function getFoundersHtml() {
+        let html = '';
+        let founderNumber = 1;
+        let founderInput = document.getElementById(`founder${founderNumber}Name`);
+        
+        while (founderInput) {
+          const name = document.getElementById(`founder${founderNumber}Name`).value;
+          const address = document.getElementById(`founder${founderNumber}Address`).value;
+          const email = document.getElementById(`founder${founderNumber}Email`).value;
+          const equity = document.getElementById(`founder${founderNumber}Equity`).value;
+          const role = document.getElementById(`founder${founderNumber}Role`).value;
+          const responsibilities = document.getElementById(`founder${founderNumber}Responsibilities`).value;
+          
+          if (name) {
+            html += `
+              <p><span class="field-label">2.${founderNumber} Founder ${founderNumber}:</span> ${name}, residing at ${address}, with email address ${email}.</p>
+              
+              <p><span class="field-label">Equity Percentage:</span> ${equity}%</p>
+              
+              <p><span class="field-label">Role / Position:</span> ${role}</p>
+              
+              <p><span class="field-label">Key Responsibilities:</span> ${responsibilities}</p>
+              
+            `;
+          }
+          
+          founderNumber++;
+          founderInput = document.getElementById(`founder${founderNumber}Name`);
+        }
+        
+        return html;
+      }
+      
+      // Get HTML for founder signature blocks
+      function getFounderSignatureBlocks() {
+        let html = '';
+        let founderNumber = 1;
+        let founderInput = document.getElementById(`founder${founderNumber}Name`);
+        
+        while (founderInput) {
+          const name = document.getElementById(`founder${founderNumber}Name`).value;
+          
+          if (name) {
+            html += `
+              <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
+              <p style="margin-top: 5px; margin-bottom: 40px;"><strong>${name}</strong></p>
+            `;
+          }
+          
+          founderNumber++;
+          founderInput = document.getElementById(`founder${founderNumber}Name`);
+        }
+        
+        return html;
+      }
+      
+      // Function to highlight changed content in the preview
+      function highlightChangedContent(changedField) {
+        // Clear any existing highlights
+        clearHighlights();
+        
+        // Determine which section to highlight based on the changed field
+        let sectionId = '';
+        let elements = [];
+        
+        // Map fields to their corresponding sections
+        if (['companyName', 'companyAddress', 'businessPurpose', 'incorporationStatus', 'incorporationDate', 'agreementDate', 'governingLaw', 'otherState'].includes(changedField)) {
+          sectionId = 'section-company-info';
+        } else if (changedField.startsWith('founder') && changedField.includes('Name')) {
+          sectionId = 'section-founders';
+        } else if (changedField.startsWith('founder') && changedField.includes('Address')) {
+          sectionId = 'section-founders';
+        } else if (changedField.startsWith('founder') && changedField.includes('Email')) {
+          sectionId = 'section-founders';
+        } else if (changedField.startsWith('founder') && changedField.includes('Equity')) {
+          sectionId = 'section-founders';
+        } else if (changedField.startsWith('founder') && changedField.includes('Role')) {
+          sectionId = 'section-founders';
+        } else if (changedField.startsWith('founder') && changedField.includes('Responsibilities')) {
+          sectionId = 'section-founders';
+        } else if (['equityForm', 'vestingSchedule', 'customVestingDescription', 'acceleratedVesting', 'customAccelerationDescription'].includes(changedField)) {
+          sectionId = 'section-equity';
+        } else if (['decisionMaking', 'customDecisionDescription', 'timeCommitment', 'customTimeDescription', 'salariesCompensation', 'customSalaryDescription', 'majorDecisions'].includes(changedField)) {
+          sectionId = 'section-roles';
+        } else if (['ipAssignment', 'customIpDescription', 'priorIp', 'priorIpDetails'].includes(changedField)) {
+          sectionId = 'section-ip';
+        } else if (['nonCompete', 'nonCompeteDetails', 'confidentiality', 'confidentialityDetails'].includes(changedField)) {
+          sectionId = 'section-covenants';
+        } else if (['voluntaryExit', 'customExitDescription', 'founderTermination', 'customTerminationDescription', 'disputeResolution', 'customDisputeDescription'].includes(changedField)) {
+          sectionId = 'section-exit';
+        } else if (['additionalProvisions'].includes(changedField)) {
+          sectionId = 'section-additional';
+        }
+        
+        if (sectionId) {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            // Find the specific paragraph that contains the changed field
+            let fieldLabel = '';
+            
+            // Map changedField to fieldLabel
+            switch (changedField) {
+              case 'companyName':
+                fieldLabel = '1.1 Company Name:';
+                break;
+              case 'companyAddress':
+                fieldLabel = '1.2 Principal Place of Business:';
+                break;
+              case 'businessPurpose':
+                fieldLabel = '1.3 Business Purpose:';
+                break;
+              case 'incorporationStatus':
+              case 'incorporationDate':
+                fieldLabel = '1.4 Incorporation Status:';
+                break;
+              case 'governingLaw':
+              case 'otherState':
+                fieldLabel = '1.5 Governing Law:';
+                break;
+              case 'equityForm':
+                fieldLabel = '3.1 Equity Form:';
+                break;
+              case 'vestingSchedule':
+              case 'customVestingDescription':
+                fieldLabel = '3.2 Vesting Schedule:';
+                break;
+              case 'acceleratedVesting':
+              case 'customAccelerationDescription':
+                fieldLabel = '3.3 Accelerated Vesting:';
+                break;
+              case 'decisionMaking':
+              case 'customDecisionDescription':
+                fieldLabel = '4.1 Decision Making:';
+                break;
+              case 'majorDecisions':
+                fieldLabel = '4.2 Major Decisions:';
+                break;
+              case 'timeCommitment':
+              case 'customTimeDescription':
+                fieldLabel = '4.3 Time Commitment:';
+                break;
+              case 'salariesCompensation':
+              case 'customSalaryDescription':
+                fieldLabel = '4.4 Initial Salaries/Compensation:';
+                break;
+              case 'ipAssignment':
+              case 'customIpDescription':
+                fieldLabel = '5.1 IP Assignment:';
+                break;
+              case 'priorIp':
+              case 'priorIpDetails':
+                fieldLabel = '5.2 Prior IP Exclusions:';
+                break;
+              case 'nonCompete':
+              case 'nonCompeteDetails':
+                fieldLabel = '6.1 Non-Compete:';
+                break;
+              case 'confidentiality':
+              case 'confidentialityDetails':
+                fieldLabel = '6.2 Confidentiality:';
+                break;
+              case 'voluntaryExit':
+              case 'customExitDescription':
+                fieldLabel = '7.1 Voluntary Exit:';
+                break;
+              case 'founderTermination':
+              case 'customTerminationDescription':
+                fieldLabel = '7.2 Founder Termination:';
+                break;
+              case 'disputeResolution':
+              case 'customDisputeDescription':
+                fieldLabel = '7.3 Dispute Resolution:';
+                break;
+              case 'additionalProvisions':
+                fieldLabel = '8.1 Additional Provisions:';
+                break;
+              default:
+                // For founder fields, handle specially
+                if (changedField.startsWith('founder')) {
+                  const matches = changedField.match(/founder(\d+)([A-Za-z]+)/);
+                  if (matches && matches.length >= 3) {
+                    const founderNum = matches[1];
+                    const fieldType = matches[2];
+                    
+                    if (fieldType === 'Name' || fieldType === 'Address' || fieldType === 'Email') {
+                      fieldLabel = `2.${founderNum} Founder ${founderNum}:`;
+                    } else if (fieldType === 'Equity') {
+                      fieldLabel = 'Equity Percentage:';
+                    } else if (fieldType === 'Role') {
+                      fieldLabel = 'Role / Position:';
+                    } else if (fieldType === 'Responsibilities') {
+                      fieldLabel = 'Key Responsibilities:';
+                    }
+                  }
+                }
+            }
+            
+            // If we didn't find a specific field label, highlight the whole section
+            if (fieldLabel === '') {
+              elements = [section];
+            } else {
+              // Find the specific paragraph with the field label
+              const contentDiv = section.querySelector('.section-content');
+              if (contentDiv) {
+                const paragraphs = contentDiv.querySelectorAll('p');
+                paragraphs.forEach(p => {
+                  if (p.innerHTML.includes(fieldLabel)) {
+                    elements.push(p);
+                  }
+                });
+              }
+              
+              // If no specific paragraph found, highlight the section
+              if (elements.length === 0) {
+                elements = [section];
+              }
+            }
+            
+            // Apply highlight class to found elements
+            elements.forEach(element => {
+              element.classList.add('highlight');
+              highlightedElements.push(element);
+            });
+            
+            // Ensure the highlighted element is visible in the preview
+            if (elements.length > 0) {
+              const firstElement = elements[0];
+              const elementRect = firstElement.getBoundingClientRect();
+              const previewRect = previewBox.getBoundingClientRect();
+              
+              // If element is not fully visible in the preview box
+              if (elementRect.top < previewRect.top || elementRect.bottom > previewRect.bottom) {
+                // Scroll to the element
+                firstElement.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'center'
+                });
+              }
+            }
+            
+            // Set timeout to remove highlight after some time (user's next click will clear this anyway)
+            highlightTimeout = setTimeout(() => {
+              clearHighlights();
+            }, 5000);
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
