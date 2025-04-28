@@ -204,6 +204,7 @@
         .highlight {
             background-color: var(--highlight);
             transition: background-color 0.5s;
+            padding: 2px 0;
         }
         
         .info-box {
@@ -571,13 +572,9 @@
                         </label>
                     </div>
                     
-                    <div class="form-group">
-                        <label class="checkbox-label">
-                            <input type="checkbox" id="notarizationCheck"> Parties plan to have this document notarized
-                        </label>
-                        <div class="info-box" style="margin-top: 10px">
-                            Tip: Notarization can help establish authenticity of signatures but does not affect the legal content or enforceability of terms.
-                        </div>
+                        <div class="form-group">
+                        <label for="additionalNotes">Additional Notes or Comments (optional, not included in document):</label>
+                        <textarea id="additionalNotes" rows="2" placeholder="Add any additional notes for your reference..."></textarea>
                     </div>
                     
                     <div class="button-group">
@@ -592,7 +589,7 @@
         
                     <div class="preview-section">
             <h2>Live Preview</h2>
-            <div class="preview-container" id="previewContainer" style="height: 800px;">
+            <div class="preview-container" id="previewContainer" style="height: 1000px;">
                 <div id="previewContent" style="font-family: Arial, sans-serif; font-size: 11pt;">
                     <h3 style="text-align: center; font-family: Arial, sans-serif; font-size: 11pt;">MUTUAL NON-DISCLOSURE AGREEMENT</h3>
                     <p>This Non-Disclosure Agreement (the "Agreement") is entered into by and between:</p>
@@ -731,21 +728,15 @@
             });
         });
         
-        // Function to highlight changed content
+        // Function to highlight changed content and ensure it's visible
         function highlightElement(elementId) {
             const element = document.getElementById(elementId);
             if (element) {
                 element.classList.add('highlight');
                 
-                // Check if element is in view
+                // Ensure element is in view
                 const container = document.getElementById('previewContainer');
-                const elementRect = element.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                
-                if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
-                    // Element is not fully visible, scroll to it
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 
                 // Remove highlight after 1.5 seconds
                 setTimeout(() => {
@@ -1039,9 +1030,9 @@
             
             // Update damages amount in preview
             const previewContent = document.getElementById('previewContent');
-            const regex = /monetary damages in the amount of \$([\d,]+)/;
+            const regex = /monetary damages in the amount of \$([\d,]+) as liquidated damages/;
             
-            const updatedContent = previewContent.innerHTML.replace(regex, `monetary damages in the amount of $${formattedAmount}`);
+            const updatedContent = previewContent.innerHTML.replace(regex, `monetary damages in the amount of ${formattedAmount} as liquidated damages`);
             previewContent.innerHTML = updatedContent;
             
             // Highlight the change
@@ -1263,62 +1254,9 @@
             highlightElement('previewEntire');
         });
         
-        // Notarization check
-        document.getElementById('notarizationCheck').addEventListener('change', function() {
-            const includeNotary = this.checked;
-            
-            // Find the signature block in the preview
-            const previewContent = document.getElementById('previewContent');
-            const signatureBlockRegex = /<div style="display: flex; justify-content: space-between; margin-top: 40px;">[\s\S]*?<\/div>/;
-            
-            let newSignatureBlock;
-            if (includeNotary) {
-                newSignatureBlock = `<div style="display: flex; justify-content: space-between; margin-top: 40px;">
-                    <div style="width: 45%;">
-                        <p>_______________________<br>
-                        First Party Signature</p>
-                        <p style="margin-top: 20px;">_______________________<br>
-                        Date</p>
-                        <p style="margin-top: 40px;">STATE OF _____________ )<br>
-                        COUNTY OF ___________ )</p>
-                        <p style="margin-top: 10px;">On _____________ before me, _____________, Notary Public, personally appeared _____________, who proved to me on the basis of satisfactory evidence to be the person whose name is subscribed to the within instrument and acknowledged to me that he/she executed the same.</p>
-                        <p style="margin-top: 10px;">_______________________<br>
-                        Notary Public Signature</p>
-                    </div>
-                    <div style="width: 45%;">
-                        <p>_______________________<br>
-                        Second Party Signature</p>
-                        <p style="margin-top: 20px;">_______________________<br>
-                        Date</p>
-                        <p style="margin-top: 40px;">STATE OF _____________ )<br>
-                        COUNTY OF ___________ )</p>
-                        <p style="margin-top: 10px;">On _____________ before me, _____________, Notary Public, personally appeared _____________, who proved to me on the basis of satisfactory evidence to be the person whose name is subscribed to the within instrument and acknowledged to me that he/she executed the same.</p>
-                        <p style="margin-top: 10px;">_______________________<br>
-                        Notary Public Signature</p>
-                    </div>
-                </div>`;
-            } else {
-                newSignatureBlock = `<div style="display: flex; justify-content: space-between; margin-top: 40px;">
-                    <div style="width: 45%;">
-                        <p>_______________________<br>
-                        First Party Signature</p>
-                        <p style="margin-top: 20px;">_______________________<br>
-                        Date</p>
-                    </div>
-                    <div style="width: 45%;">
-                        <p>_______________________<br>
-                        Second Party Signature</p>
-                        <p style="margin-top: 20px;">_______________________<br>
-                        Date</p>
-                    </div>
-                </div>`;
-            }
-            
-            const updatedContent = previewContent.innerHTML.replace(signatureBlockRegex, newSignatureBlock);
-            previewContent.innerHTML = updatedContent;
-            
-            // Highlight the change
-            highlightElement('previewSignatures');
+        // Additional notes - not actually updating the preview
+        document.getElementById('additionalNotes').addEventListener('input', function() {
+            // This is just for the user's reference, doesn't affect the document
         });
         
         // Helper function to renumber sections after removing one
@@ -1484,8 +1422,8 @@
                 <meta charset="UTF-8">
                 <title>Relationship Privacy Non-Disclosure Agreement</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 1in; line-height: 1.5; }
-                    h3 { text-align: center; }
+                    body { font-family: Arial, sans-serif; margin: 0.7in; line-height: 1.5; font-size: 11pt; }
+                    h3 { text-align: center; font-size: 11pt; font-weight: bold; }
                 </style>
             </head>
             <body>
