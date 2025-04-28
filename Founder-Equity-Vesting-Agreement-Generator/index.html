@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Founder Equity & Vesting Agreement Generator</title>
+    <style>
+        :root {
+            --primary-color: #3a5a78;
+            --secondary-color: #f5f5f5;
+            --accent-color: #6c9bbf;
+            --text-color: #333;
+            --highlight-color: #ffff99;
+            --border-color: #d9d9d9;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            background-color: #fff;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+            font-size: 1.8rem;
+        }
+
+        .header p {
+            color: var(--text-color);
+            font-size: 1rem;
+            margin-top: 0;
+        }
+
+        .content {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .form-container {
+            flex: 1;
+            background-color: var(--secondary-color);
+            border-radius: 5px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .preview-container {
+            flex: 1;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 20px;
+            background-color: white;
+            position: relative;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            overflow-y: auto;
+            height: 700px;
+        }
+
+        .tab-container {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #e9e9e9;
+            margin-right: 5px;
+        }
+
+        .tab:hover {
+            background-color: #d9d9d9;
+        }
+
+        .tab.active {
+            background-color: white;
+            border-color: var(--border-color);
+            border-bottom-color: white;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        select {
+            height: 35px;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .col {
+            flex: 1;
+        }
+
+        .highlighted {
+            background-color: var(--highlight-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .primary-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .primary-button:hover {
+            background-color: #2c4760;
+        }
+
+        .secondary-button {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+        }
+
+        .secondary-button:hover {
+            background-color: #e9e9e9;
+        }
+
+        .preview-title {
+            text-align: center;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+
+            .preview-container {
+                height: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Founder Equity & Vesting Agreement Generator</h1>
+            <p>Fill out the form below to generate a customized founder equity and vesting agreement</p>
+        </div>
+
+        <div class="content">
+            <div class="form-container">
+                <div class="tab-container">
+                    <div class="tab active" onclick="switchTab(0)">Company & Founders</div>
+                    <div class="tab" onclick="switchTab(1)">Equity & Vesting</div>
+                    <div class="tab" onclick="switchTab(2)">Roles & Decisions</div>
+                    <div class="tab" onclick="switchTab(3)">Legal Terms</div>
+                </div>
+
+                <div class="tab-content active" id="tab-1">
+                    <div class="form-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" id="companyName" value="ABC Company" oninput="updateAgreement()">
+                    </div>
+                    <div class="form-group">
+                        <label for="businessDescription">Business Description:</label>
+                        <textarea id="businessDescription" rows="3" oninput="updateAgreement()">developing and marketing mobile applications</textarea>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder1Name">Founder 1 Name:</label>
+                                <input type="text" id="founder1Name" value="John Smith" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder1Address">Founder 1 Address:</label>
+                                <input type="text" id="founder1Address" value="123 Main St, Anytown, CA 90000" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder2Name">Founder 2 Name:</label>
+                                <input type="text" id="founder2Name" value="Jane Lee" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder2Address">Founder 2 Address:</label>
+                                <input type="text" id="founder2Address" value="456 Oak Rd, Anytown, CA 90000" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="agreementDate">Agreement Date:</label>
+                        <input type="date" id="agreementDate" value="2023-01-01" oninput="updateAgreement()">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button secondary-button" onclick="resetForm()">Reset</button>
+                        <button class="button primary-button" onclick="switchTab(1)">Next: Equity & Vesting</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-2">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder1Equity">Founder 1 Equity %:</label>
+                                <input type="number" id="founder1Equity" min="1" max="99" value="60" oninput="updateEquity(); updateAgreement()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder2Equity">Founder 2 Equity %:</label>
+                                <input type="number" id="founder2Equity" min="1" max="99" value="40" oninput="updateEquity(); updateAgreement()" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="vestingPeriod">Vesting Period (years):</label>
+                        <select id="vestingPeriod" oninput="updateAgreement()">
+                            <option value="3">3 years</option>
+                            <option value="4" selected>4 years</option>
+                            <option value="5">5 years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="cliffPeriod">Cliff Period (months):</label>
+                        <select id="cliffPeriod" oninput="updateAgreement()">
+                            <option value="6">6 months</option>
+                            <option value="12" selected>12 months</option>
+                            <option value="18">18 months</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="vestingFrequency">Vesting Frequency After Cliff:</label>
+                        <select id="vestingFrequency" oninput="updateAgreement()">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Quarterly" selected>Quarterly</option>
+                            <option value="Semi-annually">Semi-annually</option>
+                            <option value="Annually">Annually</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="acceleratedVesting">Include Accelerated Vesting on Sale:</label>
+                        <select id="acceleratedVesting" oninput="updateAgreement()">
+                            <option value="Yes">Yes</option>
+                            <option value="No" selected>No</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button secondary-button" onclick="switchTab(0)">Previous</button>
+                        <button class="button primary-button" onclick="switchTab(2)">Next: Roles & Decisions</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-3">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder1Title">Founder 1 Title:</label>
+                                <input type="text" id="founder1Title" value="Chief Executive Officer" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-group">
+                                <label for="founder2Title">Founder 2 Title:</label>
+                                <input type="text" id="founder2Title" value="Chief Technology Officer" oninput="updateAgreement()">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="founder1Duties">Founder 1 Duties:</label>
+                        <textarea id="founder1Duties" rows="3" oninput="updateAgreement()">leading strategy, fundraising, marketing, and overall operations</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="founder2Duties">Founder 2 Duties:</label>
+                        <textarea id="founder2Duties" rows="3" oninput="updateAgreement()">leading engineering, product development, and technical operations</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="fullTimeCommitment">Full-Time Commitment Required:</label>
+                        <select id="fullTimeCommitment" oninput="updateAgreement()">
+                            <option value="Yes" selected>Yes</option>
+                            <option value="No">No</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="majorDecisions">Major Decisions Require:</label>
+                        <select id="majorDecisions" oninput="updateAgreement()">
+                            <option value="Unanimous approval" selected>Unanimous approval</option>
+                            <option value="Simple majority">Simple majority</option>
+                            <option value="Supermajority (75%)">Supermajority (75%)</option>
+                        </select>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button secondary-button" onclick="switchTab(1)">Previous</button>
+                        <button class="button primary-button" onclick="switchTab(3)">Next: Legal Terms</button>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="tab-4">
+                    <div class="form-group">
+                        <label for="governingLaw">Governing Law (State):</label>
+                        <select id="governingLaw" oninput="updateAgreement()">
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California" selected>California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New Mexico">New Mexico</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="North Dakota">North Dakota</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="disputeResolution">Dispute Resolution Method:</label>
+                        <select id="disputeResolution" oninput="updateAgreement()">
+                            <option value="Mediation" selected>Mediation</option>
+                            <option value="Arbitration">Arbitration</option>
+                            <option value="Litigation">Litigation</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="noticeRequired">Notice Required for Departure (days):</label>
+                        <input type="number" id="noticeRequired" min="0" max="180" value="30" oninput="updateAgreement()">
+                    </div>
+                    <div class="form-group">
+                        <label for="additionalTerms">Additional Terms (Optional):</label>
+                        <textarea id="additionalTerms" rows="3" oninput="updateAgreement()"></textarea>
+                    </div>
+
+                    <div class="button-group">
+                        <button class="button secondary-button" onclick="switchTab(2)">Previous</button>
+                        <button class="button primary-button" onclick="downloadAgreement()">Download Agreement</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="preview-container" id="agreementPreview">
+                <div class="preview-title">Agreement Preview</div>
+                <div id="preview-content"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the agreement preview
+        document.addEventListener('DOMContentLoaded', function() {
+            updateAgreement();
+        });
+
+        // Global variable to keep track of the current state
+        let currentState = {};
+
+        // Function to switch between tabs
+        function switchTab(tabIndex) {
+            // Hide all tabs
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Show selected tab
+            tabs[tabIndex].classList.add('active');
+            tabContents[tabIndex].classList.add('active');
+        }
+
+        // Function to ensure founder equity percentages add up to 100%
+        function updateEquity() {
+            const founder1Equity = parseInt(document.getElementById('founder1Equity').value) || 0;
+            document.getElementById('founder2Equity').value = 100 - founder1Equity;
+        }
+
+        // Function to update the agreement preview
+        function updateAgreement() {
+            const companyName = document.getElementById('companyName').value;
+            const businessDescription = document.getElementById('businessDescription').value;
+            const founder1Name = document.getElementById('founder1Name').value;
+            const founder1Address = document.getElementById('founder1Address').value;
+            const founder2Name = document.getElementById('founder2Name').value;
+            const founder2Address = document.getElementById('founder2Address').value;
+            
+            const founder1Equity = document.getElementById('founder1Equity').value;
+            const founder2Equity = document.getElementById('founder2Equity').value;
+            const vestingPeriod = document.getElementById('vestingPeriod').value;
+            const cliffPeriod = document.getElementById('cliffPeriod').value;
+            const vestingFrequency = document.getElementById('vestingFrequency').value;
+            const acceleratedVesting = document.getElementById('acceleratedVesting').value;
+            
+            const founder1Title = document.getElementById('founder1Title').value;
+            const founder2Title = document.getElementById('founder2Title').value;
+            const founder1Duties = document.getElementById('founder1Duties').value;
+            const founder2Duties = document.getElementById('founder2Duties').value;
+            const fullTimeCommitment = document.getElementById('fullTimeCommitment').value;
+            const majorDecisions = document.getElementById('majorDecisions').value;
+            
+            const governingLaw = document.getElementById('governingLaw').value;
+            const disputeResolution = document.getElementById('disputeResolution').value;
+            const noticeRequired = document.getElementById('noticeRequired').value;
+            const additionalTerms = document.getElementById('additionalTerms').value;
+            
+            // Format date
+            const agreementDate = new Date(document.getElementById('agreementDate').value);
+            const formattedDate = agreementDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Create the agreement text
+            const agreementText = `
+                <h2 style="text-align: center;">Founder Partnership Agreement</h2>
+                
+                <p>This Founder Partnership Agreement (the "Agreement") is entered into on ${formattedDate} (the "Effective Date") by and between:</p>
+                
+                <p><strong>${founder1Name}</strong>, residing at ${founder1Address} ("Founder 1")</p>
+                
+                <p>and</p>
+                
+                <p><strong>${founder2Name}</strong>, residing at ${founder2Address} ("Founder 2")</p>
+                
+                <p><strong>Whereas:</strong></p>
+                
+                <p>A. Founder 1 and Founder 2 intend to establish a business relationship for the purpose of developing and growing ${companyName} (the "Company").</p>
+                
+                <p>B. The Company will engage in ${businessDescription}.</p>
+                
+                <p>C. Founder 1 and Founder 2 wish to establish their respective equity ownership, responsibilities, and participation in the Company through this Agreement.</p>
+                
+                <p><strong>Now, therefore, the founders agree as follows:</strong></p>
+                
+                <h3>1. Equity Ownership</h3>
+                
+                <p>Founder 1 will hold ${founder1Equity}% equity ownership in the Company. Founder 2 will hold ${founder2Equity}% equity ownership in the Company.</p>
+                
+                <p>If any additional founders join, equity will be diluted pro rata based on respective ownership percentages.</p>
+                
+                <h3>2. Vesting Schedule</h3>
+                
+                <p>All founder equity shall vest over a ${vestingPeriod} year period according to the following schedule:</p>
+                
+                <ul>
+                    <li>For the first ${cliffPeriod} months, no equity shall vest (cliff period)</li>
+                    <li>After ${cliffPeriod} months, equity shall vest ${vestingFrequency.toLowerCase()} over the next ${vestingPeriod - (cliffPeriod/12)} years</li>
+                    <li>By the end of the ${vestingPeriod} year vesting period, 100% of founder equity shall be vested</li>
+                </ul>
+                
+                <p>If a founder departs the Company for any reason prior to full vesting, any unvested equity shall be returned to the Company.</p>
+                
+                ${acceleratedVesting === 'Yes' ? '<p>In the event of a sale or acquisition of the Company, any unvested founder equity shall immediately vest in full.</p>' : ''}
+                
+                <p>In the event of dissolution or liquidation, vested equity shall be distributed to the founders according to their respective ownership percentages.</p>
+                
+                <h3>3. Founder Participation and Duties</h3>
+                
+                <p>Founder 1 shall carry out duties as ${founder1Title} including ${founder1Duties}.</p>
+                
+                <p>Founder 2 shall carry out duties as ${founder2Title} including ${founder2Duties}.</p>
+                
+                ${fullTimeCommitment === 'Yes' ? '<p>Both founders agree to dedicate their full-time efforts to developing and growing the Company. Any outside business activities or other employment must be disclosed and not conflict with Company interests.</p>' : '<p>Founders may engage in other professional activities, provided they do not conflict with Company interests and all agreed responsibilities are fulfilled.</p>'}
+                
+                <h3>4. Decisions</h3>
+                
+                <p>Ordinary business decisions shall be made together by the founders and require a simple majority.</p>
+                
+                <p>Major decisions such as those involving equity, corporate structure, mergers/acquisitions, asset sales, and business wind-down must be made by ${majorDecisions}.</p>
+                
+                <p>In the event of persistent disagreement regarding a major decision, the issue shall be referred to a mutually agreed upon advisory board member or neutral advisor for ${disputeResolution.toLowerCase()}.</p>
+                
+                <h3>5. Term</h3>
+                
+                <p>This Agreement shall remain in effect until terminated by mutual written consent of both founders or dissolution of the Company.</p>
+                
+                <p>Individual founders may withdraw from the Company voluntarily but must provide ${noticeRequired} days advance written notice. Departing founders shall be entitled only to their vested equity at time of departure.</p>
+                
+                <h3>6. Governing Law</h3>
+                
+                <p>This Agreement shall be governed by the laws of the State of ${governingLaw}.</p>
+                
+                <h3>7. Modification</h3>
+                
+                <p>This Agreement may only be modified through a written amendment signed by both Founder 1 and Founder 2.</p>
+                
+                <h3>8. Miscellaneous</h3>
+                
+                <p>This Agreement represents the entire understanding between the founders.</p>
+                
+                <p>The invalidity or unenforceability of any provision shall not affect the other provisions.</p>
+                
+                <p>Paragraph headings are for convenience and shall have no interpretive value.</p>
+                
+                ${additionalTerms ? `<p>${additionalTerms}</p>` : ''}
+                
+                <p>In witness whereof, the founders hereby execute this Founder Partnership Agreement.</p>
+                
+                <p>Founder 1 Signature: ______________ Date: __________</p>
+                
+                <p>Print Name: ${founder1Name}</p>
+                
+                <p>Founder 2 Signature: ______________ Date: __________</p>
+                
+                <p>Print Name: ${founder2Name}</p>
+            `;
+            
+            // Get the previous state before updating
+            const newState = {
+                companyName, businessDescription, founder1Name, founder1Address, founder2Name, founder2Address,
+                formattedDate, founder1Equity, founder2Equity, vestingPeriod, cliffPeriod, vestingFrequency,
+                acceleratedVesting, founder1Title, founder2Title, founder1Duties, founder2Duties,
+                fullTimeCommitment, majorDecisions, governingLaw, disputeResolution, noticeRequired, additionalTerms
+            };
+            
+            // Update the preview
+            document.getElementById('preview-content').innerHTML = agreementText;
+            
+            // Highlight changes
+            highlightChanges(currentState, newState);
+            
+            // Save current state for next comparison
+            currentState = {...newState};
+        }
+
+        // Function to highlight changes in the preview
+        function highlightChanges(oldState, newState) {
+            if (!oldState || Object.keys(oldState).length === 0) return;
+            
+            // Remove existing highlights
+            const highlightedElements = document.querySelectorAll('.highlighted');
+            highlightedElements.forEach(el => {
+                el.classList.remove('highlighted');
+            });
+            
+            // Check for changes and highlight them
+            const previewContent = document.getElementById('preview-content');
+            
+            // Helper function to highlight specific text
+            function highlightText(text, container) {
+                if (!text || !container) return;
+                
+                const regex = new RegExp(`\\b${escapeRegExp(text)}\\b`, 'g');
+                container.innerHTML = container.innerHTML.replace(regex, `<span class="highlighted">${text}</span>`);
+                
+                // Scroll to the first highlight if not visible
+                const firstHighlight = container.querySelector('.highlighted');
+                if (firstHighlight) {
+                    const previewContainer = document.getElementById('agreementPreview');
+                    const highlightRect = firstHighlight.getBoundingClientRect();
+                    const containerRect = previewContainer.getBoundingClientRect();
+                    
+                    if (highlightRect.top < containerRect.top || highlightRect.bottom > containerRect.bottom) {
+                        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            }
+            
+            // Check each field for changes
+            for (const key in newState) {
+                if (oldState[key] !== newState[key]) {
+                    highlightText(newState[key], previewContent);
+                }
+            }
+        }
+
+        // Function to escape special characters for regex
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // Function to reset the form
+        function resetForm() {
+            document.getElementById('companyName').value = 'ABC Company';
+            document.getElementById('businessDescription').value = 'developing and marketing mobile applications';
+            document.getElementById('founder1Name').value = 'John Smith';
+            document.getElementById('founder1Address').value = '123 Main St, Anytown, CA 90000';
+            document.getElementById('founder2Name').value = 'Jane Lee';
+            document.getElementById('founder2Address').value = '456 Oak Rd, Anytown, CA 90000';
+            document.getElementById('agreementDate').value = '2023-01-01';
+            
+            document.getElementById('founder1Equity').value = '60';
+            document.getElementById('founder2Equity').value = '40';
+            document.getElementById('vestingPeriod').value = '4';
+            document.getElementById('cliffPeriod').value = '12';
+            document.getElementById('vestingFrequency').value = 'Quarterly';
+            document.getElementById('acceleratedVesting').value = 'No';
+            
+            document.getElementById('founder1Title').value = 'Chief Executive Officer';
+            document.getElementById('founder2Title').value = 'Chief Technology Officer';
+            document.getElementById('founder1Duties').value = 'leading strategy, fundraising, marketing, and overall operations';
+            document.getElementById('founder2Duties').value = 'leading engineering, product development, and technical operations';
+            document.getElementById('fullTimeCommitment').value = 'Yes';
+            document.getElementById('majorDecisions').value = 'Unanimous approval';
+            
+            document.getElementById('governingLaw').value = 'California';
+            document.getElementById('disputeResolution').value = 'Mediation';
+            document.getElementById('noticeRequired').value = '30';
+            document.getElementById('additionalTerms').value = '';
+            
+            // Reset current state
+            currentState = {};
+            
+            // Update the preview
+            updateAgreement();
+        }
+
+        // Function to download the agreement
+        function downloadAgreement() {
+            const companyName = document.getElementById('companyName').value;
+            const founder1Name = document.getElementById('founder1Name').value;
+            const founder2Name = document.getElementById('founder2Name').value;
+            
+            const previewContent = document.getElementById('preview-content').innerHTML;
+            const blob = new Blob([`<html><head><title>Founder Agreement</title><style>body { font-family: Arial, sans-serif; line-height: 1.6; margin: 40px; }</style></head><body>${previewContent}</body></html>`], { type: 'text/html' });
+            
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `${companyName} - Founder Agreement - ${founder1Name} and ${founder2Name}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    </script>
+</body>
+</html>
