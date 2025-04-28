@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mark-to-Market Tax Savings Calculator</title>
+    <style>
+        :root {
+            --primary-color: #0069ff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --border-color: #dee2e6;
+            --highlight-color: #ffff99;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .calculator-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        @media (min-width: 768px) {
+            .calculator-container {
+                flex-direction: row;
+            }
+        }
+        
+        .input-section {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .preview-section {
+            flex: 1;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: auto;
+            height: 600px;
+        }
+        
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .intro {
+            margin-bottom: 20px;
+        }
+        
+        .form-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: 500;
+            border: none;
+            background: none;
+            color: var(--text-color);
+        }
+        
+        .tab.active {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .form-section {
+            display: none;
+        }
+        
+        .form-section.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        
+        .tooltip {
+            display: inline-block;
+            margin-left: 5px;
+            position: relative;
+            cursor: help;
+        }
+        
+        .tooltip-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            line-height: 18px;
+            font-size: 12px;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            border-radius: 4px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        input[type="number"],
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .percentage-input {
+            position: relative;
+        }
+        
+        .percentage-input input {
+            padding-right: 30px;
+        }
+        
+        .percentage-input::after {
+            content: "%";
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0052cc;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e2e6ea;
+        }
+        
+        .btn-disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .result-section {
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        
+        .result-label {
+            font-weight: 500;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            animation: fadeHighlight 3s forwards;
+        }
+        
+        @keyframes fadeHighlight {
+            0% { background-color: var(--highlight-color); }
+            70% { background-color: var(--highlight-color); }
+            100% { background-color: transparent; }
+        }
+        
+        .calendar-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: var(--primary-color);
+        }
+        
+        .calendar-link:hover {
+            text-decoration: underline;
+        }
+        
+        .save-section {
+            margin-top: 30px;
+        }
+        
+        .explanation {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="intro">
+        <h1>Mark-to-Market Tax Savings Calculator</h1>
+        <p>This calculator helps traders compare potential tax outcomes under traditional accounting versus the mark-to-market (MTM) election under Section 475(f) of the Internal Revenue Code.</p>
+    </div>
+    
+    <div class="calculator-container">
+        <div class="input-section">
+            <div class="form-tabs">
+                <button class="tab active" data-tab="basic">Basic Info</button>
+                <button class="tab" data-tab="trading">Trading Activity</button>
+                <button class="tab" data-tab="additional">Additional Factors</button>
+                <button class="tab" data-tab="results">Results</button>
+            </div>
+            
+            <form id="calculator-form">
+                <!-- Basic Info Section -->
+                <div class="form-section active" id="basic-section">
+                    <h2>Basic Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="filing-status">Filing Status</label>
+                        <select id="filing-status" name="filing-status">
+                            <option value="single">Single</option>
+                            <option value="married-joint">Married Filing Jointly</option>
+                            <option value="married-separate">Married Filing Separately</option>
+                            <option value="head">Head of Household</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="other-income">
+                            Other Income
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Include all non-trading income such as wages, self-employment, interest, dividends, etc.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="other-income" name="other-income" placeholder="0" min="0" step="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="standard-deduction">Use Standard Deduction</label>
+                        <select id="standard-deduction" name="standard-deduction">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group" id="itemized-deduction-group" style="display: none;">
+                        <label for="itemized-deductions">
+                            Itemized Deductions
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Total of all itemized deductions including mortgage interest, charitable contributions, state and local taxes (limited to $10,000), etc.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="itemized-deductions" name="itemized-deductions" placeholder="0" min="0" step="1000">
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="reset-button">Reset</button>
+                        <button type="button" class="btn-primary" id="next-basic">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Trading Activity Section -->
+                <div class="form-section" id="trading-section">
+                    <h2>Trading Activity</h2>
+                    
+                    <div class="form-group">
+                        <label for="trading-style">Predominant Trading Style</label>
+                        <select id="trading-style" name="trading-style">
+                            <option value="day">Day Trading (< 1 day holds)</option>
+                            <option value="swing">Swing Trading (Days to weeks)</option>
+                            <option value="position">Position Trading (Weeks to months)</option>
+                            <option value="mixed">Mixed Approach</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="short-term-gains">
+                            Short-Term Gains/Losses (≤ 1 year)
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Enter negative numbers for losses. This is the total expected for the year.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="short-term-gains" name="short-term-gains" placeholder="0" step="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="long-term-gains">
+                            Long-Term Gains/Losses (> 1 year)
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Enter negative numbers for losses. This is the total expected for the year.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="long-term-gains" name="long-term-gains" placeholder="0" step="1000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loss-carryover">
+                            Capital Loss Carryover
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Enter any capital loss carryovers from previous years. Enter as a positive number.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="loss-carryover" name="loss-carryover" placeholder="0" min="0" step="1000">
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="prev-trading">Previous</button>
+                        <button type="button" class="btn-primary" id="next-trading">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Additional Factors Section -->
+                <div class="form-section" id="additional-section">
+                    <h2>Additional Factors</h2>
+                    
+                    <div class="form-group">
+                        <label for="trading-expenses">
+                            Trading Business Expenses
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Expenses related to your trading business that could be deducted under Section 162 if you qualify as a trader.</span>
+                            </div>
+                        </label>
+                        <input type="number" id="trading-expenses" name="trading-expenses" placeholder="0" min="0" step="500">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="trade-frequency">
+                            Approximate Trade Frequency
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">This helps assess your likelihood of qualifying for trader tax status.</span>
+                            </div>
+                        </label>
+                        <select id="trade-frequency" name="trade-frequency">
+                            <option value="high">High (Daily or near-daily)</option>
+                            <option value="medium">Medium (Several times per week)</option>
+                            <option value="low">Low (Weekly or less)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="wash-sales">
+                            Typically Have Wash Sales?
+                            <div class="tooltip">
+                                <span class="tooltip-icon">?</span>
+                                <span class="tooltip-text">Do you frequently repurchase securities within 30 days of selling them at a loss?</span>
+                            </div>
+                        </label>
+                        <select id="wash-sales" name="wash-sales">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                            <option value="unsure">Unsure</option>
+                        </select>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="prev-additional">Previous</button>
+                        <button type="button" class="btn-primary" id="calculate-button">Calculate Results</button>
+                    </div>
+                </div>
+                
+                <!-- Results Section -->
+                <div class="form-section" id="results-section">
+                    <h2>Tax Comparison Results</h2>
+                    
+                    <div class="result-section">
+                        <div class="result-row">
+                            <span class="result-label">Traditional Method Tax:</span>
+                            <span id="traditional-tax">$0</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">MTM Method Tax:</span>
+                            <span id="mtm-tax">$0</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Potential Savings:</span>
+                            <span id="tax-savings">$0</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="result-label">Recommendation:</span>
+                            <span id="recommendation">Complete the form to see recommendation</span>
+                        </div>
+                    </div>
+                    
+                    <div class="explanation" id="explanation-text">
+                        Complete the calculator to see a detailed explanation of your results.
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" id="prev-results">Previous</button>
+                        <button type="button" class="btn-primary" id="recalculate-button">Recalculate</button>
+                    </div>
+                    
+                    <div class="save-section">
+                        <p>Need professional help with your trader tax planning?</p>
+                        <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" class="calendar-link" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule a consultation</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        
+        <div class="preview-section" id="preview-pane">
+            <h2>Live Preview</h2>
+            <div id="preview-content">
+                <p><strong>Your Tax Situation Summary</strong></p>
+                <p>Filing Status: Single</p>
+                <p>Other Income: $0</p>
+                <p>Standard Deduction: Yes ($13,850)</p>
+                <p>Short-Term Gains/Losses: $0</p>
+                <p>Long-Term Gains/Losses: $0</p>
+                <p>Capital Loss Carryover: $0</p>
+                <p>Trading Business Expenses: $0</p>
+                <p>Trading Style: Day Trading</p>
+                <p>Trade Frequency: High (Daily or near-daily)</p>
+                <p>Wash Sale Issues: No</p>
+                
+                <p><strong>Tax Comparison</strong></p>
+                <p>With Traditional Accounting: $0</p>
+                <p>With Mark-to-Market: $0</p>
+                <p>Potential Tax Savings: $0</p>
+                
+                <p><strong>Recommendation</strong></p>
+                <p>Complete the form to receive a personalized recommendation based on your trading situation.</p>
+                
+                <p><strong>Explanation</strong></p>
+                <p>The calculator will provide a detailed explanation of how these calculations were made and what factors were considered in the recommendation.</p>
+                
+                <p><strong>Important Considerations</strong></p>
+                <p>Mark-to-Market (MTM) accounting treats all trading gains and losses as ordinary income, eliminating the $3,000 capital loss limitation.</p>
+                <p>Once you make the MTM election, it can only be revoked with IRS consent.</p>
+                <p>The MTM election must be made by the original due date (not including extensions) of the tax return for the year before the year you want the election to take effect.</p>
+                <p>MTM accounting eliminates wash sale rules, which can be beneficial for active traders.</p>
+                <p>To qualify for trader tax status, you must have substantial, regular, and continuous trading activity with the primary purpose of income or profit.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tax brackets for 2024 (estimated)
+        const taxBrackets = {
+            'single': [
+                { rate: 0.10, min: 0, max: 11000 },
+                { rate: 0.12, min: 11001, max: 44725 },
+                { rate: 0.22, min: 44726, max: 95375 },
+                { rate: 0.24, min: 95376, max: 182100 },
+                { rate: 0.32, min: 182101, max: 231250 },
+                { rate: 0.35, min: 231251, max: 578125 },
+                { rate: 0.37, min: 578126, max: Infinity }
+            ],
+            'married-joint': [
+                { rate: 0.10, min: 0, max: 22000 },
+                { rate: 0.12, min: 22001, max: 89450 },
+                { rate: 0.22, min: 89451, max: 190750 },
+                { rate: 0.24, min: 190751, max: 364200 },
+                { rate: 0.32, min: 364201, max: 462500 },
+                { rate: 0.35, min: 462501, max: 693750 },
+                { rate: 0.37, min: 693751, max: Infinity }
+            ],
+            'married-separate': [
+                { rate: 0.10, min: 0, max: 11000 },
+                { rate: 0.12, min: 11001, max: 44725 },
+                { rate: 0.22, min: 44726, max: 95375 },
+                { rate: 0.24, min: 95376, max: 182100 },
+                { rate: 0.32, min: 182101, max: 231250 },
+                { rate: 0.35, min: 231251, max: 346875 },
+                { rate: 0.37, min: 346876, max: Infinity }
+            ],
+            'head': [
+                { rate: 0.10, min: 0, max: 15700 },
+                { rate: 0.12, min: 15701, max: 59850 },
+                { rate: 0.22, min: 59851, max: 95350 },
+                { rate: 0.24, min: 95351, max: 182100 },
+                { rate: 0.32, min: 182101, max: 231250 },
+                { rate: 0.35, min: 231251, max: 578100 },
+                { rate: 0.37, min: 578101, max: Infinity }
+            ]
+        };
+
+        // Long-term capital gains tax rates for 2024 (estimated)
+        const ltcgRates = {
+            'single': [
+                { rate: 0.00, min: 0, max: 44625 },
+                { rate: 0.15, min: 44626, max: 492300 },
+                { rate: 0.20, min: 492301, max: Infinity }
+            ],
+            'married-joint': [
+                { rate: 0.00, min: 0, max: 89250 },
+                { rate: 0.15, min: 89251, max: 553850 },
+                { rate: 0.20, min: 553851, max: Infinity }
+            ],
+            'married-separate': [
+                { rate: 0.00, min: 0, max: 44625 },
+                { rate: 0.15, min: 44626, max: 276900 },
+                { rate: 0.20, min: 276901, max: Infinity }
+            ],
+            'head': [
+                { rate: 0.00, min: 0, max: 59750 },
+                { rate: 0.15, min: 59751, max: 523050 },
+                { rate: 0.20, min: 523051, max: Infinity }
+            ]
+        };
+
+        // Standard deduction amounts for 2024 (estimated)
+        const standardDeductions = {
+            'single': 13850,
+            'married-joint': 27700,
+            'married-separate': 13850,
+            'head': 20800
+        };
+
+        // Tab navigation
+        const tabs = document.querySelectorAll('.tab');
+        const sections = document.querySelectorAll('.form-section');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.getAttribute('data-tab');
+                
+                // Update active tab
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                // Show active section
+                sections.forEach(section => {
+                    section.classList.remove('active');
+                    if (section.id === `${targetTab}-section`) {
+                        section.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Navigation buttons
+        document.getElementById('next-basic').addEventListener('click', () => {
+            document.querySelector('[data-tab="trading"]').click();
+        });
+        
+        document.getElementById('prev-trading').addEventListener('click', () => {
+            document.querySelector('[data-tab="basic"]').click();
+        });
+        
+        document.getElementById('next-trading').addEventListener('click', () => {
+            document.querySelector('[data-tab="additional"]').click();
+        });
+        
+        document.getElementById('prev-additional').addEventListener('click', () => {
+            document.querySelector('[data-tab="trading"]').click();
+        });
+        
+        document.getElementById('prev-results').addEventListener('click', () => {
+            document.querySelector('[data-tab="additional"]').click();
+        });
+        
+        document.getElementById('calculate-button').addEventListener('click', () => {
+            calculateResults();
+            document.querySelector('[data-tab="results"]').click();
+        });
+        
+        document.getElementById('recalculate-button').addEventListener('click', () => {
+            calculateResults();
+        });
+        
+        document.getElementById('reset-button').addEventListener('click', () => {
+            document.getElementById('calculator-form').reset();
+            updatePreview();
+        });
+
+        // Show/hide itemized deductions based on standard deduction selection
+        document.getElementById('standard-deduction').addEventListener('change', function() {
+            const itemizedGroup = document.getElementById('itemized-deduction-group');
+            if (this.value === 'no') {
+                itemizedGroup.style.display = 'block';
+            } else {
+                itemizedGroup.style.display = 'none';
+            }
+            updatePreview();
+        });
+
+        // Update preview when inputs change
+        const inputs = document.querySelectorAll('input, select');
+        inputs.forEach(input => {
+            input.addEventListener('change', updatePreview);
+            input.addEventListener('input', updatePreview);
+        });
+
+        // Initial preview update
+        updatePreview();
+
+        // Main function to update the preview pane
+        function updatePreview() {
+            const filingStatus = document.getElementById('filing-status').value;
+            const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
+            const useStandard = document.getElementById('standard-deduction').value === 'yes';
+            const itemizedDeductions = parseFloat(document.getElementById('itemized-deductions').value) || 0;
+            const shortTermGains = parseFloat(document.getElementById('short-term-gains').value) || 0;
+            const longTermGains = parseFloat(document.getElementById('long-term-gains').value) || 0;
+            const lossCarryover = parseFloat(document.getElementById('loss-carryover').value) || 0;
+            const tradingExpenses = parseFloat(document.getElementById('trading-expenses').value) || 0;
+            const tradingStyle = document.getElementById('trading-style').value;
+            const tradeFrequency = document.getElementById('trade-frequency').value;
+            const washSales = document.getElementById('wash-sales').value;
+            
+            // Format trading style for display
+            let tradingStyleDisplay = 'Day Trading';
+            switch(tradingStyle) {
+                case 'day': tradingStyleDisplay = 'Day Trading'; break;
+                case 'swing': tradingStyleDisplay = 'Swing Trading'; break;
+                case 'position': tradingStyleDisplay = 'Position Trading'; break;
+                case 'mixed': tradingStyleDisplay = 'Mixed Approach'; break;
+            }
+            
+            // Format trade frequency for display
+            let tradeFrequencyDisplay = 'High (Daily or near-daily)';
+            switch(tradeFrequency) {
+                case 'high': tradeFrequencyDisplay = 'High (Daily or near-daily)'; break;
+                case 'medium': tradeFrequencyDisplay = 'Medium (Several times per week)'; break;
+                case 'low': tradeFrequencyDisplay = 'Low (Weekly or less)'; break;
+            }
+            
+            // Format wash sales for display
+            let washSalesDisplay = 'No';
+            switch(washSales) {
+                case 'yes': washSalesDisplay = 'Yes'; break;
+                case 'no': washSalesDisplay = 'No'; break;
+                case 'unsure': washSalesDisplay = 'Unsure'; break;
+            }
+            
+            // Format filing status for display
+            let filingStatusDisplay = 'Single';
+            switch(filingStatus) {
+                case 'single': filingStatusDisplay = 'Single'; break;
+                case 'married-joint': filingStatusDisplay = 'Married Filing Jointly'; break;
+                case 'married-separate': filingStatusDisplay = 'Married Filing Separately'; break;
+                case 'head': filingStatusDisplay = 'Head of Household'; break;
+            }
+            
+            // Create preview HTML
+            const standardDeduction = standardDeductions[filingStatus];
+            const previewHTML = `
+                <p><strong>Your Tax Situation Summary</strong></p>
+                <p>Filing Status: ${filingStatusDisplay}</p>
+                <p>Other Income: ${formatCurrency(otherIncome)}</p>
+                <p>Standard Deduction: ${useStandard ? 'Yes (' + formatCurrency(standardDeduction) + ')' : 'No'}</p>
+                ${!useStandard ? `<p>Itemized Deductions: ${formatCurrency(itemizedDeductions)}</p>` : ''}
+                <p>Short-Term Gains/Losses: ${formatCurrency(shortTermGains)}</p>
+                <p>Long-Term Gains/Losses: ${formatCurrency(longTermGains)}</p>
+                <p>Capital Loss Carryover: ${formatCurrency(lossCarryover)}</p>
+                <p>Trading Business Expenses: ${formatCurrency(tradingExpenses)}</p>
+                <p>Trading Style: ${tradingStyleDisplay}</p>
+                <p>Trade Frequency: ${tradeFrequencyDisplay}</p>
+                <p>Wash Sale Issues: ${washSalesDisplay}</p>
+                
+                <p><strong>Tax Comparison</strong></p>
+                <p>With Traditional Accounting: ${document.getElementById('traditional-tax').textContent}</p>
+                <p>With Mark-to-Market: ${document.getElementById('mtm-tax').textContent}</p>
+                <p>Potential Tax Savings: ${document.getElementById('tax-savings').textContent}</p>
+                
+                <p><strong>Recommendation</strong></p>
+                <p>${document.getElementById('recommendation').textContent === 'Complete the form to see recommendation' ? 
+                    'Complete the form to receive a personalized recommendation based on your trading situation.' : 
+                    document.getElementById('recommendation').textContent}</p>
+                
+                <p><strong>Explanation</strong></p>
+                <p>${document.getElementById('explanation-text').textContent === 'Complete the calculator to see a detailed explanation of your results.' ? 
+                    'The calculator will provide a detailed explanation of how these calculations were made and what factors were considered in the recommendation.' : 
+                    document.getElementById('explanation-text').textContent}</p>
+                
+                <p><strong>Important Considerations</strong></p>
+                <p>Mark-to-Market (MTM) accounting treats all trading gains and losses as ordinary income, eliminating the $3,000 capital loss limitation.</p>
+                <p>Once you make the MTM election, it can only be revoked with IRS consent.</p>
+                <p>The MTM election must be made by the original due date (not including extensions) of the tax return for the year before the year you want the election to take effect.</p>
+                <p>MTM accounting eliminates wash sale rules, which can be beneficial for active traders.</p>
+                <p>To qualify for trader tax status, you must have substantial, regular, and continuous trading activity with the primary purpose of income or profit.</p>
+            `;
+            
+            // Update preview content and add compare logic to highlight changes
+            updateContentWithHighlights('preview-content', previewHTML);
+        }
+
+        // Function to calculate tax results
+        function calculateResults() {
+            const filingStatus = document.getElementById('filing-status').value;
+            const otherIncome = parseFloat(document.getElementById('other-income').value) || 0;
+            const useStandard = document.getElementById('standard-deduction').value === 'yes';
+            const itemizedDeductions = parseFloat(document.getElementById('itemized-deductions').value) || 0;
+            const shortTermGains = parseFloat(document.getElementById('short-term-gains').value) || 0;
+            const longTermGains = parseFloat(document.getElementById('long-term-gains').value) || 0;
+            const lossCarryover = parseFloat(document.getElementById('loss-carryover').value) || 0;
+            const tradingExpenses = parseFloat(document.getElementById('trading-expenses').value) || 0;
+            const tradingStyle = document.getElementById('trading-style').value;
+            const tradeFrequency = document.getElementById('trade-frequency').value;
+            const washSales = document.getElementById('wash-sales').value;
+            
+            // Calculate traditional tax
+            const traditionalTax = calculateTraditionalTax(
+                filingStatus,
+                otherIncome,
+                useStandard,
+                itemizedDeductions,
+                shortTermGains,
+                longTermGains,
+                lossCarryover
+            );
+            
+            // Calculate MTM tax
+            const mtmTax = calculateMTMTax(
+                filingStatus,
+                otherIncome,
+                useStandard,
+                itemizedDeductions,
+                shortTermGains,
+                longTermGains,
+                tradingExpenses
+            );
+            
+            // Calculate savings
+            const savings = traditionalTax - mtmTax;
+            
+            // Update result displays
+            document.getElementById('traditional-tax').textContent = formatCurrency(traditionalTax);
+            document.getElementById('mtm-tax').textContent = formatCurrency(mtmTax);
+            document.getElementById('tax-savings').textContent = formatCurrency(savings);
+            
+            // Generate recommendation
+            const recommendation = generateRecommendation(
+                savings,
+                shortTermGains,
+                longTermGains,
+                tradingStyle,
+                tradeFrequency,
+                washSales,
+                lossCarryover
+            );
+            document.getElementById('recommendation').textContent = recommendation;
+            
+            // Generate explanation
+            const explanation = generateExplanation(
+                traditionalTax,
+                mtmTax,
+                savings,
+                shortTermGains,
+                longTermGains,
+                lossCarryover,
+                tradingStyle,
+                tradeFrequency,
+                washSales
+            );
+            document.getElementById('explanation-text').textContent = explanation;
+            
+            // Update preview
+            updatePreview();
+        }
+        
+        // Calculate tax under traditional accounting
+        function calculateTraditionalTax(filingStatus, otherIncome, useStandard, itemizedDeductions, shortTermGains, longTermGains, lossCarryover) {
+            // Apply loss carryover
+            let remainingLossCarryover = lossCarryover;
+            let adjustedShortTerm = shortTermGains;
+            let adjustedLongTerm = longTermGains;
+            
+            // Apply loss carryover to short-term first
+            if (remainingLossCarryover > 0 && adjustedShortTerm > 0) {
+                if (remainingLossCarryover >= adjustedShortTerm) {
+                    remainingLossCarryover -= adjustedShortTerm;
+                    adjustedShortTerm = 0;
+                } else {
+                    adjustedShortTerm -= remainingLossCarryover;
+                    remainingLossCarryover = 0;
+                }
+            }
+            
+            // Apply remaining loss carryover to long-term
+            if (remainingLossCarryover > 0 && adjustedLongTerm > 0) {
+                if (remainingLossCarryover >= adjustedLongTerm) {
+                    remainingLossCarryover -= adjustedLongTerm;
+                    adjustedLongTerm = 0;
+                } else {
+                    adjustedLongTerm -= remainingLossCarryover;
+                    remainingLossCarryover = 0;
+                }
+            }
+            
+            // Apply current year short-term losses to long-term gains
+            if (adjustedShortTerm < 0 && adjustedLongTerm > 0) {
+                const absShortTerm = Math.abs(adjustedShortTerm);
+                if (absShortTerm >= adjustedLongTerm) {
+                    adjustedShortTerm = -(absShortTerm - adjustedLongTerm);
+                    adjustedLongTerm = 0;
+                } else {
+                    adjustedLongTerm -= absShortTerm;
+                    adjustedShortTerm = 0;
+                }
+            }
+            
+            // Apply current year long-term losses to short-term gains
+            if (adjustedLongTerm < 0 && adjustedShortTerm > 0) {
+                const absLongTerm = Math.abs(adjustedLongTerm);
+                if (absLongTerm >= adjustedShortTerm) {
+                    adjustedLongTerm = -(absLongTerm - adjustedShortTerm);
+                    adjustedShortTerm = 0;
+                } else {
+                    adjustedShortTerm -= absLongTerm;
+                    adjustedLongTerm = 0;
+                }
+            }
+            
+            // Determine total net capital gain/loss
+            let netCapitalGainLoss = adjustedShortTerm + adjustedLongTerm;
+            
+            // Apply $3,000 capital loss limitation
+            let ordinaryIncomeOffset = 0;
+            if (netCapitalGainLoss < 0) {
+                ordinaryIncomeOffset = Math.min(3000, Math.abs(netCapitalGainLoss));
+                netCapitalGainLoss += ordinaryIncomeOffset;
+            }
+            
+            // Calculate taxable income
+            const deduction = useStandard ? standardDeductions[filingStatus] : itemizedDeductions;
+            let taxableIncome = Math.max(0, otherIncome - ordinaryIncomeOffset - deduction);
+            
+            // Calculate ordinary income tax
+            let tax = calculateOrdinaryIncomeTax(taxableIncome, filingStatus);
+            
+            // Add tax on long-term capital gains if positive
+            if (adjustedLongTerm > 0) {
+                tax += calculateLTCGTax(adjustedLongTerm, taxableIncome, filingStatus);
+            }
+            
+            // Add tax on short-term capital gains if positive
+            if (adjustedShortTerm > 0) {
+                const shortTermTaxableIncome = taxableIncome + adjustedShortTerm;
+                const taxWithShortTerm = calculateOrdinaryIncomeTax(shortTermTaxableIncome, filingStatus);
+                tax += taxWithShortTerm - calculateOrdinaryIncomeTax(taxableIncome, filingStatus);
+            }
+            
+            return tax;
+        }
+        
+        // Calculate tax under MTM accounting
+        function calculateMTMTax(filingStatus, otherIncome, useStandard, itemizedDeductions, shortTermGains, longTermGains, tradingExpenses) {
+            // All gains/losses are ordinary income in MTM
+            const totalTradingIncome = shortTermGains + longTermGains - tradingExpenses;
+            
+            // Calculate taxable income
+            const deduction = useStandard ? standardDeductions[filingStatus] : itemizedDeductions;
+            const taxableIncome = Math.max(0, otherIncome + totalTradingIncome - deduction);
+            
+            // Calculate tax
+            return calculateOrdinaryIncomeTax(taxableIncome, filingStatus);
+        }
+
+        // Calculate ordinary income tax
+        function calculateOrdinaryIncomeTax(taxableIncome, filingStatus) {
+            let tax = 0;
+            const brackets = taxBrackets[filingStatus];
+            
+            for (let i = 0; i < brackets.length; i++) {
+                const bracket = brackets[i];
+                if (taxableIncome > bracket.min) {
+                    const amountInBracket = Math.min(taxableIncome, bracket.max) - bracket.min;
+                    tax += amountInBracket * bracket.rate;
+                }
+                
+                if (taxableIncome <= bracket.max) {
+                    break;
+                }
+            }
+            
+            return tax;
+        }
+        
+        // Calculate tax on long-term capital gains
+        function calculateLTCGTax(ltcgAmount, ordinaryIncome, filingStatus) {
+            let tax = 0;
+            const brackets = ltcgRates[filingStatus];
+            
+            // Ordinary income is considered to "fill up" lower brackets first
+            let remainingLTCG = ltcgAmount;
+            
+            for (let i = 0; i < brackets.length; i++) {
+                const bracket = brackets[i];
+                const bracketsAlreadyUsed = Math.min(Math.max(0, ordinaryIncome - bracket.min), bracket.max - bracket.min);
+                const spaceInBracket = (bracket.max - bracket.min) - bracketsAlreadyUsed;
+                
+                if (spaceInBracket > 0 && remainingLTCG > 0) {
+                    const amountInBracket = Math.min(remainingLTCG, spaceInBracket);
+                    tax += amountInBracket * bracket.rate;
+                    remainingLTCG -= amountInBracket;
+                }
+                
+                if (remainingLTCG <= 0) {
+                    break;
+                }
+            }
+            
+            return tax;
+        }
+
+        // Generate recommendation based on inputs and calculation results
+        function generateRecommendation(savings, shortTermGains, longTermGains, tradingStyle, tradeFrequency, washSales, lossCarryover) {
+            if (savings > 3000) {
+                return `Based on your inputs, the Mark-to-Market election could save you approximately ${formatCurrency(savings)} in taxes. This strongly suggests MTM would be beneficial for your situation.`;
+            } else if (savings > 0) {
+                return `The Mark-to-Market election could save you approximately ${formatCurrency(savings)} in taxes, which is a moderate benefit. Consider other factors beyond tax savings.`;
+            } else if (savings === 0) {
+                return `There is no significant tax difference between the two methods based on your current inputs. Consider other factors like wash sale rules and administrative complexity.`;
+            } else {
+                return `The traditional accounting method would save you approximately ${formatCurrency(Math.abs(savings))} compared to MTM. Unless you have compelling non-tax reasons, MTM is likely not advantageous for you.`;
+            }
+        }
+        
+        // Generate detailed explanation
+        function generateExplanation(traditionalTax, mtmTax, savings, shortTermGains, longTermGains, lossCarryover, tradingStyle, tradeFrequency, washSales) {
+            let explanation = '';
+            
+            // Explain traditional accounting calculation
+            explanation += `Under traditional accounting, your tax liability would be approximately ${formatCurrency(traditionalTax)}. `;
+            
+            if (shortTermGains < 0 && Math.abs(shortTermGains) > 3000) {
+                explanation += `With traditional accounting, your capital losses exceeding $3,000 would have to be carried forward to future years. `;
+            }
+            
+            if (lossCarryover > 0) {
+                explanation += `Your existing loss carryover of ${formatCurrency(lossCarryover)} was applied to offset gains before calculating tax. `;
+            }
+            
+            // Explain MTM calculation
+            explanation += `Under mark-to-market accounting, your tax liability would be approximately ${formatCurrency(mtmTax)}. `;
+            
+            if (shortTermGains < 0) {
+                explanation += `With MTM, all trading losses can offset other income without the $3,000 limitation. `;
+            }
+            
+            // Explain savings and recommendation
+            if (savings > 0) {
+                explanation += `Electing MTM would result in tax savings of approximately ${formatCurrency(savings)}. `;
+                
+                if (savings > 3000) {
+                    explanation += `This is a significant benefit that suggests MTM would be advantageous. `;
+                } else {
+                    explanation += `This moderate benefit should be weighed against the administrative requirements of MTM. `;
+                }
+            } else if (savings < 0) {
+                explanation += `Staying with traditional accounting would save you approximately ${formatCurrency(Math.abs(savings))} compared to MTM. `;
+            } else {
+                explanation += `There is no significant tax difference between the two methods based on your current inputs. `;
+            }
+            
+            // Consider trading style
+            if (tradingStyle === 'day' || tradingStyle === 'swing') {
+                explanation += `Your ${tradingStyle === 'day' ? 'day' : 'swing'} trading style suggests frequent short-term positions, which can be well-suited for MTM. `;
+            } else if (tradingStyle === 'position') {
+                explanation += `Your position trading style with longer holding periods might benefit more from traditional accounting if you occasionally qualify for long-term capital gains rates. `;
+            }
+            
+            // Consider trade frequency for trader tax status
+            if (tradeFrequency === 'high') {
+                explanation += `Your high trading frequency suggests you may qualify for trader tax status, which is required for the MTM election. `;
+            } else if (tradeFrequency === 'medium') {
+                explanation += `Your medium trading frequency might be sufficient for trader tax status, but you should document your trading activity carefully. `;
+            } else {
+                explanation += `Your low trading frequency might make it difficult to qualify for trader tax status, which is required for the MTM election. `;
+            }
+            
+            // Consider wash sales
+            if (washSales === 'yes') {
+                explanation += `Since you frequently encounter wash sale issues, MTM could simplify your tax reporting by eliminating these rules. `;
+            }
+            
+            return explanation;
+        }
+
+        // Helper function to format currency
+        function formatCurrency(amount) {
+            return '$' + amount.toLocaleString('en-US', { 
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            });
+        }
+
+        // Function to update content with highlights for changed text
+        function updateContentWithHighlights(elementId, newHTML) {
+            const container = document.getElementById(elementId);
+            const oldHTML = container.innerHTML;
+            
+            // Update the content
+            container.innerHTML = newHTML;
+            
+            // Highlight changes (simplified approach - in a real implementation, 
+            // you would want a more sophisticated diff algorithm)
+            if (oldHTML) {
+                const oldParagraphs = getTextNodes(oldHTML);
+                const newParagraphs = Array.from(container.childNodes).filter(node => 
+                    node.nodeType === Node.ELEMENT_NODE && node.tagName === 'P'
+                );
+                
+                newParagraphs.forEach((newP, i) => {
+                    if (i < oldParagraphs.length) {
+                        const oldText = oldParagraphs[i];
+                        const newText = newP.textContent;
+                        
+                        if (oldText !== newText) {
+                            highlightChanges(newP, oldText, newText);
+                        }
+                    }
+                });
+            }
+        }
+
+        // Extract text content from HTML string
+        function getTextNodes(html) {
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            return Array.from(div.querySelectorAll('p')).map(p => p.textContent);
+        }
+
+        // Highlight changes in text (simplified version)
+        function highlightChanges(element, oldText, newText) {
+            // This is a simplified approach - in a real implementation,
+            // you would want to use a proper diff algorithm to identify exactly what changed
+            element.classList.add('highlight');
+            
+            // Scroll to the highlighted element if it's not in view
+            const container = document.getElementById('preview-pane');
+            const isInView = 
+                element.offsetTop >= container.scrollTop && 
+                element.offsetTop <= container.scrollTop + container.clientHeight;
+                
+            if (!isInView) {
+                container.scrollTop = element.offsetTop - 100;
+            }
+        }
+    </script>
+</body>
+</html>
