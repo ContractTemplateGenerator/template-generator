@@ -2241,15 +2241,1443 @@
 </script>
     
     
-    <!-- Tab Content for Dispute Resolution -->
-    <div id="dispute-tab" class="tools-tab-content">
-      <div class="coming-soon-container">
-        <div class="coming-soon-icon">🔜</div>
-        <h3 class="coming-soon-title">Dispute Resolution Generator</h3>
-        <p class="coming-soon-description">Generate customized dispute resolution clauses with arbitration, jurisdiction, class action waiver, and attorney's fees provisions tailored to your jurisdiction and business requirements.</p>
-        <div class="coming-soon-notification">Coming Soon!</div>
+
+<!-- Tab Content for Dispute Resolution -->
+<div id="dispute-tab" class="tools-tab-content">
+  <div class="generator-container">
+    <!-- Form Column -->
+    <div class="form-column">
+      <!-- Industry Presets -->
+      <div class="industry-presets">
+        <div class="preset-title">Quick Start: Select Your Industry</div>
+        <div class="preset-buttons">
+          <button class="preset-btn" onclick="disputeGenerator.applyPreset('saas')">SaaS/Software</button>
+          <button class="preset-btn" onclick="disputeGenerator.applyPreset('ecommerce')">E-commerce</button>
+          <button class="preset-btn" onclick="disputeGenerator.applyPreset('content')">Content Platform</button>
+          <button class="preset-btn" onclick="disputeGenerator.applyPreset('consumer')">Consumer Products</button>
+          <button class="preset-btn" onclick="disputeGenerator.applyPreset('b2b')">B2B Services</button>
+        </div>
+      </div>
+    
+      <!-- Agreement Information -->
+      <div class="section-header">Agreement Information</div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_companyName">Company Name</label>
+        <input type="text" id="dr_companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="disputeGenerator.updatePreview('companyName')">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_serviceType">Service Type</label>
+        <select id="dr_serviceType" class="form-select" onchange="disputeGenerator.updatePreview('serviceType')">
+          <option value="website" selected>Website</option>
+          <option value="mobileApp">Mobile App</option>
+          <option value="saas">SaaS Platform</option>
+          <option value="marketplace">Online Marketplace</option>
+          <option value="ecommerce">E-commerce Store</option>
+          <option value="subscription">Subscription Service</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_serviceName">Service/Product Name</label>
+        <input type="text" id="dr_serviceName" class="form-input" value="Our Service" placeholder="Enter service name" onkeyup="disputeGenerator.updatePreview('serviceName')">
+      </div>
+      
+      <!-- Governing Law -->
+      <div class="section-header">Governing Law & Jurisdiction</div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_jurisdictionRegion">
+          Jurisdiction Region
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select the region where your governing law is located.
+            </div>
+          </div>
+        </label>
+        <select id="dr_jurisdictionRegion" class="form-select" onchange="disputeGenerator.handleJurisdictionRegionChange()">
+          <option value="us" selected>United States</option>
+          <option value="international">International</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="dr_usStateGroup">
+        <label class="form-label" for="dr_governingLawUS">
+          Governing Law (US State)
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select the state law that will govern the interpretation and enforcement of your terms. This is typically the state where your business is headquartered.
+            </div>
+          </div>
+        </label>
+        <select id="dr_governingLawUS" class="form-select" onchange="disputeGenerator.updatePreview('governingLaw')">
+          <option value="alabama">Alabama</option>
+          <option value="alaska">Alaska</option>
+          <option value="arizona">Arizona</option>
+          <option value="arkansas">Arkansas</option>
+          <option value="california" selected>California</option>
+          <option value="colorado">Colorado</option>
+          <option value="connecticut">Connecticut</option>
+          <option value="delaware">Delaware</option>
+          <option value="florida">Florida</option>
+          <option value="georgia">Georgia</option>
+          <option value="hawaii">Hawaii</option>
+          <option value="idaho">Idaho</option>
+          <option value="illinois">Illinois</option>
+          <option value="indiana">Indiana</option>
+          <option value="iowa">Iowa</option>
+          <option value="kansas">Kansas</option>
+          <option value="kentucky">Kentucky</option>
+          <option value="louisiana">Louisiana</option>
+          <option value="maine">Maine</option>
+          <option value="maryland">Maryland</option>
+          <option value="massachusetts">Massachusetts</option>
+          <option value="michigan">Michigan</option>
+          <option value="minnesota">Minnesota</option>
+          <option value="mississippi">Mississippi</option>
+          <option value="missouri">Missouri</option>
+          <option value="montana">Montana</option>
+          <option value="nebraska">Nebraska</option>
+          <option value="nevada">Nevada</option>
+          <option value="new_hampshire">New Hampshire</option>
+          <option value="new_jersey">New Jersey</option>
+          <option value="new_mexico">New Mexico</option>
+          <option value="new_york">New York</option>
+          <option value="north_carolina">North Carolina</option>
+          <option value="north_dakota">North Dakota</option>
+          <option value="ohio">Ohio</option>
+          <option value="oklahoma">Oklahoma</option>
+          <option value="oregon">Oregon</option>
+          <option value="pennsylvania">Pennsylvania</option>
+          <option value="rhode_island">Rhode Island</option>
+          <option value="south_carolina">South Carolina</option>
+          <option value="south_dakota">South Dakota</option>
+          <option value="tennessee">Tennessee</option>
+          <option value="texas">Texas</option>
+          <option value="utah">Utah</option>
+          <option value="vermont">Vermont</option>
+          <option value="virginia">Virginia</option>
+          <option value="washington">Washington</option>
+          <option value="west_virginia">West Virginia</option>
+          <option value="wisconsin">Wisconsin</option>
+          <option value="wyoming">Wyoming</option>
+          <option value="district_of_columbia">District of Columbia</option>
+        </select>
+      </div>
+      
+      <div class="form-group" id="dr_internationalGroup" style="display: none;">
+        <label class="form-label" for="dr_governingLawInternational">
+          Governing Law (International)
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select the country whose laws will govern the interpretation and enforcement of your terms.
+            </div>
+          </div>
+        </label>
+        <select id="dr_governingLawInternational" class="form-select" onchange="disputeGenerator.updatePreview('governingLaw')">
+          <option value="australia">Australia</option>
+          <option value="austria">Austria</option>
+          <option value="belgium">Belgium</option>
+          <option value="brazil">Brazil</option>
+          <option value="canada">Canada</option>
+          <option value="china">China</option>
+          <option value="denmark">Denmark</option>
+          <option value="finland">Finland</option>
+          <option value="france">France</option>
+          <option value="germany">Germany</option>
+          <option value="hong_kong">Hong Kong</option>
+          <option value="india">India</option>
+          <option value="ireland">Ireland</option>
+          <option value="israel">Israel</option>
+          <option value="italy">Italy</option>
+          <option value="japan">Japan</option>
+          <option value="mexico">Mexico</option>
+          <option value="netherlands">Netherlands</option>
+          <option value="new_zealand">New Zealand</option>
+          <option value="norway">Norway</option>
+          <option value="poland">Poland</option>
+          <option value="portugal">Portugal</option>
+          <option value="singapore">Singapore</option>
+          <option value="south_korea">South Korea</option>
+          <option value="spain">Spain</option>
+          <option value="sweden">Sweden</option>
+          <option value="switzerland">Switzerland</option>
+          <option value="uk">United Kingdom</option>
+          <option value="eu">European Union</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_exclusiveJurisdiction">
+          Jurisdiction Approach
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Exclusive:</strong> Disputes can only be filed in the specified courts.<br>
+              <strong>Non-exclusive:</strong> Disputes can be filed in the specified courts or elsewhere.<br>
+              <strong>None:</strong> No specific jurisdiction is designated.
+            </div>
+          </div>
+        </label>
+        <select id="dr_exclusiveJurisdiction" class="form-select" onchange="disputeGenerator.updatePreview('exclusiveJurisdiction')">
+          <option value="exclusive" selected>Exclusive Jurisdiction</option>
+          <option value="non-exclusive">Non-exclusive Jurisdiction</option>
+          <option value="none">No Specified Jurisdiction</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" for="dr_venueCity">
+          Venue City/County
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Specify the city or county where legal proceedings must be brought. Typically your company's location.
+            </div>
+          </div>
+        </label>
+        <input type="text" id="dr_venueCity" class="form-input" value="San Francisco, California" placeholder="City, State/Province, Country" onkeyup="disputeGenerator.updatePreview('venueCity')">
+      </div>
+      
+      <!-- Dispute Resolution Method -->
+      <div class="section-header">Dispute Resolution Method</div>
+      
+      <div class="form-group">
+        <label class="form-label" for="dr_resolutionMethod">
+          Primary Resolution Method
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Court Litigation:</strong> Disputes resolved through traditional court proceedings.<br>
+              <strong>Binding Arbitration:</strong> Disputes resolved by a neutral arbitrator outside of court.<br>
+              <strong>Tiered Approach:</strong> Negotiation, then mediation, then arbitration or litigation.
+            </div>
+          </div>
+        </label>
+        <select id="dr_resolutionMethod" class="form-select" onchange="disputeGenerator.handleResolutionMethodChange(); disputeGenerator.updatePreview('resolutionMethod')">
+          <option value="court">Court Litigation</option>
+          <option value="arbitration" selected>Binding Arbitration</option>
+          <option value="tiered">Tiered Approach</option>
+        </select>
+      </div>
+      
+      <div id="dr_arbitrationOptions">
+        <div class="form-group">
+          <label class="form-label" for="dr_arbitrationProvider">
+            Arbitration Provider
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Select the organization that will administer the arbitration. Note that some providers may not be available in all jurisdictions.
+              </div>
+            </div>
+          </label>
+          <select id="dr_arbitrationProvider" class="form-select" onchange="disputeGenerator.handleArbitrationProviderChange(); disputeGenerator.updatePreview('arbitrationProvider')">
+            <!-- Options will be populated by JavaScript based on jurisdiction -->
+          </select>
+        </div>
+        
+        <div class="form-group" id="dr_otherProviderGroup" style="display: none;">
+          <label class="form-label" for="dr_otherProvider">Other Provider Name</label>
+          <input type="text" id="dr_otherProvider" class="form-input" value="" placeholder="Enter provider name" onkeyup="disputeGenerator.updatePreview('otherProvider')">
+        </div>
+        
+        <div class="form-group" id="dr_aaaOptionsGroup" style="display: none;">
+          <label class="form-label" for="dr_aaaHearingType">
+            AAA Hearing Type
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                <strong>In-person hearings:</strong> Parties appear in person before the arbitrator.<br>
+                <strong>Documents-only:</strong> Decision made based solely on submitted documents with no in-person appearances. This is a cost-effective option for e-commerce and other businesses as it doesn't require travel or physical appearances.
+              </div>
+            </div>
+          </label>
+          <select id="dr_aaaHearingType" class="form-select" onchange="disputeGenerator.updatePreview('aaaHearingType')">
+            <option value="in-person">In-person Hearings</option>
+            <option value="documents-only" selected>Documents-only (No In-person Appearances)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="dr_arbitrationLanguage">Arbitration Language</label>
+          <select id="dr_arbitrationLanguage" class="form-select" onchange="disputeGenerator.updatePreview('arbitrationLanguage')">
+            <option value="english" selected>English</option>
+            <option value="spanish">Spanish</option>
+            <option value="french">French</option>
+            <option value="german">German</option>
+            <option value="japanese">Japanese</option>
+            <option value="chinese">Chinese</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="dr_arbitrationLocation">Arbitration Location</label>
+          <input type="text" id="dr_arbitrationLocation" class="form-input" value="San Francisco, California" placeholder="City, State/Province, Country" onkeyup="disputeGenerator.updatePreview('arbitrationLocation')">
+        </div>
+      </div>
+      
+      <div id="dr_tieredOptions" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="dr_negotiationPeriod">
+            Negotiation Period
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                The number of days parties must attempt direct negotiation before proceeding to the next dispute resolution step.
+              </div>
+            </div>
+          </label>
+          <select id="dr_negotiationPeriod" class="form-select" onchange="disputeGenerator.updatePreview('negotiationPeriod')">
+            <option value="15">15 days</option>
+            <option value="30" selected>30 days</option>
+            <option value="45">45 days</option>
+            <option value="60">60 days</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Include Mediation Step?</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="dr_includeMediation" id="dr_includeMediationYes" value="yes" checked onclick="disputeGenerator.handleMediationChange(); disputeGenerator.updatePreview('includeMediation')">
+              <span class="radio-label">Yes</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="dr_includeMediation" id="dr_includeMediationNo" value="no" onclick="disputeGenerator.handleMediationChange(); disputeGenerator.updatePreview('includeMediation')">
+              <span class="radio-label">No</span>
+            </label>
+          </div>
+        </div>
+        
+        <div id="dr_mediationOptions">
+          <div class="form-group">
+            <label class="form-label" for="dr_mediationProvider">Mediation Provider</label>
+            <select id="dr_mediationProvider" class="form-select" onchange="disputeGenerator.handleMediationProviderChange(); disputeGenerator.updatePreview('mediationProvider')">
+              <!-- Options will be populated by JavaScript based on jurisdiction -->
+            </select>
+          </div>
+          
+          <div class="form-group" id="dr_otherMediationProviderGroup" style="display: none;">
+            <label class="form-label" for="dr_otherMediationProvider">Other Mediation Provider</label>
+            <input type="text" id="dr_otherMediationProvider" class="form-input" value="" placeholder="Enter provider name" onkeyup="disputeGenerator.updatePreview('otherMediationProvider')">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="dr_mediationLocation">Mediation Location</label>
+            <input type="text" id="dr_mediationLocation" class="form-input" value="San Francisco, California" placeholder="City, State/Province, Country" onkeyup="disputeGenerator.updatePreview('mediationLocation')">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="dr_finalMethod">Final Resolution Method</label>
+          <select id="dr_finalMethod" class="form-select" onchange="disputeGenerator.handleFinalMethodChange(); disputeGenerator.updatePreview('finalMethod')">
+            <option value="arbitration" selected>Arbitration</option>
+            <option value="litigation">Litigation</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Additional Provisions -->
+      <div class="section-header">Additional Provisions</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Class Action Waiver
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              A provision preventing users from participating in class action lawsuits against your company. May not be enforceable in all jurisdictions.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="dr_classActionWaiver" id="dr_classActionWaiverYes" value="yes" checked onclick="disputeGenerator.updatePreview('classActionWaiver')">
+            <span class="radio-label">Include</span>
+            <div class="risk-container">
+              <span class="risk-indicator risk-medium"></span>
+              <span class="risk-tooltip">May not be enforceable in some jurisdictions (e.g., EU)</span>
+            </div>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="dr_classActionWaiver" id="dr_classActionWaiverNo" value="no" onclick="disputeGenerator.updatePreview('classActionWaiver')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Small Claims Exception
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Allows users to bring disputes in small claims court rather than through the primary dispute resolution method.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="dr_smallClaimsException" id="dr_smallClaimsExceptionYes" value="yes" checked onclick="disputeGenerator.updatePreview('smallClaimsException')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="dr_smallClaimsException" id="dr_smallClaimsExceptionNo" value="no" onclick="disputeGenerator.updatePreview('smallClaimsException')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Attorney's Fees Provision
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Specifies how attorney's fees will be handled for disputes.
+            </div>
+          </div>
+        </label>
+        <select id="dr_attorneysFees" class="form-select" onchange="disputeGenerator.updatePreview('attorneysFees')">
+          <option value="none">No Provision</option>
+          <option value="prevailing">Prevailing Party Recovers Fees</option>
+          <option value="each-own" selected>Each Party Bears Own Fees</option>
+          <option value="court-discretion">Court/Arbitrator Discretion</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Injunctive Relief
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Allows parties to seek injunctive relief in court (stop someone from doing something) even if other disputes go through arbitration.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="dr_injunctiveRelief" id="dr_injunctiveReliefYes" value="yes" checked onclick="disputeGenerator.updatePreview('injunctiveRelief')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="dr_injunctiveRelief" id="dr_injunctiveReliefNo" value="no" onclick="disputeGenerator.updatePreview('injunctiveRelief')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Limitations Period
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Time limit for users to bring claims. If set too short, may not be enforceable in some jurisdictions.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="dr_limitationsPeriod" id="dr_limitationsPeriodDefault" value="default" checked onclick="disputeGenerator.handleLimitationsPeriodChange(); disputeGenerator.updatePreview('limitationsPeriod')">
+            <span class="radio-label">Statutory</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="dr_limitationsPeriod" id="dr_limitationsPeriodCustom" value="custom" onclick="disputeGenerator.handleLimitationsPeriodChange(); disputeGenerator.updatePreview('limitationsPeriod')">
+            <span class="radio-label">Custom Period</span>
+          </label>
+        </div>
+      </div>
+      
+      <div id="dr_customLimitationsGroup" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="dr_customLimitationsPeriod">Custom Limitations Period</label>
+          <select id="dr_customLimitationsPeriod" class="form-select" onchange="disputeGenerator.updatePreview('customLimitationsPeriod')">
+            <option value="6months">6 months</option>
+            <option value="1year" selected>1 year</option>
+            <option value="18months">18 months</option>
+            <option value="2years">2 years</option>
+          </select>
+          <div class="risk-container">
+            <span class="risk-indicator risk-medium"></span>
+            <span class="risk-tooltip">May not be enforceable if too short in some jurisdictions</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Consumer Protection Notes -->
+      <div class="form-group">
+        <label class="form-label">
+          Consumer Protection Notice
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Include language acknowledging that certain consumer protection laws may override these terms in some jurisdictions.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="dr_consumerProtection" id="dr_consumerProtectionYes" value="yes" checked onclick="disputeGenerator.updatePreview('consumerProtection')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="dr_consumerProtection" id="dr_consumerProtectionNo" value="no" onclick="disputeGenerator.updatePreview('consumerProtection')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
       </div>
     </div>
+    
+    <!-- Preview Column -->
+    <div class="preview-column">
+      <div class="preview-header">
+        <div class="preview-title">Dispute Resolution Clause Preview</div>
+        <div class="preview-note">Updates as you complete the form</div>
+      </div>
+      
+      <div class="preview-content" id="drPreview">
+        <!-- Preview content will be populated by JavaScript -->
+      </div>
+      
+      <div id="dr-preview-fade" class="preview-fade"></div>
+      
+      <div class="button-container">
+        <button id="drCopyBtn" class="copy-btn" onclick="disputeGenerator.handleCopyClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          COPY CLAUSE
+        </button>
+        <button id="drWordBtn" class="copy-btn" onclick="disputeGenerator.generateWordDoc()">MS WORD DOC</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Create a namespace to avoid global scope pollution in WordPress
+  var disputeGenerator = {
+    // Initialize the generator
+    init: function() {
+      this.handleJurisdictionRegionChange();
+      this.populateArbitrationProviders();
+      this.populateMediationProviders();
+      this.handleResolutionMethodChange();
+      this.handleMediationChange();
+      this.handleFinalMethodChange();
+      this.handleLimitationsPeriodChange();
+      this.handleArbitrationProviderChange();
+      this.handleMediationProviderChange();
+      this.updatePreview();
+      
+      // Add event listeners for jurisdiction changes
+      document.getElementById('dr_jurisdictionRegion').addEventListener('change', function() {
+        disputeGenerator.handleJurisdictionRegionChange();
+        disputeGenerator.populateArbitrationProviders();
+        disputeGenerator.populateMediationProviders();
+        disputeGenerator.updatePreview('governingLaw');
+      });
+      
+      document.getElementById('dr_governingLawUS').addEventListener('change', function() {
+        disputeGenerator.updatePreview('governingLaw');
+      });
+      
+      document.getElementById('dr_governingLawInternational').addEventListener('change', function() {
+        disputeGenerator.updatePreview('governingLaw');
+      });
+    },
+    
+    // Handle jurisdiction region change
+    handleJurisdictionRegionChange: function() {
+      const jurisdictionRegion = document.getElementById('dr_jurisdictionRegion').value;
+      
+      // Show/hide US state or international country selectors
+      document.getElementById('dr_usStateGroup').style.display = 
+        (jurisdictionRegion === 'us') ? 'block' : 'none';
+      document.getElementById('dr_internationalGroup').style.display = 
+        (jurisdictionRegion === 'international') ? 'block' : 'none';
+    },
+    
+    // Populate arbitration providers based on jurisdiction
+    populateArbitrationProviders: function() {
+      const jurisdictionRegion = document.getElementById('dr_jurisdictionRegion').value;
+      const arbitrationProviderSelect = document.getElementById('dr_arbitrationProvider');
+      
+      // Clear existing options
+      arbitrationProviderSelect.innerHTML = '';
+      
+      // Add options based on jurisdiction
+      if (jurisdictionRegion === 'us') {
+        this.addOption(arbitrationProviderSelect, 'aaa', 'American Arbitration Association (AAA)');
+        this.addOption(arbitrationProviderSelect, 'jams', 'JAMS');
+        this.addOption(arbitrationProviderSelect, 'nat', 'National Arbitration and Mediation (NAM)');
+        this.addOption(arbitrationProviderSelect, 'other', 'Other Provider');
+      } else {
+        this.addOption(arbitrationProviderSelect, 'icc', 'International Chamber of Commerce (ICC)');
+        this.addOption(arbitrationProviderSelect, 'lcia', 'London Court of International Arbitration (LCIA)');
+        this.addOption(arbitrationProviderSelect, 'siac', 'Singapore International Arbitration Centre (SIAC)');
+        this.addOption(arbitrationProviderSelect, 'hkiac', 'Hong Kong International Arbitration Centre (HKIAC)');
+        this.addOption(arbitrationProviderSelect, 'local', 'Local Arbitration Provider');
+        this.addOption(arbitrationProviderSelect, 'other', 'Other Provider');
+      }
+    },
+    
+    // Populate mediation providers based on jurisdiction
+    populateMediationProviders: function() {
+      const jurisdictionRegion = document.getElementById('dr_jurisdictionRegion').value;
+      const mediationProviderSelect = document.getElementById('dr_mediationProvider');
+      
+      // Clear existing options
+      mediationProviderSelect.innerHTML = '';
+      
+      // Add options based on jurisdiction
+      if (jurisdictionRegion === 'us') {
+        this.addOption(mediationProviderSelect, 'aaa', 'American Arbitration Association (AAA)');
+        this.addOption(mediationProviderSelect, 'jams', 'JAMS');
+        this.addOption(mediationProviderSelect, 'nat', 'National Arbitration and Mediation (NAM)');
+        this.addOption(mediationProviderSelect, 'other', 'Other Provider');
+      } else {
+        this.addOption(mediationProviderSelect, 'icc', 'International Chamber of Commerce (ICC)');
+        this.addOption(mediationProviderSelect, 'cedr', 'Centre for Effective Dispute Resolution (CEDR)');
+        this.addOption(mediationProviderSelect, 'local', 'Local Mediation Provider');
+        this.addOption(mediationProviderSelect, 'other', 'Other Provider');
+      }
+    },
+    
+    // Helper function to add an option to a select element
+    addOption: function(selectElement, value, text) {
+      const option = document.createElement('option');
+      option.value = value;
+      option.textContent = text;
+      selectElement.appendChild(option);
+    },
+    
+    // Apply industry preset
+    applyPreset: function(preset) {
+      // SaaS/Software preset
+      if (preset === 'saas') {
+        document.getElementById('dr_serviceType').value = 'saas';
+        document.getElementById('dr_serviceName').value = 'Our Software';
+        document.getElementById('dr_jurisdictionRegion').value = 'us';
+        this.handleJurisdictionRegionChange();
+        this.populateArbitrationProviders();
+        this.populateMediationProviders();
+        document.getElementById('dr_governingLawUS').value = 'california';
+        document.getElementById('dr_exclusiveJurisdiction').value = 'exclusive';
+        document.getElementById('dr_venueCity').value = 'San Francisco, California';
+        document.getElementById('dr_resolutionMethod').value = 'arbitration';
+        document.getElementById('dr_arbitrationProvider').value = 'aaa';
+        document.getElementById('dr_aaaHearingType').value = 'documents-only';
+        document.getElementById('dr_arbitrationLanguage').value = 'english';
+        document.getElementById('dr_arbitrationLocation').value = 'San Francisco, California';
+        document.getElementById('dr_classActionWaiverYes').checked = true;
+        document.getElementById('dr_smallClaimsExceptionYes').checked = true;
+        document.getElementById('dr_attorneysFees').value = 'each-own';
+        document.getElementById('dr_injunctiveReliefYes').checked = true;
+        document.getElementById('dr_limitationsPeriodDefault').checked = true;
+        document.getElementById('dr_consumerProtectionYes').checked = true;
+      }
+      // E-commerce preset
+      else if (preset === 'ecommerce') {
+        document.getElementById('dr_serviceType').value = 'ecommerce';
+        document.getElementById('dr_serviceName').value = 'Our Store';
+        document.getElementById('dr_jurisdictionRegion').value = 'us';
+        this.handleJurisdictionRegionChange();
+        this.populateArbitrationProviders();
+        this.populateMediationProviders();
+        document.getElementById('dr_governingLawUS').value = 'delaware';
+        document.getElementById('dr_exclusiveJurisdiction').value = 'exclusive';
+        document.getElementById('dr_venueCity').value = 'Wilmington, Delaware';
+        document.getElementById('dr_resolutionMethod').value = 'arbitration';
+        document.getElementById('dr_arbitrationProvider').value = 'aaa';
+        document.getElementById('dr_aaaHearingType').value = 'documents-only';
+        document.getElementById('dr_arbitrationLanguage').value = 'english';
+        document.getElementById('dr_arbitrationLocation').value = 'Wilmington, Delaware';
+        document.getElementById('dr_classActionWaiverYes').checked = true;
+        document.getElementById('dr_smallClaimsExceptionYes').checked = true;
+        document.getElementById('dr_attorneysFees').value = 'each-own';
+        document.getElementById('dr_injunctiveReliefYes').checked = true;
+        document.getElementById('dr_limitationsPeriodDefault').checked = true;
+        document.getElementById('dr_consumerProtectionYes').checked = true;
+      }
+      // Content Platform preset
+      else if (preset === 'content') {
+        document.getElementById('dr_serviceType').value = 'website';
+        document.getElementById('dr_serviceName').value = 'Our Platform';
+        document.getElementById('dr_jurisdictionRegion').value = 'us';
+        this.handleJurisdictionRegionChange();
+        this.populateArbitrationProviders();
+        this.populateMediationProviders();
+        document.getElementById('dr_governingLawUS').value = 'california';
+        document.getElementById('dr_exclusiveJurisdiction').value = 'exclusive';
+        document.getElementById('dr_venueCity').value = 'Los Angeles, California';
+        document.getElementById('dr_resolutionMethod').value = 'tiered';
+        document.getElementById('dr_negotiationPeriod').value = '30';
+        document.getElementById('dr_includeMediationYes').checked = true;
+        document.getElementById('dr_mediationProvider').value = 'jams';
+        document.getElementById('dr_mediationLocation').value = 'Los Angeles, California';
+        document.getElementById('dr_finalMethod').value = 'arbitration';
+        document.getElementById('dr_arbitrationProvider').value = 'jams';
+        document.getElementById('dr_arbitrationLanguage').value = 'english';
+        document.getElementById('dr_arbitrationLocation').value = 'Los Angeles, California';
+        document.getElementById('dr_classActionWaiverYes').checked = true;
+        document.getElementById('dr_smallClaimsExceptionYes').checked = true;
+        document.getElementById('dr_attorneysFees').value = 'prevailing';
+        document.getElementById('dr_injunctiveReliefYes').checked = true;
+        document.getElementById('dr_limitationsPeriodDefault').checked = true;
+        document.getElementById('dr_consumerProtectionYes').checked = true;
+      }
+      // Consumer Products preset
+      else if (preset === 'consumer') {
+        document.getElementById('dr_serviceType').value = 'website';
+        document.getElementById('dr_serviceName').value = 'Our Products';
+        document.getElementById('dr_jurisdictionRegion').value = 'us';
+        this.handleJurisdictionRegionChange();
+        this.populateArbitrationProviders();
+        this.populateMediationProviders();
+        document.getElementById('dr_governingLawUS').value = 'new_york';
+        document.getElementById('dr_exclusiveJurisdiction').value = 'non-exclusive';
+        document.getElementById('dr_venueCity').value = 'New York, New York';
+        document.getElementById('dr_resolutionMethod').value = 'court';
+        document.getElementById('dr_classActionWaiverNo').checked = true;
+        document.getElementById('dr_smallClaimsExceptionYes').checked = true;
+        document.getElementById('dr_attorneysFees').value = 'court-discretion';
+        document.getElementById('dr_injunctiveReliefYes').checked = true;
+        document.getElementById('dr_limitationsPeriodDefault').checked = true;
+        document.getElementById('dr_consumerProtectionYes').checked = true;
+      }
+      // B2B Services preset
+      else if (preset === 'b2b') {
+        document.getElementById('dr_serviceType').value = 'saas';
+        document.getElementById('dr_serviceName').value = 'Our B2B Services';
+        document.getElementById('dr_jurisdictionRegion').value = 'us';
+        this.handleJurisdictionRegionChange();
+        this.populateArbitrationProviders();
+        this.populateMediationProviders();
+        document.getElementById('dr_governingLawUS').value = 'delaware';
+        document.getElementById('dr_exclusiveJurisdiction').value = 'exclusive';
+        document.getElementById('dr_venueCity').value = 'Wilmington, Delaware';
+        document.getElementById('dr_resolutionMethod').value = 'tiered';
+        document.getElementById('dr_negotiationPeriod').value = '30';
+        document.getElementById('dr_includeMediationYes').checked = true;
+        document.getElementById('dr_mediationProvider').value = 'jams';
+        document.getElementById('dr_mediationLocation').value = 'Wilmington, Delaware';
+        document.getElementById('dr_finalMethod').value = 'arbitration';
+        document.getElementById('dr_arbitrationProvider').value = 'aaa';
+        document.getElementById('dr_aaaHearingType').value = 'in-person';
+        document.getElementById('dr_arbitrationLanguage').value = 'english';
+        document.getElementById('dr_arbitrationLocation').value = 'Wilmington, Delaware';
+        document.getElementById('dr_classActionWaiverYes').checked = true;
+        document.getElementById('dr_smallClaimsExceptionNo').checked = true;
+        document.getElementById('dr_attorneysFees').value = 'prevailing';
+        document.getElementById('dr_injunctiveReliefYes').checked = true;
+        document.getElementById('dr_limitationsPeriodCustom').checked = true;
+        document.getElementById('dr_customLimitationsPeriod').value = '1year';
+        document.getElementById('dr_consumerProtectionNo').checked = true;
+      }
+      
+      // Update the DOM based on the presets
+      this.handleResolutionMethodChange();
+      this.handleMediationChange();
+      this.handleFinalMethodChange();
+      this.handleLimitationsPeriodChange();
+      this.handleArbitrationProviderChange();
+      this.handleMediationProviderChange();
+      this.updatePreview();
+    },
+    
+    // Handle resolution method change
+    handleResolutionMethodChange: function() {
+      const resolutionMethod = document.getElementById('dr_resolutionMethod').value;
+      
+      // Show/hide arbitration options
+      document.getElementById('dr_arbitrationOptions').style.display = 
+        (resolutionMethod === 'arbitration') ? 'block' : 'none';
+      
+      // Show/hide tiered options
+      document.getElementById('dr_tieredOptions').style.display = 
+        (resolutionMethod === 'tiered') ? 'block' : 'none';
+      
+      this.updatePreview('resolutionMethod');
+    },
+    
+    // Handle arbitration provider change
+    handleArbitrationProviderChange: function() {
+      const arbitrationProvider = document.getElementById('dr_arbitrationProvider');
+      
+      if (!arbitrationProvider) return; // Safety check
+      
+      const provider = arbitrationProvider.value;
+      
+      // Show/hide other provider field
+      document.getElementById('dr_otherProviderGroup').style.display = 
+        (provider === 'other' || provider === 'local') ? 'block' : 'none';
+      
+      // Show/hide AAA-specific options
+      document.getElementById('dr_aaaOptionsGroup').style.display = 
+        (provider === 'aaa') ? 'block' : 'none';
+      
+      this.updatePreview('arbitrationProvider');
+    },
+    
+    // Handle mediation provider change
+    handleMediationProviderChange: function() {
+      const mediationProviderElement = document.getElementById('dr_mediationProvider');
+      
+      if (!mediationProviderElement) return; // Safety check
+      
+      const provider = mediationProviderElement.value;
+      
+      // Show/hide other provider field
+      document.getElementById('dr_otherMediationProviderGroup').style.display = 
+        (provider === 'other' || provider === 'local') ? 'block' : 'none';
+      
+      this.updatePreview('mediationProvider');
+    },
+    
+    // Handle mediation change
+    handleMediationChange: function() {
+      const includeMediation = document.querySelector('input[name="dr_includeMediation"]:checked');
+      
+      if (!includeMediation) return; // Safety check
+      
+      const includeMediationValue = includeMediation.value === 'yes';
+      
+      // Show/hide mediation options
+      const mediationOptions = document.getElementById('dr_mediationOptions');
+      if (mediationOptions) {
+        mediationOptions.style.display = includeMediationValue ? 'block' : 'none';
+      }
+      
+      this.updatePreview('includeMediation');
+    },
+    
+    // Handle final method change
+    handleFinalMethodChange: function() {
+      // If we need to show/hide additional options based on final method
+      this.updatePreview('finalMethod');
+    },
+    
+    // Handle limitations period change
+    handleLimitationsPeriodChange: function() {
+      const limitationsPeriodElements = document.querySelectorAll('input[name="dr_limitationsPeriod"]');
+      
+      if (limitationsPeriodElements.length === 0) return; // Safety check
+      
+      let limitationsPeriod = 'default';
+      
+      for (let i = 0; i < limitationsPeriodElements.length; i++) {
+        if (limitationsPeriodElements[i].checked) {
+          limitationsPeriod = limitationsPeriodElements[i].value;
+          break;
+        }
+      }
+      
+      // Show/hide custom limitations period field
+      const customLimitationsGroup = document.getElementById('dr_customLimitationsGroup');
+      if (customLimitationsGroup) {
+        customLimitationsGroup.style.display = (limitationsPeriod === 'custom') ? 'block' : 'none';
+      }
+      
+      this.updatePreview('limitationsPeriod');
+    },
+    
+    // Get the governing law text
+    getGoverningLawText: function() {
+      const jurisdictionRegion = document.getElementById('dr_jurisdictionRegion').value;
+      
+      if (jurisdictionRegion === 'us') {
+        const stateSelect = document.getElementById('dr_governingLawUS');
+        if (!stateSelect) return 'the applicable state';
+        
+        const selectedOption = stateSelect.options[stateSelect.selectedIndex];
+        return selectedOption ? selectedOption.text : 'the applicable state';
+      } else {
+        const countrySelect = document.getElementById('dr_governingLawInternational');
+        if (!countrySelect) return 'the applicable country';
+        
+        const selectedOption = countrySelect.options[countrySelect.selectedIndex];
+        return selectedOption ? selectedOption.text : 'the applicable country';
+      }
+    },
+    
+    // Generate clause text
+    generateClause: function() {
+      const companyName = document.getElementById('dr_companyName').value;
+      const serviceType = document.getElementById('dr_serviceType').value;
+      const serviceTypeText = document.getElementById('dr_serviceType').options[document.getElementById('dr_serviceType').selectedIndex].text;
+      const serviceName = document.getElementById('dr_serviceName').value;
+      const jurisdictionRegion = document.getElementById('dr_jurisdictionRegion').value;
+      
+      // Get governing law and jurisdiction settings
+      const governingLawText = this.getGoverningLawText();
+      const exclusiveJurisdiction = document.getElementById('dr_exclusiveJurisdiction').value;
+      const venueCity = document.getElementById('dr_venueCity').value;
+      
+      // Build governing law and jurisdiction language
+      let governingLawLanguage = `These Terms and any disputes arising out of or related to these Terms or the use of ${serviceName} shall be governed by and construed in accordance with the laws of ${governingLawText},`;
+      
+      // Add conflict of laws provision
+      governingLawLanguage += ` without regard to its conflict of laws principles.`;
+      
+      // Build jurisdiction language
+      let jurisdictionLanguage = '';
+      if (exclusiveJurisdiction === 'exclusive') {
+        jurisdictionLanguage = `Any legal suit, action, or proceeding arising out of or related to these Terms or ${serviceName} shall be instituted exclusively in the courts located in ${venueCity}, and each party irrevocably submits to the exclusive jurisdiction of such courts in any such suit, action, or proceeding.`;
+      } else if (exclusiveJurisdiction === 'non-exclusive') {
+        jurisdictionLanguage = `Any legal suit, action, or proceeding arising out of or related to these Terms or ${serviceName} may be instituted in the courts located in ${venueCity}, though ${companyName} reserves the right to bring any suit, action, or proceeding against you for breach of these Terms in your country of residence or any other relevant jurisdiction.`;
+      } else {
+        jurisdictionLanguage = ''; // No specific jurisdiction
+      }
+      
+      // Get dispute resolution method settings
+      const resolutionMethod = document.getElementById('dr_resolutionMethod').value;
+      
+      // Build dispute resolution method language
+      let resolutionMethodLanguage = '';
+      
+      if (resolutionMethod === 'court') {
+        resolutionMethodLanguage = `Any dispute arising out of or relating to these Terms or your use of ${serviceName}, including the breach, termination, enforcement, interpretation, or validity thereof, shall be resolved through legal proceedings in the appropriate courts as set forth above.`;
+      } else if (resolutionMethod === 'arbitration') {
+        const arbitrationProvider = document.getElementById('dr_arbitrationProvider').value;
+        let arbitrationProviderText = this.getArbitrationProviderText(arbitrationProvider);
+        
+        const arbitrationLanguage = document.getElementById('dr_arbitrationLanguage').value;
+        const arbitrationLanguageText = document.getElementById('dr_arbitrationLanguage').options[document.getElementById('dr_arbitrationLanguage').selectedIndex].text;
+        const arbitrationLocation = document.getElementById('dr_arbitrationLocation').value;
+        
+        // Add documents-only provision for AAA
+        let hearingTypeText = '';
+        if (arbitrationProvider === 'aaa') {
+          const hearingType = document.getElementById('dr_aaaHearingType').value;
+          if (hearingType === 'documents-only') {
+            hearingTypeText = ` The arbitration shall be conducted on a documents-only basis with no in-person appearances unless otherwise agreed by the parties.`;
+          }
+        }
+        
+        resolutionMethodLanguage = `Any dispute arising out of or relating to these Terms or your use of ${serviceName}, including the breach, termination, enforcement, interpretation, or validity thereof, shall be resolved by final and binding arbitration administered by the ${arbitrationProviderText} in accordance with its applicable rules. The arbitration shall take place in ${arbitrationLocation}, and shall be conducted in the ${arbitrationLanguageText} language by a single arbitrator.${hearingTypeText} The arbitrator shall apply the law specified in the Governing Law section above.`;
+      } else { // tiered
+        const negotiationPeriod = document.getElementById('dr_negotiationPeriod').value;
+        const includeMediation = document.querySelector('input[name="dr_includeMediation"]:checked').value === 'yes';
+        const finalMethod = document.getElementById('dr_finalMethod').value;
+        
+        resolutionMethodLanguage = `Any dispute arising out of or relating to these Terms or your use of ${serviceName} shall be resolved through the following dispute resolution process:\n\n`;
+        
+        resolutionMethodLanguage += `<p><u>Informal Negotiation</u>: The parties shall first attempt in good faith to resolve any dispute by informal negotiation. The complaining party must notify the other party in writing of the dispute, and the other party shall have ${negotiationPeriod} days from receipt of the notification to respond. If the dispute is not resolved within ${negotiationPeriod} days of such notification, either party may proceed to the next step.</p>`;
+        
+        if (includeMediation) {
+          const mediationProvider = document.getElementById('dr_mediationProvider').value;
+          let mediationProviderText = this.getMediationProviderText(mediationProvider);
+          
+          const mediationLocation = document.getElementById('dr_mediationLocation').value;
+          
+          resolutionMethodLanguage += `<p><u>Mediation</u>: If the dispute cannot be resolved through informal negotiation, the parties shall submit the dispute to mediation administered by the ${mediationProviderText}. The mediation shall take place in ${mediationLocation}, unless otherwise agreed by the parties. The parties shall share equally in the costs of mediation.</p>`;
+        }
+        
+        if (finalMethod === 'arbitration') {
+          const arbitrationProvider = document.getElementById('dr_arbitrationProvider').value;
+          let arbitrationProviderText = this.getArbitrationProviderText(arbitrationProvider);
+          
+          const arbitrationLanguage = document.getElementById('dr_arbitrationLanguage').value;
+          const arbitrationLanguageText = document.getElementById('dr_arbitrationLanguage').options[document.getElementById('dr_arbitrationLanguage').selectedIndex].text;
+          const arbitrationLocation = document.getElementById('dr_arbitrationLocation').value;
+          
+          // Add documents-only provision for AAA
+          let hearingTypeText = '';
+          if (arbitrationProvider === 'aaa') {
+            const hearingType = document.getElementById('dr_aaaHearingType').value;
+            if (hearingType === 'documents-only') {
+              hearingTypeText = ` The arbitration shall be conducted on a documents-only basis with no in-person appearances unless otherwise agreed by the parties.`;
+            }
+          }
+          
+          resolutionMethodLanguage += `<p><u>Arbitration</u>: If the dispute remains unresolved following ${includeMediation ? 'mediation' : 'negotiation'}, either party may submit the dispute to binding arbitration administered by the ${arbitrationProviderText} in accordance with its applicable rules. The arbitration shall take place in ${arbitrationLocation}, and shall be conducted in the ${arbitrationLanguageText} language by a single arbitrator.${hearingTypeText} The arbitrator shall apply the law specified in the Governing Law section above.</p>`;
+        } else { // litigation
+          resolutionMethodLanguage += `<p><u>Litigation</u>: If the dispute remains unresolved following ${includeMediation ? 'mediation' : 'negotiation'}, either party may pursue legal proceedings in accordance with the Jurisdiction section above.</p>`;
+        }
+      }
+      
+      // Get additional provisions settings
+      const includeClassActionWaiver = document.querySelector('input[name="dr_classActionWaiver"]:checked').value === 'yes';
+      const includeSmallClaimsException = document.querySelector('input[name="dr_smallClaimsException"]:checked').value === 'yes';
+      const attorneysFees = document.getElementById('dr_attorneysFees').value;
+      const includeInjunctiveRelief = document.querySelector('input[name="dr_injunctiveRelief"]:checked').value === 'yes';
+      const limitationsPeriod = document.querySelector('input[name="dr_limitationsPeriod"]:checked').value;
+      const includeConsumerProtection = document.querySelector('input[name="dr_consumerProtection"]:checked').value === 'yes';
+      
+      // Build additional provisions language
+      
+      // Class action waiver language
+      let classActionWaiverLanguage = '';
+      if (includeClassActionWaiver) {
+        classActionWaiverLanguage = `<p><strong>CLASS ACTION WAIVER</strong></p>
+<p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, YOU AND ${companyName} AGREE THAT EACH PARTY MAY BRING DISPUTES AGAINST THE OTHER PARTY ONLY IN AN INDIVIDUAL CAPACITY AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING. Unless both you and ${companyName} agree otherwise, no arbitrator or judge may consolidate more than one person's claims or otherwise preside over any form of a representative or class proceeding.</p>`;
+      }
+      
+      // Small claims exception language
+      let smallClaimsLanguage = '';
+      if (includeSmallClaimsException && (resolutionMethod === 'arbitration' || (resolutionMethod === 'tiered' && document.getElementById('dr_finalMethod').value === 'arbitration'))) {
+        smallClaimsLanguage = `<p><strong>SMALL CLAIMS COURT EXCEPTION</strong></p>
+<p>Notwithstanding the foregoing, either party may bring an individual action in small claims court in ${venueCity} or another location as required by the small claims court rules, provided such action remains in such court and is pursued on an individual (non-class, non-representative) basis.</p>`;
+      }
+      
+      // Attorney's fees language
+      let attorneysFeesLanguage = '';
+      if (attorneysFees === 'prevailing') {
+        attorneysFeesLanguage = `<p><strong>ATTORNEY'S FEES</strong></p>
+<p>In any dispute arising out of or relating to these Terms, the prevailing party shall be entitled to recover, in addition to any other relief awarded, its reasonable attorney's fees and costs incurred in connection with the dispute.</p>`;
+      } else if (attorneysFees === 'each-own') {
+        attorneysFeesLanguage = `<p><strong>COSTS OF DISPUTE RESOLUTION</strong></p>
+<p>Except as otherwise provided in these Terms, each party shall bear its own costs and expenses (including attorney's fees) in connection with any dispute resolution process.</p>`;
+      } else if (attorneysFees === 'court-discretion') {
+        attorneysFeesLanguage = `<p><strong>COSTS AND ATTORNEY'S FEES</strong></p>
+<p>The allocation of costs and attorney's fees incurred in connection with any dispute shall be determined by the court or arbitrator, as applicable, in accordance with applicable law.</p>`;
+      }
+      
+      // Injunctive relief language
+      let injunctiveReliefLanguage = '';
+      if (includeInjunctiveRelief) {
+        injunctiveReliefLanguage = `<p><strong>EQUITABLE RELIEF</strong></p>
+<p>Notwithstanding the dispute resolution provisions above, either party may seek injunctive or other equitable relief in any court of competent jurisdiction to prevent or stop the infringement of intellectual property rights or the unauthorized use or disclosure of confidential information.</p>`;
+      }
+      
+      // Limitations period language
+      let limitationsPeriodLanguage = '';
+      if (limitationsPeriod === 'custom') {
+        const customLimitationsPeriod = document.getElementById('dr_customLimitationsPeriod').value;
+        let periodText = '';
+        
+        if (customLimitationsPeriod === '6months') {
+          periodText = 'six (6) months';
+        } else if (customLimitationsPeriod === '1year') {
+          periodText = 'one (1) year';
+        } else if (customLimitationsPeriod === '18months') {
+          periodText = 'eighteen (18) months';
+        } else if (customLimitationsPeriod === '2years') {
+          periodText = 'two (2) years';
+        }
+        
+        limitationsPeriodLanguage = `<p><strong>LIMITATIONS PERIOD</strong></p>
+<p>ANY CAUSE OF ACTION OR CLAIM YOU MAY HAVE ARISING OUT OF OR RELATING TO THESE TERMS OR ${serviceName} MUST BE COMMENCED WITHIN ${periodText} AFTER THE CAUSE OF ACTION ACCRUES; OTHERWISE, SUCH CAUSE OF ACTION OR CLAIM IS PERMANENTLY BARRED.</p>`;
+      }
+      
+      // Consumer protection language
+      let consumerProtectionLanguage = '';
+      if (includeConsumerProtection) {
+        consumerProtectionLanguage = `<p><strong>CONSUMER PROTECTION NOTICE</strong></p>
+<p>Some jurisdictions, including the European Union, provide consumers with mandatory statutory rights. Nothing in these Terms, including the dispute resolution, governing law, and limitations provisions, is intended to deprive you of your mandatory consumer protection statutory rights under the laws applicable in your jurisdiction.</p>`;
+      }
+      
+      // Build the complete clause
+      let clause = `
+<p><strong>DISPUTE RESOLUTION</strong></p>
+
+<p><strong>GOVERNING LAW</strong></p>
+<p>${governingLawLanguage}</p>
+`;
+
+      // Add jurisdiction language if present
+      if (jurisdictionLanguage) {
+        clause += `
+<p><strong>JURISDICTION</strong></p>
+<p>${jurisdictionLanguage}</p>
+`;
+      }
+
+      // Add dispute resolution method language
+      clause += `
+<p><strong>DISPUTE RESOLUTION PROCESS</strong></p>
+<p>${resolutionMethodLanguage}</p>
+`;
+
+      // Add additional provisions
+      if (classActionWaiverLanguage) {
+        clause += classActionWaiverLanguage;
+      }
+      
+      if (smallClaimsLanguage) {
+        clause += smallClaimsLanguage;
+      }
+      
+      if (attorneysFeesLanguage) {
+        clause += attorneysFeesLanguage;
+      }
+      
+      if (injunctiveReliefLanguage) {
+        clause += injunctiveReliefLanguage;
+      }
+      
+      if (limitationsPeriodLanguage) {
+        clause += limitationsPeriodLanguage;
+      }
+      
+      if (consumerProtectionLanguage) {
+        clause += consumerProtectionLanguage;
+      }
+
+      return clause;
+    },
+    
+    // Get arbitration provider text
+    getArbitrationProviderText: function(provider) {
+      switch (provider) {
+        case 'aaa':
+          return 'American Arbitration Association (AAA)';
+        case 'jams':
+          return 'JAMS';
+        case 'nat':
+          return 'National Arbitration and Mediation (NAM)';
+        case 'icc':
+          return 'International Chamber of Commerce (ICC)';
+        case 'lcia':
+          return 'London Court of International Arbitration (LCIA)';
+        case 'siac':
+          return 'Singapore International Arbitration Centre (SIAC)';
+        case 'hkiac':
+          return 'Hong Kong International Arbitration Centre (HKIAC)';
+        case 'local':
+          const otherProvider = document.getElementById('dr_otherProvider').value;
+          return otherProvider || 'appropriate local arbitration provider';
+        case 'other':
+          const customProvider = document.getElementById('dr_otherProvider').value;
+          return customProvider || 'mutually agreed upon arbitration provider';
+        default:
+          return 'appropriate arbitration provider';
+      }
+    },
+    
+    // Get mediation provider text
+    getMediationProviderText: function(provider) {
+      switch (provider) {
+        case 'aaa':
+          return 'American Arbitration Association (AAA)';
+        case 'jams':
+          return 'JAMS';
+        case 'nat':
+          return 'National Arbitration and Mediation (NAM)';
+        case 'icc':
+          return 'International Chamber of Commerce (ICC)';
+        case 'cedr':
+          return 'Centre for Effective Dispute Resolution (CEDR)';
+        case 'local':
+          const otherProvider = document.getElementById('dr_otherMediationProvider').value;
+          return otherProvider || 'appropriate local mediation provider';
+        case 'other':
+          const customProvider = document.getElementById('dr_otherMediationProvider').value;
+          return customProvider || 'mutually agreed upon mediation provider';
+        default:
+          return 'appropriate mediation provider';
+      }
+    },
+    
+    // Update the preview
+    updatePreview: function(changedField) {
+      // Clear previous highlights
+      this.clearHighlights();
+      
+      // Generate new clause text
+      const clauseText = this.generateClause();
+      
+      // Update preview
+      document.getElementById('drPreview').innerHTML = clauseText;
+      
+      // If a field was changed, highlight the relevant text
+      if (changedField) {
+        this.highlightChangedText(changedField);
+      }
+    },
+    
+    // Clear highlights
+    clearHighlights: function() {
+      const highlightElements = document.getElementsByClassName('highlight');
+      while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+      }
+    },
+    
+    // Find text in document and highlight it
+    findAndHighlightText: function(searchText) {
+      if (!searchText) return;
+      
+      const previewElement = document.getElementById('drPreview');
+      const previewHTML = previewElement.innerHTML;
+      
+      // A simpler approach for WordPress compatibility
+      if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+          new RegExp(this.escapeRegExp(searchText), 'g'),
+          '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+          const highlightElements = document.getElementsByClassName('highlight');
+          if (highlightElements.length > 0) {
+            const firstHighlight = highlightElements[0];
+            if (firstHighlight) {
+              firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+          }
+        }, 100);
+      }
+    },
+    
+    // Escape special regex characters
+    escapeRegExp: function(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    },
+    
+    // Highlight changed text based on field
+    highlightChangedText: function(changedField) {
+      const self = this;
+      
+      switch (changedField) {
+        case 'companyName':
+          this.findAndHighlightText(document.getElementById('dr_companyName').value);
+          break;
+        case 'serviceType':
+          // Highlight the service type text
+          const serviceTypeElement = document.getElementById('dr_serviceType');
+          const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text;
+          this.findAndHighlightText(serviceTypeText);
+          break;
+        case 'serviceName':
+          this.findAndHighlightText(document.getElementById('dr_serviceName').value);
+          break;
+        case 'governingLaw':
+          const governingLawText = this.getGoverningLawText();
+          this.findAndHighlightText(governingLawText);
+          break;
+        case 'exclusiveJurisdiction':
+          const exclusiveJurisdiction = document.getElementById('dr_exclusiveJurisdiction').value;
+          if (exclusiveJurisdiction === 'exclusive') {
+            this.findAndHighlightText('exclusively');
+          } else if (exclusiveJurisdiction === 'non-exclusive') {
+            this.findAndHighlightText('may be instituted');
+          }
+          break;
+        case 'venueCity':
+          this.findAndHighlightText(document.getElementById('dr_venueCity').value);
+          break;
+        case 'resolutionMethod':
+          const resolutionMethod = document.getElementById('dr_resolutionMethod').value;
+          if (resolutionMethod === 'court') {
+            this.findAndHighlightText('legal proceedings in the appropriate courts');
+          } else if (resolutionMethod === 'arbitration') {
+            this.findAndHighlightText('final and binding arbitration');
+          } else { // tiered
+            this.findAndHighlightText('following dispute resolution process');
+          }
+          break;
+        case 'arbitrationProvider':
+        case 'otherProvider':
+          const arbitrationProvider = document.getElementById('dr_arbitrationProvider').value;
+          this.findAndHighlightText(this.getArbitrationProviderText(arbitrationProvider));
+          break;
+        case 'aaaHearingType':
+          const hearingType = document.getElementById('dr_aaaHearingType').value;
+          if (hearingType === 'documents-only') {
+            this.findAndHighlightText('documents-only basis with no in-person appearances');
+          }
+          break;
+        case 'arbitrationLanguage':
+          const arbitrationLanguageElement = document.getElementById('dr_arbitrationLanguage');
+          const arbitrationLanguageText = arbitrationLanguageElement.options[arbitrationLanguageElement.selectedIndex].text;
+          this.findAndHighlightText(arbitrationLanguageText + ' language');
+          break;
+        case 'arbitrationLocation':
+          this.findAndHighlightText(document.getElementById('dr_arbitrationLocation').value);
+          break;
+        case 'negotiationPeriod':
+          this.findAndHighlightText(document.getElementById('dr_negotiationPeriod').value + ' days');
+          break;
+        case 'includeMediation':
+          const includeMediation = document.querySelector('input[name="dr_includeMediation"]:checked').value === 'yes';
+          if (includeMediation) {
+            this.findAndHighlightText('Mediation');
+          } else {
+            this.findAndHighlightText('negotiation'); // Highlight negotiation instead
+          }
+          break;
+        case 'mediationProvider':
+        case 'otherMediationProvider':
+          const mediationProvider = document.getElementById('dr_mediationProvider').value;
+          this.findAndHighlightText(this.getMediationProviderText(mediationProvider));
+          break;
+        case 'mediationLocation':
+          this.findAndHighlightText(document.getElementById('dr_mediationLocation').value);
+          break;
+        case 'finalMethod':
+          const finalMethod = document.getElementById('dr_finalMethod').value;
+          if (finalMethod === 'arbitration') {
+            this.findAndHighlightText('submit the dispute to binding arbitration');
+          } else { // litigation
+            this.findAndHighlightText('pursue legal proceedings');
+          }
+          break;
+        case 'classActionWaiver':
+          const includeClassActionWaiver = document.querySelector('input[name="dr_classActionWaiver"]:checked').value === 'yes';
+          if (includeClassActionWaiver) {
+            this.findAndHighlightText('CLASS ACTION WAIVER');
+          }
+          break;
+        case 'smallClaimsException':
+          const includeSmallClaimsException = document.querySelector('input[name="dr_smallClaimsException"]:checked').value === 'yes';
+          if (includeSmallClaimsException) {
+            this.findAndHighlightText('SMALL CLAIMS COURT EXCEPTION');
+          }
+          break;
+        case 'attorneysFees':
+          const attorneysFees = document.getElementById('dr_attorneysFees').value;
+          if (attorneysFees === 'prevailing') {
+            this.findAndHighlightText('prevailing party shall be entitled to recover');
+          } else if (attorneysFees === 'each-own') {
+            this.findAndHighlightText('each party shall bear its own costs');
+          } else if (attorneysFees === 'court-discretion') {
+            this.findAndHighlightText('determined by the court or arbitrator');
+          }
+          break;
+        case 'injunctiveRelief':
+          const includeInjunctiveRelief = document.querySelector('input[name="dr_injunctiveRelief"]:checked').value === 'yes';
+          if (includeInjunctiveRelief) {
+            this.findAndHighlightText('EQUITABLE RELIEF');
+          }
+          break;
+        case 'limitationsPeriod':
+        case 'customLimitationsPeriod':
+          const limitationsPeriod = document.querySelector('input[name="dr_limitationsPeriod"]:checked').value;
+          if (limitationsPeriod === 'custom') {
+            this.findAndHighlightText('LIMITATIONS PERIOD');
+            
+            // Also highlight the specific period if that's what changed
+            if (changedField === 'customLimitationsPeriod') {
+              const customLimitationsPeriod = document.getElementById('dr_customLimitationsPeriod').value;
+              if (customLimitationsPeriod === '6months') {
+                this.findAndHighlightText('six (6) months');
+              } else if (customLimitationsPeriod === '1year') {
+                this.findAndHighlightText('one (1) year');
+              } else if (customLimitationsPeriod === '18months') {
+                this.findAndHighlightText('eighteen (18) months');
+              } else if (customLimitationsPeriod === '2years') {
+                this.findAndHighlightText('two (2) years');
+              }
+            }
+          }
+          break;
+        case 'consumerProtection':
+          const includeConsumerProtection = document.querySelector('input[name="dr_consumerProtection"]:checked').value === 'yes';
+          if (includeConsumerProtection) {
+            this.findAndHighlightText('CONSUMER PROTECTION NOTICE');
+          }
+          break;
+      }
+      
+      // Remove highlights after 3 seconds
+      setTimeout(function() {
+        self.clearHighlights();
+      }, 3000);
+    },
+    
+    // Generate MS Word document
+    generateWordDoc: function() {
+      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                   "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                   "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+      const footer = "</body></html>";
+      const content = document.getElementById('drPreview').innerHTML;
+      const sourceHTML = header + content + footer;
+      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+      
+      // Create a download link and trigger it
+      const fileDownload = document.createElement("a");
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = 'DisputeResolutionClause.doc';
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
+    },
+    
+    // Handle copy button click
+    handleCopyClick: function() {
+      const text = document.getElementById('drPreview').innerText;
+      
+      try {
+        // Modern approach
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text)
+            .then(function() {
+              const copyBtn = document.getElementById('drCopyBtn');
+              const originalText = copyBtn.innerHTML;
+              copyBtn.innerHTML = 'COPIED!';
+              setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+              }, 2000);
+            })
+            .catch(function(err) {
+              console.error('Could not copy text: ', err);
+              fallbackCopyTextToClipboard(text);
+            });
+        } 
+        // Fallback approach
+        else {
+          fallbackCopyTextToClipboard(text);
+        }
+      } catch(err) {
+        console.error('Copy failed: ', err);
+        alert('Please select and copy the text manually.');
+      }
+      
+      function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        
+        // Make the textarea out of viewport
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          const copyBtn = document.getElementById('drCopyBtn');
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = successful ? 'COPIED!' : 'FAILED!';
+          setTimeout(function() {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        } catch (err) {
+          console.error('Fallback: Could not copy text: ', err);
+          alert('Please select and copy the text manually.');
+        }
+        
+        document.body.removeChild(textArea);
+      }
+    }
+  };
+  
+  // Initialize when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    disputeGenerator.init();
+  });
+  
+  // Initialize immediately as well (for WordPress)
+  disputeGenerator.init();
+</script>
     
 <!-- Tab Content for Acceptable Use Policy -->
 <div id="userconduct-tab" class="tools-tab-content">
@@ -3595,17 +5023,1186 @@ ${enforcementHtml}
 </script>
 
 
-    <!-- Tab Content for Termination -->
-    <div id="termination-tab" class="tools-tab-content">
-      <div class="coming-soon-container">
-        <div class="coming-soon-icon">🔜</div>
-        <h3 class="coming-soon-title">Termination & Account Suspension Generator</h3>
-        <p class="coming-soon-description">Generate comprehensive termination clauses covering termination rights, procedures, post-termination obligations, and account suspension conditions tailored to your business model.</p>
-        <div class="coming-soon-notification">Coming Soon!</div>
+<!-- Tab Content for Termination -->
+<div id="termination-tab" class="tools-tab-content">
+  <div class="generator-container">
+    <!-- Form Column -->
+    <div class="form-column">
+      <!-- Industry Presets -->
+      <div class="industry-presets">
+        <div class="preset-title">Quick Start: Select Your Industry</div>
+        <div class="preset-buttons">
+          <button class="preset-btn" onclick="terminationGenerator.applyPreset('saas')">SaaS/Software</button>
+          <button class="preset-btn" onclick="terminationGenerator.applyPreset('ecommerce')">E-commerce</button>
+          <button class="preset-btn" onclick="terminationGenerator.applyPreset('content')">Content Platform</button>
+          <button class="preset-btn" onclick="terminationGenerator.applyPreset('subscription')">Subscription Service</button>
+          <button class="preset-btn" onclick="terminationGenerator.applyPreset('marketplace')">Online Marketplace</button>
+        </div>
+      </div>
+    
+      <!-- Agreement Information -->
+      <div class="section-header">Agreement Information</div>
+      
+      <div class="form-group">
+        <label class="form-label" for="term_companyName">Company Name</label>
+        <input type="text" id="term_companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="terminationGenerator.updatePreview('companyName')">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="term_serviceType">Service Type</label>
+        <select id="term_serviceType" class="form-select" onchange="terminationGenerator.updatePreview('serviceType')">
+          <option value="website" selected>Website</option>
+          <option value="mobileApp">Mobile App</option>
+          <option value="saas">SaaS Platform</option>
+          <option value="marketplace">Online Marketplace</option>
+          <option value="subscription">Subscription Service</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="term_serviceName">Service/Product Name</label>
+        <input type="text" id="term_serviceName" class="form-input" value="Our Service" placeholder="Enter service name" onkeyup="terminationGenerator.updatePreview('serviceName')">
+      </div>
+      
+      <!-- Company Termination Rights -->
+      <div class="section-header">Company Termination Rights</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Termination at Will
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Your right to terminate service to a user for any reason or no reason.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_companyAtWill" id="term_companyAtWillYes" value="yes" checked onclick="terminationGenerator.handleCompanyAtWillChange(); terminationGenerator.updatePreview('companyAtWill')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_companyAtWill" id="term_companyAtWillNo" value="no" onclick="terminationGenerator.handleCompanyAtWillChange(); terminationGenerator.updatePreview('companyAtWill')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div id="term_companyNoticeGroup">
+        <div class="form-group">
+          <label class="form-label">Notice Period for Company Termination</label>
+          <select id="term_companyNoticePeriod" class="form-select" onchange="terminationGenerator.updatePreview('companyNoticePeriod')">
+            <option value="immediate">No Notice Required</option>
+            <option value="24hours">24 Hours</option>
+            <option value="3days">3 Days</option>
+            <option value="7days">7 Days</option>
+            <option value="14days">14 Days</option>
+            <option value="30days" selected>30 Days</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Termination for Cause
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Your right to terminate service immediately for violations of terms, illegal activity, etc.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_companyForCause" id="term_companyForCauseYes" value="yes" checked onclick="terminationGenerator.updatePreview('companyForCause')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_companyForCause" id="term_companyForCauseNo" value="no" onclick="terminationGenerator.updatePreview('companyForCause')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Specific Causes for Termination</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeTOU" checked onclick="terminationGenerator.updatePreview('causeTOU')">
+            <span class="checkbox-label">Terms Violation</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeIllegal" checked onclick="terminationGenerator.updatePreview('causeIllegal')">
+            <span class="checkbox-label">Illegal Activity</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeHarm" checked onclick="terminationGenerator.updatePreview('causeHarm')">
+            <span class="checkbox-label">Harmful Conduct</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeInfringement" checked onclick="terminationGenerator.updatePreview('causeInfringement')">
+            <span class="checkbox-label">IP Infringement</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeFraud" checked onclick="terminationGenerator.updatePreview('causeFraud')">
+            <span class="checkbox-label">Fraud/Misrepresentation</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_causeInactivity" onclick="terminationGenerator.updatePreview('causeInactivity')">
+            <span class="checkbox-label">Account Inactivity</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- User Termination Rights -->
+      <div class="section-header">User Termination Rights</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          User Cancellation Rights
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              User's ability to terminate/cancel their account or service.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_userCancellation" id="term_userCancellationYes" value="yes" checked onclick="terminationGenerator.handleUserCancellationChange(); terminationGenerator.updatePreview('userCancellation')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_userCancellation" id="term_userCancellationNo" value="no" onclick="terminationGenerator.handleUserCancellationChange(); terminationGenerator.updatePreview('userCancellation')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div id="term_userCancellationOptions">
+        <div class="form-group">
+          <label class="form-label">Cancellation Method</label>
+          <select id="term_cancellationMethod" class="form-select" onchange="terminationGenerator.handleCancellationMethodChange(); terminationGenerator.updatePreview('cancellationMethod')">
+            <option value="account">Through Account Settings</option>
+            <option value="email">Email Request</option>
+            <option value="combined" selected>Multiple Methods</option>
+            <option value="custom">Custom Instructions</option>
+          </select>
+        </div>
+        
+        <div id="term_cancellationEmailGroup" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="term_cancellationEmail">Cancellation Email Address</label>
+            <input type="text" id="term_cancellationEmail" class="form-input" value="support@yourcompany.com" placeholder="Enter email for cancellation requests" onkeyup="terminationGenerator.updatePreview('cancellationEmail')">
+          </div>
+        </div>
+        
+        <div id="term_customCancellationGroup" style="display: none;">
+          <div class="form-group">
+            <label class="form-label" for="term_customCancellationInstructions">Custom Cancellation Instructions</label>
+            <textarea id="term_customCancellationInstructions" class="form-textarea" rows="2" placeholder="Enter custom cancellation instructions" onkeyup="terminationGenerator.updatePreview('customCancellationInstructions')">To cancel your account, please contact our customer support team or use the cancellation option in your account settings.</textarea>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Suspension Provisions -->
+      <div class="section-header">Account Suspension</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Account Suspension Provisions
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Your right to temporarily suspend user accounts instead of terminating them.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_suspension" id="term_suspensionYes" value="yes" checked onclick="terminationGenerator.updatePreview('suspension')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_suspension" id="term_suspensionNo" value="no" onclick="terminationGenerator.updatePreview('suspension')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Suspension Grounds</label>
+        <select id="term_suspensionGrounds" class="form-select" onchange="terminationGenerator.updatePreview('suspensionGrounds')">
+          <option value="broad" selected>Broad Discretion</option>
+          <option value="specific">Specific Violations Only</option>
+          <option value="investigation">During Investigation Only</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Maximum Suspension Period</label>
+        <select id="term_suspensionPeriod" class="form-select" onchange="terminationGenerator.updatePreview('suspensionPeriod')">
+          <option value="unspecified" selected>Unspecified</option>
+          <option value="7days">7 Days</option>
+          <option value="14days">14 Days</option>
+          <option value="30days">30 Days</option>
+          <option value="90days">90 Days</option>
+        </select>
+      </div>
+      
+      <!-- Effect of Termination -->
+      <div class="section-header">Effect of Termination</div>
+      
+      <div class="form-group">
+        <label class="form-label">Post-Termination Effects</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_effectAccess" checked onclick="terminationGenerator.updatePreview('effectAccess')">
+            <span class="checkbox-label">Loss of Access</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_effectContent" checked onclick="terminationGenerator.updatePreview('effectContent')">
+            <span class="checkbox-label">Content Removal</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_effectFees" checked onclick="terminationGenerator.updatePreview('effectFees')">
+            <span class="checkbox-label">Payment Obligations</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_effectNoRefund" checked onclick="terminationGenerator.updatePreview('effectNoRefund')">
+            <span class="checkbox-label">No Refunds</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="term_effectSurvival" checked onclick="terminationGenerator.updatePreview('effectSurvival')">
+            <span class="checkbox-label">Survival of Terms</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">Data Retention After Termination</label>
+        <select id="term_dataRetention" class="form-select" onchange="terminationGenerator.updatePreview('dataRetention')">
+          <option value="immediate">Immediate Deletion</option>
+          <option value="30days" selected>30 Days Retention</option>
+          <option value="60days">60 Days Retention</option>
+          <option value="90days">90 Days Retention</option>
+          <option value="policy">Per Privacy Policy</option>
+        </select>
+      </div>
+      
+      <!-- Additional Options -->
+      <div class="section-header">Additional Options</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Reactivation Policy
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Whether and how users can reactivate terminated accounts.
+            </div>
+          </div>
+        </label>
+        <select id="term_reactivation" class="form-select" onchange="terminationGenerator.updatePreview('reactivation')">
+          <option value="none">No Reactivation</option>
+          <option value="discretion" selected>At Company Discretion</option>
+          <option value="limited">Limited Time Window</option>
+          <option value="unlimited">Always Available</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Third-Party Service Impact
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Language clarifying the impact of termination on third-party integrations or services.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_thirdParty" id="term_thirdPartyYes" value="yes" checked onclick="terminationGenerator.updatePreview('thirdParty')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_thirdParty" id="term_thirdPartyNo" value="no" onclick="terminationGenerator.updatePreview('thirdParty')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Force Majeure Termination
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Language allowing termination due to circumstances beyond a party's control.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="term_forceMajeure" id="term_forceMajeureYes" value="yes" onclick="terminationGenerator.updatePreview('forceMajeure')">
+            <span class="radio-label">Include</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="term_forceMajeure" id="term_forceMajeureNo" value="no" checked onclick="terminationGenerator.updatePreview('forceMajeure')">
+            <span class="radio-label">Exclude</span>
+          </label>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Preview Column -->
+    <div class="preview-column">
+      <div class="preview-header">
+        <div class="preview-title">Termination Clause Preview</div>
+        <div class="preview-note">Updates as you complete the form</div>
+      </div>
+      
+      <div class="preview-content" id="termPreview">
+        <!-- Preview content will be populated by JavaScript -->
+      </div>
+      
+      <div id="term-preview-fade" class="preview-fade"></div>
+      
+      <div class="button-container">
+        <button id="termCopyBtn" class="copy-btn" onclick="terminationGenerator.handleCopyClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          COPY CLAUSE
+        </button>
+        <button id="termWordBtn" class="copy-btn" onclick="terminationGenerator.generateWordDoc()">MS WORD DOC</button>
       </div>
     </div>
   </div>
+</div>
 
+<script>
+  // Create a namespace to avoid global scope pollution in WordPress
+  var terminationGenerator = {
+    // Initialize the generator
+    init: function() {
+      this.handleCompanyAtWillChange();
+      this.handleUserCancellationChange();
+      this.handleCancellationMethodChange();
+      this.updatePreview();
+    },
+    
+    // Apply industry preset
+    applyPreset: function(preset) {
+      // SaaS/Software preset
+      if (preset === 'saas') {
+        document.getElementById('term_serviceType').value = 'saas';
+        document.getElementById('term_serviceName').value = 'Our Software';
+        document.getElementById('term_companyAtWillYes').checked = true;
+        document.getElementById('term_companyNoticePeriod').value = '30days';
+        document.getElementById('term_companyForCauseYes').checked = true;
+        document.getElementById('term_causeTOU').checked = true;
+        document.getElementById('term_causeIllegal').checked = true;
+        document.getElementById('term_causeHarm').checked = true;
+        document.getElementById('term_causeInfringement').checked = true;
+        document.getElementById('term_causeFraud').checked = true;
+        document.getElementById('term_causeInactivity').checked = false;
+        document.getElementById('term_userCancellationYes').checked = true;
+        document.getElementById('term_cancellationMethod').value = 'account';
+        document.getElementById('term_suspensionYes').checked = true;
+        document.getElementById('term_suspensionGrounds').value = 'broad';
+        document.getElementById('term_suspensionPeriod').value = 'unspecified';
+        document.getElementById('term_effectAccess').checked = true;
+        document.getElementById('term_effectContent').checked = true;
+        document.getElementById('term_effectFees').checked = true;
+        document.getElementById('term_effectNoRefund').checked = true;
+        document.getElementById('term_effectSurvival').checked = true;
+        document.getElementById('term_dataRetention').value = '30days';
+        document.getElementById('term_reactivation').value = 'discretion';
+        document.getElementById('term_thirdPartyYes').checked = true;
+        document.getElementById('term_forceMajeureNo').checked = true;
+      }
+      // E-commerce preset
+      else if (preset === 'ecommerce') {
+        document.getElementById('term_serviceType').value = 'ecommerce';
+        document.getElementById('term_serviceName').value = 'Our Store';
+        document.getElementById('term_companyAtWillYes').checked = true;
+        document.getElementById('term_companyNoticePeriod').value = '7days';
+        document.getElementById('term_companyForCauseYes').checked = true;
+        document.getElementById('term_causeTOU').checked = true;
+        document.getElementById('term_causeIllegal').checked = true;
+        document.getElementById('term_causeHarm').checked = true;
+        document.getElementById('term_causeInfringement').checked = true;
+        document.getElementById('term_causeFraud').checked = true;
+        document.getElementById('term_causeInactivity').checked = true;
+        document.getElementById('term_userCancellationYes').checked = true;
+        document.getElementById('term_cancellationMethod').value = 'email';
+        document.getElementById('term_cancellationEmail').value = 'support@yourcompany.com';
+        document.getElementById('term_suspensionYes').checked = true;
+        document.getElementById('term_suspensionGrounds').value = 'specific';
+        document.getElementById('term_suspensionPeriod').value = '14days';
+        document.getElementById('term_effectAccess').checked = true;
+        document.getElementById('term_effectContent').checked = true;
+        document.getElementById('term_effectFees').checked = true;
+        document.getElementById('term_effectNoRefund').checked = true;
+        document.getElementById('term_effectSurvival').checked = true;
+        document.getElementById('term_dataRetention').value = 'policy';
+        document.getElementById('term_reactivation').value = 'limited';
+        document.getElementById('term_thirdPartyNo').checked = true;
+        document.getElementById('term_forceMajeureNo').checked = true;
+      }
+      // Content Platform preset
+      else if (preset === 'content') {
+        document.getElementById('term_serviceType').value = 'website';
+        document.getElementById('term_serviceName').value = 'Our Platform';
+        document.getElementById('term_companyAtWillYes').checked = true;
+        document.getElementById('term_companyNoticePeriod').value = '14days';
+        document.getElementById('term_companyForCauseYes').checked = true;
+        document.getElementById('term_causeTOU').checked = true;
+        document.getElementById('term_causeIllegal').checked = true;
+        document.getElementById('term_causeHarm').checked = true;
+        document.getElementById('term_causeInfringement').checked = true;
+        document.getElementById('term_causeFraud').checked = true;
+        document.getElementById('term_causeInactivity').checked = true;
+        document.getElementById('term_userCancellationYes').checked = true;
+        document.getElementById('term_cancellationMethod').value = 'combined';
+        document.getElementById('term_cancellationEmail').value = 'support@yourcompany.com';
+        document.getElementById('term_suspensionYes').checked = true;
+        document.getElementById('term_suspensionGrounds').value = 'broad';
+        document.getElementById('term_suspensionPeriod').value = '30days';
+        document.getElementById('term_effectAccess').checked = true;
+        document.getElementById('term_effectContent').checked = true;
+        document.getElementById('term_effectFees').checked = true;
+        document.getElementById('term_effectNoRefund').checked = true;
+        document.getElementById('term_effectSurvival').checked = true;
+        document.getElementById('term_dataRetention').value = '90days';
+        document.getElementById('term_reactivation').value = 'limited';
+        document.getElementById('term_thirdPartyYes').checked = true;
+        document.getElementById('term_forceMajeureNo').checked = true;
+      }
+      // Subscription Service preset
+      else if (preset === 'subscription') {
+        document.getElementById('term_serviceType').value = 'subscription';
+        document.getElementById('term_serviceName').value = 'Our Subscription Service';
+        document.getElementById('term_companyAtWillYes').checked = true;
+        document.getElementById('term_companyNoticePeriod').value = '30days';
+        document.getElementById('term_companyForCauseYes').checked = true;
+        document.getElementById('term_causeTOU').checked = true;
+        document.getElementById('term_causeIllegal').checked = true;
+        document.getElementById('term_causeHarm').checked = true;
+        document.getElementById('term_causeInfringement').checked = true;
+        document.getElementById('term_causeFraud').checked = true;
+        document.getElementById('term_causeInactivity').checked = false;
+        document.getElementById('term_userCancellationYes').checked = true;
+        document.getElementById('term_cancellationMethod').value = 'combined';
+        document.getElementById('term_cancellationEmail').value = 'support@yourcompany.com';
+        document.getElementById('term_suspensionYes').checked = true;
+        document.getElementById('term_suspensionGrounds').value = 'broad';
+        document.getElementById('term_suspensionPeriod').value = '14days';
+        document.getElementById('term_effectAccess').checked = true;
+        document.getElementById('term_effectContent').checked = true;
+        document.getElementById('term_effectFees').checked = true;
+        document.getElementById('term_effectNoRefund').checked = true;
+        document.getElementById('term_effectSurvival').checked = true;
+        document.getElementById('term_dataRetention').value = '30days';
+        document.getElementById('term_reactivation').value = 'unlimited';
+        document.getElementById('term_thirdPartyYes').checked = true;
+        document.getElementById('term_forceMajeureNo').checked = true;
+      }
+      // Online Marketplace preset
+      else if (preset === 'marketplace') {
+        document.getElementById('term_serviceType').value = 'marketplace';
+        document.getElementById('term_serviceName').value = 'Our Marketplace';
+        document.getElementById('term_companyAtWillYes').checked = true;
+        document.getElementById('term_companyNoticePeriod').value = '14days';
+        document.getElementById('term_companyForCauseYes').checked = true;
+        document.getElementById('term_causeTOU').checked = true;
+        document.getElementById('term_causeIllegal').checked = true;
+        document.getElementById('term_causeHarm').checked = true;
+        document.getElementById('term_causeInfringement').checked = true;
+        document.getElementById('term_causeFraud').checked = true;
+        document.getElementById('term_causeInactivity').checked = true;
+        document.getElementById('term_userCancellationYes').checked = true;
+        document.getElementById('term_cancellationMethod').value = 'account';
+        document.getElementById('term_suspensionYes').checked = true;
+        document.getElementById('term_suspensionGrounds').value = 'specific';
+        document.getElementById('term_suspensionPeriod').value = '30days';
+        document.getElementById('term_effectAccess').checked = true;
+        document.getElementById('term_effectContent').checked = true;
+        document.getElementById('term_effectFees').checked = true;
+        document.getElementById('term_effectNoRefund').checked = true;
+        document.getElementById('term_effectSurvival').checked = true;
+        document.getElementById('term_dataRetention').value = 'policy';
+        document.getElementById('term_reactivation').value = 'discretion';
+        document.getElementById('term_thirdPartyYes').checked = true;
+        document.getElementById('term_forceMajeureYes').checked = true;
+      }
+      
+      // Update the DOM based on the presets
+      this.handleCompanyAtWillChange();
+      this.handleUserCancellationChange();
+      this.handleCancellationMethodChange();
+      this.updatePreview();
+    },
+    
+    // Handle company at will change
+    handleCompanyAtWillChange: function() {
+      const companyAtWill = document.querySelector('input[name="term_companyAtWill"]:checked').value === 'yes';
+      
+      // Show/hide company notice period
+      document.getElementById('term_companyNoticeGroup').style.display = companyAtWill ? 'block' : 'none';
+      
+      this.updatePreview('companyAtWill');
+    },
+    
+    // Handle user cancellation change
+    handleUserCancellationChange: function() {
+      const userCancellation = document.querySelector('input[name="term_userCancellation"]:checked').value === 'yes';
+      
+      // Show/hide user cancellation options
+      document.getElementById('term_userCancellationOptions').style.display = userCancellation ? 'block' : 'none';
+      
+      this.updatePreview('userCancellation');
+    },
+    
+    // Handle cancellation method change
+    handleCancellationMethodChange: function() {
+      const cancellationMethod = document.getElementById('term_cancellationMethod').value;
+      
+      // Show/hide email input
+      document.getElementById('term_cancellationEmailGroup').style.display = 
+        (cancellationMethod === 'email' || cancellationMethod === 'combined') ? 'block' : 'none';
+      
+      // Show/hide custom instructions input
+      document.getElementById('term_customCancellationGroup').style.display = 
+        (cancellationMethod === 'custom') ? 'block' : 'none';
+      
+      this.updatePreview('cancellationMethod');
+    },
+    
+    // Generate clause text
+    generateClause: function() {
+      const companyName = document.getElementById('term_companyName').value;
+      const serviceType = document.getElementById('term_serviceType').value;
+      const serviceTypeText = document.getElementById('term_serviceType').options[document.getElementById('term_serviceType').selectedIndex].text;
+      const serviceName = document.getElementById('term_serviceName').value;
+      
+      // COMPANY TERMINATION RIGHTS
+      // Get company at will termination settings
+      const companyAtWill = document.querySelector('input[name="term_companyAtWill"]:checked').value === 'yes';
+      let companyAtWillLanguage = '';
+      
+      if (companyAtWill) {
+        const companyNoticePeriod = document.getElementById('term_companyNoticePeriod').value;
+        let noticeText = '';
+        
+        if (companyNoticePeriod === 'immediate') {
+          noticeText = 'at any time without notice';
+        } else if (companyNoticePeriod === '24hours') {
+          noticeText = 'with 24 hours\' notice';
+        } else if (companyNoticePeriod === '3days') {
+          noticeText = 'with 3 days\' notice';
+        } else if (companyNoticePeriod === '7days') {
+          noticeText = 'with 7 days\' notice';
+        } else if (companyNoticePeriod === '14days') {
+          noticeText = 'with 14 days\' notice';
+        } else if (companyNoticePeriod === '30days') {
+          noticeText = 'with 30 days\' notice';
+        }
+        
+        companyAtWillLanguage = `<p><u>Termination by ${companyName}</u>: ${companyName} reserves the right to terminate your access to and use of ${serviceName} ${noticeText}, for any reason or no reason, with or without cause, in ${companyName}'s sole discretion.</p>`;
+      }
+      
+      // Get company for cause termination settings
+      const companyForCause = document.querySelector('input[name="term_companyForCause"]:checked').value === 'yes';
+      let companyForCauseLanguage = '';
+      
+      if (companyForCause) {
+        // Get specific causes
+        const causeTOU = document.getElementById('term_causeTOU').checked;
+        const causeIllegal = document.getElementById('term_causeIllegal').checked;
+        const causeHarm = document.getElementById('term_causeHarm').checked;
+        const causeInfringement = document.getElementById('term_causeInfringement').checked;
+        const causeFraud = document.getElementById('term_causeFraud').checked;
+        const causeInactivity = document.getElementById('term_causeInactivity').checked;
+        
+        // Build causes list
+        let causes = [];
+        
+        if (causeTOU) causes.push("you violate these Terms");
+        if (causeIllegal) causes.push("you use the Service for any illegal purpose or in violation of any applicable law or regulation");
+        if (causeHarm) causes.push("you engage in any conduct that harms " + companyName + ", its users, or third parties");
+        if (causeInfringement) causes.push("you infringe the intellectual property rights or other rights of " + companyName + " or any third party");
+        if (causeFraud) causes.push("you provide any information that is inaccurate, false, or fraudulent");
+        if (causeInactivity) causes.push("your account remains inactive for an extended period");
+        
+        // Format causes string
+        let causesText = '';
+        if (causes.length === 1) {
+          causesText = causes[0];
+        } else if (causes.length === 2) {
+          causesText = causes.join(' or ');
+        } else if (causes.length > 2) {
+          const lastCause = causes.pop();
+          causesText = causes.join(', ') + ', or ' + lastCause;
+        }
+        
+        if (causesText) {
+          companyForCauseLanguage = `<p><u>Immediate Termination for Cause</u>: ${companyName} may terminate your access to ${serviceName} immediately and without notice if ${causesText}.</p>`;
+        }
+      }
+      
+      // USER TERMINATION RIGHTS
+      const userCancellation = document.querySelector('input[name="term_userCancellation"]:checked').value === 'yes';
+      let userCancellationLanguage = '';
+      
+      if (userCancellation) {
+        const cancellationMethod = document.getElementById('term_cancellationMethod').value;
+        let cancellationMethodText = '';
+        
+        if (cancellationMethod === 'account') {
+          cancellationMethodText = 'by using the cancellation or account deletion option in your account settings';
+        } else if (cancellationMethod === 'email') {
+          const cancellationEmail = document.getElementById('term_cancellationEmail').value;
+          cancellationMethodText = 'by sending an email to ' + cancellationEmail + ' with your cancellation request';
+        } else if (cancellationMethod === 'combined') {
+          const cancellationEmail = document.getElementById('term_cancellationEmail').value;
+          cancellationMethodText = 'by using the cancellation option in your account settings or by sending an email to ' + cancellationEmail + ' with your cancellation request';
+        } else { // custom
+          cancellationMethodText = document.getElementById('term_customCancellationInstructions').value;
+        }
+        
+        userCancellationLanguage = `<p><u>Termination by You</u>: You may cancel your account and terminate your use of ${serviceName} at any time ${cancellationMethodText}.</p>`;
+      }
+      
+      // ACCOUNT SUSPENSION
+      const includeSuspension = document.querySelector('input[name="term_suspension"]:checked').value === 'yes';
+      let suspensionLanguage = '';
+      
+      if (includeSuspension) {
+        const suspensionGrounds = document.getElementById('term_suspensionGrounds').value;
+        let suspensionGroundsText = '';
+        
+        if (suspensionGrounds === 'broad') {
+          suspensionGroundsText = 'for any reason in its sole discretion';
+        } else if (suspensionGrounds === 'specific') {
+          suspensionGroundsText = 'if it believes you have violated these Terms or engaged in conduct that could harm ' + companyName + ', its users, or third parties';
+        } else { // investigation
+          suspensionGroundsText = 'during investigation of suspected violations of these Terms or applicable laws';
+        }
+        
+        const suspensionPeriod = document.getElementById('term_suspensionPeriod').value;
+        let suspensionPeriodText = '';
+        
+        if (suspensionPeriod !== 'unspecified') {
+          if (suspensionPeriod === '7days') {
+            suspensionPeriodText = ' for up to 7 days';
+          } else if (suspensionPeriod === '14days') {
+            suspensionPeriodText = ' for up to 14 days';
+          } else if (suspensionPeriod === '30days') {
+            suspensionPeriodText = ' for up to 30 days';
+          } else if (suspensionPeriod === '90days') {
+            suspensionPeriodText = ' for up to 90 days';
+          }
+        }
+        
+        suspensionLanguage = `<p><u>Account Suspension</u>: In addition to termination rights, ${companyName} reserves the right to temporarily suspend your access to ${serviceName} ${suspensionGroundsText}${suspensionPeriodText}. During suspension, you may not be able to access your account or use some or all features of ${serviceName}.</p>`;
+      }
+      
+      // EFFECT OF TERMINATION
+      // Get effect of termination settings
+      const effectAccess = document.getElementById('term_effectAccess').checked;
+      const effectContent = document.getElementById('term_effectContent').checked;
+      const effectFees = document.getElementById('term_effectFees').checked;
+      const effectNoRefund = document.getElementById('term_effectNoRefund').checked;
+      const effectSurvival = document.getElementById('term_effectSurvival').checked;
+      
+      // Build effects list
+      let effects = [];
+      
+      if (effectAccess) effects.push('your right to access and use ' + serviceName + ' will immediately cease');
+      if (effectContent) effects.push(companyName + ' may delete or remove your content from ' + serviceName);
+      if (effectFees) effects.push('you will remain liable for all amounts due under your account up to and including the date of termination');
+      if (effectNoRefund) effects.push('no refunds will be provided for any unused portion of the service or prepaid fees');
+      
+      // Format effects string
+      let effectsText = '';
+      if (effects.length === 1) {
+        effectsText = effects[0];
+      } else if (effects.length === 2) {
+        effectsText = effects.join(' and ');
+      } else if (effects.length > 2) {
+        const lastEffect = effects.pop();
+        effectsText = effects.join(', ') + ', and ' + lastEffect;
+      }
+      
+      // Build effect of termination paragraph
+      let effectOfTerminationLanguage = '';
+      if (effectsText) {
+        effectOfTerminationLanguage = `<p><u>Effect of Termination</u>: Upon termination of your access to ${serviceName} for any reason, ${effectsText}.</p>`;
+      }
+      
+      // Data retention language
+      const dataRetention = document.getElementById('term_dataRetention').value;
+      let dataRetentionLanguage = '';
+      
+      if (dataRetention !== 'policy') { // If not referring to privacy policy
+        let retentionPeriodText = '';
+        
+        if (dataRetention === 'immediate') {
+          retentionPeriodText = 'immediately upon termination';
+        } else if (dataRetention === '30days') {
+          retentionPeriodText = 'after 30 days following termination';
+        } else if (dataRetention === '60days') {
+          retentionPeriodText = 'after 60 days following termination';
+        } else if (dataRetention === '90days') {
+          retentionPeriodText = 'after 90 days following termination';
+        }
+        
+        dataRetentionLanguage = `<p><u>Data Retention</u>: Following termination, ${companyName} may delete all of your data, content, and personal information ${retentionPeriodText}. You are responsible for backing up any data or content you wish to retain.</p>`;
+      } else {
+        dataRetentionLanguage = `<p><u>Data Retention</u>: Following termination, ${companyName} will handle your data and personal information in accordance with our Privacy Policy.</p>`;
+      }
+      
+      // Survival of terms language
+      let survivalLanguage = '';
+      if (effectSurvival) {
+        survivalLanguage = `<p><u>Survival</u>: All provisions of these Terms which by their nature should survive termination shall survive termination, including, without limitation, ownership provisions, warranty disclaimers, indemnity, and limitations of liability.</p>`;
+      }
+      
+      // ADDITIONAL OPTIONS
+      // Reactivation policy
+      const reactivation = document.getElementById('term_reactivation').value;
+      let reactivationLanguage = '';
+      
+      if (reactivation !== 'none') {
+        let reactivationText = '';
+        
+        if (reactivation === 'discretion') {
+          reactivationText = 'at the sole discretion of ' + companyName;
+        } else if (reactivation === 'limited') {
+          reactivationText = 'within 30 days of termination, subject to any conditions imposed by ' + companyName;
+        } else if (reactivation === 'unlimited') {
+          reactivationText = 'at any time by creating a new account, subject to these Terms';
+        }
+        
+        reactivationLanguage = `<p><u>Account Reactivation</u>: After termination, you may be able to reactivate your account ${reactivationText}.</p>`;
+      }
+      
+      // Third-party service impact
+      const includeThirdParty = document.querySelector('input[name="term_thirdParty"]:checked').value === 'yes';
+      let thirdPartyLanguage = '';
+      
+      if (includeThirdParty) {
+        thirdPartyLanguage = `<p><u>Third-Party Services</u>: Termination of your access to ${serviceName} may also result in the termination of any third-party services or integrations linked to your account. ${companyName} is not responsible for the impact termination may have on your access to third-party services.</p>`;
+      }
+      
+      // Force majeure termination
+      const includeForceMajeure = document.querySelector('input[name="term_forceMajeure"]:checked').value === 'yes';
+      let forceMajeureLanguage = '';
+      
+      if (includeForceMajeure) {
+        forceMajeureLanguage = `<p><u>Force Majeure</u>: Either party may terminate this agreement if performance becomes impossible due to circumstances beyond the reasonable control of either party, including but not limited to acts of God, war, terrorism, riots, embargoes, acts of civil or military authorities, fire, floods, accidents, or strikes.</p>`;
+      }
+      
+      // Build the complete clause
+      let clause = `
+<p><strong>TERMINATION</strong></p>
+`;
+
+      // Add company termination language
+      if (companyAtWillLanguage || companyForCauseLanguage) {
+        if (companyAtWillLanguage) {
+          clause += companyAtWillLanguage;
+        }
+        
+        if (companyForCauseLanguage) {
+          clause += companyForCauseLanguage;
+        }
+      }
+      
+      // Add user termination language
+      if (userCancellationLanguage) {
+        clause += userCancellationLanguage;
+      }
+      
+      // Add suspension language
+      if (suspensionLanguage) {
+        clause += suspensionLanguage;
+      }
+      
+      // Add effect of termination language
+      if (effectOfTerminationLanguage) {
+        clause += effectOfTerminationLanguage;
+      }
+      
+      // Add data retention language
+      if (dataRetentionLanguage) {
+        clause += dataRetentionLanguage;
+      }
+      
+      // Add survival language
+      if (survivalLanguage) {
+        clause += survivalLanguage;
+      }
+      
+      // Add reactivation language
+      if (reactivationLanguage) {
+        clause += reactivationLanguage;
+      }
+      
+      // Add third-party language
+      if (thirdPartyLanguage) {
+        clause += thirdPartyLanguage;
+      }
+      
+      // Add force majeure language
+      if (forceMajeureLanguage) {
+        clause += forceMajeureLanguage;
+      }
+
+      return clause;
+    },
+    
+    // Update the preview
+    updatePreview: function(changedField) {
+      // Clear previous highlights
+      this.clearHighlights();
+      
+      // Generate new clause text
+      const clauseText = this.generateClause();
+      
+      // Update preview
+      document.getElementById('termPreview').innerHTML = clauseText;
+      
+      // If a field was changed, highlight the relevant text
+      if (changedField) {
+        this.highlightChangedText(changedField);
+      }
+    },
+    
+    // Clear highlights
+    clearHighlights: function() {
+      const highlightElements = document.getElementsByClassName('highlight');
+      while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+      }
+    },
+    
+    // Find text in document and highlight it
+    findAndHighlightText: function(searchText) {
+      if (!searchText) return;
+      
+      const previewElement = document.getElementById('termPreview');
+      const previewHTML = previewElement.innerHTML;
+      
+      // A simpler approach for WordPress compatibility
+      if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+          new RegExp(this.escapeRegExp(searchText), 'g'),
+          '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+          const highlightElements = document.getElementsByClassName('highlight');
+          if (highlightElements.length > 0) {
+            const firstHighlight = highlightElements[0];
+            if (firstHighlight) {
+              firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+          }
+        }, 100);
+      }
+    },
+    
+    // Escape special regex characters
+    escapeRegExp: function(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    },
+    
+    // Highlight changed text based on field
+    highlightChangedText: function(changedField) {
+      const self = this;
+      
+      switch (changedField) {
+        case 'companyName':
+          this.findAndHighlightText(document.getElementById('term_companyName').value);
+          break;
+        case 'serviceType':
+          // Highlight the service type text
+          const serviceTypeElement = document.getElementById('term_serviceType');
+          const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text;
+          this.findAndHighlightText(serviceTypeText);
+          break;
+        case 'serviceName':
+          this.findAndHighlightText(document.getElementById('term_serviceName').value);
+          break;
+        case 'companyAtWill':
+        case 'companyNoticePeriod':
+          const companyAtWill = document.querySelector('input[name="term_companyAtWill"]:checked').value === 'yes';
+          if (companyAtWill) {
+            const companyNoticePeriod = document.getElementById('term_companyNoticePeriod').value;
+            let noticeText = '';
+            
+            if (companyNoticePeriod === 'immediate') {
+              this.findAndHighlightText('at any time without notice');
+            } else if (companyNoticePeriod === '24hours') {
+              this.findAndHighlightText('with 24 hours\' notice');
+            } else if (companyNoticePeriod === '3days') {
+              this.findAndHighlightText('with 3 days\' notice');
+            } else if (companyNoticePeriod === '7days') {
+              this.findAndHighlightText('with 7 days\' notice');
+            } else if (companyNoticePeriod === '14days') {
+              this.findAndHighlightText('with 14 days\' notice');
+            } else if (companyNoticePeriod === '30days') {
+              this.findAndHighlightText('with 30 days\' notice');
+            }
+          }
+          break;
+        case 'companyForCause':
+          const companyForCause = document.querySelector('input[name="term_companyForCause"]:checked').value === 'yes';
+          if (companyForCause) {
+            this.findAndHighlightText('Immediate Termination for Cause');
+          }
+          break;
+        case 'causeTOU':
+        case 'causeIllegal':
+        case 'causeHarm':
+        case 'causeInfringement':
+        case 'causeFraud':
+        case 'causeInactivity':
+          // Highlight the specific cause text
+          if (changedField === 'causeTOU' && document.getElementById('term_causeTOU').checked) {
+            this.findAndHighlightText('you violate these Terms');
+          } else if (changedField === 'causeIllegal' && document.getElementById('term_causeIllegal').checked) {
+            this.findAndHighlightText('you use the Service for any illegal purpose');
+          } else if (changedField === 'causeHarm' && document.getElementById('term_causeHarm').checked) {
+            this.findAndHighlightText('you engage in any conduct that harms');
+          } else if (changedField === 'causeInfringement' && document.getElementById('term_causeInfringement').checked) {
+            this.findAndHighlightText('you infringe the intellectual property rights');
+          } else if (changedField === 'causeFraud' && document.getElementById('term_causeFraud').checked) {
+            this.findAndHighlightText('you provide any information that is inaccurate, false, or fraudulent');
+          } else if (changedField === 'causeInactivity' && document.getElementById('term_causeInactivity').checked) {
+            this.findAndHighlightText('your account remains inactive for an extended period');
+          }
+          break;
+        case 'userCancellation':
+          const userCancellation = document.querySelector('input[name="term_userCancellation"]:checked').value === 'yes';
+          if (userCancellation) {
+            this.findAndHighlightText('Termination by You');
+          }
+          break;
+        case 'cancellationMethod':
+        case 'cancellationEmail':
+        case 'customCancellationInstructions':
+          const cancellationMethod = document.getElementById('term_cancellationMethod').value;
+          if (cancellationMethod === 'account') {
+            this.findAndHighlightText('by using the cancellation or account deletion option');
+          } else if (cancellationMethod === 'email') {
+            this.findAndHighlightText(document.getElementById('term_cancellationEmail').value);
+          } else if (cancellationMethod === 'combined') {
+            this.findAndHighlightText('using the cancellation option in your account settings or by sending an email');
+          } else { // custom
+            this.findAndHighlightText(document.getElementById('term_customCancellationInstructions').value);
+          }
+          break;
+        case 'suspension':
+          const includeSuspension = document.querySelector('input[name="term_suspension"]:checked').value === 'yes';
+          if (includeSuspension) {
+            this.findAndHighlightText('Account Suspension');
+          }
+          break;
+        case 'suspensionGrounds':
+          const suspensionGrounds = document.getElementById('term_suspensionGrounds').value;
+          if (suspensionGrounds === 'broad') {
+            this.findAndHighlightText('for any reason in its sole discretion');
+          } else if (suspensionGrounds === 'specific') {
+            this.findAndHighlightText('if it believes you have violated these Terms');
+          } else { // investigation
+            this.findAndHighlightText('during investigation of suspected violations');
+          }
+          break;
+        case 'suspensionPeriod':
+          const suspensionPeriod = document.getElementById('term_suspensionPeriod').value;
+          if (suspensionPeriod !== 'unspecified') {
+            if (suspensionPeriod === '7days') {
+              this.findAndHighlightText('for up to 7 days');
+            } else if (suspensionPeriod === '14days') {
+              this.findAndHighlightText('for up to 14 days');
+            } else if (suspensionPeriod === '30days') {
+              this.findAndHighlightText('for up to 30 days');
+            } else if (suspensionPeriod === '90days') {
+              this.findAndHighlightText('for up to 90 days');
+            }
+          }
+          break;
+        case 'effectAccess':
+        case 'effectContent':
+        case 'effectFees':
+        case 'effectNoRefund':
+          // Highlight the specific effect text
+          if (changedField === 'effectAccess' && document.getElementById('term_effectAccess').checked) {
+            this.findAndHighlightText('your right to access and use');
+          } else if (changedField === 'effectContent' && document.getElementById('term_effectContent').checked) {
+            this.findAndHighlightText('may delete or remove your content');
+          } else if (changedField === 'effectFees' && document.getElementById('term_effectFees').checked) {
+            this.findAndHighlightText('you will remain liable for all amounts due');
+          } else if (changedField === 'effectNoRefund' && document.getElementById('term_effectNoRefund').checked) {
+            this.findAndHighlightText('no refunds will be provided');
+          }
+          break;
+        case 'effectSurvival':
+          const effectSurvival = document.getElementById('term_effectSurvival').checked;
+          if (effectSurvival) {
+            this.findAndHighlightText('Survival');
+          }
+          break;
+        case 'dataRetention':
+          const dataRetention = document.getElementById('term_dataRetention').value;
+          this.findAndHighlightText('Data Retention');
+          
+          if (dataRetention === 'immediate') {
+            this.findAndHighlightText('immediately upon termination');
+          } else if (dataRetention === '30days') {
+            this.findAndHighlightText('after 30 days following termination');
+          } else if (dataRetention === '60days') {
+            this.findAndHighlightText('after 60 days following termination');
+          } else if (dataRetention === '90days') {
+            this.findAndHighlightText('after 90 days following termination');
+          } else {
+            this.findAndHighlightText('in accordance with our Privacy Policy');
+          }
+          break;
+        case 'reactivation':
+          const reactivation = document.getElementById('term_reactivation').value;
+          if (reactivation !== 'none') {
+            this.findAndHighlightText('Account Reactivation');
+            
+            if (reactivation === 'discretion') {
+              this.findAndHighlightText('at the sole discretion');
+            } else if (reactivation === 'limited') {
+              this.findAndHighlightText('within 30 days of termination');
+            } else if (reactivation === 'unlimited') {
+              this.findAndHighlightText('at any time by creating a new account');
+            }
+          }
+          break;
+        case 'thirdParty':
+          const includeThirdParty = document.querySelector('input[name="term_thirdParty"]:checked').value === 'yes';
+          if (includeThirdParty) {
+            this.findAndHighlightText('Third-Party Services');
+          }
+          break;
+        case 'forceMajeure':
+          const includeForceMajeure = document.querySelector('input[name="term_forceMajeure"]:checked').value === 'yes';
+          if (includeForceMajeure) {
+            this.findAndHighlightText('Force Majeure');
+          }
+          break;
+      }
+      
+      // Remove highlights after 3 seconds
+      setTimeout(function() {
+        self.clearHighlights();
+      }, 3000);
+    },
+    
+    // Generate MS Word document
+    generateWordDoc: function() {
+      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                   "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                   "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+      const footer = "</body></html>";
+      const content = document.getElementById('termPreview').innerHTML;
+      const sourceHTML = header + content + footer;
+      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+      
+      // Create a download link and trigger it
+      const fileDownload = document.createElement("a");
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = 'TerminationClause.doc';
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
+    },
+    
+    // Handle copy button click
+    handleCopyClick: function() {
+      const text = document.getElementById('termPreview').innerText;
+      
+      try {
+        // Modern approach
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text)
+            .then(function() {
+              const copyBtn = document.getElementById('termCopyBtn');
+              const originalText = copyBtn.innerHTML;
+              copyBtn.innerHTML = 'COPIED!';
+              setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+              }, 2000);
+            })
+            .catch(function(err) {
+              console.error('Could not copy text: ', err);
+              fallbackCopyTextToClipboard(text);
+            });
+        } 
+        // Fallback approach
+        else {
+          fallbackCopyTextToClipboard(text);
+        }
+      } catch(err) {
+        console.error('Copy failed: ', err);
+        alert('Please select and copy the text manually.');
+      }
+      
+      function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        
+        // Make the textarea out of viewport
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          const copyBtn = document.getElementById('termCopyBtn');
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = successful ? 'COPIED!' : 'FAILED!';
+          setTimeout(function() {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        } catch (err) {
+          console.error('Fallback: Could not copy text: ', err);
+          alert('Please select and copy the text manually.');
+        }
+        
+        document.body.removeChild(textArea);
+      }
+    }
+  };
+  
+  // Initialize when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    terminationGenerator.init();
+  });
+  
+  // Initialize immediately as well (for WordPress)
+  terminationGenerator.init();
+</script>
   <script>
     // Create a namespace to avoid global scope pollution in WordPress
     var warrantyLiabilityGenerator = {
