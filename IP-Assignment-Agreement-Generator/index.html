@@ -28,6 +28,7 @@
         .container {
             display: flex;
             min-height: 100vh;
+            height: 100vh;
         }
         
         .form-container {
@@ -35,7 +36,8 @@
             padding: 20px;
             background-color: white;
             overflow-y: auto;
-            max-width: 500px;
+            max-width: 50%;
+            height: 100%;
         }
         
         .preview-container {
@@ -44,6 +46,8 @@
             background-color: var(--light-bg);
             border-left: 1px solid var(--border-color);
             overflow-y: auto;
+            max-width: 50%;
+            height: 100%;
         }
         
         h1, h2, h3 {
@@ -159,6 +163,12 @@
             justify-content: space-between;
         }
         
+        body, html {
+            height: 100%;
+            margin: 0;
+            overflow: hidden;
+        }
+        
         @media (max-width: 768px) {
             .container {
                 flex-direction: column;
@@ -167,6 +177,7 @@
             .form-container,
             .preview-container {
                 max-width: 100%;
+                height: 50%;
             }
         }
     </style>
@@ -366,7 +377,7 @@
             <div id="preview-content" class="preview-content"></div>
             
             <div class="button-group">
-                <button id="downloadBtn">Download as PDF</button>
+                <button id="downloadBtn">Download as Text File</button>
                 <button id="copyBtn">Copy to Clipboard</button>
             </div>
         </div>
@@ -452,18 +463,79 @@
         // Generate button
         document.getElementById('generateBtn').addEventListener('click', generateAgreement);
         
-        // Download button
+        // Download as text file button
         document.getElementById('downloadBtn').addEventListener('click', function() {
-            alert('In a production environment, this would generate a PDF download. For this demo, please use the copy function.');
+            const content = document.getElementById('preview-content').textContent;
+            const filename = 'IP_Assignment_Agreement.txt';
+            
+            // Create element with anchor tag
+            const element = document.createElement('a');
+            
+            // Create a blob with the text content
+            const file = new Blob([content], {type: 'text/plain'});
+            
+            // Set anchor's href to blob URL
+            element.href = URL.createObjectURL(file);
+            
+            // Set download attribute with filename
+            element.download = filename;
+            
+            // Hide the element
+            element.style.display = 'none';
+            
+            // Add to DOM, click it, and remove it
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
         });
         
-        // Copy button
+        // Copy button - using execCommand as a fallback for older browsers
         document.getElementById('copyBtn').addEventListener('click', function() {
             const content = document.getElementById('preview-content').textContent;
-            navigator.clipboard.writeText(content)
-                .then(() => alert('Agreement copied to clipboard!'))
-                .catch(err => console.error('Error copying text: ', err));
+            
+            // Try the modern clipboard API first
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(content)
+                    .then(() => alert('Agreement copied to clipboard!'))
+                    .catch(err => {
+                        console.error('Error copying text: ', err);
+                        fallbackCopyTextToClipboard(content);
+                    });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyTextToClipboard(content);
+            }
         });
+        
+        // Fallback copy function
+        function fallbackCopyTextToClipboard(text) {
+            // Create text area
+            const textArea = document.createElement("textarea");
+            textArea.value = text;
+            
+            // Make it invisible
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            
+            // Focus and select the text
+            textArea.focus();
+            textArea.select();
+            
+            try {
+                // Execute the copy command
+                const successful = document.execCommand('copy');
+                const msg = successful ? 'Agreement copied to clipboard!' : 'Unable to copy';
+                alert(msg);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                alert('Copy function not supported in your browser');
+            }
+            
+            // Clean up
+            document.body.removeChild(textArea);
+        }
         
         // Function to update the agreement when inputs change
         function updateAgreement(changedSection) {
@@ -477,17 +549,25 @@
             // Highlight the changed sections
             if (changedSection) {
                 const elementsToHighlight = document.querySelectorAll(`[data-highlight="${changedSection}"]`);
+                
+                // If no elements found with that data-highlight, don't try to highlight
+                if (elementsToHighlight.length === 0) return;
+                
                 elementsToHighlight.forEach(element => {
                     element.classList.add('highlight');
                     
-                    // If the element isn't visible in the preview, scroll to it
+                    // Always ensure the element is visible in the preview
                     const previewContainer = document.querySelector('.preview-container');
-                    const elementPosition = element.offsetTop;
-                    const containerScrollTop = previewContainer.scrollTop;
-                    const containerHeight = previewContainer.clientHeight;
+                    const elementTop = element.offsetTop;
+                    const elementBottom = elementTop + element.offsetHeight;
+                    const containerTop = previewContainer.scrollTop;
+                    const containerBottom = containerTop + previewContainer.clientHeight;
                     
-                    if (elementPosition < containerScrollTop || elementPosition > containerScrollTop + containerHeight) {
-                        previewContainer.scrollTop = elementPosition - 100;
+                    // If element is not fully visible, scroll to make it visible
+                    if (elementTop < containerTop || elementBottom > containerBottom) {
+                        // Calculate scroll position to center the element in the view
+                        const scrollPosition = elementTop - (previewContainer.clientHeight / 2);
+                        previewContainer.scrollTop = Math.max(0, scrollPosition);
                     }
                     
                     // Remove highlight after 2 seconds
