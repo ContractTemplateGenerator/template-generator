@@ -1166,14 +1166,1080 @@
     </div>
     
     <!-- Tab Content for Intellectual Property -->
-    <div id="ip-tab" class="tools-tab-content">
-      <div class="coming-soon-container">
-        <div class="coming-soon-icon">🔜</div>
-        <h3 class="coming-soon-title">Intellectual Property Rights Generator</h3>
-        <p class="coming-soon-description">Create comprehensive IP rights clauses covering ownership, licenses, copyrights, trademarks, user-generated content, and more. Perfectly tailored to your business needs.</p>
-        <div class="coming-soon-notification">Coming Soon!</div>
+<div id="ip-tab" class="tools-tab-content">
+  <div class="generator-container">
+    <!-- Form Column -->
+    <div class="form-column">
+      <!-- Industry Presets -->
+      <div class="industry-presets">
+        <div class="preset-title">Quick Start: Select Your Industry</div>
+        <div class="preset-buttons">
+          <button class="preset-btn" onclick="ipGenerator.applyPreset('saas')">SaaS/Software</button>
+          <button class="preset-btn" onclick="ipGenerator.applyPreset('ecommerce')">E-commerce</button>
+          <button class="preset-btn" onclick="ipGenerator.applyPreset('content')">Content Platform</button>
+          <button class="preset-btn" onclick="ipGenerator.applyPreset('educational')">Educational</button>
+          <button class="preset-btn" onclick="ipGenerator.applyPreset('marketplace')">Online Marketplace</button>
+        </div>
+      </div>
+    
+      <!-- Agreement Information -->
+      <div class="section-header">Agreement Information</div>
+      
+      <div class="form-group">
+        <label class="form-label" for="ip_companyName">Company Name</label>
+        <input type="text" id="ip_companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="ipGenerator.updatePreview('companyName')">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="ip_serviceType">Service Type</label>
+        <select id="ip_serviceType" class="form-select" onchange="ipGenerator.updatePreview('serviceType')">
+          <option value="website" selected>Website</option>
+          <option value="mobileApp">Mobile App</option>
+          <option value="saas">SaaS Platform</option>
+          <option value="marketplace">Online Marketplace</option>
+          <option value="content">Content Platform</option>
+        </select>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="ip_serviceName">Service/Product Name</label>
+        <input type="text" id="ip_serviceName" class="form-input" value="OUR SERVICE" placeholder="Enter service name (ALL CAPS recommended)" onkeyup="ipGenerator.updatePreview('serviceName')">
+      </div>
+      
+      <!-- Company IP Rights -->
+      <div class="section-header">Company IP Rights</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Ownership Statement
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Strong:</strong> Claims broad ownership of all content and IP.<br>
+              <strong>Moderate:</strong> Claims ownership with some exceptions.<br>
+              <strong>Limited:</strong> Claims ownership only of specific company materials.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="ip_ownershipLevel" id="ip_ownershipStrong" value="strong" checked onclick="ipGenerator.updatePreview('ownershipLevel')">
+            <span class="radio-label">Strong Claim</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_ownershipLevel" id="ip_ownershipModerate" value="moderate" onclick="ipGenerator.updatePreview('ownershipLevel')">
+            <span class="radio-label">Moderate Claim</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_ownershipLevel" id="ip_ownershipLimited" value="limited" onclick="ipGenerator.updatePreview('ownershipLevel')">
+            <span class="radio-label">Limited Claim</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          IP Types Specifically Protected
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select the specific types of intellectual property you want to explicitly protect in your terms.
+            </div>
+          </div>
+        </label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_protectCopyright" checked onclick="ipGenerator.updatePreview('protectCopyright')">
+            <span class="checkbox-label">Copyrighted Content</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_protectTrademarks" checked onclick="ipGenerator.updatePreview('protectTrademarks')">
+            <span class="checkbox-label">Trademarks & Logos</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_protectPatents" onclick="ipGenerator.updatePreview('protectPatents')">
+            <span class="checkbox-label">Patents</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_protectTradeSecrets" onclick="ipGenerator.updatePreview('protectTradeSecrets')">
+            <span class="checkbox-label">Trade Secrets</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_protectDesigns" onclick="ipGenerator.updatePreview('protectDesigns')">
+            <span class="checkbox-label">Designs & UI Elements</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- User License -->
+      <div class="section-header">User License</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          License Type
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Limited Personal:</strong> User can only use the service for personal purposes.<br>
+              <strong>Commercial:</strong> User can use the service for both personal and commercial purposes.<br>
+              <strong>Custom:</strong> Define specific license terms for your unique needs.
+            </div>
+          </div>
+        </label>
+        <select id="ip_licenseType" class="form-select" onchange="ipGenerator.handleLicenseTypeChange(); ipGenerator.updatePreview('licenseType');">
+          <option value="limited" selected>Limited Personal License</option>
+          <option value="commercial">Commercial License</option>
+          <option value="custom">Custom License Terms</option>
+        </select>
+      </div>
+      
+      <div id="ip_customLicenseGroup" style="display: none;">
+        <div class="form-group">
+          <label class="form-label" for="ip_customLicenseTerms">Custom License Terms</label>
+          <textarea id="ip_customLicenseTerms" class="form-textarea" rows="3" placeholder="Describe your custom license terms" onkeyup="ipGenerator.updatePreview('customLicenseTerms')">The User is granted a limited, non-exclusive, non-transferable license to use the service subject to these terms.</textarea>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">License Restrictions</label>
+        <div class="checkbox-group">
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_restrictModification" checked onclick="ipGenerator.updatePreview('restrictModification')">
+            <span class="checkbox-label">No Modification</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_restrictDistribution" checked onclick="ipGenerator.updatePreview('restrictDistribution')">
+            <span class="checkbox-label">No Distribution</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_restrictSublicense" checked onclick="ipGenerator.updatePreview('restrictSublicense')">
+            <span class="checkbox-label">No Sublicensing</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_restrictReverse" checked onclick="ipGenerator.updatePreview('restrictReverse')">
+            <span class="checkbox-label">No Reverse Engineering</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" id="ip_restrictCompete" onclick="ipGenerator.updatePreview('restrictCompete')">
+            <span class="checkbox-label">No Competing Services</span>
+          </label>
+        </div>
+      </div>
+      
+      <!-- User Content -->
+      <div class="section-header">User-Generated Content</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Does Your Service Allow User Content?
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              If your service allows users to upload, create, or share content, select Yes to include user content provisions.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="ip_userContent" id="ip_userContentYes" value="yes" checked onclick="ipGenerator.handleUserContentChange(); ipGenerator.updatePreview('userContent');">
+            <span class="radio-label">Yes</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_userContent" id="ip_userContentNo" value="no" onclick="ipGenerator.handleUserContentChange(); ipGenerator.updatePreview('userContent');">
+            <span class="radio-label">No</span>
+          </label>
+        </div>
+      </div>
+      
+      <div id="ip_userContentOptions">
+        <div class="form-group">
+          <label class="form-label">
+            User Content License to Company
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                The license that users grant to your company for content they upload or create. This allows you to display, store, or use their content.
+              </div>
+            </div>
+          </label>
+          <select id="ip_userLicenseType" class="form-select" onchange="ipGenerator.updatePreview('userLicenseType')">
+            <option value="broad" selected>Broad License</option>
+            <option value="moderate">Moderate License</option>
+            <option value="limited">Limited License</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">User Content Ownership</label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="ip_userOwnership" id="ip_userOwnershipUser" value="user" checked onclick="ipGenerator.updatePreview('userOwnership')">
+              <span class="radio-label">User Retains Ownership</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="ip_userOwnership" id="ip_userOwnershipCompany" value="company" onclick="ipGenerator.updatePreview('userOwnership')">
+              <span class="radio-label">Company Claims Ownership</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="ip_userOwnership" id="ip_userOwnershipJoint" value="joint" onclick="ipGenerator.updatePreview('userOwnership')">
+              <span class="radio-label">Joint Ownership</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Specific User Content Rights</label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" id="ip_rightDisplay" checked onclick="ipGenerator.updatePreview('rightDisplay')">
+              <span class="checkbox-label">Display/Publish</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="ip_rightModify" checked onclick="ipGenerator.updatePreview('rightModify')">
+              <span class="checkbox-label">Modify/Edit</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="ip_rightDistribute" checked onclick="ipGenerator.updatePreview('rightDistribute')">
+              <span class="checkbox-label">Distribute</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="ip_rightPromote" checked onclick="ipGenerator.updatePreview('rightPromote')">
+              <span class="checkbox-label">Use in Promotion</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="ip_rightSublicense" onclick="ipGenerator.updatePreview('rightSublicense')">
+              <span class="checkbox-label">Sublicense</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- DMCA -->
+      <div class="section-header">Additional IP Provisions</div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Include DMCA Policy
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              The Digital Millennium Copyright Act (DMCA) provides a safe harbor for online service providers if they have a process for handling copyright infringement notices.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="ip_dmcaPolicy" id="ip_dmcaPolicyYes" value="yes" checked onclick="ipGenerator.updatePreview('dmcaPolicy')">
+            <span class="radio-label">Yes</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_dmcaPolicy" id="ip_dmcaPolicyNo" value="no" onclick="ipGenerator.updatePreview('dmcaPolicy')">
+            <span class="radio-label">No</span>
+          </label>
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label" for="ip_dmcaEmail">DMCA Contact Email</label>
+        <input type="text" id="ip_dmcaEmail" class="form-input" value="copyright@yourcompany.com" placeholder="Email for copyright issues" onkeyup="ipGenerator.updatePreview('dmcaEmail')">
+      </div>
+      
+      <div class="form-group">
+        <label class="form-label">
+          Feedback Ownership
+          <div class="tooltip-container">
+            <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Determines who owns the intellectual property rights to feedback, suggestions, or ideas that users provide about your service.
+            </div>
+          </div>
+        </label>
+        <div class="radio-group">
+          <label class="radio-item">
+            <input type="radio" name="ip_feedbackOwnership" id="ip_feedbackOwnershipCompany" value="company" checked onclick="ipGenerator.updatePreview('feedbackOwnership')">
+            <span class="radio-label">Company Owns</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_feedbackOwnership" id="ip_feedbackOwnershipLicense" value="license" onclick="ipGenerator.updatePreview('feedbackOwnership')">
+            <span class="radio-label">Company License Only</span>
+          </label>
+          <label class="radio-item">
+            <input type="radio" name="ip_feedbackOwnership" id="ip_feedbackOwnershipUser" value="user" onclick="ipGenerator.updatePreview('feedbackOwnership')">
+            <span class="radio-label">User Retains Rights</span>
+          </label>
+        </div>
       </div>
     </div>
+    
+    <!-- Preview Column -->
+    <div class="preview-column">
+      <div class="preview-header">
+        <div class="preview-title">Intellectual Property Clause Preview</div>
+        <div class="preview-note">Updates as you complete the form</div>
+      </div>
+      
+      <div class="preview-content" id="ipPreview">
+        <!-- Preview content will be populated by JavaScript -->
+      </div>
+      
+      <div id="ip-preview-fade" class="preview-fade"></div>
+      
+      <div class="button-container">
+        <button id="ipCopyBtn" class="copy-btn" onclick="ipGenerator.handleCopyClick()">
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          COPY CLAUSE
+        </button>
+        <button id="ipWordBtn" class="copy-btn" onclick="ipGenerator.generateWordDoc()">MS WORD DOC</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Create a namespace to avoid global scope pollution in WordPress
+  var ipGenerator = {
+    // Initialize the generator
+    init: function() {
+      this.handleLicenseTypeChange();
+      this.handleUserContentChange();
+      this.updatePreview();
+    },
+    
+    // Apply industry preset
+    applyPreset: function(preset) {
+      // SaaS/Software preset
+      if (preset === 'saas') {
+        document.getElementById('ip_serviceType').value = 'saas';
+        document.getElementById('ip_serviceName').value = 'OUR SOFTWARE';
+        document.getElementById('ip_ownershipStrong').checked = true;
+        document.getElementById('ip_protectCopyright').checked = true;
+        document.getElementById('ip_protectTrademarks').checked = true;
+        document.getElementById('ip_protectPatents').checked = true;
+        document.getElementById('ip_protectTradeSecrets').checked = true;
+        document.getElementById('ip_protectDesigns').checked = true;
+        document.getElementById('ip_licenseType').value = 'commercial';
+        document.getElementById('ip_restrictModification').checked = true;
+        document.getElementById('ip_restrictDistribution').checked = true;
+        document.getElementById('ip_restrictSublicense').checked = true;
+        document.getElementById('ip_restrictReverse').checked = true;
+        document.getElementById('ip_restrictCompete').checked = true;
+        document.getElementById('ip_userContentNo').checked = true;
+        document.getElementById('ip_dmcaPolicyYes').checked = true;
+        document.getElementById('ip_feedbackOwnershipCompany').checked = true;
+      }
+      // E-commerce preset
+      else if (preset === 'ecommerce') {
+        document.getElementById('ip_serviceType').value = 'website';
+        document.getElementById('ip_serviceName').value = 'OUR STORE';
+        document.getElementById('ip_ownershipStrong').checked = true;
+        document.getElementById('ip_protectCopyright').checked = true;
+        document.getElementById('ip_protectTrademarks').checked = true;
+        document.getElementById('ip_protectPatents').checked = false;
+        document.getElementById('ip_protectTradeSecrets').checked = false;
+        document.getElementById('ip_protectDesigns').checked = true;
+        document.getElementById('ip_licenseType').value = 'limited';
+        document.getElementById('ip_restrictModification').checked = true;
+        document.getElementById('ip_restrictDistribution').checked = true;
+        document.getElementById('ip_restrictSublicense').checked = true;
+        document.getElementById('ip_restrictReverse').checked = true;
+        document.getElementById('ip_restrictCompete').checked = false;
+        document.getElementById('ip_userContentNo').checked = true;
+        document.getElementById('ip_dmcaPolicyYes').checked = true;
+        document.getElementById('ip_feedbackOwnershipCompany').checked = true;
+      }
+      // Content Platform preset
+      else if (preset === 'content') {
+        document.getElementById('ip_serviceType').value = 'content';
+        document.getElementById('ip_serviceName').value = 'OUR PLATFORM';
+        document.getElementById('ip_ownershipModerate').checked = true;
+        document.getElementById('ip_protectCopyright').checked = true;
+        document.getElementById('ip_protectTrademarks').checked = true;
+        document.getElementById('ip_protectPatents').checked = false;
+        document.getElementById('ip_protectTradeSecrets').checked = false;
+        document.getElementById('ip_protectDesigns').checked = true;
+        document.getElementById('ip_licenseType').value = 'limited';
+        document.getElementById('ip_restrictModification').checked = true;
+        document.getElementById('ip_restrictDistribution').checked = true;
+        document.getElementById('ip_restrictSublicense').checked = true;
+        document.getElementById('ip_restrictReverse').checked = false;
+        document.getElementById('ip_restrictCompete').checked = false;
+        document.getElementById('ip_userContentYes').checked = true;
+        document.getElementById('ip_userLicenseType').value = 'broad';
+        document.getElementById('ip_userOwnershipUser').checked = true;
+        document.getElementById('ip_rightDisplay').checked = true;
+        document.getElementById('ip_rightModify').checked = true;
+        document.getElementById('ip_rightDistribute').checked = true;
+        document.getElementById('ip_rightPromote').checked = true;
+        document.getElementById('ip_rightSublicense').checked = true;
+        document.getElementById('ip_dmcaPolicyYes').checked = true;
+        document.getElementById('ip_feedbackOwnershipLicense').checked = true;
+      }
+      // Educational preset
+      else if (preset === 'educational') {
+        document.getElementById('ip_serviceType').value = 'website';
+        document.getElementById('ip_serviceName').value = 'OUR EDUCATIONAL PLATFORM';
+        document.getElementById('ip_ownershipModerate').checked = true;
+        document.getElementById('ip_protectCopyright').checked = true;
+        document.getElementById('ip_protectTrademarks').checked = true;
+        document.getElementById('ip_protectPatents').checked = false;
+        document.getElementById('ip_protectTradeSecrets').checked = false;
+        document.getElementById('ip_protectDesigns').checked = false;
+        document.getElementById('ip_licenseType').value = 'limited';
+        document.getElementById('ip_restrictModification').checked = true;
+        document.getElementById('ip_restrictDistribution').checked = true;
+        document.getElementById('ip_restrictSublicense').checked = true;
+        document.getElementById('ip_restrictReverse').checked = false;
+        document.getElementById('ip_restrictCompete').checked = false;
+        document.getElementById('ip_userContentYes').checked = true;
+        document.getElementById('ip_userLicenseType').value = 'limited';
+        document.getElementById('ip_userOwnershipUser').checked = true;
+        document.getElementById('ip_rightDisplay').checked = true;
+        document.getElementById('ip_rightModify').checked = false;
+        document.getElementById('ip_rightDistribute').checked = false;
+        document.getElementById('ip_rightPromote').checked = false;
+        document.getElementById('ip_rightSublicense').checked = false;
+        document.getElementById('ip_dmcaPolicyYes').checked = true;
+        document.getElementById('ip_feedbackOwnershipUser').checked = true;
+      }
+      // Online Marketplace preset
+      else if (preset === 'marketplace') {
+        document.getElementById('ip_serviceType').value = 'marketplace';
+        document.getElementById('ip_serviceName').value = 'OUR MARKETPLACE';
+        document.getElementById('ip_ownershipStrong').checked = true;
+        document.getElementById('ip_protectCopyright').checked = true;
+        document.getElementById('ip_protectTrademarks').checked = true;
+        document.getElementById('ip_protectPatents').checked = false;
+        document.getElementById('ip_protectTradeSecrets').checked = true;
+        document.getElementById('ip_protectDesigns').checked = true;
+        document.getElementById('ip_licenseType').value = 'commercial';
+        document.getElementById('ip_restrictModification').checked = true;
+        document.getElementById('ip_restrictDistribution').checked = true;
+        document.getElementById('ip_restrictSublicense').checked = true;
+        document.getElementById('ip_restrictReverse').checked = true;
+        document.getElementById('ip_restrictCompete').checked = true;
+        document.getElementById('ip_userContentYes').checked = true;
+        document.getElementById('ip_userLicenseType').value = 'moderate';
+        document.getElementById('ip_userOwnershipUser').checked = true;
+        document.getElementById('ip_rightDisplay').checked = true;
+        document.getElementById('ip_rightModify').checked = false;
+        document.getElementById('ip_rightDistribute').checked = true;
+        document.getElementById('ip_rightPromote').checked = true;
+        document.getElementById('ip_rightSublicense').checked = false;
+        document.getElementById('ip_dmcaPolicyYes').checked = true;
+        document.getElementById('ip_feedbackOwnershipCompany').checked = true;
+      }
+      
+      // Update the DOM based on the presets
+      this.handleLicenseTypeChange();
+      this.handleUserContentChange();
+      this.updatePreview();
+    },
+    
+    // Generate clause text
+    generateClause: function() {
+      const companyName = document.getElementById('ip_companyName').value;
+      const serviceType = document.getElementById('ip_serviceType').value;
+      const serviceTypeText = document.getElementById('ip_serviceType').options[document.getElementById('ip_serviceType').selectedIndex].text;
+      const serviceName = document.getElementById('ip_serviceName').value.toUpperCase();
+      
+      // Get ownership level
+      let ownershipLevel = '';
+      const ownershipRadios = document.getElementsByName('ip_ownershipLevel');
+      for (let i = 0; i < ownershipRadios.length; i++) {
+        if (ownershipRadios[i].checked) {
+          ownershipLevel = ownershipRadios[i].value;
+          break;
+        }
+      }
+      
+      // Get protected IP types
+      const protectCopyright = document.getElementById('ip_protectCopyright').checked;
+      const protectTrademarks = document.getElementById('ip_protectTrademarks').checked;
+      const protectPatents = document.getElementById('ip_protectPatents').checked;
+      const protectTradeSecrets = document.getElementById('ip_protectTradeSecrets').checked;
+      const protectDesigns = document.getElementById('ip_protectDesigns').checked;
+      
+      // Build protected IP types list
+      let protectedTypes = [];
+      if (protectCopyright) protectedTypes.push("copyrights");
+      if (protectTrademarks) protectedTypes.push("trademarks");
+      if (protectPatents) protectedTypes.push("patents");
+      if (protectTradeSecrets) protectedTypes.push("trade secrets");
+      if (protectDesigns) protectedTypes.push("designs and user interface elements");
+      
+      // Format protected types string
+      let protectedTypesText = '';
+      if (protectedTypes.length > 0) {
+        if (protectedTypes.length === 1) {
+          protectedTypesText = protectedTypes[0];
+        } else if (protectedTypes.length === 2) {
+          protectedTypesText = protectedTypes.join(" and ");
+        } else {
+          const lastType = protectedTypes.pop();
+          protectedTypesText = protectedTypes.join(", ") + ", and " + lastType;
+        }
+      }
+      
+      // Get license type
+      const licenseType = document.getElementById('ip_licenseType').value;
+      const customLicenseTerms = document.getElementById('ip_customLicenseTerms').value;
+      
+      // Get license restrictions
+      const restrictModification = document.getElementById('ip_restrictModification').checked;
+      const restrictDistribution = document.getElementById('ip_restrictDistribution').checked;
+      const restrictSublicense = document.getElementById('ip_restrictSublicense').checked;
+      const restrictReverse = document.getElementById('ip_restrictReverse').checked;
+      const restrictCompete = document.getElementById('ip_restrictCompete').checked;
+      
+      // Build license restrictions list
+      let restrictions = [];
+      if (restrictModification) restrictions.push("modify, adapt, or create derivative works");
+      if (restrictDistribution) restrictions.push("distribute, sell, rent, lease, or transfer");
+      if (restrictSublicense) restrictions.push("sublicense");
+      if (restrictReverse) restrictions.push("reverse engineer, decompile, or disassemble");
+      if (restrictCompete) restrictions.push("use the Service to create a competing product or service");
+      
+      // Format restrictions string
+      let restrictionsText = '';
+      if (restrictions.length > 0) {
+        if (restrictions.length === 1) {
+          restrictionsText = restrictions[0];
+        } else if (restrictions.length === 2) {
+          restrictionsText = restrictions.join(" or ");
+        } else {
+          const lastRestriction = restrictions.pop();
+          restrictionsText = restrictions.join(", ") + ", or " + lastRestriction;
+        }
+      }
+      
+      // Get user content options
+      let hasUserContent = document.querySelector('input[name="ip_userContent"]:checked').value === 'yes';
+      let userLicenseType = document.getElementById('ip_userLicenseType').value;
+      
+      let userOwnership = '';
+      const userOwnershipRadios = document.getElementsByName('ip_userOwnership');
+      for (let i = 0; i < userOwnershipRadios.length; i++) {
+        if (userOwnershipRadios[i].checked) {
+          userOwnership = userOwnershipRadios[i].value;
+          break;
+        }
+      }
+      
+      // Get user content rights
+      const rightDisplay = document.getElementById('ip_rightDisplay').checked;
+      const rightModify = document.getElementById('ip_rightModify').checked;
+      const rightDistribute = document.getElementById('ip_rightDistribute').checked;
+      const rightPromote = document.getElementById('ip_rightPromote').checked;
+      const rightSublicense = document.getElementById('ip_rightSublicense').checked;
+      
+      // Build user content rights list
+      let userRights = [];
+      if (rightDisplay) userRights.push("display, publish, and host");
+      if (rightModify) userRights.push("modify, edit, and adapt");
+      if (rightDistribute) userRights.push("distribute and make available to others");
+      if (rightPromote) userRights.push("use in promotional materials and advertising");
+      if (rightSublicense) userRights.push("sublicense to affiliates and service providers");
+      
+      // Format user rights string
+      let userRightsText = '';
+      if (userRights.length > 0) {
+        if (userRights.length === 1) {
+          userRightsText = userRights[0];
+        } else if (userRights.length === 2) {
+          userRightsText = userRights.join(" and ");
+        } else {
+          const lastRight = userRights.pop();
+          userRightsText = userRights.join(", ") + ", and " + lastRight;
+        }
+      }
+      
+      // Get additional options
+      const includeDMCA = document.querySelector('input[name="ip_dmcaPolicy"]:checked').value === 'yes';
+      const dmcaEmail = document.getElementById('ip_dmcaEmail').value;
+      
+      let feedbackOwnership = '';
+      const feedbackOwnershipRadios = document.getElementsByName('ip_feedbackOwnership');
+      for (let i = 0; i < feedbackOwnershipRadios.length; i++) {
+        if (feedbackOwnershipRadios[i].checked) {
+          feedbackOwnership = feedbackOwnershipRadios[i].value;
+          break;
+        }
+      }
+      
+      // Build clause sections
+      
+      // 1. Ownership and IP rights section
+      let ownershipLanguage = '';
+      if (ownershipLevel === 'strong') {
+        ownershipLanguage = `Unless otherwise indicated, ${serviceName} and all content, features, and functionality (including but not limited to all information, software, text, displays, images, video, audio, and the design, selection, and arrangement thereof) are owned by ${companyName}, its licensors, or other providers of such material and are protected by United States and international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws.`;
+      } else if (ownershipLevel === 'moderate') {
+        ownershipLanguage = `Unless otherwise indicated, ${serviceName}, including all content and materials made available on or through the service that are specifically created or provided by ${companyName}, are owned by ${companyName}, its licensors, or other providers of such material and are protected by applicable intellectual property laws.`;
+      } else {
+        ownershipLanguage = `${companyName} owns and retains all rights to the ${serviceName} branding, logos, and original content created and provided by ${companyName} through the service.`;
+      }
+      
+      // Add specific IP types if selected
+      let specificIPLanguage = '';
+      if (protectedTypesText) {
+        specificIPLanguage = `This includes, but is not limited to, all ${protectedTypesText} associated with ${serviceName}.`;
+      }
+      
+      // 2. User License section
+      let licenseLanguage = '';
+      if (licenseType === 'limited') {
+        licenseLanguage = `Subject to these Terms, ${companyName} grants you a limited, non-exclusive, non-transferable, non-sublicensable, revocable license to access and use ${serviceName} solely for your personal, non-commercial purposes.`;
+      } else if (licenseType === 'commercial') {
+        licenseLanguage = `Subject to these Terms, ${companyName} grants you a limited, non-exclusive, non-transferable license to access and use ${serviceName} for your personal or commercial purposes, as permitted through the functionality of the service and these Terms.`;
+      } else {
+        licenseLanguage = customLicenseTerms;
+      }
+      
+      // Add license restrictions if selected
+      let restrictionsLanguage = '';
+      if (restrictionsText) {
+        restrictionsLanguage = `You may not ${restrictionsText} any portion of ${serviceName} without the prior written consent of ${companyName}.`;
+      }
+      
+      // 3. User-generated content section
+      let userContentLanguage = '';
+      if (hasUserContent) {
+        // User content ownership statement
+        if (userOwnership === 'user') {
+          userContentLanguage = `<p><strong>User-Generated Content</strong></p><p>When you create, upload, post, send, receive, store, or otherwise make available any content on or through ${serviceName} ("User Content"), you retain all rights that you had in your User Content before uploading it.`;
+        } else if (userOwnership === 'company') {
+          userContentLanguage = `<p><strong>User-Generated Content</strong></p><p>Any content that you create, upload, post, send, receive, store, or otherwise make available on or through ${serviceName} ("User Content") shall become the property of ${companyName} and you hereby assign all rights, title, and interest in and to such User Content to ${companyName}.`;
+        } else {
+          userContentLanguage = `<p><strong>User-Generated Content</strong></p><p>When you create, upload, post, send, receive, store, or otherwise make available any content on or through ${serviceName} ("User Content"), you and ${companyName} each maintain your respective ownership rights in such content.`;
+        }
+        
+        // User license to company
+        if (userOwnership === 'user' || userOwnership === 'joint') {
+          if (userLicenseType === 'broad') {
+            userContentLanguage += ` However, by creating or providing User Content, you grant ${companyName} and its affiliates a worldwide, perpetual, irrevocable, royalty-free, fully-paid, non-exclusive, transferable, and sublicensable license to use, copy, modify, adapt, prepare derivative works from, distribute, perform, display, and otherwise exploit your User Content in connection with ${serviceName} and ${companyName}'s business, including for the purpose of promoting and redistributing part or all of ${serviceName} in any media formats and through any media channels.`;
+          } else if (userLicenseType === 'moderate') {
+            userContentLanguage += ` However, by creating or providing User Content, you grant ${companyName} a worldwide, non-exclusive, royalty-free license to use, reproduce, display, and distribute your User Content in connection with the operation and provision of ${serviceName}.`;
+          } else {
+            userContentLanguage += ` However, by creating or providing User Content, you grant ${companyName} a limited license to use your User Content solely for the purpose of providing ${serviceName} to you and other users.`;
+          }
+        }
+        
+        // Add specific rights if applicable
+        if (userRightsText && (userOwnership === 'user' || userOwnership === 'joint')) {
+          userContentLanguage += ` This license allows ${companyName} to ${userRightsText} your User Content.`;
+        }
+        
+        // Add representations and warranties for user content
+        userContentLanguage += `</p><p>You represent and warrant that: (i) you own your User Content or have the right to grant the rights and licenses described in these Terms; (ii) your User Content does not violate these Terms, applicable law, or the rights (intellectual property rights or otherwise) of any third party; and (iii) your User Content will not cause ${companyName} to violate any applicable laws or rights of any third party.</p>`;
+      }
+      
+      // 4. DMCA Policy section
+      let dmcaLanguage = '';
+      if (includeDMCA) {
+        dmcaLanguage = `
+<p><strong>DMCA Copyright Policy</strong></p>
+<p>${companyName} respects the intellectual property rights of others and expects its users to do the same. In accordance with the Digital Millennium Copyright Act of 1998 ("DMCA"), ${companyName} will respond promptly to valid notices of copyright infringement and will terminate the accounts of repeat infringers as appropriate.</p>
+<p>If you believe that your work has been copied in a way that constitutes copyright infringement, please provide ${companyName}'s copyright agent with the following information:</p>
+<ol>
+  <li>An electronic or physical signature of the person authorized to act on behalf of the owner of the copyright interest;</li>
+  <li>A description of the copyrighted work that you claim has been infringed;</li>
+  <li>A description of where the material that you claim is infringing is located on the service;</li>
+  <li>Your address, telephone number, and email address;</li>
+  <li>A statement by you that you have a good faith belief that the disputed use is not authorized by the copyright owner, its agent, or the law; and</li>
+  <li>A statement by you, made under penalty of perjury, that the above information in your notice is accurate and that you are the copyright owner or authorized to act on the copyright owner's behalf.</li>
+</ol>
+<p>${companyName}'s designated copyright agent can be reached at: ${dmcaEmail}</p>
+`;
+      }
+      
+      // 5. Feedback section
+      let feedbackLanguage = '';
+      if (feedbackOwnership === 'company') {
+        feedbackLanguage = `
+<p><strong>Feedback</strong></p>
+<p>If you provide ${companyName} with any comments, suggestions, recommendations, requests, or any other feedback related to ${serviceName} ("Feedback"), you hereby assign to ${companyName} all rights, title, and interest in and to the Feedback. ${companyName} will be free to use, disclose, reproduce, license, and otherwise distribute and exploit the Feedback as it sees fit, without any obligation or restriction of any kind.</p>
+`;
+      } else if (feedbackOwnership === 'license') {
+        feedbackLanguage = `
+<p><strong>Feedback</strong></p>
+<p>If you provide ${companyName} with any comments, suggestions, recommendations, requests, or any other feedback related to ${serviceName} ("Feedback"), you grant ${companyName} a perpetual, irrevocable, worldwide, royalty-free license to use, disclose, reproduce, license, distribute, and exploit the Feedback without any obligation or restriction of any kind. This license does not grant ${companyName} any ownership rights to your Feedback.</p>
+`;
+      } else {
+        feedbackLanguage = `
+<p><strong>Feedback</strong></p>
+<p>If you provide ${companyName} with any comments, suggestions, recommendations, requests, or any other feedback related to ${serviceName} ("Feedback"), you retain all rights to your Feedback. Nothing in these Terms limits your right to use your Feedback in any way.</p>
+`;
+      }
+      
+      // Build the complete clause
+      let clause = `
+<p><strong>INTELLECTUAL PROPERTY RIGHTS</strong></p>
+<p>${ownershipLanguage} ${specificIPLanguage}</p>
+
+<p><strong>USER LICENSE</strong></p>
+<p>${licenseLanguage} ${restrictionsLanguage}</p>
+`;
+
+      // Add user content section if applicable
+      if (hasUserContent) {
+        clause += userContentLanguage;
+      }
+
+      // Add DMCA section if selected
+      if (includeDMCA) {
+        clause += dmcaLanguage;
+      }
+
+      // Add feedback section
+      clause += feedbackLanguage;
+
+      // Add general prohibition
+      clause += `
+<p><strong>PROHIBITED USES</strong></p>
+<p>You may use ${serviceName} only for lawful purposes and in accordance with these Terms. You agree not to infringe upon or violate the intellectual property rights or any other rights of ${companyName} or any third party.</p>
+`;
+
+      return clause;
+    },
+    
+    // Handle license type change
+    handleLicenseTypeChange: function() {
+      const licenseType = document.getElementById('ip_licenseType').value;
+      
+      // Show/hide custom license terms field
+      document.getElementById('ip_customLicenseGroup').style.display = licenseType === 'custom' ? 'block' : 'none';
+      
+      // Update preview
+      this.updatePreview('licenseType');
+    },
+    
+    // Handle user content change
+    handleUserContentChange: function() {
+      const hasUserContent = document.querySelector('input[name="ip_userContent"]:checked').value === 'yes';
+      
+      // Show/hide user content options
+      document.getElementById('ip_userContentOptions').style.display = hasUserContent ? 'block' : 'none';
+      
+      // Update preview
+      this.updatePreview('userContent');
+    },
+    
+    // Update the preview
+    updatePreview: function(changedField) {
+      // Clear previous highlights
+      this.clearHighlights();
+      
+      // Generate new clause text
+      const clauseText = this.generateClause();
+      
+      // Update preview
+      document.getElementById('ipPreview').innerHTML = clauseText;
+      
+      // If a field was changed, highlight the relevant text
+      if (changedField) {
+        this.highlightChangedText(changedField);
+      }
+    },
+    
+    // Clear highlights
+    clearHighlights: function() {
+      const highlightElements = document.getElementsByClassName('highlight');
+      while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+      }
+    },
+    
+    // Find text in document and highlight it
+    findAndHighlightText: function(searchText) {
+      if (!searchText) return;
+      
+      const previewElement = document.getElementById('ipPreview');
+      const previewHTML = previewElement.innerHTML;
+      
+      // A simpler approach for WordPress compatibility
+      if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+          new RegExp(this.escapeRegExp(searchText), 'g'),
+          '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+          const highlightElements = document.getElementsByClassName('highlight');
+          if (highlightElements.length > 0) {
+            const firstHighlight = highlightElements[0];
+            if (firstHighlight) {
+              firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+            }
+          }
+        }, 100);
+      }
+    },
+    
+    // Escape special regex characters
+    escapeRegExp: function(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    },
+    
+    // Highlight changed text based on field
+    highlightChangedText: function(changedField) {
+      const self = this;
+      
+      switch (changedField) {
+        case 'companyName':
+          this.findAndHighlightText(document.getElementById('ip_companyName').value);
+          break;
+        case 'serviceType':
+          // Highlight the service type text
+          const serviceTypeElement = document.getElementById('ip_serviceType');
+          const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text;
+          this.findAndHighlightText(serviceTypeText);
+          break;
+        case 'serviceName':
+          this.findAndHighlightText(document.getElementById('ip_serviceName').value.toUpperCase());
+          break;
+        case 'ownershipLevel':
+          // Highlight ownership language based on level
+          const ownershipLevel = document.querySelector('input[name="ip_ownershipLevel"]:checked').value;
+          if (ownershipLevel === 'strong') {
+            this.findAndHighlightText("all content, features, and functionality");
+          } else if (ownershipLevel === 'moderate') {
+            this.findAndHighlightText("all content and materials made available on or through the service that are specifically created or provided");
+          } else {
+            this.findAndHighlightText("owns and retains all rights to the");
+          }
+          break;
+        case 'protectCopyright':
+        case 'protectTrademarks':
+        case 'protectPatents':
+        case 'protectTradeSecrets':
+        case 'protectDesigns':
+          // Build protected IP types list
+          let protectedTypes = [];
+          if (document.getElementById('ip_protectCopyright').checked) protectedTypes.push("copyrights");
+          if (document.getElementById('ip_protectTrademarks').checked) protectedTypes.push("trademarks");
+          if (document.getElementById('ip_protectPatents').checked) protectedTypes.push("patents");
+          if (document.getElementById('ip_protectTradeSecrets').checked) protectedTypes.push("trade secrets");
+          if (document.getElementById('ip_protectDesigns').checked) protectedTypes.push("designs and user interface elements");
+          
+          // Format protected types string
+          if (protectedTypes.length > 0) {
+            this.findAndHighlightText("This includes, but is not limited to, all");
+            
+            // Also highlight the specific type that was changed
+            if (changedField === 'protectCopyright' && document.getElementById('ip_protectCopyright').checked) {
+              this.findAndHighlightText("copyrights");
+            } else if (changedField === 'protectTrademarks' && document.getElementById('ip_protectTrademarks').checked) {
+              this.findAndHighlightText("trademarks");
+            } else if (changedField === 'protectPatents' && document.getElementById('ip_protectPatents').checked) {
+              this.findAndHighlightText("patents");
+            } else if (changedField === 'protectTradeSecrets' && document.getElementById('ip_protectTradeSecrets').checked) {
+              this.findAndHighlightText("trade secrets");
+            } else if (changedField === 'protectDesigns' && document.getElementById('ip_protectDesigns').checked) {
+              this.findAndHighlightText("designs and user interface elements");
+            }
+          }
+          break;
+        case 'licenseType':
+          const licenseType = document.getElementById('ip_licenseType').value;
+          if (licenseType === 'limited') {
+            this.findAndHighlightText("for your personal, non-commercial purposes");
+          } else if (licenseType === 'commercial') {
+            this.findAndHighlightText("for your personal or commercial purposes");
+          } else {
+            this.findAndHighlightText(document.getElementById('ip_customLicenseTerms').value);
+          }
+          break;
+        case 'customLicenseTerms':
+          this.findAndHighlightText(document.getElementById('ip_customLicenseTerms').value);
+          break;
+        case 'restrictModification':
+        case 'restrictDistribution':
+        case 'restrictSublicense':
+        case 'restrictReverse':
+        case 'restrictCompete':
+          // Highlight the specific restriction that was changed
+          if (changedField === 'restrictModification' && document.getElementById('ip_restrictModification').checked) {
+            this.findAndHighlightText("modify, adapt, or create derivative works");
+          } else if (changedField === 'restrictDistribution' && document.getElementById('ip_restrictDistribution').checked) {
+            this.findAndHighlightText("distribute, sell, rent, lease, or transfer");
+          } else if (changedField === 'restrictSublicense' && document.getElementById('ip_restrictSublicense').checked) {
+            this.findAndHighlightText("sublicense");
+          } else if (changedField === 'restrictReverse' && document.getElementById('ip_restrictReverse').checked) {
+            this.findAndHighlightText("reverse engineer, decompile, or disassemble");
+          } else if (changedField === 'restrictCompete' && document.getElementById('ip_restrictCompete').checked) {
+            this.findAndHighlightText("use the Service to create a competing product or service");
+          }
+          break;
+        case 'userContent':
+          const hasUserContent = document.querySelector('input[name="ip_userContent"]:checked').value === 'yes';
+          if (hasUserContent) {
+            this.findAndHighlightText("User-Generated Content");
+          } else {
+            // If user content is turned off, highlight the section that would have contained it
+            this.findAndHighlightText("USER LICENSE");
+          }
+          break;
+        case 'userLicenseType':
+          const userLicenseType = document.getElementById('ip_userLicenseType').value;
+          if (userLicenseType === 'broad') {
+            this.findAndHighlightText("worldwide, perpetual, irrevocable, royalty-free, fully-paid, non-exclusive, transferable, and sublicensable license");
+          } else if (userLicenseType === 'moderate') {
+            this.findAndHighlightText("worldwide, non-exclusive, royalty-free license");
+          } else {
+            this.findAndHighlightText("limited license");
+          }
+          break;
+        case 'userOwnership':
+          const userOwnership = document.querySelector('input[name="ip_userOwnership"]:checked').value;
+          if (userOwnership === 'user') {
+            this.findAndHighlightText("you retain all rights that you had in your User Content");
+          } else if (userOwnership === 'company') {
+            this.findAndHighlightText("shall become the property of");
+          } else {
+            this.findAndHighlightText("you and");
+          }
+          break;
+        case 'rightDisplay':
+        case 'rightModify':
+        case 'rightDistribute':
+        case 'rightPromote':
+        case 'rightSublicense':
+          // Highlight the specific right that was changed
+          if (changedField === 'rightDisplay' && document.getElementById('ip_rightDisplay').checked) {
+            this.findAndHighlightText("display, publish, and host");
+          } else if (changedField === 'rightModify' && document.getElementById('ip_rightModify').checked) {
+            this.findAndHighlightText("modify, edit, and adapt");
+          } else if (changedField === 'rightDistribute' && document.getElementById('ip_rightDistribute').checked) {
+            this.findAndHighlightText("distribute and make available to others");
+          } else if (changedField === 'rightPromote' && document.getElementById('ip_rightPromote').checked) {
+            this.findAndHighlightText("use in promotional materials and advertising");
+          } else if (changedField === 'rightSublicense' && document.getElementById('ip_rightSublicense').checked) {
+            this.findAndHighlightText("sublicense to affiliates and service providers");
+          }
+          break;
+        case 'dmcaPolicy':
+          const includeDMCA = document.querySelector('input[name="ip_dmcaPolicy"]:checked').value === 'yes';
+          if (includeDMCA) {
+            this.findAndHighlightText("DMCA Copyright Policy");
+          }
+          break;
+        case 'dmcaEmail':
+          this.findAndHighlightText(document.getElementById('ip_dmcaEmail').value);
+          break;
+        case 'feedbackOwnership':
+          const feedbackOwnership = document.querySelector('input[name="ip_feedbackOwnership"]:checked').value;
+          if (feedbackOwnership === 'company') {
+            this.findAndHighlightText("you hereby assign to");
+          } else if (feedbackOwnership === 'license') {
+            this.findAndHighlightText("you grant");
+          } else {
+            this.findAndHighlightText("you retain all rights to your Feedback");
+          }
+          break;
+      }
+      
+      // Remove highlights after 3 seconds
+      setTimeout(function() {
+        self.clearHighlights();
+      }, 3000);
+    },
+    
+    // Generate MS Word document
+    generateWordDoc: function() {
+      const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                   "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                   "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+      const footer = "</body></html>";
+      const content = document.getElementById('ipPreview').innerHTML;
+      const sourceHTML = header + content + footer;
+      const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+      
+      // Create a download link and trigger it
+      const fileDownload = document.createElement("a");
+      document.body.appendChild(fileDownload);
+      fileDownload.href = source;
+      fileDownload.download = 'IntellectualPropertyClause.doc';
+      fileDownload.click();
+      document.body.removeChild(fileDownload);
+    },
+    
+    // Handle copy button click
+    handleCopyClick: function() {
+      const text = document.getElementById('ipPreview').innerText;
+      
+      try {
+        // Modern approach
+        if (navigator.clipboard) {
+          navigator.clipboard.writeText(text)
+            .then(function() {
+              const copyBtn = document.getElementById('ipCopyBtn');
+              const originalText = copyBtn.innerHTML;
+              copyBtn.innerHTML = 'COPIED!';
+              setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+              }, 2000);
+            })
+            .catch(function(err) {
+              console.error('Could not copy text: ', err);
+              fallbackCopyTextToClipboard(text);
+            });
+        } 
+        // Fallback approach
+        else {
+          fallbackCopyTextToClipboard(text);
+        }
+      } catch(err) {
+        console.error('Copy failed: ', err);
+        alert('Please select and copy the text manually.');
+      }
+      
+      function fallbackCopyTextToClipboard(text) {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        
+        // Make the textarea out of viewport
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          const copyBtn = document.getElementById('ipCopyBtn');
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = successful ? 'COPIED!' : 'FAILED!';
+          setTimeout(function() {
+            copyBtn.innerHTML = originalText;
+          }, 2000);
+        } catch (err) {
+          console.error('Fallback: Could not copy text: ', err);
+          alert('Please select and copy the text manually.');
+        }
+        
+        document.body.removeChild(textArea);
+      }
+    }
+  };
+  
+  // Initialize when the page loads
+  document.addEventListener('DOMContentLoaded', function() {
+    ipGenerator.init();
+  });
+  
+  // Initialize immediately as well (for WordPress)
+  ipGenerator.init();
+</script>
+    
     
     <!-- Tab Content for Dispute Resolution -->
     <div id="dispute-tab" class="tools-tab-content">
