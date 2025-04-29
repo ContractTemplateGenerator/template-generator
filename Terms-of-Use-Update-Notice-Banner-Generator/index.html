@@ -4,91 +4,100 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Terms of Use Update Notice & Banner Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
+        /* Base Styles */
         :root {
             --primary-color: #0069ff;
-            --secondary-color: #f8f9fa;
-            --border-color: #dee2e6;
+            --secondary-color: #f9f9f9;
+            --border-color: #ddd;
+            --text-color: #333333;
             --highlight-color: #ffff00;
-            --text-color: #212529;
-            --light-text: #6c757d;
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
         
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Open Sans', sans-serif;
         }
         
         body {
-            background-color: #fff;
+            background-color: var(--secondary-color);
             color: var(--text-color);
             line-height: 1.6;
+            padding: 20px;
         }
         
-        .container {
-            display: flex;
+        .generator-container {
             max-width: 1200px;
             margin: 0 auto;
-            min-height: 100vh;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            overflow: hidden;
         }
         
+        /* Header Styles */
+        .generator-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        .generator-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .generator-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Content Layout */
+        .generator-content {
+            display: flex;
+            min-height: 600px;
+        }
+        
+        /* Form Styles */
         .form-container {
             flex: 1;
-            padding: 20px;
+            padding: 25px;
             border-right: 1px solid var(--border-color);
             overflow-y: auto;
-            max-height: 100vh;
+            max-height: 800px;
         }
         
-        .preview-container {
-            flex: 1;
-            padding: 20px;
-            position: relative;
-            overflow-y: auto;
-            max-height: 100vh;
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-size: 24px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 10px;
-        }
-        
-        h2 {
-            color: var(--text-color);
-            margin: 15px 0;
-            font-size: 18px;
-        }
-        
-        .tab-container {
-            margin-bottom: 20px;
-        }
-        
-        .tab-buttons {
+        .tabs {
             display: flex;
-            flex-wrap: wrap;
+            margin-bottom: 20px;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 15px;
         }
         
-        .tab-button {
-            background: none;
-            border: none;
-            padding: 10px 15px;
+        .tab {
+            padding: 10px 20px;
             cursor: pointer;
-            font-weight: 500;
-            border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 5px 5px 0 0;
+            background-color: #f1f1f1;
             margin-right: 5px;
+            transition: background-color 0.3s;
         }
         
-        .tab-button.active {
-            border-bottom: 3px solid var(--primary-color);
-            color: var(--primary-color);
+        .tab:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: bold;
         }
         
         .tab-content {
@@ -99,21 +108,34 @@
             display: block;
         }
         
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        
+        .form-section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
         .form-group {
             margin-bottom: 15px;
         }
         
-        label {
+        .form-group label {
             display: block;
-            margin-bottom: 5px;
             font-weight: 500;
+            margin-bottom: 5px;
         }
         
-        input[type="text"],
-        input[type="date"],
-        input[type="number"],
-        select,
-        textarea {
+        .form-input {
             width: 100%;
             padding: 10px;
             border: 1px solid var(--border-color);
@@ -121,1308 +143,1061 @@
             font-size: 14px;
         }
         
-        textarea {
-            min-height: 100px;
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 105, 255, 0.2);
+        }
+        
+        textarea.form-input {
+            min-height: 80px;
             resize: vertical;
         }
         
+        .form-helper {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+        
+        /* Checkbox Styles */
         .checkbox-group {
-            margin-top: 10px;
+            margin-top: 5px;
         }
         
         .checkbox-label {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
+            padding: 8px 10px;
             margin-bottom: 8px;
+            background-color: #f5f7fa;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .checkbox-label:hover {
+            background-color: #eef2f7;
+        }
+        
+        .checkbox-label.selected {
+            background-color: #e8f6f3;
+            border-color: var(--primary-color);
         }
         
         .checkbox-label input {
-            margin-right: 8px;
+            margin-right: 10px;
+            margin-top: 3px;
         }
         
+        .checkbox-content {
+            flex: 1;
+        }
+        
+        .checkbox-title {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 2px;
+        }
+        
+        .checkbox-description {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        /* Button Styles */
         .button-group {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
         }
         
-        button {
-            background-color: var(--primary-color);
-            color: white;
+        .btn {
+            padding: 10px 15px;
             border: none;
-            padding: 8px 15px;
             border-radius: 4px;
             cursor: pointer;
+            font-weight: 600;
             transition: background-color 0.3s;
         }
         
-        button:hover {
-            background-color: #0056cc;
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
         }
         
-        button.secondary {
-            background-color: var(--light-text);
+        .btn-primary:hover {
+            background-color: #0052cc;
         }
         
-        button.secondary:hover {
-            background-color: #5a6268;
+        .btn-secondary {
+            background-color: #f1f1f1;
+            color: var(--text-color);
+        }
+        
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+        
+        /* Preview Styles */
+        .preview-container {
+            flex: 1;
+            padding: 25px;
+            position: relative;
         }
         
         .preview-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
         
-        .preview-actions button {
+        .preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        .preview-note {
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .preview-box {
+            height: 700px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            background-color: white;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s ease;
+        }
+        
+        .copy-message {
+            display: none;
+            font-size: 14px;
+            color: #27ae60;
             margin-left: 10px;
         }
         
-        .preview-content {
-            background-color: white;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 20px;
-            min-height: 400px;
-        }
-        
-        .banner-preview, .email-preview, .app-notification-preview {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 4px;
-        }
-        
-        .banner-preview {
-            background-color: #f8d7da;
-            border: 1px solid #f5c6cb;
-            color: #721c24;
-        }
-        
-        .highlighted {
-            background-color: var(--highlight-color);
-            transition: background-color 0.5s;
-        }
-        
-        .color-picker-group {
-            display: flex;
-            align-items: center;
-        }
-        
-        .color-picker-group input[type="color"] {
-            width: 50px;
-            height: 30px;
-            margin-right: 10px;
-        }
-        
-        .custom-checkbox {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .custom-checkbox input {
-            margin-right: 8px;
-        }
-        
-        .help-text {
-            font-size: 12px;
-            color: var(--light-text);
-            margin-top: 5px;
-        }
-        
-        .notification-settings {
-            border: 1px solid var(--border-color);
-            padding: 15px;
-            margin-top: 10px;
-            border-radius: 4px;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .generator-content {
                 flex-direction: column;
-            }
-            
-            .form-container, .preview-container {
-                flex: none;
-                width: 100%;
-                max-height: none;
             }
             
             .form-container {
                 border-right: none;
                 border-bottom: 1px solid var(--border-color);
+                max-height: none;
+            }
+            
+            .preview-box {
+                height: 500px;
             }
         }
-
-        /* Banner Styles */
-        .banner-box {
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            position: relative;
+        
+        @media (max-width: 768px) {
+            .generator-container {
+                margin: 0;
+                border-radius: 0;
+            }
+            
+            .generator-header {
+                padding: 20px;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .copy-message {
+                margin-left: 0;
+                margin-top: 5px;
+                text-align: center;
+            }
         }
-
-        .banner-top {
-            position: relative;
-            width: 100%;
-            top: 0;
-        }
-
-        .banner-bottom {
-            position: relative;
-            width: 100%;
-            bottom: 0;
-        }
-
-        .banner-sticky {
-            position: sticky;
-            width: 100%;
-            top: 0;
-        }
-
-        .banner-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            max-width: 500px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-        }
-
-        .banner-actions {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 10px;
-        }
-
-        .banner-actions button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            font-size: 14px;
-        }
-
-        .banner-close {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background: none;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
-            color: inherit;
-        }
-
-        .preview-section {
-            margin-bottom: 30px;
-        }
-
-        .preview-section h3 {
-            margin-bottom: 15px;
-            font-size: 16px;
-            color: var(--primary-color);
-        }
-
-        .notice-box {
-            padding: 20px;
+        
+        .banner-preview {
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
             border-radius: 4px;
+            padding: 15px;
             margin-bottom: 20px;
         }
-
+        
         .email-preview {
             font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            border: 1px solid #ddd;
-            padding: 20px;
         }
-
-        .email-header {
+        
+        .email-preview .email-header {
             border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
-
-        .email-footer {
+        
+        .email-preview .email-footer {
             border-top: 1px solid #eee;
-            padding-top: 15px;
-            margin-top: 15px;
+            padding-top: 10px;
+            margin-top: 20px;
             font-size: 12px;
             color: #777;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-container">
+    <div class="generator-container">
+        <div class="generator-header">
             <h1>Terms of Use Update Notice & Banner Generator</h1>
-            
-            <div class="tab-container">
-                <div class="tab-buttons">
-                    <button class="tab-button active" data-tab="company-info">Company Info</button>
-                    <button class="tab-button" data-tab="update-details">Update Details</button>
-                    <button class="tab-button" data-tab="notification-methods">Notification Methods</button>
-                    <button class="tab-button" data-tab="banner-customization">Banner Design</button>
-                    <button class="tab-button" data-tab="email-customization">Email Design</button>
+            <p>Create professional notices for your website users when updating your Terms of Use</p>
+        </div>
+        
+        <div class="generator-content">
+            <!-- Form Container -->
+            <div class="form-container">
+                <div class="tabs">
+                    <div class="tab active" onclick="switchTab('general-tab')">General Info</div>
+                    <div class="tab" onclick="switchTab('changes-tab')">Changes Made</div>
+                    <div class="tab" onclick="switchTab('display-tab')">Display Options</div>
                 </div>
                 
-                <div class="tab-content active" id="company-info">
-                    <h2>Company Information</h2>
+                <div class="tab-content active" id="general-tab">
                     <div class="form-group">
                         <label for="company-name">Company/Website Name</label>
-                        <input type="text" id="company-name" placeholder="E.g., Acme Inc. or example.com">
+                        <input type="text" id="company-name" class="form-input" placeholder="e.g., Your Company Name" value="Your Company" oninput="updatePreview()">
                     </div>
                     
                     <div class="form-group">
                         <label for="website-url">Website URL</label>
-                        <input type="text" id="website-url" placeholder="E.g., https://example.com">
+                        <input type="text" id="website-url" class="form-input" placeholder="e.g., https://yourcompany.com" value="https://yourcompany.com" oninput="updatePreview()">
                     </div>
                     
                     <div class="form-group">
-                        <label for="company-logo">Company Logo URL (Optional)</label>
-                        <input type="text" id="company-logo" placeholder="E.g., https://example.com/logo.png">
+                        <label for="effective-date">Effective Date</label>
+                        <input type="date" id="effective-date" class="form-input" onchange="updatePreview()">
                     </div>
                     
                     <div class="form-group">
-                        <label for="company-address">Company Address (Optional)</label>
-                        <textarea id="company-address" placeholder="Your company's physical address"></textarea>
+                        <label for="notice-period">Notice Period (days)</label>
+                        <input type="number" id="notice-period" class="form-input" placeholder="e.g., 30" value="30" min="1" max="90" oninput="updatePreview()">
+                        <div class="form-helper">How many days in advance to notify users before changes take effect</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="terms-url">Link to Updated Terms</label>
+                        <input type="text" id="terms-url" class="form-input" placeholder="e.g., https://yourcompany.com/terms" value="https://yourcompany.com/terms" oninput="updatePreview()">
                     </div>
                     
                     <div class="form-group">
                         <label for="contact-email">Contact Email</label>
-                        <input type="text" id="contact-email" placeholder="E.g., support@example.com">
+                        <input type="email" id="contact-email" class="form-input" placeholder="e.g., support@yourcompany.com" value="support@yourcompany.com" oninput="updatePreview()">
                     </div>
                     
                     <div class="button-group">
-                        <div></div> <!-- Empty div for spacing -->
-                        <button id="company-next">Next</button>
+                        <button class="btn btn-secondary" id="reset-btn" onclick="resetForm()">Reset</button>
+                        <button class="btn btn-primary" onclick="switchTab('changes-tab')">Next</button>
                     </div>
                 </div>
                 
-                <div class="tab-content" id="update-details">
-                    <h2>Terms Update Details</h2>
-                    
+                <div class="tab-content" id="changes-tab">
                     <div class="form-group">
-                        <label for="current-terms-url">Current Terms of Use URL</label>
-                        <input type="text" id="current-terms-url" placeholder="E.g., https://example.com/terms">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="new-terms-url">New Terms of Use URL (if different)</label>
-                        <input type="text" id="new-terms-url" placeholder="Leave blank if same as current">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="update-date">Update Effective Date</label>
-                        <input type="date" id="update-date">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="update-type">Type of Update</label>
-                        <select id="update-type">
-                            <option value="minor">Minor (formatting, clarifications, corrections)</option>
-                            <option value="moderate">Moderate (some policy changes, limited impact)</option>
-                            <option value="major">Major (significant changes to rights, obligations)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Sections Being Updated</label>
+                        <label>Select Changes Made (Check all that apply)</label>
                         <div class="checkbox-group">
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-privacy" value="privacy">
-                                <span>Privacy Provisions</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-user-rights" value="user-rights">
-                                <span>User Rights & Responsibilities</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-liability" value="liability">
-                                <span>Liability & Disclaimers</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-payment" value="payment">
-                                <span>Payment Terms</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-content" value="content">
-                                <span>Content Policies</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-disputes" value="disputes">
-                                <span>Dispute Resolution</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-termination" value="termination">
-                                <span>Termination Conditions</span>
-                            </div>
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="update-other" value="other">
-                                <span>Other</span>
-                            </div>
+                            <label class="checkbox-label selected" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="privacy-policy" checked> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Data Privacy Updates</span>
+                                    <span class="checkbox-description">Changes to comply with privacy laws or how you handle user data</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label selected" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="refund-policy" checked> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Refund Policy Changes</span>
+                                    <span class="checkbox-description">Updates to refund terms, eligibility, or timeframes</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label selected" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="ip-rights" checked> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Intellectual Property Rights</span>
+                                    <span class="checkbox-description">Changes to copyright, trademark, or content ownership</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label selected" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="jurisdiction" checked> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Jurisdiction Changes</span>
+                                    <span class="checkbox-description">Updates to governing law or dispute resolution</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label selected" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="service-changes" checked> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Service Features/Functionality</span>
+                                    <span class="checkbox-description">Changes to features, services, or platform functionality</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="payment-terms"> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">Payment Terms</span>
+                                    <span class="checkbox-description">Updates to pricing, billing, or payment methods</span>
+                                </div>
+                            </label>
+                            
+                            <label class="checkbox-label" onclick="toggleOption(this)">
+                                <input type="checkbox" name="change-option" value="user-content"> 
+                                <div class="checkbox-content">
+                                    <span class="checkbox-title">User Content Rights</span>
+                                    <span class="checkbox-description">Changes to how user-generated content is managed</span>
+                                </div>
+                            </label>
                         </div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="update-summary">Brief Summary of Key Changes</label>
-                        <textarea id="update-summary" placeholder="Briefly explain the most important changes (1-2 sentences)"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="update-details-text">Detailed Description of Changes (Optional)</label>
-                        <textarea id="update-details-text" placeholder="Provide more detailed explanation of the changes if needed"></textarea>
+                        <label for="custom-details">Custom Details (Optional)</label>
+                        <textarea id="custom-details" class="form-input" placeholder="Add any specific details about the changes..." oninput="updatePreview()"></textarea>
+                        <div class="form-helper">Provide specific details about significant changes</div>
                     </div>
                     
                     <div class="button-group">
-                        <button class="secondary" id="update-prev">Previous</button>
-                        <button id="update-next">Next</button>
+                        <button class="btn btn-secondary" onclick="switchTab('general-tab')">Previous</button>
+                        <button class="btn btn-primary" onclick="switchTab('display-tab')">Next</button>
                     </div>
                 </div>
                 
-                <div class="tab-content" id="notification-methods">
-                    <h2>Notification Methods</h2>
-                    
+                <div class="tab-content" id="display-tab">
                     <div class="form-group">
-                        <label>How will users be notified?</label>
-                        <div class="checkbox-group">
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="notify-email" value="email" checked>
-                                <span>Email Notification</span>
-                            </div>
-                            <div class="notification-settings" id="email-settings">
-                                <div class="form-group">
-                                    <label for="email-subject">Email Subject Line</label>
-                                    <input type="text" id="email-subject" placeholder="E.g., Important Update to Our Terms of Use">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email-from">From Name</label>
-                                    <input type="text" id="email-from" placeholder="E.g., Example.com Team">
-                                </div>
-                                <div class="form-group">
-                                    <label for="email-sender">Sender Email</label>
-                                    <input type="text" id="email-sender" placeholder="E.g., updates@example.com">
-                                </div>
-                            </div>
-                            
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="notify-banner" value="banner" checked>
-                                <span>Website Banner/Notice</span>
-                            </div>
-                            <div class="notification-settings" id="banner-settings">
-                                <div class="form-group">
-                                    <label for="banner-display-time">Display Duration (in days)</label>
-                                    <input type="number" id="banner-display-time" min="1" max="90" value="30">
-                                    <div class="help-text">How long to display the banner after the update goes live</div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="banner-position">Banner Position</label>
-                                    <select id="banner-position">
-                                        <option value="top">Top of page</option>
-                                        <option value="bottom">Bottom of page</option>
-                                        <option value="popup">Popup/Modal</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="banner-dismissible">Dismissible</label>
-                                    <select id="banner-dismissible">
-                                        <option value="yes">Yes, can be dismissed (recommended for minor updates)</option>
-                                        <option value="temp">Temporarily (hides for current session only)</option>
-                                        <option value="no">No, must be acknowledged (recommended for major updates)</option>
-                                    </select>
-                                </div>
-                            </div>
-                            
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="notify-account" value="account">
-                                <span>In-Account Notification</span>
-                            </div>
-                            
-                            <div class="checkbox-label">
-                                <input type="checkbox" id="notify-app" value="app">
-                                <span>Mobile App Notification</span>
-                            </div>
-                            <div class="notification-settings" id="app-settings" style="display: none;">
-                                <div class="form-group">
-                                    <label for="app-message">App Notification Message</label>
-                                    <input type="text" id="app-message" placeholder="E.g., We've updated our Terms of Use. Tap to review.">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="acceptance-type">User Acceptance Requirement</label>
-                        <select id="acceptance-type">
-                            <option value="explicit">Explicit Acceptance Required (user must click "I Accept")</option>
-                            <option value="implicit">Implicit Acceptance (continued use = acceptance)</option>
-                            <option value="login">Force Accept on Next Login (for registered users)</option>
+                        <label for="notice-type">Notice Type</label>
+                        <select id="notice-type" class="form-input" onchange="updatePreview()">
+                            <option value="both">Both Email & Website Banner</option>
+                            <option value="email">Email Notice Only</option>
+                            <option value="banner">Website Banner Only</option>
                         </select>
                     </div>
                     
                     <div class="form-group">
-                        <label for="advance-notice">Advance Notice Period (days before effective date)</label>
-                        <input type="number" id="advance-notice" min="0" max="90" value="30">
-                        <div class="help-text">How many days before the effective date to start notifications</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="documentation-method">Documentation Method</label>
-                        <select id="documentation-method">
-                            <option value="changelog">Public Changelog</option>
-                            <option value="archive">Terms Archive</option>
-                            <option value="version">Version Control</option>
-                            <option value="internal">Internal Documentation Only</option>
+                        <label for="banner-style">Banner Style</label>
+                        <select id="banner-style" class="form-input" onchange="updatePreview()">
+                            <option value="top">Top of Page</option>
+                            <option value="bottom">Bottom of Page</option>
+                            <option value="popup">Popup/Modal</option>
                         </select>
-                        <div class="help-text">How you'll document the changes for record-keeping and transparency</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="consent-type">User Consent Method</label>
+                        <select id="consent-type" class="form-input" onchange="updatePreview()">
+                            <option value="explicit">Explicit (Require Click to Accept)</option>
+                            <option value="implicit">Implicit (Continued Use Is Acceptance)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="banner-color">Banner Color</label>
+                        <select id="banner-color" class="form-input" onchange="updatePreview()">
+                            <option value="blue">Blue</option>
+                            <option value="green">Green</option>
+                            <option value="yellow">Yellow</option>
+                            <option value="red">Red</option>
+                            <option value="gray">Gray</option>
+                        </select>
                     </div>
                     
                     <div class="button-group">
-                        <button class="secondary" id="notification-prev">Previous</button>
-                        <button id="notification-next">Next</button>
+                        <button class="btn btn-secondary" onclick="switchTab('changes-tab')">Previous</button>
+                        <button class="btn btn-primary" onclick="generateFinalOutput()">Generate Full Version</button>
                     </div>
-                </div>
-                
-                <div class="tab-content" id="banner-customization">
-                    <h2>Banner Design Customization</h2>
-                    
-                    <div class="form-group">
-                        <label for="banner-title">Banner Title/Heading</label>
-                        <input type="text" id="banner-title" placeholder="E.g., Terms of Use Update" value="Terms of Use Update">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="banner-text">Banner Message</label>
-                        <textarea id="banner-text" placeholder="E.g., We've updated our Terms of Use effective [date]. Please review the changes.">We've updated our Terms of Use effective [date]. Please review the changes.</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="banner-bg-color">Background Color</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="banner-bg-color" value="#f8d7da">
-                            <input type="text" id="banner-bg-color-hex" placeholder="#RRGGBB" value="#f8d7da">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="banner-text-color">Text Color</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="banner-text-color" value="#721c24">
-                            <input type="text" id="banner-text-color-hex" placeholder="#RRGGBB" value="#721c24">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="banner-border-color">Border Color</label>
-                        <div class="color-picker-group">
-                            <input type="color" id="banner-border-color" value="#f5c6cb">
-                            <input type="text" id="banner-border-color-hex" placeholder="#RRGGBB" value="#f5c6cb">
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="accept-button-text">Accept Button Text</label>
-                        <input type="text" id="accept-button-text" placeholder="E.g., I Accept" value="I Accept">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="review-button-text">Review Button Text</label>
-                        <input type="text" id="review-button-text" placeholder="E.g., Review Changes" value="Review Changes">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="dismiss-button-text">Dismiss Button Text (if dismissible)</label>
-                        <input type="text" id="dismiss-button-text" placeholder="E.g., Dismiss" value="Dismiss">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="banner-custom-css">Additional Custom CSS (Advanced)</label>
-                        <textarea id="banner-custom-css" placeholder="Any additional custom CSS for the banner"></textarea>
-                        <div class="help-text">For developers: Add any custom CSS to further style the banner</div>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button class="secondary" id="banner-prev">Previous</button>
-                        <button id="banner-next">Next</button>
-                    </div>
-                </div>
-                
-                <div class="tab-content" id="email-customization">
-                    <h2>Email Notification Customization</h2>
-                    
-                    <div class="form-group">
-                        <label for="email-greeting">Email Greeting</label>
-                        <input type="text" id="email-greeting" placeholder="E.g., Dear User," value="Dear User,">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-intro">Email Introduction</label>
-                        <textarea id="email-intro" placeholder="Introductory paragraph explaining the update">We're writing to inform you about upcoming changes to our Terms of Use, which will take effect on [date].</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-body">Email Body Content</label>
-                        <textarea id="email-body" placeholder="Main content of the email notification">These updates include changes to our [sections] policies. We encourage you to review the updated terms in full by visiting our website.</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-action">Call to Action</label>
-                        <input type="text" id="email-action" placeholder="E.g., Please review the updated terms" value="Please review the updated terms by clicking the link below.">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-closing">Email Closing</label>
-                        <textarea id="email-closing" placeholder="Closing paragraph">If you have any questions about these changes, please contact our support team. Thank you for your understanding.</textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-signature">Email Signature</label>
-                        <input type="text" id="email-signature" placeholder="E.g., The Example.com Team" value="The [Company] Team">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="email-footer">Email Footer Text</label>
-                        <textarea id="email-footer" placeholder="Text for the email footer section">© [Year] [Company]. All rights reserved. [Address]</textarea>
-                    </div>
-                    
-                    <div class="button-group">
-                        <button class="secondary" id="email-prev">Previous</button>
-                        <button id="generate-btn">Generate Notices</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="preview-container">
-            <div class="preview-header">
-                <h2>Live Preview</h2>
-                <div class="preview-actions">
-                    <button id="copy-code">Copy HTML</button>
-                    <button id="download-txt">Download .txt</button>
                 </div>
             </div>
             
-            <div class="preview-content">
-                <div class="preview-section">
-                    <h3>Website Banner Preview</h3>
-                    <div class="banner-box" id="banner-preview" style="background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;">
-                        <h4>Terms of Use Update</h4>
-                        <p>We've updated our Terms of Use effective [date]. Please review the changes.</p>
-                        <div class="banner-actions">
-                            <button style="background-color: #0069ff;">Review Changes</button>
-                            <button style="background-color: #0069ff;">I Accept</button>
-                            <button class="secondary">Dismiss</button>
-                        </div>
-                    </div>
+            <!-- Preview Container -->
+            <div class="preview-container">
+                <div class="preview-header">
+                    <div class="preview-title">Live Preview</div>
+                    <div class="preview-note">Updates as you complete the form</div>
                 </div>
                 
-                <div class="preview-section">
-                    <h3>Email Notification Preview</h3>
-                    <div class="email-preview" id="email-preview">
-                        <div class="email-header">
-                            <h4>Terms of Use Update</h4>
-                        </div>
-                        <p>Dear User,</p>
-                        <p>We're writing to inform you about upcoming changes to our Terms of Use, which will take effect on [date].</p>
-                        <p>These updates include changes to our [sections] policies. We encourage you to review the updated terms in full by visiting our website.</p>
-                        <p>Please review the updated terms by clicking the link below.</p>
-                        <p><a href="#" style="color: #0069ff;">View Updated Terms of Use</a></p>
-                        <p>If you have any questions about these changes, please contact our support team. Thank you for your understanding.</p>
-                        <p>The [Company] Team</p>
-                        <div class="email-footer">
-                            <p>© [Year] [Company]. All rights reserved. [Address]</p>
-                        </div>
-                    </div>
+                <div class="preview-box" id="preview-content">
+                    <!-- Content will be generated via JavaScript -->
                 </div>
                 
-                <div class="preview-section">
-                    <h3>Documentation for Records</h3>
-                    <div class="notice-box" id="documentation-preview">
-                        <h4>Terms of Use Update Documentation</h4>
-                        <p><strong>Company:</strong> [Company Name]</p>
-                        <p><strong>Update Type:</strong> [Update Type]</p>
-                        <p><strong>Effective Date:</strong> [Effective Date]</p>
-                        <p><strong>Notification Methods:</strong> [Notification Methods]</p>
-                        <p><strong>Sections Updated:</strong> [Sections Updated]</p>
-                        <p><strong>Summary of Changes:</strong> [Summary]</p>
-                        <p><strong>Notice Period:</strong> [Notice Period] days</p>
-                        <p><strong>Acceptance Method:</strong> [Acceptance Method]</p>
-                        <p><strong>Documentation Method:</strong> [Documentation Method]</p>
-                    </div>
+                <div class="button-group" style="margin-top: 20px;">
+                    <button class="btn btn-secondary" id="copy-btn" onclick="copyToClipboard()">Copy</button>
+                    <span id="copy-message" class="copy-message">Copied to clipboard!</span>
+                    <button class="btn btn-primary" id="download-btn" onclick="downloadText()">Download as Text</button>
                 </div>
             </div>
         </div>
     </div>
-
+    
     <script>
-        // Tab Navigation
+        // Set today's date as the default effective date
         document.addEventListener('DOMContentLoaded', function() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            let lastChanges = {};
-            let highlightTimeout;
+            const today = new Date();
+            const futureDate = new Date();
+            futureDate.setDate(today.getDate() + 30); // Default to 30 days in the future
             
-            // Tab switching functionality
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.getAttribute('data-tab');
-                    
-                    // Hide all tab contents and deactivate all buttons
-                    tabContents.forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('active');
-                    });
-                    
-                    // Show selected tab content and activate button
-                    document.getElementById(tabId).classList.add('active');
-                    button.classList.add('active');
-                });
-            });
+            const formattedDate = futureDate.toISOString().slice(0, 10);
+            document.getElementById('effective-date').value = formattedDate;
             
-            // Next/Previous button navigation
-            document.getElementById('company-next').addEventListener('click', () => {
-                activateTab('update-details');
-            });
-            
-            document.getElementById('update-prev').addEventListener('click', () => {
-                activateTab('company-info');
-            });
-            
-            document.getElementById('update-next').addEventListener('click', () => {
-                activateTab('notification-methods');
-            });
-            
-            document.getElementById('notification-prev').addEventListener('click', () => {
-                activateTab('update-details');
-            });
-            
-            document.getElementById('notification-next').addEventListener('click', () => {
-                activateTab('banner-customization');
-            });
-            
-            document.getElementById('banner-prev').addEventListener('click', () => {
-                activateTab('notification-methods');
-            });
-            
-            document.getElementById('banner-next').addEventListener('click', () => {
-                activateTab('email-customization');
-            });
-            
-            document.getElementById('email-prev').addEventListener('click', () => {
-                activateTab('banner-customization');
-            });
-            
-            function activateTab(tabId) {
-                tabButtons.forEach(btn => {
-                    if (btn.getAttribute('data-tab') === tabId) {
-                        btn.click();
-                    }
-                });
-            }
-            
-            // Toggle notification settings based on checkboxes
-            document.getElementById('notify-email').addEventListener('change', function() {
-                document.getElementById('email-settings').style.display = this.checked ? 'block' : 'none';
-                updatePreviews();
-            });
-            
-            document.getElementById('notify-banner').addEventListener('change', function() {
-                document.getElementById('banner-settings').style.display = this.checked ? 'block' : 'none';
-                updatePreviews();
-            });
-            
-            document.getElementById('notify-app').addEventListener('change', function() {
-                document.getElementById('app-settings').style.display = this.checked ? 'block' : 'none';
-                updatePreviews();
-            });
-            
-            // Color picker synchronization
-            document.getElementById('banner-bg-color').addEventListener('input', function() {
-                document.getElementById('banner-bg-color-hex').value = this.value;
-                updateBannerStyles();
-            });
-            
-            document.getElementById('banner-bg-color-hex').addEventListener('input', function() {
-                document.getElementById('banner-bg-color').value = this.value;
-                updateBannerStyles();
-            });
-            
-            document.getElementById('banner-text-color').addEventListener('input', function() {
-                document.getElementById('banner-text-color-hex').value = this.value;
-                updateBannerStyles();
-            });
-            
-            document.getElementById('banner-text-color-hex').addEventListener('input', function() {
-                document.getElementById('banner-text-color').value = this.value;
-                updateBannerStyles();
-            });
-            
-            document.getElementById('banner-border-color').addEventListener('input', function() {
-                document.getElementById('banner-border-color-hex').value = this.value;
-                updateBannerStyles();
-            });
-            
-            document.getElementById('banner-border-color-hex').addEventListener('input', function() {
-                document.getElementById('banner-border-color').value = this.value;
-                updateBannerStyles();
-            });
-            
-            // Update banner styles
-            function updateBannerStyles() {
-                const bannerPreview = document.getElementById('banner-preview');
-                const bgColor = document.getElementById('banner-bg-color').value;
-                const textColor = document.getElementById('banner-text-color').value;
-                const borderColor = document.getElementById('banner-border-color').value;
-                
-                bannerPreview.style.backgroundColor = bgColor;
-                bannerPreview.style.color = textColor;
-                bannerPreview.style.borderColor = borderColor;
-                
-                highlightChanges('banner-preview');
-                updatePreviews();
-            }
-            
-            // Banner position update
-            document.getElementById('banner-position').addEventListener('change', function() {
-                const bannerPreview = document.getElementById('banner-preview');
-                const position = this.value;
-                
-                // Remove all position classes
-                bannerPreview.classList.remove('banner-top', 'banner-bottom', 'banner-popup');
-                
-                // Add selected position class
-                if (position === 'top') {
-                    bannerPreview.classList.add('banner-top');
-                } else if (position === 'bottom') {
-                    bannerPreview.classList.add('banner-bottom');
-                } else if (position === 'popup') {
-                    bannerPreview.classList.add('banner-popup');
-                }
-                
-                highlightChanges('banner-preview');
-                updatePreviews();
-            });
-            
-            // Banner dismissible update
-            document.getElementById('banner-dismissible').addEventListener('change', function() {
-                const dismissBtn = document.querySelector('#banner-preview .secondary');
-                const dismissible = this.value;
-                
-                dismissBtn.style.display = dismissible === 'no' ? 'none' : 'inline-block';
-                
-                highlightChanges('banner-preview');
-                updatePreviews();
-            });
-            
-            // Banner content updates
-            document.getElementById('banner-title').addEventListener('input', function() {
-                document.querySelector('#banner-preview h4').textContent = this.value;
-                highlightChanges('banner-preview h4');
-                updatePreviews();
-            });
-            
-            document.getElementById('banner-text').addEventListener('input', function() {
-                document.querySelector('#banner-preview p').textContent = this.value;
-                highlightChanges('banner-preview p');
-                updatePreviews();
-            });
-            
-            document.getElementById('accept-button-text').addEventListener('input', function() {
-                const buttons = document.querySelectorAll('#banner-preview .banner-actions button');
-                buttons[1].textContent = this.value;
-                highlightChanges('banner-preview .banner-actions button:nth-child(2)');
-                updatePreviews();
-            });
-            
-            document.getElementById('review-button-text').addEventListener('input', function() {
-                const buttons = document.querySelectorAll('#banner-preview .banner-actions button');
-                buttons[0].textContent = this.value;
-                highlightChanges('banner-preview .banner-actions button:nth-child(1)');
-                updatePreviews();
-            });
-            
-            document.getElementById('dismiss-button-text').addEventListener('input', function() {
-                const buttons = document.querySelectorAll('#banner-preview .banner-actions button');
-                buttons[2].textContent = this.value;
-                highlightChanges('banner-preview .banner-actions button:nth-child(3)');
-                updatePreviews();
-            });
-            
-            // Email content updates
-            document.getElementById('email-greeting').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(2)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(2)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-intro').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(3)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(3)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-body').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(4)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(4)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-action').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(5)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(5)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-closing').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(7)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(7)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-signature').addEventListener('input', function() {
-                document.querySelector('#email-preview p:nth-child(8)').textContent = this.value;
-                highlightChanges('email-preview p:nth-child(8)');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-footer').addEventListener('input', function() {
-                document.querySelector('#email-preview .email-footer p').textContent = this.value;
-                highlightChanges('email-preview .email-footer p');
-                updatePreviews();
-            });
-            
-            document.getElementById('email-subject').addEventListener('input', function() {
-                document.querySelector('#email-preview .email-header h4').textContent = this.value || 'Terms of Use Update';
-                highlightChanges('email-preview .email-header h4');
-                updatePreviews();
-            });
-            
-            // Company info and update details
-            document.getElementById('company-name').addEventListener('input', function() {
-                const companyPlaceholders = document.querySelectorAll('[data-placeholder="company"]');
-                companyPlaceholders.forEach(el => {
-                    el.textContent = this.value || '[Company]';
-                });
-                updateCompanyInfo();
-                updatePreviews();
-            });
-            
-            document.getElementById('update-date').addEventListener('input', function() {
-                const dateStr = formatDate(this.value);
-                const datePlaceholders = document.querySelectorAll('[data-placeholder="date"]');
-                datePlaceholders.forEach(el => {
-                    el.textContent = dateStr || '[date]';
-                });
-                updateDocumentation();
-                updatePreviews();
-            });
-            
-            // Update types and sections
-            document.getElementById('update-type').addEventListener('change', updateDocumentation);
-            
-            const sectionCheckboxes = document.querySelectorAll('input[id^="update-"]');
-            sectionCheckboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', updateDocumentation);
-            });
-            
-            document.getElementById('update-summary').addEventListener('input', updateDocumentation);
-            document.getElementById('acceptance-type').addEventListener('change', updateDocumentation);
-            document.getElementById('advance-notice').addEventListener('input', updateDocumentation);
-            document.getElementById('documentation-method').addEventListener('change', updateDocumentation);
-            
-            // Generate button
-            document.getElementById('generate-btn').addEventListener('click', function() {
-                updateAllPreviews();
-                // Flash the preview to indicate generation is complete
-                document.querySelector('.preview-content').style.transition = 'background-color 0.3s';
-                document.querySelector('.preview-content').style.backgroundColor = '#e8f5e9';
-                setTimeout(() => {
-                    document.querySelector('.preview-content').style.backgroundColor = 'white';
-                }, 300);
-            });
-            
-            // Copy code button
-            document.getElementById('copy-code').addEventListener('click', function() {
-                // Generate final HTML code
-                const html = generateHTML();
-                
-                // Copy to clipboard
-                navigator.clipboard.writeText(html).then(() => {
-                    alert('HTML code copied to clipboard!');
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
-                    alert('Failed to copy HTML. Please try again.');
-                });
-            });
-            
-            // Download text button
-            document.getElementById('download-txt').addEventListener('click', function() {
-                // Generate plain text versions
-                const text = generateTextContent();
-                
-                // Create download link
-                const element = document.createElement('a');
-                element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
-                element.setAttribute('download', 'terms_update_notices.txt');
-                element.style.display = 'none';
-                
-                document.body.appendChild(element);
-                element.click();
-                document.body.removeChild(element);
-            });
-            
-            // Helper function to highlight changes
-            function highlightChanges(selector) {
-                // Clear previous highlights after delay
-                clearTimeout(highlightTimeout);
-                
-                const elements = document.querySelectorAll('.highlighted');
-                elements.forEach(el => {
-                    el.classList.remove('highlighted');
-                });
-                
-                // Apply new highlight
-                const targetElements = document.querySelectorAll(`#${selector}`) || document.querySelectorAll(`.${selector}`) || document.querySelectorAll(selector);
-                targetElements.forEach(el => {
-                    el.classList.add('highlighted');
-                    
-                    // Ensure the element is in view
-                    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                });
-                
-                // Schedule highlight removal
-                highlightTimeout = setTimeout(() => {
-                    targetElements.forEach(el => {
-                        el.classList.remove('highlighted');
-                    });
-                }, 2000);
-            }
-            
-            // Helper function to update company info in previews
-            function updateCompanyInfo() {
-                const companyName = document.getElementById('company-name').value || '[Company Name]';
-                const websiteUrl = document.getElementById('website-url').value || '[Website URL]';
-                const contactEmail = document.getElementById('contact-email').value || '[Contact Email]';
-                
-                // Update email preview
-                document.querySelector('#email-preview .email-signature').textContent = 
-                    `The ${companyName} Team`;
-                    
-                document.querySelector('#email-preview .email-footer p').textContent = 
-                    `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`;
-                
-                // Update documentation preview
-                document.querySelector('#documentation-preview p:nth-child(2)').innerHTML = 
-                    `<strong>Company:</strong> ${companyName}`;
-                
-                highlightChanges('documentation-preview p:nth-child(2)');
-            }
-            
-            // Helper function to update documentation preview
-            function updateDocumentation() {
-                const companyName = document.getElementById('company-name').value || '[Company Name]';
-                const updateType = document.getElementById('update-type').value;
-                const updateTypeText = document.getElementById('update-type').options[document.getElementById('update-type').selectedIndex].text;
-                const updateDate = formatDate(document.getElementById('update-date').value) || '[Effective Date]';
-                
-                // Get selected sections
-                const selectedSections = [];
-                document.querySelectorAll('input[id^="update-"]:checked').forEach(checkbox => {
-                    const label = checkbox.nextElementSibling.textContent;
-                    selectedSections.push(label);
-                });
-                
-                const sectionsText = selectedSections.length > 0 ? selectedSections.join(', ') : '[Sections Updated]';
-                
-                // Get notification methods
-                const notificationMethods = [];
-                if (document.getElementById('notify-email').checked) notificationMethods.push('Email');
-                if (document.getElementById('notify-banner').checked) notificationMethods.push('Website Banner');
-                if (document.getElementById('notify-account').checked) notificationMethods.push('Account Notification');
-                if (document.getElementById('notify-app').checked) notificationMethods.push('Mobile App');
-                
-                const notificationText = notificationMethods.length > 0 ? notificationMethods.join(', ') : '[Notification Methods]';
-                
-                const acceptanceType = document.getElementById('acceptance-type').value;
-                let acceptanceText = '[Acceptance Method]';
-                if (acceptanceType === 'explicit') acceptanceText = 'Explicit Acceptance Required';
-                if (acceptanceType === 'implicit') acceptanceText = 'Implicit (Continued Use)';
-                if (acceptanceType === 'login') acceptanceText = 'Accept on Next Login';
-                
-                const advanceNotice = document.getElementById('advance-notice').value || '30';
-                const documentationMethod = document.getElementById('documentation-method').options[document.getElementById('documentation-method').selectedIndex].text;
-                const updateSummary = document.getElementById('update-summary').value || '[Summary]';
-                
-                // Update documentation preview
-                document.querySelector('#documentation-preview p:nth-child(2)').innerHTML = 
-                    `<strong>Company:</strong> ${companyName}`;
-                document.querySelector('#documentation-preview p:nth-child(3)').innerHTML = 
-                    `<strong>Update Type:</strong> ${updateTypeText}`;
-                document.querySelector('#documentation-preview p:nth-child(4)').innerHTML = 
-                    `<strong>Effective Date:</strong> ${updateDate}`;
-                document.querySelector('#documentation-preview p:nth-child(5)').innerHTML = 
-                    `<strong>Notification Methods:</strong> ${notificationText}`;
-                document.querySelector('#documentation-preview p:nth-child(6)').innerHTML = 
-                    `<strong>Sections Updated:</strong> ${sectionsText}`;
-                document.querySelector('#documentation-preview p:nth-child(7)').innerHTML = 
-                    `<strong>Summary of Changes:</strong> ${updateSummary}`;
-                document.querySelector('#documentation-preview p:nth-child(8)').innerHTML = 
-                    `<strong>Notice Period:</strong> ${advanceNotice} days`;
-                document.querySelector('#documentation-preview p:nth-child(9)').innerHTML = 
-                    `<strong>Acceptance Method:</strong> ${acceptanceText}`;
-                document.querySelector('#documentation-preview p:nth-child(10)').innerHTML = 
-                    `<strong>Documentation Method:</strong> ${documentationMethod}`;
-                
-                // Update the other previews with the section information
-                let bannerText = document.getElementById('banner-text').value;
-                bannerText = bannerText.replace('[date]', updateDate).replace('[sections]', getSectionsList());
-                document.querySelector('#banner-preview p').textContent = bannerText;
-                
-                let emailIntro = document.getElementById('email-intro').value;
-                emailIntro = emailIntro.replace('[date]', updateDate);
-                document.querySelector('#email-preview p:nth-child(3)').textContent = emailIntro;
-                
-                let emailBody = document.getElementById('email-body').value;
-                emailBody = emailBody.replace('[sections]', getSectionsList());
-                document.querySelector('#email-preview p:nth-child(4)').textContent = emailBody;
-                
-                highlightChanges('documentation-preview');
-            }
-            
-            // Helper function to get a readable list of sections
-            function getSectionsList() {
-                const selectedSections = [];
-                document.querySelectorAll('input[id^="update-"]:checked').forEach(checkbox => {
-                    if (checkbox.id !== 'update-other') { // Exclude 'Other' option from the list
-                        const label = checkbox.nextElementSibling.textContent;
-                        selectedSections.push(label);
-                    }
-                });
-                
-                if (selectedSections.length === 0) return '[sections]';
-                if (selectedSections.length === 1) return selectedSections[0];
-                if (selectedSections.length === 2) return `${selectedSections[0]} and ${selectedSections[1]}`;
-                
-                const lastSection = selectedSections.pop();
-                return `${selectedSections.join(', ')}, and ${lastSection}`;
-            }
-            
-            // Helper function to format date
-            function formatDate(dateStr) {
-                if (!dateStr) return '';
-                
-                const date = new Date(dateStr);
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return date.toLocaleDateString('en-US', options);
-            }
-            
-            // Helper function to update all previews
-            function updateAllPreviews() {
-                updateCompanyInfo();
-                updateDocumentation();
-                updateBannerStyles();
-                updatePreviews();
-            }
-            
-            // Helper function to update previews with actual data
-            function updatePreviews() {
-                const companyName = document.getElementById('company-name').value || '[Company]';
-                const updateDate = formatDate(document.getElementById('update-date').value) || '[date]';
-                const currentYear = new Date().getFullYear();
-                
-                // Replace all placeholders
-                const elements = document.querySelectorAll('.preview-content p, .preview-content h4');
-                elements.forEach(el => {
-                    let content = el.textContent;
-                    content = content.replace(/\[Company\]/g, companyName);
-                    content = content.replace(/\[Company Name\]/g, companyName);
-                    content = content.replace(/\[date\]/g, updateDate);
-                    content = content.replace(/\[Year\]/g, currentYear);
-                    content = content.replace(/\[sections\]/g, getSectionsList());
-                    el.textContent = content;
-                });
-                
-                // Update email link href
-                const termsUrl = document.getElementById('current-terms-url').value || 
-                               document.getElementById('new-terms-url').value || 
-                               '#';
-                document.querySelector('#email-preview a').href = termsUrl;
-            }
-            
-            // Generate HTML function
-            function generateHTML() {
-                const bannerPreview = document.getElementById('banner-preview').cloneNode(true);
-                const emailPreview = document.getElementById('email-preview').cloneNode(true);
-                
-                // Format the HTML with proper indentation
-                const html = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Use Update Notice</title>
-    <style>
-        /* Banner Styles */
-        .terms-update-banner {
-            ${bannerPreview.getAttribute('style')}
-            padding: 15px;
-            margin: 0;
-            position: ${document.getElementById('banner-position').value === 'popup' ? 'fixed' : 'relative'};
-            ${document.getElementById('banner-position').value === 'top' ? 'top: 0;' : ''}
-            ${document.getElementById('banner-position').value === 'bottom' ? 'bottom: 0;' : ''}
-            ${document.getElementById('banner-position').value === 'popup' ? 'top: 50%; left: 50%; transform: translate(-50%, -50%); max-width: 500px; z-index: 9999; box-shadow: 0 0 15px rgba(0,0,0,0.2);' : ''}
-            width: ${document.getElementById('banner-position').value === 'popup' ? 'auto' : '100%'};
-            z-index: 1000;
-        }
-        
-        .terms-update-banner h4 {
-            margin-top: 0;
-            margin-bottom: 10px;
-        }
-        
-        .terms-update-banner p {
-            margin-bottom: 15px;
-        }
-        
-        .terms-update-banner .banner-actions {
-            display: flex;
-            justify-content: flex-end;
-        }
-        
-        .terms-update-banner .banner-actions button {
-            margin-left: 10px;
-            padding: 5px 10px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background-color: #0069ff;
-            color: white;
-        }
-        
-        .terms-update-banner .banner-actions button.secondary {
-            background-color: #6c757d;
-        }
-        
-        /* Email Styles */
-        .terms-update-email {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            border: 1px solid #ddd;
-        }
-        
-        .terms-update-email .email-header {
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .terms-update-email .email-footer {
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            margin-top: 15px;
-            font-size: 12px;
-            color: #777;
-        }
-        
-        ${document.getElementById('banner-custom-css').value || ''}
-    </style>
-</head>
-<body>
-    <!-- Terms Update Banner -->
-    <div class="terms-update-banner">
-        <h4>${bannerPreview.querySelector('h4').textContent}</h4>
-        <p>${bannerPreview.querySelector('p').textContent}</p>
-        <div class="banner-actions">
-            <button onclick="window.location.href='${document.getElementById('current-terms-url').value || '#'}'">
-                ${bannerPreview.querySelectorAll('.banner-actions button')[0].textContent}
-            </button>
-            <button onclick="acceptTerms()">
-                ${bannerPreview.querySelectorAll('.banner-actions button')[1].textContent}
-            </button>
-            ${document.getElementById('banner-dismissible').value !== 'no' ? 
-                `<button class="secondary" onclick="dismissBanner()">
-                    ${bannerPreview.querySelectorAll('.banner-actions button')[2].textContent}
-                </button>` : ''}
-        </div>
-    </div>
-
-    <script>
-        // Function to handle terms acceptance
-        function acceptTerms() {
-            // Set a cookie or localStorage item to remember acceptance
-            localStorage.setItem('termsAccepted', 'true');
-            // Hide the banner
-            document.querySelector('.terms-update-banner').style.display = 'none';
-            // You can also redirect the user or perform other actions
-            // window.location.href = '/';
-        }
-        
-        // Function to dismiss the banner
-        function dismissBanner() {
-            ${document.getElementById('banner-dismissible').value === 'temp' ? 
-                `// Only hide for this session
-                document.querySelector('.terms-update-banner').style.display = 'none';` : 
-                `// Set a cookie or localStorage item to remember dismissal
-                localStorage.setItem('termsDismissed', 'true');
-                // Hide the banner
-                document.querySelector('.terms-update-banner').style.display = 'none';`}
-        }
-        
-        // Check if the user has already accepted or dismissed
-        window.onload = function() {
-            const accepted = localStorage.getItem('termsAccepted');
-            const dismissed = localStorage.getItem('termsDismissed');
-            
-            if (accepted === 'true' || ${document.getElementById('banner-dismissible').value !== 'temp' ? `dismissed === 'true'` : 'false'}) {
-                document.querySelector('.terms-update-banner').style.display = 'none';
-            }
-        };
-    </script>
-</body>
-</html>`;
-                
-                return html;
-            }
-            
-            // Generate plain text content
-            function generateTextContent() {
-                const companyName = document.getElementById('company-name').value || '[Company Name]';
-                const updateDate = formatDate(document.getElementById('update-date').value) || '[Effective Date]';
-                const bannerText = document.querySelector('#banner-preview p').textContent;
-                const emailContent = document.getElementById('email-preview').innerText;
-                const documentationContent = document.getElementById('documentation-preview').innerText;
-                
-                return `TERMS OF USE UPDATE NOTICES FOR ${companyName.toUpperCase()}
-Effective Date: ${updateDate}
-
-==== WEBSITE BANNER TEXT ====
-${document.querySelector('#banner-preview h4').textContent}
-${bannerText}
-
-==== EMAIL NOTIFICATION ====
-${emailContent}
-
-==== DOCUMENTATION FOR RECORDS ====
-${documentationContent}
-
-Generated on: ${new Date().toLocaleString()}
-`;
-            }
-            
-            // Initialize the preview on load
-            updateAllPreviews();
+            // Initial preview update
+            updatePreview();
         });
+        
+        // Track currently highlighted elements
+        let highlightedElements = [];
+        let highlightTimeout;
+        
+        // Format date function
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        // Calculate notice date
+        function calculateNoticeDate(effectiveDate, noticePeriod) {
+            const date = new Date(effectiveDate);
+            date.setDate(date.getDate() - parseInt(noticePeriod));
+            return formatDate(date);
+        }
+        
+        // Tab switching functionality
+        function switchTab(tabId) {
+            // Remove active class from all tabs and tab contents
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            document.querySelectorAll(`.tab`).forEach((tab, index) => {
+                if (tab.getAttribute('onclick').includes(tabId)) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Update preview after tab switch (to ensure all elements are properly initialized)
+            updatePreview();
+        }
+        
+        // Toggle checkbox options
+        function toggleOption(element) {
+            const checkbox = element.querySelector('input[type="checkbox"]');
+            checkbox.checked = !checkbox.checked;
+            
+            if (checkbox.checked) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+            
+            updatePreview();
+        }
+        
+        // Clear highlights
+        function clearHighlights() {
+            if (highlightTimeout) {
+                clearTimeout(highlightTimeout);
+            }
+            
+            highlightedElements.forEach(element => {
+                if (element && element.classList) {
+                    element.classList.remove('highlight');
+                }
+            });
+            
+            highlightedElements = [];
+        }
+        
+        // Update preview function
+        function updatePreview(changedField = null) {
+            // Clear existing highlights
+            clearHighlights();
+            
+            // Get all form values
+            const companyName = document.getElementById('company-name').value;
+            const websiteUrl = document.getElementById('website-url').value;
+            const effectiveDate = document.getElementById('effective-date').value;
+            const formattedEffectiveDate = formatDate(effectiveDate);
+            const noticePeriod = document.getElementById('notice-period').value;
+            const noticeDate = calculateNoticeDate(effectiveDate, noticePeriod);
+            const termsUrl = document.getElementById('terms-url').value;
+            const contactEmail = document.getElementById('contact-email').value;
+            
+            // Get selected changes
+            const selectedChanges = [];
+            document.querySelectorAll('input[name="change-option"]:checked').forEach(checkbox => {
+                selectedChanges.push(checkbox.value);
+            });
+            
+            const customDetails = document.getElementById('custom-details').value;
+            
+            // Get display options
+            const noticeType = document.getElementById('notice-type')?.value || 'both';
+            const bannerStyle = document.getElementById('banner-style')?.value || 'top';
+            const consentType = document.getElementById('consent-type')?.value || 'explicit';
+            const bannerColor = document.getElementById('banner-color')?.value || 'blue';
+            
+            // Build changes list
+            let changesList = '';
+            
+            if (selectedChanges.includes('privacy-policy')) {
+                changesList += '<p class="change-item privacy-policy"><strong>Data Privacy Updates:</strong> We have updated our data privacy policy to comply with recent legislation. This includes changes to the types of information we collect, how we use it, and how you can control your data.</p>';
+            }
+            
+            if (selectedChanges.includes('refund-policy')) {
+                changesList += '<p class="change-item refund-policy"><strong>Refund Policy:</strong> We have revised our refund policy to provide more clarity on the circumstances under which refunds will be granted.</p>';
+            }
+            
+            if (selectedChanges.includes('ip-rights')) {
+                changesList += '<p class="change-item ip-rights"><strong>Intellectual Property Rights:</strong> We have added new language to protect our intellectual property rights. This includes an explicit prohibition on using our content without permission.</p>';
+            }
+            
+            if (selectedChanges.includes('jurisdiction')) {
+                changesList += '<p class="change-item jurisdiction"><strong>Jurisdiction:</strong> We have added language specifying that our terms of use and any disputes arising therefrom will be governed by specific legal jurisdiction.</p>';
+            }
+            
+            if (selectedChanges.includes('service-changes')) {
+                changesList += '<p class="change-item service-changes"><strong>Service Features/Functionality:</strong> We have updated our terms to reflect changes to our service features and functionality.</p>';
+            }
+            
+            if (selectedChanges.includes('payment-terms')) {
+                changesList += '<p class="change-item payment-terms"><strong>Payment Terms:</strong> We have updated our payment terms and conditions.</p>';
+            }
+            
+            if (selectedChanges.includes('user-content')) {
+                changesList += '<p class="change-item user-content"><strong>User Content Rights:</strong> We have updated our terms regarding user-generated content and the rights associated with it.</p>';
+            }
+            
+            // Add custom details if provided
+            let customDetailsHtml = '';
+            if (customDetails) {
+                customDetailsHtml = `<p class="change-item custom-details"><strong>Additional Details:</strong><br>${customDetails.replace(/\n/g, '<br>')}</p>`;
+            }
+            
+            // Banner color styles
+            let bannerStyleCSS = '';
+            switch (bannerColor) {
+                case 'blue':
+                    bannerStyleCSS = 'background-color: #e3f2fd; border-color: #90caf9;';
+                    break;
+                case 'green':
+                    bannerStyleCSS = 'background-color: #e8f5e9; border-color: #a5d6a7;';
+                    break;
+                case 'yellow':
+                    bannerStyleCSS = 'background-color: #fffde7; border-color: #fff59d;';
+                    break;
+                case 'red':
+                    bannerStyleCSS = 'background-color: #ffebee; border-color: #ef9a9a;';
+                    break;
+                case 'gray':
+                    bannerStyleCSS = 'background-color: #f5f5f5; border-color: #e0e0e0;';
+                    break;
+            }
+            
+            // Generate banner HTML based on style
+            let bannerPositionCSS = '';
+            switch (bannerStyle) {
+                case 'top':
+                    bannerPositionCSS = 'position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 15px; border-bottom: 1px solid;';
+                    break;
+                case 'bottom':
+                    bannerPositionCSS = 'position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 15px; border-top: 1px solid;';
+                    break;
+                case 'popup':
+                    bannerPositionCSS = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; padding: 20px; border: 1px solid; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px;';
+                    break;
+            }
+            
+            // Generate consent button based on type
+            let consentButton = '';
+            if (consentType === 'explicit') {
+                consentButton = '<button style="background-color: #0069ff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px;">I Accept</button>';
+            }
+            
+            // Generate banner content
+            const bannerHTML = `
+                <div style="${bannerPositionCSS} ${bannerStyleCSS}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <strong>Terms of Use Update Notice:</strong> We've updated our Terms of Use effective ${formattedEffectiveDate}. 
+                            <a href="${termsUrl}" style="color: #0069ff; text-decoration: underline;">Click here</a> to review the changes.
+                            ${consentType === 'implicit' ? 'By continuing to use our site, you accept these changes.' : ''}
+                        </div>
+                        ${consentButton}
+                        ${bannerStyle === 'popup' ? '<button style="background: none; border: none; font-size: 16px; cursor: pointer; margin-left: 10px;">×</button>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Generate email template
+            const emailTemplate = `
+                <div class="email-preview">
+                    <div class="email-header">
+                        <strong>From:</strong> ${companyName} &lt;${contactEmail}&gt;<br>
+                        <strong>Subject:</strong> Important Update to Our Terms of Use
+                    </div>
+                    
+                    <p>Dear Valued User,</p>
+                    
+                    <p>We are writing to inform you that we have updated our Terms of Use. These changes will take effect on <strong>${formattedEffectiveDate}</strong>.</p>
+                    
+                    <p>Here's a summary of the key changes:</p>
+                    
+                    ${changesList}
+                    ${customDetailsHtml}
+                    
+                    <p>You can review the full updated Terms of Use at: <a href="${termsUrl}">${termsUrl}</a></p>
+                    
+                    <p>${consentType === 'implicit' ? 'If you continue to use our service after ' + formattedEffectiveDate + ', it will be considered that you have accepted the updated terms.' : 'Please review and accept these terms the next time you use our service.'}</p>
+                    
+                    <p>If you have any questions or concerns about these changes, please don't hesitate to contact us at <a href="mailto:${contactEmail}">${contactEmail}</a>.</p>
+                    
+                    <p>Thank you for being a valued user of our service.</p>
+                    
+                    <p>Sincerely,<br>
+                    The ${companyName} Team</p>
+                    
+                    <div class="email-footer">
+                        <p>${companyName}<br>
+                        ${websiteUrl}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Generate preview HTML based on selected notice type
+            let previewHTML = '';
+            
+            if (noticeType === 'both' || noticeType === 'banner') {
+                previewHTML += `
+                    <h4>Website Banner</h4>
+                    <div class="banner-preview">
+                        ${bannerHTML}
+                    </div>
+                `;
+            }
+            
+            if (noticeType === 'both' || noticeType === 'email') {
+                previewHTML += `
+                    <h4>Email Template</h4>
+                    ${emailTemplate}
+                `;
+            }
+            
+            if (previewHTML === '') {
+                previewHTML = '<p>Please select a notice type to generate the preview.</p>';
+            }
+            
+            // Update the preview content
+            document.getElementById('preview-content').innerHTML = previewHTML;
+            
+            // Remember which field was changed to highlight related content
+            if (changedField) {
+                highlightChangedContent(changedField);
+            }
+        }
+        
+        // Generate final, detailed output
+        function generateFinalOutput() {
+            // Get form values
+            const companyName = document.getElementById('company-name').value;
+            const websiteUrl = document.getElementById('website-url').value;
+            const effectiveDate = document.getElementById('effective-date').value;
+            const formattedEffectiveDate = formatDate(effectiveDate);
+            const noticePeriod = document.getElementById('notice-period').value;
+            const noticeDate = calculateNoticeDate(effectiveDate, noticePeriod);
+            const termsUrl = document.getElementById('terms-url').value;
+            const contactEmail = document.getElementById('contact-email').value;
+            
+            // Get selected changes
+            const selectedChanges = [];
+            document.querySelectorAll('input[name="change-option"]:checked').forEach(checkbox => {
+                selectedChanges.push(checkbox.value);
+            });
+            
+            const customDetails = document.getElementById('custom-details').value;
+            
+            // Get display options
+            const noticeType = document.getElementById('notice-type').value;
+            const bannerStyle = document.getElementById('banner-style').value;
+            const consentType = document.getElementById('consent-type').value;
+            const bannerColor = document.getElementById('banner-color').value;
+            
+            // Build changes list
+            let changesList = '';
+            
+            if (selectedChanges.includes('privacy-policy')) {
+                changesList += '<p class="change-item privacy-policy"><strong>Data Privacy Updates:</strong> We have updated our data privacy policy to comply with recent legislation. This includes changes to the types of information we collect, how we use it, and how you can control your data.</p>';
+            }
+            
+            if (selectedChanges.includes('refund-policy')) {
+                changesList += '<p class="change-item refund-policy"><strong>Refund Policy:</strong> We have revised our refund policy to provide more clarity on the circumstances under which refunds will be granted.</p>';
+            }
+            
+            if (selectedChanges.includes('ip-rights')) {
+                changesList += '<p class="change-item ip-rights"><strong>Intellectual Property Rights:</strong> We have added new language to protect our intellectual property rights. This includes an explicit prohibition on using our content without permission.</p>';
+            }
+            
+            if (selectedChanges.includes('jurisdiction')) {
+                changesList += '<p class="change-item jurisdiction"><strong>Jurisdiction:</strong> We have added language specifying that our terms of use and any disputes arising therefrom will be governed by specific legal jurisdiction.</p>';
+            }
+            
+            if (selectedChanges.includes('service-changes')) {
+                changesList += '<p class="change-item service-changes"><strong>Service Features/Functionality:</strong> We have updated our terms to reflect changes to our service features and functionality.</p>';
+            }
+            
+            if (selectedChanges.includes('payment-terms')) {
+                changesList += '<p class="change-item payment-terms"><strong>Payment Terms:</strong> We have updated our payment terms and conditions.</p>';
+            }
+            
+            if (selectedChanges.includes('user-content')) {
+                changesList += '<p class="change-item user-content"><strong>User Content Rights:</strong> We have updated our terms regarding user-generated content and the rights associated with it.</p>';
+            }
+            
+            // Add custom details if provided
+            let customDetailsHtml = '';
+            if (customDetails) {
+                customDetailsHtml = `<p class="change-item custom-details"><strong>Additional Details:</strong><br>${customDetails.replace(/\n/g, '<br>')}</p>`;
+            }
+            
+            // Banner color styles
+            let bannerStyleCSS = '';
+            switch (bannerColor) {
+                case 'blue':
+                    bannerStyleCSS = 'background-color: #e3f2fd; border-color: #90caf9;';
+                    break;
+                case 'green':
+                    bannerStyleCSS = 'background-color: #e8f5e9; border-color: #a5d6a7;';
+                    break;
+                case 'yellow':
+                    bannerStyleCSS = 'background-color: #fffde7; border-color: #fff59d;';
+                    break;
+                case 'red':
+                    bannerStyleCSS = 'background-color: #ffebee; border-color: #ef9a9a;';
+                    break;
+                case 'gray':
+                    bannerStyleCSS = 'background-color: #f5f5f5; border-color: #e0e0e0;';
+                    break;
+            }
+            
+            // Generate banner HTML based on style
+            let bannerPositionCSS = '';
+            switch (bannerStyle) {
+                case 'top':
+                    bannerPositionCSS = 'position: fixed; top: 0; left: 0; right: 0; z-index: 1000; padding: 15px; border-bottom: 1px solid;';
+                    break;
+                case 'bottom':
+                    bannerPositionCSS = 'position: fixed; bottom: 0; left: 0; right: 0; z-index: 1000; padding: 15px; border-top: 1px solid;';
+                    break;
+                case 'popup':
+                    bannerPositionCSS = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; padding: 20px; border: 1px solid; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); max-width: 500px;';
+                    break;
+            }
+            
+            // Generate consent button based on type
+            let consentButton = '';
+            if (consentType === 'explicit') {
+                consentButton = '<button onclick="this.parentNode.style.display=\'none\'" style="background-color: #0069ff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-left: 10px;">I Accept</button>';
+            }
+            
+            // Generate banner content
+            const bannerHTML = `
+                <div style="${bannerPositionCSS} ${bannerStyleCSS}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div style="flex: 1;">
+                            <strong>Terms of Use Update Notice:</strong> We've updated our Terms of Use effective ${formattedEffectiveDate}. 
+                            <a href="${termsUrl}" style="color: #0069ff; text-decoration: underline;">Click here</a> to review the changes.
+                            ${consentType === 'implicit' ? 'By continuing to use our site, you accept these changes.' : ''}
+                        </div>
+                        ${consentButton}
+                        ${bannerStyle === 'popup' ? '<button onclick="this.parentNode.parentNode.style.display=\'none\'" style="background: none; border: none; font-size: 16px; cursor: pointer; margin-left: 10px;">×</button>' : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Generate email template
+            const emailTemplate = `
+                <div class="email-preview">
+                    <div class="email-header">
+                        <strong>From:</strong> ${companyName} &lt;${contactEmail}&gt;<br>
+                        <strong>Subject:</strong> Important Update to Our Terms of Use
+                    </div>
+                    
+                    <p>Dear Valued User,</p>
+                    
+                    <p>We are writing to inform you that we have updated our Terms of Use. These changes will take effect on <strong>${formattedEffectiveDate}</strong>.</p>
+                    
+                    <p>Here's a summary of the key changes:</p>
+                    
+                    ${changesList}
+                    ${customDetailsHtml}
+                    
+                    <p>You can review the full updated Terms of Use at: <a href="${termsUrl}">${termsUrl}</a></p>
+                    
+                    <p>${consentType === 'implicit' ? 'If you continue to use our service after ' + formattedEffectiveDate + ', it will be considered that you have accepted the updated terms.' : 'Please review and accept these terms the next time you use our service.'}</p>
+                    
+                    <p>If you have any questions or concerns about these changes, please don't hesitate to contact us at <a href="mailto:${contactEmail}">${contactEmail}</a>.</p>
+                    
+                    <p>Thank you for being a valued user of our service.</p>
+                    
+                    <p>Sincerely,<br>
+                    The ${companyName} Team</p>
+                    
+                    <div class="email-footer">
+                        <p>${companyName}<br>
+                        ${websiteUrl}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Generate HTML output based on selected notice type
+            let finalOutput = '';
+            
+            if (noticeType === 'both' || noticeType === 'banner') {
+                finalOutput += `
+                    <h2>Website Banner Code</h2>
+                    <p>Add this code to your website to display the notice banner:</p>
+                    <pre style="background-color: #f5f5f5; padding: 15px; border-radius: 4px; overflow-x: auto;">${bannerHTML.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
+                    <div style="margin: 20px 0;">
+                        <h3>Banner Preview:</h3>
+                        <div class="banner-preview">
+                            ${bannerHTML}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (noticeType === 'both' || noticeType === 'email') {
+                finalOutput += `
+                    <h2>Email Notification Template</h2>
+                    <p>Use this template for your email notification:</p>
+                    <hr>
+                    ${emailTemplate}
+                    <hr>
+                `;
+            }
+            
+            finalOutput += `
+                <h2>Implementation Notes</h2>
+                <p>1. The banner should be displayed starting on <strong>${noticeDate}</strong> (${noticePeriod} days before the effective date).</p>
+                <p>2. Email notifications should be sent at least ${noticePeriod} days before the effective date (by <strong>${noticeDate}</strong>).</p>
+                <p>3. For optimal legal protection, consider keeping records of when users were notified and when they accepted the updated terms.</p>
+            `;
+            
+            // Update the preview content
+            document.getElementById('preview-content').innerHTML = finalOutput;
+        }
+        
+        // Function to highlight changed content
+        function highlightChangedContent(changedField) {
+            // Clear existing highlights
+            clearHighlights();
+            
+            // Define elements to highlight based on the changed field
+            let elementsToHighlight = [];
+            const previewContent = document.getElementById('preview-content');
+            
+            // Find elements to highlight based on the field that changed
+            switch(changedField) {
+                case 'company-name':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.email-header, .email-footer p'));
+                    break;
+                    
+                case 'website-url':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.email-footer p'));
+                    break;
+                    
+                case 'effective-date':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.banner-preview strong, .email-preview p:nth-of-type(2) strong'));
+                    break;
+                    
+                case 'terms-url':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.banner-preview a, .email-preview a[href="' + document.getElementById('terms-url').value + '"]'));
+                    break;
+                    
+                case 'contact-email':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.email-header, .email-preview a[href^="mailto"]'));
+                    break;
+                    
+                case 'change-option':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.change-item'));
+                    break;
+                    
+                case 'custom-details':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.change-item.custom-details'));
+                    break;
+                    
+                case 'banner-style':
+                case 'banner-color':
+                    elementsToHighlight = Array.from(previewContent.querySelectorAll('.banner-preview'));
+                    break;
+                    
+                case 'consent-type':
+                    if (document.getElementById('consent-type').value === 'explicit') {
+                        elementsToHighlight = Array.from(previewContent.querySelectorAll('.banner-preview button'));
+                    } else {
+                        elementsToHighlight = Array.from(previewContent.querySelectorAll('.banner-preview div div, .email-preview p:contains(continue to use)'));
+                    }
+                    break;
+            }
+            
+            // Apply highlights
+            elementsToHighlight.forEach(el => {
+                if (el) {
+                    el.classList.add('highlight');
+                    highlightedElements.push(el);
+                    
+                    // Scroll to the element if not in view
+                    const previewBox = document.querySelector('.preview-box');
+                    const elRect = el.getBoundingClientRect();
+                    const containerRect = previewBox.getBoundingClientRect();
+                    
+                    if (elRect.top < containerRect.top || elRect.bottom > containerRect.bottom) {
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+            
+            // Remove highlights after a delay
+            highlightTimeout = setTimeout(() => {
+                clearHighlights();
+            }, 2000);
+        }
+        
+        // Function to reset the form
+        function resetForm() {
+            document.getElementById('company-name').value = 'Your Company';
+            document.getElementById('website-url').value = 'https://yourcompany.com';
+            
+            // Reset to a date 30 days in the future
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 30);
+            document.getElementById('effective-date').value = futureDate.toISOString().slice(0, 10);
+            
+            document.getElementById('notice-period').value = '30';
+            document.getElementById('terms-url').value = 'https://yourcompany.com/terms';
+            document.getElementById('contact-email').value = 'support@yourcompany.com';
+            
+            // Reset checkboxes
+            document.querySelectorAll('.checkbox-label').forEach(label => {
+                const checkbox = label.querySelector('input[type="checkbox"]');
+                if (checkbox.value === 'privacy-policy' || 
+                    checkbox.value === 'refund-policy' || 
+                    checkbox.value === 'ip-rights' || 
+                    checkbox.value === 'jurisdiction' || 
+                    checkbox.value === 'service-changes') {
+                    checkbox.checked = true;
+                    label.classList.add('selected');
+                } else {
+                    checkbox.checked = false;
+                    label.classList.remove('selected');
+                }
+            });
+            
+            document.getElementById('custom-details').value = '';
+            
+            if (document.getElementById('notice-type')) {
+                document.getElementById('notice-type').value = 'both';
+            }
+            
+            if (document.getElementById('banner-style')) {
+                document.getElementById('banner-style').value = 'top';
+            }
+            
+            if (document.getElementById('consent-type')) {
+                document.getElementById('consent-type').value = 'explicit';
+            }
+            
+            if (document.getElementById('banner-color')) {
+                document.getElementById('banner-color').value = 'blue';
+            }
+            
+            // Clear any highlights
+            clearHighlights();
+            
+            // Update preview
+            updatePreview();
+            
+            // Hide copy message
+            document.getElementById('copy-message').style.display = 'none';
+        }
+        
+        // Function to copy to clipboard
+        function copyToClipboard() {
+            const previewContent = document.getElementById('preview-content');
+            
+            // Create a temporary textarea to copy from
+            const textarea = document.createElement('textarea');
+            textarea.value = previewContent.innerText;
+            document.body.appendChild(textarea);
+            
+            // Select and copy
+            textarea.select();
+            document.execCommand('copy');
+            
+            // Remove the textarea
+            document.body.removeChild(textarea);
+            
+            // Show copy message
+            const copyMessage = document.getElementById('copy-message');
+            copyMessage.style.display = 'inline-block';
+            
+            // Hide message after 3 seconds
+            setTimeout(() => {
+                copyMessage.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Function to download as text
+        function downloadText() {
+            const previewContent = document.getElementById('preview-content');
+            const companyName = document.getElementById('company-name').value;
+            const blob = new Blob([previewContent.innerText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${companyName.replace(/\s+/g, '-').toLowerCase()}-terms-update-notice.txt`;
+            document.body.appendChild(a);
+            a.click();
+            
+            // Cleanup
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
     </script>
 </body>
 </html>
