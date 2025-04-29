@@ -1,480 +1,4 @@
-<!-- wp:html -->
-<!-- Unified Paywall for Terms of Use Clause Generators -->
-<style>
-/* Paywall related styles */
-.tou-tools-paywall-container {
-  position: relative;
-  margin-bottom: 40px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  background: #f9f9f9;
-}
-
-.tou-tools-header {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.tou-tools-header h3 {
-  font-size: 22px;
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-
-.tou-tools-header p {
-  color: #555;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-/* Fixed paywall modal styles */
-.paywall-overlay {
-  display: none; /* Initially hidden, will be shown via JS */
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 500px;
-  background: white;
-  z-index: 1000;
-  padding: 25px;
-  text-align: center;
-  border-radius: 8px;
-  box-shadow: 0 5px 30px rgba(0,0,0,0.3);
-}
-
-/* Close button for payment modal */
-.paywall-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 25px;
-  height: 25px;
-  background: #f1f1f1;
-  border-radius: 50%;
-  text-align: center;
-  line-height: 25px;
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 1001;
-}
-
-.paywall-close:hover {
-  background: #e1e1e1;
-}
-
-/* Semi-transparent background overlay */
-.paywall-backdrop {
-  display: none; /* Initially hidden, will be shown via JS */
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 999;
-}
-
-.premium-badge {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: #2c3e50;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: bold;
-  display: none;
-  z-index: 50;
-}
-
-.lock-icon {
-  font-size: 40px;
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-
-.paywall-title {
-  font-size: 22px;
-  font-weight: bold;
-  margin-bottom: 10px;
-  color: #2c3e50;
-}
-
-.paywall-description {
-  margin-bottom: 15px;
-  max-width: 400px;
-  font-size: 14px;
-}
-
-.features-list {
-  text-align: left;
-  margin: 0 auto 20px;
-  max-width: 400px;
-  font-size: 14px;
-}
-
-.features-list li {
-  margin-bottom: 6px;
-  position: relative;
-  padding-left: 22px;
-}
-
-.features-list li:before {
-  content: "✓";
-  position: absolute;
-  left: 0;
-  color: #27ae60;
-  font-weight: bold;
-}
-
-.payment-container {
-  margin-bottom: 15px;
-}
-
-/* Transaction ID Recovery Section */
-.recovery-section {
-  margin-top: 20px;
-  padding: 15px;
-  background: #f5f5f5;
-  border-radius: 8px;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  width: 100%;
-}
-
-.recovery-title {
-  font-weight: bold;
-  font-size: 16px;
-  color: #2c3e50;
-}
-
-.recovery-description {
-  font-size: 13px;
-  color: #555;
-}
-
-.recovery-input {
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 100%;
-}
-
-.recovery-button {
-  background: #3498db;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  font-weight: 500;
-  margin-top: 5px;
-}
-
-.recovery-button:hover {
-  background: #2980b9;
-}
-
-.success-overlay {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.8);
-  z-index: 1000;
-  align-items: center;
-  justify-content: center;
-}
-
-.success-message {
-  background: white;
-  padding: 25px;
-  border-radius: 8px;
-  max-width: 400px;
-  text-align: center;
-}
-
-.success-icon {
-  font-size: 40px;
-  color: #27ae60;
-  margin-bottom: 15px;
-}
-
-.success-title {
-  font-size: 22px;
-  margin-bottom: 15px;
-  color: #2c3e50;
-}
-
-.success-description {
-  margin-bottom: 20px;
-  color: #555;
-  font-size: 14px;
-}
-
-.success-button {
-  background: #27ae60;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.success-button:hover {
-  background: #219653;
-}
-
-/* Modified preview fade effect */
-.preview-fade {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(to bottom, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.9) 100%);
-  pointer-events: none;
-  z-index: 50;
-}
-
-/* Specific generator adjustments */
-.clause-generator .preview-column {
-  position: relative;
-}
-
-.clause-generator .preview-content {
-  position: relative;
-  user-select: none;
-}
-
-/* Fixed button styles to ensure they're truly disabled until payment */
-.clause-generator .copy-btn {
-  opacity: 0.6;
-  cursor: not-allowed;
-  pointer-events: auto; /* We'll control the behavior with our event listeners */
-}
-
-/* New Buy Button */
-.unlock-button {
-  background: #3498db;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 60;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-}
-
-.unlock-button:hover {
-  background: #2980b9;
-}
-
-/* Mobile Payment Notice */
-.mobile-payment-notice {
-  margin-top: 10px;
-  font-size: 12px;
-  color: #666;
-  text-align: center;
-}
-
-/* Tabs Navigation for Multiple Generators */
-.tools-tabs-container {
-  margin-bottom: 20px;
-}
-
-.tools-tabs {
-  display: flex;
-  flex-wrap: wrap;
-  border-bottom: 1px solid #ddd;
-  margin-bottom: 20px;
-}
-
-.tools-tab {
-  padding: 10px 15px;
-  cursor: pointer;
-  border: 1px solid transparent;
-  border-bottom: none;
-  margin-right: 5px;
-  border-radius: 4px 4px 0 0;
-  font-weight: 500;
-  color: #555;
-}
-
-.tools-tab:hover {
-  background-color: #f5f5f5;
-}
-
-.tools-tab.active {
-  background-color: white;
-  border-color: #ddd;
-  color: #2c3e50;
-  margin-bottom: -1px;
-  padding-bottom: 11px;
-}
-
-.tools-tab-content {
-  display: none;
-}
-
-.tools-tab-content.active {
-  display: block;
-}
-
-.paypal-button-container {
-  width: 100% !important;
-  margin-bottom: 15px;
-}
-
-#paypal-container {
-  width: 230px;
-  margin: 0 auto;
-}
-
-/* Coming Soon Tab Styles */
-.coming-soon-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 300px;
-  padding: 20px;
-  text-align: center;
-  background: #f5f5f5;
-  border-radius: 8px;
-}
-
-.coming-soon-icon {
-  font-size: 48px;
-  color: #3498db;
-  margin-bottom: 20px;
-}
-
-.coming-soon-title {
-  font-size: 24px;
-  font-weight: bold;
-  color: #2c3e50;
-  margin-bottom: 10px;
-}
-
-.coming-soon-description {
-  font-size: 16px;
-  color: #555;
-  max-width: 600px;
-  margin-bottom: 20px;
-}
-
-.coming-soon-notification {
-  display: inline-block;
-  padding: 8px 16px;
-  background: #ecf0f1;
-  border: 1px solid #bdc3c7;
-  border-radius: 4px;
-  font-size: 14px;
-  color: #7f8c8d;
-}
-</style>
-
-<div id="tou-tools-container" class="tou-tools-paywall-container">
-  <div class="tou-tools-header">
-    <h3>Terms of Use Clause Generators</h3>
-    <p>Create customized Terms of Use contract clauses tailored to your specific business situation. All generators are included in one purchase.</p>
-  </div>
-  
-  <!-- Premium Badge (shown after payment) -->
-  <div id="premium-badge" class="premium-badge">PREMIUM UNLOCKED</div>
-  
-  <!-- Tabs for Multiple Generators -->
-  <div class="tools-tabs-container">
-    <div class="tools-tabs">
-      <div class="tools-tab active" data-tab="warranty">Warranties & Liability</div>
-      <div class="tools-tab" data-tab="ip">Intellectual Property</div>
-      <div class="tools-tab" data-tab="dispute">Dispute Resolution</div>
-      <div class="tools-tab" data-tab="userconduct">User Obligations</div>
-      <div class="tools-tab" data-tab="termination">Termination</div>
-    </div>
-  </div>
-  
-  <!-- New backdrop overlay -->
-  <div id="paywall-backdrop" class="paywall-backdrop"></div>
-  
-  <!-- Paywall Overlay - Now a popup with close button -->
-  <div id="paywall-overlay" class="paywall-overlay">
-    <div id="paywall-close" class="paywall-close">✕</div>
-    <div class="lock-icon">🔒</div>
-    <h2 class="paywall-title">Unlock All Generators</h2>
-    <p class="paywall-description">Get immediate access to all Terms of Use clause generators.</p>
-    
-    <ul class="features-list">
-      <li>Create custom Warranties & Liability clauses</li>
-      <li>Generate Intellectual Property provisions</li>
-      <li>Draft Dispute Resolution clauses</li>
-      <li>Download MS Word documents</li>
-      <li>Unlimited use for all contracts</li>
-    </ul>
-    
-    <div id="paypal-container" class="payment-container">
-      <!-- PayPal Button -->
-      <style>.pp-XM4YBFHQ526AL{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
-      <form action="https://www.paypal.com/ncp/payment/XM4YBFHQ526AL" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
-        <input class="pp-XM4YBFHQ526AL" type="submit" value="Buy Now" />
-        <img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" />
-        <section> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
-      </form>
-    </div>
-    
-    <div class="mobile-payment-notice">
-      On mobile devices: After payment, you may need to manually return to this page. Your form data will be preserved.
-    </div>
-    
-    <!-- Transaction ID Recovery Section -->
-    <div class="recovery-section">
-      <div class="recovery-title">Already paid?</div>
-      <div class="recovery-description">If you've already completed payment but don't see the content, enter your PayPal Transaction ID below:</div>
-      <input type="text" id="transaction-id-input" class="recovery-input" placeholder="Enter PayPal Transaction ID">
-      <button id="recover-access-btn" class="recovery-button">Unlock Access</button>
-    </div>
-  </div>
-  
-  <!-- Success Overlay (shown after successful payment) -->
-  <div id="success-overlay" class="success-overlay">
-    <div class="success-message">
-      <div class="success-icon">✓</div>
-      <h2 class="success-title">Payment Successful!</h2>
-      <p class="success-description">You now have full access to all Terms of Use clause generators.</p>
-      <button id="success-button" class="success-button">Start Using Your Generators</button>
-    </div>
-  </div>
-  
-  <!-- Tab Content Containers -->
-  
-  
-  
-  
-  
-  
-  
-  <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -830,6 +354,53 @@
       opacity: 1;
     }
     
+    /* Tab Navigation Styles - Fixed */
+    .tools-tabs-container {
+      margin-bottom: 20px;
+    }
+    
+    .tools-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      border-bottom: 1px solid #ddd;
+      margin-bottom: 20px;
+      list-style: none;
+      padding-left: 0;
+    }
+    
+    .tools-tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      margin-right: 5px;
+      border-radius: 4px 4px 0 0;
+      font-weight: 500;
+      color: #555;
+      list-style: none;
+      background-color: transparent;
+    }
+    
+    .tools-tab:hover {
+      background-color: #f5f5f5;
+    }
+    
+    .tools-tab.active {
+      background-color: white;
+      border-color: #ddd;
+      color: #2c3e50;
+      margin-bottom: -1px;
+      padding-bottom: 11px;
+    }
+    
+    .tools-tab-content {
+      display: none;
+    }
+    
+    .tools-tab-content.active {
+      display: block;
+    }
+    
     /* Responsive adjustments */
     @media (max-width: 768px) {
       .generator-container {
@@ -849,367 +420,417 @@
 </head>
 <body>
   <div class="clause-generator" id="warranty-liability-generator">
-    <div class="generator-container">
-      <!-- Form Column -->
-      <div class="form-column">
-        <!-- Industry Presets -->
-        <div class="industry-presets">
-          <div class="preset-title">Quick Start: Select Your Industry</div>
-          <div class="preset-buttons">
-            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('saas')">SaaS/Software</button>
-            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('ecommerce')">E-commerce</button>
-            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('content')">Content Platform</button>
-            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('subscription')">Subscription Service</button>
-            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('marketplace')">Online Marketplace</button>
-          </div>
-        </div>
-      
-        <!-- Agreement Information -->
-        <div class="section-header">Agreement Information</div>
-        
-        <div class="form-group">
-          <label class="form-label" for="companyName">Company Name</label>
-          <input type="text" id="companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="warrantyLiabilityGenerator.updatePreview('companyName')">
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="serviceType">Service Type</label>
-          <select id="serviceType" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('serviceType')">
-            <option value="website" selected>Website</option>
-            <option value="mobileApp">Mobile App</option>
-            <option value="saas">SaaS Platform</option>
-            <option value="marketplace">Online Marketplace</option>
-            <option value="subscription">Subscription Service</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="serviceName">Service/Product Name</label>
-          <input type="text" id="serviceName" class="form-input" value="OUR SERVICE" placeholder="Enter service name (ALL CAPS recommended)" onkeyup="warrantyLiabilityGenerator.updatePreview('serviceName')">
-        </div>
-        
-        <!-- Warranty Options -->
-        <div class="section-header">Warranty Disclaimer</div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Warranty Level
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                <strong>Strong Disclaimer:</strong> Completely disclaims all warranties.<br>
-                <strong>Moderate Disclaimer:</strong> Disclaims most warranties but offers some limited ones.<br>
-                <strong>Limited Disclaimer:</strong> More user-friendly language with fewer disclaimers.
-              </div>
+    <!-- Tab Navigation -->
+    <div class="tools-tabs-container">
+      <ul class="tools-tabs">
+        <li class="tools-tab active" data-tab="warranties">Warranties & Liability</li>
+        <li class="tools-tab" data-tab="ip">Intellectual Property</li>
+        <li class="tools-tab" data-tab="dispute">Dispute Resolution</li>
+        <li class="tools-tab" data-tab="userconduct">User Obligations</li>
+        <li class="tools-tab" data-tab="termination">Termination</li>
+      </ul>
+    </div>
+    
+    <!-- Tab Content for Warranties & Liability -->
+    <div id="warranties-tab" class="tools-tab-content active">
+      <div class="generator-container">
+        <!-- Form Column -->
+        <div class="form-column">
+          <!-- Industry Presets -->
+          <div class="industry-presets">
+            <div class="preset-title">Quick Start: Select Your Industry</div>
+            <div class="preset-buttons">
+              <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('saas')">SaaS/Software</button>
+              <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('ecommerce')">E-commerce</button>
+              <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('content')">Content Platform</button>
+              <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('subscription')">Subscription Service</button>
+              <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('marketplace')">Online Marketplace</button>
             </div>
-          </label>
-          <div class="radio-group">
-            <label class="radio-item">
-              <input type="radio" name="warrantyLevel" id="warrantyStrong" value="strong" checked onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
-              <span class="radio-label">Strong Disclaimer</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-medium"></span>
-                <span class="risk-tooltip">Medium enforceability risk in consumer contexts</span>
-              </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="warrantyLevel" id="warrantyModerate" value="moderate" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
-              <span class="radio-label">Moderate Disclaimer</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
-              </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="warrantyLevel" id="warrantyLimited" value="limited" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
-              <span class="radio-label">Limited Disclaimer</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Most enforceable but provides less protection</span>
-              </div>
-            </label>
           </div>
-        </div>
         
-        <div class="form-group">
-          <label class="form-label">
-            Specific Disclaimers
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Select specific aspects of your service that you want to explicitly disclaim warranty for. Include only those relevant to your service to avoid overly broad disclaimers.
-              </div>
-            </div>
-          </label>
-          <div class="checkbox-group">
-            <label class="checkbox-item">
-              <input type="checkbox" id="disclaimerUptime" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerUptime')">
-              <span class="checkbox-label">Uptime & Availability</span>
+          <!-- Agreement Information -->
+          <div class="section-header">Agreement Information</div>
+          
+          <div class="form-group">
+            <label class="form-label" for="companyName">Company Name</label>
+            <input type="text" id="companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="warrantyLiabilityGenerator.updatePreview('companyName')">
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="serviceType">Service Type</label>
+            <select id="serviceType" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('serviceType')">
+              <option value="website" selected>Website</option>
+              <option value="mobileApp">Mobile App</option>
+              <option value="saas">SaaS Platform</option>
+              <option value="marketplace">Online Marketplace</option>
+              <option value="subscription">Subscription Service</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="serviceName">Service/Product Name</label>
+            <input type="text" id="serviceName" class="form-input" value="OUR SERVICE" placeholder="Enter service name (ALL CAPS recommended)" onkeyup="warrantyLiabilityGenerator.updatePreview('serviceName')">
+          </div>
+          
+          <!-- Warranty Options -->
+          <div class="section-header">Warranty Disclaimer</div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Warranty Level
               <div class="tooltip-container">
                 <span class="tooltip-trigger">?</span>
                 <div class="tooltip-content">
-                  Disclaims guarantees about your service being available 24/7 without interruptions. Important for all online services.
+                  <strong>Strong Disclaimer:</strong> Completely disclaims all warranties.<br>
+                  <strong>Moderate Disclaimer:</strong> Disclaims most warranties but offers some limited ones.<br>
+                  <strong>Limited Disclaimer:</strong> More user-friendly language with fewer disclaimers.
                 </div>
               </div>
             </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="disclaimerAccuracy" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerAccuracy')">
-              <span class="checkbox-label">Content Accuracy</span>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="warrantyLevel" id="warrantyStrong" value="strong" checked onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+                <span class="radio-label">Strong Disclaimer</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-medium"></span>
+                  <span class="risk-tooltip">Medium enforceability risk in consumer contexts</span>
+                </div>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="warrantyLevel" id="warrantyModerate" value="moderate" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+                <span class="radio-label">Moderate Disclaimer</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+                </div>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="warrantyLevel" id="warrantyLimited" value="limited" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+                <span class="radio-label">Limited Disclaimer</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Most enforceable but provides less protection</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Specific Disclaimers
               <div class="tooltip-container">
                 <span class="tooltip-trigger">?</span>
                 <div class="tooltip-content">
-                  Disclaims guarantees about the accuracy of information provided through your service. Critical for platforms with user-generated content.
+                  Select specific aspects of your service that you want to explicitly disclaim warranty for. Include only those relevant to your service to avoid overly broad disclaimers.
                 </div>
               </div>
             </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="disclaimerSecurity" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerSecurity')">
-              <span class="checkbox-label">Security</span>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" id="disclaimerUptime" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerUptime')">
+                <span class="checkbox-label">Uptime & Availability</span>
+                <div class="tooltip-container">
+                  <span class="tooltip-trigger">?</span>
+                  <div class="tooltip-content">
+                    Disclaims guarantees about your service being available 24/7 without interruptions. Important for all online services.
+                  </div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="disclaimerAccuracy" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerAccuracy')">
+                <span class="checkbox-label">Content Accuracy</span>
+                <div class="tooltip-container">
+                  <span class="tooltip-trigger">?</span>
+                  <div class="tooltip-content">
+                    Disclaims guarantees about the accuracy of information provided through your service. Critical for platforms with user-generated content.
+                  </div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="disclaimerSecurity" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerSecurity')">
+                <span class="checkbox-label">Security</span>
+                <div class="tooltip-container">
+                  <span class="tooltip-trigger">?</span>
+                  <div class="tooltip-content">
+                    Disclaims guarantees about perfect security. Important, but include specific security measures you do take elsewhere in your terms.
+                  </div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="disclaimerThirdParty" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerThirdParty')">
+                <span class="checkbox-label">Third-Party Links/Content</span>
+                <div class="tooltip-container">
+                  <span class="tooltip-trigger">?</span>
+                  <div class="tooltip-content">
+                    Disclaims responsibility for third-party websites, services, or content accessible through your service.
+                  </div>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="disclaimerProfessional" onclick="warrantyLiabilityGenerator.updatePreview('disclaimerProfessional')">
+                <span class="checkbox-label">Professional Advice</span>
+                <div class="tooltip-container">
+                  <span class="tooltip-trigger">?</span>
+                  <div class="tooltip-content">
+                    Disclaims that your service provides professional, legal, medical, or financial advice. Essential for informational platforms.
+                  </div>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <!-- Liability Limitations -->
+          <div class="section-header">Liability Limitations</div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Limitation Scope
               <div class="tooltip-container">
                 <span class="tooltip-trigger">?</span>
                 <div class="tooltip-content">
-                  Disclaims guarantees about perfect security. Important, but include specific security measures you do take elsewhere in your terms.
+                  <strong>Broad:</strong> Excludes all types of damages (most protective for you)<br>
+                  <strong>Intermediate:</strong> Excludes indirect damages but allows direct damages<br>
+                  <strong>Narrow:</strong> Only excludes specific damage types (least protective)
                 </div>
               </div>
             </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="disclaimerThirdParty" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerThirdParty')">
-              <span class="checkbox-label">Third-Party Links/Content</span>
+            <select id="liabilityScope" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('liabilityScope'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
+              <option value="broad" selected>Broad (All Damages)</option>
+              <option value="intermediate">Intermediate (Most Damages)</option>
+              <option value="narrow">Narrow (Direct Damages Only)</option>
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Specific Damages Excluded
               <div class="tooltip-container">
                 <span class="tooltip-trigger">?</span>
                 <div class="tooltip-content">
-                  Disclaims responsibility for third-party websites, services, or content accessible through your service.
+                  <strong>Direct damages:</strong> Immediate costs/losses directly caused by a breach<br>
+                  <strong>Indirect damages:</strong> Secondary losses that flow from the direct damages<br>
+                  <strong>Consequential damages:</strong> Damages from special circumstances known to the parties<br>
+                  <strong>Punitive damages:</strong> Damages intended to punish wrongdoing<br>
+                  <strong>Special damages:</strong> Unusual or special losses known to both parties
                 </div>
               </div>
             </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="disclaimerProfessional" onclick="warrantyLiabilityGenerator.updatePreview('disclaimerProfessional')">
-              <span class="checkbox-label">Professional Advice</span>
+            <div class="checkbox-group">
+              <label class="checkbox-item">
+                <input type="checkbox" id="excludeDirect" onclick="warrantyLiabilityGenerator.updatePreview('excludeDirect')">
+                <span class="checkbox-label">Direct Damages</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-high"></span>
+                  <span class="risk-tooltip">High risk - often unenforceable in many jurisdictions</span>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="excludeIndirect" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeIndirect')">
+                <span class="checkbox-label">Indirect Damages</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="excludeConsequential" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeConsequential')">
+                <span class="checkbox-label">Consequential Damages</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="excludePunitive" checked onclick="warrantyLiabilityGenerator.updatePreview('excludePunitive')">
+                <span class="checkbox-label">Punitive Damages</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+                </div>
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="excludeSpecial" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeSpecial')">
+                <span class="checkbox-label">Special Damages</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Liability Cap
               <div class="tooltip-container">
                 <span class="tooltip-trigger">?</span>
                 <div class="tooltip-content">
-                  Disclaims that your service provides professional, legal, medical, or financial advice. Essential for informational platforms.
+                  <strong>No Cap:</strong> No maximum limit on liability (least protective)<br>
+                  <strong>Fees Paid:</strong> Cap liability at fees paid by user (recommended)<br>
+                  <strong>Fixed Amount:</strong> Set a specific dollar amount as cap
                 </div>
               </div>
             </label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="liabilityCap" id="capNone" value="none" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+                <span class="radio-label">No Cap</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-high"></span>
+                  <span class="risk-tooltip">High risk - unlimited liability exposure</span>
+                </div>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="liabilityCap" id="capFees" value="fees" checked onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+                <span class="radio-label">Fees Paid</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-low"></span>
+                  <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+                </div>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="liabilityCap" id="capFixed" value="fixed" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+                <span class="radio-label">Fixed Amount</span>
+                <div class="risk-container">
+                  <span class="risk-indicator risk-medium"></span>
+                  <span class="risk-tooltip">Medium risk if amount is too low relative to potential damages</span>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group" id="fixedCapAmount" style="display: none;">
+            <label class="form-label" for="capAmount">Fixed Cap Amount</label>
+            <input type="text" id="capAmount" class="form-input" value="$500" placeholder="Enter cap amount" onkeyup="warrantyLiabilityGenerator.updatePreview('capAmount')">
+          </div>
+          
+          <!-- Additional Options -->
+          <div class="section-header">Additional Options</div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Severability Clause
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  A severability clause ensures that if any part of these disclaimers is found invalid, the rest remains enforceable. Highly recommended.
+                </div>
+              </div>
+            </label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="severability" id="severabilityYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('severability')">
+                <span class="radio-label">Include</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="severability" id="severabilityNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('severability')">
+                <span class="radio-label">Exclude</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">
+              Indemnification Clause
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  An indemnification clause requires users to defend and compensate you for claims resulting from their use of your service or violation of terms.
+                </div>
+              </div>
+            </label>
+            <div class="radio-group">
+              <label class="radio-item">
+                <input type="radio" name="indemnification" id="indemnificationYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
+                <span class="radio-label">Include</span>
+              </label>
+              <label class="radio-item">
+                <input type="radio" name="indemnification" id="indemnificationNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
+                <span class="radio-label">Exclude</span>
+              </label>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label" for="jurisdiction">
+              Jurisdiction Consideration
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Select the primary jurisdiction where your users are located to get region-specific language that addresses local laws.
+                </div>
+              </div>
+            </label>
+            <select id="jurisdiction" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('jurisdiction'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
+              <option value="us" selected>United States</option>
+              <option value="eu">European Union</option>
+              <option value="uk">United Kingdom</option>
+              <option value="ca">Canada</option>
+              <option value="au">Australia</option>
+              <option value="global">Global</option>
+            </select>
+            <div id="jurisdiction-warning" class="jurisdiction-warning"></div>
           </div>
         </div>
         
-        <!-- Liability Limitations -->
-        <div class="section-header">Liability Limitations</div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Limitation Scope
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                <strong>Broad:</strong> Excludes all types of damages (most protective for you)<br>
-                <strong>Intermediate:</strong> Excludes indirect damages but allows direct damages<br>
-                <strong>Narrow:</strong> Only excludes specific damage types (least protective)
-              </div>
-            </div>
-          </label>
-          <select id="liabilityScope" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('liabilityScope'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
-            <option value="broad" selected>Broad (All Damages)</option>
-            <option value="intermediate">Intermediate (Most Damages)</option>
-            <option value="narrow">Narrow (Direct Damages Only)</option>
-          </select>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Specific Damages Excluded
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                <strong>Direct damages:</strong> Immediate costs/losses directly caused by a breach<br>
-                <strong>Indirect damages:</strong> Secondary losses that flow from the direct damages<br>
-                <strong>Consequential damages:</strong> Damages from special circumstances known to the parties<br>
-                <strong>Punitive damages:</strong> Damages intended to punish wrongdoing<br>
-                <strong>Special damages:</strong> Unusual or special losses known to both parties
-              </div>
-            </div>
-          </label>
-          <div class="checkbox-group">
-            <label class="checkbox-item">
-              <input type="checkbox" id="excludeDirect" onclick="warrantyLiabilityGenerator.updatePreview('excludeDirect')">
-              <span class="checkbox-label">Direct Damages</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-high"></span>
-                <span class="risk-tooltip">High risk - often unenforceable in many jurisdictions</span>
-              </div>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="excludeIndirect" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeIndirect')">
-              <span class="checkbox-label">Indirect Damages</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
-              </div>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="excludeConsequential" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeConsequential')">
-              <span class="checkbox-label">Consequential Damages</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
-              </div>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="excludePunitive" checked onclick="warrantyLiabilityGenerator.updatePreview('excludePunitive')">
-              <span class="checkbox-label">Punitive Damages</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
-              </div>
-            </label>
-            <label class="checkbox-item">
-              <input type="checkbox" id="excludeSpecial" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeSpecial')">
-              <span class="checkbox-label">Special Damages</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
-              </div>
-            </label>
+        <!-- Preview Column -->
+        <div class="preview-column">
+          <div class="preview-header">
+            <div class="preview-title">Disclaimer of Warranties & Limitation of Liability Preview</div>
+            <div class="preview-note">Updates as you complete the form</div>
           </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Liability Cap
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                <strong>No Cap:</strong> No maximum limit on liability (least protective)<br>
-                <strong>Fees Paid:</strong> Cap liability at fees paid by user (recommended)<br>
-                <strong>Fixed Amount:</strong> Set a specific dollar amount as cap
-              </div>
-            </div>
-          </label>
-          <div class="radio-group">
-            <label class="radio-item">
-              <input type="radio" name="liabilityCap" id="capNone" value="none" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
-              <span class="radio-label">No Cap</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-high"></span>
-                <span class="risk-tooltip">High risk - unlimited liability exposure</span>
-              </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="liabilityCap" id="capFees" value="fees" checked onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
-              <span class="radio-label">Fees Paid</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-low"></span>
-                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
-              </div>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="liabilityCap" id="capFixed" value="fixed" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
-              <span class="radio-label">Fixed Amount</span>
-              <div class="risk-container">
-                <span class="risk-indicator risk-medium"></span>
-                <span class="risk-tooltip">Medium risk if amount is too low relative to potential damages</span>
-              </div>
-            </label>
+          
+          <div class="preview-content" id="warrantyPreview">
+            <!-- Preview content will be populated by JavaScript -->
           </div>
-        </div>
-        
-        <div class="form-group" id="fixedCapAmount" style="display: none;">
-          <label class="form-label" for="capAmount">Fixed Cap Amount</label>
-          <input type="text" id="capAmount" class="form-input" value="$500" placeholder="Enter cap amount" onkeyup="warrantyLiabilityGenerator.updatePreview('capAmount')">
-        </div>
-        
-        <!-- Additional Options -->
-        <div class="section-header">Additional Options</div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Severability Clause
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                A severability clause ensures that if any part of these disclaimers is found invalid, the rest remains enforceable. Highly recommended.
-              </div>
-            </div>
-          </label>
-          <div class="radio-group">
-            <label class="radio-item">
-              <input type="radio" name="severability" id="severabilityYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('severability')">
-              <span class="radio-label">Include</span>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="severability" id="severabilityNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('severability')">
-              <span class="radio-label">Exclude</span>
-            </label>
+          
+          <div class="button-container">
+            <button id="warrantyCopyBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.handleCopyClick()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              COPY CLAUSE
+            </button>
+            <button id="warrantyWordBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.generateWordDoc()">MS WORD DOC</button>
           </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">
-            Indemnification Clause
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                An indemnification clause requires users to defend and compensate you for claims resulting from their use of your service or violation of terms.
-              </div>
-            </div>
-          </label>
-          <div class="radio-group">
-            <label class="radio-item">
-              <input type="radio" name="indemnification" id="indemnificationYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
-              <span class="radio-label">Include</span>
-            </label>
-            <label class="radio-item">
-              <input type="radio" name="indemnification" id="indemnificationNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
-              <span class="radio-label">Exclude</span>
-            </label>
-          </div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label" for="jurisdiction">
-            Jurisdiction Consideration
-            <div class="tooltip-container">
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Select the primary jurisdiction where your users are located to get region-specific language that addresses local laws.
-              </div>
-            </div>
-          </label>
-          <select id="jurisdiction" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('jurisdiction'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
-            <option value="us" selected>United States</option>
-            <option value="eu">European Union</option>
-            <option value="uk">United Kingdom</option>
-            <option value="ca">Canada</option>
-            <option value="au">Australia</option>
-            <option value="global">Global</option>
-          </select>
-          <div id="jurisdiction-warning" class="jurisdiction-warning"></div>
         </div>
       </div>
-      
-      <!-- Preview Column -->
-      <div class="preview-column">
-        <div class="preview-header">
-          <div class="preview-title">Disclaimer of Warranties & Limitation of Liability Preview</div>
-          <div class="preview-note">Updates as you complete the form</div>
-        </div>
-        
-        <div class="preview-content" id="warrantyPreview">
-          <!-- Preview content will be populated by JavaScript -->
-        </div>
-        
-        <div class="button-container">
-          <button id="warrantyCopyBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.handleCopyClick()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
-              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-            </svg>
-            COPY CLAUSE
-          </button>
-          <button id="warrantyWordBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.generateWordDoc()">MS WORD DOC</button>
-        </div>
+    </div>
+    
+    <!-- Tab Content for Intellectual Property -->
+    <div id="ip-tab" class="tools-tab-content">
+      <div class="coming-soon-container">
+        <h3>Intellectual Property Rights Generator</h3>
+        <p>Create comprehensive IP rights clauses covering ownership, licenses, copyrights, trademarks, user-generated content, and more. Perfectly tailored to your business needs.</p>
+        <div>Coming Soon!</div>
+      </div>
+    </div>
+    
+    <!-- Tab Content for Dispute Resolution -->
+    <div id="dispute-tab" class="tools-tab-content">
+      <div class="coming-soon-container">
+        <h3>Dispute Resolution Generator</h3>
+        <p>Generate customized dispute resolution clauses with arbitration, jurisdiction, class action waiver, and attorney's fees provisions tailored to your jurisdiction and business requirements.</p>
+        <div>Coming Soon!</div>
+      </div>
+    </div>
+    
+    <!-- Tab Content for User Obligations -->
+    <div id="userconduct-tab" class="tools-tab-content">
+      <div class="coming-soon-container">
+        <h3>User Obligations & Code of Conduct Generator</h3>
+        <p>Create detailed user obligation clauses including acceptable use policies, prohibited activities, account security requirements, and content standards for your platform or service.</p>
+        <div>Coming Soon!</div>
+      </div>
+    </div>
+    
+    <!-- Tab Content for Termination -->
+    <div id="termination-tab" class="tools-tab-content">
+      <div class="coming-soon-container">
+        <h3>Termination & Account Suspension Generator</h3>
+        <p>Generate comprehensive termination clauses covering termination rights, procedures, post-termination obligations, and account suspension conditions tailored to your business model.</p>
+        <div>Coming Soon!</div>
       </div>
     </div>
   </div>
@@ -1222,6 +843,35 @@
         this.handleLiabilityCapChange();
         this.updateJurisdictionWarning();
         this.updatePreview();
+        this.setupTabNavigation();
+      },
+      
+      // Set up tab navigation
+      setupTabNavigation: function() {
+        const tabs = document.querySelectorAll('.tools-tab');
+        
+        tabs.forEach(tab => {
+          tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            document.querySelectorAll('.tools-tab').forEach(t => {
+              t.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            tab.classList.add('active');
+            
+            // Get the tab data-tab attribute
+            const tabName = tab.getAttribute('data-tab');
+            
+            // Hide all tab content
+            document.querySelectorAll('.tools-tab-content').forEach(content => {
+              content.classList.remove('active');
+            });
+            
+            // Show the corresponding tab content
+            document.getElementById(tabName + '-tab').classList.add('active');
+          });
+        });
       },
       
       // Apply industry preset
@@ -1938,350 +1588,3 @@
   </script>
 </body>
 </html>
-  
-  
-  
-  
-  
-  
-  
-  
-
-
-
-  <div id="ip-tab" class="tools-tab-content">
-    <!-- IP Rights Tab Content (Coming Soon) -->
-    <div class="coming-soon-container">
-      <div class="coming-soon-icon">🔜</div>
-      <h3 class="coming-soon-title">Intellectual Property Rights Generator</h3>
-      <p class="coming-soon-description">Create comprehensive IP rights clauses covering ownership, licenses, copyrights, trademarks, user-generated content, and more. Perfectly tailored to your business needs.</p>
-      <div class="coming-soon-notification">Coming Soon!</div>
-    </div>
-  </div>
-  
-  <div id="dispute-tab" class="tools-tab-content">
-    <!-- Dispute Resolution Tab Content (Coming Soon) -->
-    <div class="coming-soon-container">
-      <div class="coming-soon-icon">🔜</div>
-      <h3 class="coming-soon-title">Dispute Resolution Generator</h3>
-      <p class="coming-soon-description">Generate customized dispute resolution clauses with arbitration, jurisdiction, class action waiver, and attorney's fees provisions tailored to your jurisdiction and business requirements.</p>
-      <div class="coming-soon-notification">Coming Soon!</div>
-    </div>
-  </div>
-  
-  <div id="userconduct-tab" class="tools-tab-content">
-    <!-- User Obligations Tab Content (Coming Soon) -->
-    <div class="coming-soon-container">
-      <div class="coming-soon-icon">🔜</div>
-      <h3 class="coming-soon-title">User Obligations & Code of Conduct Generator</h3>
-      <p class="coming-soon-description">Create detailed user obligation clauses including acceptable use policies, prohibited activities, account security requirements, and content standards for your platform or service.</p>
-      <div class="coming-soon-notification">Coming Soon!</div>
-    </div>
-  </div>
-  
-  <div id="termination-tab" class="tools-tab-content">
-    <!-- Termination Tab Content (Coming Soon) -->
-    <div class="coming-soon-container">
-      <div class="coming-soon-icon">🔜</div>
-      <h3 class="coming-soon-title">Termination & Account Suspension Generator</h3>
-      <p class="coming-soon-description">Generate comprehensive termination clauses covering termination rights, procedures, post-termination obligations, and account suspension conditions tailored to your business model.</p>
-      <div class="coming-soon-notification">Coming Soon!</div>
-    </div>
-  </div>
-  
-</div>
-
-<script>
-(function() {
-  // State variables
-  let isPaid = false;
-  
-  // UI Elements
-  const paywallOverlay = document.getElementById('paywall-overlay');
-  const paywallBackdrop = document.getElementById('paywall-backdrop');
-  const paywallClose = document.getElementById('paywall-close');
-  const premiumBadge = document.getElementById('premium-badge');
-  const successOverlay = document.getElementById('success-overlay');
-  const successButton = document.getElementById('success-button');
-  const warrantyFade = document.getElementById('warranty-fade');
-  const recoverAccessBtn = document.getElementById('recover-access-btn');
-  const transactionIdInput = document.getElementById('transaction-id-input');
-  
-  // Constants
-  const FORM_DATA_KEY = 'touGeneratorFormData';
-  const PAYMENT_KEY = 'touGeneratorsPaid';
-  const AUTO_RETURN_PARAM = 'pmt_token48432s';
-  
-  // Initialize the page
-  function init() {
-    // Check for payment in URL (auto-return)
-    checkPaymentInUrl();
-    
-    // Check if already paid
-    checkPaidStatus();
-    
-    // Initialize tabs
-    initializeTabs();
-    
-    // Set up success overlay button
-    setupSuccessButton();
-    
-    // Set up paywall close button
-    setupPaywallClose();
-    
-    // Set up recovery button
-    setupRecoveryFeatures();
-    
-    // Disable copy and MS Word buttons until paid
-    disableButtonsUntilPaid();
-    
-    // Save form data before payment
-    setupFormDataSaving();
-  }
-  
-  // Check if user has already paid
-  function checkPaidStatus() {
-    if (localStorage.getItem(PAYMENT_KEY) === 'true') {
-      isPaid = true;
-      markAsPaid();
-    }
-  }
-  
-  // Check for payment in URL parameters (auto-return)
-  function checkPaymentInUrl() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const paymentParam = urlParams.get(AUTO_RETURN_PARAM);
-    
-    if (paymentParam || urlParams.get('tx') || urlParams.get('token') || urlParams.get('paymentId')) {
-      console.log('Payment detected in URL');
-      isPaid = true;
-      markAsPaid();
-      showSuccess();
-      
-      // Store the transaction ID if available
-      if (urlParams.get('tx')) {
-        localStorage.setItem('touGeneratorTransactionId', urlParams.get('tx'));
-      }
-    }
-  }
-  
-  // Initialize tabs
-  function initializeTabs() {
-    const tabs = document.querySelectorAll('.tools-tab');
-    const tabContents = document.querySelectorAll('.tools-tab-content');
-    
-    tabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        // Remove active class from all tabs and contents
-        tabs.forEach(t => t.classList.remove('active'));
-        tabContents.forEach(c => c.classList.remove('active'));
-        
-        // Add active class to clicked tab and corresponding content
-        tab.classList.add('active');
-        const tabId = tab.getAttribute('data-tab');
-        document.getElementById(`${tabId}-tab`).classList.add('active');
-      });
-    });
-  }
-  
-  // Disable copy and MS Word buttons until paid
-  function disableButtonsUntilPaid() {
-    // Using event capturing to prevent default behavior
-    document.addEventListener('click', function(e) {
-      if (!isPaid && (e.target.classList.contains('copy-btn') || e.target.closest('.copy-btn'))) {
-        e.preventDefault();
-        e.stopPropagation();
-        showPaywall();
-        return false;
-      }
-    }, true);
-  }
-  
-  // Set up form data saving before payment
-  function setupFormDataSaving() {
-    // Save form data before PayPal redirect
-    const form = document.querySelector('form[action*="paypal.com"]');
-    if (form) {
-      form.addEventListener('submit', function(e) {
-        saveFormData();
-      });
-    }
-  }
-  
-  // Save form data to localStorage
-  function saveFormData() {
-    try {
-      // Collect data from the active generator
-      const formData = collectFormData();
-      
-      // Store in localStorage
-      localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
-      
-      console.log('Form data saved before payment');
-    } catch (e) {
-      console.error('Error saving form data:', e);
-    }
-  }
-  
-  // Collect form data from current tab
-  function collectFormData() {
-    const formData = {};
-    
-    // Find active tab content
-    const activeTab = document.querySelector('.tools-tab-content.active');
-    if (!activeTab) return formData;
-    
-    // Get all form elements in active tab
-    const formElements = activeTab.querySelectorAll('input, select, textarea');
-    formElements.forEach(el => {
-      if (el.type === 'checkbox' || el.type === 'radio') {
-        formData[el.id] = el.checked;
-      } else {
-        formData[el.id] = el.value;
-      }
-    });
-    
-    return formData;
-  }
-  
-  // Restore form data from localStorage
-  function restoreFormData() {
-    try {
-      const savedData = localStorage.getItem(FORM_DATA_KEY);
-      if (!savedData) return false;
-      
-      const formData = JSON.parse(savedData);
-      
-      // Apply to form elements
-      Object.keys(formData).forEach(key => {
-        const el = document.getElementById(key);
-        if (el) {
-          if (el.type === 'checkbox' || el.type === 'radio') {
-            el.checked = formData[key];
-          } else {
-            el.value = formData[key];
-          }
-        }
-      });
-      
-      // Update previews after restoring data
-      if (window.warrantyLiabilityGenerator && typeof window.warrantyLiabilityGenerator.updatePreview === 'function') {
-        window.warrantyLiabilityGenerator.updatePreview();
-      }
-      
-      return true;
-    } catch (e) {
-      console.error('Error restoring form data:', e);
-      return false;
-    }
-  }
-  
-  // Set up paywall close button
-  function setupPaywallClose() {
-    paywallClose.addEventListener('click', function() {
-      hidePaywall();
-    });
-    
-    // Also close when clicking on backdrop
-    paywallBackdrop.addEventListener('click', function() {
-      hidePaywall();
-    });
-  }
-  
-  // Show paywall popup
-  function showPaywall() {
-    paywallOverlay.style.display = 'flex';
-    paywallBackdrop.style.display = 'block';
-  }
-  
-  // Hide paywall popup
-  function hidePaywall() {
-    paywallOverlay.style.display = 'none';
-    paywallBackdrop.style.display = 'none';
-  }
-  
-  // Set up success button
-  function setupSuccessButton() {
-    successButton.addEventListener('click', function() {
-      successOverlay.style.display = 'none';
-      
-      // Restore form data if available
-      restoreFormData();
-    });
-  }
-  
-  // Set up recovery features
-  function setupRecoveryFeatures() {
-    recoverAccessBtn.addEventListener('click', function() {
-      const txnId = transactionIdInput.value.trim();
-      
-      if (txnId && isValidPayPalTransactionId(txnId)) {
-        markAsPaid(txnId);
-        hidePaywall();
-        showSuccess();
-      } else {
-        alert('Please enter a valid PayPal Transaction ID');
-      }
-    });
-  }
-  
-  // Basic validation for PayPal transaction IDs
-  function isValidPayPalTransactionId(txnId) {
-    // PayPal transaction IDs are typically alphanumeric and may include hyphens
-    return /^[a-zA-Z0-9\-]{10,30}$/.test(txnId);
-  }
-  
-  // Function to mark as paid
-  function markAsPaid(transactionId) {
-    isPaid = true;
-    localStorage.setItem(PAYMENT_KEY, 'true');
-    
-    // Store transaction ID if provided
-    if (transactionId) {
-      localStorage.setItem('touGeneratorTransactionId', transactionId);
-    }
-    
-    // Hide paywall and backdrop
-    hidePaywall();
-    
-    // Show premium badge
-    premiumBadge.style.display = 'block';
-    
-    // Remove fade effects
-    warrantyFade.style.display = 'none';
-    
-    // Enable copy buttons and Word buttons
-    const copyBtns = document.querySelectorAll('.copy-btn');
-    copyBtns.forEach(btn => {
-      btn.style.opacity = '1';
-      btn.style.cursor = 'pointer';
-      if (btn.hasAttribute('disabled')) {
-        btn.removeAttribute('disabled');
-      }
-    });
-    
-    // Enable selection in preview panes
-    const previewContents = document.querySelectorAll('.preview-content');
-    previewContents.forEach(preview => {
-      preview.style.userSelect = 'text';
-    });
-    
-    // Restore form data if it exists
-    restoreFormData();
-    
-    console.log('Paywall unlocked');
-  }
-  
-  // Function to show success overlay
-  function showSuccess() {
-    successOverlay.style.display = 'flex';
-  }
-  
-  // Initialize the page
-  init();
-  
-  // Make the markAsPaid function globally available for generators to access
-  window.markTouGeneratorAsPaid = markAsPaid;
-})();
-</script>
-<!-- /wp:html -->
