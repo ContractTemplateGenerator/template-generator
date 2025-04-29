@@ -50,7 +50,7 @@
         .generator-content {
             display: flex;
             gap: 20px;
-            min-height: 400px;
+            min-height: 500px;
         }
         
         .options-panel {
@@ -67,6 +67,39 @@
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow-y: auto;
+        }
+        
+        .tab-navigation {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab-button {
+            padding: 10px 15px;
+            background-color: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+        
+        .tab-button:hover {
+            background-color: rgba(0, 105, 255, 0.05);
+        }
+        
+        .tab-button.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
         
         .form-group {
@@ -127,6 +160,16 @@
             display: none;
         }
         
+        .checkbox-option {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .checkbox-option input {
+            margin-right: 10px;
+        }
+        
         .btn {
             padding: 8px 16px;
             background-color: var(--primary-color);
@@ -148,6 +191,12 @@
         
         .btn-secondary:hover {
             background-color: #5a6268;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
         }
         
         .preview-title {
@@ -183,148 +232,441 @@
                 width: 100%;
             }
         }
+        
+        .info-tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            font-size: 14px;
+            color: var(--primary-color);
+            cursor: help;
+        }
+        
+        .info-tooltip .tooltip-text {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 4px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -125px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        
+        .info-tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .calendly-widget-area {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .calendly-link {
+            display: inline-block;
+            margin-top: 10px;
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+        
+        .calendly-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
     <div class="generator-container">
         <div class="generator-header">
-            <h2>Money-Back Guarantee Generator</h2>
-            <p>Create a customized money-back guarantee clause for your client service agreements</p>
+            <h2>Professional Money-Back Guarantee Generator</h2>
+            <p>Create a legally sound money-back guarantee clause tailored to your business needs</p>
         </div>
         
         <div class="generator-content">
             <!-- Options Panel -->
             <div class="options-panel">
+                <div class="tab-navigation">
+                    <button class="tab-button active" onclick="openTab(event, 'basicInfo')">Basic Info</button>
+                    <button class="tab-button" onclick="openTab(event, 'guaranteeOptions')">Guarantee Structure</button>
+                    <button class="tab-button" onclick="openTab(event, 'refundDetails')">Refund Details</button>
+                    <button class="tab-button" onclick="openTab(event, 'legalTerms')">Legal Protections</button>
+                </div>
+                
                 <form id="guaranteeForm">
-                    <div class="form-group">
-                        <label for="businessName">Business/Service Provider Name:</label>
-                        <input type="text" id="businessName" class="form-control" value="[Your Business Name]">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="serviceName">Service/Product Name (Optional):</label>
-                        <input type="text" id="serviceName" class="form-control" placeholder="e.g., Web Development Services">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Guarantee Type:</label>
-                        <div class="option-group">
-                            <div class="radio-option selected" onclick="selectOption(this, 'guaranteeType')">
-                                <input type="radio" name="guaranteeType" value="full" checked> 
-                                <div>
-                                    <strong>Full Money-Back Guarantee</strong>
-                                    <div>100% refund of the purchase price</div>
-                                </div>
-                            </div>
-                            
-                            <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
-                                <input type="radio" name="guaranteeType" value="partial"> 
-                                <div>
-                                    <strong>Partial Money-Back Guarantee</strong>
-                                    <div>Refund a portion of the purchase price</div>
-                                </div>
-                            </div>
-                            
-                            <div class="sub-options" id="partialOptions">
-                                <div class="form-group">
-                                    <label for="refundPercentage">Refund Percentage:</label>
-                                    <select id="refundPercentage" class="form-control">
-                                        <option value="75">75%</option>
-                                        <option value="50" selected>50%</option>
-                                        <option value="25">25%</option>
-                                        <option value="custom">Custom Percentage</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group" id="customPercentageGroup" style="display: none;">
-                                    <label for="customPercentage">Custom Percentage (%):</label>
-                                    <input type="number" id="customPercentage" class="form-control" value="50" min="1" max="99">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="exclusions">Exclusions (fees/costs not refundable):</label>
-                                    <input type="text" id="exclusions" class="form-control" placeholder="e.g., setup fees, third-party costs">
-                                </div>
-                            </div>
-                            
-                            <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
-                                <input type="radio" name="guaranteeType" value="conditional"> 
-                                <div>
-                                    <strong>Conditional Money-Back Guarantee</strong>
-                                    <div>Refund only if certain conditions are met</div>
-                                </div>
-                            </div>
-                            
-                            <div class="sub-options" id="conditionalOptions">
-                                <div class="form-group">
-                                    <label for="conditions">Refund Conditions:</label>
-                                    <textarea id="conditions" class="form-control" placeholder="e.g., Client must demonstrate that service failed to achieve stated objectives">Client must demonstrate that the service failed to meet the specifications outlined in the service agreement.</textarea>
-                                </div>
-                            </div>
-                            
-                            <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
-                                <input type="radio" name="guaranteeType" value="timeLimited"> 
-                                <div>
-                                    <strong>Time-Limited Money-Back Guarantee</strong>
-                                    <div>Full refund available within a specific time period</div>
-                                </div>
-                            </div>
-                            
-                            <div class="sub-options" id="timeLimitedOptions">
-                                <div class="form-group">
-                                    <label for="timeFrame">Time Frame:</label>
-                                    <select id="timeFrame" class="form-control">
-                                        <option value="7">7 days</option>
-                                        <option value="14" selected>14 days</option>
-                                        <option value="30">30 days</option>
-                                        <option value="60">60 days</option>
-                                        <option value="90">90 days</option>
-                                        <option value="custom">Custom period</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="form-group" id="customTimeGroup" style="display: none;">
-                                    <label for="customTimePeriod">Custom Time Period (days):</label>
-                                    <input type="number" id="customTimePeriod" class="form-control" value="14" min="1" max="365">
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="startingPoint">Starting Point:</label>
-                                    <select id="startingPoint" class="form-control">
-                                        <option value="purchase" selected>Date of purchase</option>
-                                        <option value="delivery">Date of service delivery</option>
-                                        <option value="completion">Project completion</option>
-                                    </select>
-                                </div>
-                            </div>
+                    <!-- Basic Info Tab -->
+                    <div id="basicInfo" class="tab-content active">
+                        <div class="form-group">
+                            <label for="businessName">Business/Service Provider Name:</label>
+                            <input type="text" id="businessName" class="form-control" value="[Your Business Name]">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="serviceName">Service/Product Name (Optional):</label>
+                            <input type="text" id="serviceName" class="form-control" placeholder="e.g., Web Development Services">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="businessType">Business Type:</label>
+                            <select id="businessType" class="form-control">
+                                <option value="service" selected>Service Provider</option>
+                                <option value="product">Physical Product Seller</option>
+                                <option value="digital">Digital Product Seller</option>
+                                <option value="subscription">Subscription Service</option>
+                                <option value="saas">Software as a Service (SaaS)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="jurisdiction">Primary Jurisdiction: <span class="info-tooltip">ⓘ<span class="tooltip-text">The jurisdiction where your business is registered or primarily operates. This may affect the legal requirements of your guarantee.</span></span></label>
+                            <select id="jurisdiction" class="form-control">
+                                <option value="US" selected>United States</option>
+                                <option value="EU">European Union</option>
+                                <option value="UK">United Kingdom</option>
+                                <option value="CA">Canada</option>
+                                <option value="AU">Australia</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="stateJurisdictionGroup">
+                            <label for="stateJurisdiction">State Jurisdiction (if US):</label>
+                            <select id="stateJurisdiction" class="form-control">
+                                <option value="CA" selected>California</option>
+                                <option value="NY">New York</option>
+                                <option value="TX">Texas</option>
+                                <option value="FL">Florida</option>
+                                <option value="IL">Illinois</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="navigation-buttons">
+                            <div></div> <!-- Empty div for spacing -->
+                            <button type="button" class="btn" onclick="navigateTab('next')">Next</button>
                         </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="additionalTerms">Additional Terms (Optional):</label>
-                        <textarea id="additionalTerms" class="form-control" placeholder="e.g., Refund request must be submitted in writing, Refund will be processed within 14 business days"></textarea>
+                    <!-- Guarantee Options Tab -->
+                    <div id="guaranteeOptions" class="tab-content">
+                        <div class="form-group">
+                            <label>Guarantee Type:</label>
+                            <div class="option-group">
+                                <div class="radio-option selected" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="full" checked> 
+                                    <div>
+                                        <strong>Full Money-Back Guarantee</strong>
+                                        <div>100% refund of the purchase price</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="partial"> 
+                                    <div>
+                                        <strong>Partial Money-Back Guarantee</strong>
+                                        <div>Refund a portion of the purchase price</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sub-options" id="partialOptions">
+                                    <div class="form-group">
+                                        <label for="refundPercentage">Refund Percentage:</label>
+                                        <select id="refundPercentage" class="form-control">
+                                            <option value="90">90%</option>
+                                            <option value="75">75%</option>
+                                            <option value="50" selected>50%</option>
+                                            <option value="25">25%</option>
+                                            <option value="custom">Custom Percentage</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" id="customPercentageGroup" style="display: none;">
+                                        <label for="customPercentage">Custom Percentage (%):</label>
+                                        <input type="number" id="customPercentage" class="form-control" value="50" min="1" max="99">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="exclusions">Exclusions (fees/costs not refundable):</label>
+                                        <input type="text" id="exclusions" class="form-control" placeholder="e.g., setup fees, third-party costs">
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="conditional"> 
+                                    <div>
+                                        <strong>Conditional Money-Back Guarantee</strong>
+                                        <div>Refund only if certain conditions are met</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sub-options" id="conditionalOptions">
+                                    <div class="form-group">
+                                        <label for="conditions">Refund Conditions:</label>
+                                        <textarea id="conditions" class="form-control" placeholder="e.g., Client must demonstrate that service failed to achieve stated objectives">Client must demonstrate that the service failed to meet the specifications outlined in the service agreement through documented evidence of non-conformance.</textarea>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="verificationProcess">Verification Process:</label>
+                                        <textarea id="verificationProcess" class="form-control" placeholder="e.g., How you will verify that conditions were met">Business will review client's evidence of non-conformance and make a determination within 10 business days of submission.</textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="timeLimited"> 
+                                    <div>
+                                        <strong>Time-Limited Money-Back Guarantee</strong>
+                                        <div>Full refund available within a specific time period</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sub-options" id="timeLimitedOptions">
+                                    <div class="form-group">
+                                        <label for="timeFrame">Time Frame:</label>
+                                        <select id="timeFrame" class="form-control">
+                                            <option value="7">7 days</option>
+                                            <option value="14" selected>14 days</option>
+                                            <option value="30">30 days</option>
+                                            <option value="60">60 days</option>
+                                            <option value="90">90 days</option>
+                                            <option value="custom">Custom period</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="form-group" id="customTimeGroup" style="display: none;">
+                                        <label for="customTimePeriod">Custom Time Period (days):</label>
+                                        <input type="number" id="customTimePeriod" class="form-control" value="14" min="1" max="365">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="startingPoint">Starting Point:</label>
+                                        <select id="startingPoint" class="form-control">
+                                            <option value="purchase" selected>Date of purchase</option>
+                                            <option value="delivery">Date of service delivery</option>
+                                            <option value="completion">Project completion</option>
+                                            <option value="firstUse">First use of the product/service</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="tiered"> 
+                                    <div>
+                                        <strong>Tiered Money-Back Guarantee</strong>
+                                        <div>Different refund amounts based on time or usage</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sub-options" id="tieredOptions">
+                                    <div class="form-group">
+                                        <label for="tier1Period">Tier 1 Period (days):</label>
+                                        <input type="number" id="tier1Period" class="form-control" value="7" min="1" max="365">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="tier1Percentage">Tier 1 Refund Percentage:</label>
+                                        <input type="number" id="tier1Percentage" class="form-control" value="100" min="1" max="100">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="tier2Period">Tier 2 Period (days):</label>
+                                        <input type="number" id="tier2Period" class="form-control" value="30" min="1" max="365">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="tier2Percentage">Tier 2 Refund Percentage:</label>
+                                        <input type="number" id="tier2Percentage" class="form-control" value="50" min="1" max="100">
+                                    </div>
+                                </div>
+                                
+                                <div class="radio-option" onclick="selectOption(this, 'guaranteeType')">
+                                    <input type="radio" name="guaranteeType" value="satisfaction"> 
+                                    <div>
+                                        <strong>Satisfaction Guarantee</strong>
+                                        <div>Refund based on client satisfaction criteria</div>
+                                    </div>
+                                </div>
+                                
+                                <div class="sub-options" id="satisfactionOptions">
+                                    <div class="form-group">
+                                        <label for="satisfactionCriteria">Satisfaction Criteria:</label>
+                                        <textarea id="satisfactionCriteria" class="form-control" placeholder="e.g., Specify criteria for satisfaction">Client's subjective satisfaction with the delivered service, without requirement to specify reason for dissatisfaction.</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="navigation-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTab('prev')">Previous</button>
+                            <button type="button" class="btn" onclick="navigateTab('next')">Next</button>
+                        </div>
                     </div>
                     
-                    <div class="form-group">
-                        <label for="refundMethod">Refund Method:</label>
-                        <select id="refundMethod" class="form-control">
-                            <option value="original" selected>Original payment method</option>
-                            <option value="credit">Account credit</option>
-                            <option value="check">Check/bank transfer</option>
-                            <option value="choice">Client's choice</option>
-                        </select>
+                    <!-- Refund Details Tab -->
+                    <div id="refundDetails" class="tab-content">
+                        <div class="form-group">
+                            <label for="refundMethod">Refund Method:</label>
+                            <select id="refundMethod" class="form-control">
+                                <option value="original" selected>Original payment method</option>
+                                <option value="credit">Account credit</option>
+                                <option value="check">Check/bank transfer</option>
+                                <option value="choice">Client's choice</option>
+                                <option value="partial_services">Partial services credit</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="refundTimeline">Refund Processing Timeline:</label>
+                            <select id="refundTimeline" class="form-control">
+                                <option value="immediate">Immediate (within 24 hours)</option>
+                                <option value="3days">Within 3 business days</option>
+                                <option value="5days">Within 5 business days</option>
+                                <option value="7days">Within 7 business days</option>
+                                <option value="14days" selected>Within 14 business days</option>
+                                <option value="30days">Within 30 business days</option>
+                                <option value="custom">Custom timeline</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="customTimelineGroup" style="display: none;">
+                            <label for="customTimeline">Custom Timeline (days):</label>
+                            <input type="number" id="customTimeline" class="form-control" value="14" min="1" max="90">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="requestMethod">Refund Request Method:</label>
+                            <select id="requestMethod" class="form-control">
+                                <option value="email" selected>Email</option>
+                                <option value="form">Online form</option>
+                                <option value="phone">Phone call</option>
+                                <option value="writing">In writing via mail</option>
+                                <option value="multiple">Multiple channels</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="requestEmailGroup">
+                            <label for="requestEmail">Request Email Address (Optional):</label>
+                            <input type="text" id="requestEmail" class="form-control" placeholder="e.g., refunds@yourbusiness.com">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="documentationRequired">Documentation Required for Refund:</label>
+                            <select id="documentationRequired" class="form-control">
+                                <option value="none" selected>None</option>
+                                <option value="receipt">Proof of purchase</option>
+                                <option value="issues">Documentation of issues</option>
+                                <option value="form">Completed refund form</option>
+                                <option value="custom">Custom documentation</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group" id="customDocumentationGroup" style="display: none;">
+                            <label for="customDocumentation">Specify Required Documentation:</label>
+                            <textarea id="customDocumentation" class="form-control" placeholder="e.g., Specify exact documentation needed"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Additional Refund Terms:</label>
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="unusedRequirement" class="form-check-input">
+                                <label for="unusedRequirement">Product/service must be unused/partially used</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="originalPackaging" class="form-check-input">
+                                <label for="originalPackaging">Original packaging/materials required</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="returnShipping" class="form-check-input">
+                                <label for="returnShipping">Client responsible for return shipping</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="restockingFee" class="form-check-input">
+                                <label for="restockingFee">Restocking/processing fee applies</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="restockingFeeGroup" style="display: none;">
+                            <label for="restockingFeeAmount">Restocking/Processing Fee (%):</label>
+                            <input type="number" id="restockingFeeAmount" class="form-control" value="15" min="1" max="50">
+                        </div>
+                        
+                        <div class="navigation-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTab('prev')">Previous</button>
+                            <button type="button" class="btn" onclick="navigateTab('next')">Next</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Legal Protections Tab -->
+                    <div id="legalTerms" class="tab-content">
+                        <div class="form-group">
+                            <label>Legal Protections to Include:</label>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="fraudProtection" class="form-check-input" checked>
+                                <label for="fraudProtection">Fraud prevention clause</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="abuseProtection" class="form-check-input" checked>
+                                <label for="abuseProtection">Abuse prevention clause</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="modificationRights" class="form-check-input" checked>
+                                <label for="modificationRights">Right to modify guarantee terms</label>
+                            </div>
+                            
+                            <div class="checkbox-option">
+                                <input type="checkbox" id="disputeResolution" class="form-check-input">
+                                <label for="disputeResolution">Dispute resolution process</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group" id="disputeResolutionGroup" style="display: none;">
+                            <label for="disputeResolutionMethod">Dispute Resolution Method:</label>
+                            <select id="disputeResolutionMethod" class="form-control">
+                                <option value="mediation" selected>Mediation</option>
+                                <option value="arbitration">Binding arbitration</option>
+                                <option value="internal">Internal review process</option>
+                                <option value="court">Court in relevant jurisdiction</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="additionalTerms">Additional Terms (Optional):</label>
+                            <textarea id="additionalTerms" class="form-control" placeholder="e.g., Any other specific terms or conditions for your guarantee"></textarea>
+                        </div>
+                        
+                        <div class="navigation-buttons">
+                            <button type="button" class="btn btn-secondary" onclick="navigateTab('prev')">Previous</button>
+                            <button type="button" class="btn" onclick="generateFinal()">Generate Guarantee</button>
+                        </div>
                     </div>
                 </form>
+                
+                <div class="calendly-widget-area">
+                    <p>Need personalized legal advice for your business?</p>
+                    <a href="" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;" class="calendly-link">Schedule a consultation</a>
+                </div>
             </div>
             
             <!-- Preview Panel -->
             <div class="preview-panel">
-                <h3 class="preview-title">Guarantee Clause Preview</h3>
+                <h3 class="preview-title">Money-Back Guarantee Preview</h3>
                 <div class="preview-content" id="preview"></div>
                 
                 <div class="action-buttons">
-                    <button class="btn" id="copyBtn" onclick="copyToClipboard()">Copy Text</button>
-                    <button class="btn" id="downloadBtn" onclick="downloadText()">Download</button>
+                    <button class="btn" id="downloadBtn" onclick="downloadText()">Download as Text</button>
                 </div>
             </div>
         </div>
@@ -333,9 +675,22 @@
     <script>
         // Initialize form elements and preview
         document.addEventListener('DOMContentLoaded', function() {
-            // Set all form event listeners
+            // Set form event listeners
             document.getElementById('businessName').addEventListener('input', updatePreview);
             document.getElementById('serviceName').addEventListener('input', updatePreview);
+            document.getElementById('businessType').addEventListener('change', updatePreview);
+            document.getElementById('jurisdiction').addEventListener('change', function() {
+                const stateGroup = document.getElementById('stateJurisdictionGroup');
+                if (this.value === 'US') {
+                    stateGroup.style.display = 'block';
+                } else {
+                    stateGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('stateJurisdiction').addEventListener('change', updatePreview);
+            
+            // Refund percentage event listeners
             document.getElementById('refundPercentage').addEventListener('change', function() {
                 const customGroup = document.getElementById('customPercentageGroup');
                 if (this.value === 'custom') {
@@ -347,7 +702,12 @@
             });
             document.getElementById('customPercentage').addEventListener('input', updatePreview);
             document.getElementById('exclusions').addEventListener('input', updatePreview);
+            
+            // Conditional guarantee listeners
             document.getElementById('conditions').addEventListener('input', updatePreview);
+            document.getElementById('verificationProcess').addEventListener('input', updatePreview);
+            
+            // Time-limited guarantee listeners
             document.getElementById('timeFrame').addEventListener('change', function() {
                 const customGroup = document.getElementById('customTimeGroup');
                 if (this.value === 'custom') {
@@ -359,12 +719,140 @@
             });
             document.getElementById('customTimePeriod').addEventListener('input', updatePreview);
             document.getElementById('startingPoint').addEventListener('change', updatePreview);
-            document.getElementById('additionalTerms').addEventListener('input', updatePreview);
+            
+            // Tiered guarantee listeners
+            document.getElementById('tier1Period').addEventListener('input', updatePreview);
+            document.getElementById('tier1Percentage').addEventListener('input', updatePreview);
+            document.getElementById('tier2Period').addEventListener('input', updatePreview);
+            document.getElementById('tier2Percentage').addEventListener('input', updatePreview);
+            
+            // Satisfaction guarantee listeners
+            document.getElementById('satisfactionCriteria').addEventListener('input', updatePreview);
+            
+            // Refund details listeners
             document.getElementById('refundMethod').addEventListener('change', updatePreview);
+            document.getElementById('refundTimeline').addEventListener('change', function() {
+                const customGroup = document.getElementById('customTimelineGroup');
+                if (this.value === 'custom') {
+                    customGroup.style.display = 'block';
+                } else {
+                    customGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('customTimeline').addEventListener('input', updatePreview);
+            document.getElementById('requestMethod').addEventListener('change', function() {
+                const emailGroup = document.getElementById('requestEmailGroup');
+                if (this.value === 'email' || this.value === 'multiple') {
+                    emailGroup.style.display = 'block';
+                } else {
+                    emailGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('requestEmail').addEventListener('input', updatePreview);
+            document.getElementById('documentationRequired').addEventListener('change', function() {
+                const customGroup = document.getElementById('customDocumentationGroup');
+                if (this.value === 'custom') {
+                    customGroup.style.display = 'block';
+                } else {
+                    customGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('customDocumentation').addEventListener('input', updatePreview);
+            
+            // Additional refund terms listeners
+            document.getElementById('unusedRequirement').addEventListener('change', updatePreview);
+            document.getElementById('originalPackaging').addEventListener('change', updatePreview);
+            document.getElementById('returnShipping').addEventListener('change', updatePreview);
+            document.getElementById('restockingFee').addEventListener('change', function() {
+                const feeGroup = document.getElementById('restockingFeeGroup');
+                if (this.checked) {
+                    feeGroup.style.display = 'block';
+                } else {
+                    feeGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('restockingFeeAmount').addEventListener('input', updatePreview);
+            
+            // Legal protections listeners
+            document.getElementById('fraudProtection').addEventListener('change', updatePreview);
+            document.getElementById('abuseProtection').addEventListener('change', updatePreview);
+            document.getElementById('modificationRights').addEventListener('change', updatePreview);
+            document.getElementById('disputeResolution').addEventListener('change', function() {
+                const disputeGroup = document.getElementById('disputeResolutionGroup');
+                if (this.checked) {
+                    disputeGroup.style.display = 'block';
+                } else {
+                    disputeGroup.style.display = 'none';
+                }
+                updatePreview();
+            });
+            document.getElementById('disputeResolutionMethod').addEventListener('change', updatePreview);
+            document.getElementById('additionalTerms').addEventListener('input', updatePreview);
             
             // Initialize preview
             updatePreview();
         });
+        
+        // Tab navigation functions
+        function openTab(evt, tabName) {
+            // Hide all tab content
+            var tabContents = document.getElementsByClassName("tab-content");
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+            
+            // Remove active class from all tab buttons
+            var tabButtons = document.getElementsByClassName("tab-button");
+            for (var i = 0; i < tabButtons.length; i++) {
+                tabButtons[i].classList.remove("active");
+            }
+            
+            // Show the selected tab content and mark button as active
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+            
+            // Update preview
+            updatePreview();
+        }
+        
+        function navigateTab(direction) {
+            // Get all tab content divs
+            const tabs = Array.from(document.getElementsByClassName("tab-content"));
+            const buttons = Array.from(document.getElementsByClassName("tab-button"));
+            
+            // Find the active tab
+            const activeTabIndex = tabs.findIndex(tab => tab.classList.contains("active"));
+            
+            if (direction === 'next' && activeTabIndex < tabs.length - 1) {
+                // Hide current tab, show next tab
+                tabs[activeTabIndex].classList.remove("active");
+                tabs[activeTabIndex + 1].classList.add("active");
+                
+                // Update tab buttons
+                buttons[activeTabIndex].classList.remove("active");
+                buttons[activeTabIndex + 1].classList.add("active");
+            } else if (direction === 'prev' && activeTabIndex > 0) {
+                // Hide current tab, show previous tab
+                tabs[activeTabIndex].classList.remove("active");
+                tabs[activeTabIndex - 1].classList.add("active");
+                
+                // Update tab buttons
+                buttons[activeTabIndex].classList.remove("active");
+                buttons[activeTabIndex - 1].classList.add("active");
+            }
+            
+            // Update preview
+            updatePreview();
+        }
+        
+        // Function to finalize guarantee generation
+        function generateFinal() {
+            updatePreview(true);
+        }
         
         // Function to select an option and show/hide relevant sub-options
         function selectOption(element, groupName) {
@@ -391,6 +879,10 @@
                 document.getElementById('conditionalOptions').style.display = 'block';
             } else if (input.value === 'timeLimited') {
                 document.getElementById('timeLimitedOptions').style.display = 'block';
+            } else if (input.value === 'tiered') {
+                document.getElementById('tieredOptions').style.display = 'block';
+            } else if (input.value === 'satisfaction') {
+                document.getElementById('satisfactionOptions').style.display = 'block';
             }
             
             // Update preview
@@ -399,22 +891,46 @@
         
         let lastPreviewContent = '';
         let highlightTimeout;
+        let elementsToHighlight = [];
         
         // Function to update the preview
-        function updatePreview() {
+        function updatePreview(isFinal = false) {
+            // Store previous preview content for comparison
+            const previousContent = lastPreviewContent;
+            
             // Get form values
             const businessName = document.getElementById('businessName').value || '[Your Business Name]';
             const serviceName = document.getElementById('serviceName').value;
+            const businessType = document.getElementById('businessType').value;
+            const jurisdiction = document.getElementById('jurisdiction').value;
+            const stateJurisdiction = document.getElementById('stateJurisdiction').value;
             const guaranteeType = document.querySelector('input[name="guaranteeType"]:checked').value;
             
-            // Build the guarantee clause
+            // Begin building the guarantee clause
             let guaranteeClause = '';
-            let serviceTerm = serviceName ? serviceName : 'services';
+            let serviceTerm = serviceName ? serviceName : getServiceTerm(businessType);
             
-            guaranteeClause += `<h4>MONEY-BACK GUARANTEE</h4>`;
+            // Create section IDs for highlighting
+            const sections = {
+                header: "guarantee-header",
+                main: "guarantee-main",
+                conditions: "guarantee-conditions",
+                process: "guarantee-process",
+                timeline: "guarantee-timeline",
+                refundMethod: "refund-method",
+                documentation: "documentation-requirements",
+                additionalTerms: "additional-terms",
+                legalProtections: "legal-protections",
+                modifications: "modifications-clause",
+                disputeResolution: "dispute-resolution"
+            };
             
+            // Generate the guarantee header
+            guaranteeClause += `<h4 id="${sections.header}">MONEY-BACK GUARANTEE</h4>`;
+            
+            // Generate the main guarantee clause based on type
             if (guaranteeType === 'full') {
-                guaranteeClause += `<p id="guarantee-main">${businessName} offers a full money-back guarantee. If you are not completely satisfied with our ${serviceTerm}, we will refund 100% of your payment.</p>`;
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a full money-back guarantee for our ${serviceTerm}. If for any reason you are not completely satisfied with the ${serviceTerm} provided, ${businessName} will refund 100% of your payment upon request.</p>`;
             }
             else if (guaranteeType === 'partial') {
                 let percentage = document.getElementById('refundPercentage').value;
@@ -424,18 +940,25 @@
                 
                 const exclusions = document.getElementById('exclusions').value;
                 
-                guaranteeClause += `<p id="guarantee-main">${businessName} offers a partial money-back guarantee. If you are not completely satisfied with our ${serviceTerm}, we will refund ${percentage}% of your payment`;
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a partial money-back guarantee for our ${serviceTerm}. If you are not completely satisfied with the ${serviceTerm} provided, ${businessName} will refund ${percentage}% of your payment`;
                 
                 if (exclusions) {
                     guaranteeClause += `, excluding ${exclusions}`;
                 }
                 
-                guaranteeClause += `.</p>`;
+                guaranteeClause += `. This partial refund reflects our commitment to client satisfaction while accounting for resources already allocated to your service.</p>`;
             }
             else if (guaranteeType === 'conditional') {
                 const conditions = document.getElementById('conditions').value;
+                const verificationProcess = document.getElementById('verificationProcess').value;
                 
-                guaranteeClause += `<p id="guarantee-main">${businessName} offers a conditional money-back guarantee. We will provide a full refund if the following conditions are met: ${conditions}</p>`;
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a conditional money-back guarantee for our ${serviceTerm}. We will provide a full refund if the following conditions are met:</p>`;
+                
+                guaranteeClause += `<p id="${sections.conditions}">${conditions}</p>`;
+                
+                if (verificationProcess) {
+                    guaranteeClause += `<p id="${sections.process}">Verification process: ${verificationProcess}</p>`;
+                }
             }
             else if (guaranteeType === 'timeLimited') {
                 let timePeriod = document.getElementById('timeFrame').value;
@@ -452,19 +975,57 @@
                     startingPointText = 'date of service delivery';
                 } else if (startingPoint === 'completion') {
                     startingPointText = 'project completion date';
+                } else if (startingPoint === 'firstUse') {
+                    startingPointText = 'first use of the product/service';
                 }
                 
-                guaranteeClause += `<p id="guarantee-main">${businessName} offers a time-limited money-back guarantee. If you are not completely satisfied with our ${serviceTerm}, you may request a full refund within ${timePeriod} days of the ${startingPointText}.</p>`;
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a time-limited money-back guarantee for our ${serviceTerm}. If you are not completely satisfied with our ${serviceTerm}, you may request a full refund within ${timePeriod} days of the ${startingPointText}. This guarantee allows you sufficient time to evaluate our ${serviceTerm} while providing a reasonable timeframe for refund requests.</p>`;
             }
-            
-            // Additional terms
-            const additionalTerms = document.getElementById('additionalTerms').value;
-            if (additionalTerms) {
-                guaranteeClause += `<p id="additional-terms">Additional terms: ${additionalTerms}</p>`;
+            else if (guaranteeType === 'tiered') {
+                const tier1Period = document.getElementById('tier1Period').value;
+                const tier1Percentage = document.getElementById('tier1Percentage').value;
+                const tier2Period = document.getElementById('tier2Period').value;
+                const tier2Percentage = document.getElementById('tier2Percentage').value;
+                
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a tiered money-back guarantee for our ${serviceTerm}, with refund amounts that vary based on the time elapsed:</p>`;
+                
+                guaranteeClause += `<ul id="${sections.timeline}">
+                    <li>Within ${tier1Period} days: ${tier1Percentage}% refund of the total paid amount</li>
+                    <li>Within ${tier2Period} days: ${tier2Percentage}% refund of the total paid amount</li>
+                    <li>After ${tier2Period} days: No refund available</li>
+                </ul>`;
+                
+                guaranteeClause += `<p>This tiered approach allows you to evaluate our ${serviceTerm} while accounting for the resources already invested in your project.</p>`;
+            }
+            else if (guaranteeType === 'satisfaction') {
+                const satisfactionCriteria = document.getElementById('satisfactionCriteria').value;
+                
+                guaranteeClause += `<p id="${sections.main}">${businessName} offers a satisfaction guarantee for our ${serviceTerm}. If you are not satisfied with the ${serviceTerm} provided based on the following criteria, we will provide a full refund:</p>`;
+                
+                guaranteeClause += `<p id="${sections.conditions}">${satisfactionCriteria}</p>`;
             }
             
             // Refund method
             const refundMethod = document.getElementById('refundMethod').value;
+            const refundTimeline = document.getElementById('refundTimeline').value;
+            let refundTimelineText = '';
+            
+            if (refundTimeline === 'immediate') {
+                refundTimelineText = 'within 24 hours';
+            } else if (refundTimeline === '3days') {
+                refundTimelineText = 'within 3 business days';
+            } else if (refundTimeline === '5days') {
+                refundTimelineText = 'within 5 business days';
+            } else if (refundTimeline === '7days') {
+                refundTimelineText = 'within 7 business days';
+            } else if (refundTimeline === '14days') {
+                refundTimelineText = 'within 14 business days';
+            } else if (refundTimeline === '30days') {
+                refundTimelineText = 'within 30 business days';
+            } else if (refundTimeline === 'custom') {
+                refundTimelineText = `within ${document.getElementById('customTimeline').value} business days`;
+            }
+            
             let refundMethodText = '';
             
             if (refundMethod === 'original') {
@@ -475,17 +1036,150 @@
                 refundMethodText = 'check or bank transfer';
             } else if (refundMethod === 'choice') {
                 refundMethodText = 'the method of your choice';
+            } else if (refundMethod === 'partial_services') {
+                refundMethodText = 'a combination of partial refund and service credit';
             }
             
-            guaranteeClause += `<p id="refund-method">All refunds will be processed via ${refundMethodText} within a reasonable time period.</p>`;
+            guaranteeClause += `<p id="${sections.refundMethod}">All approved refunds will be processed via ${refundMethodText} ${refundTimelineText} of the approved refund request.</p>`;
+            
+            // Refund request method
+            const requestMethod = document.getElementById('requestMethod').value;
+            const requestEmail = document.getElementById('requestEmail').value;
+            
+            guaranteeClause += `<h4>REFUND PROCESS</h4>`;
+            let requestMethodText = '';
+            
+            if (requestMethod === 'email') {
+                requestMethodText = `by email${requestEmail ? ' to ' + requestEmail : ''}`;
+            } else if (requestMethod === 'form') {
+                requestMethodText = 'through our online refund request form';
+            } else if (requestMethod === 'phone') {
+                requestMethodText = 'by phone to our customer service department';
+            } else if (requestMethod === 'writing') {
+                requestMethodText = 'in writing via postal mail';
+            } else if (requestMethod === 'multiple') {
+                requestMethodText = `through any of our support channels${requestEmail ? ', including email to ' + requestEmail : ''}`;
+            }
+            
+            guaranteeClause += `<p>To request a refund under this guarantee, please submit your request ${requestMethodText}. All refund requests must include your order information and the reason for your dissatisfaction.</p>`;
+            
+            // Documentation requirements
+            const documentationRequired = document.getElementById('documentationRequired').value;
+            let documentationText = '';
+            
+            if (documentationRequired === 'none') {
+                documentationText = 'No additional documentation is required to process your refund request.';
+            } else if (documentationRequired === 'receipt') {
+                documentationText = 'Please include proof of purchase (receipt or order number) with your refund request.';
+            } else if (documentationRequired === 'issues') {
+                documentationText = 'Please provide documentation of the issues experienced with our product/service as part of your refund request.';
+            } else if (documentationRequired === 'form') {
+                documentationText = 'A completed refund request form is required, which can be obtained from our customer service department.';
+            } else if (documentationRequired === 'custom') {
+                documentationText = document.getElementById('customDocumentation').value;
+            }
+            
+            guaranteeClause += `<p id="${sections.documentation}">${documentationText}</p>`;
+            
+            // Additional refund terms
+            let additionalRefundTerms = [];
+            
+            if (document.getElementById('unusedRequirement').checked) {
+                additionalRefundTerms.push('The product/service must be unused or only partially used.');
+            }
+            
+            if (document.getElementById('originalPackaging').checked) {
+                additionalRefundTerms.push('Original packaging or materials must be returned.');
+            }
+            
+            if (document.getElementById('returnShipping').checked) {
+                additionalRefundTerms.push('Client is responsible for return shipping costs.');
+            }
+            
+            if (document.getElementById('restockingFee').checked) {
+                const restockingFeeAmount = document.getElementById('restockingFeeAmount').value;
+                additionalRefundTerms.push(`A ${restockingFeeAmount}% restocking/processing fee will be deducted from the refund amount.`);
+            }
+            
+            if (additionalRefundTerms.length > 0) {
+                guaranteeClause += `<h4>ADDITIONAL REFUND TERMS</h4>`;
+                guaranteeClause += `<ul id="additional-refund-terms">`;
+                additionalRefundTerms.forEach(term => {
+                    guaranteeClause += `<li>${term}</li>`;
+                });
+                guaranteeClause += `</ul>`;
+            }
+            
+            // Legal protections
+            let legalProtections = [];
+            
+            if (document.getElementById('fraudProtection').checked) {
+                legalProtections.push(`${businessName} reserves the right to refuse refund requests that appear fraudulent, abusive, or violate the terms of this guarantee.`);
+            }
+            
+            if (document.getElementById('abuseProtection').checked) {
+                legalProtections.push(`Repeated refund requests from the same client may be subject to additional review. Abuse of this guarantee may result in the termination of the client relationship and may be grounds for refusal of future refund requests.`);
+            }
+            
+            if (document.getElementById('modificationRights').checked) {
+                legalProtections.push(`${businessName} reserves the right to modify or discontinue this guarantee at any time. Any changes will not affect refund requests submitted prior to the modification date.`);
+            }
+            
+            if (legalProtections.length > 0) {
+                guaranteeClause += `<h4>LEGAL PROTECTIONS</h4>`;
+                guaranteeClause += `<p id="${sections.legalProtections}">`;
+                legalProtections.forEach((protection, index) => {
+                    guaranteeClause += protection;
+                    if (index < legalProtections.length - 1) {
+                        guaranteeClause += " ";
+                    }
+                });
+                guaranteeClause += `</p>`;
+            }
+            
+            // Dispute resolution
+            if (document.getElementById('disputeResolution').checked) {
+                const disputeResolutionMethod = document.getElementById('disputeResolutionMethod').value;
+                let disputeResolutionText = '';
+                
+                if (disputeResolutionMethod === 'mediation') {
+                    disputeResolutionText = 'non-binding mediation';
+                } else if (disputeResolutionMethod === 'arbitration') {
+                    disputeResolutionText = 'binding arbitration';
+                } else if (disputeResolutionMethod === 'internal') {
+                    disputeResolutionText = 'our internal review process';
+                } else if (disputeResolutionMethod === 'court') {
+                    let courtJurisdiction = '';
+                    if (jurisdiction === 'US') {
+                        courtJurisdiction = stateJurisdiction;
+                    } else {
+                        courtJurisdiction = jurisdiction;
+                    }
+                    
+                    disputeResolutionText = `courts in ${getJurisdictionName(courtJurisdiction)}`;
+                }
+                
+                guaranteeClause += `<h4>DISPUTE RESOLUTION</h4>`;
+                guaranteeClause += `<p id="${sections.disputeResolution}">Any disputes arising from this guarantee shall be resolved through ${disputeResolutionText}. This guarantee shall be governed by the laws of ${getJurisdictionName(jurisdiction === 'US' ? stateJurisdiction : jurisdiction)}.</p>`;
+            }
+            
+            // Additional terms
+            const additionalTerms = document.getElementById('additionalTerms').value;
+            if (additionalTerms) {
+                guaranteeClause += `<h4>ADDITIONAL TERMS</h4>`;
+                guaranteeClause += `<p id="${sections.additionalTerms}">${additionalTerms}</p>`;
+            }
+            
+            // Legal notice at the end
+            guaranteeClause += `<p><em>This money-back guarantee is part of the contractual agreement between ${businessName} and the client. By purchasing our ${serviceTerm}, you acknowledge that you have read, understood, and agree to the terms of this guarantee.</em></p>`;
             
             // Calculate what sections changed
             const newContent = guaranteeClause;
             const previewElement = document.getElementById('preview');
             
             // If content changed, highlight the changes
-            if (lastPreviewContent && lastPreviewContent !== newContent) {
-                // Find changed sections
+            if (previousContent && previousContent !== newContent && !isFinal) {
+                // Identify changed sections (a simplistic approach - find different parts)
                 previewElement.innerHTML = newContent;
                 
                 // Clear any existing highlights
@@ -493,18 +1187,31 @@
                     clearTimeout(highlightTimeout);
                 }
                 
-                // Find primary changed section (simplistic approach - just highlight guarantee-main)
-                const mainElement = document.getElementById('guarantee-main');
-                if (mainElement) {
-                    mainElement.classList.add('highlight');
-                    
-                    // Ensure the element is visible in the preview
-                    mainElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Remove highlight after a delay
-                    highlightTimeout = setTimeout(() => {
-                        mainElement.classList.remove('highlight');
-                    }, 1500);
+                // Clear previous highlights
+                document.querySelectorAll('.highlight').forEach(element => {
+                    element.classList.remove('highlight');
+                });
+                
+                // Highlight the most recently changed section
+                // This is a simplified approach - in a real implementation, 
+                // you'd want to do a more sophisticated diff to find exactly what changed
+                for (const sectionId of Object.values(sections)) {
+                    const sectionElement = document.getElementById(sectionId);
+                    if (sectionElement) {
+                        // For demonstration, we'll highlight the guarantee-main section
+                        // In a real implementation, you'd determine which section actually changed
+                        sectionElement.classList.add('highlight');
+                        
+                        // Ensure the element is visible in the preview
+                        sectionElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        
+                        // Remove highlight after a delay
+                        highlightTimeout = setTimeout(() => {
+                            sectionElement.classList.remove('highlight');
+                        }, 1500);
+                        
+                        break; // Just highlight one section for demonstration
+                    }
                 }
             } else {
                 previewElement.innerHTML = newContent;
@@ -514,27 +1221,69 @@
             lastPreviewContent = newContent;
         }
         
-        // Function to copy text to clipboard
-        function copyToClipboard() {
-            const previewText = document.getElementById('preview').innerText;
-            navigator.clipboard.writeText(previewText).then(() => {
-                const copyBtn = document.getElementById('copyBtn');
-                const originalText = copyBtn.innerText;
-                copyBtn.innerText = 'Copied!';
-                setTimeout(() => {
-                    copyBtn.innerText = originalText;
-                }, 2000);
-            });
+        // Helper function to get service term based on business type
+        function getServiceTerm(businessType) {
+            switch (businessType) {
+                case 'service':
+                    return 'services';
+                case 'product':
+                    return 'products';
+                case 'digital':
+                    return 'digital products';
+                case 'subscription':
+                    return 'subscription service';
+                case 'saas':
+                    return 'software service';
+                default:
+                    return 'services';
+            }
+        }
+        
+        // Helper function to get jurisdiction name
+        function getJurisdictionName(code) {
+            const jurisdictions = {
+                'US': 'United States',
+                'EU': 'European Union',
+                'UK': 'United Kingdom',
+                'CA': 'Canada',
+                'AU': 'Australia',
+                'CA': 'California',
+                'NY': 'New York',
+                'TX': 'Texas',
+                'FL': 'Florida',
+                'IL': 'Illinois',
+                'other': 'the applicable jurisdiction'
+            };
+            
+            return jurisdictions[code] || code;
         }
         
         // Function to download text
         function downloadText() {
             const businessName = document.getElementById('businessName').value || 'Business';
             const cleanBusinessName = businessName.replace(/[^a-z0-9]/gi, '-').toLowerCase();
-            const previewText = document.getElementById('preview').innerText;
+            
+            // Get the HTML content
+            const htmlContent = document.getElementById('preview').innerHTML;
+            
+            // Convert HTML to plain text (basic conversion)
+            let plainText = htmlContent
+                .replace(/<h4[^>]*>(.*?)<\/h4>/gi, '\n\n$1\n')
+                .replace(/<p[^>]*>(.*?)<\/p>/gi, '$1\n\n')
+                .replace(/<ul[^>]*>(.*?)<\/ul>/gi, '$1\n')
+                .replace(/<li[^>]*>(.*?)<\/li>/gi, '• $1\n')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/<[^>]*>/g, '')
+                .replace(/&nbsp;/g, ' ')
+                .replace(/&amp;/g, '&')
+                .replace(/&lt;/g, '<')
+                .replace(/&gt;/g, '>');
+            
+            // Normalize whitespace
+            plainText = plainText.replace(/\n\s*\n\s*\n/g, '\n\n');
             
             // Create a blob and download link
-            const blob = new Blob([previewText], { type: 'text/plain' });
+            const blob = new Blob([plainText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
