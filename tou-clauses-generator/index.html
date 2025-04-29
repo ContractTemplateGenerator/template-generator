@@ -1,0 +1,2167 @@
+<!-- wp:html -->
+<!-- Unified Paywall for Terms of Use Clause Generators -->
+<style>
+/* Paywall related styles */
+.tou-tools-paywall-container {
+  position: relative;
+  margin-bottom: 40px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+.tou-tools-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.tou-tools-header h3 {
+  font-size: 22px;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.tou-tools-header p {
+  color: #555;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Fixed paywall modal styles */
+.paywall-overlay {
+  display: none; /* Initially hidden, will be shown via JS */
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 500px;
+  background: white;
+  z-index: 1000;
+  padding: 25px;
+  text-align: center;
+  border-radius: 8px;
+  box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+}
+
+/* Close button for payment modal */
+.paywall-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 25px;
+  height: 25px;
+  background: #f1f1f1;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 25px;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1001;
+}
+
+.paywall-close:hover {
+  background: #e1e1e1;
+}
+
+/* Semi-transparent background overlay */
+.paywall-backdrop {
+  display: none; /* Initially hidden, will be shown via JS */
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 999;
+}
+
+.premium-badge {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #2c3e50;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  display: none;
+  z-index: 50;
+}
+
+.lock-icon {
+  font-size: 40px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.paywall-title {
+  font-size: 22px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
+.paywall-description {
+  margin-bottom: 15px;
+  max-width: 400px;
+  font-size: 14px;
+}
+
+.features-list {
+  text-align: left;
+  margin: 0 auto 20px;
+  max-width: 400px;
+  font-size: 14px;
+}
+
+.features-list li {
+  margin-bottom: 6px;
+  position: relative;
+  padding-left: 22px;
+}
+
+.features-list li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #27ae60;
+  font-weight: bold;
+}
+
+.payment-container {
+  margin-bottom: 15px;
+}
+
+/* Transaction ID Recovery Section */
+.recovery-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f5f5f5;
+  border-radius: 8px;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+
+.recovery-title {
+  font-weight: bold;
+  font-size: 16px;
+  color: #2c3e50;
+}
+
+.recovery-description {
+  font-size: 13px;
+  color: #555;
+}
+
+.recovery-input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+}
+
+.recovery-button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-top: 5px;
+}
+
+.recovery-button:hover {
+  background: #2980b9;
+}
+
+.success-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-message {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  max-width: 400px;
+  text-align: center;
+}
+
+.success-icon {
+  font-size: 40px;
+  color: #27ae60;
+  margin-bottom: 15px;
+}
+
+.success-title {
+  font-size: 22px;
+  margin-bottom: 15px;
+  color: #2c3e50;
+}
+
+.success-description {
+  margin-bottom: 20px;
+  color: #555;
+  font-size: 14px;
+}
+
+.success-button {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.success-button:hover {
+  background: #219653;
+}
+
+/* Modified preview fade effect */
+.preview-fade {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.9) 100%);
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* Specific generator adjustments */
+.clause-generator .preview-column {
+  position: relative;
+}
+
+.clause-generator .preview-content {
+  position: relative;
+  user-select: none;
+}
+
+/* Fixed button styles to ensure they're truly disabled until payment */
+.clause-generator .copy-btn {
+  opacity: 0.6;
+  cursor: not-allowed;
+  pointer-events: auto; /* We'll control the behavior with our event listeners */
+}
+
+/* New Buy Button */
+.unlock-button {
+  background: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 60;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.unlock-button:hover {
+  background: #2980b9;
+}
+
+/* Mobile Payment Notice */
+.mobile-payment-notice {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+/* Tabs Navigation for Multiple Generators */
+.tools-tabs-container {
+  margin-bottom: 20px;
+}
+
+.tools-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #ddd;
+  margin-bottom: 20px;
+}
+
+.tools-tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  border-bottom: none;
+  margin-right: 5px;
+  border-radius: 4px 4px 0 0;
+  font-weight: 500;
+  color: #555;
+}
+
+.tools-tab:hover {
+  background-color: #f5f5f5;
+}
+
+.tools-tab.active {
+  background-color: white;
+  border-color: #ddd;
+  color: #2c3e50;
+  margin-bottom: -1px;
+  padding-bottom: 11px;
+}
+
+.tools-tab-content {
+  display: none;
+}
+
+.tools-tab-content.active {
+  display: block;
+}
+
+.paypal-button-container {
+  width: 100% !important;
+  margin-bottom: 15px;
+}
+
+#paypal-container {
+  width: 230px;
+  margin: 0 auto;
+}
+
+/* Coming Soon Tab Styles */
+.coming-soon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  padding: 20px;
+  text-align: center;
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.coming-soon-icon {
+  font-size: 48px;
+  color: #3498db;
+  margin-bottom: 20px;
+}
+
+.coming-soon-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+.coming-soon-description {
+  font-size: 16px;
+  color: #555;
+  max-width: 600px;
+  margin-bottom: 20px;
+}
+
+.coming-soon-notification {
+  display: inline-block;
+  padding: 8px 16px;
+  background: #ecf0f1;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #7f8c8d;
+}
+</style>
+
+<div id="tou-tools-container" class="tou-tools-paywall-container">
+  <div class="tou-tools-header">
+    <h3>Terms of Use Clause Generators</h3>
+    <p>Create customized Terms of Use contract clauses tailored to your specific business situation. All generators are included in one purchase.</p>
+  </div>
+  
+  <!-- Premium Badge (shown after payment) -->
+  <div id="premium-badge" class="premium-badge">PREMIUM UNLOCKED</div>
+  
+  <!-- Tabs for Multiple Generators -->
+  <div class="tools-tabs-container">
+    <div class="tools-tabs">
+      <div class="tools-tab active" data-tab="warranty">Warranties & Liability</div>
+      <div class="tools-tab" data-tab="ip">Intellectual Property</div>
+      <div class="tools-tab" data-tab="dispute">Dispute Resolution</div>
+      <div class="tools-tab" data-tab="userconduct">User Obligations</div>
+      <div class="tools-tab" data-tab="termination">Termination</div>
+    </div>
+  </div>
+  
+  <!-- New backdrop overlay -->
+  <div id="paywall-backdrop" class="paywall-backdrop"></div>
+  
+  <!-- Paywall Overlay - Now a popup with close button -->
+  <div id="paywall-overlay" class="paywall-overlay">
+    <div id="paywall-close" class="paywall-close">✕</div>
+    <div class="lock-icon">🔒</div>
+    <h2 class="paywall-title">Unlock All Generators</h2>
+    <p class="paywall-description">Get immediate access to all Terms of Use clause generators.</p>
+    
+    <ul class="features-list">
+      <li>Create custom Warranties & Liability clauses</li>
+      <li>Generate Intellectual Property provisions</li>
+      <li>Draft Dispute Resolution clauses</li>
+      <li>Download MS Word documents</li>
+      <li>Unlimited use for all contracts</li>
+    </ul>
+    
+    <div id="paypal-container" class="payment-container">
+      <!-- PayPal Button -->
+      <style>.pp-XM4YBFHQ526AL{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style>
+      <form action="https://www.paypal.com/ncp/payment/XM4YBFHQ526AL" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;">
+        <input class="pp-XM4YBFHQ526AL" type="submit" value="Buy Now" />
+        <img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" />
+        <section> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section>
+      </form>
+    </div>
+    
+    <div class="mobile-payment-notice">
+      On mobile devices: After payment, you may need to manually return to this page. Your form data will be preserved.
+    </div>
+    
+    <!-- Transaction ID Recovery Section -->
+    <div class="recovery-section">
+      <div class="recovery-title">Already paid?</div>
+      <div class="recovery-description">If you've already completed payment but don't see the content, enter your PayPal Transaction ID below:</div>
+      <input type="text" id="transaction-id-input" class="recovery-input" placeholder="Enter PayPal Transaction ID">
+      <button id="recover-access-btn" class="recovery-button">Unlock Access</button>
+    </div>
+  </div>
+  
+  <!-- Success Overlay (shown after successful payment) -->
+  <div id="success-overlay" class="success-overlay">
+    <div class="success-message">
+      <div class="success-icon">✓</div>
+      <h2 class="success-title">Payment Successful!</h2>
+      <p class="success-description">You now have full access to all Terms of Use clause generators.</p>
+      <button id="success-button" class="success-button">Start Using Your Generators</button>
+    </div>
+  </div>
+  
+  <!-- Tab Content Containers -->
+  
+  
+  
+  
+  
+  
+  
+  <div id="warranty-tab" class="tools-tab-content active">
+    <!-- Warranties & Liability Generator -->
+    <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Disclaimer of Warranties & Limitation of Liability Generator</title>
+  <style>
+    /* Base Styles - WordPress Compatible */
+    .clause-generator {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      max-width: 100%;
+      margin: 0 auto 20px;
+      color: #333;
+      box-sizing: border-box;
+    }
+    
+    .clause-generator * {
+      box-sizing: border-box;
+    }
+    
+    /* Two-column layout */
+    .generator-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    
+    .form-column {
+      flex: 1;
+      min-width: 300px;
+      max-height: 550px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .preview-column {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    /* Form Elements - Compact */
+    .form-group {
+      margin-bottom: 10px;
+    }
+    
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 3px;
+      font-size: 14px;
+    }
+    
+    .form-input, 
+    .form-select, 
+    .form-textarea {
+      width: 100%;
+      padding: 6px 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.3;
+    }
+    
+    .form-select {
+      height: 32px;
+    }
+    
+    .form-hint {
+      font-size: 11px;
+      color: #666;
+      margin-top: 2px;
+    }
+    
+    /* Radio Groups */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    
+    .radio-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0;
+    }
+    
+    .radio-item input[type="radio"] {
+      margin-right: 4px;
+    }
+    
+    .radio-label {
+      font-size: 13px;
+    }
+    
+    /* Checkbox Groups */
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+    
+    .checkbox-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 0;
+    }
+    
+    .checkbox-item input[type="checkbox"] {
+      margin-right: 6px;
+      margin-top: 2px;
+    }
+    
+    .checkbox-label {
+      font-size: 13px;
+    }
+    
+    /* Section Headers - Compact */
+    .section-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c3e50;
+      margin: 12px 0 8px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    /* Preview Section */
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #2c3e50;
+      padding-bottom: 6px;
+    }
+    
+    .preview-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    
+    .preview-note {
+      font-size: 11px;
+      color: #666;
+      font-style: italic;
+    }
+    
+    .preview-content {
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 12px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.4;
+      height: 450px;
+      overflow-y: auto;
+    }
+    
+    .preview-content p {
+      margin-bottom: 8px;
+      margin-top: 8px;
+    }
+    
+    .highlight {
+      background-color: #ffff00;
+      transition: background-color 0.5s ease-in-out;
+    }
+    
+    /* Copy and Word Doc Buttons Container */
+    .button-container {
+      display: flex;
+      gap: 10px;
+    }
+    
+    /* Copy Button */
+    .copy-btn {
+      flex: 1;
+      padding: 8px;
+      background-color: #2c3e50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+    }
+    
+    .copy-btn:hover {
+      background-color: #1a252f;
+    }
+    
+    .copy-icon {
+      display: inline-block;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    
+    /* Industry Presets */
+    .industry-presets {
+      margin-bottom: 15px;
+      padding: 12px;
+      background: #f5f7fa;
+      border-radius: 6px;
+      border: 1px solid #e1e5e9;
+    }
+    
+    .preset-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: #2c3e50;
+    }
+    
+    .preset-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    
+    .preset-btn {
+      padding: 6px 12px;
+      font-size: 13px;
+      background: white;
+      border: 1px solid #cfd8dc;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .preset-btn:hover {
+      background: #ecf0f1;
+      border-color: #b0bec5;
+    }
+    
+    /* Tooltip Styles */
+    .tooltip-trigger {
+      display: inline-block;
+      margin-left: 5px;
+      width: 14px;
+      height: 14px;
+      background: #3498db;
+      color: white;
+      font-size: 10px;
+      line-height: 14px;
+      text-align: center;
+      border-radius: 50%;
+      cursor: help;
+    }
+    
+    .tooltip-content {
+      display: none;
+      position: absolute;
+      background: #2c3e50;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      width: 250px;
+      font-size: 12px;
+      line-height: 1.4;
+      z-index: 100;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+    }
+    
+    .tooltip-trigger:hover + .tooltip-content {
+      display: block;
+    }
+    
+    /* Jurisdiction Warning */
+    .jurisdiction-warning {
+      display: none;
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #fff9e6;
+      border-left: 3px solid #f1c40f;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+    
+    /* Risk Indicators */
+    .risk-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-left: 8px;
+    }
+    
+    .risk-low {
+      background-color: #27ae60;
+    }
+    
+    .risk-medium {
+      background-color: #f39c12;
+    }
+    
+    .risk-high {
+      background-color: #e74c3c;
+    }
+    
+    .risk-tooltip {
+      display: none;
+      position: absolute;
+      background: #2c3e50;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      z-index: 100;
+    }
+    
+    .risk-indicator:hover + .risk-tooltip {
+      display: block;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .generator-container {
+        flex-direction: column;
+      }
+      
+      .form-column {
+        max-height: none;
+        overflow-y: visible;
+      }
+      
+      .preview-content {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="clause-generator" id="warranty-liability-generator">
+    <div class="generator-container">
+      <!-- Form Column -->
+      <div class="form-column">
+        <!-- Industry Presets -->
+        <div class="industry-presets">
+          <div class="preset-title">Quick Start: Select Your Industry</div>
+          <div class="preset-buttons">
+            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('saas')">SaaS/Software</button>
+            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('ecommerce')">E-commerce</button>
+            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('content')">Content Platform</button>
+            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('subscription')">Subscription Service</button>
+            <button class="preset-btn" onclick="warrantyLiabilityGenerator.applyPreset('marketplace')">Online Marketplace</button>
+          </div>
+        </div>
+      
+        <!-- Agreement Information -->
+        <div class="section-header">Agreement Information</div>
+        
+        <div class="form-group">
+          <label class="form-label" for="companyName">Company Name</label>
+          <input type="text" id="companyName" class="form-input" value="YourCompany, Inc." placeholder="Enter your company name" onkeyup="warrantyLiabilityGenerator.updatePreview('companyName')">
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="serviceType">Service Type</label>
+          <select id="serviceType" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('serviceType')">
+            <option value="website" selected>Website</option>
+            <option value="mobileApp">Mobile App</option>
+            <option value="saas">SaaS Platform</option>
+            <option value="marketplace">Online Marketplace</option>
+            <option value="subscription">Subscription Service</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="serviceName">Service/Product Name</label>
+          <input type="text" id="serviceName" class="form-input" value="Our Service" placeholder="Enter service name" onkeyup="warrantyLiabilityGenerator.updatePreview('serviceName')">
+        </div>
+        
+        <!-- Warranty Options -->
+        <div class="section-header">Warranty Disclaimer</div>
+        
+        <div class="form-group">
+          <label class="form-label">Warranty Level <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Strong Disclaimer:</strong> Completely disclaims all warranties.<br>
+              <strong>Moderate Disclaimer:</strong> Disclaims most warranties but offers some limited ones.<br>
+              <strong>Limited Disclaimer:</strong> More user-friendly language with fewer disclaimers.
+            </div>
+          </label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="warrantyLevel" id="warrantyStrong" value="strong" checked onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+              <span class="radio-label">Strong Disclaimer</span>
+              <span class="risk-indicator risk-medium"></span>
+              <span class="risk-tooltip">Medium enforceability risk in consumer contexts</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="warrantyLevel" id="warrantyModerate" value="moderate" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+              <span class="radio-label">Moderate Disclaimer</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="warrantyLevel" id="warrantyLimited" value="limited" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
+              <span class="radio-label">Limited Disclaimer</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Most enforceable but provides less protection</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Specific Disclaimers <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select specific aspects of your service that you want to explicitly disclaim warranty for. Include only those relevant to your service to avoid overly broad disclaimers.
+            </div>
+          </label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" id="disclaimerUptime" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerUptime')">
+              <span class="checkbox-label">Uptime & Availability</span>
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Disclaims guarantees about your service being available 24/7 without interruptions. Important for all online services.
+              </div>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="disclaimerAccuracy" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerAccuracy')">
+              <span class="checkbox-label">Content Accuracy</span>
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Disclaims guarantees about the accuracy of information provided through your service. Critical for platforms with user-generated content.
+              </div>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="disclaimerSecurity" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerSecurity')">
+              <span class="checkbox-label">Security</span>
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Disclaims guarantees about perfect security. Important, but include specific security measures you do take elsewhere in your terms.
+              </div>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="disclaimerThirdParty" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerThirdParty')">
+              <span class="checkbox-label">Third-Party Links/Content</span>
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Disclaims responsibility for third-party websites, services, or content accessible through your service.
+              </div>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="disclaimerProfessional" onclick="warrantyLiabilityGenerator.updatePreview('disclaimerProfessional')">
+              <span class="checkbox-label">Professional Advice</span>
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Disclaims that your service provides professional, legal, medical, or financial advice. Essential for informational platforms.
+              </div>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Liability Limitations -->
+        <div class="section-header">Liability Limitations</div>
+        
+        <div class="form-group">
+          <label class="form-label">Limitation Scope <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Broad:</strong> Excludes all types of damages (most protective for you)<br>
+              <strong>Intermediate:</strong> Excludes indirect damages but allows direct damages<br>
+              <strong>Narrow:</strong> Only excludes specific damage types (least protective)
+            </div>
+          </label>
+          <select id="liabilityScope" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('liabilityScope'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
+            <option value="broad" selected>Broad (All Damages)</option>
+            <option value="intermediate">Intermediate (Most Damages)</option>
+            <option value="narrow">Narrow (Direct Damages Only)</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Specific Damages Excluded <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>Direct damages:</strong> Immediate costs/losses directly caused by a breach<br>
+              <strong>Indirect damages:</strong> Secondary losses that flow from the direct damages<br>
+              <strong>Consequential damages:</strong> Damages from special circumstances known to the parties<br>
+              <strong>Punitive damages:</strong> Damages intended to punish wrongdoing<br>
+              <strong>Special damages:</strong> Unusual or special losses known to both parties
+            </div>
+          </label>
+          <div class="checkbox-group">
+            <label class="checkbox-item">
+              <input type="checkbox" id="excludeDirect" onclick="warrantyLiabilityGenerator.updatePreview('excludeDirect')">
+              <span class="checkbox-label">Direct Damages</span>
+              <span class="risk-indicator risk-high"></span>
+              <span class="risk-tooltip">High risk - often unenforceable in many jurisdictions</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="excludeIndirect" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeIndirect')">
+              <span class="checkbox-label">Indirect Damages</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="excludeConsequential" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeConsequential')">
+              <span class="checkbox-label">Consequential Damages</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="excludePunitive" checked onclick="warrantyLiabilityGenerator.updatePreview('excludePunitive')">
+              <span class="checkbox-label">Punitive Damages</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" id="excludeSpecial" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeSpecial')">
+              <span class="checkbox-label">Special Damages</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Liability Cap <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              <strong>No Cap:</strong> No maximum limit on liability (least protective)<br>
+              <strong>Fees Paid:</strong> Cap liability at fees paid by user (recommended)<br>
+              <strong>Fixed Amount:</strong> Set a specific dollar amount as cap
+            </div>
+          </label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="liabilityCap" id="capNone" value="none" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+              <span class="radio-label">No Cap</span>
+              <span class="risk-indicator risk-high"></span>
+              <span class="risk-tooltip">High risk - unlimited liability exposure</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="liabilityCap" id="capFees" value="fees" checked onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+              <span class="radio-label">Fees Paid</span>
+              <span class="risk-indicator risk-low"></span>
+              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="liabilityCap" id="capFixed" value="fixed" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
+              <span class="radio-label">Fixed Amount</span>
+              <span class="risk-indicator risk-medium"></span>
+              <span class="risk-tooltip">Medium risk if amount is too low relative to potential damages</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group" id="fixedCapAmount" style="display: none;">
+          <label class="form-label" for="capAmount">Fixed Cap Amount</label>
+          <input type="text" id="capAmount" class="form-input" value="$500" placeholder="Enter cap amount" onkeyup="warrantyLiabilityGenerator.updatePreview('capAmount')">
+        </div>
+        
+        <!-- Additional Options -->
+        <div class="section-header">Additional Options</div>
+        
+        <div class="form-group">
+          <label class="form-label">Severability Clause <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              A severability clause ensures that if any part of these disclaimers is found invalid, the rest remains enforceable. Highly recommended.
+            </div>
+          </label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="severability" id="severabilityYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('severability')">
+              <span class="radio-label">Include</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="severability" id="severabilityNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('severability')">
+              <span class="radio-label">Exclude</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label">Indemnification Clause <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              An indemnification clause requires users to defend and compensate you for claims resulting from their use of your service or violation of terms.
+            </div>
+          </label>
+          <div class="radio-group">
+            <label class="radio-item">
+              <input type="radio" name="indemnification" id="indemnificationYes" value="yes" checked onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
+              <span class="radio-label">Include</span>
+            </label>
+            <label class="radio-item">
+              <input type="radio" name="indemnification" id="indemnificationNo" value="no" onclick="warrantyLiabilityGenerator.updatePreview('indemnification')">
+              <span class="radio-label">Exclude</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label" for="jurisdiction">Jurisdiction Consideration <span class="tooltip-trigger">?</span>
+            <div class="tooltip-content">
+              Select the primary jurisdiction where your users are located to get region-specific language that addresses local laws.
+            </div>
+          </label>
+          <select id="jurisdiction" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('jurisdiction'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
+            <option value="us" selected>United States</option>
+            <option value="eu">European Union</option>
+            <option value="uk">United Kingdom</option>
+            <option value="ca">Canada</option>
+            <option value="au">Australia</option>
+            <option value="global">Global</option>
+          </select>
+          <div id="jurisdiction-warning" class="jurisdiction-warning"></div>
+        </div>
+      </div>
+      
+      <!-- Preview Column -->
+      <div class="preview-column">
+        <div class="preview-header">
+          <div class="preview-title">Disclaimer of Warranties & Limitation of Liability Preview</div>
+          <div class="preview-note">Updates as you complete the form</div>
+        </div>
+        
+        <div class="preview-content" id="warrantyPreview">
+          <!-- Preview content will be populated by JavaScript -->
+        </div>
+        
+        <div class="button-container">
+          <button id="warrantyCopyBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.handleCopyClick()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            COPY CLAUSE
+          </button>
+          <button id="warrantyWordBtn" class="copy-btn" onclick="warrantyLiabilityGenerator.generateWordDoc()">MS WORD DOC</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Create a namespace to avoid global scope pollution in WordPress
+    var warrantyLiabilityGenerator = {
+      // Initialize the generator
+      init: function() {
+        this.handleLiabilityCapChange();
+        this.updateJurisdictionWarning();
+        this.updatePreview();
+      },
+      
+      // Apply industry preset
+      applyPreset: function(preset) {
+        // SaaS/Software preset
+        if (preset === 'saas') {
+          document.getElementById('serviceType').value = 'saas';
+          document.getElementById('serviceName').value = 'Our Software';
+          document.getElementById('warrantyStrong').checked = true;
+          document.getElementById('disclaimerUptime').checked = true;
+          document.getElementById('disclaimerAccuracy').checked = true;
+          document.getElementById('disclaimerSecurity').checked = true;
+          document.getElementById('disclaimerThirdParty').checked = true;
+          document.getElementById('disclaimerProfessional').checked = false;
+          document.getElementById('liabilityScope').value = 'intermediate';
+          document.getElementById('excludeDirect').checked = false;
+          document.getElementById('excludeIndirect').checked = true;
+          document.getElementById('excludeConsequential').checked = true;
+          document.getElementById('excludePunitive').checked = true;
+          document.getElementById('excludeSpecial').checked = true;
+          document.getElementById('capFees').checked = true;
+          document.getElementById('severabilityYes').checked = true;
+          document.getElementById('indemnificationYes').checked = true;
+        }
+        // E-commerce preset
+        else if (preset === 'ecommerce') {
+          document.getElementById('serviceType').value = 'website';
+          document.getElementById('serviceName').value = 'Our Store';
+          document.getElementById('warrantyModerate').checked = true;
+          document.getElementById('disclaimerUptime').checked = true;
+          document.getElementById('disclaimerAccuracy').checked = true;
+          document.getElementById('disclaimerSecurity').checked = true;
+          document.getElementById('disclaimerThirdParty').checked = true;
+          document.getElementById('disclaimerProfessional').checked = false;
+          document.getElementById('liabilityScope').value = 'intermediate';
+          document.getElementById('excludeDirect').checked = false;
+          document.getElementById('excludeIndirect').checked = true;
+          document.getElementById('excludeConsequential').checked = true;
+          document.getElementById('excludePunitive').checked = true;
+          document.getElementById('excludeSpecial').checked = true;
+          document.getElementById('capFees').checked = true;
+          document.getElementById('severabilityYes').checked = true;
+          document.getElementById('indemnificationYes').checked = true;
+        }
+        // Content Platform preset
+        else if (preset === 'content') {
+          document.getElementById('serviceType').value = 'website';
+          document.getElementById('serviceName').value = 'Our Platform';
+          document.getElementById('warrantyStrong').checked = true;
+          document.getElementById('disclaimerUptime').checked = true;
+          document.getElementById('disclaimerAccuracy').checked = true;
+          document.getElementById('disclaimerSecurity').checked = true;
+          document.getElementById('disclaimerThirdParty').checked = true;
+          document.getElementById('disclaimerProfessional').checked = true;
+          document.getElementById('liabilityScope').value = 'broad';
+          document.getElementById('excludeDirect').checked = false;
+          document.getElementById('excludeIndirect').checked = true;
+          document.getElementById('excludeConsequential').checked = true;
+          document.getElementById('excludePunitive').checked = true;
+          document.getElementById('excludeSpecial').checked = true;
+          document.getElementById('capFees').checked = true;
+          document.getElementById('severabilityYes').checked = true;
+          document.getElementById('indemnificationYes').checked = true;
+        }
+        // Subscription Service preset
+        else if (preset === 'subscription') {
+          document.getElementById('serviceType').value = 'subscription';
+          document.getElementById('serviceName').value = 'Our Subscription Service';
+          document.getElementById('warrantyModerate').checked = true;
+          document.getElementById('disclaimerUptime').checked = true;
+          document.getElementById('disclaimerAccuracy').checked = true;
+          document.getElementById('disclaimerSecurity').checked = true;
+          document.getElementById('disclaimerThirdParty').checked = true;
+          document.getElementById('disclaimerProfessional').checked = false;
+          document.getElementById('liabilityScope').value = 'intermediate';
+          document.getElementById('excludeDirect').checked = false;
+          document.getElementById('excludeIndirect').checked = true;
+          document.getElementById('excludeConsequential').checked = true;
+          document.getElementById('excludePunitive').checked = true;
+          document.getElementById('excludeSpecial').checked = true;
+          document.getElementById('capFees').checked = true;
+          document.getElementById('severabilityYes').checked = true;
+          document.getElementById('indemnificationYes').checked = true;
+        }
+        // Online Marketplace preset
+        else if (preset === 'marketplace') {
+          document.getElementById('serviceType').value = 'marketplace';
+          document.getElementById('serviceName').value = 'Our Marketplace';
+          document.getElementById('warrantyStrong').checked = true;
+          document.getElementById('disclaimerUptime').checked = true;
+          document.getElementById('disclaimerAccuracy').checked = true;
+          document.getElementById('disclaimerSecurity').checked = true;
+          document.getElementById('disclaimerThirdParty').checked = true;
+          document.getElementById('disclaimerProfessional').checked = false;
+          document.getElementById('liabilityScope').value = 'broad';
+          document.getElementById('excludeDirect').checked = false;
+          document.getElementById('excludeIndirect').checked = true;
+          document.getElementById('excludeConsequential').checked = true;
+          document.getElementById('excludePunitive').checked = true;
+          document.getElementById('excludeSpecial').checked = true;
+          document.getElementById('capFees').checked = true;
+          document.getElementById('severabilityYes').checked = true;
+          document.getElementById('indemnificationYes').checked = true;
+        }
+        
+        // Update the preview after applying preset
+        this.handleLiabilityCapChange();
+        this.updateJurisdictionWarning();
+        this.updatePreview();
+      },
+
+      // Update jurisdiction warning
+      updateJurisdictionWarning: function() {
+        const jurisdiction = document.getElementById('jurisdiction').value;
+        const liabilityScope = document.getElementById('liabilityScope').value;
+        const excludeDirect = document.getElementById('excludeDirect').checked;
+        const warningElement = document.getElementById('jurisdiction-warning');
+        
+        let warningText = '';
+        
+        if (jurisdiction === 'eu') {
+          if (liabilityScope === 'broad' || excludeDirect) {
+            warningText = '<strong>Warning:</strong> EU consumer protection laws may limit the enforceability of broad liability exclusions. Under the EU Consumer Rights Directive and national laws, you cannot exclude liability for direct damages to consumers in many circumstances.';
+          } else {
+            warningText = '<strong>Note:</strong> EU law requires specific protections for consumers that override terms of service. Your clause addresses this, but you should consult with local counsel to ensure compliance with EU member state laws.';
+          }
+        } else if (jurisdiction === 'uk') {
+          if (liabilityScope === 'broad' || excludeDirect) {
+            warningText = '<strong>Warning:</strong> UK Consumer Rights Act and Unfair Contract Terms Act may limit the enforceability of broad liability exclusions, particularly for direct damages to consumers.';
+          }
+        } else if (jurisdiction === 'au') {
+          if (liabilityScope === 'broad' || excludeDirect) {
+            warningText = '<strong>Warning:</strong> The Australian Consumer Law provides non-excludable consumer guarantees that override broad liability disclaimers for consumers.';
+          }
+        } else if (jurisdiction === 'ca') {
+          if (liabilityScope === 'broad' && jurisdiction === 'ca') {
+            warningText = '<strong>Warning:</strong> Canadian provinces like Quebec have consumer protection laws that may limit the enforceability of broad liability exclusions.';
+          }
+        } else if (jurisdiction === 'us') {
+          if (liabilityScope === 'broad' && excludeDirect) {
+            warningText = '<strong>Note:</strong> Some U.S. states limit the enforceability of clauses that exclude all liability, including direct damages. Consider a more moderate approach for consumer-facing services.';
+          }
+        }
+        
+        if (warningText) {
+          warningElement.innerHTML = warningText;
+          warningElement.style.display = 'block';
+        } else {
+          warningElement.style.display = 'none';
+        }
+      },
+      
+      // Generate clause text
+      generateClause: function() {
+        const companyName = document.getElementById('companyName').value;
+        const serviceType = document.getElementById('serviceType').value;
+        const serviceTypeText = document.getElementById('serviceType').options[document.getElementById('serviceType').selectedIndex].text;
+        const serviceName = document.getElementById('serviceName').value;
+        
+        // Get warranty level
+        let warrantyLevel = '';
+        const warrantyRadios = document.getElementsByName('warrantyLevel');
+        for (let i = 0; i < warrantyRadios.length; i++) {
+          if (warrantyRadios[i].checked) {
+            warrantyLevel = warrantyRadios[i].value;
+            break;
+          }
+        }
+        
+        // Get specific disclaimers
+        const disclaimerUptime = document.getElementById('disclaimerUptime').checked;
+        const disclaimerAccuracy = document.getElementById('disclaimerAccuracy').checked;
+        const disclaimerSecurity = document.getElementById('disclaimerSecurity').checked;
+        const disclaimerThirdParty = document.getElementById('disclaimerThirdParty').checked;
+        const disclaimerProfessional = document.getElementById('disclaimerProfessional').checked;
+        
+        // Get liability scope
+        const liabilityScope = document.getElementById('liabilityScope').value;
+        
+        // Get specific damages excluded
+        const excludeDirect = document.getElementById('excludeDirect').checked;
+        const excludeIndirect = document.getElementById('excludeIndirect').checked;
+        const excludeConsequential = document.getElementById('excludeConsequential').checked;
+        const excludePunitive = document.getElementById('excludePunitive').checked;
+        const excludeSpecial = document.getElementById('excludeSpecial').checked;
+        
+        // Get liability cap
+        let liabilityCap = '';
+        const liabilityCapRadios = document.getElementsByName('liabilityCap');
+        for (let i = 0; i < liabilityCapRadios.length; i++) {
+          if (liabilityCapRadios[i].checked) {
+            liabilityCap = liabilityCapRadios[i].value;
+            break;
+          }
+        }
+        
+        const capAmount = document.getElementById('capAmount').value;
+        
+        // Get additional options
+        let severability = '';
+        const severabilityRadios = document.getElementsByName('severability');
+        for (let i = 0; i < severabilityRadios.length; i++) {
+          if (severabilityRadios[i].checked) {
+            severability = severabilityRadios[i].value;
+            break;
+          }
+        }
+        
+        let indemnification = '';
+        const indemnificationRadios = document.getElementsByName('indemnification');
+        for (let i = 0; i < indemnificationRadios.length; i++) {
+          if (indemnificationRadios[i].checked) {
+            indemnification = indemnificationRadios[i].value;
+            break;
+          }
+        }
+        
+        const jurisdiction = document.getElementById('jurisdiction').value;
+        
+        // Build clause sections
+        
+        // Build warranty disclaimer heading
+        let disclaimerHeading = '';
+        if (warrantyLevel === 'strong') {
+          disclaimerHeading = "DISCLAIMER OF WARRANTIES";
+        } else if (warrantyLevel === 'moderate') {
+          disclaimerHeading = "LIMITED WARRANTY";
+        } else {
+          disclaimerHeading = "WARRANTY DISCLAIMER";
+        }
+        
+        // Build warranty disclaimer language
+        let disclaimerLanguage = '';
+        if (warrantyLevel === 'strong') {
+          disclaimerLanguage = `${serviceName} IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND. TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ${companyName} EXPRESSLY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, NON-INFRINGEMENT, AND ANY WARRANTIES ARISING FROM COURSE OF DEALING OR COURSE OF PERFORMANCE.`;
+        } else if (warrantyLevel === 'moderate') {
+          disclaimerLanguage = `${serviceName} IS PROVIDED "AS IS" AND "AS AVAILABLE," WITH CERTAIN LIMITED WARRANTIES. ${companyName} DISCLAIMS, TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ALL OTHER WARRANTIES, WHETHER EXPRESS, IMPLIED, OR STATUTORY, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.`;
+        } else {
+          disclaimerLanguage = `${companyName} strives to provide ${serviceName} in a professional manner, but we cannot guarantee that it will always be error-free or meet your specific requirements. Certain warranties may be provided as expressly stated in our agreements with you, but otherwise, ${serviceName} is provided with limited warranties.`;
+        }
+        
+        // Build specific disclaimers
+        let specificDisclaimers = [];
+        
+        if (disclaimerUptime) {
+          if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
+            specificDisclaimers.push(`${companyName} DOES NOT WARRANT THAT ${serviceName} WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, ACCURATE, RELIABLE, OR AVAILABLE AT ALL TIMES. YOU UNDERSTAND THAT THE ${serviceTypeText.toUpperCase()} MAY BE SUBJECT TO LIMITATIONS, DELAYS, AND OTHER ISSUES INHERENT IN THE USE OF THE INTERNET AND ELECTRONIC COMMUNICATIONS.`);
+          } else {
+            specificDisclaimers.push(`While we strive for high availability, ${companyName} does not guarantee that ${serviceName} will be uninterrupted, error-free, or available at all times. The ${serviceTypeText} may be subject to limitations, delays, and other issues inherent in the use of the internet and electronic communications.`);
+          }
+        }
+        
+        if (disclaimerAccuracy) {
+          if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
+            specificDisclaimers.push(`${companyName} MAKES NO WARRANTY REGARDING THE ACCURACY, COMPLETENESS, OR RELIABILITY OF ANY CONTENT AVAILABLE THROUGH ${serviceName}.`);
+          } else {
+            specificDisclaimers.push(`${companyName} does not guarantee the accuracy, completeness, or reliability of any content available through ${serviceName}.`);
+          }
+        }
+        
+        if (disclaimerSecurity) {
+          if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
+            specificDisclaimers.push(`${companyName} DOES NOT WARRANT THAT ${serviceName} WILL BE SECURE OR FREE FROM VIRUSES, MALWARE, OR OTHER HARMFUL COMPONENTS.`);
+          } else {
+            specificDisclaimers.push(`While we implement reasonable security measures, ${companyName} cannot guarantee that ${serviceName} will be completely secure or free from viruses, malware, or other harmful components.`);
+          }
+        }
+        
+        if (disclaimerThirdParty) {
+          if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
+            specificDisclaimers.push(`${companyName} DISCLAIMS ALL WARRANTIES AND LIABILITIES RELATED TO ANY THIRD-PARTY CONTENT, SERVICES, OR LINKS ACCESSIBLE THROUGH ${serviceName}.`);
+          } else {
+            specificDisclaimers.push(`${companyName} is not responsible for any third-party content, services, or links accessible through ${serviceName} and disclaims all warranties related to such third-party elements.`);
+          }
+        }
+        
+        if (disclaimerProfessional) {
+          if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
+            specificDisclaimers.push(`${serviceName} IS NOT INTENDED TO PROVIDE PROFESSIONAL, LEGAL, MEDICAL, ACCOUNTING, OR FINANCIAL ADVICE. ANY INFORMATION PROVIDED THROUGH ${serviceName} SHOULD NOT BE CONSIDERED A SUBSTITUTE FOR PROFESSIONAL ADVICE.`);
+          } else {
+            specificDisclaimers.push(`${serviceName} is not intended to provide professional, legal, medical, accounting, or financial advice. You should consult with qualified professionals for advice tailored to your specific situation.`);
+          }
+        }
+        
+        // Format specific disclaimers
+        let specificDisclaimersText = '';
+        if (specificDisclaimers.length > 0) {
+          specificDisclaimersText = specificDisclaimers.join(' ');
+        }
+        
+        // Build liability limitation heading
+        let liabilityHeading = "LIMITATION OF LIABILITY";
+        
+        // Build excluded damages list for all liability scopes
+        let excludedDamagesArray = [];
+        
+        if (excludeDirect) {
+          excludedDamagesArray.push("direct");
+        }
+        
+        if (excludeIndirect) {
+          excludedDamagesArray.push("indirect");
+        }
+        
+        if (excludeConsequential) {
+          excludedDamagesArray.push("consequential");
+        }
+        
+        if (excludePunitive) {
+          excludedDamagesArray.push("punitive");
+        }
+        
+        if (excludeSpecial) {
+          excludedDamagesArray.push("special");
+        }
+        
+        // Format excluded damages for all liability scopes
+        let formattedExcludedDamages = '';
+        if (excludedDamagesArray.length > 0) {
+          if (excludedDamagesArray.length === 1) {
+            formattedExcludedDamages = excludedDamagesArray[0].toUpperCase();
+          } else {
+            let lastDamage = excludedDamagesArray.pop();
+            formattedExcludedDamages = excludedDamagesArray.join(', ').toUpperCase() + ', OR ' + lastDamage.toUpperCase();
+          }
+        }
+        
+        // Build liability limitation language based on scope and excluded damages
+        let liabilityLanguage = '';
+        if (liabilityScope === 'broad') {
+          // For broad scope, we'll exclude only the selected damages
+          if (excludedDamagesArray.length > 0) {
+            liabilityLanguage = `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL ${companyName} OR ITS DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, PARTNERS, OR SUPPLIERS BE LIABLE FOR ANY ${formattedExcludedDamages} DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE ${serviceName}, REGARDLESS OF THE FORM OF ACTION AND WHETHER OR NOT ${companyName} HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.`;
+          } else {
+            liabilityLanguage = `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL ${companyName} OR ITS DIRECTORS, OFFICERS, EMPLOYEES, AGENTS, PARTNERS, OR SUPPLIERS BE LIABLE FOR ANY DAMAGES WHATSOEVER, WHETHER DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, EXEMPLARY, OR OTHERWISE, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE ${serviceName}, REGARDLESS OF THE FORM OF ACTION AND WHETHER OR NOT ${companyName} HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.`;
+          }
+        } else if (liabilityScope === 'intermediate') {
+          // For intermediate scope, we'll exclude only the selected damages
+          if (excludedDamagesArray.length > 0) {
+            liabilityLanguage = `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ${companyName} WILL NOT BE LIABLE FOR ANY ${formattedExcludedDamages} DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE ${serviceName}, REGARDLESS OF THE FORM OF ACTION.`;
+          } else {
+            liabilityLanguage = `TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, ${companyName} WILL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES, INCLUDING BUT NOT LIMITED TO DAMAGES FOR LOSS OF PROFITS, GOODWILL, USE, DATA, OR OTHER INTANGIBLE LOSSES, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE ${serviceName}, REGARDLESS OF THE FORM OF ACTION.`;
+          }
+        } else {
+          // For narrow scope
+          if (excludedDamagesArray.length > 0) {
+            liabilityLanguage = `${companyName}'s liability is limited to direct damages arising out of or related to your use of ${serviceName}, subject to the exclusions and limitations set forth in this section. WITHOUT LIMITING THE FOREGOING, ${companyName} WILL NOT BE LIABLE FOR ANY ${formattedExcludedDamages} DAMAGES.`;
+          } else {
+            liabilityLanguage = `${companyName}'s liability is limited to direct damages arising out of or related to your use of ${serviceName}, subject to the exclusions and limitations set forth in this section.`;
+          }
+        }
+        
+        // Build liability cap language
+        let liabilityCapLanguage = '';
+        if (liabilityCap === 'none') {
+          liabilityCapLanguage = '';
+        } else if (liabilityCap === 'fees') {
+          liabilityCapLanguage = `IN ANY CASE, ${companyName}'S MAXIMUM AGGREGATE LIABILITY UNDER THESE TERMS SHALL BE LIMITED TO THE AMOUNT YOU HAVE PAID ${companyName} FOR USE OF ${serviceName} IN THE TWELVE (12) MONTHS PRECEDING THE EVENT GIVING RISE TO THE LIABILITY. IF YOU HAVE NOT PAID ${companyName} FOR THE USE OF ${serviceName}, THEN ${companyName}'S MAXIMUM AGGREGATE LIABILITY SHALL BE LIMITED TO ONE HUNDRED DOLLARS ($100).`;
+        } else if (liabilityCap === 'fixed') {
+          liabilityCapLanguage = `IN ANY CASE, ${companyName}'S MAXIMUM AGGREGATE LIABILITY UNDER THESE TERMS SHALL BE LIMITED TO ${capAmount}.`;
+        }
+        
+        // Build severability language
+        let severabilityLanguage = '';
+        if (severability === 'yes') {
+          severabilityLanguage = `<p>If any provision of these disclaimer and limitation sections is found to be unenforceable or invalid under applicable law, such provision shall be limited or eliminated to the minimum extent necessary, and the remaining provisions shall remain in full force and effect.</p>`;
+        }
+        
+        // Build indemnification language
+        let indemnificationLanguage = '';
+        if (indemnification === 'yes') {
+          indemnificationLanguage = `<p><strong>INDEMNIFICATION</strong></p>
+<p>You agree to defend, indemnify, and hold harmless ${companyName}, its officers, directors, employees, and agents, from and against any claims, liabilities, damages, losses, and expenses, including without limitation reasonable attorney's fees and costs, arising out of or in any way connected with your access to or use of ${serviceName} or your violation of these Terms. ${companyName} reserves the right to assume the exclusive defense and control of any matter otherwise subject to indemnification by you, in which event you will cooperate with ${companyName} in asserting any available defenses.</p>`;
+        }
+        
+        // Build jurisdiction-specific language
+        let jurisdictionLanguage = '';
+        if (jurisdiction === 'eu' || jurisdiction === 'uk') {
+          jurisdictionLanguage = `<p>Nothing in these Terms shall exclude or limit ${companyName}'s liability for death or personal injury caused by negligence, fraud, or any other liability that cannot be excluded or limited by applicable law. Consumer statutory rights that cannot be waived or limited are not affected by these Terms.</p>`;
+        } else if (jurisdiction === 'au') {
+          jurisdictionLanguage = `<p>Nothing in these Terms excludes, restricts, or modifies any consumer guarantee, right, or remedy conferred on you by the Australian Consumer Law or any other applicable law that cannot be excluded, restricted, or modified by agreement.</p>`;
+        } else if (jurisdiction === 'ca') {
+          jurisdictionLanguage = `<p>Some jurisdictions, including Quebec, do not allow the exclusion or limitation of implied warranties or the limitation of certain damages, so some of the above disclaimers and limitations may not apply to residents of these jurisdictions.</p>`;
+        }
+        
+        // Build the complete clause
+        let clause = `
+<p><strong>${disclaimerHeading}</strong></p>
+<p>${disclaimerLanguage} ${specificDisclaimersText}</p>
+
+<p><strong>${liabilityHeading}</strong></p>
+<p>${liabilityLanguage} ${liabilityCapLanguage}</p>
+`;
+
+        // Add severability paragraph if included
+        if (severability === 'yes') {
+          clause += severabilityLanguage;
+        }
+
+        // Add indemnification section if included
+        if (indemnification === 'yes') {
+          clause += indemnificationLanguage;
+        }
+
+        // Add jurisdiction-specific paragraph if needed
+        if (jurisdictionLanguage) {
+          clause += jurisdictionLanguage;
+        }
+
+        return clause;
+      },
+      
+      // Handle liability cap change
+      handleLiabilityCapChange: function() {
+        const liabilityCapRadios = document.getElementsByName('liabilityCap');
+        let selectedCap = '';
+        
+        for (let i = 0; i < liabilityCapRadios.length; i++) {
+          if (liabilityCapRadios[i].checked) {
+            selectedCap = liabilityCapRadios[i].value;
+            break;
+          }
+        }
+        
+        // Show/hide fixed cap amount field
+        document.getElementById('fixedCapAmount').style.display = selectedCap === 'fixed' ? 'block' : 'none';
+        
+        // Update preview
+        this.updatePreview('liabilityCap');
+      },
+      
+      // Update the preview
+      updatePreview: function(changedField) {
+        // Clear previous highlights
+        this.clearHighlights();
+        
+        // Generate new clause text
+        const clauseText = this.generateClause();
+        
+        // Update preview
+        document.getElementById('warrantyPreview').innerHTML = clauseText;
+        
+        // If a field was changed, highlight the relevant text
+        if (changedField) {
+          this.highlightChangedText(changedField);
+        }
+        
+        // Setup listeners for cap change
+        const liabilityCapRadios = document.getElementsByName('liabilityCap');
+        for (let i = 0; i < liabilityCapRadios.length; i++) {
+          liabilityCapRadios[i].onclick = this.handleLiabilityCapChange.bind(this);
+        }
+      },
+      
+      // Clear highlights
+      clearHighlights: function() {
+        const highlightElements = document.getElementsByClassName('highlight');
+        while (highlightElements.length > 0) {
+          const element = highlightElements[0];
+          const text = element.textContent;
+          const textNode = document.createTextNode(text);
+          element.parentNode.replaceChild(textNode, element);
+        }
+      },
+      
+      // Find text in document and highlight it
+      findAndHighlightText: function(searchText) {
+        if (!searchText) return;
+        
+        const previewElement = document.getElementById('warrantyPreview');
+        const previewHTML = previewElement.innerHTML;
+        
+        // A simpler approach for WordPress compatibility
+        if (previewHTML.indexOf(searchText) >= 0) {
+          const newHTML = previewHTML.replace(
+            new RegExp(this.escapeRegExp(searchText), 'g'),
+            '<span class="highlight">' + searchText + '</span>'
+          );
+          
+          previewElement.innerHTML = newHTML;
+          
+          // Try to scroll to the highlighted element
+          setTimeout(function() {
+            const highlightElements = document.getElementsByClassName('highlight');
+            if (highlightElements.length > 0) {
+              const firstHighlight = highlightElements[0];
+              if (firstHighlight) {
+                firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+              }
+            }
+          }, 100);
+        }
+      },
+      
+      // Escape special regex characters
+      escapeRegExp: function(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      },
+      
+      // Highlight changed text based on field
+      highlightChangedText: function(changedField) {
+        const self = this;
+        
+        switch (changedField) {
+          case 'companyName':
+            this.findAndHighlightText(document.getElementById('companyName').value);
+            break;
+          case 'serviceType':
+            // Highlight the service type text
+            const serviceTypeElement = document.getElementById('serviceType');
+            const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text;
+            this.findAndHighlightText(serviceTypeText.toUpperCase());
+            break;
+          case 'serviceName':
+            this.findAndHighlightText(document.getElementById('serviceName').value);
+            break;
+          case 'warrantyLevel':
+            // Highlight the warranty heading
+            const warrantyLevel = document.querySelector('input[name="warrantyLevel"]:checked').value;
+            if (warrantyLevel === 'strong') {
+              this.findAndHighlightText("DISCLAIMER OF WARRANTIES");
+            } else if (warrantyLevel === 'moderate') {
+              this.findAndHighlightText("LIMITED WARRANTY");
+            } else {
+              this.findAndHighlightText("WARRANTY DISCLAIMER");
+            }
+            break;
+          case 'disclaimerUptime':
+            if (document.getElementById('disclaimerUptime').checked) {
+              this.findAndHighlightText("uninterrupted, error-free");
+            }
+            break;
+          case 'disclaimerAccuracy':
+            if (document.getElementById('disclaimerAccuracy').checked) {
+              this.findAndHighlightText("accuracy, completeness, or reliability");
+            }
+            break;
+          case 'disclaimerSecurity':
+            if (document.getElementById('disclaimerSecurity').checked) {
+              this.findAndHighlightText("secure or free from viruses");
+            }
+            break;
+          case 'disclaimerThirdParty':
+            if (document.getElementById('disclaimerThirdParty').checked) {
+              this.findAndHighlightText("third-party content");
+            }
+            break;
+          case 'disclaimerProfessional':
+            if (document.getElementById('disclaimerProfessional').checked) {
+              this.findAndHighlightText("professional, legal, medical");
+            }
+            break;
+          case 'liabilityScope':
+          case 'excludeDirect':
+          case 'excludeIndirect':
+          case 'excludeConsequential':
+          case 'excludePunitive':
+          case 'excludeSpecial':
+            // Get excluded damages
+            const excludedDamages = [];
+            
+            if (document.getElementById('excludeDirect').checked) excludedDamages.push("direct");
+            if (document.getElementById('excludeIndirect').checked) excludedDamages.push("indirect");
+            if (document.getElementById('excludeConsequential').checked) excludedDamages.push("consequential");
+            if (document.getElementById('excludePunitive').checked) excludedDamages.push("punitive");
+            if (document.getElementById('excludeSpecial').checked) excludedDamages.push("special");
+            
+            if (excludedDamages.length > 0) {
+              if (excludedDamages.length === 1) {
+                this.findAndHighlightText(excludedDamages[0].toUpperCase());
+              } else {
+                const lastDamage = excludedDamages[excludedDamages.length - 1];
+                const otherDamages = excludedDamages.slice(0, -1);
+                const damageText = otherDamages.join(', ').toUpperCase() + ', OR ' + lastDamage.toUpperCase();
+                this.findAndHighlightText(damageText);
+              }
+            } else {
+              // Highlight basic scope text if no specific damages are excluded
+              const liabilityScope = document.getElementById('liabilityScope').value;
+              if (liabilityScope === 'broad') {
+                this.findAndHighlightText("ANY DAMAGES WHATSOEVER");
+              } else if (liabilityScope === 'intermediate') {
+                this.findAndHighlightText("ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, PUNITIVE, OR EXEMPLARY DAMAGES");
+              } else {
+                this.findAndHighlightText("limited to direct damages");
+              }
+            }
+            break;
+          case 'liabilityCap':
+            const liabilityCap = document.querySelector('input[name="liabilityCap"]:checked').value;
+            if (liabilityCap === 'fees') {
+              this.findAndHighlightText("limited to the amount you have paid");
+            } else if (liabilityCap === 'fixed') {
+              this.findAndHighlightText("limited to " + document.getElementById('capAmount').value);
+            }
+            break;
+          case 'capAmount':
+            this.findAndHighlightText(document.getElementById('capAmount').value);
+            break;
+          case 'severability':
+            if (document.querySelector('input[name="severability"]:checked').value === 'yes') {
+              this.findAndHighlightText("If any provision of these disclaimer and limitation sections is found to be unenforceable");
+            }
+            break;
+          case 'indemnification':
+            if (document.querySelector('input[name="indemnification"]:checked').value === 'yes') {
+              this.findAndHighlightText("INDEMNIFICATION");
+            }
+            break;
+          case 'jurisdiction':
+            const jurisdiction = document.getElementById('jurisdiction').value;
+            if (jurisdiction === 'eu' || jurisdiction === 'uk') {
+              this.findAndHighlightText("Nothing in these Terms shall exclude or limit");
+            } else if (jurisdiction === 'au') {
+              this.findAndHighlightText("Nothing in these Terms excludes, restricts, or modifies any consumer guarantee");
+            } else if (jurisdiction === 'ca') {
+              this.findAndHighlightText("Some jurisdictions, including Quebec");
+            }
+            break;
+        }
+        
+        // Remove highlights after 3 seconds
+        setTimeout(function() {
+          self.clearHighlights();
+        }, 3000);
+      },
+      
+      // Generate MS Word document
+      generateWordDoc: function() {
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                     "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                     "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+        const footer = "</body></html>";
+        const content = document.getElementById('warrantyPreview').innerHTML;
+        const sourceHTML = header + content + footer;
+        const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+        
+        // Create a download link and trigger it
+        const fileDownload = document.createElement("a");
+        document.body.appendChild(fileDownload);
+        fileDownload.href = source;
+        fileDownload.download = 'WarrantyAndLiabilityClause.doc';
+        fileDownload.click();
+        document.body.removeChild(fileDownload);
+      },
+      
+      // Handle copy button click
+      handleCopyClick: function() {
+        const text = document.getElementById('warrantyPreview').innerText;
+        const copyBtn = document.getElementById('warrantyCopyBtn');
+        const originalText = copyBtn.innerHTML;
+        
+        try {
+          // Modern approach
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+              copyBtn.innerHTML = 'COPIED!';
+              setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+              }, 2000);
+            });
+          } 
+          // Fallback approach
+          else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyBtn.innerHTML = 'COPIED!';
+            setTimeout(function() {
+              copyBtn.innerHTML = originalText;
+            }, 2000);
+          }
+        } catch(err) {
+          alert('Please select and copy the text manually.');
+        }
+      }
+    };
+    
+    // Start the generator when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+      warrantyLiabilityGenerator.init();
+    });
+    
+    // Initialize immediately as well (for WordPress)
+    warrantyLiabilityGenerator.init();
+  </script>
+</body>
+</html>
+
+    <div class="preview-fade" id="warranty-fade"></div>
+  </div>
+  
+  
+  
+  
+  
+  
+  
+  
+
+
+
+  <div id="ip-tab" class="tools-tab-content">
+    <!-- IP Rights Tab Content (Coming Soon) -->
+    <div class="coming-soon-container">
+      <div class="coming-soon-icon">🔜</div>
+      <h3 class="coming-soon-title">Intellectual Property Rights Generator</h3>
+      <p class="coming-soon-description">Create comprehensive IP rights clauses covering ownership, licenses, copyrights, trademarks, user-generated content, and more. Perfectly tailored to your business needs.</p>
+      <div class="coming-soon-notification">Coming Soon!</div>
+    </div>
+  </div>
+  
+  <div id="dispute-tab" class="tools-tab-content">
+    <!-- Dispute Resolution Tab Content (Coming Soon) -->
+    <div class="coming-soon-container">
+      <div class="coming-soon-icon">🔜</div>
+      <h3 class="coming-soon-title">Dispute Resolution Generator</h3>
+      <p class="coming-soon-description">Generate customized dispute resolution clauses with arbitration, jurisdiction, class action waiver, and attorney's fees provisions tailored to your jurisdiction and business requirements.</p>
+      <div class="coming-soon-notification">Coming Soon!</div>
+    </div>
+  </div>
+  
+  <div id="userconduct-tab" class="tools-tab-content">
+    <!-- User Obligations Tab Content (Coming Soon) -->
+    <div class="coming-soon-container">
+      <div class="coming-soon-icon">🔜</div>
+      <h3 class="coming-soon-title">User Obligations & Code of Conduct Generator</h3>
+      <p class="coming-soon-description">Create detailed user obligation clauses including acceptable use policies, prohibited activities, account security requirements, and content standards for your platform or service.</p>
+      <div class="coming-soon-notification">Coming Soon!</div>
+    </div>
+  </div>
+  
+  <div id="termination-tab" class="tools-tab-content">
+    <!-- Termination Tab Content (Coming Soon) -->
+    <div class="coming-soon-container">
+      <div class="coming-soon-icon">🔜</div>
+      <h3 class="coming-soon-title">Termination & Account Suspension Generator</h3>
+      <p class="coming-soon-description">Generate comprehensive termination clauses covering termination rights, procedures, post-termination obligations, and account suspension conditions tailored to your business model.</p>
+      <div class="coming-soon-notification">Coming Soon!</div>
+    </div>
+  </div>
+  
+</div>
+
+<script>
+(function() {
+  // State variables
+  let isPaid = false;
+  
+  // UI Elements
+  const paywallOverlay = document.getElementById('paywall-overlay');
+  const paywallBackdrop = document.getElementById('paywall-backdrop');
+  const paywallClose = document.getElementById('paywall-close');
+  const premiumBadge = document.getElementById('premium-badge');
+  const successOverlay = document.getElementById('success-overlay');
+  const successButton = document.getElementById('success-button');
+  const warrantyFade = document.getElementById('warranty-fade');
+  const recoverAccessBtn = document.getElementById('recover-access-btn');
+  const transactionIdInput = document.getElementById('transaction-id-input');
+  
+  // Constants
+  const FORM_DATA_KEY = 'touGeneratorFormData';
+  const PAYMENT_KEY = 'touGeneratorsPaid';
+  const AUTO_RETURN_PARAM = 'pmt_token48432s';
+  
+  // Initialize the page
+  function init() {
+    // Check for payment in URL (auto-return)
+    checkPaymentInUrl();
+    
+    // Check if already paid
+    checkPaidStatus();
+    
+    // Initialize tabs
+    initializeTabs();
+    
+    // Set up success overlay button
+    setupSuccessButton();
+    
+    // Set up paywall close button
+    setupPaywallClose();
+    
+    // Set up recovery button
+    setupRecoveryFeatures();
+    
+    // Disable copy and MS Word buttons until paid
+    disableButtonsUntilPaid();
+    
+    // Save form data before payment
+    setupFormDataSaving();
+  }
+  
+  // Check if user has already paid
+  function checkPaidStatus() {
+    if (localStorage.getItem(PAYMENT_KEY) === 'true') {
+      isPaid = true;
+      markAsPaid();
+    }
+  }
+  
+  // Check for payment in URL parameters (auto-return)
+  function checkPaymentInUrl() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const paymentParam = urlParams.get(AUTO_RETURN_PARAM);
+    
+    if (paymentParam || urlParams.get('tx') || urlParams.get('token') || urlParams.get('paymentId')) {
+      console.log('Payment detected in URL');
+      isPaid = true;
+      markAsPaid();
+      showSuccess();
+      
+      // Store the transaction ID if available
+      if (urlParams.get('tx')) {
+        localStorage.setItem('touGeneratorTransactionId', urlParams.get('tx'));
+      }
+    }
+  }
+  
+  // Initialize tabs
+  function initializeTabs() {
+    const tabs = document.querySelectorAll('.tools-tab');
+    const tabContents = document.querySelectorAll('.tools-tab-content');
+    
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        // Remove active class from all tabs and contents
+        tabs.forEach(t => t.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Add active class to clicked tab and corresponding content
+        tab.classList.add('active');
+        const tabId = tab.getAttribute('data-tab');
+        document.getElementById(`${tabId}-tab`).classList.add('active');
+      });
+    });
+  }
+  
+  // Disable copy and MS Word buttons until paid
+  function disableButtonsUntilPaid() {
+    // Using event capturing to prevent default behavior
+    document.addEventListener('click', function(e) {
+      if (!isPaid && (e.target.classList.contains('copy-btn') || e.target.closest('.copy-btn'))) {
+        e.preventDefault();
+        e.stopPropagation();
+        showPaywall();
+        return false;
+      }
+    }, true);
+  }
+  
+  // Set up form data saving before payment
+  function setupFormDataSaving() {
+    // Save form data before PayPal redirect
+    const form = document.querySelector('form[action*="paypal.com"]');
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        saveFormData();
+      });
+    }
+  }
+  
+  // Save form data to localStorage
+  function saveFormData() {
+    try {
+      // Collect data from the active generator
+      const formData = collectFormData();
+      
+      // Store in localStorage
+      localStorage.setItem(FORM_DATA_KEY, JSON.stringify(formData));
+      
+      console.log('Form data saved before payment');
+    } catch (e) {
+      console.error('Error saving form data:', e);
+    }
+  }
+  
+  // Collect form data from current tab
+  function collectFormData() {
+    const formData = {};
+    
+    // Find active tab content
+    const activeTab = document.querySelector('.tools-tab-content.active');
+    if (!activeTab) return formData;
+    
+    // Get all form elements in active tab
+    const formElements = activeTab.querySelectorAll('input, select, textarea');
+    formElements.forEach(el => {
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        formData[el.id] = el.checked;
+      } else {
+        formData[el.id] = el.value;
+      }
+    });
+    
+    return formData;
+  }
+  
+  // Restore form data from localStorage
+  function restoreFormData() {
+    try {
+      const savedData = localStorage.getItem(FORM_DATA_KEY);
+      if (!savedData) return false;
+      
+      const formData = JSON.parse(savedData);
+      
+      // Apply to form elements
+      Object.keys(formData).forEach(key => {
+        const el = document.getElementById(key);
+        if (el) {
+          if (el.type === 'checkbox' || el.type === 'radio') {
+            el.checked = formData[key];
+          } else {
+            el.value = formData[key];
+          }
+        }
+      });
+      
+      // Update previews after restoring data
+      if (window.warrantyLiabilityGenerator && typeof window.warrantyLiabilityGenerator.updatePreview === 'function') {
+        window.warrantyLiabilityGenerator.updatePreview();
+      }
+      
+      return true;
+    } catch (e) {
+      console.error('Error restoring form data:', e);
+      return false;
+    }
+  }
+  
+  // Set up paywall close button
+  function setupPaywallClose() {
+    paywallClose.addEventListener('click', function() {
+      hidePaywall();
+    });
+    
+    // Also close when clicking on backdrop
+    paywallBackdrop.addEventListener('click', function() {
+      hidePaywall();
+    });
+  }
+  
+  // Show paywall popup
+  function showPaywall() {
+    paywallOverlay.style.display = 'flex';
+    paywallBackdrop.style.display = 'block';
+  }
+  
+  // Hide paywall popup
+  function hidePaywall() {
+    paywallOverlay.style.display = 'none';
+    paywallBackdrop.style.display = 'none';
+  }
+  
+  // Set up success button
+  function setupSuccessButton() {
+    successButton.addEventListener('click', function() {
+      successOverlay.style.display = 'none';
+      
+      // Restore form data if available
+      restoreFormData();
+    });
+  }
+  
+  // Set up recovery features
+  function setupRecoveryFeatures() {
+    recoverAccessBtn.addEventListener('click', function() {
+      const txnId = transactionIdInput.value.trim();
+      
+      if (txnId && isValidPayPalTransactionId(txnId)) {
+        markAsPaid(txnId);
+        hidePaywall();
+        showSuccess();
+      } else {
+        alert('Please enter a valid PayPal Transaction ID');
+      }
+    });
+  }
+  
+  // Basic validation for PayPal transaction IDs
+  function isValidPayPalTransactionId(txnId) {
+    // PayPal transaction IDs are typically alphanumeric and may include hyphens
+    return /^[a-zA-Z0-9\-]{10,30}$/.test(txnId);
+  }
+  
+  // Function to mark as paid
+  function markAsPaid(transactionId) {
+    isPaid = true;
+    localStorage.setItem(PAYMENT_KEY, 'true');
+    
+    // Store transaction ID if provided
+    if (transactionId) {
+      localStorage.setItem('touGeneratorTransactionId', transactionId);
+    }
+    
+    // Hide paywall and backdrop
+    hidePaywall();
+    
+    // Show premium badge
+    premiumBadge.style.display = 'block';
+    
+    // Remove fade effects
+    warrantyFade.style.display = 'none';
+    
+    // Enable copy buttons and Word buttons
+    const copyBtns = document.querySelectorAll('.copy-btn');
+    copyBtns.forEach(btn => {
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      if (btn.hasAttribute('disabled')) {
+        btn.removeAttribute('disabled');
+      }
+    });
+    
+    // Enable selection in preview panes
+    const previewContents = document.querySelectorAll('.preview-content');
+    previewContents.forEach(preview => {
+      preview.style.userSelect = 'text';
+    });
+    
+    // Restore form data if it exists
+    restoreFormData();
+    
+    console.log('Paywall unlocked');
+  }
+  
+  // Function to show success overlay
+  function showSuccess() {
+    successOverlay.style.display = 'flex';
+  }
+  
+  // Initialize the page
+  init();
+  
+  // Make the markAsPaid function globally available for generators to access
+  window.markTouGeneratorAsPaid = markAsPaid;
+})();
+</script>
+<!-- /wp:html -->
