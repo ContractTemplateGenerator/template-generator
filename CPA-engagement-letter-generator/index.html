@@ -1224,44 +1224,15 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
             document.getElementById('nextTab5').addEventListener('click', () => showTab(5));
             document.getElementById('prevTab6').addEventListener('click', () => showTab(4));
             
-            // Preview buttons for each tab
-            const previewButtons = document.querySelectorAll('[id^="previewBtn"]');
-            previewButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    try {
-                        showPreview();
-                    } catch(e) {
-                        console.error('Error showing preview:', e);
-                        alert('Error generating preview. Please check console for details.');
-                    }
-                });
-            });
-            
-            // Final preview and generate buttons
-            const previewFinalBtn = document.getElementById('previewFinalBtn');
-            const generateBtn = document.getElementById('generateBtn');
-            
-            if (previewFinalBtn) {
-                previewFinalBtn.addEventListener('click', function() {
-                    try {
-                        showPreview();
-                    } catch(e) {
-                        console.error('Error showing final preview:', e);
-                        alert('Error generating final preview. Please check console for details.');
-                    }
-                });
-            }
-            
-            if (generateBtn) {
-                generateBtn.addEventListener('click', function() {
-                    try {
-                        showPreview();
-                    } catch(e) {
-                        console.error('Error generating letter:', e);
-                        alert('Error generating letter. Please check console for details.');
-                    }
-                });
-            }
+            // Direct event listeners for preview buttons with simplified approach
+            document.getElementById('previewBtn1').onclick = showPreview;
+            document.getElementById('previewBtn2').onclick = showPreview;
+            document.getElementById('previewBtn3').onclick = showPreview;
+            document.getElementById('previewBtn4').onclick = showPreview;
+            document.getElementById('previewBtn5').onclick = showPreview;
+            document.getElementById('previewBtn6').onclick = showPreview;
+            document.getElementById('previewFinalBtn').onclick = showPreview;
+            document.getElementById('generateBtn').onclick = showPreview;
             
             // Service type toggle
             const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
@@ -1366,155 +1337,92 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 field.addEventListener('input', highlightChanges);
             });
             
-            // Modal functionality
-            const modal = document.getElementById('previewModal');
-            const closeBtn = document.querySelector('.close');
-            const closeModalBtn = document.getElementById('closeModalBtn');
+            // Modal functionality - simplified and direct
+            document.querySelector('.close').onclick = function() {
+                document.getElementById('previewModal').style.display = 'none';
+            };
             
-            closeBtn.addEventListener('click', closeModal);
-            closeModalBtn.addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').onclick = function() {
+                document.getElementById('previewModal').style.display = 'none';
+            };
             
             // Close modal when clicking outside it
-            window.addEventListener('click', function(event) {
-                if (event.target === modal) {
-                    closeModal();
+            window.onclick = function(event) {
+                if (event.target === document.getElementById('previewModal')) {
+                    document.getElementById('previewModal').style.display = 'none';
                 }
-            });
+            };
             
-            function closeModal() {
-                modal.style.display = 'none';
-            }
-            
-            // Copy letter functionality
-            const copyLetterBtn = document.getElementById('copyLetterBtn');
-            if (copyLetterBtn) {
-                copyLetterBtn.addEventListener('click', function() {
-                    try {
-                        copyLetter();
-                    } catch(e) {
-                        console.error('Error copying letter:', e);
-                        alert('Error copying letter. Please check console for details.');
-                    }
-                });
-            }
-            
-            function copyLetter() {
-                const letterheadPreview = document.getElementById('letterheadPreview');
-                const datePreview = document.getElementById('datePreview');
-                const letterContent = document.getElementById('letterContent');
-                const cpaSignature = document.getElementById('cpaSignature');
-                const clientSignature = document.getElementById('clientSignature');
+            // Direct and simplified copy/download functionality
+            document.getElementById('copyLetterBtn').onclick = function() {
+                const letterText = document.getElementById('letterheadPreview').innerText + '\n\n' + 
+                                   document.getElementById('datePreview').innerText + '\n\n' +
+                                   document.getElementById('letterContent').innerText + '\n\n' +
+                                   'Sincerely,\n\n' +
+                                   document.getElementById('cpaSignature').innerText + '\n\n' +
+                                   'ACCEPTED AND AGREED:\n\n' +
+                                   document.getElementById('clientSignature').innerText;
                 
-                if (!letterheadPreview || !datePreview || !letterContent || !cpaSignature || !clientSignature) {
-                    console.error('One or more elements not found for copying');
-                    alert('Error: Could not find all elements needed for copying');
-                    return;
-                }
-                
-                const letterContentText = letterheadPreview.innerText + '\n\n' + 
-                                    datePreview.innerText + '\n\n' +
-                                    letterContent.innerText + '\n\n' +
-                                    'Sincerely,\n\n' +
-                                    cpaSignature.innerText + '\n\n' +
-                                    'ACCEPTED AND AGREED:\n\n' +
-                                    clientSignature.innerText;
-                
-                // Create a temporary textarea element to copy the text
                 const textarea = document.createElement('textarea');
-                textarea.value = letterContentText;
-                textarea.setAttribute('readonly', '');
-                textarea.style.position = 'absolute';
-                textarea.style.left = '-9999px';
+                textarea.value = letterText;
                 document.body.appendChild(textarea);
                 textarea.select();
                 document.execCommand('copy');
                 document.body.removeChild(textarea);
                 
-                // Show notification
                 const notification = document.getElementById('notification');
                 notification.style.display = 'block';
-                setTimeout(function() {
-                    notification.style.display = 'none';
-                }, 2000);
-            }
+                setTimeout(function() { notification.style.display = 'none'; }, 2000);
+            };
             
-            // Download functionality
-            const downloadBtn = document.getElementById('downloadBtn');
-            const downloadModalBtn = document.getElementById('downloadModalBtn');
+            // Simple direct download functionality
+            document.getElementById('downloadBtn').onclick = downloadLetter;
+            document.getElementById('downloadModalBtn').onclick = downloadLetter;
             
-            if (downloadBtn) {
-                downloadBtn.addEventListener('click', function() {
-                    try {
-                        downloadLetter();
-                    } catch(e) {
-                        console.error('Error downloading letter:', e);
-                        alert('Error downloading letter. Please check console for details.');
-                    }
-                });
-            }
-            
-            if (downloadModalBtn) {
-                downloadModalBtn.addEventListener('click', function() {
-                    try {
-                        downloadLetter();
-                    } catch(e) {
-                        console.error('Error downloading letter from modal:', e);
-                        alert('Error downloading letter. Please check console for details.');
-                    }
-                });
-            }
-            
+            // Simplified download function with minimal complexity
             function downloadLetter() {
-                generateLetter(); // Make sure letter content is up to date
+                // Always regenerate letter for latest content
+                generateLetter();
                 
-                const letterheadPreview = document.getElementById('letterheadPreview');
-                const datePreview = document.getElementById('datePreview');
-                const letterContent = document.getElementById('letterContent');
-                const cpaSignature = document.getElementById('cpaSignature');
-                const clientSignature = document.getElementById('clientSignature');
-                const clientName = document.getElementById('clientName');
+                // Get the plain text version of the letter
+                const letterText = document.getElementById('letterheadPreview').innerText + '\n\n' + 
+                                  document.getElementById('datePreview').innerText + '\n\n' +
+                                  document.getElementById('letterContent').innerText.replace(/<[^>]*>/g, '') + '\n\n' +
+                                  'Sincerely,\n\n' +
+                                  document.getElementById('cpaSignature').innerText + '\n\n' +
+                                  'ACCEPTED AND AGREED:\n\n' +
+                                  document.getElementById('clientSignature').innerText;
                 
-                if (!letterheadPreview || !datePreview || !letterContent || !cpaSignature || !clientSignature || !clientName) {
-                    console.error('One or more elements not found for download');
-                    alert('Error: Could not find all elements needed for download');
-                    return;
-                }
+                // Create file name based on client name
+                const clientNameSafe = document.getElementById('clientName').value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const fileName = `cpa_engagement_letter_${clientNameSafe}.txt`;
                 
-                const letterContentText = letterheadPreview.innerText + '\n\n' + 
-                                    datePreview.innerText + '\n\n' +
-                                    letterContent.innerText
-                                        .replace(/<[^>]*>/g, '')
-                                        .replace(/&nbsp;/g, ' ') + '\n\n' +
-                                    'Sincerely,\n\n' +
-                                    cpaSignature.innerText.replace(/<[^>]*>/g, '\n') + '\n\n' +
-                                    'ACCEPTED AND AGREED:\n\n' +
-                                    clientSignature.innerText.replace(/<[^>]*>/g, '\n');
+                // Create download link with the text content
+                const blob = new Blob([letterText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
                 
-                const fileName = `cpa_engagement_letter_${clientName.value.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.txt`;
+                // Create a link element and trigger download
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
                 
-                const blob = new Blob([letterContentText], { type: 'text/plain' });
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
             }
             
-            // Show preview modal
+            // Simpler, more reliable showPreview function
             function showPreview() {
-                try {
-                    generateLetter();
-                    if (modal) {
-                        modal.style.display = 'block';
-                    } else {
-                        console.error('Modal element not found');
-                        alert('Preview modal not found');
-                    }
-                } catch(e) {
-                    console.error('Error in showPreview:', e);
-                    throw e;
-                }
+                // Generate the letter content
+                generateLetter();
+                
+                // Show the modal directly - no conditionals or error handling that might interrupt
+                document.getElementById('previewModal').style.display = 'block';
             }
             
             // Helper function to format dates
