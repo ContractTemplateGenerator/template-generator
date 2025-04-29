@@ -1,1737 +1,1525 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CPA Engagement Letter Generator</title>
-    <style>
-        :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --accent-color: #e74c3c;
-            --light-color: #ecf0f1;
-            --dark-color: #34495e;
-            --highlight-color: #fffacd;
-        }
-        
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        
-        body {
-            font-family: 'Arial', sans-serif;
-            line-height: 1.6;
-            color: var(--dark-color);
-            background-color: #f9f9f9;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .form-container {
-            background-color: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-        
-        h2 {
-            color: var(--primary-color);
-            margin: 20px 0 10px;
-            font-size: 18px;
-            border-bottom: 1px solid var(--light-color);
-            padding-bottom: 5px;
-        }
-        
-        .form-row {
-            display: flex;
-            flex-wrap: wrap;
-            margin: 0 -10px;
-        }
-        
-        .form-col {
-            flex: 1;
-            min-width: 300px;
-            padding: 0 10px;
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        
-        textarea {
-            height: 100px;
-            resize: vertical;
-        }
-        
-        select {
-            background-color: white;
-        }
-        
-        .checkbox-group {
-            margin-top: 10px;
-        }
-        
-        .checkbox-group label {
-            display: inline-flex;
-            align-items: center;
-            font-weight: normal;
-            margin-right: 15px;
-            margin-bottom: 10px;
-            cursor: pointer;
-        }
-        
-        .checkbox-group input {
-            width: auto;
-            margin-right: 5px;
-        }
-        
-        .radio-group {
-            margin-top: 10px;
-        }
-        
-        .radio-group label {
-            display: inline-flex;
-            align-items: center;
-            font-weight: normal;
-            margin-right: 15px;
-            cursor: pointer;
-        }
-        
-        .radio-group input {
-            width: auto;
-            margin-right: 5px;
-        }
-        
-        button {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            margin-top: 10px;
-        }
-        
-        button:hover {
-            background-color: #2980b9;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary-color);
-        }
-        
-        .btn-primary:hover {
-            background-color: #1a252f;
-        }
-        
-        .btn-success {
-            background-color: #27ae60;
-        }
-        
-        .btn-success:hover {
-            background-color: #2ecc71;
-        }
-        
-        .btn-warning {
-            background-color: #f39c12;
-        }
-        
-        .btn-warning:hover {
-            background-color: #f1c40f;
-        }
-        
-        .tabs {
-            display: flex;
-            flex-wrap: wrap;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 20px;
-        }
-        
-        .tab {
-            padding: 10px 15px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            border-bottom: none;
-            border-radius: 4px 4px 0 0;
-            background-color: #f8f8f8;
-            margin-right: 5px;
-            margin-bottom: -1px;
-        }
-        
-        .tab.active {
-            background-color: white;
-            border-color: #ddd;
-            border-bottom-color: white;
-            font-weight: bold;
-            color: var(--secondary-color);
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        .prev-next-buttons {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        .buttons-container {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-        
-        /* Modal styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 8px;
-            width: 80%;
-            max-width: 800px;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-        }
-        
-        .close {
-            position: absolute;
-            top: 15px;
-            right: 20px;
-            color: #aaa;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        
-        .close:hover {
-            color: var(--dark-color);
-        }
-        
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #ddd;
-        }
-        
-        .letterhead {
-            font-size: 20px;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        
-        .date {
-            font-style: italic;
-        }
-        
-        #letterContent {
-            line-height: 1.8;
-            font-size: 14px;
-        }
-        
-        #letterContent p {
-            margin-bottom: 15px;
-        }
-        
-        #letterContent h2 {
-            margin-top: 20px;
-            font-size: 18px;
-            color: var(--primary-color);
-        }
-        
-        #letterContent h3 {
-            margin-top: 15px;
-            font-size: 16px;
-            color: var(--primary-color);
-        }
-        
-        .signature-section {
-            margin-top: 40px;
-        }
-        
-        /* Notification */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 10px 20px;
-            background-color: var(--secondary-color);
-            color: white;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1000;
-        }
-        
-        /* Tab specific styles */
-        .tab-actions {
-            position: sticky;
-            bottom: 0;
-            background-color: white;
-            padding: 15px 0;
-            border-top: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-        }
-        
-        /* Floating preview button */
-        .preview-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 100;
-            background-color: var(--primary-color);
-            color: white;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            cursor: pointer;
-        }
-        
-        .preview-btn:hover {
-            background-color: #3a506b;
-        }
-        
-        .modal-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-        
-        /* Highlight class for affected text */
-        .highlight {
-            background-color: var(--highlight-color);
-            transition: background-color 0.3s ease;
-        }
-
-        /* Added for two-panel layout */
-        .preview-content {
-            background-color: white;
-            padding: 30px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            height: 100%;
-            overflow-y: auto;
-            white-space: pre-wrap;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
-            
-            .form-container,
-            .preview-container {
-                max-width: 100%;
-                height: auto;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CPA Engagement Letter Generator</title>
+  <style>
+    /* Base Styles */
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #3498db;
+      --accent-color: #27ae60;
+      --bg-color: #f9fafb;
+      --card-bg: #ffffff;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --border-color: #e0e0e0;
+      --shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      --border-radius: 8px;
+      --transition: all 0.3s ease;
+      --highlight-color: #ffff8d;
+    }
+    
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    }
+    
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding: 20px;
+    }
+    
+    /* Container Styles */
+    .generator-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    
+    /* Header Styles */
+    .generator-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+    
+    .generator-header h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    
+    .generator-header p {
+      font-size: 16px;
+      opacity: 0.9;
+    }
+    
+    /* Content Layout */
+    .generator-content {
+      display: flex;
+      min-height: 600px;
+    }
+    
+    /* Form Styles */
+    .form-container {
+      flex: 1;
+      padding: 25px;
+      border-right: 1px solid var(--border-color);
+      overflow-y: auto;
+      max-height: 800px;
+    }
+    
+    .form-section {
+      margin-bottom: 25px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    
+    .form-section:last-child {
+      border-bottom: none;
+    }
+    
+    .form-section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+    }
+    
+    .form-group {
+      margin-bottom: 15px;
+    }
+    
+    .form-group label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 5px;
+      color: var(--text-primary);
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      color: var(--text-primary);
+      background-color: white;
+      transition: var(--transition);
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+    }
+    
+    textarea.form-input {
+      min-height: 80px;
+      resize: vertical;
+    }
+    
+    .form-helper {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+    
+    /* Radio and Checkbox Styles */
+    .options-group {
+      margin-bottom: 15px;
+    }
+    
+    .option-item {
+      display: flex;
+      align-items: flex-start;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+      background-color: #f5f7fa;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    
+    .option-item:hover {
+      background-color: #eef2f7;
+    }
+    
+    .option-item.selected {
+      background-color: #e8f6f3;
+      border-color: var(--accent-color);
+    }
+    
+    .option-item input[type="radio"],
+    .option-item input[type="checkbox"] {
+      margin-right: 10px;
+      margin-top: 3px;
+    }
+    
+    .option-content {
+      flex: 1;
+    }
+    
+    .option-label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 2px;
+    }
+    
+    .option-description {
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    
+    /* Form Actions */
+    .form-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 25px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    
+    .btn {
+      padding: 10px 16px;
+      border-radius: 4px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      border: none;
+      text-align: center;
+    }
+    
+    .btn-reset {
+      background-color: #f1f1f1;
+      color: var(--text-primary);
+    }
+    
+    .btn-reset:hover {
+      background-color: #e4e4e4;
+    }
+    
+    .btn-copy {
+      background-color: var(--secondary-color);
+      color: white;
+    }
+    
+    .btn-copy:hover {
+      background-color: #2980b9;
+    }
+    
+    .btn-download {
+      background-color: var(--accent-color);
+      color: white;
+    }
+    
+    .btn-download:hover {
+      background-color: #219653;
+    }
+    
+    .copy-message {
+      display: none;
+      font-size: 14px;
+      color: #27ae60;
+      margin-left: 10px;
+    }
+    
+    .btn-consult {
+      display: block;
+      width: 100%;
+      margin-top: 15px;
+      padding: 12px;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      text-align: center;
+      border-radius: 4px;
+      font-weight: 500;
+      transition: var(--transition);
+    }
+    
+    .btn-consult:hover {
+      background-color: #1e2a37;
+    }
+    
+    /* Preview Styles */
+    .preview-container {
+      flex: 1;
+      padding: 25px;
+      position: relative;
+    }
+    
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .preview-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+    
+    .preview-note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      font-style: italic;
+    }
+    
+    .preview-box {
+      height: 700px;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 25px;
+      background-color: white;
+      font-size: 14px;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+    
+    /* Document Styles */
+    .document-template {
+      font-family: Arial, sans-serif;
+    }
+    
+    .document-title {
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    
+    .document-section {
+      margin-bottom: 20px;
+    }
+    
+    .section-title {
+      font-weight: bold;
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: var(--primary-color);
+    }
+    
+    .section-content {
+      margin-bottom: 15px;
+    }
+    
+    .field-label {
+      font-weight: bold;
+    }
+    
+    /* Highlight Effect */
+    .highlight {
+      background-color: var(--highlight-color);
+      transition: background-color 0.5s ease;
+    }
+    
+    /* Responsive Styles */
+    @media (max-width: 1024px) {
+      .generator-content {
+        flex-direction: column;
+      }
+      
+      .form-container {
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        max-height: none;
+      }
+      
+      .preview-box {
+        height: 500px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .generator-container {
+        margin: 0;
+        border-radius: 0;
+      }
+      
+      .generator-header {
+        padding: 20px;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .copy-message {
+        margin-left: 0;
+        margin-top: 5px;
+        text-align: center;
+      }
+    }
+    
+    @media print {
+      body {
+        background-color: white;
+        padding: 0;
+      }
+      
+      .generator-container {
+        box-shadow: none;
+        border-radius: 0;
+      }
+      
+      .generator-header,
+      .form-container,
+      .preview-header,
+      .form-actions,
+      .btn-consult {
+        display: none;
+      }
+      
+      .generator-content {
+        display: block;
+      }
+      
+      .preview-container {
+        padding: 0;
+      }
+      
+      .preview-box {
+        height: auto;
+        overflow: visible;
+        border: none;
+        padding: 0;
+      }
+    }
+    
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      margin-bottom: 15px;
+    }
+    
+    .tab {
+      padding: 10px 15px;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      border-bottom: none;
+      border-radius: 4px 4px 0 0;
+      background-color: #f8f8f8;
+      margin-right: 5px;
+      margin-bottom: -1px;
+    }
+    
+    .tab.active {
+      background-color: white;
+      border-color: var(--border-color);
+      border-bottom-color: white;
+      font-weight: bold;
+      color: var(--secondary-color);
+    }
+    
+    .tab-content {
+      display: none;
+      border-top: 1px solid var(--border-color);
+      padding-top: 15px;
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="form-container" style="max-width: 100%;">
-            <h1>CPA Engagement Letter Generator</h1>
-            
-            <div class="tabs">
-                <div class="tab active" data-tab="basic-info">Basic Info</div>
-                <div class="tab" data-tab="scope-services">Scope of Services</div>
-                <div class="tab" data-tab="fees-timeline">Fees & Timeline</div>
-                <div class="tab" data-tab="responsibilities">Responsibilities</div>
-                <div class="tab" data-tab="legal-provisions">Legal Provisions</div>
-                <div class="tab" data-tab="specialized">Specialized Services</div>
+  <div class="generator-container">
+    <div class="generator-header">
+      <h1>CPA Engagement Letter Generator</h1>
+      <p>Create a customized engagement letter for CPA services</p>
+    </div>
+    
+    <div class="generator-content">
+      <!-- Form Container -->
+      <div class="form-container">
+        <form id="cpaForm">
+          <div class="tabs">
+            <div class="tab active" data-tab="basic-info">Basic Info</div>
+            <div class="tab" data-tab="services">Services</div>
+            <div class="tab" data-tab="fees">Fees & Timeline</div>
+            <div class="tab" data-tab="terms">Terms & Conditions</div>
+          </div>
+          
+          <!-- Basic Info Tab -->
+          <div class="tab-content active" id="basic-info">
+            <div class="form-section">
+              <h2 class="form-section-title">CPA Firm Information</h2>
+              
+              <div class="form-group">
+                <label for="cpaFirmName">CPA Firm Name</label>
+                <input type="text" id="cpaFirmName" class="form-input" value="Smith & Associates, CPAs">
+              </div>
+              
+              <div class="form-group">
+                <label for="cpaAddress">CPA Firm Address</label>
+                <input type="text" id="cpaAddress" class="form-input" value="123 Financial Way, Suite 500, Accounting City, CA 90210">
+              </div>
+              
+              <div class="form-group">
+                <label for="cpaPhone">Phone Number</label>
+                <input type="text" id="cpaPhone" class="form-input" value="(555) 123-4567">
+              </div>
+              
+              <div class="form-group">
+                <label for="cpaEmail">Email Address</label>
+                <input type="email" id="cpaEmail" class="form-input" value="info@smithcpas.com">
+              </div>
+              
+              <div class="form-group">
+                <label for="cpaPartnerName">Partner Name</label>
+                <input type="text" id="cpaPartnerName" class="form-input" value="John Smith, CPA">
+              </div>
             </div>
             
-            <!-- Basic Info Tab -->
-            <div class="tab-content active" id="basic-info">
-                <div class="form-row">
-                    <div class="form-col">
-                        <h2>CPA Firm Information</h2>
-                        <div class="form-group">
-                            <label for="cpaFirmName">CPA Firm Name:</label>
-                            <input type="text" id="cpaFirmName" value="Smith & Associates, CPAs" class="input-field" data-target="firmName">
-                        </div>
-                        <div class="form-group">
-                            <label for="cpaAddress">CPA Firm Address:</label>
-                            <input type="text" id="cpaAddress" value="123 Financial Way, Suite 500, Accounting City, CA 90210" class="input-field" data-target="firmAddress">
-                        </div>
-                        <div class="form-group">
-                            <label for="cpaPhone">Phone Number:</label>
-                            <input type="text" id="cpaPhone" value="(555) 123-4567" class="input-field" data-target="firmPhone">
-                        </div>
-                        <div class="form-group">
-                            <label for="cpaEmail">Email:</label>
-                            <input type="email" id="cpaEmail" value="info@smithcpas.com" class="input-field" data-target="firmEmail">
-                        </div>
+            <div class="form-section">
+              <h2 class="form-section-title">Client Information</h2>
+              
+              <div class="form-group">
+                <label for="clientName">Client Name</label>
+                <input type="text" id="clientName" class="form-input" value="XYZ Corporation">
+              </div>
+              
+              <div class="form-group">
+                <label for="clientAddress">Client Address</label>
+                <input type="text" id="clientAddress" class="form-input" value="456 Business Blvd, Enterprise, CA 90211">
+              </div>
+              
+              <div class="form-group">
+                <label for="clientContact">Primary Contact Person</label>
+                <input type="text" id="clientContact" class="form-input" value="Jane Smith, CFO">
+              </div>
+              
+              <div class="form-group">
+                <label for="entityType">Client Entity Type</label>
+                <select id="entityType" class="form-input">
+                  <option value="Corporation" selected>Corporation</option>
+                  <option value="S-Corporation">S-Corporation</option>
+                  <option value="LLC">Limited Liability Company (LLC)</option>
+                  <option value="Partnership">Partnership</option>
+                  <option value="SoleProprietorship">Sole Proprietorship</option>
+                  <option value="NonProfit">Non-Profit Organization</option>
+                  <option value="Individual">Individual</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="letterDate">Date of Letter</label>
+                <input type="date" id="letterDate" class="form-input" value="2025-04-28">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Services Tab -->
+          <div class="tab-content" id="services">
+            <div class="form-section">
+              <h2 class="form-section-title">Service Type</h2>
+              
+              <div class="form-group">
+                <label>Primary Service Category</label>
+                <div class="options-group">
+                  <label class="option-item selected">
+                    <input type="radio" name="serviceType" value="Tax" checked>
+                    <div class="option-content">
+                      <span class="option-label">Tax Services</span>
+                      <span class="option-description">Tax return preparation and planning</span>
                     </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="serviceType" value="Audit">
+                    <div class="option-content">
+                      <span class="option-label">Audit & Attest</span>
+                      <span class="option-description">Financial statement audits and reviews</span>
+                    </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="serviceType" value="Advisory">
+                    <div class="option-content">
+                      <span class="option-label">Advisory Services</span>
+                      <span class="option-description">Business consulting and financial advisory</span>
+                    </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="serviceType" value="Bookkeeping">
+                    <div class="option-content">
+                      <span class="option-label">Bookkeeping</span>
+                      <span class="option-description">Regular financial record-keeping</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <div id="taxServiceDetails" class="service-details">
+                <div class="form-group">
+                  <label>Tax Returns to Prepare</label>
+                  <div class="options-group">
+                    <label class="option-item selected">
+                      <input type="checkbox" name="taxReturns" value="Federal" checked>
+                      <div class="option-content">
+                        <span class="option-label">Federal Income Tax Returns</span>
+                      </div>
+                    </label>
                     
-                    <div class="form-col">
-                        <h2>Client Information</h2>
-                        <div class="form-group">
-                            <label for="clientName">Client Name:</label>
-                            <input type="text" id="clientName" value="XYZ Corporation" class="input-field" data-target="clientName">
-                        </div>
-                        <div class="form-group">
-                            <label for="clientAddress">Client Address:</label>
-                            <input type="text" id="clientAddress" value="456 Business Blvd, Enterprise, CA 90211" class="input-field" data-target="clientAddress">
-                        </div>
-                        <div class="form-group">
-                            <label for="clientContact">Primary Contact Person:</label>
-                            <input type="text" id="clientContact" value="Jane Smith, CFO" class="input-field" data-target="clientContact">
-                        </div>
-                        <div class="form-group">
-                            <label for="entityType">Client Entity Type:</label>
-                            <select id="entityType" class="input-field" data-target="entityType">
-                                <option value="Corporation">Corporation</option>
-                                <option value="S-Corporation">S-Corporation</option>
-                                <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
-                                <option value="Partnership">Partnership</option>
-                                <option value="Sole Proprietorship">Sole Proprietorship</option>
-                                <option value="Non-Profit Organization">Non-Profit Organization</option>
-                                <option value="Individual">Individual</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="letterDate">Date of Letter:</label>
-                            <input type="date" id="letterDate" value="2025-04-28" class="input-field" data-target="letterDate">
-                        </div>
-                    </div>
+                    <label class="option-item selected">
+                      <input type="checkbox" name="taxReturns" value="State" checked>
+                      <div class="option-content">
+                        <span class="option-label">State Income Tax Returns</span>
+                      </div>
+                    </label>
+                    
+                    <label class="option-item">
+                      <input type="checkbox" name="taxReturns" value="Local">
+                      <div class="option-content">
+                        <span class="option-label">Local Tax Returns</span>
+                      </div>
+                    </label>
+                    
+                    <label class="option-item">
+                      <input type="checkbox" name="taxReturns" value="Sales">
+                      <div class="option-content">
+                        <span class="option-label">Sales Tax Returns</span>
+                      </div>
+                    </label>
+                    
+                    <label class="option-item">
+                      <input type="checkbox" name="taxReturns" value="Payroll">
+                      <div class="option-content">
+                        <span class="option-label">Payroll Tax Returns</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
                 
-                <div class="tab-actions">
-                    <button id="prevTab1" type="button" disabled>Previous</button>
-                    <button id="previewBtn1" type="button" class="btn-primary">Preview Letter</button>
-                    <button id="nextTab1" type="button">Next</button>
+                <div class="form-group">
+                  <label for="taxYear">Tax Year</label>
+                  <input type="text" id="taxYear" class="form-input" value="2024">
                 </div>
+              </div>
             </div>
             
-            <!-- Scope of Services Tab -->
-            <div class="tab-content" id="scope-services">
-                <h2>Service Type</h2>
-                <div class="form-group">
-                    <label>Primary Service Category:</label>
-                    <div class="radio-group">
-                        <label>
-                            <input type="radio" name="serviceType" value="Tax" checked class="input-field" data-target="serviceType"> Tax Services
-                        </label>
-                        <label>
-                            <input type="radio" name="serviceType" value="Audit" class="input-field" data-target="serviceType"> Audit & Attest
-                        </label>
-                        <label>
-                            <input type="radio" name="serviceType" value="Advisory" class="input-field" data-target="serviceType"> Advisory Services
-                        </label>
-                        <label>
-                            <input type="radio" name="serviceType" value="Bookkeeping" class="input-field" data-target="serviceType"> Bookkeeping
-                        </label>
-                    </div>
-                </div>
-                
-                <div id="taxServiceOptions" class="service-options">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <h2>Tax Service Details</h2>
-                            <div class="form-group">
-                                <label>Tax Returns to Prepare:</label>
-                                <div class="checkbox-group">
-                                    <label>
-                                        <input type="checkbox" value="Federal income tax returns" checked class="input-field" data-target="taxReturns"> Federal income tax returns
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="State income tax returns" checked class="input-field" data-target="taxReturns"> State income tax returns
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Local tax returns" class="input-field" data-target="taxReturns"> Local tax returns
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Franchise tax returns" class="input-field" data-target="taxReturns"> Franchise tax returns
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Sales tax returns" class="input-field" data-target="taxReturns"> Sales tax returns
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Payroll tax returns" class="input-field" data-target="taxReturns"> Payroll tax returns
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="taxYear">Tax Year:</label>
-                                <input type="text" id="taxYear" value="2024" class="input-field" data-target="taxYear">
-                            </div>
-                        </div>
-                        
-                        <div class="form-col">
-                            <h2>Tax Planning & Representation</h2>
-                            <div class="form-group">
-                                <label>Tax Planning Services:</label>
-                                <div class="checkbox-group">
-                                    <label>
-                                        <input type="checkbox" value="Tax planning consultation" class="input-field" data-target="taxPlanning"> Tax planning consultation
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Estimated tax payment calculations" class="input-field" data-target="taxPlanning"> Estimated tax payment calculations
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Year-end tax projections" class="input-field" data-target="taxPlanning"> Year-end tax projections
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Tax Representation:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="taxRepresentation" value="Included" class="input-field" data-target="taxRepresentation"> Included in service
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="taxRepresentation" value="AdditionalFee" checked class="input-field" data-target="taxRepresentation"> Available for additional fee
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="taxRepresentation" value="NotIncluded" class="input-field" data-target="taxRepresentation"> Not included
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="auditServiceOptions" class="service-options" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <h2>Audit & Attest Service Details</h2>
-                            <div class="form-group">
-                                <label>Service Level:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="auditLevel" value="Audit" checked class="input-field" data-target="auditLevel"> Audit
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="auditLevel" value="Review" class="input-field" data-target="auditLevel"> Review
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="auditLevel" value="Compilation" class="input-field" data-target="auditLevel"> Compilation
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="auditLevel" value="AgreedUpon" class="input-field" data-target="auditLevel"> Agreed-Upon Procedures
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="financialPeriod">Financial Statement Period:</label>
-                                <input type="text" id="financialPeriod" value="Year ending December 31, 2024" class="input-field" data-target="financialPeriod">
-                            </div>
-                        </div>
-                        
-                        <div class="form-col">
-                            <h2>Reporting Framework</h2>
-                            <div class="form-group">
-                                <label>Reporting Framework:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="reportingFramework" value="GAAP" checked class="input-field" data-target="reportingFramework"> GAAP
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="reportingFramework" value="IFRS" class="input-field" data-target="reportingFramework"> IFRS
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="reportingFramework" value="Cash" class="input-field" data-target="reportingFramework"> Cash Basis
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="reportingFramework" value="TaxBasis" class="input-field" data-target="reportingFramework"> Tax Basis
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="advisoryServiceOptions" class="service-options" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <h2>Advisory Service Details</h2>
-                            <div class="form-group">
-                                <label>Advisory Services Included:</label>
-                                <div class="checkbox-group">
-                                    <label>
-                                        <input type="checkbox" value="Business valuation" class="input-field" data-target="advisoryServices"> Business valuation
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Financial forecasting" checked class="input-field" data-target="advisoryServices"> Financial forecasting
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Cash flow management" checked class="input-field" data-target="advisoryServices"> Cash flow management
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Merger & acquisition analysis" class="input-field" data-target="advisoryServices"> Merger & acquisition analysis
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Internal controls consulting" class="input-field" data-target="advisoryServices"> Internal controls consulting
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Technology systems advisory" class="input-field" data-target="advisoryServices"> Technology systems advisory
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-col">
-                            <h2>Advisory Scope</h2>
-                            <div class="form-group">
-                                <label for="advisoryScope">Advisory Scope Description:</label>
-                                <textarea id="advisoryScope" class="input-field" data-target="advisoryScope">Providing financial forecasting and cash flow management services to assist management in strategic decision-making. Services will include monthly cash flow projections and quarterly financial forecasts.</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="bookkeepingServiceOptions" class="service-options" style="display: none;">
-                    <div class="form-row">
-                        <div class="form-col">
-                            <h2>Bookkeeping Service Details</h2>
-                            <div class="form-group">
-                                <label>Bookkeeping Services Included:</label>
-                                <div class="checkbox-group">
-                                    <label>
-                                        <input type="checkbox" value="Monthly financial statement preparation" checked class="input-field" data-target="bookkeepingServices"> Monthly financial statement preparation
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Accounts receivable management" checked class="input-field" data-target="bookkeepingServices"> Accounts receivable management
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Accounts payable processing" checked class="input-field" data-target="bookkeepingServices"> Accounts payable processing
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Bank reconciliations" checked class="input-field" data-target="bookkeepingServices"> Bank reconciliations
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="Payroll processing" class="input-field" data-target="bookkeepingServices"> Payroll processing
-                                    </label>
-                                    <label>
-                                        <input type="checkbox" value="General ledger maintenance" checked class="input-field" data-target="bookkeepingServices"> General ledger maintenance
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-col">
-                            <h2>Service Frequency</h2>
-                            <div class="form-group">
-                                <label>Frequency of Service:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="bookkeepingFrequency" value="Monthly" checked class="input-field" data-target="bookkeepingFrequency"> Monthly
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="bookkeepingFrequency" value="Quarterly" class="input-field" data-target="bookkeepingFrequency"> Quarterly
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="bookkeepingFrequency" value="Annual" class="input-field" data-target="bookkeepingFrequency"> Annual
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h2>Service Exclusions</h2>
-                <div class="form-group">
-                    <label for="serviceExclusions">Explicitly Excluded Services:</label>
-                    <textarea id="serviceExclusions" class="input-field" data-target="serviceExclusions">1. Detecting fraud or other irregularities
+            <div class="form-section">
+              <h2 class="form-section-title">Service Exclusions</h2>
+              
+              <div class="form-group">
+                <label for="serviceExclusions">Explicitly Excluded Services</label>
+                <textarea id="serviceExclusions" class="form-input">1. Detecting fraud or other irregularities
 2. Verifying the accuracy of information provided by the client
 3. Filing extensions without specific authorization
 4. Representing the client in audit or collection proceedings without a separate engagement
 5. Preparing returns for related entities unless specifically engaged to do so</textarea>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Fees & Timeline Tab -->
+          <div class="tab-content" id="fees">
+            <div class="form-section">
+              <h2 class="form-section-title">Fee Structure</h2>
+              
+              <div class="form-group">
+                <label>Fee Arrangement</label>
+                <div class="options-group">
+                  <label class="option-item selected">
+                    <input type="radio" name="feeStructure" value="Fixed" checked>
+                    <div class="option-content">
+                      <span class="option-label">Fixed Fee</span>
+                      <span class="option-description">Set price for defined services</span>
+                    </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="feeStructure" value="Hourly">
+                    <div class="option-content">
+                      <span class="option-label">Hourly Rate</span>
+                      <span class="option-description">Billed based on time spent</span>
+                    </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="feeStructure" value="Monthly">
+                    <div class="option-content">
+                      <span class="option-label">Monthly Retainer</span>
+                      <span class="option-description">Regular monthly fee</span>
+                    </div>
+                  </label>
+                </div>
+              </div>
+              
+              <div id="fixedFeeDetails" class="fee-details">
+                <div class="form-group">
+                  <label for="fixedFeeAmount">Fixed Fee Amount</label>
+                  <input type="text" id="fixedFeeAmount" class="form-input" value="$5,000">
                 </div>
                 
-                <div class="tab-actions">
-                    <button id="prevTab2" type="button">Previous</button>
-                    <button id="previewBtn2" type="button" class="btn-primary">Preview Letter</button>
-                    <button id="nextTab2" type="button">Next</button>
-                </div>
-            </div>
-            
-            <!-- Fees & Timeline Tab -->
-            <div class="tab-content" id="fees-timeline">
-                <div class="form-row">
-                    <div class="form-col">
-                        <h2>Fee Structure</h2>
-                        <div class="form-group">
-                            <label>Fee Arrangement:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="feeStructure" value="Fixed" checked class="input-field" data-target="feeStructure"> Fixed Fee
-                                </label>
-                                <label>
-                                    <input type="radio" name="feeStructure" value="Hourly" class="input-field" data-target="feeStructure"> Hourly Rate
-                                </label>
-                                <label>
-                                    <input type="radio" name="feeStructure" value="Monthly" class="input-field" data-target="feeStructure"> Monthly Retainer
-                                </label>
-                            </div>
-                        </div>
-                        
-                        <div id="fixedFeeOptions">
-                            <div class="form-group">
-                                <label for="fixedFeeAmount">Fixed Fee Amount:</label>
-                                <input type="text" id="fixedFeeAmount" value="$5,000" class="input-field" data-target="fixedFeeAmount">
-                            </div>
-                            <div class="form-group">
-                                <label>Payment Schedule:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="fixedFeeSchedule" value="Upfront" class="input-field" data-target="paymentSchedule"> 100% Upfront
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="fixedFeeSchedule" value="50-50" checked class="input-field" data-target="paymentSchedule"> 50% Upfront, 50% Upon Completion
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="fixedFeeSchedule" value="Completion" class="input-field" data-target="paymentSchedule"> 100% Upon Completion
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="hourlyFeeOptions" style="display: none;">
-                            <div class="form-group">
-                                <label for="partnerRate">Partner Rate:</label>
-                                <input type="text" id="partnerRate" value="$350 per hour" class="input-field" data-target="partnerRate">
-                            </div>
-                            <div class="form-group">
-                                <label for="managerRate">Manager Rate:</label>
-                                <input type="text" id="managerRate" value="$250 per hour" class="input-field" data-target="managerRate">
-                            </div>
-                            <div class="form-group">
-                                <label for="staffRate">Staff Rate:</label>
-                                <input type="text" id="staffRate" value="$175 per hour" class="input-field" data-target="staffRate">
-                            </div>
-                            <div class="form-group">
-                                <label for="estimatedHours">Estimated Total Hours:</label>
-                                <input type="text" id="estimatedHours" value="25" class="input-field" data-target="estimatedHours">
-                            </div>
-                            <div class="form-group">
-                                <label for="estimatedTotal">Estimated Total Fee:</label>
-                                <input type="text" id="estimatedTotal" value="$5,000 - $7,500" class="input-field" data-target="estimatedTotal">
-                            </div>
-                            <div class="form-group">
-                                <label>Billing Frequency:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="hourlyBillingFrequency" value="Monthly" checked class="input-field" data-target="billingFrequency"> Monthly
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="hourlyBillingFrequency" value="Biweekly" class="input-field" data-target="billingFrequency"> Bi-weekly
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="hourlyBillingFrequency" value="Completion" class="input-field" data-target="billingFrequency"> Upon Completion
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div id="monthlyFeeOptions" style="display: none;">
-                            <div class="form-group">
-                                <label for="monthlyRetainer">Monthly Retainer Amount:</label>
-                                <input type="text" id="monthlyRetainer" value="$1,500" class="input-field" data-target="monthlyRetainer">
-                            </div>
-                            <div class="form-group">
-                                <label for="retainerTerm">Retainer Term:</label>
-                                <input type="text" id="retainerTerm" value="12 months" class="input-field" data-target="retainerTerm">
-                            </div>
-                            <div class="form-group">
-                                <label for="retainerIncludes">Retainer Includes:</label>
-                                <textarea id="retainerIncludes" class="input-field" data-target="retainerIncludes">- Monthly financial statement preparation
-- Quarterly tax planning meetings
-- Annual tax return preparation
-- Unlimited email support</textarea>
-                            </div>
-                        </div>
-                        
-                        <h2>Expenses</h2>
-                        <div class="form-group">
-                            <label>Out-of-Pocket Expenses:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="expenseHandling" value="Included" class="input-field" data-target="expenseHandling"> Included in fee
-                                </label>
-                                <label>
-                                    <input type="radio" name="expenseHandling" value="Billed" checked class="input-field" data-target="expenseHandling"> Billed separately
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group" id="expenseDetailsGroup">
-                            <label for="expenseDetails">Billable Expense Details:</label>
-                            <textarea id="expenseDetails" class="input-field" data-target="expenseDetails">Travel expenses, courier fees, filing fees, and other out-of-pocket expenses will be billed separately as incurred. These expenses will be itemized on your invoice.</textarea>
-                        </div>
-                    </div>
+                <div class="form-group">
+                  <label>Payment Schedule</label>
+                  <div class="options-group">
+                    <label class="option-item">
+                      <input type="radio" name="paymentSchedule" value="Upfront">
+                      <div class="option-content">
+                        <span class="option-label">100% Upfront</span>
+                      </div>
+                    </label>
                     
-                    <div class="form-col">
-                        <h2>Timeline</h2>
-                        <div class="form-group">
-                            <label for="startDate">Engagement Start Date:</label>
-                            <input type="date" id="startDate" value="2025-05-01" class="input-field" data-target="startDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="endDate">Estimated Completion Date:</label>
-                            <input type="date" id="endDate" value="2025-06-30" class="input-field" data-target="endDate">
-                        </div>
-                        <div class="form-group">
-                            <label for="keyDeadlines">Key Deadlines:</label>
-                            <textarea id="keyDeadlines" class="input-field" data-target="keyDeadlines">- Client information due: May 15, 2025
-- Draft deliverables: June 15, 2025
-- Client review period: June 15-22, 2025
-- Final deliverables: June 30, 2025</textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-actions">
-                    <button id="prevTab3" type="button">Previous</button>
-                    <button id="previewBtn3" type="button" class="btn-primary">Preview Letter</button>
-                    <button id="nextTab3" type="button">Next</button>
-                </div>
-            </div>
-            
-            <!-- Responsibilities Tab -->
-            <div class="tab-content" id="responsibilities">
-                <div class="form-row">
-                    <div class="form-col">
-                        <h2>Client Responsibilities</h2>
-                        <div class="form-group">
-                            <label for="clientResponsibilities">Client Information Responsibilities:</label>
-                            <textarea id="clientResponsibilities" class="input-field" data-target="clientResponsibilities">1. Provide complete and accurate information in a timely manner
-2. Make available all relevant records and documentation
-3. Respond promptly to inquiries and requests for additional information
-4. Review draft deliverables and provide feedback within specified timeframes
-5. Promptly notify us of any changes in circumstances that may affect our services
-6. Retain original documentation for your records</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="clientDeadlines">Client Information Deadlines:</label>
-                            <input type="text" id="clientDeadlines" value="May 15, 2025" class="input-field" data-target="clientDeadlines">
-                        </div>
-                        <div class="form-group">
-                            <label for="clientFormat">Required Information Format:</label>
-                            <textarea id="clientFormat" class="input-field" data-target="clientFormat">Information should be provided electronically whenever possible, preferably in Excel, PDF, or QuickBooks format. Physical documents should be provided in an organized fashion with appropriate labeling.</textarea>
-                        </div>
-                    </div>
+                    <label class="option-item selected">
+                      <input type="radio" name="paymentSchedule" value="Split" checked>
+                      <div class="option-content">
+                        <span class="option-label">50% Upfront, 50% Upon Completion</span>
+                      </div>
+                    </label>
                     
-                    <div class="form-col">
-                        <h2>CPA Firm Responsibilities</h2>
-                        <div class="form-group">
-                            <label for="cpaResponsibilities">CPA Firm Service Commitments:</label>
-                            <textarea id="cpaResponsibilities" class="input-field" data-target="cpaResponsibilities">1. Perform all services with professional competence and due care
-2. Maintain client confidentiality in accordance with professional standards
-3. Comply with applicable professional standards and regulations
-4. Communicate significant matters that arise during the engagement
-5. Provide drafts of deliverables for client review before finalization
-6. Meet agreed-upon deadlines provided client information is received timely</textarea>
-                        </div>
-                        <div class="form-group">
-                            <label for="cpaCommunication">Communication Expectations:</label>
-                            <textarea id="cpaCommunication" class="input-field" data-target="cpaCommunication">We will provide regular status updates throughout the engagement. Significant issues will be communicated promptly via email or telephone. The engagement partner will be available for consultation during normal business hours.</textarea>
-                        </div>
-                        
-                        <h2>Quality Control</h2>
-                        <div class="form-group">
-                            <label for="qualityControl">Quality Control Procedures:</label>
-                            <textarea id="qualityControl" class="input-field" data-target="qualityControl">All work products will undergo multiple levels of review, including:
-1. Staff-level preparation and initial review
-2. Manager-level detailed review
-3. Partner-level final review before client delivery
-We maintain a comprehensive quality control system in compliance with AICPA standards.</textarea>
-                        </div>
-                    </div>
+                    <label class="option-item">
+                      <input type="radio" name="paymentSchedule" value="Completion">
+                      <div class="option-content">
+                        <span class="option-label">100% Upon Completion</span>
+                      </div>
+                    </label>
+                  </div>
                 </div>
-                
-                <div class="tab-actions">
-                    <button id="prevTab4" type="button">Previous</button>
-                    <button id="previewBtn4" type="button" class="btn-primary">Preview Letter</button>
-                    <button id="nextTab4" type="button">Next</button>
-                </div>
+              </div>
             </div>
             
-            <!-- Legal Provisions Tab -->
-            <div class="tab-content" id="legal-provisions">
-                <div class="form-row">
-                    <div class="form-col">
-                        <h2>Governing Law</h2>
-                        <div class="form-group">
-                            <label for="governingState">Governing State Law:</label>
-                            <select id="governingState" class="input-field" data-target="governingState">
-                                <option value="Alabama">Alabama</option>
-                                <option value="Alaska">Alaska</option>
-                                <option value="Arizona">Arizona</option>
-                                <option value="Arkansas">Arkansas</option>
-                                <option value="California" selected>California</option>
-                                <option value="Colorado">Colorado</option>
-                                <option value="Connecticut">Connecticut</option>
-                                <option value="Delaware">Delaware</option>
-                                <option value="Florida">Florida</option>
-                                <option value="Georgia">Georgia</option>
-                                <option value="Hawaii">Hawaii</option>
-                                <option value="Idaho">Idaho</option>
-                                <option value="Illinois">Illinois</option>
-                                <option value="Indiana">Indiana</option>
-                                <option value="Iowa">Iowa</option>
-                                <option value="Kansas">Kansas</option>
-                                <option value="Kentucky">Kentucky</option>
-                                <option value="Louisiana">Louisiana</option>
-                                <option value="Maine">Maine</option>
-                                <option value="Maryland">Maryland</option>
-                                <option value="Massachusetts">Massachusetts</option>
-                                <option value="Michigan">Michigan</option>
-                                <option value="Minnesota">Minnesota</option>
-                                <option value="Mississippi">Mississippi</option>
-                                <option value="Missouri">Missouri</option>
-                                <option value="Montana">Montana</option>
-                                <option value="Nebraska">Nebraska</option>
-                                <option value="Nevada">Nevada</option>
-                                <option value="New Hampshire">New Hampshire</option>
-                                <option value="New Jersey">New Jersey</option>
-                                <option value="New Mexico">New Mexico</option>
-                                <option value="New York">New York</option>
-                                <option value="North Carolina">North Carolina</option>
-                                <option value="North Dakota">North Dakota</option>
-                                <option value="Ohio">Ohio</option>
-                                <option value="Oklahoma">Oklahoma</option>
-                                <option value="Oregon">Oregon</option>
-                                <option value="Pennsylvania">Pennsylvania</option>
-                                <option value="Rhode Island">Rhode Island</option>
-                                <option value="South Carolina">South Carolina</option>
-                                <option value="South Dakota">South Dakota</option>
-                                <option value="Tennessee">Tennessee</option>
-                                <option value="Texas">Texas</option>
-                                <option value="Utah">Utah</option>
-                                <option value="Vermont">Vermont</option>
-                                <option value="Virginia">Virginia</option>
-                                <option value="Washington">Washington</option>
-                                <option value="West Virginia">West Virginia</option>
-                                <option value="Wisconsin">Wisconsin</option>
-                                <option value="Wyoming">Wyoming</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="venueCounty">Venue (County):</label>
-                            <input type="text" id="venueCounty" value="Los Angeles County" class="input-field" data-target="venueCounty">
-                        </div>
-                        
-                        <h2>Limitation of Liability</h2>
-                        <div class="form-group">
-                            <label>Include Liability Limitation:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="includeLiability" value="Yes" checked class="input-field" data-target="includeLiability"> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name="includeLiability" value="No" class="input-field" data-target="includeLiability"> No
-                                </label>
-                            </div>
-                        </div>
-                        <div id="liabilityOptions">
-                            <div class="form-group">
-                                <label>Liability Cap Type:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="liabilityCapType" value="Fees" checked class="input-field" data-target="liabilityCapType"> Fee-based Cap
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="liabilityCapType" value="Fixed" class="input-field" data-target="liabilityCapType"> Fixed Amount Cap
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group" id="feesCapGroup">
-                                <label>Fee-based Cap Multiplier:</label>
-                                <div class="radio-group">
-                                    <label>
-                                        <input type="radio" name="feesCapMultiplier" value="1x" class="input-field" data-target="feesCapMultiplier"> 1x Fees Paid
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="feesCapMultiplier" value="2x" checked class="input-field" data-target="feesCapMultiplier"> 2x Fees Paid
-                                    </label>
-                                    <label>
-                                        <input type="radio" name="feesCapMultiplier" value="3x" class="input-field" data-target="feesCapMultiplier"> 3x Fees Paid
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group" id="fixedCapGroup" style="display: none;">
-                                <label for="fixedCapAmount">Fixed Cap Amount:</label>
-                                <input type="text" id="fixedCapAmount" value="$100,000" class="input-field" data-target="fixedCapAmount">
-                            </div>
-                            <div class="form-group">
-                                <label for="liabilityExclusions">Liability Type Exclusions:</label>
-                                <textarea id="liabilityExclusions" class="input-field" data-target="liabilityExclusions">This limitation of liability does not apply to claims arising from our willful misconduct or fraudulent behavior. Our liability shall be limited to direct damages only, and we shall not be liable for any consequential, incidental, indirect, punitive, exemplary or special damages.</textarea>
-                            </div>
-                        </div>
+            <div class="form-section">
+              <h2 class="form-section-title">Timeline</h2>
+              
+              <div class="form-group">
+                <label for="startDate">Engagement Start Date</label>
+                <input type="date" id="startDate" class="form-input" value="2025-05-01">
+              </div>
+              
+              <div class="form-group">
+                <label for="endDate">Estimated Completion Date</label>
+                <input type="date" id="endDate" class="form-input" value="2025-06-30">
+              </div>
+              
+              <div class="form-group">
+                <label for="clientDeadline">Client Information Deadline</label>
+                <input type="date" id="clientDeadline" class="form-input" value="2025-05-15">
+              </div>
+            </div>
+          </div>
+          
+          <!-- Terms & Conditions Tab -->
+          <div class="tab-content" id="terms">
+            <div class="form-section">
+              <h2 class="form-section-title">Legal Provisions</h2>
+              
+              <div class="form-group">
+                <label for="governingState">Governing State Law</label>
+                <select id="governingState" class="form-input">
+                  <option value="Alabama">Alabama</option>
+                  <option value="Alaska">Alaska</option>
+                  <option value="Arizona">Arizona</option>
+                  <option value="Arkansas">Arkansas</option>
+                  <option value="California" selected>California</option>
+                  <option value="Colorado">Colorado</option>
+                  <option value="Connecticut">Connecticut</option>
+                  <option value="Delaware">Delaware</option>
+                  <option value="Florida">Florida</option>
+                  <option value="Georgia">Georgia</option>
+                  <option value="Hawaii">Hawaii</option>
+                  <option value="Idaho">Idaho</option>
+                  <option value="Illinois">Illinois</option>
+                  <option value="Indiana">Indiana</option>
+                  <option value="Iowa">Iowa</option>
+                  <option value="Kansas">Kansas</option>
+                  <option value="Kentucky">Kentucky</option>
+                  <option value="Louisiana">Louisiana</option>
+                  <option value="Maine">Maine</option>
+                  <option value="Maryland">Maryland</option>
+                  <option value="Massachusetts">Massachusetts</option>
+                  <option value="Michigan">Michigan</option>
+                  <option value="Minnesota">Minnesota</option>
+                  <option value="Mississippi">Mississippi</option>
+                  <option value="Missouri">Missouri</option>
+                  <option value="Montana">Montana</option>
+                  <option value="Nebraska">Nebraska</option>
+                  <option value="Nevada">Nevada</option>
+                  <option value="New Hampshire">New Hampshire</option>
+                  <option value="New Jersey">New Jersey</option>
+                  <option value="New Mexico">New Mexico</option>
+                  <option value="New York">New York</option>
+                  <option value="North Carolina">North Carolina</option>
+                  <option value="North Dakota">North Dakota</option>
+                  <option value="Ohio">Ohio</option>
+                  <option value="Oklahoma">Oklahoma</option>
+                  <option value="Oregon">Oregon</option>
+                  <option value="Pennsylvania">Pennsylvania</option>
+                  <option value="Rhode Island">Rhode Island</option>
+                  <option value="South Carolina">South Carolina</option>
+                  <option value="South Dakota">South Dakota</option>
+                  <option value="Tennessee">Tennessee</option>
+                  <option value="Texas">Texas</option>
+                  <option value="Utah">Utah</option>
+                  <option value="Vermont">Vermont</option>
+                  <option value="Virginia">Virginia</option>
+                  <option value="Washington">Washington</option>
+                  <option value="West Virginia">West Virginia</option>
+                  <option value="Wisconsin">Wisconsin</option>
+                  <option value="Wyoming">Wyoming</option>
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label>Dispute Resolution Method</label>
+                <div class="options-group">
+                  <label class="option-item">
+                    <input type="radio" name="disputeResolution" value="Mediation">
+                    <div class="option-content">
+                      <span class="option-label">Mediation Only</span>
                     </div>
-                    
-                    <div class="form-col">
-                        <h2>Dispute Resolution</h2>
-                        <div class="form-group">
-                            <label>Dispute Resolution Method:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="disputeResolution" value="Mediation" class="input-field" data-target="disputeResolution"> Mediation Only
-                                </label>
-                                <label>
-                                    <input type="radio" name="disputeResolution" value="MediationArbitration" checked class="input-field" data-target="disputeResolution"> Mediation then Arbitration
-                                </label>
-                                <label>
-                                    <input type="radio" name="disputeResolution" value="Arbitration" class="input-field" data-target="disputeResolution"> Arbitration Only
-                                </label>
-                                <label>
-                                    <input type="radio" name="disputeResolution" value="Litigation" class="input-field" data-target="disputeResolution"> Litigation
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group" id="mediationArbitrationGroup">
-                            <label for="mediationArbitrationDetails">Mediation/Arbitration Details:</label>
-                            <textarea id="mediationArbitrationDetails" class="input-field" data-target="mediationArbitrationDetails">Disputes shall first be submitted to mediation administered by the American Arbitration Association under its Professional Accounting and Related Services Dispute Resolution Rules. If mediation is unsuccessful, the dispute shall be settled by binding arbitration administered by the American Arbitration Association in accordance with its Professional Accounting and Related Services Arbitration Rules.</textarea>
-                        </div>
-                        
-                        <h2>Termination</h2>
-                        <div class="form-group">
-                            <label>Termination Notice Period:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="terminationPeriod" value="15Days" class="input-field" data-target="terminationPeriod"> 15 Days
-                                </label>
-                                <label>
-                                    <input type="radio" name="terminationPeriod" value="30Days" checked class="input-field" data-target="terminationPeriod"> 30 Days
-                                </label>
-                                <label>
-                                    <input type="radio" name="terminationPeriod" value="60Days" class="input-field" data-target="terminationPeriod"> 60 Days
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="terminationObligations">Post-Termination Obligations:</label>
-                            <textarea id="terminationObligations" class="input-field" data-target="terminationObligations">Upon termination, Client shall be responsible for payment of all fees and expenses incurred through the effective date of termination. We will cooperate in the transition of services to successor service providers, provided all outstanding invoices have been paid in full. Confidentiality obligations shall survive termination of this engagement.</textarea>
-                        </div>
-                        
-                        <h2>Confidentiality</h2>
-                        <div class="form-group">
-                            <label for="confidentialityProvisions">Confidentiality Provisions:</label>
-                            <textarea id="confidentialityProvisions" class="input-field" data-target="confidentialityProvisions">We will maintain the confidentiality of all information provided by you in accordance with applicable professional standards. We will not disclose any confidential information without your consent, except as required by law or professional standards. We may use cloud-based systems to process and store your information, with appropriate security measures in place to protect confidentiality.</textarea>
-                        </div>
+                  </label>
+                  
+                  <label class="option-item selected">
+                    <input type="radio" name="disputeResolution" value="MediationArbitration" checked>
+                    <div class="option-content">
+                      <span class="option-label">Mediation then Arbitration</span>
                     </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="disputeResolution" value="Arbitration">
+                    <div class="option-content">
+                      <span class="option-label">Arbitration Only</span>
+                    </div>
+                  </label>
+                  
+                  <label class="option-item">
+                    <input type="radio" name="disputeResolution" value="Litigation">
+                    <div class="option-content">
+                      <span class="option-label">Litigation</span>
+                    </div>
+                  </label>
                 </div>
-                
-                <div class="tab-actions">
-                    <button id="prevTab5" type="button">Previous</button>
-                    <button id="previewBtn5" type="button" class="btn-primary">Preview Letter</button>
-                    <button id="nextTab5" type="button">Next</button>
-                </div>
+              </div>
             </div>
             
-            <!-- Specialized Services Tab -->
-            <div class="tab-content" id="specialized">
-                <div class="form-row">
-                    <div class="form-col">
-                        <h2>Record Retention</h2>
-                        <div class="form-group">
-                            <label for="recordRetentionPeriod">Record Retention Period:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="retentionPeriod" value="5Years" class="input-field" data-target="retentionPeriod"> 5 Years
-                                </label>
-                                <label>
-                                    <input type="radio" name="retentionPeriod" value="7Years" checked class="input-field" data-target="retentionPeriod"> 7 Years
-                                </label>
-                                <label>
-                                    <input type="radio" name="retentionPeriod" value="10Years" class="input-field" data-target="retentionPeriod"> 10 Years
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="recordRetentionPolicy">Record Retention Policy Details:</label>
-                            <textarea id="recordRetentionPolicy" class="input-field" data-target="recordRetentionPolicy">We will retain our working papers and copies of client-provided records for 7 years after completion of the engagement. After this period, records may be destroyed without further notice. Original client records will be returned to you upon completion of the engagement. You are responsible for retaining your records for any future needs.</textarea>
-                        </div>
-                        
-                        <h2>Electronic Communications</h2>
-                        <div class="form-group">
-                            <label>Electronic Communication Methods:</label>
-                            <div class="checkbox-group">
-                                <label>
-                                    <input type="checkbox" value="Email" checked class="input-field" data-target="electronicMethods"> Email
-                                </label>
-                                <label>
-                                    <input type="checkbox" value="Client Portal" checked class="input-field" data-target="electronicMethods"> Client Portal
-                                </label>
-                                <label>
-                                    <input type="checkbox" value="Text Messages" class="input-field" data-target="electronicMethods"> Text Messages
-                                </label>
-                                <label>
-                                    <input type="checkbox" value="Cloud Storage" checked class="input-field" data-target="electronicMethods"> Cloud Storage
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label for="electronicCommunicationTerms">Electronic Communication Terms:</label>
-                            <textarea id="electronicCommunicationTerms" class="input-field" data-target="electronicCommunicationTerms">By signing this engagement letter, you acknowledge and accept the inherent security limitations of electronic communications. We use commercially reasonable measures to protect electronic information, but cannot guarantee complete security. You authorize us to use email, secure client portals, and other electronic means to transmit information. Sensitive information will be shared through our secure client portal whenever possible.</textarea>
-                        </div>
-                    </div>
-                    
-                    <div class="form-col">
-                        <h2>Additional Provisions</h2>
-                        <div class="form-group">
-                            <label>Include Third-Party Provisions:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="thirdPartyProvisions" value="Yes" checked class="input-field" data-target="includeThirdParty"> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name="thirdPartyProvisions" value="No" class="input-field" data-target="includeThirdParty"> No
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group" id="thirdPartyTermsGroup">
-                            <label for="thirdPartyTerms">Third-Party Terms:</label>
-                            <textarea id="thirdPartyTerms" class="input-field" data-target="thirdPartyTerms">Our services and work product are intended solely for your use. We do not anticipate that any third parties will rely on our work product, and we assume no responsibility to any third parties. You agree to indemnify and hold us harmless from any claims, liabilities, costs, or expenses resulting from third-party use of or reliance on our services or work product.</textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Include Staffing Provisions:</label>
-                            <div class="radio-group">
-                                <label>
-                                    <input type="radio" name="staffingProvisions" value="Yes" checked class="input-field" data-target="includeStaffing"> Yes
-                                </label>
-                                <label>
-                                    <input type="radio" name="staffingProvisions" value="No" class="input-field" data-target="includeStaffing"> No
-                                </label>
-                            </div>
-                        </div>
-                        <div class="form-group" id="staffingDetailsGroup">
-                            <label for="staffingDetails">Staffing Details:</label>
-                            <textarea id="staffingDetails" class="input-field" data-target="staffingDetails">The engagement will be supervised by [Partner Name], with [Manager Name] serving as the day-to-day contact. Staff members with appropriate expertise will be assigned as needed. We reserve the right to make staffing changes as necessary to meet engagement requirements and deadlines.</textarea>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="additionalTerms">Additional Terms and Conditions:</label>
-                            <textarea id="additionalTerms" class="input-field" data-target="additionalTerms">This engagement letter constitutes the entire agreement between the parties with respect to the services described herein and supersedes all prior agreements, understandings, or representations. Any modification to this engagement letter must be in writing and signed by both parties.</textarea>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="tab-actions">
-                    <button id="prevTab6" type="button">Previous</button>
-                    <button id="previewBtn6" type="button" class="btn-primary">Preview Letter</button>
-                </div>
+            <div class="form-section">
+              <h2 class="form-section-title">Additional Terms</h2>
+              
+              <div class="form-group">
+                <label for="additionalTerms">Additional Terms and Conditions</label>
+                <textarea id="additionalTerms" class="form-input">This engagement letter constitutes the entire agreement between the parties with respect to the services described herein and supersedes all prior agreements, understandings, or representations. Any modification to this engagement letter must be in writing and signed by both parties.</textarea>
+              </div>
             </div>
-            
-            <div class="buttons-container">
-                <button id="downloadBtn" class="btn-warning">Download as Text File</button>
-            </div>
+          </div>
+          
+          <!-- Form Actions -->
+          <div class="form-actions">
+            <button type="button" id="copyBtn" class="btn btn-copy">Copy Agreement</button>
+            <span id="copyMessage" class="copy-message">Agreement copied!</span>
+            <button type="button" id="downloadBtn" class="btn btn-download">Download as DOCX</button>
+            <button type="reset" id="resetBtn" class="btn btn-reset">Reset Form</button>
+          </div>
+          
+          <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+            Schedule Legal Consultation
+          </a>
+        </form>
+      </div>
+      
+      <!-- Preview Container -->
+      <div class="preview-container">
+        <div class="preview-header">
+          <div class="preview-title">Agreement Preview</div>
+          <div class="preview-note">Updates as you complete the form</div>
         </div>
         
-
-    </div>
-    
-    <!-- Modal for Preview -->
-    <div id="previewModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <div class="preview-header">
-                <div class="letterhead" id="letterheadPreview">Smith & Associates, CPAs</div>
-                <div class="date" id="datePreview">April 28, 2025</div>
-            </div>
-            <div id="letterContent">
-                <!-- Letter content will be generated here -->
-            </div>
-            <div class="signature-section">
-                <p>Sincerely,</p>
-                <p id="cpaSignature">[Partner Name]<br>Smith & Associates, CPAs</p>
-                <p style="margin-top: 40px;">ACCEPTED AND AGREED:</p>
-                <p id="clientSignature">_____________________________<br>XYZ Corporation<br>By: Jane Smith, CFO<br>Date: _____________________</p>
-                <p style="margin-top: 20px; font-style: italic; font-size: 12px;">Please sign and return a copy of this engagement letter to indicate your acceptance of these terms.</p>
-            </div>
-            
-            <div class="modal-buttons">
-                <button id="copyLetterBtn" class="btn-primary">Copy to Clipboard</button>
-                <button id="downloadModalBtn" class="btn-warning">Download as Text</button>
-                <button id="closeModalBtn" class="btn-secondary">Close</button>
-            </div>
+        <div class="preview-box">
+          <div class="document-template" id="agreementPreview">
+            <!-- Document content will be populated by JavaScript -->
+          </div>
         </div>
+      </div>
     </div>
-    
-    <div class="notification" id="notification">Letter copied to clipboard!</div>
-    
-    <script>
-        // Wait for DOM to fully load before attaching event handlers
-        document.addEventListener('DOMContentLoaded', function() {
-            // Helper function to format dates
-            function formatDate(dateString) {
-                if (!dateString) return '';
-                const date = new Date(dateString);
-                if (isNaN(date.getTime())) return dateString; // Return original if invalid
-                const options = { year: 'numeric', month: 'long', day: 'numeric' };
-                return date.toLocaleDateString('en-US', options);
-            }
-            
-            // Generate letter for preview
-            function generateLetter() {
-                let letterHtml = '';
-                
-                // Letterhead
-                letterHtml += `<div class="letterhead">${document.getElementById('cpaFirmName').value}</div>`;
-                letterHtml += `<div class="date">${formatDate(document.getElementById('letterDate').value)}</div>`;
-                
-                // Client address section
-                letterHtml += `<p>${document.getElementById('clientName').value}<br>
-                ${document.getElementById('clientAddress').value}<br>
-                Attention: ${document.getElementById('clientContact').value}</p>`;
-                
-                letterHtml += `<p>Re: Engagement Letter for Professional Services</p>`;
-                
-                // Introduction
-                letterHtml += `<p>Dear ${document.getElementById('clientContact').value.split(',')[0]}:</p>`;
-                
-                letterHtml += `<p>Thank you for selecting ${document.getElementById('cpaFirmName').value} ("we", "us", "our") to provide professional services to ${document.getElementById('clientName').value} ("you", "your", "Client"). This engagement letter outlines the terms and conditions of our engagement, as well as the nature and limitations of the services we will provide.</p>`;
-                
-                // Scope of Services
-                letterHtml += `<h2>Scope of Services</h2>`;
-                
-                const serviceType = document.querySelector('input[name="serviceType"]:checked').value;
-                
-                if (serviceType === 'Tax') {
-                    // Tax service scope
-                    const taxReturns = Array.from(document.querySelectorAll('input[data-target="taxReturns"]:checked'))
-                        .map(input => input.value);
-                    
-                    const taxPlanning = Array.from(document.querySelectorAll('input[data-target="taxPlanning"]:checked'))
-                        .map(input => input.value);
-                    
-                    letterHtml += `<p>We will prepare the following tax returns for ${document.getElementById('clientName').value} for the ${document.getElementById('taxYear').value} tax year:</p>`;
-                    
-                    if (taxReturns.length > 0) {
-                        letterHtml += `<p>${taxReturns.join('<br>')}</p>`;
-                    } else {
-                        letterHtml += `<p>To be determined based on our initial assessment of your tax situation.</p>`;
-                    }
-                    
-                    if (taxPlanning.length > 0) {
-                        letterHtml += `<p>Our services will also include the following tax planning assistance:</p>`;
-                        letterHtml += `<p>${taxPlanning.join('<br>')}</p>`;
-                    }
-                    
-                    const taxRepresentation = document.querySelector('input[name="taxRepresentation"]:checked').value;
-                    
-                    if (taxRepresentation === 'Included') {
-                        letterHtml += `<p>This engagement includes representation before taxing authorities in the event of an examination of the returns we prepare, at no additional cost.</p>`;
-                    } else if (taxRepresentation === 'AdditionalFee') {
-                        letterHtml += `<p>If your tax returns are selected for examination or audit, we will be available to represent you for an additional fee.</p>`;
-                    } else {
-                        letterHtml += `<p>This engagement does not include representation before taxing authorities in the event of an examination or audit.</p>`;
-                    }
-                } else if (serviceType === 'Audit') {
-                    // Audit service scope
-                    const auditLevel = document.querySelector('input[name="auditLevel"]:checked').value;
-                    const reportingFramework = document.querySelector('input[name="reportingFramework"]:checked').value;
-                    
-                    if (auditLevel === 'Audit') {
-                        letterHtml += `<p>We will audit the financial statements of ${document.getElementById('clientName').value}, which comprise the balance sheet as of ${document.getElementById('financialPeriod').value}, and the related statements of income, changes in equity, and cash flows for the period then ended, and the related notes to the financial statements. Our audit will be conducted in accordance with auditing standards generally accepted in the United States of America (GAAS).</p>`;
-                        
-                        letterHtml += `<p>The objective of our audit is to express an opinion about whether your financial statements are fairly presented, in all material respects, in conformity with ${reportingFramework} accounting principles.</p>`;
-                    } else if (auditLevel === 'Review') {
-                        letterHtml += `<p>We will review the financial statements of ${document.getElementById('clientName').value}, which comprise the balance sheet as of ${document.getElementById('financialPeriod').value}, and the related statements of income, changes in equity, and cash flows for the period then ended. Our review will be conducted in accordance with Statements on Standards for Accounting and Review Services (SSARS) issued by the American Institute of Certified Public Accountants (AICPA).</p>`;
-                        
-                        letterHtml += `<p>A review consists primarily of applying analytical procedures to management's financial data and making inquiries of company management. A review is substantially less in scope than an audit, and we will not express an opinion regarding the financial statements as a whole.</p>`;
-                    } else if (auditLevel === 'Compilation') {
-                        letterHtml += `<p>We will compile the financial statements of ${document.getElementById('clientName').value}, which comprise the balance sheet as of ${document.getElementById('financialPeriod').value}, and the related statements of income, changes in equity, and cash flows for the period then ended. Our compilation will be conducted in accordance with Statements on Standards for Accounting and Review Services (SSARS) issued by the American Institute of Certified Public Accountants (AICPA).</p>`;
-                        
-                        letterHtml += `<p>A compilation is limited to presenting, in the form of financial statements, information that is the representation of management. We will not audit or review the financial statements and, accordingly, will not express an opinion or any other form of assurance on them.</p>`;
-                    } else if (auditLevel === 'AgreedUpon') {
-                        letterHtml += `<p>We will perform agreed-upon procedures related to ${document.getElementById('financialPeriod').value} for ${document.getElementById('clientName').value}. Our engagement will be conducted in accordance with attestation standards established by the American Institute of Certified Public Accountants (AICPA).</p>`;
-                        
-                        letterHtml += `<p>The agreed-upon procedures will be performed solely to assist you in [purpose to be specified]. The procedures we will perform will be specifically determined and agreed upon with you. Our report will list the procedures performed and our findings. We will not express an opinion or any other form of assurance on the subject matter.</p>`;
-                    }
-                } else if (serviceType === 'Advisory') {
-                    // Advisory service scope
-                    const advisoryServices = Array.from(document.querySelectorAll('input[data-target="advisoryServices"]:checked'))
-                        .map(input => input.value);
-                    
-                    letterHtml += `<p>We will provide the following advisory services to ${document.getElementById('clientName').value}:</p>`;
-                    
-                    if (advisoryServices.length > 0) {
-                        letterHtml += `<p>${advisoryServices.join('<br>')}</p>`;
-                    }
-                    
-                    letterHtml += `<p>${document.getElementById('advisoryScope').value}</p>`;
-                    
-                    letterHtml += `<p>Our advisory services are consultative in nature. We will provide recommendations and guidance, but management is responsible for making all decisions regarding implementation of our recommendations.</p>`;
-                } else if (serviceType === 'Bookkeeping') {
-                    // Bookkeeping service scope
-                    const bookkeepingServices = Array.from(document.querySelectorAll('input[data-target="bookkeepingServices"]:checked'))
-                        .map(input => input.value);
-                    
-                    const bookkeepingFrequency = document.querySelector('input[name="bookkeepingFrequency"]:checked').value;
-                    
-                    letterHtml += `<p>We will provide the following ${bookkeepingFrequency.toLowerCase()} bookkeeping services to ${document.getElementById('clientName').value}:</p>`;
-                    
-                    if (bookkeepingServices.length > 0) {
-                        letterHtml += `<p>${bookkeepingServices.join('<br>')}</p>`;
-                    }
-                    
-                    letterHtml += `<p>Our bookkeeping services will be performed in accordance with professional standards applicable to such services. We will not audit or review the underlying data, and accordingly, will not express an opinion or any other form of assurance on the financial information.</p>`;
-                }
-                
-                // Service exclusions
-                letterHtml += `<h3>Service Exclusions</h3>`;
-                letterHtml += `<p>Our engagement specifically excludes the following services:</p>`;
-                letterHtml += `<p>${document.getElementById('serviceExclusions').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Fee Arrangements
-                letterHtml += `<h2>Fee Arrangements</h2>`;
-                
-                const feeStructure = document.querySelector('input[name="feeStructure"]:checked').value;
-                
-                if (feeStructure === 'Fixed') {
-                    letterHtml += `<p>Our fee for the services described above will be ${document.getElementById('fixedFeeAmount').value}.</p>`;
-                    
-                    const paymentSchedule = document.querySelector('input[name="fixedFeeSchedule"]:checked').value;
-                    
-                    if (paymentSchedule === 'Upfront') {
-                        letterHtml += `<p>The full amount is due upon signing this engagement letter.</p>`;
-                    } else if (paymentSchedule === '50-50') {
-                        let amount = document.getElementById('fixedFeeAmount').value;
-                        let numericAmount = amount.replace(/[^0-9.]/g, '');
-                        let halfAmount = parseFloat(numericAmount) / 2;
-                        if (isNaN(halfAmount)) {
-                            halfAmount = "half of the total";
-                        } else {
-                            halfAmount = "$" + halfAmount.toFixed(2);
-                        }
-                        
-                        letterHtml += `<p>50% of the fee (${halfAmount}) is due upon signing this engagement letter, with the remaining 50% due upon completion of the engagement.</p>`;
-                    } else if (paymentSchedule === 'Completion') {
-                        letterHtml += `<p>The full amount is due upon completion of the engagement.</p>`;
-                    }
-                } else if (feeStructure === 'Hourly') {
-                    letterHtml += `<p>Our fees will be based on the time spent by our personnel at the following hourly rates:</p>`;
-                    letterHtml += `<p>Partner: ${document.getElementById('partnerRate').value}<br>
-                    Manager: ${document.getElementById('managerRate').value}<br>
-                    Staff: ${document.getElementById('staffRate').value}</p>`;
-                    
-                    letterHtml += `<p>Based on our preliminary assessment, we estimate that the total hours required will be approximately ${document.getElementById('estimatedHours').value}, resulting in an estimated fee of ${document.getElementById('estimatedTotal').value}. This is only an estimate, and the actual fee may differ based on the time required to complete the engagement.</p>`;
-                    
-                    const billingFrequency = document.querySelector('input[name="hourlyBillingFrequency"]:checked').value;
-                    
-                    letterHtml += `<p>Invoices will be issued ${billingFrequency.toLowerCase()} and are due upon receipt.</p>`;
-                } else if (feeStructure === 'Monthly') {
-                    letterHtml += `<p>Our fee for the services described above will be a monthly retainer of ${document.getElementById('monthlyRetainer').value} for a term of ${document.getElementById('retainerTerm').value}.</p>`;
-                    
-                    letterHtml += `<p>The monthly retainer includes:</p>`;
-                    letterHtml += `<p>${document.getElementById('retainerIncludes').value.replace(/\n/g, '<br>')}</p>`;
-                    
-                    letterHtml += `<p>The monthly retainer will be billed at the beginning of each month and is due upon receipt.</p>`;
-                }
-                
-                // Expenses
-                const expenseHandling = document.querySelector('input[name="expenseHandling"]:checked').value;
-                
-                if (expenseHandling === 'Included') {
-                    letterHtml += `<p>Out-of-pocket expenses are included in the fee arrangement described above.</p>`;
-                } else if (expenseHandling === 'Billed') {
-                    letterHtml += `<p>${document.getElementById('expenseDetails').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Timeline
-                letterHtml += `<h2>Timeline and Deliverables</h2>`;
-                letterHtml += `<p>This engagement will begin on ${formatDate(document.getElementById('startDate').value)} and is expected to be completed by ${formatDate(document.getElementById('endDate').value)}. The following key deadlines apply:</p>`;
-                letterHtml += `<p>${document.getElementById('keyDeadlines').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Client Responsibilities
-                letterHtml += `<h2>Client Responsibilities</h2>`;
-                letterHtml += `<p>${document.getElementById('clientResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<p>You must provide all information necessary for the completion of our services by ${document.getElementById('clientDeadlines').value}. The information should be provided in the following format: ${document.getElementById('clientFormat').value}</p>`;
-                
-                // CPA Firm Responsibilities
-                letterHtml += `<h2>CPA Firm Responsibilities</h2>`;
-                letterHtml += `<p>${document.getElementById('cpaResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<p>${document.getElementById('cpaCommunication').value.replace(/\n/g, '<br>')}</p>`;
-                
-                letterHtml += `<h3>Quality Control</h3>`;
-                letterHtml += `<p>${document.getElementById('qualityControl').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Legal Provisions
-                letterHtml += `<h2>Legal Provisions</h2>`;
-                
-                // Governing Law
-                letterHtml += `<h3>Governing Law</h3>`;
-                letterHtml += `<p>This engagement letter shall be governed by and construed in accordance with the laws of the State of ${document.getElementById('governingState').value}, without giving effect to any choice or conflict of law provision or rule. Any legal action arising out of or relating to this engagement shall be brought exclusively in the state or federal courts located in ${document.getElementById('venueCounty').value}, and the parties consent to the personal jurisdiction of such courts.</p>`;
-                
-                // Limitation of Liability
-                const includeLiability = document.querySelector('input[name="includeLiability"]:checked').value;
-                
-                if (includeLiability === 'Yes') {
-                    letterHtml += `<h3>Limitation of Liability</h3>`;
-                    
-                    const liabilityCapType = document.querySelector('input[name="liabilityCapType"]:checked').value;
-                    
-                    if (liabilityCapType === 'Fees') {
-                        const feesCapMultiplier = document.querySelector('input[name="feesCapMultiplier"]:checked').value;
-                        
-                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${feesCapMultiplier} the amount of fees paid by Client for the services that are the subject of the claim.</p>`;
-                    } else if (liabilityCapType === 'Fixed') {
-                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${document.getElementById('fixedCapAmount').value}.</p>`;
-                    }
-                    
-                    letterHtml += `<p>${document.getElementById('liabilityExclusions').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Dispute Resolution
-                letterHtml += `<h3>Dispute Resolution</h3>`;
-                
-                const disputeResolution = document.querySelector('input[name="disputeResolution"]:checked').value;
-                
-                if (disputeResolution === 'Mediation') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall first be submitted to mediation. The mediation shall be conducted in accordance with the rules of the American Arbitration Association. The cost of mediation shall be shared equally by the parties.</p>`;
-                } else if (disputeResolution === 'MediationArbitration') {
-                    letterHtml += `<p>${document.getElementById('mediationArbitrationDetails').value.replace(/\n/g, '<br>')}</p>`;
-                } else if (disputeResolution === 'Arbitration') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall be settled by binding arbitration administered by the American Arbitration Association in accordance with its Professional Accounting and Related Services Arbitration Rules. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction.</p>`;
-                } else if (disputeResolution === 'Litigation') {
-                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement may be resolved through litigation in the appropriate courts as specified in the Governing Law section above.</p>`;
-                }
-                
-                // Termination
-                letterHtml += `<h3>Termination</h3>`;
-                
-                const terminationPeriod = document.querySelector('input[name="terminationPeriod"]:checked').value;
-                
-                if (terminationPeriod === '15Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 15 days' written notice to the other party.</p>`;
-                } else if (terminationPeriod === '30Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 30 days' written notice to the other party.</p>`;
-                } else if (terminationPeriod === '60Days') {
-                    letterHtml += `<p>Either party may terminate this engagement with 60 days' written notice to the other party.</p>`;
-                }
-                
-                letterHtml += `<p>${document.getElementById('terminationObligations').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Confidentiality
-                letterHtml += `<h3>Confidentiality</h3>`;
-                letterHtml += `<p>${document.getElementById('confidentialityProvisions').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Record Retention
-                letterHtml += `<h3>Record Retention</h3>`;
-                letterHtml += `<p>${document.getElementById('recordRetentionPolicy').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Electronic Communications
-                letterHtml += `<h3>Electronic Communications</h3>`;
-                
-                const electronicMethods = Array.from(document.querySelectorAll('input[data-target="electronicMethods"]:checked'))
-                    .map(input => input.value);
-                
-                if (electronicMethods.length > 0) {
-                    letterHtml += `<p>We will use the following electronic communication methods: ${electronicMethods.join(', ')}.</p>`;
-                }
-                
-                letterHtml += `<p>${document.getElementById('electronicCommunicationTerms').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Third-Party Provisions
-                const includeThirdParty = document.querySelector('input[name="includeThirdParty"]:checked').value;
-                
-                if (includeThirdParty === 'Yes') {
-                    letterHtml += `<h3>Third-Party Use Limitations</h3>`;
-                    letterHtml += `<p>${document.getElementById('thirdPartyTerms').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Staffing Provisions
-                const includeStaffing = document.querySelector('input[name="includeStaffing"]:checked').value;
-                
-                if (includeStaffing === 'Yes') {
-                    letterHtml += `<h3>Engagement Staffing</h3>`;
-                    letterHtml += `<p>${document.getElementById('staffingDetails').value.replace(/\n/g, '<br>')}</p>`;
-                }
-                
-                // Additional Terms
-                letterHtml += `<h3>Additional Terms and Conditions</h3>`;
-                letterHtml += `<p>${document.getElementById('additionalTerms').value.replace(/\n/g, '<br>')}</p>`;
-                
-                // Conclusion
-                letterHtml += `<p>We appreciate the opportunity to be of service to you. If you have any questions about the contents of this letter, please contact us. If the services and terms outlined in this engagement letter are in accordance with your understanding of our agreement, please sign and return a copy to us.</p>`;
-                
-                // Signature section
-                letterHtml += `<div class="signature-section">
-                    <p>Sincerely,</p>
-                    <p id="cpaSignature">[Partner Name]<br>${document.getElementById('cpaFirmName').value}</p>
-                    
-                    <p style="margin-top: 40px;">ACCEPTED AND AGREED:</p>
-                    <p id="clientSignature">_____________________________<br>${document.getElementById('clientName').value}<br>By: ${document.getElementById('clientContact').value}<br>Date: _____________________</p>
-                    
-                    <p style="margin-top: 20px; font-style: italic; font-size: 12px;">Please sign and return a copy of this engagement letter to indicate your acceptance of these terms.</p>
-                </div>`;
-                
-                // Update the preview
-                document.getElementById('preview-content').innerHTML = letterHtml;
-            }
-            
-            // Update the preview when form inputs change
-            const allInputs = document.querySelectorAll('input, select, textarea');
-            allInputs.forEach(input => {
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    input.addEventListener('change', generateLetter);
-                } else {
-                    input.addEventListener('input', generateLetter);
-                    input.addEventListener('change', generateLetter);
-                }
-            });
-            
-            // Toggle service options based on service type
-            const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
-            serviceTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.querySelectorAll('.service-options').forEach(option => {
-                        option.style.display = 'none';
-                    });
-                    
-                    const selectedOption = document.getElementById(this.value.toLowerCase() + 'ServiceOptions');
-                    if (selectedOption) {
-                        selectedOption.style.display = 'block';
-                    }
-                    
-                    generateLetter();
-                });
-            });
-            
-            // Toggle fee structure options
-            const feeStructureRadios = document.querySelectorAll('input[name="feeStructure"]');
-            feeStructureRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.getElementById('fixedFeeOptions').style.display = 'none';
-                    document.getElementById('hourlyFeeOptions').style.display = 'none';
-                    document.getElementById('monthlyFeeOptions').style.display = 'none';
-                    
-                    if (this.value === 'Fixed') {
-                        document.getElementById('fixedFeeOptions').style.display = 'block';
-                    } else if (this.value === 'Hourly') {
-                        document.getElementById('hourlyFeeOptions').style.display = 'block';
-                    } else if (this.value === 'Monthly') {
-                        document.getElementById('monthlyFeeOptions').style.display = 'block';
-                    }
-                    
-                    generateLetter();
-                });
-            });
-            
-            // Toggle liability options
-            const liabilityCapTypeRadios = document.querySelectorAll('input[name="liabilityCapType"]');
-            liabilityCapTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    document.getElementById('feesCapGroup').style.display = 'none';
-                    document.getElementById('fixedCapGroup').style.display = 'none';
-                    
-                    if (this.value === 'Fees') {
-                        document.getElementById('feesCapGroup').style.display = 'block';
-                    } else if (this.value === 'Fixed') {
-                        document.getElementById('fixedCapGroup').style.display = 'block';
-                    }
-                    
-                    generateLetter();
-                });
-            });
-            
-            // Tab navigation
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    const tabId = this.getAttribute('data-tab');
-                    
-                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    document.querySelectorAll('.tab-content').forEach(content => {
-                        content.classList.remove('active');
-                        content.style.display = 'none';
-                    });
-                    
-                    const activeContent = document.getElementById(tabId);
-                    activeContent.classList.add('active');
-                    activeContent.style.display = 'block';
-                });
-            });
-            
-            // Previous and Next buttons
-            document.getElementById('nextTab1').addEventListener('click', function() {
-                document.querySelector('[data-tab="scope-services"]').click();
-            });
-            
-            document.getElementById('prevTab2').addEventListener('click', function() {
-                document.querySelector('[data-tab="basic-info"]').click();
-            });
-            
-            document.getElementById('nextTab2').addEventListener('click', function() {
-                document.querySelector('[data-tab="fees-timeline"]').click();
-            });
-            
-            document.getElementById('prevTab3').addEventListener('click', function() {
-                document.querySelector('[data-tab="scope-services"]').click();
-            });
-            
-            document.getElementById('nextTab3').addEventListener('click', function() {
-                document.querySelector('[data-tab="responsibilities"]').click();
-            });
-            
-            document.getElementById('prevTab4').addEventListener('click', function() {
-                document.querySelector('[data-tab="fees-timeline"]').click();
-            });
-            
-            document.getElementById('nextTab4').addEventListener('click', function() {
-                document.querySelector('[data-tab="legal-provisions"]').click();
-            });
-            
-            document.getElementById('prevTab5').addEventListener('click', function() {
-                document.querySelector('[data-tab="responsibilities"]').click();
-            });
-            
-            document.getElementById('nextTab5').addEventListener('click', function() {
-                document.querySelector('[data-tab="specialized"]').click();
-            });
-            
-            document.getElementById('prevTab6').addEventListener('click', function() {
-                document.querySelector('[data-tab="legal-provisions"]').click();
-            });
-            
-            // Preview buttons
-            document.getElementById('previewBtn1').addEventListener('click', showPreview);
-            document.getElementById('previewBtn2').addEventListener('click', showPreview);
-            document.getElementById('previewBtn3').addEventListener('click', showPreview);
-            document.getElementById('previewBtn4').addEventListener('click', showPreview);
-            document.getElementById('previewBtn5').addEventListener('click', showPreview);
-            document.getElementById('previewBtn6').addEventListener('click', showPreview);
-            
-            // Function to show preview modal
-            function showPreview() {
-                generateLetter();
-                document.getElementById('previewModal').style.display = 'block';
-            }
-            
-            // Function to close modal
-            function closeModal() {
-                document.getElementById('previewModal').style.display = 'none';
-            }
-            
-            // Close button and click outside
-            document.querySelector('.close').addEventListener('click', closeModal);
-            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-            window.addEventListener('click', function(event) {
-                if (event.target === document.getElementById('previewModal')) {
-                    closeModal();
-                }
-            });
-            
-            // Copy button
-            document.getElementById('copyLetterBtn').addEventListener('click', function() {
-                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                document.getElementById('datePreview').innerText + '\n\n' +
-                                document.getElementById('letterContent').innerText + '\n\n' +
-                                'Sincerely,\n\n' +
-                                document.getElementById('cpaSignature').innerText + '\n\n' +
-                                'ACCEPTED AND AGREED:\n\n' +
-                                document.getElementById('clientSignature').innerText;
-                
-                navigator.clipboard.writeText(letterContent)
-                    .then(() => {
-                        const notification = document.getElementById('notification');
-                        notification.style.display = 'block';
-                        setTimeout(function() {
-                            notification.style.display = 'none';
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Failed to copy: ', err);
-                        alert('Failed to copy to clipboard. Please try again.');
-                    });
-            });
-            
-            // Download buttons
-            document.getElementById('downloadBtn').addEventListener('click', downloadLetter);
-            document.getElementById('downloadModalBtn').addEventListener('click', downloadLetter);
-            
-            // Function to download letter
-            function downloadLetter() {
-                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                document.getElementById('datePreview').innerText + '\n\n' +
-                                document.getElementById('letterContent').innerText
-                                    .replace(/<[^>]*>/g, '')
-                                    .replace(/&nbsp;/g, ' ') + '\n\n' +
-                                'Sincerely,\n\n' +
-                                document.getElementById('cpaSignature').innerText.replace(/<[^>]*>/g, '\n') + '\n\n' +
-                                'ACCEPTED AND AGREED:\n\n' +
-                                document.getElementById('clientSignature').innerText.replace(/<[^>]*>/g, '\n');
-                
-                const clientName = document.getElementById('clientName').value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const fileName = `cpa_engagement_letter_${clientName}.txt`;
-                
-                const blob = new Blob([letterContent], { type: 'text/plain' });
-                const link = document.createElement('a');
-                link.href = window.URL.createObjectURL(blob);
-                link.download = fileName;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }
-            
-            // Initial generation
-            generateLetter();
+  </div>
+  
+  <!-- Libraries for DOCX download -->
+  <script src="https://cdn.jsdelivr.net/npm/docx@7.8.2/build/index.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  
+  <!-- Calendly Integration -->
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+  <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const form = document.getElementById('cpaForm');
+      const preview = document.getElementById('agreementPreview');
+      const copyBtn = document.getElementById('copyBtn');
+      const copyMessage = document.getElementById('copyMessage');
+      const downloadBtn = document.getElementById('downloadBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      
+      // Set current date if not already set
+      if (!document.getElementById('letterDate').value) {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('letterDate').value = today;
+      }
+      
+      // Format date from YYYY-MM-DD to readable format
+      function formatDate(dateString) {
+        if (!dateString) return '';
+        
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric'
         });
-    </script>
+      }
+      
+      // Tab navigation
+      const tabs = document.querySelectorAll('.tab');
+      const tabContents = document.querySelectorAll('.tab-content');
+      
+      tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          const tabId = this.getAttribute('data-tab');
+          
+          // Remove active class from all tabs and contents
+          tabs.forEach(t => t.classList.remove('active'));
+          tabContents.forEach(c => c.classList.remove('active'));
+          
+          // Add active class to selected tab and content
+          this.classList.add('active');
+          document.getElementById(tabId).classList.add('active');
+        });
+      });
+      
+      // Option items toggle
+      const optionItems = document.querySelectorAll('.option-item');
+      
+      optionItems.forEach(item => {
+        item.addEventListener('click', function(e) {
+          const input = this.querySelector('input');
+          
+          // Don't toggle if clicked directly on input
+          if (e.target === input) return;
+          
+          if (input.type === 'radio') {
+            // For radio buttons
+            const name = input.name;
+            document.querySelectorAll(`input[name="${name}"]`).forEach(radio => {
+              radio.checked = false;
+              radio.closest('.option-item').classList.remove('selected');
+            });
+            input.checked = true;
+            this.classList.add('selected');
+          } else {
+            // For checkboxes
+            input.checked = !input.checked;
+            this.classList.toggle('selected', input.checked);
+          }
+          
+          // Handle service type change
+          if (input.name === 'serviceType') {
+            updateServiceDetails(input.value);
+          }
+          
+          // Handle fee structure change
+          if (input.name === 'feeStructure') {
+            updateFeeDetails(input.value);
+          }
+          
+          // Update preview
+          updatePreview();
+        });
+      });
+      
+      // Service type details toggle
+      function updateServiceDetails(serviceType) {
+        // Hide all service details
+        document.querySelectorAll('.service-details').forEach(details => {
+          details.style.display = 'none';
+        });
+        
+        // Show selected service details
+        if (serviceType === 'Tax') {
+          document.getElementById('taxServiceDetails').style.display = 'block';
+        }
+      }
+      
+      // Fee structure details toggle
+      function updateFeeDetails(feeStructure) {
+        // Hide all fee details
+        document.querySelectorAll('.fee-details').forEach(details => {
+          details.style.display = 'none';
+        });
+        
+        // Show selected fee details
+        if (feeStructure === 'Fixed') {
+          document.getElementById('fixedFeeDetails').style.display = 'block';
+        }
+      }
+      
+      // Update preview on form input changes
+      form.addEventListener('input', function() {
+        updatePreview();
+        copyMessage.style.display = 'none';
+      });
+      
+      // Handle form inputs with radio/checkbox changes
+      document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(input => {
+        input.addEventListener('change', function() {
+          updatePreview();
+          copyMessage.style.display = 'none';
+        });
+      });
+      
+      // Reset form button
+      resetBtn.addEventListener('click', function() {
+        setTimeout(() => {
+          // Reset option item selections
+          document.querySelectorAll('.option-item').forEach(item => {
+            const input = item.querySelector('input');
+            if (input) {
+              item.classList.toggle('selected', input.checked);
+            }
+          });
+          
+          // Reset service and fee details
+          updateServiceDetails('Tax');
+          updateFeeDetails('Fixed');
+          
+          // Update preview
+          updatePreview();
+          copyMessage.style.display = 'none';
+        }, 10);
+      });
+      
+      // Copy agreement to clipboard
+      copyBtn.addEventListener('click', function() {
+        const agreementText = preview.innerText;
+        
+        navigator.clipboard.writeText(agreementText)
+          .then(() => {
+            copyMessage.style.display = 'inline-block';
+            setTimeout(() => {
+              copyMessage.style.display = 'none';
+            }, 3000);
+          })
+          .catch(err => {
+            console.error('Could not copy text:', err);
+            alert('Failed to copy text. Please try manually selecting and copying the text.');
+          });
+      });
+      
+      // Download as DOCX
+      downloadBtn.addEventListener('click', function() {
+        try {
+          // Access docx library
+          const docx = window.docx;
+          if (!docx) {
+            throw new Error("DOCX library not loaded");
+          }
+          
+          const clientName = document.getElementById('clientName').value || 'Client';
+          const filename = `CPA_Engagement_Letter_${clientName.replace(/[^a-z0-9]/gi, '_')}.docx`;
+          
+          // Create document sections
+          const sections = [];
+          
+          // Get all needed values from form
+          const cpaFirmName = document.getElementById('cpaFirmName').value;
+          const cpaAddress = document.getElementById('cpaAddress').value;
+          const clientAddress = document.getElementById('clientAddress').value;
+          const clientContact = document.getElementById('clientContact').value;
+          const letterDate = formatDate(document.getElementById('letterDate').value);
+          const cpaPartnerName = document.getElementById('cpaPartnerName').value;
+          
+          // Create title
+          sections.push(
+            new docx.Paragraph({
+              alignment: docx.AlignmentType.CENTER,
+              spacing: {
+                before: 200,
+                after: 200
+              },
+              children: [
+                new docx.TextRun({
+                  text: "ENGAGEMENT LETTER",
+                  bold: true,
+                  size: 28
+                })
+              ]
+            })
+          );
+          
+          // Create letterhead and date
+          sections.push(
+            new docx.Paragraph({
+              alignment: docx.AlignmentType.LEFT,
+              spacing: {
+                before: 100,
+                after: 200
+              },
+              children: [
+                new docx.TextRun({
+                  text: cpaFirmName,
+                  bold: true,
+                  size: 24
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              alignment: docx.AlignmentType.LEFT,
+              spacing: {
+                before: 100,
+                after: 300
+              },
+              children: [
+                new docx.TextRun({
+                  text: letterDate,
+                  size: 24
+                })
+              ]
+            })
+          );
+          
+          // Client address
+          sections.push(
+            new docx.Paragraph({
+              children: [
+                new docx.TextRun({
+                  text: clientName
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              children: [
+                new docx.TextRun({
+                  text: clientAddress
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                after: 200
+              },
+              children: [
+                new docx.TextRun({
+                  text: `Attention: ${clientContact}`
+                })
+              ]
+            })
+          );
+          
+          // Get the rest of the agreement text (main body)
+          const mainSections = document.querySelectorAll('#agreementPreview .document-section');
+          mainSections.forEach(section => {
+            // Add section title
+            const titleElement = section.querySelector('.section-title');
+            if (titleElement) {
+              sections.push(
+                new docx.Paragraph({
+                  spacing: {
+                    before: 200,
+                    after: 100
+                  },
+                  children: [
+                    new docx.TextRun({
+                      text: titleElement.textContent,
+                      bold: true,
+                      size: 24
+                    })
+                  ]
+                })
+              );
+            }
+            
+            // Add section paragraphs
+            const contentParagraphs = section.querySelectorAll('.section-content p');
+            contentParagraphs.forEach(paragraph => {
+              sections.push(
+                new docx.Paragraph({
+                  spacing: {
+                    before: 100,
+                    after: 100
+                  },
+                  children: [
+                    new docx.TextRun({
+                      text: paragraph.textContent
+                    })
+                  ]
+                })
+              );
+            });
+          });
+          
+          // Add signature section
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 300,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: "Sincerely,"
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 200,
+                after: 300
+              },
+              children: [
+                new docx.TextRun({
+                  text: cpaPartnerName + "\n" + cpaFirmName
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 300,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: "ACCEPTED AND AGREED:"
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 200,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: "___________________________________"
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 100,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: clientName
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 100,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: `By: ${clientContact}`
+                })
+              ]
+            })
+          );
+          
+          sections.push(
+            new docx.Paragraph({
+              spacing: {
+                before: 100,
+                after: 100
+              },
+              children: [
+                new docx.TextRun({
+                  text: "Date: _____________________"
+                })
+              ]
+            })
+          );
+          
+          // Create the document with all sections
+          const doc = new docx.Document({
+            sections: [{
+              properties: {
+                page: {
+                  margin: {
+                    top: 1440, // 1 inch (in twips)
+                    right: 1440,
+                    bottom: 1440,
+                    left: 1440
+                  }
+                }
+              },
+              children: sections
+            }]
+          });
+          
+          // Generate and save DOCX file
+          docx.Packer.toBlob(doc)
+            .then(blob => {
+              window.saveAs(blob, filename);
+            })
+            .catch(error => {
+              console.error("Error saving document:", error);
+              alert("Failed to generate document. Please try again.");
+            });
+        } catch (error) {
+          console.error("Error creating document:", error);
+          alert("Failed to generate document. Please try again.");
+        }
+      });
+      
+      // Update preview function - generates the preview HTML
+      function updatePreview() {
+        // Get values from form
+        const cpaFirmName = document.getElementById('cpaFirmName').value;
+        const cpaAddress = document.getElementById('cpaAddress').value;
+        const cpaPhone = document.getElementById('cpaPhone').value;
+        const cpaEmail = document.getElementById('cpaEmail').value;
+        const cpaPartnerName = document.getElementById('cpaPartnerName').value;
+        
+        const clientName = document.getElementById('clientName').value;
+        const clientAddress = document.getElementById('clientAddress').value;
+        const clientContact = document.getElementById('clientContact').value;
+        const entityType = document.getElementById('entityType').value;
+        const letterDate = formatDate(document.getElementById('letterDate').value);
+        
+        // Get service type
+        const serviceType = document.querySelector('input[name="serviceType"]:checked').value;
+        
+        // Get tax returns if tax service
+        let taxReturns = [];
+        if (serviceType === 'Tax') {
+          document.querySelectorAll('input[name="taxReturns"]:checked').forEach(checkbox => {
+            taxReturns.push(checkbox.value);
+          });
+        }
+        const taxYear = document.getElementById('taxYear').value;
+        
+        // Get service exclusions
+        const serviceExclusions = document.getElementById('serviceExclusions').value;
+        
+        // Get fee structure
+        const feeStructure = document.querySelector('input[name="feeStructure"]:checked').value;
+        let feeDetails = '';
+        
+        if (feeStructure === 'Fixed') {
+          const fixedFeeAmount = document.getElementById('fixedFeeAmount').value;
+          const paymentSchedule = document.querySelector('input[name="paymentSchedule"]:checked').value;
+          
+          feeDetails = `Our fee for the services described above will be ${fixedFeeAmount}. `;
+          
+          if (paymentSchedule === 'Upfront') {
+            feeDetails += 'The full amount is due upon signing this engagement letter.';
+          } else if (paymentSchedule === 'Split') {
+            feeDetails += '50% of the fee is due upon signing this engagement letter, with the remaining 50% due upon completion of the engagement.';
+          } else {
+            feeDetails += 'The full amount is due upon completion of the engagement.';
+          }
+        } else if (feeStructure === 'Hourly') {
+          feeDetails = 'Our fees will be based on the time spent by our personnel. We will provide you with an estimate of our fees after we have had the opportunity to assess the scope of work required.';
+        } else if (feeStructure === 'Monthly') {
+          feeDetails = 'Our fee for the services described above will be billed as a monthly retainer. The amount will be determined based on the scope of services required.';
+        }
+        
+        // Get timeline
+        const startDate = formatDate(document.getElementById('startDate').value);
+        const endDate = formatDate(document.getElementById('endDate').value);
+        const clientDeadline = formatDate(document.getElementById('clientDeadline').value);
+        
+        // Get legal provisions
+        const governingState = document.getElementById('governingState').value;
+        const disputeResolution = document.querySelector('input[name="disputeResolution"]:checked').value;
+        
+        let disputeResolutionText = '';
+        if (disputeResolution === 'Mediation') {
+          disputeResolutionText = 'Any dispute or claim arising out of or relating to this engagement shall first be submitted to mediation.';
+        } else if (disputeResolution === 'MediationArbitration') {
+          disputeResolutionText = 'Disputes shall first be submitted to mediation administered by the American Arbitration Association. If mediation is unsuccessful, the dispute shall be settled by binding arbitration.';
+        } else if (disputeResolution === 'Arbitration') {
+          disputeResolutionText = 'Any dispute or claim arising out of or relating to this engagement shall be settled by binding arbitration administered by the American Arbitration Association.';
+        } else {
+          disputeResolutionText = 'Any dispute or claim arising out of or relating to this engagement may be resolved through litigation in the appropriate courts.';
+        }
+        
+        // Get additional terms
+        const additionalTerms = document.getElementById('additionalTerms').value;
+        
+        // Build the preview HTML
+        let previewHtml = `
+          <div class="document-title">CPA ENGAGEMENT LETTER</div>
+          
+          <div class="document-section" id="section-letterhead">
+            <div class="section-content">
+              <p><strong>${cpaFirmName}</strong></p>
+              <p>${cpaAddress}</p>
+              <p>Phone: ${cpaPhone} | Email: ${cpaEmail}</p>
+              <p>${letterDate}</p>
+              
+              <p style="margin-top: 20px;">${clientName}</p>
+              <p>${clientAddress}</p>
+              <p>Attention: ${clientContact}</p>
+              
+              <p style="margin-top: 20px;">Re: Engagement Letter for Professional Services</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-intro">
+            <div class="section-content">
+              <p>Dear ${clientContact.split(',')[0]}:</p>
+              
+              <p>Thank you for selecting ${cpaFirmName} ("we", "us", "our") to provide professional services to ${clientName} ("you", "your", "Client"). This engagement letter outlines the terms and conditions of our engagement, as well as the nature and limitations of the services we will provide.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-services">
+            <div class="section-title">1. SCOPE OF SERVICES</div>
+            <div class="section-content">
+              ${serviceType === 'Tax' ? `
+                <p>We will prepare the following tax returns for ${clientName} for the ${taxYear} tax year:</p>
+                <p>${taxReturns.map(type => {
+                  if (type === 'Federal') return 'Federal income tax returns';
+                  if (type === 'State') return 'State income tax returns';
+                  if (type === 'Local') return 'Local tax returns';
+                  if (type === 'Sales') return 'Sales tax returns';
+                  if (type === 'Payroll') return 'Payroll tax returns';
+                  return type;
+                }).join('<br>')}</p>
+              ` : serviceType === 'Audit' ? `
+                <p>We will perform an examination of the financial statements of ${clientName} in accordance with auditing standards generally accepted in the United States of America.</p>
+              ` : serviceType === 'Advisory' ? `
+                <p>We will provide advisory services to ${clientName} in connection with business and financial matters as requested and agreed upon.</p>
+              ` : `
+                <p>We will provide bookkeeping services to ${clientName} including preparation of financial statements, bank reconciliations, and other record-keeping functions as agreed upon.</p>
+              `}
+              
+              <p><strong>Service Exclusions:</strong> Our engagement specifically excludes the following services:</p>
+              <p>${serviceExclusions}</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-fees">
+            <div class="section-title">2. FEES AND BILLING</div>
+            <div class="section-content">
+              <p>${feeDetails}</p>
+              
+              <p>Out-of-pocket expenses such as database charges, travel expenses, and courier fees will be billed in addition to our professional fees unless specified otherwise.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-timeline">
+            <div class="section-title">3. TIMELINE AND DELIVERABLES</div>
+            <div class="section-content">
+              <p>This engagement will begin on ${startDate} and is expected to be completed by ${endDate}.</p>
+              
+              <p>You must provide all information necessary for the completion of our services by ${clientDeadline}. Failure to provide required information in a timely manner may result in delays in the completion of our services.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-responsibilities">
+            <div class="section-title">4. RESPONSIBILITIES</div>
+            <div class="section-content">
+              <p><strong>Client Responsibilities:</strong> You are responsible for the accuracy and completeness of all information provided to us. You agree to provide us with accurate and complete information necessary to perform the services outlined in this engagement letter.</p>
+              
+              <p><strong>Our Responsibilities:</strong> We will perform our services in accordance with applicable professional standards. We will maintain client confidentiality and provide timely communication regarding the progress of our services.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-legal">
+            <div class="section-title">5. LEGAL PROVISIONS</div>
+            <div class="section-content">
+              <p><strong>Governing Law:</strong> This engagement letter shall be governed by and construed in accordance with the laws of the State of ${governingState}, without giving effect to any choice or conflict of law provision or rule.</p>
+              
+              <p><strong>Dispute Resolution:</strong> ${disputeResolutionText}</p>
+              
+              <p><strong>Limitation of Liability:</strong> Our liability to you for any claim arising from our services shall not exceed the fees paid by you for the services that are the subject of the claim.</p>
+              
+              <p><strong>Termination:</strong> Either party may terminate this engagement upon 30 days' written notice to the other party. Upon termination, you shall be obligated to compensate us for all time expended and to reimburse us for all out-of-pocket expenditures through the date of termination.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-additional">
+            <div class="section-title">6. ADDITIONAL TERMS</div>
+            <div class="section-content">
+              <p>${additionalTerms}</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-acceptance">
+            <div class="section-title">7. ACCEPTANCE</div>
+            <div class="section-content">
+              <p>If the services and terms outlined in this engagement letter are in accordance with your understanding of our agreement, please sign and return a copy to us.</p>
+              
+              <p>We appreciate the opportunity to be of service to you and look forward to working with you and your team.</p>
+            </div>
+          </div>
+          
+          <div class="document-section" id="section-signature">
+            <div class="section-content">
+              <p style="margin-top: 20px;">Sincerely,</p>
+              <p style="margin-top: 20px;">${cpaPartnerName}</p>
+              <p>${cpaFirmName}</p>
+              
+              <p style="margin-top: 40px;"><strong>ACCEPTED AND AGREED:</strong></p>
+              <p style="margin-top: 20px;">____________________________________</p>
+              <p>${clientName}</p>
+              <p>By: ${clientContact}</p>
+              <p style="margin-top: 10px;">Date: ______________________________</p>
+            </div>
+          </div>
+        `;
+        
+        // Update the preview
+        preview.innerHTML = previewHtml;
+      }
+      
+      // Initialize preview
+      updatePreview();
+      
+      // Initialize service and fee details visibility
+      updateServiceDetails('Tax');
+      updateFeeDetails('Fixed');
+    });
+  </script>
 </body>
 </html>
