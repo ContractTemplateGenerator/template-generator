@@ -474,13 +474,11 @@
   
   
   
-  <div id="warranty-tab" class="tools-tab-content active">
-    <!-- Warranties & Liability Generator -->
-    <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Disclaimer of Warranties & Limitation of Liability Generator</title>
   <style>
     /* Base Styles - WordPress Compatible */
@@ -716,26 +714,29 @@
       border-color: #b0bec5;
     }
     
-    /* Tooltip Styles */
+    /* Tooltip Styles - Improved */
+    .tooltip-container {
+      position: relative;
+      display: inline-block;
+    }
+    
     .tooltip-trigger {
-      display: inline-block !important;
+      display: inline-block;
       margin-left: 5px;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
       background: #3498db;
       color: white;
       font-size: 10px;
-      line-height: 14px;
+      line-height: 16px;
       text-align: center;
       border-radius: 50%;
       cursor: help;
-      position: relative;
-      z-index: 5;
     }
     
     .tooltip-content {
-      display: none;
-      position: absolute !important;
+      visibility: hidden;
+      position: absolute;
       background: #2c3e50;
       color: white;
       padding: 8px 12px;
@@ -743,10 +744,17 @@
       width: 250px;
       font-size: 12px;
       line-height: 1.4;
-      z-index: 999999 !important;
+      z-index: 100;
       box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-      left: 22px;
+      left: 25px;
       top: -5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .tooltip-container:hover .tooltip-content {
+      visibility: visible;
+      opacity: 1;
     }
     
     /* Jurisdiction Warning */
@@ -761,14 +769,17 @@
     }
     
     /* Risk Indicators */
+    .risk-container {
+      position: relative;
+      display: inline-block;
+    }
+    
     .risk-indicator {
       display: inline-block;
       width: 10px;
       height: 10px;
       border-radius: 50%;
       margin-left: 8px;
-      position: relative;
-      z-index: 5;
     }
     
     .risk-low {
@@ -784,17 +795,24 @@
     }
     
     .risk-tooltip {
-      display: none;
-      position: absolute !important;
+      visibility: hidden;
+      position: absolute;
       background: #2c3e50;
       color: white;
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 10px;
-      z-index: 999999 !important;
+      z-index: 100;
       white-space: nowrap;
-      left: 15px;
+      left: 20px;
       top: -5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .risk-container:hover .risk-tooltip {
+      visibility: visible;
+      opacity: 1;
     }
     
     /* Responsive adjustments */
@@ -859,80 +877,104 @@
         <div class="section-header">Warranty Disclaimer</div>
         
         <div class="form-group">
-          <label class="form-label">Warranty Level <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              <strong>Strong Disclaimer:</strong> Completely disclaims all warranties.<br>
-              <strong>Moderate Disclaimer:</strong> Disclaims most warranties but offers some limited ones.<br>
-              <strong>Limited Disclaimer:</strong> More user-friendly language with fewer disclaimers.
+          <label class="form-label">
+            Warranty Level
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                <strong>Strong Disclaimer:</strong> Completely disclaims all warranties.<br>
+                <strong>Moderate Disclaimer:</strong> Disclaims most warranties but offers some limited ones.<br>
+                <strong>Limited Disclaimer:</strong> More user-friendly language with fewer disclaimers.
+              </div>
             </div>
           </label>
           <div class="radio-group">
             <label class="radio-item">
               <input type="radio" name="warrantyLevel" id="warrantyStrong" value="strong" checked onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
               <span class="radio-label">Strong Disclaimer</span>
-              <span class="risk-indicator risk-medium"></span>
-              <span class="risk-tooltip">Medium enforceability risk in consumer contexts</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-medium"></span>
+                <span class="risk-tooltip">Medium enforceability risk in consumer contexts</span>
+              </div>
             </label>
             <label class="radio-item">
               <input type="radio" name="warrantyLevel" id="warrantyModerate" value="moderate" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
               <span class="radio-label">Moderate Disclaimer</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              </div>
             </label>
             <label class="radio-item">
               <input type="radio" name="warrantyLevel" id="warrantyLimited" value="limited" onclick="warrantyLiabilityGenerator.updatePreview('warrantyLevel')">
               <span class="radio-label">Limited Disclaimer</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Most enforceable but provides less protection</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Most enforceable but provides less protection</span>
+              </div>
             </label>
           </div>
         </div>
         
         <div class="form-group">
-          <label class="form-label">Specific Disclaimers <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              Select specific aspects of your service that you want to explicitly disclaim warranty for. Include only those relevant to your service to avoid overly broad disclaimers.
+          <label class="form-label">
+            Specific Disclaimers
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Select specific aspects of your service that you want to explicitly disclaim warranty for. Include only those relevant to your service to avoid overly broad disclaimers.
+              </div>
             </div>
           </label>
           <div class="checkbox-group">
             <label class="checkbox-item">
               <input type="checkbox" id="disclaimerUptime" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerUptime')">
               <span class="checkbox-label">Uptime & Availability</span>
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Disclaims guarantees about your service being available 24/7 without interruptions. Important for all online services.
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Disclaims guarantees about your service being available 24/7 without interruptions. Important for all online services.
+                </div>
               </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="disclaimerAccuracy" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerAccuracy')">
               <span class="checkbox-label">Content Accuracy</span>
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Disclaims guarantees about the accuracy of information provided through your service. Critical for platforms with user-generated content.
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Disclaims guarantees about the accuracy of information provided through your service. Critical for platforms with user-generated content.
+                </div>
               </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="disclaimerSecurity" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerSecurity')">
               <span class="checkbox-label">Security</span>
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Disclaims guarantees about perfect security. Important, but include specific security measures you do take elsewhere in your terms.
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Disclaims guarantees about perfect security. Important, but include specific security measures you do take elsewhere in your terms.
+                </div>
               </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="disclaimerThirdParty" checked onclick="warrantyLiabilityGenerator.updatePreview('disclaimerThirdParty')">
               <span class="checkbox-label">Third-Party Links/Content</span>
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Disclaims responsibility for third-party websites, services, or content accessible through your service.
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Disclaims responsibility for third-party websites, services, or content accessible through your service.
+                </div>
               </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="disclaimerProfessional" onclick="warrantyLiabilityGenerator.updatePreview('disclaimerProfessional')">
               <span class="checkbox-label">Professional Advice</span>
-              <span class="tooltip-trigger">?</span>
-              <div class="tooltip-content">
-                Disclaims that your service provides professional, legal, medical, or financial advice. Essential for informational platforms.
+              <div class="tooltip-container">
+                <span class="tooltip-trigger">?</span>
+                <div class="tooltip-content">
+                  Disclaims that your service provides professional, legal, medical, or financial advice. Essential for informational platforms.
+                </div>
               </div>
             </label>
           </div>
@@ -942,11 +984,15 @@
         <div class="section-header">Liability Limitations</div>
         
         <div class="form-group">
-          <label class="form-label">Limitation Scope <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              <strong>Broad:</strong> Excludes all types of damages (most protective for you)<br>
-              <strong>Intermediate:</strong> Excludes indirect damages but allows direct damages<br>
-              <strong>Narrow:</strong> Only excludes specific damage types (least protective)
+          <label class="form-label">
+            Limitation Scope
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                <strong>Broad:</strong> Excludes all types of damages (most protective for you)<br>
+                <strong>Intermediate:</strong> Excludes indirect damages but allows direct damages<br>
+                <strong>Narrow:</strong> Only excludes specific damage types (least protective)
+              </div>
             </div>
           </label>
           <select id="liabilityScope" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('liabilityScope'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
@@ -957,75 +1003,99 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label">Specific Damages Excluded <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              <strong>Direct damages:</strong> Immediate costs/losses directly caused by a breach<br>
-              <strong>Indirect damages:</strong> Secondary losses that flow from the direct damages<br>
-              <strong>Consequential damages:</strong> Damages from special circumstances known to the parties<br>
-              <strong>Punitive damages:</strong> Damages intended to punish wrongdoing<br>
-              <strong>Special damages:</strong> Unusual or special losses known to both parties
+          <label class="form-label">
+            Specific Damages Excluded
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                <strong>Direct damages:</strong> Immediate costs/losses directly caused by a breach<br>
+                <strong>Indirect damages:</strong> Secondary losses that flow from the direct damages<br>
+                <strong>Consequential damages:</strong> Damages from special circumstances known to the parties<br>
+                <strong>Punitive damages:</strong> Damages intended to punish wrongdoing<br>
+                <strong>Special damages:</strong> Unusual or special losses known to both parties
+              </div>
             </div>
           </label>
           <div class="checkbox-group">
             <label class="checkbox-item">
               <input type="checkbox" id="excludeDirect" onclick="warrantyLiabilityGenerator.updatePreview('excludeDirect')">
               <span class="checkbox-label">Direct Damages</span>
-              <span class="risk-indicator risk-high"></span>
-              <span class="risk-tooltip">High risk - often unenforceable in many jurisdictions</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-high"></span>
+                <span class="risk-tooltip">High risk - often unenforceable in many jurisdictions</span>
+              </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="excludeIndirect" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeIndirect')">
               <span class="checkbox-label">Indirect Damages</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="excludeConsequential" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeConsequential')">
               <span class="checkbox-label">Consequential Damages</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="excludePunitive" checked onclick="warrantyLiabilityGenerator.updatePreview('excludePunitive')">
               <span class="checkbox-label">Punitive Damages</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              </div>
             </label>
             <label class="checkbox-item">
               <input type="checkbox" id="excludeSpecial" checked onclick="warrantyLiabilityGenerator.updatePreview('excludeSpecial')">
               <span class="checkbox-label">Special Damages</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in commercial contexts</span>
+              </div>
             </label>
           </div>
         </div>
         
         <div class="form-group">
-          <label class="form-label">Liability Cap <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              <strong>No Cap:</strong> No maximum limit on liability (least protective)<br>
-              <strong>Fees Paid:</strong> Cap liability at fees paid by user (recommended)<br>
-              <strong>Fixed Amount:</strong> Set a specific dollar amount as cap
+          <label class="form-label">
+            Liability Cap
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                <strong>No Cap:</strong> No maximum limit on liability (least protective)<br>
+                <strong>Fees Paid:</strong> Cap liability at fees paid by user (recommended)<br>
+                <strong>Fixed Amount:</strong> Set a specific dollar amount as cap
+              </div>
             </div>
           </label>
           <div class="radio-group">
             <label class="radio-item">
               <input type="radio" name="liabilityCap" id="capNone" value="none" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
               <span class="radio-label">No Cap</span>
-              <span class="risk-indicator risk-high"></span>
-              <span class="risk-tooltip">High risk - unlimited liability exposure</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-high"></span>
+                <span class="risk-tooltip">High risk - unlimited liability exposure</span>
+              </div>
             </label>
             <label class="radio-item">
               <input type="radio" name="liabilityCap" id="capFees" value="fees" checked onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
               <span class="radio-label">Fees Paid</span>
-              <span class="risk-indicator risk-low"></span>
-              <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-low"></span>
+                <span class="risk-tooltip">Generally enforceable in most jurisdictions</span>
+              </div>
             </label>
             <label class="radio-item">
               <input type="radio" name="liabilityCap" id="capFixed" value="fixed" onclick="warrantyLiabilityGenerator.updatePreview('liabilityCap')">
               <span class="radio-label">Fixed Amount</span>
-              <span class="risk-indicator risk-medium"></span>
-              <span class="risk-tooltip">Medium risk if amount is too low relative to potential damages</span>
+              <div class="risk-container">
+                <span class="risk-indicator risk-medium"></span>
+                <span class="risk-tooltip">Medium risk if amount is too low relative to potential damages</span>
+              </div>
             </label>
           </div>
         </div>
@@ -1039,9 +1109,13 @@
         <div class="section-header">Additional Options</div>
         
         <div class="form-group">
-          <label class="form-label">Severability Clause <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              A severability clause ensures that if any part of these disclaimers is found invalid, the rest remains enforceable. Highly recommended.
+          <label class="form-label">
+            Severability Clause
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                A severability clause ensures that if any part of these disclaimers is found invalid, the rest remains enforceable. Highly recommended.
+              </div>
             </div>
           </label>
           <div class="radio-group">
@@ -1057,9 +1131,13 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label">Indemnification Clause <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              An indemnification clause requires users to defend and compensate you for claims resulting from their use of your service or violation of terms.
+          <label class="form-label">
+            Indemnification Clause
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                An indemnification clause requires users to defend and compensate you for claims resulting from their use of your service or violation of terms.
+              </div>
             </div>
           </label>
           <div class="radio-group">
@@ -1075,9 +1153,13 @@
         </div>
         
         <div class="form-group">
-          <label class="form-label" for="jurisdiction">Jurisdiction Consideration <span class="tooltip-trigger">?</span>
-            <div class="tooltip-content">
-              Select the primary jurisdiction where your users are located to get region-specific language that addresses local laws.
+          <label class="form-label" for="jurisdiction">
+            Jurisdiction Consideration
+            <div class="tooltip-container">
+              <span class="tooltip-trigger">?</span>
+              <div class="tooltip-content">
+                Select the primary jurisdiction where your users are located to get region-specific language that addresses local laws.
+              </div>
             </div>
           </label>
           <select id="jurisdiction" class="form-select" onchange="warrantyLiabilityGenerator.updatePreview('jurisdiction'); warrantyLiabilityGenerator.updateJurisdictionWarning();">
@@ -1806,64 +1888,16 @@
       }
     };
     
-    // Initialize tooltips
-    function initTooltips() {
-      const tooltipTriggers = document.querySelectorAll('.tooltip-trigger');
-      tooltipTriggers.forEach(trigger => {
-        trigger.addEventListener('mouseenter', function() {
-          const tooltip = this.nextElementSibling;
-          if (tooltip && tooltip.classList.contains('tooltip-content')) {
-            tooltip.style.display = 'block';
-          }
-        });
-        
-        trigger.addEventListener('mouseleave', function() {
-          const tooltip = this.nextElementSibling;
-          if (tooltip && tooltip.classList.contains('tooltip-content')) {
-            setTimeout(() => {
-              tooltip.style.display = 'none';
-            }, 300);
-          }
-        });
-      });
-      
-      // Also handle risk indicators
-      const riskIndicators = document.querySelectorAll('.risk-indicator');
-      riskIndicators.forEach(indicator => {
-        indicator.addEventListener('mouseenter', function() {
-          const tooltip = this.nextElementSibling;
-          if (tooltip && tooltip.classList.contains('risk-tooltip')) {
-            tooltip.style.display = 'block';
-          }
-        });
-        
-        indicator.addEventListener('mouseleave', function() {
-          const tooltip = this.nextElementSibling;
-          if (tooltip && tooltip.classList.contains('risk-tooltip')) {
-            setTimeout(() => {
-              tooltip.style.display = 'none';
-            }, 300);
-          }
-        });
-      });
-    }
-    
-    // Start the generator when the page loads
+    // Initialize the generator when the page loads
     document.addEventListener('DOMContentLoaded', function() {
       warrantyLiabilityGenerator.init();
-      initTooltips();
     });
     
     // Initialize immediately as well (for WordPress)
     warrantyLiabilityGenerator.init();
-    // Initialize tooltips immediately as well
-    setTimeout(initTooltips, 500);
   </script>
 </body>
 </html>
-
-    <div class="preview-fade" id="warranty-fade"></div>
-  </div>
   
   
   
