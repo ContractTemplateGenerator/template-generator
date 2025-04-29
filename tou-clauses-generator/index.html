@@ -662,9 +662,11 @@
       border-radius: 4px;
       font-size: 14px;
       font-weight: 500;
-      cursor: pointer;
+      cursor: pointer !important;
       text-align: center;
       text-decoration: none;
+      opacity: 1 !important;
+      pointer-events: auto !important;
     }
     
     .copy-btn:hover {
@@ -883,7 +885,7 @@
         
         <div class="form-group">
           <label class="form-label" for="serviceName">Service/Product Name</label>
-          <input type="text" id="serviceName" class="form-input" value="Our Service" placeholder="Enter service name" onkeyup="warrantyLiabilityGenerator.updatePreview('serviceName')">
+          <input type="text" id="serviceName" class="form-input" value="OUR SERVICE" placeholder="Enter service name (ALL CAPS recommended)" onkeyup="warrantyLiabilityGenerator.updatePreview('serviceName')">
         </div>
         
         <!-- Warranty Options -->
@@ -1227,7 +1229,7 @@
         // SaaS/Software preset
         if (preset === 'saas') {
           document.getElementById('serviceType').value = 'saas';
-          document.getElementById('serviceName').value = 'Our Software';
+          document.getElementById('serviceName').value = 'OUR SOFTWARE';
           document.getElementById('warrantyStrong').checked = true;
           document.getElementById('disclaimerUptime').checked = true;
           document.getElementById('disclaimerAccuracy').checked = true;
@@ -1247,7 +1249,7 @@
         // E-commerce preset
         else if (preset === 'ecommerce') {
           document.getElementById('serviceType').value = 'website';
-          document.getElementById('serviceName').value = 'Our Store';
+          document.getElementById('serviceName').value = 'OUR STORE';
           document.getElementById('warrantyModerate').checked = true;
           document.getElementById('disclaimerUptime').checked = true;
           document.getElementById('disclaimerAccuracy').checked = true;
@@ -1267,7 +1269,7 @@
         // Content Platform preset
         else if (preset === 'content') {
           document.getElementById('serviceType').value = 'website';
-          document.getElementById('serviceName').value = 'Our Platform';
+          document.getElementById('serviceName').value = 'OUR PLATFORM';
           document.getElementById('warrantyStrong').checked = true;
           document.getElementById('disclaimerUptime').checked = true;
           document.getElementById('disclaimerAccuracy').checked = true;
@@ -1287,7 +1289,7 @@
         // Subscription Service preset
         else if (preset === 'subscription') {
           document.getElementById('serviceType').value = 'subscription';
-          document.getElementById('serviceName').value = 'Our Subscription Service';
+          document.getElementById('serviceName').value = 'OUR SUBSCRIPTION SERVICE';
           document.getElementById('warrantyModerate').checked = true;
           document.getElementById('disclaimerUptime').checked = true;
           document.getElementById('disclaimerAccuracy').checked = true;
@@ -1307,7 +1309,7 @@
         // Online Marketplace preset
         else if (preset === 'marketplace') {
           document.getElementById('serviceType').value = 'marketplace';
-          document.getElementById('serviceName').value = 'Our Marketplace';
+          document.getElementById('serviceName').value = 'OUR MARKETPLACE';
           document.getElementById('warrantyStrong').checked = true;
           document.getElementById('disclaimerUptime').checked = true;
           document.getElementById('disclaimerAccuracy').checked = true;
@@ -1376,8 +1378,8 @@
       generateClause: function() {
         const companyName = document.getElementById('companyName').value;
         const serviceType = document.getElementById('serviceType').value;
-        const serviceTypeText = document.getElementById('serviceType').options[document.getElementById('serviceType').selectedIndex].text;
-        const serviceName = document.getElementById('serviceName').value;
+        const serviceTypeText = document.getElementById('serviceType').options[document.getElementById('serviceType').selectedIndex].text.toUpperCase();
+        const serviceName = document.getElementById('serviceName').value.toUpperCase();
         
         // Get warranty level
         let warrantyLevel = '';
@@ -1466,7 +1468,7 @@
         
         if (disclaimerUptime) {
           if (warrantyLevel === 'strong' || warrantyLevel === 'moderate') {
-            specificDisclaimers.push(`${companyName} DOES NOT WARRANT THAT ${serviceName} WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, ACCURATE, RELIABLE, OR AVAILABLE AT ALL TIMES. YOU UNDERSTAND THAT THE ${serviceTypeText.toUpperCase()} MAY BE SUBJECT TO LIMITATIONS, DELAYS, AND OTHER ISSUES INHERENT IN THE USE OF THE INTERNET AND ELECTRONIC COMMUNICATIONS.`);
+            specificDisclaimers.push(`${companyName} DOES NOT WARRANT THAT ${serviceName} WILL BE UNINTERRUPTED, ERROR-FREE, SECURE, ACCURATE, RELIABLE, OR AVAILABLE AT ALL TIMES. YOU UNDERSTAND THAT THE ${serviceTypeText} MAY BE SUBJECT TO LIMITATIONS, DELAYS, AND OTHER ISSUES INHERENT IN THE USE OF THE INTERNET AND ELECTRONIC COMMUNICATIONS.`);
           } else {
             specificDisclaimers.push(`While we strive for high availability, ${companyName} does not guarantee that ${serviceName} will be uninterrupted, error-free, or available at all times. The ${serviceTypeText} may be subject to limitations, delays, and other issues inherent in the use of the internet and electronic communications.`);
           }
@@ -1730,11 +1732,11 @@
           case 'serviceType':
             // Highlight the service type text
             const serviceTypeElement = document.getElementById('serviceType');
-            const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text;
-            this.findAndHighlightText(serviceTypeText.toUpperCase());
+            const serviceTypeText = serviceTypeElement.options[serviceTypeElement.selectedIndex].text.toUpperCase();
+            this.findAndHighlightText(serviceTypeText);
             break;
           case 'serviceName':
-            this.findAndHighlightText(document.getElementById('serviceName').value);
+            this.findAndHighlightText(document.getElementById('serviceName').value.toUpperCase());
             break;
           case 'warrantyLevel':
             // Highlight the warranty heading
@@ -1869,34 +1871,59 @@
       // Handle copy button click
       handleCopyClick: function() {
         const text = document.getElementById('warrantyPreview').innerText;
-        const copyBtn = document.getElementById('warrantyCopyBtn');
-        const originalText = copyBtn.innerHTML;
         
         try {
           // Modern approach
           if (navigator.clipboard) {
-            navigator.clipboard.writeText(text).then(function() {
-              copyBtn.innerHTML = 'COPIED!';
-              setTimeout(function() {
-                copyBtn.innerHTML = originalText;
-              }, 2000);
-            });
+            navigator.clipboard.writeText(text)
+              .then(function() {
+                const copyBtn = document.getElementById('warrantyCopyBtn');
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = 'COPIED!';
+                setTimeout(function() {
+                  copyBtn.innerHTML = originalText;
+                }, 2000);
+              })
+              .catch(function(err) {
+                console.error('Could not copy text: ', err);
+                fallbackCopyTextToClipboard(text);
+              });
           } 
           // Fallback approach
           else {
-            const textArea = document.createElement('textarea');
-            textArea.value = text;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            copyBtn.innerHTML = 'COPIED!';
+            fallbackCopyTextToClipboard(text);
+          }
+        } catch(err) {
+          console.error('Copy failed: ', err);
+          alert('Please select and copy the text manually.');
+        }
+        
+        function fallbackCopyTextToClipboard(text) {
+          const textArea = document.createElement('textarea');
+          textArea.value = text;
+          
+          // Make the textarea out of viewport
+          textArea.style.position = 'fixed';
+          textArea.style.left = '-999999px';
+          textArea.style.top = '-999999px';
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          
+          try {
+            const successful = document.execCommand('copy');
+            const copyBtn = document.getElementById('warrantyCopyBtn');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = successful ? 'COPIED!' : 'FAILED!';
             setTimeout(function() {
               copyBtn.innerHTML = originalText;
             }, 2000);
+          } catch (err) {
+            console.error('Fallback: Could not copy text: ', err);
+            alert('Please select and copy the text manually.');
           }
-        } catch(err) {
-          alert('Please select and copy the text manually.');
+          
+          document.body.removeChild(textArea);
         }
       }
     };
