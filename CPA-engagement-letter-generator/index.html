@@ -1188,243 +1188,8 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
     <div class="notification" id="notification">Letter copied to clipboard!</div>
     
     <script>
+        // Wait for DOM to fully load before attaching event handlers
         document.addEventListener('DOMContentLoaded', function() {
-            // Tab functionality
-            const tabs = document.querySelectorAll('.tab');
-            const tabContents = document.querySelectorAll('.tab-content');
-            let currentTabIndex = 0;
-            
-            // Track changes for highlighting
-            let lastChangedElements = [];
-
-            function showTab(index) {
-                tabs.forEach(tab => tab.classList.remove('active'));
-                tabContents.forEach(content => content.classList.remove('active'));
-                
-                tabs[index].classList.add('active');
-                tabContents[index].classList.add('active');
-                currentTabIndex = index;
-            }
-            
-            tabs.forEach((tab, index) => {
-                tab.addEventListener('click', () => {
-                    showTab(index);
-                });
-            });
-            
-            // Nav buttons for each tab
-            document.getElementById('nextTab1').addEventListener('click', () => showTab(1));
-            document.getElementById('prevTab2').addEventListener('click', () => showTab(0));
-            document.getElementById('nextTab2').addEventListener('click', () => showTab(2));
-            document.getElementById('prevTab3').addEventListener('click', () => showTab(1));
-            document.getElementById('nextTab3').addEventListener('click', () => showTab(3));
-            document.getElementById('prevTab4').addEventListener('click', () => showTab(2));
-            document.getElementById('nextTab4').addEventListener('click', () => showTab(4));
-            document.getElementById('prevTab5').addEventListener('click', () => showTab(3));
-            document.getElementById('nextTab5').addEventListener('click', () => showTab(5));
-            document.getElementById('prevTab6').addEventListener('click', () => showTab(4));
-            
-            // Direct event listeners for preview buttons with simplified approach
-            document.getElementById('previewBtn1').onclick = showPreview;
-            document.getElementById('previewBtn2').onclick = showPreview;
-            document.getElementById('previewBtn3').onclick = showPreview;
-            document.getElementById('previewBtn4').onclick = showPreview;
-            document.getElementById('previewBtn5').onclick = showPreview;
-            document.getElementById('previewBtn6').onclick = showPreview;
-            document.getElementById('previewFinalBtn').onclick = showPreview;
-            document.getElementById('generateBtn').onclick = showPreview;
-            
-            // Service type toggle
-            const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
-            const serviceOptions = document.querySelectorAll('.service-options');
-            
-            serviceTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    serviceOptions.forEach(option => {
-                        option.style.display = 'none';
-                    });
-                    
-                    const selectedOption = document.getElementById(this.value.toLowerCase() + 'ServiceOptions');
-                    if (selectedOption) {
-                        selectedOption.style.display = 'block';
-                    }
-                    
-                    highlightChanges();
-                });
-            });
-            
-            // Fee structure toggle
-            const feeStructureRadios = document.querySelectorAll('input[name="feeStructure"]');
-            const fixedFeeOptions = document.getElementById('fixedFeeOptions');
-            const hourlyFeeOptions = document.getElementById('hourlyFeeOptions');
-            const monthlyFeeOptions = document.getElementById('monthlyFeeOptions');
-            
-            feeStructureRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    fixedFeeOptions.style.display = 'none';
-                    hourlyFeeOptions.style.display = 'none';
-                    monthlyFeeOptions.style.display = 'none';
-                    
-                    if (this.value === 'Fixed') {
-                        fixedFeeOptions.style.display = 'block';
-                    } else if (this.value === 'Hourly') {
-                        hourlyFeeOptions.style.display = 'block';
-                    } else if (this.value === 'Monthly') {
-                        monthlyFeeOptions.style.display = 'block';
-                    }
-                    
-                    highlightChanges();
-                });
-            });
-            
-            // Liability cap toggle
-            const liabilityCapTypeRadios = document.querySelectorAll('input[name="liabilityCapType"]');
-            const feesCapGroup = document.getElementById('feesCapGroup');
-            const fixedCapGroup = document.getElementById('fixedCapGroup');
-            
-            liabilityCapTypeRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    feesCapGroup.style.display = 'none';
-                    fixedCapGroup.style.display = 'none';
-                    
-                    if (this.value === 'Fees') {
-                        feesCapGroup.style.display = 'block';
-                    } else if (this.value === 'Fixed') {
-                        fixedCapGroup.style.display = 'block';
-                    }
-                    
-                    highlightChanges();
-                });
-            });
-            
-            // Include liability toggle
-            const includeLiabilityRadios = document.querySelectorAll('input[name="includeLiability"]');
-            const liabilityOptions = document.getElementById('liabilityOptions');
-            
-            includeLiabilityRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    liabilityOptions.style.display = this.value === 'Yes' ? 'block' : 'none';
-                    highlightChanges();
-                });
-            });
-            
-            // Third party toggle
-            const thirdPartyRadios = document.querySelectorAll('input[name="thirdPartyProvisions"]');
-            const thirdPartyTermsGroup = document.getElementById('thirdPartyTermsGroup');
-            
-            thirdPartyRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    thirdPartyTermsGroup.style.display = this.value === 'Yes' ? 'block' : 'none';
-                    highlightChanges();
-                });
-            });
-            
-            // Staffing toggle
-            const staffingRadios = document.querySelectorAll('input[name="staffingProvisions"]');
-            const staffingDetailsGroup = document.getElementById('staffingDetailsGroup');
-            
-            staffingRadios.forEach(radio => {
-                radio.addEventListener('change', function() {
-                    staffingDetailsGroup.style.display = this.value === 'Yes' ? 'block' : 'none';
-                    highlightChanges();
-                });
-            });
-            
-            // Add change listeners to all input fields
-            const inputFields = document.querySelectorAll('.input-field');
-            inputFields.forEach(field => {
-                field.addEventListener('change', highlightChanges);
-                field.addEventListener('input', highlightChanges);
-            });
-            
-            // Modal functionality - simplified and direct
-            document.querySelector('.close').onclick = function() {
-                document.getElementById('previewModal').style.display = 'none';
-            };
-            
-            document.getElementById('closeModalBtn').onclick = function() {
-                document.getElementById('previewModal').style.display = 'none';
-            };
-            
-            // Close modal when clicking outside it
-            window.onclick = function(event) {
-                if (event.target === document.getElementById('previewModal')) {
-                    document.getElementById('previewModal').style.display = 'none';
-                }
-            };
-            
-            // Direct and simplified copy/download functionality
-            document.getElementById('copyLetterBtn').onclick = function() {
-                const letterText = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                   document.getElementById('datePreview').innerText + '\n\n' +
-                                   document.getElementById('letterContent').innerText + '\n\n' +
-                                   'Sincerely,\n\n' +
-                                   document.getElementById('cpaSignature').innerText + '\n\n' +
-                                   'ACCEPTED AND AGREED:\n\n' +
-                                   document.getElementById('clientSignature').innerText;
-                
-                const textarea = document.createElement('textarea');
-                textarea.value = letterText;
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                
-                const notification = document.getElementById('notification');
-                notification.style.display = 'block';
-                setTimeout(function() { notification.style.display = 'none'; }, 2000);
-            };
-            
-            // Simple direct download functionality
-            document.getElementById('downloadBtn').onclick = downloadLetter;
-            document.getElementById('downloadModalBtn').onclick = downloadLetter;
-            
-            // Simplified download function with minimal complexity
-            function downloadLetter() {
-                // Always regenerate letter for latest content
-                generateLetter();
-                
-                // Get the plain text version of the letter
-                const letterText = document.getElementById('letterheadPreview').innerText + '\n\n' + 
-                                  document.getElementById('datePreview').innerText + '\n\n' +
-                                  document.getElementById('letterContent').innerText.replace(/<[^>]*>/g, '') + '\n\n' +
-                                  'Sincerely,\n\n' +
-                                  document.getElementById('cpaSignature').innerText + '\n\n' +
-                                  'ACCEPTED AND AGREED:\n\n' +
-                                  document.getElementById('clientSignature').innerText;
-                
-                // Create file name based on client name
-                const clientNameSafe = document.getElementById('clientName').value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
-                const fileName = `cpa_engagement_letter_${clientNameSafe}.txt`;
-                
-                // Create download link with the text content
-                const blob = new Blob([letterText], { type: 'text/plain' });
-                const url = URL.createObjectURL(blob);
-                
-                // Create a link element and trigger download
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                
-                // Clean up
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-            }
-            
-            // Simpler, more reliable showPreview function
-            function showPreview() {
-                // Generate the letter content
-                generateLetter();
-                
-                // Show the modal directly - no conditionals or error handling that might interrupt
-                document.getElementById('previewModal').style.display = 'block';
-            }
-            
             // Helper function to format dates
             function formatDate(dateString) {
                 if (!dateString) return '';
@@ -1432,37 +1197,6 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                 if (isNaN(date.getTime())) return dateString; // Return original if invalid
                 const options = { year: 'numeric', month: 'long', day: 'numeric' };
                 return date.toLocaleDateString('en-US', options);
-            }
-            
-            // Function to track and highlight changes
-            function highlightChanges() {
-                // Clear previous highlights after a delay
-                setTimeout(() => {
-                    if (lastChangedElements.length > 0) {
-                        lastChangedElements.forEach(el => {
-                            if (el) el.classList.remove('highlight');
-                        });
-                        lastChangedElements = [];
-                    }
-                }, 3000);
-                
-                // Generate letter to reflect changes
-                generateLetter();
-                
-                // We'll implement the highlighting in the preview
-                // by looking at what data has changed and finding corresponding elements
-                const changedData = {};
-                const changedElement = event ? event.target : null;
-                
-                if (changedElement && changedElement.classList.contains('input-field')) {
-                    const target = changedElement.getAttribute('data-target');
-                    if (target) {
-                        changedData[target] = true;
-                    }
-                }
-                
-                // After generating the letter, find elements that should be highlighted
-                // This would be a more complex implementation based on your specific needs
             }
             
             // Generate letter for preview
@@ -1599,4 +1333,368 @@ We maintain a comprehensive quality control system in compliance with AICPA stan
                     } else if (paymentSchedule === 'Completion') {
                         letterHtml += `<p>The full amount is due upon completion of the engagement.</p>`;
                     }
+                } else if (feeStructure === 'Hourly') {
+                    letterHtml += `<p>Our fees will be based on the time spent by our personnel at the following hourly rates:</p>`;
+                    letterHtml += `<p>Partner: ${document.getElementById('partnerRate').value}<br>
+                    Manager: ${document.getElementById('managerRate').value}<br>
+                    Staff: ${document.getElementById('staffRate').value}</p>`;
+                    
+                    letterHtml += `<p>Based on our preliminary assessment, we estimate that the total hours required will be approximately ${document.getElementById('estimatedHours').value}, resulting in an estimated fee of ${document.getElementById('estimatedTotal').value}. This is only an estimate, and the actual fee may differ based on the time required to complete the engagement.</p>`;
+                    
+                    const billingFrequency = document.querySelector('input[name="hourlyBillingFrequency"]:checked').value;
+                    
+                    letterHtml += `<p>Invoices will be issued ${billingFrequency.toLowerCase()} and are due upon receipt.</p>`;
+                } else if (feeStructure === 'Monthly') {
+                    letterHtml += `<p>Our fee for the services described above will be a monthly retainer of ${document.getElementById('monthlyRetainer').value} for a term of ${document.getElementById('retainerTerm').value}.</p>`;
+                    
+                    letterHtml += `<p>The monthly retainer includes:</p>`;
+                    letterHtml += `<p>${document.getElementById('retainerIncludes').value.replace(/\n/g, '<br>')}</p>`;
+                    
+                    letterHtml += `<p>The monthly retainer will be billed at the beginning of each month and is due upon receipt.</p>`;
                 }
+                
+                // Expenses
+                const expenseHandling = document.querySelector('input[name="expenseHandling"]:checked').value;
+                
+                if (expenseHandling === 'Included') {
+                    letterHtml += `<p>Out-of-pocket expenses are included in the fee arrangement described above.</p>`;
+                } else if (expenseHandling === 'Billed') {
+                    letterHtml += `<p>${document.getElementById('expenseDetails').value.replace(/\n/g, '<br>')}</p>`;
+                }
+                
+                // Timeline
+                letterHtml += `<h2>Timeline and Deliverables</h2>`;
+                letterHtml += `<p>This engagement will begin on ${formatDate(document.getElementById('startDate').value)} and is expected to be completed by ${formatDate(document.getElementById('endDate').value)}. The following key deadlines apply:</p>`;
+                letterHtml += `<p>${document.getElementById('keyDeadlines').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Client Responsibilities
+                letterHtml += `<h2>Client Responsibilities</h2>`;
+                letterHtml += `<p>${document.getElementById('clientResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
+                
+                letterHtml += `<p>You must provide all information necessary for the completion of our services by ${document.getElementById('clientDeadlines').value}. The information should be provided in the following format: ${document.getElementById('clientFormat').value}</p>`;
+                
+                // CPA Firm Responsibilities
+                letterHtml += `<h2>CPA Firm Responsibilities</h2>`;
+                letterHtml += `<p>${document.getElementById('cpaResponsibilities').value.replace(/\n/g, '<br>')}</p>`;
+                
+                letterHtml += `<p>${document.getElementById('cpaCommunication').value.replace(/\n/g, '<br>')}</p>`;
+                
+                letterHtml += `<h3>Quality Control</h3>`;
+                letterHtml += `<p>${document.getElementById('qualityControl').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Legal Provisions
+                letterHtml += `<h2>Legal Provisions</h2>`;
+                
+                // Governing Law
+                letterHtml += `<h3>Governing Law</h3>`;
+                letterHtml += `<p>This engagement letter shall be governed by and construed in accordance with the laws of the State of ${document.getElementById('governingState').value}, without giving effect to any choice or conflict of law provision or rule. Any legal action arising out of or relating to this engagement shall be brought exclusively in the state or federal courts located in ${document.getElementById('venueCounty').value}, and the parties consent to the personal jurisdiction of such courts.</p>`;
+                
+                // Limitation of Liability
+                const includeLiability = document.querySelector('input[name="includeLiability"]:checked').value;
+                
+                if (includeLiability === 'Yes') {
+                    letterHtml += `<h3>Limitation of Liability</h3>`;
+                    
+                    const liabilityCapType = document.querySelector('input[name="liabilityCapType"]:checked').value;
+                    
+                    if (liabilityCapType === 'Fees') {
+                        const feesCapMultiplier = document.querySelector('input[name="feesCapMultiplier"]:checked').value;
+                        
+                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${feesCapMultiplier} the amount of fees paid by Client for the services that are the subject of the claim.</p>`;
+                    } else if (liabilityCapType === 'Fixed') {
+                        letterHtml += `<p>The liability of ${document.getElementById('cpaFirmName').value} to Client for any claim arising out of this engagement shall not exceed ${document.getElementById('fixedCapAmount').value}.</p>`;
+                    }
+                    
+                    letterHtml += `<p>${document.getElementById('liabilityExclusions').value.replace(/\n/g, '<br>')}</p>`;
+                }
+                
+                // Dispute Resolution
+                letterHtml += `<h3>Dispute Resolution</h3>`;
+                
+                const disputeResolution = document.querySelector('input[name="disputeResolution"]:checked').value;
+                
+                if (disputeResolution === 'Mediation') {
+                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall first be submitted to mediation. The mediation shall be conducted in accordance with the rules of the American Arbitration Association. The cost of mediation shall be shared equally by the parties.</p>`;
+                } else if (disputeResolution === 'MediationArbitration') {
+                    letterHtml += `<p>${document.getElementById('mediationArbitrationDetails').value.replace(/\n/g, '<br>')}</p>`;
+                } else if (disputeResolution === 'Arbitration') {
+                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement shall be settled by binding arbitration administered by the American Arbitration Association in accordance with its Professional Accounting and Related Services Arbitration Rules. Judgment on the award rendered by the arbitrator(s) may be entered in any court having jurisdiction.</p>`;
+                } else if (disputeResolution === 'Litigation') {
+                    letterHtml += `<p>Any dispute or claim arising out of or relating to this engagement may be resolved through litigation in the appropriate courts as specified in the Governing Law section above.</p>`;
+                }
+                
+                // Termination
+                letterHtml += `<h3>Termination</h3>`;
+                
+                const terminationPeriod = document.querySelector('input[name="terminationPeriod"]:checked').value;
+                
+                if (terminationPeriod === '15Days') {
+                    letterHtml += `<p>Either party may terminate this engagement with 15 days' written notice to the other party.</p>`;
+                } else if (terminationPeriod === '30Days') {
+                    letterHtml += `<p>Either party may terminate this engagement with 30 days' written notice to the other party.</p>`;
+                } else if (terminationPeriod === '60Days') {
+                    letterHtml += `<p>Either party may terminate this engagement with 60 days' written notice to the other party.</p>`;
+                }
+                
+                letterHtml += `<p>${document.getElementById('terminationObligations').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Confidentiality
+                letterHtml += `<h3>Confidentiality</h3>`;
+                letterHtml += `<p>${document.getElementById('confidentialityProvisions').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Record Retention
+                letterHtml += `<h3>Record Retention</h3>`;
+                letterHtml += `<p>${document.getElementById('recordRetentionPolicy').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Electronic Communications
+                letterHtml += `<h3>Electronic Communications</h3>`;
+                
+                const electronicMethods = Array.from(document.querySelectorAll('input[data-target="electronicMethods"]:checked'))
+                    .map(input => input.value);
+                
+                if (electronicMethods.length > 0) {
+                    letterHtml += `<p>We will use the following electronic communication methods: ${electronicMethods.join(', ')}.</p>`;
+                }
+                
+                letterHtml += `<p>${document.getElementById('electronicCommunicationTerms').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Third-Party Provisions
+                const includeThirdParty = document.querySelector('input[name="includeThirdParty"]:checked').value;
+                
+                if (includeThirdParty === 'Yes') {
+                    letterHtml += `<h3>Third-Party Use Limitations</h3>`;
+                    letterHtml += `<p>${document.getElementById('thirdPartyTerms').value.replace(/\n/g, '<br>')}</p>`;
+                }
+                
+                // Staffing Provisions
+                const includeStaffing = document.querySelector('input[name="includeStaffing"]:checked').value;
+                
+                if (includeStaffing === 'Yes') {
+                    letterHtml += `<h3>Engagement Staffing</h3>`;
+                    letterHtml += `<p>${document.getElementById('staffingDetails').value.replace(/\n/g, '<br>')}</p>`;
+                }
+                
+                // Additional Terms
+                letterHtml += `<h3>Additional Terms and Conditions</h3>`;
+                letterHtml += `<p>${document.getElementById('additionalTerms').value.replace(/\n/g, '<br>')}</p>`;
+                
+                // Conclusion
+                letterHtml += `<p>We appreciate the opportunity to be of service to you. If you have any questions about the contents of this letter, please contact us. If the services and terms outlined in this engagement letter are in accordance with your understanding of our agreement, please sign and return a copy to us.</p>`;
+                
+                document.getElementById('letterContent').innerHTML = letterHtml;
+                document.getElementById('letterheadPreview').textContent = document.getElementById('cpaFirmName').value;
+                document.getElementById('datePreview').textContent = formatDate(document.getElementById('letterDate').value);
+                document.getElementById('cpaSignature').innerHTML = '[Partner Name]<br>' + document.getElementById('cpaFirmName').value;
+                document.getElementById('clientSignature').innerHTML = '_____________________________<br>' + document.getElementById('clientName').value + '<br>By: ' + document.getElementById('clientContact').value + '<br>Date: _____________________';
+            }
+            
+            // Function to show preview modal
+            function showPreview() {
+                generateLetter();
+                document.getElementById('previewModal').style.display = 'block';
+            }
+            
+            // Function to close modal
+            function closeModal() {
+                document.getElementById('previewModal').style.display = 'none';
+            }
+            
+            // Function to copy letter to clipboard
+            function copyLetter() {
+                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
+                                document.getElementById('datePreview').innerText + '\n\n' +
+                                document.getElementById('letterContent').innerText + '\n\n' +
+                                'Sincerely,\n\n' +
+                                document.getElementById('cpaSignature').innerText + '\n\n' +
+                                'ACCEPTED AND AGREED:\n\n' +
+                                document.getElementById('clientSignature').innerText;
+                
+                const textarea = document.createElement('textarea');
+                textarea.value = letterContent;
+                textarea.setAttribute('readonly', '');
+                textarea.style.position = 'absolute';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                
+                const notification = document.getElementById('notification');
+                notification.style.display = 'block';
+                setTimeout(function() {
+                    notification.style.display = 'none';
+                }, 2000);
+            }
+            
+            // Function to download letter as text file
+            function downloadLetter() {
+                generateLetter();
+                
+                const letterContent = document.getElementById('letterheadPreview').innerText + '\n\n' + 
+                                document.getElementById('datePreview').innerText + '\n\n' +
+                                document.getElementById('letterContent').innerText
+                                    .replace(/<[^>]*>/g, '')
+                                    .replace(/&nbsp;/g, ' ') + '\n\n' +
+                                'Sincerely,\n\n' +
+                                document.getElementById('cpaSignature').innerText.replace(/<[^>]*>/g, '\n') + '\n\n' +
+                                'ACCEPTED AND AGREED:\n\n' +
+                                document.getElementById('clientSignature').innerText.replace(/<[^>]*>/g, '\n');
+                
+                const clientName = document.getElementById('clientName').value.replace(/[^a-z0-9]/gi, '_').toLowerCase();
+                const fileName = `cpa_engagement_letter_${clientName}.txt`;
+                
+                const blob = new Blob([letterContent], { type: 'text/plain' });
+                const link = document.createElement('a');
+                link.href = window.URL.createObjectURL(blob);
+                link.download = fileName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+            
+            // Tab functionality
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            function showTab(index) {
+                tabs.forEach(tab => tab.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+                
+                tabs[index].classList.add('active');
+                tabContents[index].classList.add('active');
+            }
+            
+            tabs.forEach((tab, index) => {
+                tab.addEventListener('click', function() {
+                    showTab(index);
+                });
+            });
+            
+            // Service type toggle
+            const serviceTypeRadios = document.querySelectorAll('input[name="serviceType"]');
+            const serviceOptions = document.querySelectorAll('.service-options');
+            
+            serviceTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    serviceOptions.forEach(option => {
+                        option.style.display = 'none';
+                    });
+                    
+                    const selectedOption = document.getElementById(this.value.toLowerCase() + 'ServiceOptions');
+                    if (selectedOption) {
+                        selectedOption.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Fee structure toggle
+            const feeStructureRadios = document.querySelectorAll('input[name="feeStructure"]');
+            const fixedFeeOptions = document.getElementById('fixedFeeOptions');
+            const hourlyFeeOptions = document.getElementById('hourlyFeeOptions');
+            const monthlyFeeOptions = document.getElementById('monthlyFeeOptions');
+            
+            feeStructureRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    fixedFeeOptions.style.display = 'none';
+                    hourlyFeeOptions.style.display = 'none';
+                    monthlyFeeOptions.style.display = 'none';
+                    
+                    if (this.value === 'Fixed') {
+                        fixedFeeOptions.style.display = 'block';
+                    } else if (this.value === 'Hourly') {
+                        hourlyFeeOptions.style.display = 'block';
+                    } else if (this.value === 'Monthly') {
+                        monthlyFeeOptions.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Liability toggle
+            const liabilityCapTypeRadios = document.querySelectorAll('input[name="liabilityCapType"]');
+            const feesCapGroup = document.getElementById('feesCapGroup');
+            const fixedCapGroup = document.getElementById('fixedCapGroup');
+            
+            liabilityCapTypeRadios.forEach(radio => {
+                radio.addEventListener('change', function() {
+                    feesCapGroup.style.display = 'none';
+                    fixedCapGroup.style.display = 'none';
+                    
+                    if (this.value === 'Fees') {
+                        feesCapGroup.style.display = 'block';
+                    } else if (this.value === 'Fixed') {
+                        fixedCapGroup.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Direct event handlers for navigation buttons
+            document.getElementById('nextTab1').addEventListener('click', function() {
+                showTab(1);
+            });
+            
+            document.getElementById('prevTab2').addEventListener('click', function() {
+                showTab(0);
+            });
+            
+            document.getElementById('nextTab2').addEventListener('click', function() {
+                showTab(2);
+            });
+            
+            document.getElementById('prevTab3').addEventListener('click', function() {
+                showTab(1);
+            });
+            
+            document.getElementById('nextTab3').addEventListener('click', function() {
+                showTab(3);
+            });
+            
+            document.getElementById('prevTab4').addEventListener('click', function() {
+                showTab(2);
+            });
+            
+            document.getElementById('nextTab4').addEventListener('click', function() {
+                showTab(4);
+            });
+            
+            document.getElementById('prevTab5').addEventListener('click', function() {
+                showTab(3);
+            });
+            
+            document.getElementById('nextTab5').addEventListener('click', function() {
+                showTab(5);
+            });
+            
+            document.getElementById('prevTab6').addEventListener('click', function() {
+                showTab(4);
+            });
+            
+            // Direct event handlers for preview buttons
+            document.getElementById('previewBtn1').addEventListener('click', showPreview);
+            document.getElementById('previewBtn2').addEventListener('click', showPreview);
+            document.getElementById('previewBtn3').addEventListener('click', showPreview);
+            document.getElementById('previewBtn4').addEventListener('click', showPreview);
+            document.getElementById('previewBtn5').addEventListener('click', showPreview);
+            document.getElementById('previewBtn6').addEventListener('click', showPreview);
+            document.getElementById('previewFinalBtn').addEventListener('click', showPreview);
+            document.getElementById('generateBtn').addEventListener('click', showPreview);
+            
+            // Direct event handlers for modal controls
+            document.querySelector('.close').addEventListener('click', closeModal);
+            document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+            document.getElementById('copyLetterBtn').addEventListener('click', copyLetter);
+            document.getElementById('downloadBtn').addEventListener('click', downloadLetter);
+            document.getElementById('downloadModalBtn').addEventListener('click', downloadLetter);
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === document.getElementById('previewModal')) {
+                    closeModal();
+                }
+            });
+            
+            // Initialize the letter
+            generateLetter();
+        });
+    </script>
+</body>
+</html>
