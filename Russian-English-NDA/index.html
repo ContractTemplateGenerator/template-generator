@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Language NDA Generator - English/Russian</title>
+    <style>
+        :root {
+            --primary-color: #0069ff;
+            --highlight-color: #ffff00;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-section {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 700px;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .language-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .toggle-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .toggle-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .toggle-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: var(--border-color);
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            line-height: 1.8;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 1s;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        #preview-document {
+            font-size: 14px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dual Language NDA Generator (English/Russian)</h1>
+    
+    <div class="language-toggle">
+        <button class="toggle-btn active" id="lang-en">English</button>
+        <button class="toggle-btn" id="lang-ru">Russian</button>
+    </div>
+    
+    <div class="container">
+        <div class="form-section">
+            <div class="tabs">
+                <div class="tab active" data-tab="parties">Parties</div>
+                <div class="tab" data-tab="agreement">Agreement</div>
+                <div class="tab" data-tab="term">Term & Jurisdiction</div>
+                <div class="tab" data-tab="additional">Additional Terms</div>
+            </div>
+            
+            <div class="tab-content active" id="tab-parties">
+                <div class="form-group">
+                    <label for="discloser-name">Disclosing Party Name:</label>
+                    <input type="text" id="discloser-name" placeholder="Company/Individual Name">
+                </div>
+                <div class="form-group">
+                    <label for="discloser-address">Disclosing Party Address:</label>
+                    <input type="text" id="discloser-address" placeholder="Full Address">
+                </div>
+                <div class="form-group">
+                    <label for="recipient-name">Receiving Party Name:</label>
+                    <input type="text" id="recipient-name" placeholder="Company/Individual Name">
+                </div>
+                <div class="form-group">
+                    <label for="recipient-address">Receiving Party Address:</label>
+                    <input type="text" id="recipient-address" placeholder="Full Address">
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-agreement">
+                <div class="form-group">
+                    <label for="effective-date">Effective Date:</label>
+                    <input type="date" id="effective-date">
+                </div>
+                <div class="form-group">
+                    <label for="purpose">Purpose of Disclosure:</label>
+                    <textarea id="purpose" placeholder="Describe the purpose for sharing confidential information"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="conf-info">Definition of Confidential Information:</label>
+                    <select id="conf-info">
+                        <option value="broad">Broad Definition</option>
+                        <option value="medium">Medium Definition</option>
+                        <option value="narrow">Narrow Definition</option>
+                        <option value="custom">Custom Definition</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-conf-info-group" style="display: none;">
+                    <label for="custom-conf-info">Custom Definition:</label>
+                    <textarea id="custom-conf-info" placeholder="Enter custom definition of confidential information"></textarea>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-term">
+                <div class="form-group">
+                    <label for="agreement-term">Agreement Term (years):</label>
+                    <input type="number" id="agreement-term" min="1" max="10" value="2">
+                </div>
+                <div class="form-group">
+                    <label for="survival-term">Survival Term After Expiration (years):</label>
+                    <input type="number" id="survival-term" min="1" max="10" value="3">
+                </div>
+                <div class="form-group">
+                    <label for="governing-law">Governing Law:</label>
+                    <select id="governing-law">
+                        <option value="california">California, USA</option>
+                        <option value="delaware">Delaware, USA</option>
+                        <option value="newyork">New York, USA</option>
+                        <option value="russia">Russian Federation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="dispute-resolution">Dispute Resolution:</label>
+                    <select id="dispute-resolution">
+                        <option value="courts">Courts</option>
+                        <option value="arbitration">Arbitration</option>
+                        <option value="mediation-then-arbitration">Mediation then Arbitration</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-additional">
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="include-return-destroy" checked>
+                        Include Return/Destruction of Materials
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="include-injunctive-relief" checked>
+                        Include Right to Injunctive Relief
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="include-no-license" checked>
+                        Include No License Granted Clause
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="include-no-obligation" checked>
+                        Include No Obligation to Proceed
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="controlling-language">Legally Controlling Language:</label>
+                    <select id="controlling-language">
+                        <option value="english">English</option>
+                        <option value="russian">Russian</option>
+                        <option value="both">Both Equally</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" id="prev-btn">Previous</button>
+                <button class="btn" id="next-btn">Next</button>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" id="download-btn">Download PDF</button>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h2>Live Preview</h2>
+            <div id="preview-document" class="preview-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Document template objects for both languages
+        const templates = {
+            english: {
+                title: "MUTUAL NON-DISCLOSURE AGREEMENT",
+                parties: (discloserName, discloserAddress, recipientName, recipientAddress, effectiveDate) => {
+                    return `This Mutual Non-Disclosure Agreement (the "Agreement") is entered into as of ${effectiveDate} by and between:
+
+<strong>${discloserName}</strong>, located at ${discloserAddress} (the "Disclosing Party")
+
+and
+
+<strong>${recipientName}</strong>, located at ${recipientAddress} (the "Receiving Party").`;
+                },
+                purpose: (purposeText) => {
+                    return `<h3>1. Purpose</h3>
+                    
+The parties wish to explore a potential business relationship in connection with ${purposeText} (the "Purpose"). In connection with the Purpose, each party may disclose to the other certain confidential technical and business information that the disclosing party desires the receiving party to treat as confidential.`;
+                },
+                confidentialInfo: {
+                    broad: `<h3>2. Definition of Confidential Information</h3>
+                    
+"Confidential Information" means any information disclosed by either party to the other party, either directly or indirectly, in writing, orally or by inspection of tangible objects, including without limitation documents, prototypes, samples, plant and equipment, research, product plans, products, services, customer lists, markets, software, developments, inventions, processes, designs, drawings, engineering, hardware configuration, marketing or finances, which is designated as "Confidential," "Proprietary" or some similar designation, or information which should reasonably be considered confidential given the nature of the information and circumstances of disclosure.`,
+                    
+                    medium: `<h3>2. Definition of Confidential Information</h3>
+                    
+"Confidential Information" means any non-public information that relates to the actual or anticipated business or research and development of the Disclosing Party, technical data, trade secrets or know-how, including, but not limited to, research, product plans, products, services, customer lists and customers, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances or other business information disclosed by the Disclosing Party either directly or indirectly in writing, orally or by drawings or inspection of parts or equipment.`,
+                    
+                    narrow: `<h3>2. Definition of Confidential Information</h3>
+                    
+"Confidential Information" means only that information which is (a) disclosed in writing and marked as confidential at the time of disclosure, or (b) disclosed in any other manner and identified as confidential at the time of disclosure and also summarized and designated as confidential in a written memorandum delivered to the Receiving Party within thirty (30) days of the disclosure.`,
+                    
+                    custom: (customText) => {
+                        return `<h3>2. Definition of Confidential Information</h3>
+                        
+${customText}`;
+                    }
+                },
+                obligations: `<h3>3. Obligations</h3>
+                
+The Receiving Party shall use the Confidential Information only for the Purpose and shall not disclose it to any third party. The Receiving Party shall take all reasonable measures to avoid disclosure, dissemination or unauthorized use of Confidential Information, including, at a minimum, those measures it takes to protect its own confidential information of a similar nature. The Receiving Party shall not, without the prior written consent of the Disclosing Party, disclose the fact that Confidential Information has been made available to it.`,
+                
+                nonConfidential: `<h3>4. Non-Confidential Information</h3>
+                
+The obligations and restrictions of this Agreement do not apply to information that: (a) was in the Receiving Party's possession before receipt from the Disclosing Party; (b) is or becomes a matter of public knowledge through no fault of the Receiving Party; (c) is rightfully received by the Receiving Party from a third party without a duty of confidentiality; (d) is independently developed by the Receiving Party without use of the Confidential Information; or (e) is disclosed by the Receiving Party with the Disclosing Party's prior written approval.`,
+                
+                returnDestroy: `<h3>5. Return or Destruction of Materials</h3>
+                
+All documents and other tangible objects containing or representing Confidential Information that have been disclosed to the Receiving Party, and all copies thereof which are in the possession of the Receiving Party, shall be and remain the property of the Disclosing Party and shall be promptly returned to the Disclosing Party or destroyed upon the Disclosing Party's written request.`,
+                
+                term: (agreementTerm, survivalTerm) => {
+                    return `<h3>6. Term</h3>
+                    
+This Agreement shall continue in effect for a period of ${agreementTerm} years from the Effective Date. The Receiving Party's obligations with respect to Confidential Information shall survive for a period of ${survivalTerm} years following the expiration or termination of this Agreement.`;
+                },
+                
+                injunctiveRelief: `<h3>7. Injunctive Relief</h3>
+                
+The parties acknowledge that any breach of this Agreement may cause the Disclosing Party irreparable harm for which monetary damages may be inadequate, and accordingly, the Disclosing Party may seek injunctive relief in addition to all other remedies available at law or in equity.`,
+                
+                noLicense: `<h3>8. No License Granted</h3>
+                
+Nothing in this Agreement is intended to grant any rights to either party under any patent, mask work right, copyright, trade secret or other intellectual property right, nor shall this Agreement grant any party any rights in or to the Confidential Information of the other party except as expressly set forth herein.`,
+                
+                noObligation: `<h3>9. No Obligation to Proceed</h3>
+                
+Nothing in this Agreement shall obligate either party to proceed with any transaction between them, and each party reserves the right, in its sole discretion, to terminate the discussions contemplated by this Agreement.`,
+                
+                governingLaw: {
+                    california: `<h3>10. Governing Law</h3>
+                    
+This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflicts of law principles. The parties consent to the exclusive jurisdiction and venue in the state and federal courts in Santa Clara County, California.`,
+                    
+                    delaware: `<h3>10. Governing Law</h3>
+                    
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflicts of law principles. The parties consent to the exclusive jurisdiction and venue in the state and federal courts in New Castle County, Delaware.`,
+                    
+                    newyork: `<h3>10. Governing Law</h3>
+                    
+This Agreement shall be governed by and construed in accordance with the laws of the State of New York, without regard to its conflicts of law principles. The parties consent to the exclusive jurisdiction and venue in the state and federal courts in New York County, New York.`,
+                    
+                    russia: `<h3>10. Governing Law</h3>
+                    
+This Agreement shall be governed by and construed in accordance with the laws of the Russian Federation, without regard to its conflicts of law principles. The parties consent to the exclusive jurisdiction and venue in the courts of Moscow, Russian Federation.`
+                },
+                
+                disputeResolution: {
+                    courts: `<h3>11. Dispute Resolution</h3>
+                    
+Any dispute arising out of or in connection with this Agreement shall be resolved by the courts of the jurisdiction specified in the Governing Law section.`,
+                    
+                    arbitration: `<h3>11. Dispute Resolution</h3>
+                    
+Any dispute arising out of or in connection with this Agreement shall be finally settled by binding arbitration in accordance with the rules of the International Chamber of Commerce by one arbitrator appointed in accordance with said rules. The arbitration shall be conducted in the English language.`,
+                    
+                    'mediation-then-arbitration': `<h3>11. Dispute Resolution</h3>
+                    
+Any dispute arising out of or in connection with this Agreement shall first be submitted to mediation under the rules of the International Chamber of Commerce. If the dispute is not resolved within 60 days after the start of mediation, it shall be finally settled by binding arbitration in accordance with the rules of the International Chamber of Commerce by one arbitrator appointed in accordance with said rules. The arbitration shall be conducted in the English language.`
+                },
+                
+                controllingLanguage: {
+                    english: `<h3>12. Controlling Language</h3>
+                    
+This Agreement has been prepared in both English and Russian. In the event of any inconsistency or contradiction between the English version and the Russian version, the English version shall prevail and be controlling.`,
+                    
+                    russian: `<h3>12. Controlling Language</h3>
+                    
+This Agreement has been prepared in both English and Russian. In the event of any inconsistency or contradiction between the English version and the Russian version, the Russian version shall prevail and be controlling.`,
+                    
+                    both: `<h3>12. Controlling Language</h3>
+                    
+This Agreement has been prepared in both English and Russian. Both language versions are equally authentic and controlling.`
+                },
+                
+                signatures: `<h3>13. Signatures</h3>
+                
+IN WITNESS WHEREOF, the parties have executed this Non-Disclosure Agreement as of the Effective Date.
+                
+<strong>DISCLOSING PARTY:</strong>
+                
+Signature: _______________________
+Name: _________________________
+Title: _________________________
+Date: _________________________
+                
+<strong>RECEIVING PARTY:</strong>
+                
+Signature: _______________________
+Name: _________________________
+Title: _________________________
+Date: _________________________`
+            },
+            
+            russian: {
+                title: "СОГЛАШЕНИЕ О ВЗАИМНОМ НЕРАЗГЛАШЕНИИ",
+                parties: (discloserName, discloserAddress, recipientName, recipientAddress, effectiveDate) => {
+                    return `Настоящее Соглашение о взаимном неразглашении (далее - "Соглашение") заключено по состоянию на ${effectiveDate} между:
+
+<strong>${discloserName}</strong>, расположенным по адресу ${discloserAddress} (далее - "Раскрывающая сторона")
+
+и
+
+<strong>${recipientName}</strong>, расположенным по адресу ${recipientAddress} (далее - "Получающая сторона").`;
+                },
+                purpose: (purposeText) => {
+                    return `<h3>1. Цель</h3>
+                    
+Стороны намерены изучить возможность установления деловых отношений в связи с ${purposeText} (далее - "Цель"). В связи с Целью каждая из сторон может раскрыть другой стороне определенную конфиденциальную техническую и деловую информацию, которую раскрывающая сторона желает, чтобы получающая сторона рассматривала как конфиденциальную.`;
+                },
+                confidentialInfo: {
+                    broad: `<h3>2. Определение конфиденциальной информации</h3>
+                    
+"Конфиденциальная информация" означает любую информацию, раскрытую любой из сторон другой стороне, прямо или косвенно, в письменной, устной форме или путем осмотра материальных объектов, включая, без ограничения, документы, прототипы, образцы, оборудование, исследования, планы продуктов, продукты, услуги, списки клиентов, рынки, программное обеспечение, разработки, изобретения, процессы, дизайны, чертежи, инженерные решения, аппаратные конфигурации, маркетинг или финансы, которые обозначены как "Конфиденциальные", "Собственность" или аналогичным обозначением, или информацию, которая должна разумно считаться конфиденциальной с учетом характера информации и обстоятельств раскрытия.`,
+                    
+                    medium: `<h3>2. Определение конфиденциальной информации</h3>
+                    
+"Конфиденциальная информация" означает любую непубличную информацию, которая относится к фактической или предполагаемой деловой деятельности или исследованиям и разработкам Раскрывающей стороны, техническим данным, коммерческой тайне или ноу-хау, включая, помимо прочего, исследования, планы продуктов, продукты, услуги, списки клиентов и клиентов, рынки, программное обеспечение, разработки, изобретения, процессы, формулы, технологии, дизайны, чертежи, инженерные решения, информацию о конфигурации оборудования, маркетинг, финансы или другую деловую информацию, раскрытую Раскрывающей стороной прямо или косвенно в письменной форме, устно или путем чертежей или осмотра деталей или оборудования.`,
+                    
+                    narrow: `<h3>2. Определение конфиденциальной информации</h3>
+                    
+"Конфиденциальная информация" означает только ту информацию, которая (а) раскрыта в письменной форме и помечена как конфиденциальная в момент раскрытия, или (б) раскрыта любым другим способом и определена как конфиденциальная в момент раскрытия, а также резюмирована и обозначена как конфиденциальная в письменном меморандуме, направленном Получающей стороне в течение тридцати (30) дней после раскрытия.`,
+                    
+                    custom: (customText) => {
+                        return `<h3>2. Определение конфиденциальной информации</h3>
+                        
+${customText}`;
+                    }
+                },
+                obligations: `<h3>3. Обязательства</h3>
+                
+Получающая сторона должна использовать Конфиденциальную информацию только для Цели и не должна раскрывать ее каким-либо третьим лицам. Получающая сторона должна принимать все разумные меры для избежания раскрытия, распространения или несанкционированного использования Конфиденциальной информации, включая, как минимум, те меры, которые она принимает для защиты своей собственной конфиденциальной информации аналогичного характера. Получающая сторона не должна, без предварительного письменного согласия Раскрывающей стороны, раскрывать факт того, что Конфиденциальная информация была предоставлена ей.`,
+                
+                nonConfidential: `<h3>4. Неконфиденциальная информация</h3>
+                
+Обязательства и ограничения настоящего Соглашения не распространяются на информацию, которая: (а) находилась во владении Получающей стороны до получения от Раскрывающей стороны; (б) является или становится общеизвестной не по вине Получающей стороны; (в) правомерно получена Получающей стороной от третьей стороны без обязательства соблюдения конфиденциальности; (г) разработана Получающей стороной независимо без использования Конфиденциальной информации; или (д) раскрыта Получающей стороной с предварительного письменного согласия Раскрывающей стороны.`,
+                
+                returnDestroy: `<h3>5. Возврат или уничтожение материалов</h3>
+                
+Все документы и другие материальные объекты, содержащие или представляющие Конфиденциальную информацию, которые были раскрыты Получающей стороне, и все их копии, находящиеся во владении Получающей стороны, являются и остаются собственностью Раскрывающей стороны и должны быть незамедлительно возвращены Раскрывающей стороне или уничтожены по письменному требованию Раскрывающей стороны.`,
+                
+                term: (agreementTerm, survivalTerm) => {
+                    return `<h3>6. Срок действия</h3>
+                    
+Настоящее Соглашение действует в течение ${agreementTerm} лет с Даты вступления в силу. Обязательства Получающей стороны в отношении Конфиденциальной информации сохраняются в течение ${survivalTerm} лет после истечения срока действия или прекращения настоящего Соглашения.`;
+                },
+                
+                injunctiveRelief: `<h3>7. Судебный запрет</h3>
+                
+Стороны признают, что любое нарушение настоящего Соглашения может причинить Раскрывающей стороне непоправимый вред, для которого денежная компенсация может быть недостаточной, и, соответственно, Раскрывающая сторона может требовать судебного запрета в дополнение ко всем другим средствам правовой защиты, доступным по закону или по праву справедливости.`,
+                
+                noLicense: `<h3>8. Отсутствие предоставленной лицензии</h3>
+                
+Ничто в настоящем Соглашении не предназначено для предоставления каких-либо прав любой из сторон по какому-либо патенту, праву на топологию интегральных микросхем, авторскому праву, коммерческой тайне или другому праву интеллектуальной собственности, и настоящее Соглашение не предоставляет какой-либо стороне каких-либо прав на Конфиденциальную информацию другой стороны, за исключением случаев, прямо указанных в настоящем документе.`,
+                
+                noObligation: `<h3>9. Отсутствие обязательства продолжать</h3>
+                
+Ничто в настоящем Соглашении не обязывает какую-либо из сторон продолжать какую-либо сделку между ними, и каждая сторона оставляет за собой право, по своему собственному усмотрению, прекратить обсуждения, предусмотренные настоящим Соглашением.`,
+                
+                governingLaw: {
+                    california: `<h3>10. Применимое право</h3>
+                    
+Настоящее Соглашение регулируется и толкуется в соответствии с законами штата Калифорния, без учета его принципов коллизионного права. Стороны соглашаются на исключительную юрисдикцию и место проведения судебного разбирательства в государственных и федеральных судах округа Санта-Клара, штат Калифорния.`,
+                    
+                    delaware: `<h3>10. Применимое право</h3>
+                    
+Настоящее Соглашение регулируется и толкуется в соответствии с законами штата Делавэр, без учета его принципов коллизионного права. Стороны соглашаются на исключительную юрисдикцию и место проведения судебного разбирательства в государственных и федеральных судах округа Нью-Касл, штат Делавэр.`,
+                    
+                    newyork: `<h3>10. Применимое право</h3>
+                    
+Настоящее Соглашение регулируется и толкуется в соответствии с законами штата Нью-Йорк, без учета его принципов коллизионного права. Стороны соглашаются на исключительную юрисдикцию и место проведения судебного разбирательства в государственных и федеральных судах округа Нью-Йорк, штат Нью-Йорк.`,
+                    
+                    russia: `<h3>10. Применимое право</h3>
+                    
+Настоящее Соглашение регулируется и толкуется в соответствии с законами Российской Федерации, без учета ее принципов коллизионного права. Стороны соглашаются на исключительную юрисдикцию и место проведения судебного разбирательства в судах города Москвы, Российская Федерация.`
+                },
+                
+                disputeResolution: {
+                    courts: `<h3>11. Разрешение споров</h3>
+                    
+Любой спор, возникающий из или в связи с настоящим Соглашением, должен разрешаться судами юрисдикции, указанной в разделе Применимое право.`,
+                    
+                    arbitration: `<h3>11. Разрешение споров</h3>
+                    
+Любой спор, возникающий из или в связи с настоящим Соглашением, должен быть окончательно разрешен путем обязательного арбитража в соответствии с правилами Международной торговой палаты одним арбитром, назначенным в соответствии с указанными правилами. Арбитраж должен проводиться на английском языке.`,
+                    
+                    'mediation-then-arbitration': `<h3>11. Разрешение споров</h3>
+                    
+Любой спор, возникающий из или в связи с настоящим Соглашением, должен быть сначала представлен на медиацию в соответствии с правилами Международной торговой палаты. Если спор не разрешен в течение 60 дней после начала медиации, он должен быть окончательно разрешен путем обязательного арбитража в соответствии с правилами Международной торговой палаты одним арбитром, назначенным в соответствии с указанными правилами. Арбитраж должен проводиться на английском языке.`
+                },
+                
+                controllingLanguage: {
+                    english: `<h3>12. Контролирующий язык</h3>
+                    
+Настоящее Соглашение подготовлено на английском и русском языках. В случае любого несоответствия или противоречия между английской и русской версиями, английская версия имеет преимущественную силу и является контролирующей.`,
+                    
+                    russian: `<h3>12. Контролирующий язык</h3>
+                    
+Настоящее Соглашение подготовлено на английском и русском языках. В случае любого несоответствия или противоречия между английской и русской версиями, русская версия имеет преимущественную силу и является контролирующей.`,
+                    
+                    both: `<h3>12. Контролирующий язык</h3>
+                    
+Настоящее Соглашение подготовлено на английском и русском языках. Обе языковые версии имеют одинаковую аутентичность и контролирующую силу.`
+                },
+                
+                signatures: `<h3>13. Подписи</h3>
+                
+В ПОДТВЕРЖДЕНИЕ ЧЕГО стороны заключили настоящее Соглашение о неразглашении по состоянию на Дату вступления в силу.
+                
+<strong>РАСКРЫВАЮЩАЯ СТОРОНА:</strong>
+                
+Подпись: _______________________
+Имя: _________________________
+Должность: _________________________
+Дата: _________________________
+                
+<strong>ПОЛУЧАЮЩАЯ СТОРОНА:</strong>
+                
+Подпись: _______________________
+Имя: _________________________
+Должность: _________________________
+Дата: _________________________`
+            }
+        };
+        
+        // State variables
+        let currentLanguage = 'english';
+        let currentTab = 'parties';
+        let lastChangedElement = null;
+        
+        // Helper functions
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString(currentLanguage === 'english' ? 'en-US' : 'ru-RU', options);
+        }
+        
+        function setActiveTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.querySelector(`#tab-${tabId}`).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            currentTab = tabId;
+            
+            // Update navigation buttons
+            updateNavButtons();
+        }
+        
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === tabs.length - 1;
+            
+            prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+            nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+        }
+        
+        function highlightChanges(elementId) {
+            // Store the last changed element
+            lastChangedElement = elementId;
+            
+            // Get the element that changed
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // Generate the document again
+            generateDocument();
+            
+            // After the document is generated, find and highlight the relevant part
+            setTimeout(() => {
+                const previewDoc = document.getElementById('preview-document');
+                const sections = previewDoc.children;
+                
+                let targetSection = null;
+                let elementValue = element.value;
+                
+                // For checkboxes, get the checked state
+                if (element.type === 'checkbox') {
+                    elementValue = element.checked.toString();
+                }
+                
+                // Find the section that contains the value of the changed element
+                for (let i = 0; i < sections.length; i++) {
+                    const section = sections[i];
+                    if (section.innerHTML.includes(elementValue) || 
+                        (elementId === 'conf-info' && section.tagName === 'H3' && section.textContent.includes('Confidential Information')) ||
+                        (elementId === 'governing-law' && section.tagName === 'H3' && section.textContent.includes('Governing Law')) ||
+                        (elementId === 'dispute-resolution' && section.tagName === 'H3' && section.textContent.includes('Dispute Resolution')) ||
+                        (elementId === 'controlling-language' && section.tagName === 'H3' && section.textContent.includes('Controlling Language'))) {
+                        targetSection = section;
+                        break;
+                    }
+                }
+                
+                if (targetSection) {
+                    // Create a specific highlight spot
+                    let highlightSpan;
+                    
+                    // Add the highlight class to the specific text
+                    if (elementId === 'agreement-term' || elementId === 'survival-term') {
+                        const termSection = document.querySelector('h3:contains("Term")').nextElementSibling;
+                        const termText = termSection.innerHTML;
+                        
+                        // Replace the term value with a highlighted version
+                        const newText = termText.replace(
+                            new RegExp(`${elementValue}( years)`), 
+                            `<span class="highlight">${elementValue}$1</span>`
+                        );
+                        
+                        targetSection.innerHTML = newText;
+                    } else if (elementId === 'conf-info' || elementId === 'governing-law' || 
+                               elementId === 'dispute-resolution' || elementId === 'controlling-language') {
+                        // For dropdowns that change entire sections
+                        targetSection.classList.add('highlight');
+                        
+                        // Scroll to make it visible if needed
+                        if (!isElementInViewport(targetSection)) {
+                            targetSection.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        }
+                    } else if (elementId.startsWith('include-')) {
+                        // For checkboxes that toggle sections
+                        const sectionId = elementId.replace('include-', '').replace(/-([a-z])/g, function (g) { 
+                            return g[1].toUpperCase(); 
+                        });
+                        
+                        // Find the corresponding section
+                        let sectionHeader;
+                        switch (sectionId) {
+                            case 'returnDestroy':
+                                sectionHeader = document.querySelector('h3:contains("Return")');
+                                break;
+                            case 'injunctiveRelief':
+                                sectionHeader = document.querySelector('h3:contains("Injunctive")');
+                                break;
+                            case 'noLicense':
+                                sectionHeader = document.querySelector('h3:contains("License")');
+                                break;
+                            case 'noObligation':
+                                sectionHeader = document.querySelector('h3:contains("Obligation")');
+                                break;
+                        }
+                        
+                        if (sectionHeader) {
+                            sectionHeader.classList.add('highlight');
+                            
+                            // Scroll to make it visible if needed
+                            if (!isElementInViewport(sectionHeader)) {
+                                sectionHeader.scrollIntoView({behavior: 'smooth', block: 'center'});
+                            }
+                        }
+                    } else {
+                        // For text inputs
+                        targetSection.innerHTML = targetSection.innerHTML.replace(
+                            elementValue, 
+                            `<span class="highlight">${elementValue}</span>`
+                        );
+                    }
+                }
+            }, 100);
+        }
+        
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            const container = document.querySelector('.preview-section');
+            const containerRect = container.getBoundingClientRect();
+            
+            return (
+                rect.top >= containerRect.top &&
+                rect.left >= containerRect.left &&
+                rect.bottom <= containerRect.bottom &&
+                rect.right <= containerRect.right
+            );
+        }
+        
+        // Extend jQuery to support :contains case insensitive
+        document.querySelector = document.querySelector || function(selector) {
+            if (selector.includes(':contains(')) {
+                const containsText = selector.match(/:contains\(["']?([^)"']+)["']?\)/)[1];
+                const elements = document.querySelectorAll(selector.split(':contains')[0]);
+                
+                for (let i = 0; i < elements.length; i++) {
+                    if (elements[i].textContent.includes(containsText)) {
+                        return elements[i];
+                    }
+                }
+                return null;
+            } else {
+                return document.querySelector(selector);
+            }
+        };
+        
+        function generateDocument() {
+            const discloserName = document.getElementById('discloser-name').value || '[Disclosing Party Name]';
+            const discloserAddress = document.getElementById('discloser-address').value || '[Disclosing Party Address]';
+            const recipientName = document.getElementById('recipient-name').value || '[Receiving Party Name]';
+            const recipientAddress = document.getElementById('recipient-address').value || '[Receiving Party Address]';
+            const effectiveDate = formatDate(document.getElementById('effective-date').value) || '[Effective Date]';
+            const purpose = document.getElementById('purpose').value || '[Purpose of Disclosure]';
+            const confInfoType = document.getElementById('conf-info').value;
+            const customConfInfo = document.getElementById('custom-conf-info').value;
+            const agreementTerm = document.getElementById('agreement-term').value || '2';
+            const survivalTerm = document.getElementById('survival-term').value || '3';
+            const governingLaw = document.getElementById('governing-law').value;
+            const disputeResolution = document.getElementById('dispute-resolution').value;
+            const includeReturnDestroy = document.getElementById('include-return-destroy').checked;
+            const includeInjunctiveRelief = document.getElementById('include-injunctive-relief').checked;
+            const includeNoLicense = document.getElementById('include-no-license').checked;
+            const includeNoObligation = document.getElementById('include-no-obligation').checked;
+            const controllingLanguage = document.getElementById('controlling-language').value;
+            
+            const template = templates[currentLanguage];
+            
+            let documentContent = `<h2>${template.title}</h2>`;
+            
+            documentContent += template.parties(discloserName, discloserAddress, recipientName, recipientAddress, effectiveDate);
+            documentContent += template.purpose(purpose);
+            
+            if (confInfoType === 'custom') {
+                documentContent += template.confidentialInfo.custom(customConfInfo);
+            } else {
+                documentContent += template.confidentialInfo[confInfoType];
+            }
+            
+            documentContent += template.obligations;
+            documentContent += template.nonConfidential;
+            
+            if (includeReturnDestroy) {
+                documentContent += template.returnDestroy;
+            }
+            
+            documentContent += template.term(agreementTerm, survivalTerm);
+            
+            if (includeInjunctiveRelief) {
+                documentContent += template.injunctiveRelief;
+            }
+            
+            if (includeNoLicense) {
+                documentContent += template.noLicense;
+            }
+            
+            if (includeNoObligation) {
+                documentContent += template.noObligation;
+            }
+            
+            documentContent += template.governingLaw[governingLaw];
+            documentContent += template.disputeResolution[disputeResolution];
+            documentContent += template.controllingLanguage[controllingLanguage];
+            documentContent += template.signatures;
+            
+            document.getElementById('preview-document').innerHTML = documentContent;
+        }
+        
+        // Event listeners
+        document.getElementById('lang-en').addEventListener('click', function() {
+            document.getElementById('lang-en').classList.add('active');
+            document.getElementById('lang-ru').classList.remove('active');
+            currentLanguage = 'english';
+            generateDocument();
+        });
+        
+        document.getElementById('lang-ru').addEventListener('click', function() {
+            document.getElementById('lang-ru').classList.add('active');
+            document.getElementById('lang-en').classList.remove('active');
+            currentLanguage = 'russian';
+            generateDocument();
+        });
+        
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                setActiveTab(this.getAttribute('data-tab'));
+            });
+        });
+        
+        // Previous/Next buttons
+        document.getElementById('prev-btn').addEventListener('click', function() {
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            if (currentIndex > 0) {
+                setActiveTab(tabs[currentIndex - 1]);
+            }
+        });
+        
+        document.getElementById('next-btn').addEventListener('click', function() {
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            if (currentIndex < tabs.length - 1) {
+                setActiveTab(tabs[currentIndex + 1]);
+            }
+        });
+        
+        // Conditional display for custom definition
+        document.getElementById('conf-info').addEventListener('change', function() {
+            document.getElementById('custom-conf-info-group').style.display = 
+                this.value === 'custom' ? 'block' : 'none';
+            highlightChanges('conf-info');
+        });
+        
+        // Input change events
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('change', function() {
+                highlightChanges(this.id);
+            });
+        });
+        
+        // Download PDF functionality
+        document.getElementById('download-btn').addEventListener('click', function() {
+            alert('PDF download would be implemented here. In a real implementation, this would convert the HTML to PDF.');
+        });
+        
+        // Initialize
+        setActiveTab('parties');
+        generateDocument();
+    </script>
+</body>
+</html>
