@@ -5,7 +5,7 @@ function App() {
   const [output, setOutput] = useState('');
 
   function generateClause() {
-    setOutput(\`The party, \${partyName}, agrees to maintain confidentiality of all proprietary information.\`);
+setOutput(`The party, ${partyName}, agrees to maintain confidentiality…`);
   }
 
   return (
