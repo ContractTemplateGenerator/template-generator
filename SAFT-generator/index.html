@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SAFT (Simple Agreement for Future Tokens) Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            color: #333;
+            line-height: 1.6;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f8f9fa;
+            overflow-y: auto;
+            max-height: 100vh;
+            border-right: 1px solid #ddd;
+        }
+        
+        .preview-section {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        h2 {
+            color: #3498db;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            margin-top: 30px;
+            font-size: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        
+        button:hover {
+            background-color: #2980b9;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+            background-color: #f1f1f1;
+            margin-bottom: -1px;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            border-bottom-color: white;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .preview-document {
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            background-color: #ffff80;
+            transition: background-color 0.5s;
+        }
+        
+        .preview-title {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .preview-section h3 {
+            position: sticky;
+            top: 0;
+            background-color: white;
+            padding: 10px 0;
+            margin-top: 0;
+            border-bottom: 1px solid #ddd;
+            z-index: 10;
+        }
+        
+        .calendly-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .calendly-button a {
+            display: inline-block;
+            background-color: #0069ff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .info-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .form-section, .preview-section {
+                max-height: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form Section -->
+        <div class="form-section">
+            <h1>SAFT (Simple Agreement for Future Tokens) Generator</h1>
+            
+            <div class="tabs">
+                <div class="tab active" data-tab="company">Company</div>
+                <div class="tab" data-tab="investor">Investor</div>
+                <div class="tab" data-tab="investment">Investment</div>
+                <div class="tab" data-tab="token">Token Terms</div>
+                <div class="tab" data-tab="additional">Additional Terms</div>
+            </div>
+            
+            <form id="saftForm">
+                <!-- Company Information Tab -->
+                <div class="tab-content active" id="company-tab">
+                    <h2>Company Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="companyName">Company Name:</label>
+                        <input type="text" id="companyName" name="companyName" placeholder="e.g., Blockchain Tech Inc.">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyAddress">Company Address:</label>
+                        <textarea id="companyAddress" name="companyAddress" rows="3" placeholder="Full company address"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="stateOfIncorporation">State of Incorporation:</label>
+                        <select id="stateOfIncorporation" name="stateOfIncorporation">
+                            <option value="">Select State</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="California">California</option>
+                            <option value="New York">New York</option>
+                            <option value="Wyoming">Wyoming</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Washington">Washington</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="companyEmail">Company Email:</label>
+                        <input type="email" id="companyEmail" name="companyEmail" placeholder="contact@company.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signatoryName">Authorized Signatory Name:</label>
+                        <input type="text" id="signatoryName" name="signatoryName" placeholder="e.g., John Smith">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="signatoryTitle">Authorized Signatory Title:</label>
+                        <input type="text" id="signatoryTitle" name="signatoryTitle" placeholder="e.g., CEO">
+                    </div>
+                </div>
+                
+                <!-- Investor Information Tab -->
+                <div class="tab-content" id="investor-tab">
+                    <h2>Investor Information</h2>
+                    
+                    <div class="form-group">
+                        <label for="investorType">Investor Type:</label>
+                        <select id="investorType" name="investorType">
+                            <option value="individual">Individual</option>
+                            <option value="entity">Entity (Company, LLC, etc.)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="investorName">Investor Name:</label>
+                        <input type="text" id="investorName" name="investorName" placeholder="Full legal name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="investorAddress">Investor Address:</label>
+                        <textarea id="investorAddress" name="investorAddress" rows="3" placeholder="Full legal address"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="investorEmail">Investor Email:</label>
+                        <input type="email" id="investorEmail" name="investorEmail" placeholder="investor@email.com">
+                    </div>
+                    
+                    <div class="form-group entity-only" style="display: none;">
+                        <label for="investorSignatoryName">Authorized Signatory Name:</label>
+                        <input type="text" id="investorSignatoryName" name="investorSignatoryName" placeholder="e.g., Jane Doe">
+                    </div>
+                    
+                    <div class="form-group entity-only" style="display: none;">
+                        <label for="investorSignatoryTitle">Authorized Signatory Title:</label>
+                        <input type="text" id="investorSignatoryTitle" name="investorSignatoryTitle" placeholder="e.g., Managing Partner">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="accreditedInvestor">Accredited Investor:</label>
+                        <select id="accreditedInvestor" name="accreditedInvestor">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <p class="info-text">Note: SAFTs are generally limited to accredited investors under U.S. securities laws.</p>
+                    </div>
+                </div>
+                
+                <!-- Investment Terms Tab -->
+                <div class="tab-content" id="investment-tab">
+                    <h2>Investment Terms</h2>
+                    
+                    <div class="form-group">
+                        <label for="purchaseAmount">Purchase Amount (USD):</label>
+                        <input type="number" id="purchaseAmount" name="purchaseAmount" min="0" step="0.01" placeholder="e.g., 50000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="valuationCap">Valuation Cap (USD):</label>
+                        <input type="number" id="valuationCap" name="valuationCap" min="0" step="1" placeholder="e.g., 5000000">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="discount">Discount Rate (%):</label>
+                        <input type="number" id="discount" name="discount" min="0" max="100" step="0.1" placeholder="e.g., 20">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="closingDate">Closing Date:</label>
+                        <input type="date" id="closingDate" name="closingDate">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="terminationDate">Termination Date:</label>
+                        <input type="date" id="terminationDate" name="terminationDate">
+                    </div>
+                </div>
+                
+                <!-- Token Terms Tab -->
+                <div class="tab-content" id="token-tab">
+                    <h2>Token Terms</h2>
+                    
+                    <div class="form-group">
+                        <label for="tokenName">Token Name:</label>
+                        <input type="text" id="tokenName" name="tokenName" placeholder="e.g., ExampleCoin">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="tokenSymbol">Token Symbol:</label>
+                        <input type="text" id="tokenSymbol" name="tokenSymbol" placeholder="e.g., EXC">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="networkLaunchDeadline">Network Launch Deadline:</label>
+                        <input type="date" id="networkLaunchDeadline" name="networkLaunchDeadline">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vestingPeriod">Vesting Period (months):</label>
+                        <input type="number" id="vestingPeriod" name="vestingPeriod" min="0" step="1" placeholder="e.g., 12">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="initialReleasePercentage">Initial Release Percentage (%):</label>
+                        <input type="number" id="initialReleasePercentage" name="initialReleasePercentage" min="0" max="100" step="1" placeholder="e.g., 25">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="vestingSchedule">Vesting Schedule:</label>
+                        <select id="vestingSchedule" name="vestingSchedule">
+                            <option value="monthly">Monthly</option>
+                            <option value="quarterly">Quarterly</option>
+                            <option value="annually">Annually</option>
+                            <option value="cliff">Cliff Vesting</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Additional Terms Tab -->
+                <div class="tab-content" id="additional-tab">
+                    <h2>Additional Terms</h2>
+                    
+                    <div class="form-group">
+                        <label for="governingLaw">Governing Law:</label>
+                        <select id="governingLaw" name="governingLaw">
+                            <option value="">Select State</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="California">California</option>
+                            <option value="New York">New York</option>
+                            <option value="Wyoming">Wyoming</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Washington">Washington</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="disputeResolution">Dispute Resolution:</label>
+                        <select id="disputeResolution" name="disputeResolution">
+                            <option value="courts">Courts</option>
+                            <option value="arbitration">Binding Arbitration</option>
+                            <option value="mediation">Mediation First, Then Courts</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group arbitration-only" style="display: none;">
+                        <label for="arbitrationVenue">Arbitration Venue:</label>
+                        <input type="text" id="arbitrationVenue" name="arbitrationVenue" placeholder="e.g., San Francisco, CA">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confidentiality">Confidentiality Clause:</label>
+                        <select id="confidentiality" name="confidentiality">
+                            <option value="yes">Include</option>
+                            <option value="no">Exclude</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="transferRestrictions">Transfer Restrictions:</label>
+                        <select id="transferRestrictions" name="transferRestrictions">
+                            <option value="yes">Include</option>
+                            <option value="no">Exclude</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="additionalTerms">Additional Custom Terms:</label>
+                        <textarea id="additionalTerms" name="additionalTerms" rows="5" placeholder="Enter any additional terms you want to include in the agreement"></textarea>
+                    </div>
+                    
+                    <div class="calendly-button">
+                        <p>Need legal advice on your SAFT?</p>
+                        <a href="" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule a consultation</a>
+                    </div>
+                </div>
+                
+                <div class="nav-buttons">
+                    <button type="button" id="prevBtn">Previous</button>
+                    <button type="button" id="nextBtn">Next</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Preview Section -->
+        <div class="preview-section">
+            <h3>Live Preview</h3>
+            <div class="preview-document" id="previewDocument">
+                <div class="preview-title">SIMPLE AGREEMENT FOR FUTURE TOKENS (SAFT)</div>
+                <p>This Simple Agreement for Future Tokens (the "Agreement") is dated as of <span id="preview-closingDate">[CLOSING DATE]</span> by and between <span id="preview-companyName">[COMPANY NAME]</span>, a <span id="preview-stateOfIncorporation">[STATE]</span> corporation (the "Company"), and <span id="preview-investorName">[INVESTOR NAME]</span> (the "Purchaser").</p>
+                
+                <p><strong>WHEREAS</strong>, the Purchaser desires to purchase a right to certain units of <span id="preview-tokenName">[TOKEN NAME]</span> (the "<span id="preview-tokenSymbol">[TOKEN SYMBOL]</span>" or "Tokens") to be developed, produced and issued by the Company at a future point in time, and the Company desires to issue and sell such right to the Purchaser;</p>
+                
+                <p><strong>WHEREAS</strong>, the Company intends to develop, produce and issue the Tokens as part of a decentralized blockchain-based network (the "Network") that it is creating;</p>
+                
+                <p><strong>NOW, THEREFORE</strong>, in consideration of the mutual covenants and agreements herein contained, the parties hereto agree as follows:</p>
+                
+                <p><strong>1. Events</strong></p>
+                
+                <p><strong>1.1 Network Launch.</strong> The Company will use reasonable best efforts to launch the Network on or before <span id="preview-networkLaunchDeadline">[NETWORK LAUNCH DEADLINE]</span>. Upon launch of the Network, the Company will issue the Tokens to the Purchaser pursuant to the terms set forth herein.</p>
+                
+                <p><strong>1.2 Dissolution Event.</strong> If there is a Dissolution Event before this instrument terminates, the Company will pay an amount equal to the Purchase Amount, to the Purchaser immediately prior to or concurrent with the consummation of the Dissolution Event.</p>
+                
+                <p><strong>1.3 Termination.</strong> This Agreement will terminate upon the earlier of (i) the issuance of Tokens to the Purchaser pursuant to Section 1.1; (ii) the payment of amounts due to the Purchaser pursuant to Section 1.2; and (iii) <span id="preview-terminationDate">[TERMINATION DATE]</span> (the "Termination Date"), if the Network Launch has not occurred as of such date.</p>
+                
+                <p><strong>2. Purchase and Sale</strong></p>
+                
+                <p><strong>2.1 Purchase Amount.</strong> The Purchaser hereby purchases from the Company, and the Company hereby sells to the Purchaser, the right to certain units of Tokens in exchange for <span id="preview-purchaseAmount">[PURCHASE AMOUNT]</span> USD (the "Purchase Amount").</p>
+                
+                <p><strong>2.2 Delivery of Purchase Amount.</strong> The Purchaser will deliver the Purchase Amount to the Company on or about the date of this Agreement.</p>
+                
+                <p><strong>3. Token Issuance</strong></p>
+                
+                <p><strong>3.1 Token Calculation.</strong> The number of Tokens to be issued to the Purchaser shall be determined as follows:</p>
+                
+                <p>The Purchaser will receive the number of Tokens equal to the Purchase Amount divided by the lesser of (i) a price per Token equal to the valuation cap of <span id="preview-valuationCap">[VALUATION CAP]</span> USD divided by the Network's aggregate token supply at Network Launch, or (ii) the lowest price per Token sold by the Company to any third party during the Token Sale, less a <span id="preview-discount">[DISCOUNT]</span>% discount.</p>
+                
+                <p><strong>3.2 Token Vesting.</strong> The Tokens will be delivered to the Purchaser according to the following vesting schedule:</p>
+                
+                <p><span id="preview-initialReleasePercentage">[INITIAL RELEASE PERCENTAGE]</span>% of the Tokens will be released to the Purchaser immediately upon Network Launch, and the remaining Tokens will vest over a period of <span id="preview-vestingPeriod">[VESTING PERIOD]</span> months on a <span id="preview-vestingSchedule">[VESTING SCHEDULE]</span> basis.</p>
+                
+                <p><strong>4. Representations and Warranties</strong></p>
+                
+                <p><strong>4.1 Purchaser Representations.</strong> The Purchaser represents and warrants to the Company that:</p>
+                
+                <p>(a) The Purchaser has full legal capacity, power and authority to execute and deliver this Agreement and to perform its obligations hereunder.</p>
+                
+                <p>(b) This Agreement constitutes a valid and binding obligation of the Purchaser, enforceable in accordance with its terms.</p>
+                
+                <p>(c) The Purchaser is <span id="preview-accreditedInvestor">an accredited investor</span> as defined in Rule 501(a) of Regulation D under the Securities Act. The Purchaser has been advised that this Agreement is a security and that the offer and sale of this Agreement have not been registered under the Securities Act, or any state securities laws.</p>
+                
+                <p><strong>4.2 Company Representations.</strong> The Company hereby represents and warrants to the Purchaser that:</p>
+                
+                <p>(a) The Company is duly organized, validly existing and in good standing under the laws of its state of incorporation, and has the power and authority to own, lease and operate its properties and carry on its business as now conducted.</p>
+                
+                <p>(b) The execution, delivery and performance by the Company of this Agreement is, to the Company's knowledge, within the power of the Company and has been duly authorized by all necessary actions on the part of the Company.</p>
+                
+                <p><strong>5. Miscellaneous</strong></p>
+                
+                <p><strong>5.1 Notice.</strong> Any notice required or permitted by this Agreement will be deemed sufficient when delivered personally or by overnight courier or sent by email to the relevant address listed on the signature page.</p>
+                
+                <p><strong>5.2 Assignment.</strong> Neither this Agreement nor the rights contained herein may be assigned, by operation of law or otherwise, by either party without the prior written consent of the other.</p>
+                
+                <div id="preview-transferRestrictions-section" style="display: none;">
+                    <p><strong>5.3 Transfer Restrictions.</strong> The Purchaser agrees not to transfer any Tokens received under this Agreement until the expiration of the vesting period stated in Section 3.2. Any attempted transfer in violation of this Section will be null and void.</p>
+                </div>
+                
+                <div id="preview-confidentiality-section" style="display: none;">
+                    <p><strong>5.4 Confidentiality.</strong> The Purchaser agrees to keep confidential all information provided by the Company relating to its business, technology, and the Network, except for information that is publicly available or that the Purchaser is required to disclose by law.</p>
+                </div>
+                
+                <p><strong>5.5 Governing Law.</strong> This Agreement shall be governed by and construed in accordance with the laws of the State of <span id="preview-governingLaw">[GOVERNING LAW]</span>, without regard to conflicts of laws principles.</p>
+                
+                <div id="preview-disputeResolution-courts" style="display: none;">
+                    <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall be resolved in the courts located in the State of <span id="preview-governingLaw-courts">[GOVERNING LAW]</span>.</p>
+                </div>
+                
+                <div id="preview-disputeResolution-arbitration" style="display: none;">
+                    <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in <span id="preview-arbitrationVenue">[ARBITRATION VENUE]</span> in accordance with the rules of the American Arbitration Association.</p>
+                </div>
+                
+                <div id="preview-disputeResolution-mediation" style="display: none;">
+                    <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall first be submitted to mediation, and if mediation is unsuccessful, then to the courts located in the State of <span id="preview-governingLaw-mediation">[GOVERNING LAW]</span>.</p>
+                </div>
+                
+                <div id="preview-additionalTerms-section" style="display: none;">
+                    <p><strong>5.7 Additional Terms.</strong> <span id="preview-additionalTerms">[ADDITIONAL TERMS]</span></p>
+                </div>
+                
+                <p><strong>IN WITNESS WHEREOF</strong>, the undersigned have caused this Agreement to be duly executed and delivered as of the date first written above.</p>
+                
+                <div style="margin-top: 40px;">
+                    <div style="float: left; width: 45%;">
+                        <p><strong>COMPANY:</strong></p>
+                        <p><span id="preview-companyName2">[COMPANY NAME]</span><br>
+                        <span id="preview-companyAddress">[COMPANY ADDRESS]</span><br>
+                        Email: <span id="preview-companyEmail">[COMPANY EMAIL]</span></p>
+                        
+                        <p>By: ____________________________<br>
+                        Name: <span id="preview-signatoryName">[SIGNATORY NAME]</span><br>
+                        Title: <span id="preview-signatoryTitle">[SIGNATORY TITLE]</span></p>
+                    </div>
+                    
+                    <div style="float: right; width: 45%;">
+                        <p><strong>PURCHASER:</strong></p>
+                        <p><span id="preview-investorName2">[INVESTOR NAME]</span><br>
+                        <span id="preview-investorAddress">[INVESTOR ADDRESS]</span><br>
+                        Email: <span id="preview-investorEmail">[INVESTOR EMAIL]</span></p>
+                        
+                        <div id="preview-individual-signature">
+                            <p>By: ____________________________<br>
+                            Name: <span id="preview-investorName3">[INVESTOR NAME]</span></p>
+                        </div>
+                        
+                        <div id="preview-entity-signature" style="display: none;">
+                            <p>By: ____________________________<br>
+                            Name: <span id="preview-investorSignatoryName">[INVESTOR SIGNATORY NAME]</span><br>
+                            Title: <span id="preview-investorSignatoryTitle">[INVESTOR SIGNATORY TITLE]</span></p>
+                        </div>
+                    </div>
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendly widget code -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    
+    <script>
+        // Track last changed elements
+        let lastChangedElements = [];
+        
+        // Function to highlight changes
+        function highlightChanges(elements) {
+            // Remove previous highlights
+            document.querySelectorAll('.highlight').forEach(el => {
+                el.classList.remove('highlight');
+            });
+            
+            // Add highlight to new elements
+            elements.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.add('highlight');
+                    
+                    // Check if element is in view
+                    const rect = element.getBoundingClientRect();
+                    const previewSection = document.querySelector('.preview-section');
+                    const previewRect = previewSection.getBoundingClientRect();
+                    
+                    if (rect.top < previewRect.top || rect.bottom > previewRect.bottom) {
+                        // Scroll element into view
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            });
+            
+            // Store current changes
+            lastChangedElements = elements;
+        }
+        
+        // Function to update preview based on form values
+        function updatePreview() {
+            const changedElements = [];
+            
+            // Company Information
+            const companyName = document.getElementById('companyName').value || '[COMPANY NAME]';
+            if (document.getElementById('preview-companyName').textContent !== companyName) {
+                document.getElementById('preview-companyName').textContent = companyName;
+                document.getElementById('preview-companyName2').textContent = companyName;
+                changedElements.push('preview-companyName', 'preview-companyName2');
+            }
+            
+            const companyAddress = document.getElementById('companyAddress').value || '[COMPANY ADDRESS]';
+            if (document.getElementById('preview-companyAddress').textContent !== companyAddress) {
+                document.getElementById('preview-companyAddress').textContent = companyAddress;
+                changedElements.push('preview-companyAddress');
+            }
+            
+            const stateOfIncorporation = document.getElementById('stateOfIncorporation').value || '[STATE]';
+            if (document.getElementById('preview-stateOfIncorporation').textContent !== stateOfIncorporation) {
+                document.getElementById('preview-stateOfIncorporation').textContent = stateOfIncorporation;
+                changedElements.push('preview-stateOfIncorporation');
+            }
+            
+            const companyEmail = document.getElementById('companyEmail').value || '[COMPANY EMAIL]';
+            if (document.getElementById('preview-companyEmail').textContent !== companyEmail) {
+                document.getElementById('preview-companyEmail').textContent = companyEmail;
+                changedElements.push('preview-companyEmail');
+            }
+            
+            const signatoryName = document.getElementById('signatoryName').value || '[SIGNATORY NAME]';
+            if (document.getElementById('preview-signatoryName').textContent !== signatoryName) {
+                document.getElementById('preview-signatoryName').textContent = signatoryName;
+                changedElements.push('preview-signatoryName');
+            }
+            
+            const signatoryTitle = document.getElementById('signatoryTitle').value || '[SIGNATORY TITLE]';
+            if (document.getElementById('preview-signatoryTitle').textContent !== signatoryTitle) {
+                document.getElementById('preview-signatoryTitle').textContent = signatoryTitle;
+                changedElements.push('preview-signatoryTitle');
+            }
+            
+            // Investor Information
+            const investorType = document.getElementById('investorType').value;
+            document.getElementById('preview-individual-signature').style.display = investorType === 'individual' ? 'block' : 'none';
+            document.getElementById('preview-entity-signature').style.display = investorType === 'entity' ? 'block' : 'none';
+            
+            const investorName = document.getElementById('investorName').value || '[INVESTOR NAME]';
+            if (document.getElementById('preview-investorName').textContent !== investorName) {
+                document.getElementById('preview-investorName').textContent = investorName;
+                document.getElementById('preview-investorName2').textContent = investorName;
+                document.getElementById('preview-investorName3').textContent = investorName;
+                changedElements.push('preview-investorName', 'preview-investorName2', 'preview-investorName3');
+            }
+            
+            const investorAddress = document.getElementById('investorAddress').value || '[INVESTOR ADDRESS]';
+            if (document.getElementById('preview-investorAddress').textContent !== investorAddress) {
+                document.getElementById('preview-investorAddress').textContent = investorAddress;
+                changedElements.push('preview-investorAddress');
+            }
+            
+            const investorEmail = document.getElementById('investorEmail').value || '[INVESTOR EMAIL]';
+            if (document.getElementById('preview-investorEmail').textContent !== investorEmail) {
+                document.getElementById('preview-investorEmail').textContent = investorEmail;
+                changedElements.push('preview-investorEmail');
+            }
+            
+            if (investorType === 'entity') {
+                const investorSignatoryName = document.getElementById('investorSignatoryName').value || '[INVESTOR SIGNATORY NAME]';
+                if (document.getElementById('preview-investorSignatoryName').textContent !== investorSignatoryName) {
+                    document.getElementById('preview-investorSignatoryName').textContent = investorSignatoryName;
+                    changedElements.push('preview-investorSignatoryName');
+                }
+                
+                const investorSignatoryTitle = document.getElementById('investorSignatoryTitle').value || '[INVESTOR SIGNATORY TITLE]';
+                if (document.getElementById('preview-investorSignatoryTitle').textContent !== investorSignatoryTitle) {
+                    document.getElementById('preview-investorSignatoryTitle').textContent = investorSignatoryTitle;
+                    changedElements.push('preview-investorSignatoryTitle');
+                }
+            }
+            
+            const accredited = document.getElementById('accreditedInvestor').value;
+            const accreditedText = accredited === 'yes' ? 'an accredited investor' : 'not an accredited investor';
+            if (document.getElementById('preview-accreditedInvestor').textContent !== accreditedText) {
+                document.getElementById('preview-accreditedInvestor').textContent = accreditedText;
+                changedElements.push('preview-accreditedInvestor');
+            }
+            
+            // Investment Terms
+            const purchaseAmount = document.getElementById('purchaseAmount').value || '[PURCHASE AMOUNT]';
+            if (document.getElementById('preview-purchaseAmount').textContent !== purchaseAmount) {
+                document.getElementById('preview-purchaseAmount').textContent = purchaseAmount;
+                changedElements.push('preview-purchaseAmount');
+            }
+            
+            const valuationCap = document.getElementById('valuationCap').value || '[VALUATION CAP]';
+            if (document.getElementById('preview-valuationCap').textContent !== valuationCap) {
+                document.getElementById('preview-valuationCap').textContent = valuationCap;
+                changedElements.push('preview-valuationCap');
+            }
+            
+            const discount = document.getElementById('discount').value || '[DISCOUNT]';
+            if (document.getElementById('preview-discount').textContent !== discount) {
+                document.getElementById('preview-discount').textContent = discount;
+                changedElements.push('preview-discount');
+            }
+            
+            const closingDate = document.getElementById('closingDate').value ? new Date(document.getElementById('closingDate').value).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : '[CLOSING DATE]';
+            if (document.getElementById('preview-closingDate').textContent !== closingDate) {
+                document.getElementById('preview-closingDate').textContent = closingDate;
+                changedElements.push('preview-closingDate');
+            }
+            
+            const terminationDate = document.getElementById('terminationDate').value ? new Date(document.getElementById('terminationDate').value).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : '[TERMINATION DATE]';
+            if (document.getElementById('preview-terminationDate').textContent !== terminationDate) {
+                document.getElementById('preview-terminationDate').textContent = terminationDate;
+                changedElements.push('preview-terminationDate');
+            }
+            
+            // Token Terms
+            const tokenName = document.getElementById('tokenName').value || '[TOKEN NAME]';
+            if (document.getElementById('preview-tokenName').textContent !== tokenName) {
+                document.getElementById('preview-tokenName').textContent = tokenName;
+                changedElements.push('preview-tokenName');
+            }
+            
+            const tokenSymbol = document.getElementById('tokenSymbol').value || '[TOKEN SYMBOL]';
+            if (document.getElementById('preview-tokenSymbol').textContent !== tokenSymbol) {
+                document.getElementById('preview-tokenSymbol').textContent = tokenSymbol;
+                changedElements.push('preview-tokenSymbol');
+            }
+            
+            const networkLaunchDeadline = document.getElementById('networkLaunchDeadline').value ? new Date(document.getElementById('networkLaunchDeadline').value).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : '[NETWORK LAUNCH DEADLINE]';
+            if (document.getElementById('preview-networkLaunchDeadline').textContent !== networkLaunchDeadline) {
+                document.getElementById('preview-networkLaunchDeadline').textContent = networkLaunchDeadline;
+                changedElements.push('preview-networkLaunchDeadline');
+            }
+            
+            const vestingPeriod = document.getElementById('vestingPeriod').value || '[VESTING PERIOD]';
+            if (document.getElementById('preview-vestingPeriod').textContent !== vestingPeriod) {
+                document.getElementById('preview-vestingPeriod').textContent = vestingPeriod;
+                changedElements.push('preview-vestingPeriod');
+            }
+            
+            const initialReleasePercentage = document.getElementById('initialReleasePercentage').value || '[INITIAL RELEASE PERCENTAGE]';
+            if (document.getElementById('preview-initialReleasePercentage').textContent !== initialReleasePercentage) {
+                document.getElementById('preview-initialReleasePercentage').textContent = initialReleasePercentage;
+                changedElements.push('preview-initialReleasePercentage');
+            }
+            
+            let vestingScheduleText = '[VESTING SCHEDULE]';
+            const vestingSchedule = document.getElementById('vestingSchedule').value;
+            if (vestingSchedule === 'monthly') vestingScheduleText = 'monthly';
+            else if (vestingSchedule === 'quarterly') vestingScheduleText = 'quarterly';
+            else if (vestingSchedule === 'annually') vestingScheduleText = 'annual';
+            else if (vestingSchedule === 'cliff') vestingScheduleText = 'cliff';
+            
+            if (document.getElementById('preview-vestingSchedule').textContent !== vestingScheduleText) {
+                document.getElementById('preview-vestingSchedule').textContent = vestingScheduleText;
+                changedElements.push('preview-vestingSchedule');
+            }
+            
+            // Additional Terms
+            const governingLaw = document.getElementById('governingLaw').value || '[GOVERNING LAW]';
+            if (document.getElementById('preview-governingLaw').textContent !== governingLaw) {
+                document.getElementById('preview-governingLaw').textContent = governingLaw;
+                
+                const courtsEl = document.getElementById('preview-governingLaw-courts');
+                if (courtsEl) {
+                    courtsEl.textContent = governingLaw;
+                }
+                
+                const mediationEl = document.getElementById('preview-governingLaw-mediation');
+                if (mediationEl) {
+                    mediationEl.textContent = governingLaw;
+                }
+                
+                changedElements.push('preview-governingLaw');
+                
+                if (document.getElementById('disputeResolution').value === 'courts') {
+                    changedElements.push('preview-governingLaw-courts');
+                } else if (document.getElementById('disputeResolution').value === 'mediation') {
+                    changedElements.push('preview-governingLaw-mediation');
+                }
+            }
+            
+            const disputeResolution = document.getElementById('disputeResolution').value;
+            document.getElementById('preview-disputeResolution-courts').style.display = disputeResolution === 'courts' ? 'block' : 'none';
+            document.getElementById('preview-disputeResolution-arbitration').style.display = disputeResolution === 'arbitration' ? 'block' : 'none';
+            document.getElementById('preview-disputeResolution-mediation').style.display = disputeResolution === 'mediation' ? 'block' : 'none';
+            
+            if (disputeResolution === 'arbitration') {
+                const arbitrationVenue = document.getElementById('arbitrationVenue').value || '[ARBITRATION VENUE]';
+                if (document.getElementById('preview-arbitrationVenue').textContent !== arbitrationVenue) {
+                    document.getElementById('preview-arbitrationVenue').textContent = arbitrationVenue;
+                    changedElements.push('preview-arbitrationVenue');
+                }
+            }
+            
+            const confidentiality = document.getElementById('confidentiality').value;
+            document.getElementById('preview-confidentiality-section').style.display = confidentiality === 'yes' ? 'block' : 'none';
+            
+            const transferRestrictions = document.getElementById('transferRestrictions').value;
+            document.getElementById('preview-transferRestrictions-section').style.display = transferRestrictions === 'yes' ? 'block' : 'none';
+            
+            const additionalTerms = document.getElementById('additionalTerms').value;
+            document.getElementById('preview-additionalTerms-section').style.display = additionalTerms ? 'block' : 'none';
+            if (additionalTerms && document.getElementById('preview-additionalTerms').textContent !== additionalTerms) {
+                document.getElementById('preview-additionalTerms').textContent = additionalTerms;
+                changedElements.push('preview-additionalTerms');
+            }
+            
+            // Highlight changes if there are any
+            if (changedElements.length > 0) {
+                highlightChanges(changedElements);
+            }
+        }
+        
+        // Tab navigation
+        let currentTab = 0;
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        function showTab(n) {
+            tabs.forEach(tab => tab.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            tabs[n].classList.add('active');
+            tabContents[n].classList.add('active');
+            
+            // Update navigation buttons
+            if (n === 0) {
+                document.getElementById('prevBtn').style.display = 'none';
+            } else {
+                document.getElementById('prevBtn').style.display = 'inline';
+            }
+            
+            if (n === (tabs.length - 1)) {
+                document.getElementById('nextBtn').textContent = 'Finish';
+            } else {
+                document.getElementById('nextBtn').textContent = 'Next';
+            }
+        }
+        
+        // Initialize with first tab active
+        showTab(currentTab);
+        
+        // Tab click event
+        tabs.forEach((tab, index) => {
+            tab.addEventListener('click', () => {
+                currentTab = index;
+                showTab(currentTab);
+            });
+        });
+        
+        // Next/Previous button event
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            if (currentTab < tabs.length - 1) {
+                currentTab++;
+                showTab(currentTab);
+            }
+        });
+        
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            if (currentTab > 0) {
+                currentTab--;
+                showTab(currentTab);
+            }
+        });
+        
+        // Conditional form fields
+        document.getElementById('investorType').addEventListener('change', function() {
+            const entityFields = document.querySelectorAll('.entity-only');
+            entityFields.forEach(field => {
+                field.style.display = this.value === 'entity' ? 'block' : 'none';
+            });
+            updatePreview();
+        });
+        
+        document.getElementById('disputeResolution').addEventListener('change', function() {
+            const arbitrationFields = document.querySelectorAll('.arbitration-only');
+            arbitrationFields.forEach(field => {
+                field.style.display = this.value === 'arbitration' ? 'block' : 'none';
+            });
+            updatePreview();
+        });
+        
+        // Attach event listeners to all form fields
+        const formFields = document.querySelectorAll('input, select, textarea');
+        formFields.forEach(field => {
+            field.addEventListener('change', updatePreview);
+            field.addEventListener('input', updatePreview);
+        });
+        
+        // Initialize preview
+        updatePreview();
+    </script>
+</body>
+</html>
