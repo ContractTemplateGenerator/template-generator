@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Card Authorization Form Generator</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+            --highlight-color: #ffff99;
+            --success-color: #2ecc71;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .form-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            height: fit-content;
+        }
+        
+        .preview-container {
+            flex: 1;
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            background-color: white;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .preview-header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 15px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            overflow-y: auto;
+            flex-grow: 1;
+            height: 650px;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-top: 0;
+            font-size: 24px;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        
+        input[type="text"],
+        input[type="number"],
+        input[type="email"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        input[type="email"]:focus,
+        input[type="date"]:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            border-radius: 4px 4px 0 0;
+            margin-right: 5px;
+            background-color: #f5f5f5;
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: #ddd;
+            font-weight: bold;
+            color: var(--secondary-color);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .btn {
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #27ae60;
+        }
+        
+        .btn-nav {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            width: 16px;
+            height: 16px;
+            background-color: var(--secondary-color);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: help;
+        }
+        
+        .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-color);
+            color: white;
+            text-align: left;
+            border-radius: 4px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: normal;
+            font-size: 12px;
+            line-height: 1.4;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.5s;
+            padding: 2px 0;
+        }
+        
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 8px;
+        }
+        
+        .radio-group {
+            margin-bottom: 10px;
+        }
+        
+        .radio-group label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 8px;
+        }
+        
+        .document {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.5;
+            color: black;
+            padding: 0 20px;
+        }
+        
+        .document-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin: 20px 0;
+        }
+        
+        .document p {
+            margin-bottom: 15px;
+        }
+        
+        .document-section {
+            margin-bottom: 20px;
+        }
+        
+        .document-field {
+            border-bottom: 1px solid #000;
+            display: inline-block;
+            min-width: 100px;
+            padding: 0 5px;
+        }
+        
+        .document-date {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        
+        .document-signature {
+            margin-top: 30px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid black;
+            width: 250px;
+            margin-top: 50px;
+            display: inline-block;
+        }
+        
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1>Credit Card Authorization Form Generator</h1>
+            <div class="tabs">
+                <div class="tab active" data-tab="company-info">Company Info</div>
+                <div class="tab" data-tab="cardholder-info">Cardholder Info</div>
+                <div class="tab" data-tab="card-details">Card Details</div>
+                <div class="tab" data-tab="authorization">Authorization</div>
+            </div>
+            
+            <div class="tab-content active" id="company-info">
+                <h2>Company Information</h2>
+                <div class="form-group">
+                    <label for="company-name">Company Name</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">Enter the full legal name of your company as it appears on official documents.</span>
+                    </div>
+                    <input type="text" id="company-name" value="ABC Company, Inc.">
+                </div>
+                <div class="form-group">
+                    <label for="company-address">Company Address</label>
+                    <input type="text" id="company-address" value="123 Business Ave, Suite 100, San Francisco, CA 94111">
+                </div>
+                <div class="form-group">
+                    <label for="company-phone">Company Phone</label>
+                    <input type="text" id="company-phone" value="(415) 555-1234">
+                </div>
+                <div class="form-group">
+                    <label for="company-email">Company Email</label>
+                    <input type="email" id="company-email" value="billing@abccompany.com">
+                </div>
+                <div class="btn-nav">
+                    <div></div>
+                    <button class="btn" onclick="nextTab('cardholder-info')">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="cardholder-info">
+                <h2>Cardholder Information</h2>
+                <div class="form-group">
+                    <label for="cardholder-name">Cardholder Name</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">Name as it appears on the credit card.</span>
+                    </div>
+                    <input type="text" id="cardholder-name" value="John Q. Smith">
+                </div>
+                <div class="form-group">
+                    <label for="cardholder-address">Billing Address</label>
+                    <input type="text" id="cardholder-address" value="456 Personal St, Apt 7B, San Francisco, CA 94105">
+                </div>
+                <div class="form-group">
+                    <label for="cardholder-phone">Phone Number</label>
+                    <input type="text" id="cardholder-phone" value="(415) 555-9876">
+                </div>
+                <div class="form-group">
+                    <label for="cardholder-email">Email Address</label>
+                    <input type="email" id="cardholder-email" value="john.smith@email.com">
+                </div>
+                <div class="btn-nav">
+                    <button class="btn" onclick="prevTab('company-info')">Previous</button>
+                    <button class="btn" onclick="nextTab('card-details')">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="card-details">
+                <h2>Card Details</h2>
+                <div class="form-group">
+                    <label>Card Type</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">Select the type of credit card being authorized.</span>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="card-type" value="Visa" checked> Visa</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="card-type" value="MasterCard"> MasterCard</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="card-type" value="American Express"> American Express</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="card-type" value="Discover"> Discover</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="card-type" value="Other"> Other</label>
+                    </div>
+                </div>
+                <div class="form-group" id="other-card-type-container" style="display: none;">
+                    <label for="other-card-type">Specify Card Type</label>
+                    <input type="text" id="other-card-type" placeholder="Enter card type">
+                </div>
+                <div class="form-group">
+                    <label for="card-number">Card Number</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">For security, only the last 4 digits will appear in the downloadable form.</span>
+                    </div>
+                    <input type="text" id="card-number" placeholder="•••• •••• •••• 1234" value="•••• •••• •••• 1234" maxlength="19">
+                </div>
+                <div class="form-group">
+                    <label for="card-expiration">Expiration Date (MM/YY)</label>
+                    <input type="text" id="card-expiration" placeholder="12/25" value="12/25" maxlength="5">
+                </div>
+                <div class="form-group">
+                    <label for="card-cvv">CVV/Security Code</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">For security, this will not appear in the downloadable form.</span>
+                    </div>
+                    <input type="text" id="card-cvv" placeholder="***" value="***" maxlength="4">
+                </div>
+                <div class="form-group">
+                    <label for="card-issuing-bank">Issuing Bank (Optional)</label>
+                    <input type="text" id="card-issuing-bank" placeholder="Enter bank name">
+                </div>
+                <div class="form-group">
+                    <label>Payment Type</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="payment-type" value="recurring" checked onclick="toggleRecurringOptions(true)"> Recurring Charge</label>
+                    </div>
+                    <div class="radio-group">
+                        <label><input type="radio" name="payment-type" value="one-time" onclick="toggleRecurringOptions(false)"> One-Time Charge</label>
+                    </div>
+                </div>
+                <div id="recurring-options">
+                    <div class="form-group">
+                        <label for="recurring-amount">Recurring Amount ($)</label>
+                        <input type="text" id="recurring-amount" value="99.99">
+                    </div>
+                    <div class="form-group">
+                        <label for="recurring-frequency">Frequency</label>
+                        <select id="recurring-frequency">
+                            <option value="Monthly">Monthly</option>
+                            <option value="Weekly">Weekly</option>
+                            <option value="Bi-Weekly">Bi-Weekly</option>
+                            <option value="Quarterly">Quarterly</option>
+                            <option value="Annually">Annually</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="recurring-start-date">Start Date</label>
+                        <input type="date" id="recurring-start-date" value="">
+                    </div>
+                    <div class="form-group">
+                        <label for="recurring-end-date">End Date (Optional)</label>
+                        <input type="date" id="recurring-end-date" value="">
+                    </div>
+                </div>
+                <div id="one-time-options" class="hidden">
+                    <div class="form-group">
+                        <label for="one-time-amount">Charge Amount ($)</label>
+                        <input type="text" id="one-time-amount" value="499.99">
+                    </div>
+                    <div class="form-group">
+                        <label for="charge-date">Charge Date</label>
+                        <input type="date" id="charge-date" value="">
+                    </div>
+                </div>
+                <div class="btn-nav">
+                    <button class="btn" onclick="prevTab('cardholder-info')">Previous</button>
+                    <button class="btn" onclick="nextTab('authorization')">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="authorization">
+                <h2>Authorization Details</h2>
+                <div class="form-group">
+                    <label for="purpose">Purpose of Authorization</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">Specify what products or services are being charged.</span>
+                    </div>
+                    <input type="text" id="purpose" value="Monthly subscription service">
+                </div>
+                <div class="form-group">
+                    <label for="agreement-date">Agreement Date</label>
+                    <input type="date" id="agreement-date" value="">
+                </div>
+                <div class="form-group">
+                    <label for="authorization-duration">Authorization Duration</label>
+                    <div class="tooltip">?
+                        <span class="tooltip-text">How long this authorization will remain valid.</span>
+                    </div>
+                    <select id="authorization-duration">
+                        <option value="Until canceled in writing">Until canceled in writing</option>
+                        <option value="One year from the date of signature">One year from the date of signature</option>
+                        <option value="Six months from the date of signature">Six months from the date of signature</option>
+                        <option value="For a single transaction only">For a single transaction only</option>
+                        <option value="custom">Custom duration...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-duration-container" style="display: none;">
+                    <label for="custom-duration">Custom Duration</label>
+                    <input type="text" id="custom-duration" placeholder="e.g., For the duration of the project">
+                </div>
+                <div class="form-group">
+                    <label>Additional Terms</label>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="term-cancellation" checked> Include cancellation policy</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="term-refund" checked> Include refund policy</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="term-change-fee" checked> Include change fee disclosure</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="term-liability" checked> Include liability statement</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <label><input type="checkbox" id="term-governing-law"> Include governing law</label>
+                    </div>
+                </div>
+                <div class="form-group" id="cancellation-policy-container">
+                    <label for="cancellation-days">Cancellation Notice Required (Days)</label>
+                    <input type="number" id="cancellation-days" value="30" min="0">
+                </div>
+                <div class="form-group" id="refund-policy-container">
+                    <label for="refund-policy">Refund Policy</label>
+                    <select id="refund-policy">
+                        <option value="No refunds">No refunds</option>
+                        <option value="Partial refund at company's discretion">Partial refund at company's discretion</option>
+                        <option value="Full refund within 30 days">Full refund within 30 days</option>
+                        <option value="Prorated refund">Prorated refund</option>
+                        <option value="custom">Custom refund policy...</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-refund-container" style="display: none;">
+                    <label for="custom-refund">Custom Refund Policy</label>
+                    <textarea id="custom-refund" rows="3" placeholder="Enter your custom refund policy"></textarea>
+                </div>
+                <div class="form-group" id="change-fee-container">
+                    <label for="change-fee">Change Fee Amount ($)</label>
+                    <input type="number" id="change-fee" value="25" min="0">
+                </div>
+                <div class="form-group" id="governing-law-container" style="display: none;">
+                    <label for="governing-law">Governing Law State/Country</label>
+                    <input type="text" id="governing-law" value="California" placeholder="e.g., California">
+                </div>
+                <div class="btn-nav">
+                    <button class="btn" onclick="prevTab('card-details')">Previous</button>
+                    <button class="btn btn-success" onclick="downloadWord()">Download as Word</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-container">
+            <div class="preview-header">
+                <span>Live Preview</span>
+                <div class="download-buttons">
+                    <button class="btn btn-success" onclick="downloadWord()">Download as Word</button>
+                </div>
+            </div>
+            <div class="preview-content" id="preview">
+                <!-- Preview content will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/docx/7.3.0/docx.js"></script>
+    
+    <script>
+        // Set default dates
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date();
+            const formattedDate = today.toISOString().substring(0, 10);
+            document.getElementById('agreement-date').value = formattedDate;
+            
+            // Set default start date for recurring (today)
+            document.getElementById('recurring-start-date').value = formattedDate;
+            
+            // Set default for one-time charge (today)
+            document.getElementById('charge-date').value = formattedDate;
+            
+            // Initialize preview
+            updatePreview();
+            
+            // Add event listeners to all form inputs
+            const allInputs = document.querySelectorAll('input, select, textarea');
+            allInputs.forEach(input => {
+                input.addEventListener('change', updatePreview);
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Add event listeners for card type radio buttons
+            document.querySelectorAll('input[name="card-type"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    if (this.value === 'Other') {
+                        document.getElementById('other-card-type-container').style.display = 'block';
+                    } else {
+                        document.getElementById('other-card-type-container').style.display = 'none';
+                    }
+                    updatePreview();
+                });
+            });
+            
+            // Add event listener for authorization duration
+            document.getElementById('authorization-duration').addEventListener('change', function() {
+                document.getElementById('custom-duration-container').style.display = 
+                    this.value === 'custom' ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            // Add event listener for refund policy
+            document.getElementById('refund-policy').addEventListener('change', function() {
+                document.getElementById('custom-refund-container').style.display = 
+                    this.value === 'custom' ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            // Add event listeners for checkboxes controlling additional terms
+            document.getElementById('term-cancellation').addEventListener('change', function() {
+                document.getElementById('cancellation-policy-container').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            document.getElementById('term-refund').addEventListener('change', function() {
+                document.getElementById('refund-policy-container').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            document.getElementById('term-change-fee').addEventListener('change', function() {
+                document.getElementById('change-fee-container').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            document.getElementById('term-governing-law').addEventListener('change', function() {
+                document.getElementById('governing-law-container').style.display = this.checked ? 'block' : 'none';
+                updatePreview();
+            });
+        });
+        
+        // Tab navigation
+        function showTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show the selected tab content
+            document.getElementById(tabId).classList.add('active');
+            
+            // Add active class to the selected tab
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+        }
+        
+        function nextTab(tabId) {
+            showTab(tabId);
+        }
+        
+        function prevTab(tabId) {
+            showTab(tabId);
+        }
+        
+        // Handle tab clicks
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                showTab(tabId);
+            });
+        });
+        
+        // Toggle recurring/one-time payment options
+        function toggleRecurringOptions(isRecurring) {
+            const recurringOptions = document.getElementById('recurring-options');
+            const oneTimeOptions = document.getElementById('one-time-options');
+            
+            if (isRecurring) {
+                recurringOptions.classList.remove('hidden');
+                oneTimeOptions.classList.add('hidden');
+            } else {
+                recurringOptions.classList.add('hidden');
+                oneTimeOptions.classList.remove('hidden');
+            }
+            
+            updatePreview();
+        }
+        
+        // Store previous state for comparison
+        let previousState = {};
+        
+        // Update the preview with current form values
+        function updatePreview() {
+            const preview = document.getElementById('preview');
+            
+            // Get current form values
+            const currentState = {
+                companyName: document.getElementById('company-name').value,
+                companyAddress: document.getElementById('company-address').value,
+                companyPhone: document.getElementById('company-phone').value,
+                companyEmail: document.getElementById('company-email').value,
+                cardholderName: document.getElementById('cardholder-name').value,
+                cardholderAddress: document.getElementById('cardholder-address').value,
+                cardholderPhone: document.getElementById('cardholder-phone').value,
+                cardholderEmail: document.getElementById('cardholder-email').value,
+                cardType: document.querySelector('input[name="card-type"]:checked').value,
+                otherCardType: document.getElementById('other-card-type').value,
+                cardNumber: document.getElementById('card-number').value,
+                cardExpiration: document.getElementById('card-expiration').value,
+                cardIssuingBank: document.getElementById('card-issuing-bank').value,
+                paymentType: document.querySelector('input[name="payment-type"]:checked').value,
+                recurringAmount: document.getElementById('recurring-amount').value,
+                recurringFrequency: document.getElementById('recurring-frequency').value,
+                recurringStartDate: document.getElementById('recurring-start-date').value,
+                recurringEndDate: document.getElementById('recurring-end-date').value,
+                oneTimeAmount: document.getElementById('one-time-amount').value,
+                chargeDate: document.getElementById('charge-date').value,
+                purpose: document.getElementById('purpose').value,
+                agreementDate: document.getElementById('agreement-date').value,
+                authorizationDuration: document.getElementById('authorization-duration').value,
+                customDuration: document.getElementById('custom-duration').value,
+                includeCancellation: document.getElementById('term-cancellation').checked,
+                includeRefund: document.getElementById('term-refund').checked,
+                includeChangeFee: document.getElementById('term-change-fee').checked,
+                includeLiability: document.getElementById('term-liability').checked,
+                includeGoverningLaw: document.getElementById('term-governing-law').checked,
+                cancellationDays: document.getElementById('cancellation-days').value,
+                refundPolicy: document.getElementById('refund-policy').value,
+                customRefund: document.getElementById('custom-refund').value,
+                changeFee: document.getElementById('change-fee').value,
+                governingLaw: document.getElementById('governing-law').value
+            };
+            
+            // Find differences between previous and current state
+            const changes = {};
+            for (const key in currentState) {
+                if (previousState[key] !== currentState[key]) {
+                    changes[key] = true;
+                }
+            }
+            
+            // Format dates
+            let formattedAgreementDate = "____________";
+            if (currentState.agreementDate) {
+                const agreementDate = new Date(currentState.agreementDate);
+                formattedAgreementDate = agreementDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedStartDate = "____________";
+            if (currentState.recurringStartDate) {
+                const startDate = new Date(currentState.recurringStartDate);
+                formattedStartDate = startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedEndDate = "until canceled";
+            if (currentState.recurringEndDate) {
+                const endDate = new Date(currentState.recurringEndDate);
+                formattedEndDate = endDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedChargeDate = "____________";
+            if (currentState.chargeDate) {
+                const chargeDate = new Date(currentState.chargeDate);
+                formattedChargeDate = chargeDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            // Build HTML with conditional highlighting
+            let html = `
+                <div class="document">
+                    <div class="document-title">CREDIT CARD AUTHORIZATION FORM</div>
+                    
+                    <div class="document-date">
+                        Date: ${wrapWithHighlight(formattedAgreementDate, changes.agreementDate)}
+                    </div>
+                    
+                    <div class="document-section">
+                        <p>I, ${wrapWithHighlight(currentState.cardholderName, changes.cardholderName)}, authorize ${wrapWithHighlight(currentState.companyName, changes.companyName)} to charge my credit card for the following:</p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <p><strong>Purpose of Authorization:</strong> ${wrapWithHighlight(currentState.purpose, changes.purpose)}</p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <p><strong>Authorization Duration:</strong> ${
+                            currentState.authorizationDuration === 'custom' 
+                                ? wrapWithHighlight(currentState.customDuration, changes.customDuration || changes.authorizationDuration)
+                                : wrapWithHighlight(currentState.authorizationDuration, changes.authorizationDuration)
+                        }</p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <p><strong>Payment Details:</strong></p>
+                        <p>
+            `;
+            
+            // Payment details section based on type
+            if (currentState.paymentType === 'recurring') {
+                html += `
+                    ${wrapWithHighlight("Recurring Payment", changes.paymentType)} of 
+                    ${wrapWithHighlight(currentState.recurringAmount, changes.recurringAmount)} to be charged 
+                    ${wrapWithHighlight(currentState.recurringFrequency.toLowerCase(), changes.recurringFrequency)}, 
+                    beginning on ${wrapWithHighlight(formattedStartDate, changes.recurringStartDate)} 
+                    and continuing ${wrapWithHighlight(formattedEndDate, changes.recurringEndDate)}.
+                `;
+            } else {
+                html += `
+                    ${wrapWithHighlight("One-Time Payment", changes.paymentType)} of 
+                    ${wrapWithHighlight(currentState.oneTimeAmount, changes.oneTimeAmount)} to be charged on 
+                    ${wrapWithHighlight(formattedChargeDate, changes.chargeDate)}.
+                `;
+            }
+            
+            html += `
+                        </p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <p><strong>Cardholder Information:</strong></p>
+                        <p>Name on Card: ${wrapWithHighlight(currentState.cardholderName, changes.cardholderName)}</p>
+                        <p>Billing Address: ${wrapWithHighlight(currentState.cardholderAddress, changes.cardholderAddress)}</p>
+                        <p>Phone Number: ${wrapWithHighlight(currentState.cardholderPhone, changes.cardholderPhone)}</p>
+                        <p>Email Address: ${wrapWithHighlight(currentState.cardholderEmail, changes.cardholderEmail)}</p>
+                    </div>
+                    
+                    <div class="document-section">
+                        <p><strong>Card Information:</strong></p>
+                        <p>Card Type: ${
+                            currentState.cardType === 'Other' 
+                                ? wrapWithHighlight(currentState.otherCardType, changes.otherCardType || changes.cardType)
+                                : wrapWithHighlight(currentState.cardType, changes.cardType)
+                        }</p>
+                        <p>Card Number: ${wrapWithHighlight(currentState.cardNumber, changes.cardNumber)}</p>
+                        <p>Expiration Date: ${wrapWithHighlight(currentState.cardExpiration, changes.cardExpiration)}</p>
+                        ${currentState.cardIssuingBank ? `<p>Issuing Bank: ${wrapWithHighlight(currentState.cardIssuingBank, changes.cardIssuingBank)}</p>` : ''}
+                    </div>
+            `;
+            
+            // Additional terms section
+            html += `<div class="document-section"><p><strong>Additional Terms:</strong></p>`;
+            
+            // Cancellation policy
+            if (currentState.includeCancellation) {
+                html += `
+                    <p>${wrapWithHighlight(`Cancellation Policy: Written notice of cancellation must be provided at least ${currentState.cancellationDays} days in advance.`, changes.includeCancellation || changes.cancellationDays)}</p>
+                `;
+            }
+            
+            // Refund policy
+            if (currentState.includeRefund) {
+                if (currentState.refundPolicy === 'custom') {
+                    html += `
+                        <p>${wrapWithHighlight(`Refund Policy: ${currentState.customRefund}`, changes.includeRefund || changes.customRefund || changes.refundPolicy)}</p>
+                    `;
+                } else {
+                    html += `
+                        <p>${wrapWithHighlight(`Refund Policy: ${currentState.refundPolicy}.`, changes.includeRefund || changes.refundPolicy)}</p>
+                    `;
+                }
+            }
+            
+            // Change fee
+            if (currentState.includeChangeFee) {
+                html += `
+                    <p>${wrapWithHighlight(`Change Fee: A fee of ${currentState.changeFee} will be charged for any changes to the payment schedule or amount after this authorization is signed.`, changes.includeChangeFee || changes.changeFee)}</p>
+                `;
+            }
+            
+            // Liability statement
+            if (currentState.includeLiability) {
+                html += `
+                    <p>${wrapWithHighlight(`Liability: The cardholder agrees to pay the total amount according to the card issuer agreement. The cardholder is responsible for any fees assessed by their card issuer related to this authorization.`, changes.includeLiability)}</p>
+                `;
+            }
+            
+            // Governing law
+            if (currentState.includeGoverningLaw) {
+                html += `
+                    <p>${wrapWithHighlight(`Governing Law: This authorization will be governed by the laws of ${currentState.governingLaw}.`, changes.includeGoverningLaw || changes.governingLaw)}</p>
+                `;
+            }
+            
+            html += `</div>`;
+            
+            // Company information
+            html += `
+                <div class="document-section">
+                    <p><strong>Company Information:</strong></p>
+                    <p>Company: ${wrapWithHighlight(currentState.companyName, changes.companyName)}</p>
+                    <p>Address: ${wrapWithHighlight(currentState.companyAddress, changes.companyAddress)}</p>
+                    <p>Phone: ${wrapWithHighlight(currentState.companyPhone, changes.companyPhone)}</p>
+                    <p>Email: ${wrapWithHighlight(currentState.companyEmail, changes.companyEmail)}</p>
+                </div>
+            `;
+            
+            // Authorization statement and signature
+            html += `
+                <div class="document-section">
+                    <p>By signing below, I authorize the above-named business to charge the credit card indicated in this authorization form according to the terms outlined above. This payment authorization is for the goods/services described above. I certify that I am an authorized user of this credit card and that I will not dispute the payment with my credit card company provided the transactions correspond to the terms indicated in this form.</p>
+                </div>
+                
+                <div class="document-signature">
+                    <p>Cardholder Signature: <span class="signature-line"></span></p>
+                    <p>Date: __________________</p>
+                </div>
+            </div>
+            `;
+            
+            // Update the preview
+            preview.innerHTML = html;
+            
+            // Save current state for next comparison
+            previousState = {...currentState};
+            
+            // Remove highlights after 2 seconds
+            setTimeout(removeHighlights, 2000);
+        }
+        
+        // Wrap text with highlight if it has changed
+        function wrapWithHighlight(text, hasChanged) {
+            return hasChanged ? `<span class="highlight">${text}</span>` : text;
+        }
+        
+        // Remove all highlights
+        function removeHighlights() {
+            const highlights = document.querySelectorAll('.highlight');
+            highlights.forEach(el => {
+                el.classList.remove('highlight');
+            });
+        }
+        
+        // Download as Word document
+        function downloadWord() {
+            const { Document, Paragraph, TextRun, AlignmentType, HeadingLevel, BorderStyle } = docx;
+            
+            // Get form values
+            const companyName = document.getElementById('company-name').value;
+            const companyAddress = document.getElementById('company-address').value;
+            const companyPhone = document.getElementById('company-phone').value;
+            const companyEmail = document.getElementById('company-email').value;
+            const cardholderName = document.getElementById('cardholder-name').value;
+            const cardholderAddress = document.getElementById('cardholder-address').value;
+            const cardholderPhone = document.getElementById('cardholder-phone').value;
+            const cardholderEmail = document.getElementById('cardholder-email').value;
+            const cardType = document.querySelector('input[name="card-type"]:checked').value;
+            const otherCardType = document.getElementById('other-card-type').value;
+            const cardNumber = document.getElementById('card-number').value;
+            const cardExpiration = document.getElementById('card-expiration').value;
+            const cardIssuingBank = document.getElementById('card-issuing-bank').value;
+            const paymentType = document.querySelector('input[name="payment-type"]:checked').value;
+            const recurringAmount = document.getElementById('recurring-amount').value;
+            const recurringFrequency = document.getElementById('recurring-frequency').value;
+            const recurringStartDate = document.getElementById('recurring-start-date').value;
+            const recurringEndDate = document.getElementById('recurring-end-date').value;
+            const oneTimeAmount = document.getElementById('one-time-amount').value;
+            const chargeDate = document.getElementById('charge-date').value;
+            const purpose = document.getElementById('purpose').value;
+            const agreementDate = document.getElementById('agreement-date').value;
+            const authorizationDuration = document.getElementById('authorization-duration').value;
+            const customDuration = document.getElementById('custom-duration').value;
+            const includeCancellation = document.getElementById('term-cancellation').checked;
+            const includeRefund = document.getElementById('term-refund').checked;
+            const includeChangeFee = document.getElementById('term-change-fee').checked;
+            const includeLiability = document.getElementById('term-liability').checked;
+            const includeGoverningLaw = document.getElementById('term-governing-law').checked;
+            const cancellationDays = document.getElementById('cancellation-days').value;
+            const refundPolicy = document.getElementById('refund-policy').value;
+            const customRefund = document.getElementById('custom-refund').value;
+            const changeFee = document.getElementById('change-fee').value;
+            const governingLaw = document.getElementById('governing-law').value;
+            
+            // Format dates
+            let formattedAgreementDate = "";
+            if (agreementDate) {
+                const date = new Date(agreementDate);
+                formattedAgreementDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedStartDate = "";
+            if (recurringStartDate) {
+                const date = new Date(recurringStartDate);
+                formattedStartDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedEndDate = "until canceled";
+            if (recurringEndDate) {
+                const date = new Date(recurringEndDate);
+                formattedEndDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            let formattedChargeDate = "";
+            if (chargeDate) {
+                const date = new Date(chargeDate);
+                formattedChargeDate = date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            }
+            
+            // Create document
+            const doc = new Document({
+                sections: [{
+                    properties: {},
+                    children: [
+                        new Paragraph({
+                            text: "CREDIT CARD AUTHORIZATION FORM",
+                            heading: HeadingLevel.HEADING_1,
+                            alignment: AlignmentType.CENTER,
+                            spacing: {
+                                after: 400,
+                            },
+                        }),
+                        new Paragraph({
+                            text: `Date: ${formattedAgreementDate}`,
+                            alignment: AlignmentType.RIGHT,
+                            spacing: {
+                                after: 400,
+                            },
+                        }),
+                        new Paragraph({
+                            children: [
+                                new TextRun(`I, `),
+                                new TextRun({
+                                    text: cardholderName,
+                                    bold: true,
+                                }),
+                                new TextRun(`, authorize `),
+                                new TextRun({
+                                    text: companyName,
+                                    bold: true,
+                                }),
+                                new TextRun(` to charge my credit card for the following:`),
+                            ],
+                            spacing: {
+                                after: 300,
+                            },
+                        }),
+                        new Paragraph({
+                            children: [
+                                new TextRun({
+                                    text: "Purpose of Authorization: ",
+                                    bold: true,
+                                }),
+                                new TextRun(purpose),
+                            ],
+                            spacing: {
+                                after: 300,
+                            },
+                        }),
+                        new Paragraph({
+                            text: "Payment Details:",
+                            bold: true,
+                            spacing: {
+                                after: 200,
+                            },
+                        })
+                    ]
+                }]
+            });
+            
+            // Add authorization duration
+            doc.addParagraph(
+                new Paragraph({
+                    children: [
+                        new TextRun({
+                            text: "Authorization Duration: ",
+                            bold: true,
+                        }),
+                        new TextRun(authorizationDuration === 'custom' ? customDuration : authorizationDuration),
+                    ],
+                    spacing: {
+                        after: 300,
+                    },
+                })
+            );
+            
+            // Add payment details based on type
+            if (paymentType === 'recurring') {
+                doc.addParagraph(
+                    new Paragraph({
+                        children: [
+                            new TextRun(`Recurring Payment of `),
+                            new TextRun({
+                                text: `${recurringAmount}`,
+                                bold: true,
+                            }),
+                            new TextRun(` to be charged `),
+                            new TextRun(recurringFrequency.toLowerCase()),
+                            new TextRun(`, beginning on `),
+                            new TextRun(formattedStartDate),
+                            new TextRun(` and continuing `),
+                            new TextRun(formattedEndDate),
+                            new TextRun(`.`),
+                        ],
+                        spacing: {
+                            after: 300,
+                        },
+                    })
+                );
+            } else {
+                doc.addParagraph(
+                    new Paragraph({
+                        children: [
+                            new TextRun(`One-Time Payment of `),
+                            new TextRun({
+                                text: `${oneTimeAmount}`,
+                                bold: true,
+                            }),
+                            new TextRun(` to be charged on `),
+                            new TextRun(formattedChargeDate),
+                            new TextRun(`.`),
+                        ],
+                        spacing: {
+                            after: 300,
+                        },
+                    })
+                );
+            }
+            
+            // Cardholder Information
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Cardholder Information:",
+                    bold: true,
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Name on Card: ${cardholderName}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Billing Address: ${cardholderAddress}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Phone Number: ${cardholderPhone}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Email Address: ${cardholderEmail}`,
+                    spacing: {
+                        after: 300,
+                    },
+                })
+            );
+            
+            // Card Information
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Card Information:",
+                    bold: true,
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Card Type: ${cardType === 'Other' ? otherCardType : cardType}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Card Number: ${cardNumber}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Expiration Date: ${cardExpiration}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            if (cardIssuingBank) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Issuing Bank: ${cardIssuingBank}`,
+                        spacing: {
+                            after: 300,
+                        },
+                    })
+                );
+            } else {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: ``,
+                        spacing: {
+                            after: 200,
+                        },
+                    })
+                );
+            }
+            
+            // Additional Terms
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Additional Terms:",
+                    bold: true,
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+            
+            // Cancellation policy
+            if (includeCancellation) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Cancellation Policy: Written notice of cancellation must be provided at least ${cancellationDays} days in advance.`,
+                        spacing: {
+                            after: 100,
+                        },
+                    })
+                );
+            }
+            
+            // Refund policy
+            if (includeRefund) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Refund Policy: ${refundPolicy === 'custom' ? customRefund : refundPolicy}.`,
+                        spacing: {
+                            after: 100,
+                        },
+                    })
+                );
+            }
+            
+            // Change fee
+            if (includeChangeFee) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Change Fee: A fee of ${changeFee} will be charged for any changes to the payment schedule or amount after this authorization is signed.`,
+                        spacing: {
+                            after: 100,
+                        },
+                    })
+                );
+            }
+            
+            // Liability statement
+            if (includeLiability) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Liability: The cardholder agrees to pay the total amount according to the card issuer agreement. The cardholder is responsible for any fees assessed by their card issuer related to this authorization.`,
+                        spacing: {
+                            after: 100,
+                        },
+                    })
+                );
+            }
+            
+            // Governing law
+            if (includeGoverningLaw) {
+                doc.addParagraph(
+                    new Paragraph({
+                        text: `Governing Law: This authorization will be governed by the laws of ${governingLaw}.`,
+                        spacing: {
+                            after: 300,
+                        },
+                    })
+                );
+            }
+            
+            // Company Information
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Company Information:",
+                    bold: true,
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Company: ${companyName}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Address: ${companyAddress}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Phone: ${companyPhone}`,
+                    spacing: {
+                        after: 100,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: `Email: ${companyEmail}`,
+                    spacing: {
+                        after: 300,
+                    },
+                })
+            );
+            
+            // Authorization statement
+            doc.addParagraph(
+                new Paragraph({
+                    text: "By signing below, I authorize the above-named business to charge the credit card indicated in this authorization form according to the terms outlined above. This payment authorization is for the goods/services described above. I certify that I am an authorized user of this credit card and that I will not dispute the payment with my credit card company provided the transactions correspond to the terms indicated in this form.",
+                    spacing: {
+                        after: 500,
+                    },
+                })
+            );
+            
+            // Signature line
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Cardholder Signature: _______________________________",
+                    spacing: {
+                        after: 200,
+                    },
+                })
+            );
+            
+            doc.addParagraph(
+                new Paragraph({
+                    text: "Date: _______________________",
+                })
+            );
+            
+            // Save document
+            docx.Packer.toBlob(doc).then(blob => {
+                saveAs(blob, "Credit_Card_Authorization_Form.docx");
+            });
+        }
+    </script>
+</body>
+</html>
