@@ -725,15 +725,31 @@
                 </div>
                 
                 <div id="preview-disputeResolution-arbitration" style="display: none;">
-                    <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in <span id="preview-arbitrationVenue">[ARBITRATION VENUE]</span> in accordance with the rules of the American Arbitration Association.</p>
+                    <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall be resolved by binding arbitration in <span id="preview-arbitrationVenue">[ARBITRATION VENUE]</span> in accordance with the rules of <span id="preview-arbitrationRules">[ARBITRATION RULES]</span>.</p>
                 </div>
                 
                 <div id="preview-disputeResolution-mediation" style="display: none;">
                     <p><strong>5.6 Dispute Resolution.</strong> Any dispute arising out of or relating to this Agreement shall first be submitted to mediation, and if mediation is unsuccessful, then to the courts located in the State of <span id="preview-governingLaw-mediation">[GOVERNING LAW]</span>.</p>
                 </div>
                 
+                <div id="preview-mostFavoredNation-section" style="display: none;">
+                    <p><strong>5.7 Most Favored Nation.</strong> If, at any time prior to the Network Launch, the Company issues any SAFTs or other instruments convertible into Tokens with rights, preferences or privileges that are more favorable to the holder thereof than those granted to the Purchaser herein, the Company shall promptly provide the Purchaser with written notice thereof, together with a copy of all documentation relating to such SAFT or other instrument. The Company agrees that the Purchaser shall have the right to amend this Agreement to include such more favorable terms.</p>
+                </div>
+                
+                <div id="preview-proRataRights-section" style="display: none;">
+                    <p><strong>5.8 Pro-Rata Rights.</strong> If the Company proposes to sell any equity securities or securities convertible into equity securities in a financing with the principal purpose of raising capital, the Purchaser shall have the right to purchase up to its pro rata share (calculated based on the ratio of Tokens received to total Tokens outstanding) of such securities.</p>
+                </div>
+                
+                <div id="preview-informationRights-section" style="display: none;">
+                    <p><strong>5.9 Information Rights.</strong> The Company agrees to provide the Purchaser with <span id="preview-informationRights">[INFORMATION RIGHTS]</span> concerning the financial and business condition of the Company and the development progress of the Network.</p>
+                </div>
+                
+                <div id="preview-regulatoryCompliance-section" style="display: none;">
+                    <p><strong>5.10 Regulatory Compliance.</strong> The parties agree to comply with all applicable regulations, including but not limited to <span id="preview-regulatoryCompliance">[REGULATORY COMPLIANCE]</span>.</p>
+                </div>
+                
                 <div id="preview-additionalTerms-section" style="display: none;">
-                    <p><strong>5.7 Additional Terms.</strong> <span id="preview-additionalTerms">[ADDITIONAL TERMS]</span></p>
+                    <p><strong>5.11 Additional Terms.</strong> <span id="preview-additionalTerms">[ADDITIONAL TERMS]</span></p>
                 </div>
                 
                 <p><strong>IN WITNESS WHEREOF</strong>, the undersigned have caused this Agreement to be duly executed and delivered as of the date first written above.</p>
@@ -905,6 +921,43 @@
                 changedElements.push('preview-purchaseAmount');
             }
             
+            // Payment Method
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            let paymentMethodText = '[PAYMENT METHOD]';
+            if (paymentMethod === 'wire') paymentMethodText = 'wire transfer';
+            else if (paymentMethod === 'crypto') paymentMethodText = 'cryptocurrency';
+            else if (paymentMethod === 'check') paymentMethodText = 'check';
+            else if (paymentMethod === 'other') paymentMethodText = 'other approved payment method';
+            
+            if (document.getElementById('preview-paymentMethod').textContent !== paymentMethodText) {
+                document.getElementById('preview-paymentMethod').textContent = paymentMethodText;
+                changedElements.push('preview-paymentMethod');
+            }
+            
+            // Show/hide crypto section
+            document.getElementById('preview-cryptoCurrency-section').style.display = paymentMethod === 'crypto' ? 'inline' : 'none';
+            
+            if (paymentMethod === 'crypto') {
+                const cryptoCurrency = document.getElementById('cryptoCurrency').value;
+                let cryptoCurrencyText = '[CRYPTOCURRENCY]';
+                if (cryptoCurrency === 'BTC') cryptoCurrencyText = 'Bitcoin (BTC)';
+                else if (cryptoCurrency === 'ETH') cryptoCurrencyText = 'Ethereum (ETH)';
+                else if (cryptoCurrency === 'USDC') cryptoCurrencyText = 'USD Coin (USDC)';
+                else if (cryptoCurrency === 'USDT') cryptoCurrencyText = 'Tether (USDT)';
+                else if (cryptoCurrency === 'other') cryptoCurrencyText = 'the specified cryptocurrency';
+                
+                if (document.getElementById('preview-cryptoCurrency').textContent !== cryptoCurrencyText) {
+                    document.getElementById('preview-cryptoCurrency').textContent = cryptoCurrencyText;
+                    changedElements.push('preview-cryptoCurrency');
+                }
+                
+                const cryptoAddress = document.getElementById('cryptoAddress').value || '[CRYPTO ADDRESS]';
+                if (document.getElementById('preview-cryptoAddress').textContent !== cryptoAddress) {
+                    document.getElementById('preview-cryptoAddress').textContent = cryptoAddress;
+                    changedElements.push('preview-cryptoAddress');
+                }
+            }
+            
             const valuationCap = document.getElementById('valuationCap').value || '[VALUATION CAP]';
             if (document.getElementById('preview-valuationCap').textContent !== valuationCap) {
                 document.getElementById('preview-valuationCap').textContent = valuationCap;
@@ -915,6 +968,19 @@
             if (document.getElementById('preview-discount').textContent !== discount) {
                 document.getElementById('preview-discount').textContent = discount;
                 changedElements.push('preview-discount');
+            }
+            
+            // Fundraising targets
+            const minimumRaise = document.getElementById('minimumRaise').value || '[MINIMUM RAISE]';
+            if (document.getElementById('preview-minimumRaise').textContent !== minimumRaise) {
+                document.getElementById('preview-minimumRaise').textContent = minimumRaise;
+                changedElements.push('preview-minimumRaise');
+            }
+            
+            const maximumRaise = document.getElementById('maximumRaise').value || '[MAXIMUM RAISE]';
+            if (document.getElementById('preview-maximumRaise').textContent !== maximumRaise) {
+                document.getElementById('preview-maximumRaise').textContent = maximumRaise;
+                changedElements.push('preview-maximumRaise');
             }
             
             const closingDate = document.getElementById('closingDate').value ? new Date(document.getElementById('closingDate').value).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : '[CLOSING DATE]';
@@ -929,6 +995,29 @@
                 changedElements.push('preview-terminationDate');
             }
             
+            // Dissolution payout
+            const dissolutionPayout = document.getElementById('dissolutionPayout').value;
+            let dissolutionPayoutText = '[DISSOLUTION PAYOUT]';
+            if (dissolutionPayout === 'principal') dissolutionPayoutText = 'only';
+            else if (dissolutionPayout === 'interest') dissolutionPayoutText = 'plus accrued interest';
+            else if (dissolutionPayout === 'premium') dissolutionPayoutText = 'plus a premium';
+            
+            if (document.getElementById('preview-dissolutionPayout').textContent !== dissolutionPayoutText) {
+                document.getElementById('preview-dissolutionPayout').textContent = dissolutionPayoutText;
+                changedElements.push('preview-dissolutionPayout');
+            }
+            
+            // Show/hide interest rate section
+            document.getElementById('preview-interestRate-section').style.display = (dissolutionPayout === 'interest' || dissolutionPayout === 'premium') ? 'inline' : 'none';
+            
+            if (dissolutionPayout === 'interest' || dissolutionPayout === 'premium') {
+                const interestRate = document.getElementById('interestRate').value || '[INTEREST RATE]';
+                if (document.getElementById('preview-interestRate').textContent !== interestRate) {
+                    document.getElementById('preview-interestRate').textContent = interestRate;
+                    changedElements.push('preview-interestRate');
+                }
+            }
+            
             // Token Terms
             const tokenName = document.getElementById('tokenName').value || '[TOKEN NAME]';
             if (document.getElementById('preview-tokenName').textContent !== tokenName) {
@@ -940,6 +1029,38 @@
             if (document.getElementById('preview-tokenSymbol').textContent !== tokenSymbol) {
                 document.getElementById('preview-tokenSymbol').textContent = tokenSymbol;
                 changedElements.push('preview-tokenSymbol');
+            }
+            
+            const totalSupply = document.getElementById('totalSupply').value || '[TOTAL SUPPLY]';
+            if (document.getElementById('preview-totalSupply').textContent !== totalSupply) {
+                document.getElementById('preview-totalSupply').textContent = totalSupply;
+                changedElements.push('preview-totalSupply');
+            }
+            
+            const tokenUseCase = document.getElementById('tokenUseCase').value || '[TOKEN USE CASE]';
+            if (document.getElementById('preview-tokenUseCase').textContent !== tokenUseCase) {
+                document.getElementById('preview-tokenUseCase').textContent = tokenUseCase;
+                changedElements.push('preview-tokenUseCase');
+            }
+            
+            // Token Rights
+            const tokenRightsSelect = document.getElementById('tokenRights');
+            let tokenRightsText = '[TOKEN RIGHTS]';
+            if (tokenRightsSelect.selectedOptions.length > 0) {
+                const selectedRights = Array.from(tokenRightsSelect.selectedOptions).map(option => {
+                    if (option.value === 'utility') return 'utility and platform access';
+                    if (option.value === 'governance') return 'governance voting rights';
+                    if (option.value === 'staking') return 'staking rewards';
+                    if (option.value === 'discount') return 'platform fee discounts';
+                    if (option.value === 'dividend') return 'profit sharing/dividends';
+                    if (option.value === 'none') return 'no special rights (pure utility)';
+                    return option.value;
+                });
+                tokenRightsText = selectedRights.join(', ');
+            }
+            if (document.getElementById('preview-tokenRights').textContent !== tokenRightsText) {
+                document.getElementById('preview-tokenRights').textContent = tokenRightsText;
+                changedElements.push('preview-tokenRights');
             }
             
             const networkLaunchDeadline = document.getElementById('networkLaunchDeadline').value ? new Date(document.getElementById('networkLaunchDeadline').value).toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'}) : '[NETWORK LAUNCH DEADLINE]';
@@ -966,25 +1087,50 @@
             else if (vestingSchedule === 'quarterly') vestingScheduleText = 'quarterly';
             else if (vestingSchedule === 'annually') vestingScheduleText = 'annual';
             else if (vestingSchedule === 'cliff') vestingScheduleText = 'cliff';
+            else if (vestingSchedule === 'milestone') vestingScheduleText = 'milestone-based';
             
             if (document.getElementById('preview-vestingSchedule').textContent !== vestingScheduleText) {
                 document.getElementById('preview-vestingSchedule').textContent = vestingScheduleText;
                 changedElements.push('preview-vestingSchedule');
             }
             
+            // Show/hide milestone section
+            document.getElementById('preview-milestone-section').style.display = vestingSchedule === 'milestone' ? 'block' : 'none';
+            
+            if (vestingSchedule === 'milestone') {
+                const milestones = document.getElementById('milestones').value || '[MILESTONES]';
+                if (document.getElementById('preview-milestones').textContent !== milestones) {
+                    document.getElementById('preview-milestones').textContent = milestones;
+                    changedElements.push('preview-milestones');
+                }
+            }
+            
+            const lockupPeriod = document.getElementById('lockupPeriod').value || '[LOCKUP PERIOD]';
+            if (document.getElementById('preview-lockupPeriod').textContent !== lockupPeriod) {
+                document.getElementById('preview-lockupPeriod').textContent = lockupPeriod;
+                changedElements.push('preview-lockupPeriod');
+            }
+            
             // Additional Terms
             const governingLaw = document.getElementById('governingLaw').value || '[GOVERNING LAW]';
-            if (document.getElementById('preview-governingLaw').textContent !== governingLaw) {
-                document.getElementById('preview-governingLaw').textContent = governingLaw;
+            const otherJurisdiction = document.getElementById('otherJurisdiction');
+            let finalGoverningLaw = governingLaw;
+            
+            if ((governingLaw === 'other_us' || governingLaw === 'non_us') && otherJurisdiction) {
+                finalGoverningLaw = otherJurisdiction.value || '[OTHER JURISDICTION]';
+            }
+            
+            if (document.getElementById('preview-governingLaw').textContent !== finalGoverningLaw) {
+                document.getElementById('preview-governingLaw').textContent = finalGoverningLaw;
                 
                 const courtsEl = document.getElementById('preview-governingLaw-courts');
                 if (courtsEl) {
-                    courtsEl.textContent = governingLaw;
+                    courtsEl.textContent = finalGoverningLaw;
                 }
                 
                 const mediationEl = document.getElementById('preview-governingLaw-mediation');
                 if (mediationEl) {
-                    mediationEl.textContent = governingLaw;
+                    mediationEl.textContent = finalGoverningLaw;
                 }
                 
                 changedElements.push('preview-governingLaw');
@@ -998,14 +1144,27 @@
             
             const disputeResolution = document.getElementById('disputeResolution').value;
             document.getElementById('preview-disputeResolution-courts').style.display = disputeResolution === 'courts' ? 'block' : 'none';
-            document.getElementById('preview-disputeResolution-arbitration').style.display = disputeResolution === 'arbitration' ? 'block' : 'none';
+            document.getElementById('preview-disputeResolution-arbitration').style.display = (disputeResolution === 'arbitration' || disputeResolution === 'hybrid') ? 'block' : 'none';
             document.getElementById('preview-disputeResolution-mediation').style.display = disputeResolution === 'mediation' ? 'block' : 'none';
             
-            if (disputeResolution === 'arbitration') {
+            if (disputeResolution === 'arbitration' || disputeResolution === 'hybrid') {
                 const arbitrationVenue = document.getElementById('arbitrationVenue').value || '[ARBITRATION VENUE]';
                 if (document.getElementById('preview-arbitrationVenue').textContent !== arbitrationVenue) {
                     document.getElementById('preview-arbitrationVenue').textContent = arbitrationVenue;
                     changedElements.push('preview-arbitrationVenue');
+                }
+                
+                const arbitrationRules = document.getElementById('arbitrationRules').value;
+                let arbitrationRulesText = '[ARBITRATION RULES]';
+                if (arbitrationRules === 'aaa') arbitrationRulesText = 'the American Arbitration Association (AAA)';
+                else if (arbitrationRules === 'jams') arbitrationRulesText = 'JAMS';
+                else if (arbitrationRules === 'icc') arbitrationRulesText = 'the International Chamber of Commerce (ICC)';
+                else if (arbitrationRules === 'uncitral') arbitrationRulesText = 'UNCITRAL';
+                else if (arbitrationRules === 'other') arbitrationRulesText = 'the agreed upon rules';
+                
+                if (document.getElementById('preview-arbitrationRules').textContent !== arbitrationRulesText) {
+                    document.getElementById('preview-arbitrationRules').textContent = arbitrationRulesText;
+                    changedElements.push('preview-arbitrationRules');
                 }
             }
             
@@ -1014,6 +1173,51 @@
             
             const transferRestrictions = document.getElementById('transferRestrictions').value;
             document.getElementById('preview-transferRestrictions-section').style.display = transferRestrictions === 'yes' ? 'block' : 'none';
+            
+            // Most Favored Nation
+            const mostFavoredNation = document.getElementById('mostFavoredNation').value;
+            document.getElementById('preview-mostFavoredNation-section').style.display = mostFavoredNation === 'yes' ? 'block' : 'none';
+            
+            // Pro-Rata Rights
+            const proRataRights = document.getElementById('proRataRights').value;
+            document.getElementById('preview-proRataRights-section').style.display = proRataRights === 'yes' ? 'block' : 'none';
+            
+            // Information Rights
+            const informationRights = document.getElementById('informationRights').value;
+            let informationRightsText = '[INFORMATION RIGHTS]';
+            if (informationRights === 'basic') informationRightsText = 'quarterly updates on project development';
+            else if (informationRights === 'standard') informationRightsText = 'quarterly financial reports and development updates';
+            else if (informationRights === 'comprehensive') informationRightsText = 'monthly financial reports, development milestones, and strategic planning information';
+            
+            document.getElementById('preview-informationRights-section').style.display = informationRights !== 'none' ? 'block' : 'none';
+            
+            if (document.getElementById('preview-informationRights').textContent !== informationRightsText) {
+                document.getElementById('preview-informationRights').textContent = informationRightsText;
+                changedElements.push('preview-informationRights');
+            }
+            
+            // Regulatory Compliance
+            const regulatoryComplianceSelect = document.getElementById('regulatoryCompliance');
+            let regulatoryComplianceText = '[REGULATORY COMPLIANCE]';
+            if (regulatoryComplianceSelect.selectedOptions.length > 0) {
+                const selectedCompliance = Array.from(regulatoryComplianceSelect.selectedOptions).map(option => {
+                    if (option.value === 'aml') return 'Anti-Money Laundering (AML) regulations';
+                    if (option.value === 'kyc') return 'Know Your Customer (KYC) requirements';
+                    if (option.value === 'sanctions') return 'sanctions compliance laws';
+                    if (option.value === 'securities') return 'applicable securities laws';
+                    if (option.value === 'tax') return 'tax reporting obligations';
+                    return option.value;
+                });
+                regulatoryComplianceText = selectedCompliance.join(', ');
+                document.getElementById('preview-regulatoryCompliance-section').style.display = 'block';
+            } else {
+                document.getElementById('preview-regulatoryCompliance-section').style.display = 'none';
+            }
+            
+            if (document.getElementById('preview-regulatoryCompliance').textContent !== regulatoryComplianceText) {
+                document.getElementById('preview-regulatoryCompliance').textContent = regulatoryComplianceText;
+                changedElements.push('preview-regulatoryCompliance');
+            }
             
             const additionalTerms = document.getElementById('additionalTerms').value;
             document.getElementById('preview-additionalTerms-section').style.display = additionalTerms ? 'block' : 'none';
@@ -1144,21 +1348,71 @@
         
         // Function to generate Word document
         function generateWordDocument() {
-            // Create a preformatted text representation of the agreement
-            const previewContent = document.getElementById('previewDocument').innerText;
+            // Create a properly formatted document
+            const companyName = document.getElementById('companyName').value || 'Company';
+            const investorName = document.getElementById('investorName').value || 'Investor';
+            const currentDate = new Date().toLocaleDateString('en-US', {year: 'numeric', month: 'long', day: 'numeric'});
             
-            // Create a Blob with the content
-            const blob = new Blob([previewContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            // Get all visible content from the preview
+            const previewDocument = document.getElementById('previewDocument');
             
-            // Create a temporary link to download the file
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
+            // Clone the preview to work with
+            const contentClone = previewDocument.cloneNode(true);
             
-            // Generate filename from company and investor names if available
-            let companyName = document.getElementById('companyName').value;
-            let investorName = document.getElementById('investorName').value;
+            // Create a downloadable Word document
+            const header = `
+SIMPLE AGREEMENT FOR FUTURE TOKENS (SAFT)
+`;
+            
+            // Create the content as a string
+            let previewText = header + '\n\n';
+            
+            // Process the HTML into plain text
+            const processNode = (node) => {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    return node.textContent;
+                }
+                
+                if (node.nodeType !== Node.ELEMENT_NODE) {
+                    return '';
+                }
+                
+                // Skip elements with display: none
+                const computedStyle = window.getComputedStyle(node);
+                if (computedStyle && computedStyle.display === 'none') {
+                    return '';
+                }
+                
+                // Handle different tag types
+                let text = '';
+                
+                if (node.tagName === 'DIV' || node.tagName === 'P') {
+                    const childText = Array.from(node.childNodes).map(processNode).join('');
+                    text = childText + '\n\n';
+                } else if (node.tagName === 'STRONG') {
+                    text = node.textContent;
+                } else if (node.tagName === 'SPAN') {
+                    text = node.textContent;
+                } else {
+                    // Recursively process children for other elements
+                    text = Array.from(node.childNodes).map(processNode).join('');
+                }
+                
+                return text;
+            };
+            
+            // Process the content
+            previewText += Array.from(contentClone.childNodes)
+                .map(processNode)
+                .join('')
+                .replace(/\n\n\n+/g, '\n\n') // Remove excessive line breaks
+                .replace(/\[.*?\]/g, '_______'); // Replace placeholders with underscores
+            
+            // Create a blob for download
+            const blob = new Blob([previewText], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+            
+            // Generate filename
             let filename = 'SAFT_Agreement';
-            
             if (companyName && investorName) {
                 filename = `SAFT_${companyName}_${investorName}`.replace(/\s+/g, '_');
             } else if (companyName) {
@@ -1167,9 +1421,10 @@
                 filename = `SAFT_for_${investorName}`.replace(/\s+/g, '_');
             }
             
+            // Create download link
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
             a.download = `${filename}.docx`;
-            
-            // Trigger the download
             document.body.appendChild(a);
             a.click();
             
