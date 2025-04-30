@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wholesale Agreement with MAP Policy Generator</title>
+    <style>
+        :root {
+            --primary-color: #0069ff;
+            --secondary-color: #f8f9fa;
+            --text-color: #333;
+            --highlight-color: #ffff00;
+            --border-color: #ddd;
+            --success-color: #28a745;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            box-sizing: border-box;
+            height: calc(100vh - 40px);
+            overflow: hidden;
+        }
+        
+        .form-section {
+            width: 50%;
+            padding-right: 20px;
+            overflow-y: auto;
+        }
+        
+        .preview-section {
+            width: 50%;
+            border-left: 1px solid var(--border-color);
+            padding-left: 20px;
+            overflow-y: auto;
+        }
+        
+        .tab-container {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            border: none;
+            border-radius: 5px 5px 0 0;
+            margin-right: 5px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .tab.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"], 
+        input[type="number"], 
+        input[type="date"],
+        select, 
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        input[type="checkbox"] {
+            margin-right: 10px;
+        }
+        
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+            cursor: help;
+        }
+        
+        .tooltip .fas {
+            color: var(--primary-color);
+        }
+        
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 250px;
+            background-color: #555;
+            color: #fff;
+            text-align: left;
+            border-radius: 6px;
+            padding: 10px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-weight: normal;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        .nav-button, .action-button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        
+        .nav-button {
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+        }
+        
+        .action-button {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .nav-button:hover, .action-button:hover {
+            opacity: 0.8;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            white-space: pre-wrap;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 1s;
+        }
+        
+        .success-message {
+            display: none;
+            background-color: var(--success-color);
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 30px;
+        }
+        
+        .notice {
+            font-size: 12px;
+            color: #777;
+            margin-top: 15px;
+            text-align: center;
+        }
+        
+        .preview-header {
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 992px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .form-section, .preview-section {
+                width: 100%;
+                padding: 0;
+                overflow-y: visible;
+            }
+            
+            .preview-section {
+                margin-top: 30px;
+                border-left: none;
+                border-top: 1px solid var(--border-color);
+                padding-top: 20px;
+            }
+        }
+        
+        /* Inline radio buttons */
+        .radio-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            margin-right: 5px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="form-section">
+            <h1>Wholesale Agreement with MAP Policy Generator</h1>
+            
+            <div class="tab-container">
+                <button class="tab active" data-tab="parties">1. Parties & Term</button>
+                <button class="tab" data-tab="products">2. Products & Pricing</button>
+                <button class="tab" data-tab="map">3. MAP Policy</button>
+                <button class="tab" data-tab="ordering">4. Ordering & Payment</button>
+                <button class="tab" data-tab="shipping">5. Shipping & Returns</button>
+                <button class="tab" data-tab="limitations">6. Warranty & Limitations</button>
+                <button class="tab" data-tab="termination">7. Termination & Misc</button>
+                <button class="tab" data-tab="download">8. Download</button>
+            </div>
+            
+            <div class="tab-content active" id="parties">
+                <div class="form-group">
+                    <label for="supplier-name">Supplier Legal Name:</label>
+                    <input type="text" id="supplier-name" placeholder="e.g., ABC Electronics, Inc.">
+                </div>
+                
+                <div class="form-group">
+                    <label for="supplier-address">Supplier Address:</label>
+                    <input type="text" id="supplier-address" placeholder="e.g., 123 Main St, Los Angeles, CA 90001">
+                </div>
+                
+                <div class="form-group">
+                    <label for="reseller-name">Reseller Legal Name:</label>
+                    <input type="text" id="reseller-name" placeholder="e.g., XYZ Retail, LLC">
+                </div>
+                
+                <div class="form-group">
+                    <label for="reseller-address">Reseller Address:</label>
+                    <input type="text" id="reseller-address" placeholder="e.g., 456 Market St, San Francisco, CA 94103">
+                </div>
+                
+                <div class="form-group">
+                    <label for="effective-date">Effective Date:</label>
+                    <input type="date" id="effective-date">
+                </div>
+                
+                <div class="form-group">
+                    <label for="term-length">Initial Term Length (months):</label>
+                    <input type="number" id="term-length" min="1" value="12">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The initial period during which the agreement will be valid before requiring renewal or termination. Typical terms range from 12-36 months.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="auto-renewal">Auto-Renewal:</label>
+                    <select id="auto-renewal">
+                        <option value="no">No auto-renewal</option>
+                        <option value="yes" selected>Auto-renew for same term</option>
+                        <option value="month-to-month">Auto-renew on month-to-month basis</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines what happens when the initial term expires. Month-to-month allows for easier termination after the initial term.</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" style="visibility: hidden;">Previous</button>
+                    <button class="nav-button" data-next="products">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="products">
+                <div class="form-group">
+                    <label for="product-description">Product Description:</label>
+                    <textarea id="product-description" rows="3" placeholder="e.g., Electronic gadgets and accessories as listed in Exhibit A"></textarea>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">General description of the products covered by this agreement. Specific product details can be referenced in an attached Exhibit.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="discount-rate">Wholesale Discount Rate (%):</label>
+                    <input type="number" id="discount-rate" min="0" max="100" value="40">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The percentage discount from MSRP (Manufacturer's Suggested Retail Price). Typical wholesale discounts range from 30-60%.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="minimum-order">Minimum Initial Order Amount ($):</label>
+                    <input type="number" id="minimum-order" min="0" value="1000">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The minimum dollar amount required for the first order. This helps ensure the reseller is serious about the relationship.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="reorder-minimum">Reorder Minimum Amount ($):</label>
+                    <input type="number" id="reorder-minimum" min="0" value="500">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The minimum dollar amount required for subsequent orders. Often lower than the initial order minimum.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="price-changes">Price Change Notice Period (days):</label>
+                    <input type="number" id="price-changes" min="0" value="30">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">How many days in advance the Supplier must notify the Reseller of any price changes. Typically 30-90 days.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="exclusivity">Territory Exclusivity:</label>
+                    <select id="exclusivity">
+                        <option value="non-exclusive" selected>Non-exclusive</option>
+                        <option value="exclusive-territory">Exclusive in specified territory</option>
+                        <option value="exclusive-channel">Exclusive in specified channel</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines whether the Reseller has exclusive rights to sell products in a specific geographic area or sales channel.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group" id="territory-group" style="display: none;">
+                    <label for="territory-description">Territory Description:</label>
+                    <input type="text" id="territory-description" placeholder="e.g., State of California">
+                </div>
+                
+                <div class="form-group" id="channel-group" style="display: none;">
+                    <label for="channel-description">Channel Description:</label>
+                    <input type="text" id="channel-description" placeholder="e.g., Online marketplaces only">
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="parties">Previous</button>
+                    <button class="nav-button" data-next="map">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="map">
+                <div class="form-group">
+                    <label for="map-percentage">MAP Discount from MSRP (%):</label>
+                    <input type="number" id="map-percentage" min="0" max="100" value="20">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The maximum discount from MSRP that can be advertised. If MSRP is $100 and MAP discount is 20%, the lowest advertised price would be $80.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>MAP Policy Scope:</label>
+                    <div class="radio-group">
+                        <div class="radio-option">
+                            <input type="radio" id="map-scope-all" name="map-scope" value="all" checked>
+                            <label for="map-scope-all">All advertising</label>
+                        </div>
+                        <div class="radio-option">
+                            <input type="radio" id="map-scope-online" name="map-scope" value="online-only">
+                            <label for="map-scope-online">Online advertising only</label>
+                        </div>
+                    </div>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines whether the MAP policy applies to all advertising or only online advertising. Many policies focus only on online channels where price comparison is easiest.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Covered Advertising Channels:</label>
+                    <div>
+                        <input type="checkbox" id="website" checked>
+                        <label for="website">Reseller's website</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="marketplaces" checked>
+                        <label for="marketplaces">Third-party marketplaces (Amazon, eBay, etc.)</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="email-marketing" checked>
+                        <label for="email-marketing">Email marketing</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="social-media" checked>
+                        <label for="social-media">Social media</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="print-advertising" checked>
+                        <label for="print-advertising">Print advertising</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="in-store" checked>
+                        <label for="in-store">In-store displays</label>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="map-violations">MAP Violation Consequences:</label>
+                    <select id="map-violations">
+                        <option value="3-strikes">Three-strike system</option>
+                        <option value="2-strikes">Two-strike system</option>
+                        <option value="immediate" selected>Immediate termination right</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines how violations are handled. A strike system gives warnings before termination, while immediate termination gives the supplier the right (but not obligation) to terminate after any violation.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="map-cure-period">Violation Cure Period (days):</label>
+                    <input type="number" id="map-cure-period" min="0" value="3">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">How many days the Reseller has to correct a MAP violation after notification before it counts as a strike or triggers termination rights.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="map-exceptions">MAP Policy Exceptions:</label>
+                    <select id="map-exceptions" multiple size="4">
+                        <option value="bfcm" selected>Black Friday/Cyber Monday</option>
+                        <option value="eoy">End-of-year clearance</option>
+                        <option value="closeout">Closeout/Discontinued items</option>
+                        <option value="employee">Employee purchases</option>
+                        <option value="damaged">Damaged/refurbished items</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Specific situations where the MAP policy does not apply. Hold Ctrl/Cmd to select multiple options.</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="products">Previous</button>
+                    <button class="nav-button" data-next="ordering">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="ordering">
+                <div class="form-group">
+                    <label for="order-method">Primary Order Method:</label>
+                    <select id="order-method">
+                        <option value="email" selected>Email</option>
+                        <option value="online-portal">Online Portal</option>
+                        <option value="edi">EDI (Electronic Data Interchange)</option>
+                        <option value="phone">Phone</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="payment-terms">Payment Terms:</label>
+                    <select id="payment-terms">
+                        <option value="prepaid" selected>Prepaid</option>
+                        <option value="net-15">Net 15</option>
+                        <option value="net-30">Net 30</option>
+                        <option value="net-60">Net 60</option>
+                        <option value="credit-card">Credit Card</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The timeframe and method for payment. "Prepaid" means payment is due before shipping. "Net 30" means payment is due within 30 days after delivery.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="credit-limit">Credit Limit ($):</label>
+                    <input type="number" id="credit-limit" min="0" value="5000">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The maximum amount of credit extended to the Reseller at any given time. This only applies if payment terms are not prepaid.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="late-payment">Late Payment Interest Rate (% per month):</label>
+                    <input type="number" id="late-payment" min="0" step="0.25" value="1.5">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The monthly interest rate charged on overdue payments. Typically 1-2% per month (12-24% annually).</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order-lead-time">Order Lead Time (business days):</label>
+                    <input type="number" id="order-lead-time" min="0" value="5">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of business days typically required to process and ship an order after it is received.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="order-changes">Order Changes/Cancellations:</label>
+                    <select id="order-changes">
+                        <option value="48-hours">Allowed within 48 hours</option>
+                        <option value="24-hours" selected>Allowed within 24 hours</option>
+                        <option value="no-changes">Not allowed after order placement</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The policy for modifying or cancelling orders after they have been placed.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="currency">Currency:</label>
+                    <select id="currency">
+                        <option value="USD" selected>USD (United States Dollar)</option>
+                        <option value="EUR">EUR (Euro)</option>
+                        <option value="GBP">GBP (British Pound)</option>
+                        <option value="CAD">CAD (Canadian Dollar)</option>
+                        <option value="AUD">AUD (Australian Dollar)</option>
+                    </select>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="map">Previous</button>
+                    <button class="nav-button" data-next="shipping">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="shipping">
+                <div class="form-group">
+                    <label for="shipping-terms">Shipping Terms:</label>
+                    <select id="shipping-terms">
+                        <option value="ex-works" selected>Ex Works (EXW)</option>
+                        <option value="fob-origin">FOB Origin</option>
+                        <option value="fob-destination">FOB Destination</option>
+                        <option value="cif">CIF (Cost, Insurance, Freight)</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines who pays for shipping and when risk of loss transfers. Ex Works means the buyer arranges shipping and bears all risk.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="shipping-carrier">Preferred Shipping Carrier:</label>
+                    <select id="shipping-carrier">
+                        <option value="any" selected>Any carrier</option>
+                        <option value="ups">UPS</option>
+                        <option value="fedex">FedEx</option>
+                        <option value="usps">USPS</option>
+                        <option value="dhl">DHL</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="drop-shipping">Drop Shipping Allowed:</label>
+                    <select id="drop-shipping">
+                        <option value="yes">Yes</option>
+                        <option value="approval">With prior approval</option>
+                        <option value="no" selected>No</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines whether the Supplier will ship directly to the Reseller's customers. "With prior approval" means drop shipping is considered on a case-by-case basis.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inspection-period">Inspection Period (days):</label>
+                    <input type="number" id="inspection-period" min="0" value="7">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of days the Reseller has to inspect products after delivery and report any defects or discrepancies.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="returns-policy">Returns Policy:</label>
+                    <select id="returns-policy">
+                        <option value="defective-only" selected>Defective items only</option>
+                        <option value="with-approval">Any items with approval</option>
+                        <option value="no-questions">No questions asked</option>
+                        <option value="no-returns">No returns</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Defines the conditions under which the Reseller can return products to the Supplier.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="return-period">Return Period (days):</label>
+                    <input type="number" id="return-period" min="0" value="30">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of days after delivery within which returns must be initiated.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="restocking-fee">Restocking Fee (%):</label>
+                    <input type="number" id="restocking-fee" min="0" max="100" value="15">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The percentage of the purchase price charged as a fee for returned non-defective items. Set to 0 for no restocking fee.</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="ordering">Previous</button>
+                    <button class="nav-button" data-next="limitations">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="limitations">
+                <div class="form-group">
+                    <label for="quality-control">Quality Control Requirements:</label>
+                    <select id="quality-control">
+                        <option value="none">None specified</option>
+                        <option value="minimum" selected>Minimum standards only</option>
+                        <option value="strict">Strict quality standards</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines the level of quality control standards imposed on the Reseller's operations.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="customer-service">Required Customer Service Level:</label>
+                    <select id="customer-service">
+                        <option value="none">None specified</option>
+                        <option value="minimum" selected>Minimum standards only</option>
+                        <option value="high">High service standards</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines the level of customer service standards imposed on the Reseller.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="warranty-period">Warranty Period (months):</label>
+                    <input type="number" id="warranty-period" min="0" value="12">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of months the Supplier's warranty covers the products. Set to 0 for no warranty.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="warranty-scope">Warranty Scope:</label>
+                    <select id="warranty-scope">
+                        <option value="limited" selected>Limited warranty (defects only)</option>
+                        <option value="full">Full warranty</option>
+                        <option value="none">No warranty</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines what is covered under the warranty. "Limited warranty" typically covers only manufacturing defects.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="liability-cap">Liability Cap:</label>
+                    <select id="liability-cap">
+                        <option value="purchase-price" selected>Limited to purchase price</option>
+                        <option value="contract-value">Limited to contract value</option>
+                        <option value="none">No liability cap</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines the maximum amount the Supplier can be liable for in case of damages. "Purchase price" means liability is limited to the price of the specific products causing damages.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="consequential-damages">Consequential Damages:</label>
+                    <select id="consequential-damages">
+                        <option value="excluded" selected>Excluded</option>
+                        <option value="included">Included</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines whether the Supplier can be liable for indirect damages such as lost profits or business opportunities. "Excluded" means these types of damages cannot be claimed.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="force-majeure">Force Majeure Clause:</label>
+                    <select id="force-majeure">
+                        <option value="standard" selected>Standard</option>
+                        <option value="expanded">Expanded (includes pandemics, cyber events)</option>
+                        <option value="limited">Limited</option>
+                        <option value="none">None</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines the scope of events beyond reasonable control that excuse performance. "Expanded" includes modern risks like pandemics and cyber attacks.</span>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="shipping">Previous</button>
+                    <button class="nav-button" data-next="termination">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="termination">
+                <div class="form-group">
+                    <label for="termination-convenience">Termination for Convenience:</label>
+                    <select id="termination-convenience">
+                        <option value="both-60" selected>Both parties with 60 days notice</option>
+                        <option value="both-30">Both parties with 30 days notice</option>
+                        <option value="both-90">Both parties with 90 days notice</option>
+                        <option value="supplier-only">Supplier only with 30 days notice</option>
+                        <option value="none">Not allowed</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines whether and how parties can terminate the agreement without cause.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="termination-breach">Termination for Breach Cure Period (days):</label>
+                    <input type="number" id="termination-breach" min="0" value="30">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of days a party has to fix a breach after receiving notice before the other party can terminate the agreement.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="post-termination">Post-Termination Sales Period (days):</label>
+                    <input type="number" id="post-termination" min="0" value="90">
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The number of days after termination during which the Reseller can continue to sell remaining inventory. Set to 0 to require immediate cessation of sales.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ip-ownership">Intellectual Property Ownership:</label>
+                    <select id="ip-ownership">
+                        <option value="supplier" selected>All IP remains with Supplier</option>
+                        <option value="license">Limited license to Reseller</option>
+                        <option value="joint">Joint ownership of marketing materials</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Determines who owns trademarks, copyrights, and other intellectual property related to the products.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confidentiality">Confidentiality Term:</label>
+                    <select id="confidentiality">
+                        <option value="2-years">2 years after termination</option>
+                        <option value="5-years" selected>5 years after termination</option>
+                        <option value="perpetual">Perpetual</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">How long confidential information must be protected after the agreement ends.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="dispute-resolution">Dispute Resolution:</label>
+                    <select id="dispute-resolution">
+                        <option value="litigation" selected>Litigation</option>
+                        <option value="arbitration">Binding arbitration</option>
+                        <option value="mediation-then-arbitration">Mediation, then arbitration</option>
+                    </select>
+                    <div class="tooltip"><i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">The method used to resolve disputes between the parties. Arbitration is often faster and more private than litigation.</span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="governing-law">Governing Law:</label>
+                    <select id="governing-law">
+                        <option value="california" selected>California</option>
+                        <option value="delaware">Delaware</option>
+                        <option value="new-york">New York</option>
+                        <option value="texas">Texas</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group" id="other-law-group" style="display: none;">
+                    <label for="other-law">Specify Other Governing Law:</label>
+                    <input type="text" id="other-law" placeholder="e.g., Florida">
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="limitations">Previous</button>
+                    <button class="nav-button" data-next="download">Next</button>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="download">
+                <h2>Your Wholesale Agreement with MAP Policy is Ready!</h2>
+                <p>Review your agreement in the preview panel to the right. You can make changes by going back to previous tabs.</p>
+                
+                <div class="button-group" style="margin-top: 30px;">
+                    <button class="action-button" id="copy-button">Copy to Clipboard</button>
+                    <button class="action-button" id="download-button">Download as Text File</button>
+                </div>
+                
+                <div class="success-message" id="copy-success">Agreement copied to clipboard!</div>
+                
+                <div class="notice">
+                    <p>This document is a template and does not constitute legal advice. Consult with a qualified attorney to ensure this agreement meets your specific business needs and complies with applicable laws.</p>
+                    <p>Need help customizing this agreement? <a href="#" id="consult-link">Schedule a consultation</a>.</p>
+                </div>
+                
+                <div class="button-group">
+                    <button class="nav-button" data-prev="termination">Previous</button>
+                    <button class="nav-button" style="visibility: hidden;">Next</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <div class="preview-header">AGREEMENT PREVIEW</div>
+            <div class="preview-content" id="preview-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab Navigation
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+            const navButtons = document.querySelectorAll('.nav-button');
+            
+            // Initialize with today's date
+            const today = new Date();
+            document.getElementById('effective-date').valueAsDate = today;
+            
+            // Show/Hide territory or channel description based on exclusivity
+            const exclusivitySelect = document.getElementById('exclusivity');
+            const territoryGroup = document.getElementById('territory-group');
+            const channelGroup = document.getElementById('channel-group');
+            
+            exclusivitySelect.addEventListener('change', function() {
+                territoryGroup.style.display = this.value === 'exclusive-territory' ? 'block' : 'none';
+                channelGroup.style.display = this.value === 'exclusive-channel' ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            // Show/Hide other law input based on governing law selection
+            const governingLawSelect = document.getElementById('governing-law');
+            const otherLawGroup = document.getElementById('other-law-group');
+            
+            governingLawSelect.addEventListener('change', function() {
+                otherLawGroup.style.display = this.value === 'other' ? 'block' : 'none';
+                updatePreview();
+            });
+            
+            // Format currency inputs
+            const currencyInputs = document.querySelectorAll('input[type="number"]');
+            currencyInputs.forEach(input => {
+                input.addEventListener('change', updatePreview);
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Handle tab clicks
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const targetTab = tab.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    
+                    // Update active content
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === targetTab) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Handle navigation buttons
+            navButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const prevTab = button.getAttribute('data-prev');
+                    const nextTab = button.getAttribute('data-next');
+                    
+                    if (prevTab) {
+                        document.querySelector(`.tab[data-tab="${prevTab}"]`).click();
+                    } else if (nextTab) {
+                        document.querySelector(`.tab[data-tab="${nextTab}"]`).click();
+                    }
+                });
+            });
+            
+            // Form inputs event listeners
+            const formInputs = document.querySelectorAll('input, select, textarea');
+            formInputs.forEach(input => {
+                input.addEventListener('change', updatePreview);
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Copy to clipboard
+            const copyButton = document.getElementById('copy-button');
+            const copySuccess = document.getElementById('copy-success');
+            
+            copyButton.addEventListener('click', () => {
+                const previewContent = document.getElementById('preview-content');
+                
+                navigator.clipboard.writeText(previewContent.textContent)
+                    .then(() => {
+                        copySuccess.style.display = 'block';
+                        setTimeout(() => {
+                            copySuccess.style.display = 'none';
+                        }, 3000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                    });
+            });
+            
+            // Download as text file
+            const downloadButton = document.getElementById('download-button');
+            
+            downloadButton.addEventListener('click', () => {
+                const previewContent = document.getElementById('preview-content');
+                const supplierName = document.getElementById('supplier-name').value || 'Supplier';
+                const resellerName = document.getElementById('reseller-name').value || 'Reseller';
+                
+                const blob = new Blob([previewContent.textContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                
+                a.href = url;
+                a.download = `Wholesale_Agreement_${supplierName}_${resellerName}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 0);
+            });
+            
+            // Consultation link
+            const consultLink = document.getElementById('consult-link');
+            consultLink.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting', '_blank');
+            });
+            
+            // Update preview on initial load
+            updatePreview();
+            
+            // Function to update the preview
+            function updatePreview() {
+                const previewContent = document.getElementById('preview-content');
+                const oldContent = previewContent.innerHTML;
+                
+                // Get form values
+                const supplierName = document.getElementById('supplier-name').value || '[SUPPLIER NAME]';
+                const supplierAddress = document.getElementById('supplier-address').value || '[SUPPLIER ADDRESS]';
+                const resellerName = document.getElementById('reseller-name').value || '[RESELLER NAME]';
+                const resellerAddress = document.getElementById('reseller-address').value || '[RESELLER ADDRESS]';
+                
+                const effectiveDate = document.getElementById('effective-date').value 
+                    ? new Date(document.getElementById('effective-date').value).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+                    : '[EFFECTIVE DATE]';
+                
+                const termLength = document.getElementById('term-length').value || '12';
+                const autoRenewal = document.getElementById('auto-renewal').value;
+                let autoRenewalText = '';
+                
+                if (autoRenewal === 'yes') {
+                    autoRenewalText = `and will automatically renew for successive ${termLength}-month periods`;
+                } else if (autoRenewal === 'month-to-month') {
+                    autoRenewalText = 'and will automatically renew on a month-to-month basis';
+                } else {
+                    autoRenewalText = 'and will terminate unless the parties agree in writing to renew';
+                }
+                
+                const productDescription = document.getElementById('product-description').value || '[PRODUCT DESCRIPTION]';
+                const discountRate = document.getElementById('discount-rate').value || '40';
+                const minimumOrder = document.getElementById('minimum-order').value || '1000';
+                const reorderMinimum = document.getElementById('reorder-minimum').value || '500';
+                const priceChanges = document.getElementById('price-changes').value || '30';
+                
+                const exclusivity = document.getElementById('exclusivity').value;
+                let exclusivityText = '';
+                
+                if (exclusivity === 'exclusive-territory') {
+                    const territory = document.getElementById('territory-description').value || '[TERRITORY]';
+                    exclusivityText = `This Agreement grants Reseller exclusive rights to distribute the Products within ${territory}.`;
+                } else if (exclusivity === 'exclusive-channel') {
+                    const channel = document.getElementById('channel-description').value || '[CHANNEL]';
+                    exclusivityText = `This Agreement grants Reseller exclusive rights to distribute the Products through ${channel}.`;
+                } else {
+                    exclusivityText = 'This Agreement does not grant Reseller any exclusive rights to distribute the Products.';
+                }
+                
+                const mapPercentage = document.getElementById('map-percentage').value || '20';
+                const mapScope = document.querySelector('input[name="map-scope"]:checked').value;
+                let mapScopeText = mapScope === 'all' ? 'all advertising and promotional materials' : 'all online advertising and promotional materials';
+                
+                const mapViolations = document.getElementById('map-violations').value;
+                const mapCurePeriod = document.getElementById('map-cure-period').value || '3';
+                
+                let mapViolationsText = '';
+                if (mapViolations === '3-strikes') {
+                    mapViolationsText = `Upon the first violation, Supplier will issue a written warning. Upon the second violation, Supplier may suspend Reseller's account for up to 30 days. Upon the third violation, Supplier may immediately terminate this Agreement.`;
+                } else if (mapViolations === '2-strikes') {
+                    mapViolationsText = `Upon the first violation, Supplier will issue a written warning. Upon the second violation, Supplier may immediately terminate this Agreement.`;
+                } else {
+                    mapViolationsText = `Supplier may, at its sole discretion, immediately terminate this Agreement upon any violation of the MAP Policy.`;
+                }
+                
+                // Get checked advertising channels
+                const advertisingChannels = [];
+                if (document.getElementById('website').checked) advertisingChannels.push('Reseller's website');
+                if (document.getElementById('marketplaces').checked) advertisingChannels.push('third-party marketplaces (including but not limited to Amazon, eBay, Walmart, and other online marketplaces)');
+                if (document.getElementById('email-marketing').checked) advertisingChannels.push('email marketing campaigns');
+                if (document.getElementById('social-media').checked) advertisingChannels.push('social media platforms');
+                if (document.getElementById('print-advertising').checked) advertisingChannels.push('print advertisements');
+                if (document.getElementById('in-store').checked) advertisingChannels.push('in-store displays');
+                
+                const advertisingChannelsText = advertisingChannels.length > 0 
+                    ? advertisingChannels.join(', ') 
+                    : '[ADVERTISING CHANNELS]';
+                
+                // Get selected MAP exceptions
+                const mapExceptions = Array.from(document.getElementById('map-exceptions').selectedOptions).map(option => option.value);
+                let mapExceptionsText = '';
+                
+                if (mapExceptions.length > 0) {
+                    mapExceptionsText = 'The MAP Policy shall not apply to the following circumstances: ';
+                    const exceptionItems = [];
+                    
+                    if (mapExceptions.includes('bfcm')) exceptionItems.push('Black Friday and Cyber Monday sales events');
+                    if (mapExceptions.includes('eoy')) exceptionItems.push('End-of-year clearance sales');
+                    if (mapExceptions.includes('closeout')) exceptionItems.push('Closeout or discontinued items');
+                    if (mapExceptions.includes('employee')) exceptionItems.push('Employee purchases');
+                    if (mapExceptions.includes('damaged')) exceptionItems.push('Damaged or refurbished items');
+                    
+                    mapExceptionsText += exceptionItems.join(', ') + '.';
+                }
+                
+                const orderMethod = document.getElementById('order-method').value;
+                let orderMethodText = '';
+                
+                if (orderMethod === 'email') {
+                    orderMethodText = 'by email to Supplier's designated representative';
+                } else if (orderMethod === 'online-portal') {
+                    orderMethodText = 'through Supplier's online ordering portal';
+                } else if (orderMethod === 'edi') {
+                    orderMethodText = 'through Electronic Data Interchange (EDI)';
+                } else if (orderMethod === 'phone') {
+                    orderMethodText = 'by phone to Supplier's designated representative';
+                }
+                
+                const paymentTerms = document.getElementById('payment-terms').value;
+                let paymentTermsText = '';
+                
+                if (paymentTerms === 'prepaid') {
+                    paymentTermsText = 'prepaid before shipment';
+                } else if (paymentTerms === 'net-15') {
+                    paymentTermsText = 'due within 15 days of delivery';
+                } else if (paymentTerms === 'net-30') {
+                    paymentTermsText = 'due within 30 days of delivery';
+                } else if (paymentTerms === 'net-60') {
+                    paymentTermsText = 'due within 60 days of delivery';
+                } else if (paymentTerms === 'credit-card') {
+                    paymentTermsText = 'due at time of order via credit card';
+                }
+                
+                const creditLimit = document.getElementById('credit-limit').value || '5000';
+                const latePayment = document.getElementById('late-payment').value || '1.5';
+                const orderLeadTime = document.getElementById('order-lead-time').value || '5';
+                
+                const orderChanges = document.getElementById('order-changes').value;
+                let orderChangesText = '';
+                
+                if (orderChanges === '48-hours') {
+                    orderChangesText = 'within 48 hours of order placement';
+                } else if (orderChanges === '24-hours') {
+                    orderChangesText = 'within 24 hours of order placement';
+                } else {
+                    orderChangesText = 'not permitted after order placement';
+                }
+                
+                const currency = document.getElementById('currency').value;
+                
+                const shippingTerms = document.getElementById('shipping-terms').value;
+                let shippingTermsText = '';
+                
+                if (shippingTerms === 'ex-works') {
+                    shippingTermsText = 'Ex Works (EXW) Supplier's facility';
+                } else if (shippingTerms === 'fob-origin') {
+                    shippingTermsText = 'FOB Origin';
+                } else if (shippingTerms === 'fob-destination') {
+                    shippingTermsText = 'FOB Destination';
+                } else if (shippingTerms === 'cif') {
+                    shippingTermsText = 'Cost, Insurance, and Freight (CIF)';
+                }
+                
+                const shippingCarrier = document.getElementById('shipping-carrier').value;
+                let shippingCarrierText = shippingCarrier === 'any' ? 'carrier of Supplier's choice' : shippingCarrier.toUpperCase();
+                
+                const dropShipping = document.getElementById('drop-shipping').value;
+                let dropShippingText = '';
+                
+                if (dropShipping === 'yes') {
+                    dropShippingText = 'Supplier agrees to drop-ship Products directly to Reseller's customers upon request.';
+                } else if (dropShipping === 'approval') {
+                    dropShippingText = 'Supplier may, at its sole discretion, drop-ship Products directly to Reseller's customers upon Reseller's request and Supplier's written approval.';
+                } else {
+                    dropShippingText = 'Supplier will not drop-ship Products directly to Reseller's customers.';
+                }
+                
+                const inspectionPeriod = document.getElementById('inspection-period').value || '7';
+                
+                const returnsPolicy = document.getElementById('returns-policy').value;
+                const returnPeriod = document.getElementById('return-period').value || '30';
+                const restockingFee = document.getElementById('restocking-fee').value || '15';
+                
+                let returnsPolicyText = '';
+                
+                if (returnsPolicy === 'defective-only') {
+                    returnsPolicyText = `Reseller may return defective Products within ${returnPeriod} days of delivery. Non-defective Products are not eligible for return.`;
+                } else if (returnsPolicy === 'with-approval') {
+                    returnsPolicyText = `Reseller may return Products within ${returnPeriod} days of delivery with Supplier's prior written approval. A ${restockingFee}% restocking fee will apply to returns of non-defective Products.`;
+                } else if (returnsPolicy === 'no-questions') {
+                    returnsPolicyText = `Reseller may return any Products within ${returnPeriod} days of delivery for any reason. A ${restockingFee}% restocking fee will apply to returns of non-defective Products.`;
+                } else {
+                    returnsPolicyText = 'All sales are final. Products are not eligible for return except as required by applicable law.';
+                }
+                
+                const qualityControl = document.getElementById('quality-control').value;
+                let qualityControlText = '';
+                
+                if (qualityControl === 'none') {
+                    qualityControlText = '';
+                } else if (qualityControl === 'minimum') {
+                    qualityControlText = 'Reseller shall maintain reasonable quality control standards for the storage, handling, and shipping of the Products.';
+                } else {
+                    qualityControlText = 'Reseller shall adhere to Supplier's strict quality control standards for the storage, handling, and shipping of the Products, as may be communicated to Reseller from time to time.';
+                }
+                
+                const customerService = document.getElementById('customer-service').value;
+                let customerServiceText = '';
+                
+                if (customerService === 'none') {
+                    customerServiceText = '';
+                } else if (customerService === 'minimum') {
+                    customerServiceText = 'Reseller shall provide reasonable customer service for all Products sold.';
+                } else {
+                    customerServiceText = 'Reseller shall provide high-quality customer service for all Products sold, including but not limited to prompt response to customer inquiries and professional resolution of customer complaints.';
+                }
+                
+                const warrantyPeriod = document.getElementById('warranty-period').value || '12';
+                
+                const warrantyScope = document.getElementById('warranty-scope').value;
+                let warrantyScopeText = '';
+                
+                if (warrantyScope === 'limited') {
+                    warrantyScopeText = `Supplier provides a limited warranty that the Products will be free from manufacturing defects for a period of ${warrantyPeriod} months from the date of delivery.`;
+                } else if (warrantyScope === 'full') {
+                    warrantyScopeText = `Supplier provides a full warranty for the Products for a period of ${warrantyPeriod} months from the date of delivery.`;
+                } else {
+                    warrantyScopeText = 'SUPPLIER PROVIDES NO WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION ANY WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.';
+                }
+                
+                const liabilityCap = document.getElementById('liability-cap').value;
+                let liabilityCapText = '';
+                
+                if (liabilityCap === 'purchase-price') {
+                    liabilityCapText = 'IN NO EVENT SHALL SUPPLIER'S LIABILITY EXCEED THE PURCHASE PRICE OF THE PRODUCTS GIVING RISE TO THE CLAIM.';
+                } else if (liabilityCap === 'contract-value') {
+                    liabilityCapText = 'IN NO EVENT SHALL SUPPLIER'S LIABILITY EXCEED THE TOTAL AMOUNTS PAID BY RESELLER TO SUPPLIER UNDER THIS AGREEMENT.';
+                } else {
+                    liabilityCapText = '';
+                }
+                
+                const consequentialDamages = document.getElementById('consequential-damages').value;
+                let consequentialDamagesText = consequentialDamages === 'excluded' 
+                    ? 'IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION LOST PROFITS, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.' 
+                    : '';
+                
+                const forceMajeure = document.getElementById('force-majeure').value;
+                let forceMajeureText = '';
+                
+                if (forceMajeure === 'standard') {
+                    forceMajeureText = 'Neither party shall be liable for any failure or delay in performing its obligations under this Agreement due to causes beyond its reasonable control, including but not limited to acts of God, war, terrorism, riots, fire, or natural disasters.';
+                } else if (forceMajeure === 'expanded') {
+                    forceMajeureText = 'Neither party shall be liable for any failure or delay in performing its obligations under this Agreement due to causes beyond its reasonable control, including but not limited to acts of God, war, terrorism, riots, fire, natural disasters, pandemics, epidemics, quarantines, cyber attacks, telecommunications failures, or supply chain disruptions.';
+                } else if (forceMajeure === 'limited') {
+                    forceMajeureText = 'Neither party shall be liable for any failure or delay in performing its obligations under this Agreement due to acts of God or natural disasters.';
+                } else {
+                    forceMajeureText = '';
+                }
+                
+                const terminationConvenience = document.getElementById('termination-convenience').value;
+                let terminationConvenienceText = '';
+                
+                if (terminationConvenience === 'both-60') {
+                    terminationConvenienceText = 'Either party may terminate this Agreement for convenience upon sixty (60) days' written notice to the other party.';
+                } else if (terminationConvenience === 'both-30') {
+                    terminationConvenienceText = 'Either party may terminate this Agreement for convenience upon thirty (30) days' written notice to the other party.';
+                } else if (terminationConvenience === 'both-90') {
+                    terminationConvenienceText = 'Either party may terminate this Agreement for convenience upon ninety (90) days' written notice to the other party.';
+                } else if (terminationConvenience === 'supplier-only') {
+                    terminationConvenienceText = 'Supplier may terminate this Agreement for convenience upon thirty (30) days' written notice to Reseller.';
+                } else {
+                    terminationConvenienceText = 'This Agreement may not be terminated for convenience.';
+                }
+                
+                const terminationBreach = document.getElementById('termination-breach').value || '30';
+                const postTermination = document.getElementById('post-termination').value || '90';
+                
+                const ipOwnership = document.getElementById('ip-ownership').value;
+                let ipOwnershipText = '';
+                
+                if (ipOwnership === 'supplier') {
+                    ipOwnershipText = 'All intellectual property rights in and to the Products, including but not limited to trademarks, copyrights, patents, trade secrets, and other proprietary rights, shall remain the sole and exclusive property of Supplier.';
+                } else if (ipOwnership === 'license') {
+                    ipOwnershipText = 'All intellectual property rights in and to the Products shall remain the sole and exclusive property of Supplier. Supplier grants Reseller a limited, non-exclusive license to use Supplier's trademarks and copyrighted materials solely for the purpose of marketing and selling the Products during the term of this Agreement.';
+                } else {
+                    ipOwnershipText = 'All intellectual property rights in and to the Products shall remain the sole and exclusive property of Supplier. Marketing materials jointly created by Supplier and Reseller shall be jointly owned, with each party having the right to use such materials during and after the term of this Agreement.';
+                }
+                
+                const confidentiality = document.getElementById('confidentiality').value;
+                let confidentialityText = '';
+                
+                if (confidentiality === '2-years') {
+                    confidentialityText = 'for a period of two (2) years after the termination or expiration of this Agreement';
+                } else if (confidentiality === '5-years') {
+                    confidentialityText = 'for a period of five (5) years after the termination or expiration of this Agreement';
+                } else {
+                    confidentialityText = 'in perpetuity';
+                }
+                
+                const disputeResolution = document.getElementById('dispute-resolution').value;
+                let disputeResolutionText = '';
+                
+                if (disputeResolution === 'litigation') {
+                    disputeResolutionText = 'Any dispute arising out of or relating to this Agreement shall be resolved through litigation in the courts of the jurisdiction specified in the Governing Law section.';
+                } else if (disputeResolution === 'arbitration') {
+                    disputeResolutionText = 'Any dispute arising out of or relating to this Agreement shall be resolved through binding arbitration administered by the American Arbitration Association in accordance with its Commercial Arbitration Rules.';
+                } else {
+                    disputeResolutionText = 'Any dispute arising out of or relating to this Agreement shall first be submitted to mediation. If mediation is unsuccessful, the dispute shall be resolved through binding arbitration administered by the American Arbitration Association in accordance with its Commercial Arbitration Rules.';
+                }
+                
+                const governingLaw = document.getElementById('governing-law').value;
+                let governingLawText = '';
+                
+                if (governingLaw === 'other') {
+                    governingLawText = document.getElementById('other-law').value || '[STATE/JURISDICTION]';
+                } else {
+                    governingLawText = governingLaw.charAt(0).toUpperCase() + governingLaw.slice(1);
+                }
+                
+                // Create the agreement text
+                const agreementText = `
+WHOLESALE AGREEMENT WITH MINIMUM ADVERTISED PRICE POLICY
+
+This Wholesale Agreement with Minimum Advertised Price Policy (the "Agreement") is entered into as of ${effectiveDate} (the "Effective Date") by and between:
+
+${supplierName}, with its principal place of business at ${supplierAddress} (the "Supplier"), and
+
+${resellerName}, with its principal place of business at ${resellerAddress} (the "Reseller").
+
+The Supplier and Reseller may be referred to individually as a "Party" and collectively as the "Parties."
+
+1. APPOINTMENT AND TERM
+
+1.1 Appointment. Supplier hereby appoints Reseller as an authorized non-exclusive reseller of the Products (as defined below), and Reseller accepts such appointment.
+
+1.2 Term. This Agreement shall commence on the Effective Date and shall continue for an initial term of ${termLength} months, ${autoRenewalText} unless earlier terminated in accordance with the provisions of this Agreement.
+
+1.3 Exclusivity. ${exclusivityText}
+
+2. PRODUCTS AND PRICING
+
+2.1 Products. The term "Products" means the products described as follows: ${productDescription}.
+
+2.2 Wholesale Pricing. Supplier shall sell the Products to Reseller at ${discountRate}% off the Manufacturer's Suggested Retail Price ("MSRP"). Supplier may change the MSRP of any Product upon ${priceChanges} days' written notice to Reseller.
+
+2.3 Minimum Order Requirements.
+   (a) Reseller's initial order must be a minimum of ${currency} ${minimumOrder}.
+   (b) Subsequent orders must be a minimum of ${currency} ${reorderMinimum}.
+
+2.4 Resale Pricing. Subject to the MAP Policy set forth in Section 3, Reseller shall be free to establish its own resale prices for the Products.
+
+3. MINIMUM ADVERTISED PRICE POLICY
+
+3.1 MAP Policy. Reseller shall comply with Supplier's Minimum Advertised Price ("MAP") Policy, which prohibits advertising or promoting the Products at a price more than ${mapPercentage}% below the MSRP.
+
+3.2 Scope of MAP Policy. The MAP Policy applies to ${mapScopeText}, including but not limited to ${advertisingChannelsText}.
+
+3.3 MAP Violations. Reseller's compliance with the MAP Policy is essential to this Agreement. ${mapViolationsText}
+
+3.4 Cure Period. Reseller shall have ${mapCurePeriod} business days from receipt of notice of a MAP violation to cure such violation.
+
+3.5 Examples of MAP Violations. MAP violations include, but are not limited to:
+   (a) Displaying a price below MAP in any advertising or promotional materials;
+   (b) Advertising "call for price," "email for price," or similar phrases;
+   (c) Offering coupons, instant rebates, or promotions that would result in an advertised price below MAP;
+   (d) Bundling Products with other products or services in a manner that results in an effective advertised price below MAP.
+
+3.6 Non-Violations of MAP. The following are not considered violations of the MAP Policy:
+   (a) In-cart pricing, where the price below MAP is only displayed once the Product has been added to the customer's cart;
+   (b) Customer loyalty programs that provide points or credits for future purchases;
+   (c) Pricing displayed in a physical retail location that is not advertised externally.
+
+${mapExceptionsText ? '3.7 Exceptions. ' + mapExceptionsText : ''}
+
+4. ORDERING AND PAYMENT
+
+4.1 Orders. Reseller shall submit purchase orders ${orderMethodText}. All orders are subject to acceptance by Supplier.
+
+4.2 Payment Terms. Payment is ${paymentTermsText}.${paymentTerms !== 'prepaid' && paymentTerms !== 'credit-card' ? ' Supplier may establish a credit limit of ' + currency + ' ' + creditLimit + ' for Reseller.' : ''}
+
+4.3 Late Payments. Overdue payments shall bear interest at a rate of ${latePayment}% per month or the highest rate permitted by applicable law, whichever is lower.
+
+4.4 Order Processing. Supplier shall use commercially reasonable efforts to process orders within ${orderLeadTime} business days of acceptance.
+
+4.5 Order Changes and Cancellations. Order changes and cancellations are permitted ${orderChangesText}.
+
+5. SHIPPING AND RETURNS
+
+5.1 Shipping Terms. All Products shall be shipped ${shippingTermsText} via ${shippingCarrierText}.
+
+5.2 Drop Shipping. ${dropShippingText}
+
+5.3 Inspection. Reseller shall inspect all Products within ${inspectionPeriod} days of receipt and report any discrepancies to Supplier in writing.
+
+5.4 Returns. ${returnsPolicyText}
+
+6. RESELLER OBLIGATIONS AND RESTRICTIONS
+
+6.1 Marketing and Sales. Reseller shall use commercially reasonable efforts to market and sell the Products.
+
+6.2 Product Representation. Reseller shall not make any representations, warranties, or guarantees concerning the Products that are inconsistent with or in addition to those made by Supplier.
+
+6.3 Quality Control. ${qualityControlText}
+
+6.4 Customer Service. ${customerServiceText}
+
+6.5 Reporting. Upon Supplier's reasonable request, Reseller shall provide reports on inventory levels, sales, and marketing activities related to the Products.
+
+7. WARRANTY AND LIMITATION OF LIABILITY
+
+7.1 Warranty. ${warrantyScopeText}
+
+7.2 Disclaimer. EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, SUPPLIER DISCLAIMS ALL WARRANTIES, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT.
+
+7.3 Limitation of Liability. ${liabilityCapText}
+
+7.4 Exclusion of Damages. ${consequentialDamagesText}
+
+${forceMajeure ? '7.5 Force Majeure. ' + forceMajeureText : ''}
+
+8. TERMINATION
+
+8.1 Termination for Convenience. ${terminationConvenienceText}
+
+8.2 Termination for Cause. Either Party may terminate this Agreement if the other Party materially breaches any provision of this Agreement and fails to cure such breach within ${terminationBreach} days after receiving written notice of such breach.
+
+8.3 Effect of Termination.
+   (a) Upon termination of this Agreement, Reseller shall cease all marketing and sales of the Products, except as permitted under Section 8.3(b).
+   (b) Reseller may continue to sell its remaining inventory of Products for ${postTermination} days after termination, provided that Reseller continues to comply with the MAP Policy and other relevant provisions of this Agreement.
+   (c) All outstanding orders and payment obligations shall survive termination.
+
+9. INTELLECTUAL PROPERTY AND CONFIDENTIALITY
+
+9.1 Intellectual Property Ownership. ${ipOwnershipText}
+
+9.2 Confidentiality. Each Party shall maintain the confidentiality of the other Party's confidential information and shall not disclose such information to any third party ${confidentialityText}, except as required by law or with the prior written consent of the disclosing Party.
+
+10. GENERAL PROVISIONS
+
+10.1 Relationship of Parties. The Parties are independent contractors. Nothing in this Agreement shall be construed to create a partnership, joint venture, agency, or employment relationship.
+
+10.2 Assignment. Neither Party may assign this Agreement without the prior written consent of the other Party, except that Supplier may assign this Agreement to an affiliate or successor in interest.
+
+10.3 Entire Agreement. This Agreement constitutes the entire agreement between the Parties with respect to its subject matter and supersedes all prior agreements, understandings, and negotiations.
+
+10.4 Amendment. This Agreement may only be amended by a written document signed by both Parties.
+
+10.5 Notices. All notices must be in writing and shall be delivered by email with confirmation of receipt, certified mail, or overnight courier to the addresses specified in this Agreement.
+
+10.6 Dispute Resolution. ${disputeResolutionText}
+
+10.7 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${governingLawText}, without giving effect to any choice of law or conflict of law provisions.
+
+10.8 Severability. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+
+10.9 Waiver. The failure of either Party to enforce any provision of this Agreement shall not be construed as a waiver of such provision or the right to enforce it at a later time.
+
+10.10 Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one instrument.
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the Effective Date.
+
+SUPPLIER:                                    RESELLER:
+${supplierName}                              ${resellerName}
+
+
+By: _________________________               By: _________________________
+
+Name: _______________________               Name: _______________________
+
+Title: ________________________              Title: ________________________
+
+Date: ________________________              Date: ________________________
+`;
+                
+                // Update the preview content
+                previewContent.innerHTML = agreementText;
+                
+                // Find differences and highlight changes
+                if (oldContent) {
+                    const oldTextNodes = getAllTextNodes(previewContent.cloneNode(true));
+                    const newTextNodes = getAllTextNodes(previewContent);
+                    
+                    // Remove existing highlights
+                    const highlights = previewContent.querySelectorAll('.highlight');
+                    highlights.forEach(el => {
+                        const parent = el.parentNode;
+                        while (el.firstChild) {
+                            parent.insertBefore(el.firstChild, el);
+                        }
+                        parent.removeChild(el);
+                    });
+                    
+                    // Find and highlight differences
+                    const changedNodes = findChangedNodes(oldTextNodes, newTextNodes);
+                    
+                    changedNodes.forEach(nodeIndex => {
+                        const node = newTextNodes[nodeIndex];
+                        if (node && node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                            const span = document.createElement('span');
+                            span.className = 'highlight';
+                            node.parentNode.insertBefore(span, node);
+                            span.appendChild(node);
+                            
+                            // Scroll to the highlight if it's not visible
+                            setTimeout(() => {
+                                const rect = span.getBoundingClientRect();
+                                const containerRect = previewContent.getBoundingClientRect();
+                                
+                                if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
+                                    span.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            }, 100);
+                        }
+                    });
+                }
+            }
+            
+            // Helper function to get all text nodes
+            function getAllTextNodes(element) {
+                const textNodes = [];
+                const walker = document.createTreeWalker(
+                    element,
+                    NodeFilter.SHOW_TEXT,
+                    null,
+                    false
+                );
+                
+                let node;
+                while (node = walker.nextNode()) {
+                    textNodes.push({
+                        node: node,
+                        text: node.textContent
+                    });
+                }
+                
+                return textNodes;
+            }
+            
+            // Helper function to find changed nodes
+            function findChangedNodes(oldNodes, newNodes) {
+                const changedIndices = [];
+                const minLength = Math.min(oldNodes.length, newNodes.length);
+                
+                for (let i = 0; i < minLength; i++) {
+                    if (oldNodes[i].text !== newNodes[i].node.textContent) {
+                        changedIndices.push(i);
+                    }
+                }
+                
+                // If the new document has more nodes, mark them as changed
+                if (newNodes.length > oldNodes.length) {
+                    for (let i = oldNodes.length; i < newNodes.length; i++) {
+                        changedIndices.push(i);
+                    }
+                }
+                
+                return changedIndices;
+            }
+        });
+    </script>
+</body>
+</html>
