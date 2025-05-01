@@ -194,15 +194,17 @@
       font-weight: normal;
       top: 25px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      /* Right-aligned tooltips to avoid being cut off */
-      right: 0;
+      /* Center-aligned tooltips to avoid being cut off */
+      left: 50%;
+      transform: translateX(-50%);
     }
     
     .tooltip-content::before {
       content: '';
       position: absolute;
       top: -5px;
-      right: 15px;
+      left: 50%;
+      margin-left: -5px;
       width: 0;
       height: 0;
       border-left: 5px solid transparent;
@@ -313,10 +315,14 @@
       display: none;
       font-size: 14px;
       color: #27ae60;
-      margin-left: 10px;
+      background-color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
+      margin-left: 10px;
+      border: 1px solid #e0e0e0;
     }
     
     .btn-consult {
@@ -617,6 +623,26 @@
       border: 1px solid var(--border-color);
     }
     
+    /* Signature section styles */
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    
+    .signature-block {
+      flex: 0 0 48%;
+      margin-bottom: 30px;
+    }
+    
+    .signature-line {
+      margin-top: 20px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #000;
+      width: 80%;
+    }
+    
     /* Responsive Styles */
     @media (max-width: 1024px) {
       .generator-content {
@@ -631,6 +657,10 @@
       
       .preview-box {
         height: 500px;
+      }
+      
+      .signature-block {
+        flex: 0 0 100%;
       }
     }
     
@@ -658,9 +688,11 @@
       }
       
       .copy-message {
+        position: static;
         margin-left: 0;
-        margin-top: 5px;
+        margin-top: 10px;
         text-align: center;
+        transform: none;
       }
     }
     
@@ -1109,79 +1141,6 @@
               <div class="form-group" id="customDecisionGroup" style="display: none;">
                 <label for="customDecisionDescription">Custom Decision Making Structure</label>
                 <textarea id="customDecisionDescription" class="form-input" placeholder="Describe the custom decision making structure"></textarea>
-              </div>
-              
-              <div class="form-group">
-                <label for="majorDecisionsRequired">
-                  Include Major Decisions Section
-                  <span class="tooltip-icon">?
-                    <span class="tooltip-content">Whether to include a section specifying important decisions that require formal approval according to the process specified above.</span>
-                  </span>
-                </label>
-                <select id="majorDecisionsRequired" class="form-input">
-                  <option value="yes" selected>Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              
-              <div id="majorDecisionsSection">
-                <div class="form-group">
-                  <label>
-                    Major Decisions Requiring Formal Approval
-                    <span class="tooltip-icon">?
-                      <span class="tooltip-content">Select the types of important company decisions that will require formal approval according to the decision-making process specified above.</span>
-                    </span>
-                  </label>
-                  <div class="options-group">
-                    <label class="option-item selected">
-                      <input type="checkbox" name="majorDecisions" value="funding" checked>
-                      <div class="option-content">
-                        <span class="option-label">Fundraising & Financing</span>
-                        <span class="option-description">Decisions related to raising capital or taking on debt</span>
-                      </div>
-                    </label>
-                    
-                    <label class="option-item selected">
-                      <input type="checkbox" name="majorDecisions" value="sale" checked>
-                      <div class="option-content">
-                        <span class="option-label">Sale of Company</span>
-                        <span class="option-description">Decisions about selling the company or substantial assets</span>
-                      </div>
-                    </label>
-                    
-                    <label class="option-item selected">
-                      <input type="checkbox" name="majorDecisions" value="hiring" checked>
-                      <div class="option-content">
-                        <span class="option-label">Key Hiring & Firing</span>
-                        <span class="option-description">Decisions about executive/key personnel</span>
-                      </div>
-                    </label>
-                    
-                    <label class="option-item selected">
-                      <input type="checkbox" name="majorDecisions" value="budget" checked>
-                      <div class="option-content">
-                        <span class="option-label">Budget Approval</span>
-                        <span class="option-description">Annual budget and significant deviations</span>
-                      </div>
-                    </label>
-                    
-                    <label class="option-item">
-                      <input type="checkbox" name="majorDecisions" value="partnership">
-                      <div class="option-content">
-                        <span class="option-label">Strategic Partnerships</span>
-                        <span class="option-description">Major partnerships or joint ventures</span>
-                      </div>
-                    </label>
-                    
-                    <label class="option-item">
-                      <input type="checkbox" name="majorDecisions" value="ip">
-                      <div class="option-content">
-                        <span class="option-label">IP Licensing/Sale</span>
-                        <span class="option-description">Licensing or selling company intellectual property</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
               </div>
               
               <div class="form-group">
@@ -1718,17 +1677,6 @@
         });
       });
       
-      // Toggle Major Decisions section based on selection
-      document.getElementById('majorDecisionsRequired').addEventListener('change', function() {
-        const section = document.getElementById('majorDecisionsSection');
-        if (this.value === 'yes') {
-          section.style.display = 'block';
-        } else {
-          section.style.display = 'none';
-        }
-        updatePreview();
-      });
-      
       // Handle designated decision maker selection
       document.getElementById('decisionMaking').addEventListener('change', function() {
         const designatedGroup = document.getElementById('designatedDecisionMakerGroup');
@@ -1987,10 +1935,6 @@
           document.getElementById('customDecisionGroup').style.display = value === 'custom' ? 'block' : 'none';
         }
         
-        if (id === 'majorDecisionsRequired') {
-          document.getElementById('majorDecisionsSection').style.display = value === 'yes' ? 'block' : 'none';
-        }
-        
         if (id === 'timeCommitment') {
           document.getElementById('customTimeGroup').style.display = value === 'custom' ? 'block' : 'none';
         }
@@ -2046,46 +1990,6 @@
         }
       }
       
-      // Handle checkbox changes
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          // Toggle the selected class
-          this.closest('.option-item').classList.toggle('selected', this.checked);
-          
-          // Clear highlights and update preview
-          clearHighlights();
-          updatePreview(this.name);
-          copyMessage.style.display = 'none';
-        });
-      });
-      
-      // Make option items clickable
-      document.querySelectorAll('.option-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-          // If the user clicked directly on the checkbox, don't interfere
-          if (e.target.type === 'checkbox') return;
-          
-          // Find the checkbox inside this option item
-          const checkbox = this.querySelector('input[type="checkbox"]');
-          if (checkbox) {
-            // Toggle checkbox state
-            checkbox.checked = !checkbox.checked;
-            
-            // Toggle selected class
-            this.classList.toggle('selected', checkbox.checked);
-            
-            // Clear highlights and update preview
-            clearHighlights();
-            updatePreview(checkbox.name);
-            copyMessage.style.display = 'none';
-            
-            // Dispatch change event on checkbox
-            const event = new Event('change', { bubbles: true });
-            checkbox.dispatchEvent(event);
-          }
-        });
-      });
-      
       // Initialize form dependencies
       function initFormDependencies() {
         // Call with each select element to set initial visibility
@@ -2100,7 +2004,6 @@
         handleFormDependencies(document.getElementById('vestingSchedule'));
         handleFormDependencies(document.getElementById('acceleratedVesting'));
         handleFormDependencies(document.getElementById('decisionMaking'));
-        handleFormDependencies(document.getElementById('majorDecisionsRequired'));
         handleFormDependencies(document.getElementById('timeCommitment'));
         handleFormDependencies(document.getElementById('salariesCompensation'));
         handleFormDependencies(document.getElementById('ipAssignment'));
@@ -2134,14 +2037,6 @@
           
           // Reset to original founder count
           founderCount = 2;
-          
-          // Reset selected class on option items
-          document.querySelectorAll('.option-item').forEach(item => {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-              item.classList.toggle('selected', checkbox.checked);
-            }
-          });
           
           // Reinitialize dependencies
           initFormDependencies();
@@ -2636,17 +2531,6 @@
           }
         }
         
-        // Check if major decisions section is enabled
-        const majorDecisionsRequired = document.getElementById('majorDecisionsRequired').value === 'yes';
-        
-        // Get selected major decisions
-        const selectedMajorDecisions = [];
-        if (majorDecisionsRequired) {
-          document.querySelectorAll('input[name="majorDecisions"]:checked').forEach(checkbox => {
-            selectedMajorDecisions.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
-          });
-        }
-        
         const timeCommitmentEl = document.getElementById('timeCommitment');
         const timeCommitment = timeCommitmentEl.options[timeCommitmentEl.selectedIndex].text;
         const customTimeDescription = document.getElementById('customTimeDescription').value;
@@ -2743,15 +2627,9 @@
             <div class="section-content">
               <p><span class="field-label">4.1 Decision Making:</span> ${decisionMaking === 'Custom Structure' ? customDecisionDescription : decisionMaking === 'Majority Vote (One Vote Per Founder)' ? 'Decisions regarding the Company\'s business shall be made by a majority vote of the Founders, with each Founder having one vote.' : decisionMaking === 'Unanimous Agreement' ? 'Decisions regarding the Company\'s business shall require unanimous agreement of all Founders.' : decisionMaking === 'Weighted by Equity Percentage' ? 'Decisions regarding the Company\'s business shall be made by a vote of the Founders weighted according to their respective equity percentages.' : `Decisions regarding the Company's business shall be made by ${designatedDecisionMaker} as the designated decision maker, after reasonable consultation with the other Founders.`}</p>
               
-              ${majorDecisionsRequired && selectedMajorDecisions.length > 0 ? `
-              <p><span class="field-label">4.2 Decisions Requiring Formal Approval:</span> The following decisions shall require formal approval according to the decision-making process described above:</p>
+              <p><span class="field-label">4.2 Time Commitment:</span> ${timeCommitment === 'Custom Time Commitment' ? customTimeDescription : timeCommitment === 'Full-Time (40+ hours/week)' ? 'Each Founder agrees to devote their full business time, attention, and efforts to the Company (defined as at least 40 hours per week).' : timeCommitment === 'Part-Time (Specified Hours)' ? 'Each Founder agrees to devote significant part-time efforts to the Company as specified in their individual role descriptions above.' : 'Each Founder shall devote such time and attention to the business of the Company as mutually agreed upon by the Founders, which may vary based on the needs of the Company and the individual circumstances of each Founder.'}</p>
               
-              <p>${selectedMajorDecisions.map((decision, index) => `${String.fromCharCode(97 + index)}. ${decision}`).join('<br>')}</p>
-              ` : ''}
-              
-              <p><span class="field-label">4.3 Time Commitment:</span> ${timeCommitment === 'Custom Time Commitment' ? customTimeDescription : timeCommitment === 'Full-Time (40+ hours/week)' ? 'Each Founder agrees to devote their full business time, attention, and efforts to the Company (defined as at least 40 hours per week).' : timeCommitment === 'Part-Time (Specified Hours)' ? 'Each Founder agrees to devote significant part-time efforts to the Company as specified in their individual role descriptions above.' : 'Each Founder shall devote such time and attention to the business of the Company as mutually agreed upon by the Founders, which may vary based on the needs of the Company and the individual circumstances of each Founder.'}</p>
-              
-              <p><span class="field-label">4.4 Initial Salaries/Compensation:</span> ${salariesCompensation === 'Custom Compensation Plan' ? customSalaryDescription : salariesCompensation === 'No Initial Salary' ? 'The Founders agree that they will not receive any salary or other monetary compensation until the Company has secured sufficient funding or generated adequate revenue, as determined by decision-making procedures outlined in Section 4.1.' : salariesCompensation === 'Equal Salaries' ? 'The Founders shall receive equal salaries once the Company has secured sufficient funding or generated adequate revenue.' : salariesCompensation === 'Proportional to Contribution' ? 'The Founders shall receive salaries proportional to their respective contributions, as determined through the decision-making process described above.' : 'The Founders shall receive salaries based on their respective roles and market rates for comparable positions, once the Company has secured sufficient funding or generated adequate revenue.'}</p>
+              <p><span class="field-label">4.3 Initial Salaries/Compensation:</span> ${salariesCompensation === 'Custom Compensation Plan' ? customSalaryDescription : salariesCompensation === 'No Initial Salary' ? 'The Founders agree that they will not receive any salary or other monetary compensation until the Company has secured sufficient funding or generated adequate revenue, as determined by decision-making procedures outlined in Section 4.1.' : salariesCompensation === 'Equal Salaries' ? 'The Founders shall receive equal salaries once the Company has secured sufficient funding or generated adequate revenue.' : salariesCompensation === 'Proportional to Contribution' ? 'The Founders shall receive salaries proportional to their respective contributions, as determined through the decision-making process described above.' : 'The Founders shall receive salaries based on their respective roles and market rates for comparable positions, once the Company has secured sufficient funding or generated adequate revenue.'}</p>
             </div>
           </div>
           
@@ -2814,7 +2692,9 @@
             <div class="section-content">
               <p>IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</p>
               
-              ${getFounderSignatureBlocks()}
+              <div class="signature-row">
+                ${getFounderSignatureBlocks()}
+              </div>
             </div>
           </div>
         `;
@@ -2873,23 +2753,22 @@
         return html;
       }
       
-      // Get HTML for founder signature blocks
+      // Get HTML for founder signature blocks - side by side
       function getFounderSignatureBlocks() {
         let html = '';
-        let founderNumber = 1;
-        let founderInput = document.getElementById(`founder${founderNumber}Name`);
+        const founderSections = document.querySelectorAll('.founder-section');
         
-        while (founderInput) {
-          const name = founderInput.value || `Founder ${founderNumber}`;
+        founderSections.forEach((section, index) => {
+          const founderId = section.id.match(/founder(\d+)Section/)[1];
+          const name = document.getElementById(`founder${founderId}Name`).value || `Founder ${founderId}`;
           
           html += `
-            <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
-            <p style="margin-top: 5px; margin-bottom: 40px;"><strong>${name}</strong></p>
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <p><strong>${name}</strong></p>
+            </div>
           `;
-          
-          founderNumber++;
-          founderInput = document.getElementById(`founder${founderNumber}Name`);
-        }
+        });
         
         return html;
       }
@@ -2912,7 +2791,7 @@
           sectionId = 'section-founders';
         } else if (['equityForm', 'vestingSchedule', 'customVestingDescription', 'acceleratedVesting', 'customAccelerationDescription'].includes(changedField)) {
           sectionId = 'section-equity';
-        } else if (['decisionMaking', 'designatedDecisionMaker', 'customDecisionDescription', 'majorDecisionsRequired', 'majorDecisions', 'timeCommitment', 'customTimeDescription', 'salariesCompensation', 'customSalaryDescription'].includes(changedField)) {
+        } else if (['decisionMaking', 'designatedDecisionMaker', 'customDecisionDescription', 'timeCommitment', 'customTimeDescription', 'salariesCompensation', 'customSalaryDescription'].includes(changedField)) {
           sectionId = 'section-roles';
         } else if (['ipAssignment', 'customIpDescription', 'priorIp', 'priorIpDetails'].includes(changedField)) {
           sectionId = 'section-ip';
@@ -2965,17 +2844,13 @@
               case 'customDecisionDescription':
                 fieldLabel = '4.1 Decision Making:';
                 break;
-              case 'majorDecisionsRequired':
-              case 'majorDecisions':
-                fieldLabel = '4.2 Decisions Requiring Formal Approval:';
-                break;
               case 'timeCommitment':
               case 'customTimeDescription':
-                fieldLabel = '4.3 Time Commitment:';
+                fieldLabel = '4.2 Time Commitment:';
                 break;
               case 'salariesCompensation':
               case 'customSalaryDescription':
-                fieldLabel = '4.4 Initial Salaries/Compensation:';
+                fieldLabel = '4.3 Initial Salaries/Compensation:';
                 break;
               case 'ipAssignment':
               case 'customIpDescription':
