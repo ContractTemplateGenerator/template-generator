@@ -10,6 +10,8 @@
       --primary-color: #2c3e50;
       --secondary-color: #3498db;
       --accent-color: #27ae60;
+      --warning-color: #e74c3c;
+      --info-color: #f39c12;
       --bg-color: #f9fafb;
       --card-bg: #ffffff;
       --text-primary: #333333;
@@ -136,6 +138,28 @@
       margin-top: 4px;
     }
     
+    /* Warning and Info Messages */
+    .warning-message {
+      background-color: rgba(231, 76, 60, 0.1);
+      border-left: 3px solid var(--warning-color);
+      color: var(--warning-color);
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      font-size: 13px;
+      display: none;
+    }
+    
+    .info-message {
+      background-color: rgba(243, 156, 18, 0.1);
+      border-left: 3px solid var(--info-color);
+      color: var(--info-color);
+      padding: 10px;
+      margin-top: 5px;
+      border-radius: 4px;
+      font-size: 13px;
+    }
+    
     /* Tooltip Styles */
     .tooltip-icon {
       display: inline-block;
@@ -155,7 +179,7 @@
     
     .tooltip-content {
       position: absolute;
-      width: 250px;
+      width: 280px;
       background-color: var(--primary-color);
       color: white;
       padding: 10px;
@@ -168,16 +192,19 @@
       pointer-events: none;
       text-align: left;
       font-weight: normal;
-      right: -10px;
       top: 25px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      /* Center-aligned tooltips to avoid being cut off */
+      left: 50%;
+      transform: translateX(-50%);
     }
     
     .tooltip-content::before {
       content: '';
       position: absolute;
       top: -5px;
-      right: 15px;
+      left: 50%;
+      margin-left: -5px;
       width: 0;
       height: 0;
       border-left: 5px solid transparent;
@@ -240,10 +267,10 @@
     /* Form Actions */
     .form-actions {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       margin-top: 25px;
       flex-wrap: wrap;
-      gap: 10px;
+      gap: 15px;
     }
     
     .btn {
@@ -288,7 +315,14 @@
       display: none;
       font-size: 14px;
       color: #27ae60;
+      background-color: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
       margin-left: 10px;
+      border: 1px solid #e0e0e0;
     }
     
     .btn-consult {
@@ -307,6 +341,16 @@
     
     .btn-consult:hover {
       background-color: #1e2a37;
+    }
+    
+    /* Top Buttons Bar */
+    .top-buttons-bar {
+      display: flex;
+      justify-content: center;
+      margin: 0 0 20px 0;
+      padding: 15px;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
     }
     
     /* Preview Styles */
@@ -418,14 +462,16 @@
       display: none;
     }
     
-    /* Tab Navigation */
-    .tabs-container {
-      display: flex;
+    /* Main Tabs Navigation */
+    .main-tabs {
       border-bottom: 1px solid var(--border-color);
+      display: flex;
+      flex-wrap: wrap;
       margin-bottom: 20px;
+      position: relative;
     }
     
-    .tab-button {
+    .main-tab-button {
       padding: 10px 15px;
       background-color: transparent;
       border: none;
@@ -434,15 +480,66 @@
       color: var(--text-secondary);
       border-bottom: 3px solid transparent;
       transition: var(--transition);
+      white-space: nowrap;
+      font-size: 14px;
     }
     
-    .tab-button:hover {
+    .main-tab-button:hover {
       color: var(--primary-color);
     }
     
-    .tab-button.active {
+    .main-tab-button.active {
       color: var(--secondary-color);
       border-bottom-color: var(--secondary-color);
+    }
+    
+    /* Scrollable tabs container */
+    .tabs-wrapper {
+      position: relative;
+      overflow: hidden;
+      width: 100%;
+    }
+    
+    .tabs-container {
+      display: flex;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      -ms-overflow-style: none; /* Hide scrollbar in IE and Edge */
+      scrollbar-width: none; /* Hide scrollbar in Firefox */
+      padding-bottom: 5px; /* Space for the bottom border */
+    }
+    
+    .tabs-container::-webkit-scrollbar {
+      display: none; /* Hide scrollbar in Chrome, Safari, Opera */
+    }
+    
+    /* Tab scroll buttons */
+    .tab-scroll-button {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      width: 25px;
+      background-color: rgba(255, 255, 255, 0.8);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+    
+    .tab-scroll-left {
+      left: 0;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+    
+    .tab-scroll-right {
+      right: 0;
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
     }
     
     .tab-content {
@@ -517,6 +614,35 @@
       transform: rotate(45deg);
     }
     
+    /* Total equity display */
+    .total-equity-section {
+      margin-top: 15px; 
+      padding: 10px; 
+      background-color: #f8f9fa; 
+      border-radius: 4px;
+      border: 1px solid var(--border-color);
+    }
+    
+    /* Signature section styles */
+    .signature-row {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+    
+    .signature-block {
+      flex: 0 0 48%;
+      margin-bottom: 30px;
+    }
+    
+    .signature-line {
+      margin-top: 20px;
+      margin-bottom: 5px;
+      border-bottom: 1px solid #000;
+      width: 80%;
+    }
+    
     /* Responsive Styles */
     @media (max-width: 1024px) {
       .generator-content {
@@ -532,6 +658,10 @@
       .preview-box {
         height: 500px;
       }
+      
+      .signature-block {
+        flex: 0 0 100%;
+      }
     }
     
     @media (max-width: 768px) {
@@ -544,6 +674,11 @@
         padding: 20px;
       }
       
+      .main-tab-button {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+      
       .form-actions {
         flex-direction: column;
       }
@@ -553,9 +688,11 @@
       }
       
       .copy-message {
+        position: static;
         margin-left: 0;
-        margin-top: 5px;
+        margin-top: 10px;
         text-align: center;
+        transform: none;
       }
     }
     
@@ -605,15 +742,27 @@
     <div class="generator-content">
       <!-- Form Container -->
       <div class="form-container">
-        <div class="tabs-container">
-          <button class="tab-button active" data-tab="company-tab">Company Info</button>
-          <button class="tab-button" data-tab="founders-tab">Founders</button>
-          <button class="tab-button" data-tab="equity-tab">Equity & Vesting</button>
-          <button class="tab-button" data-tab="roles-tab">Roles & Commitment</button>
-          <button class="tab-button" data-tab="ip-tab">Intellectual Property</button>
-          <button class="tab-button" data-tab="covenants-tab">Restrictive Covenants</button>
-          <button class="tab-button" data-tab="exit-tab">Exit & Termination</button>
-          <button class="tab-button" data-tab="additional-tab">Additional Provisions</button>
+        <!-- Global Action Buttons -->
+        <div class="top-buttons-bar">
+          <button type="button" id="globalCopyBtn" class="btn btn-copy">Copy Agreement</button>
+          <span id="globalCopyMessage" class="copy-message">Agreement copied!</span>
+          <button type="button" id="globalDownloadBtn" class="btn btn-download" style="margin-left: 15px;">Download as DOCX</button>
+          <button type="reset" form="foundersForm" class="btn btn-reset" style="margin-left: 15px;">Reset Form</button>
+        </div>
+        
+        <!-- Main Tabs - Simplified to 5 key sections -->
+        <div class="main-tabs">
+          <div class="tabs-wrapper">
+            <button class="tab-scroll-button tab-scroll-left" id="scrollLeft">&#9664;</button>
+            <div class="tabs-container">
+              <button class="main-tab-button active" data-tab="company-tab">Company Info</button>
+              <button class="main-tab-button" data-tab="founders-tab">Founders</button>
+              <button class="main-tab-button" data-tab="equity-tab">Equity & Vesting</button>
+              <button class="main-tab-button" data-tab="roles-tab">Roles & Terms</button>
+              <button class="main-tab-button" data-tab="legal-tab">Legal Provisions</button>
+            </div>
+            <button class="tab-scroll-button tab-scroll-right" id="scrollRight">&#9654;</button>
+          </div>
         </div>
         
         <form id="foundersForm">
@@ -672,10 +821,11 @@
                 <label for="incorporationDate">
                   Date of Incorporation
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">The date when the company was officially incorporated.</span>
+                    <span class="tooltip-content">The date when the company was officially incorporated. If using a future date, ensure this reflects your actual incorporation timeline.</span>
                   </span>
                 </label>
                 <input type="date" id="incorporationDate" class="form-input" value="">
+                <div id="futureDateWarning" class="warning-message">Warning: You've selected a future date for incorporation. Please ensure this accurately reflects your incorporation plans.</div>
               </div>
               
               <div class="form-group">
@@ -696,14 +846,15 @@
                   </span>
                 </label>
                 <select id="governingLaw" class="form-input">
-                  <option value="california" selected>California</option>
-                  <option value="delaware">Delaware</option>
+                  <option value="california">California</option>
+                  <option value="delaware" selected>Delaware</option>
                   <option value="new-york">New York</option>
                   <option value="texas">Texas</option>
                   <option value="florida">Florida</option>
                   <option value="massachusetts">Massachusetts</option>
                   <option value="other">Other State</option>
                 </select>
+                <div id="californiaLawWarning" class="warning-message" style="display: none;">Note: California has strict limitations on non-compete agreements. The non-compete provisions in this agreement may not be enforceable in California.</div>
               </div>
               
               <div class="form-group" id="otherStateGroup" style="display: none;">
@@ -714,7 +865,7 @@
             
             <div class="tab-navigation">
               <div></div>
-              <button type="button" class="btn btn-next">Next: Founders</button>
+              <button type="button" class="btn btn-next" data-next="founders-tab">Next: Founders</button>
             </div>
           </div>
           
@@ -858,7 +1009,7 @@
                 <span class="add-founder-icon">+</span> Add Another Founder
               </button>
               
-              <div class="total-equity-section" style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 4px;">
+              <div class="total-equity-section">
                 <div style="font-weight: 500; margin-bottom: 5px;">Total Equity: <span id="totalEquityDisplay">100</span>%</div>
                 <div id="totalEquityWarning" style="color: #e74c3c; font-size: 12px; display: none;">
                   Total equity must equal exactly 100%. Please adjust the equity percentages.
@@ -867,8 +1018,8 @@
             </div>
             
             <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Company Info</button>
-              <button type="button" class="btn btn-next">Next: Equity & Vesting</button>
+              <button type="button" class="btn btn-prev" data-prev="company-tab">Previous: Company Info</button>
+              <button type="button" class="btn btn-next" data-next="equity-tab">Next: Equity & Vesting</button>
             </div>
           </div>
           
@@ -896,7 +1047,7 @@
                 <label for="vestingSchedule">
                   Vesting Schedule
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">Vesting determines how founders earn their equity over time. A vesting schedule protects the company if a founder leaves early.</span>
+                    <span class="tooltip-content">Vesting determines how founders earn their equity over time. A vesting schedule protects the company if a founder leaves early. With a "cliff," no equity vests until that cliff date is reached.</span>
                   </span>
                 </label>
                 <select id="vestingSchedule" class="form-input">
@@ -906,6 +1057,10 @@
                   <option value="fastTrack">3-Year Vesting with 1-Year Cliff</option>
                   <option value="custom">Custom Schedule</option>
                 </select>
+                
+                <div class="info-message" id="vestingInfo">
+                  <strong>Standard 4-Year Vesting with 1-Year Cliff:</strong> No equity vests for the first year ("cliff period"). After 1 year, 25% vests immediately, then the remaining 75% vests in equal monthly installments over the next 3 years.
+                </div>
               </div>
               
               <div class="form-group" id="customVestingGroup" style="display: none;">
@@ -922,7 +1077,7 @@
                 <label for="acceleratedVesting">
                   Accelerated Vesting
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">Determines if unvested equity vests early upon certain events like company acquisition or founder termination.</span>
+                    <span class="tooltip-content">Determines if unvested equity vests early upon certain triggering events. Single Trigger means the event itself causes acceleration (e.g., company acquisition). Double Trigger requires two events (e.g., acquisition followed by founder termination).</span>
                   </span>
                 </label>
                 <select id="acceleratedVesting" class="form-input">
@@ -931,6 +1086,10 @@
                   <option value="doubleTrigger">Double Trigger (Change of Control + Termination)</option>
                   <option value="custom">Custom Acceleration</option>
                 </select>
+                
+                <div class="info-message" id="accelerationInfo">
+                  <strong>Single Trigger:</strong> All unvested equity immediately vests upon a change of control event (such as acquisition or merger).
+                </div>
               </div>
               
               <div class="form-group" id="customAccelerationGroup" style="display: none;">
@@ -940,29 +1099,42 @@
             </div>
             
             <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Founders</button>
-              <button type="button" class="btn btn-next">Next: Roles & Commitment</button>
+              <button type="button" class="btn btn-prev" data-prev="founders-tab">Previous: Founders</button>
+              <button type="button" class="btn btn-next" data-next="roles-tab">Next: Roles & Terms</button>
             </div>
           </div>
           
           <!-- Roles & Commitment Section -->
           <div id="roles-tab" class="tab-content">
             <div class="form-section">
-              <h2 class="form-section-title">Roles & Commitment</h2>
+              <h2 class="form-section-title">Roles & Commitment Terms</h2>
               
               <div class="form-group">
                 <label for="decisionMaking">
-                  Decision Making
+                  Decision Making Structure
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">Defines how company decisions will be made among founders, including voting rights.</span>
+                    <span class="tooltip-content">Defines how day-to-day company decisions will be made among founders.</span>
                   </span>
                 </label>
                 <select id="decisionMaking" class="form-input">
-                  <option value="majority" selected>Majority Vote</option>
+                  <option value="majority" selected>Majority Vote (One Vote Per Founder)</option>
                   <option value="unanimous">Unanimous Agreement</option>
-                  <option value="weighted">Weighted by Equity</option>
-                  <option value="ceo">CEO Final Authority</option>
+                  <option value="weighted">Weighted by Equity Percentage</option>
+                  <option value="designated">Designated Decision Maker</option>
                   <option value="custom">Custom Structure</option>
+                </select>
+              </div>
+              
+              <div class="form-group" id="designatedDecisionMakerGroup" style="display: none;">
+                <label for="designatedDecisionMaker">
+                  Designated Decision Maker
+                  <span class="tooltip-icon">?
+                    <span class="tooltip-content">Select the founder who will have primary decision-making authority for day-to-day company operations.</span>
+                  </span>
+                </label>
+                <select id="designatedDecisionMaker" class="form-input">
+                  <option value="founder1" selected>John Smith</option>
+                  <option value="founder2">Jane Doe</option>
                 </select>
               </div>
               
@@ -1011,74 +1183,16 @@
                 <label for="customSalaryDescription">Custom Compensation Details</label>
                 <textarea id="customSalaryDescription" class="form-input" placeholder="Describe the custom compensation details"></textarea>
               </div>
-              
-              <div class="form-group">
-                <label>
-                  Major Decisions Requiring Special Approval
-                  <span class="tooltip-icon">?
-                    <span class="tooltip-content">Important company decisions that will require special voting or approval processes beyond day-to-day operations.</span>
-                  </span>
-                </label>
-                <div class="options-group">
-                  <label class="option-item selected">
-                    <input type="checkbox" name="majorDecisions" value="funding" checked>
-                    <div class="option-content">
-                      <span class="option-label">Fundraising & Financing</span>
-                      <span class="option-description">Decisions related to raising capital or taking on debt</span>
-                    </div>
-                  </label>
-                  
-                  <label class="option-item selected">
-                    <input type="checkbox" name="majorDecisions" value="sale" checked>
-                    <div class="option-content">
-                      <span class="option-label">Sale of Company</span>
-                      <span class="option-description">Decisions about selling the company or substantial assets</span>
-                    </div>
-                  </label>
-                  
-                  <label class="option-item selected">
-                    <input type="checkbox" name="majorDecisions" value="hiring" checked>
-                    <div class="option-content">
-                      <span class="option-label">Key Hiring & Firing</span>
-                      <span class="option-description">Decisions about executive/key personnel</span>
-                    </div>
-                  </label>
-                  
-                  <label class="option-item selected">
-                    <input type="checkbox" name="majorDecisions" value="budget" checked>
-                    <div class="option-content">
-                      <span class="option-label">Budget Approval</span>
-                      <span class="option-description">Annual budget and significant deviations</span>
-                    </div>
-                  </label>
-                  
-                  <label class="option-item">
-                    <input type="checkbox" name="majorDecisions" value="partnership">
-                    <div class="option-content">
-                      <span class="option-label">Strategic Partnerships</span>
-                      <span class="option-description">Major partnerships or joint ventures</span>
-                    </div>
-                  </label>
-                  
-                  <label class="option-item">
-                    <input type="checkbox" name="majorDecisions" value="ip">
-                    <div class="option-content">
-                      <span class="option-label">IP Licensing/Sale</span>
-                      <span class="option-description">Licensing or selling company intellectual property</span>
-                    </div>
-                  </label>
-                </div>
-              </div>
             </div>
             
             <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Equity & Vesting</button>
-              <button type="button" class="btn btn-next">Next: Intellectual Property</button>
+              <button type="button" class="btn btn-prev" data-prev="equity-tab">Previous: Equity & Vesting</button>
+              <button type="button" class="btn btn-next" data-next="legal-tab">Next: Legal Provisions</button>
             </div>
           </div>
           
-          <!-- Intellectual Property Section -->
-          <div id="ip-tab" class="tab-content">
+          <!-- Legal Provisions Section (Combined IP, Covenants, Exit, Additional) -->
+          <div id="legal-tab" class="tab-content">
             <div class="form-section">
               <h2 class="form-section-title">Intellectual Property</h2>
               
@@ -1106,7 +1220,7 @@
                 <label for="priorIp">
                   Prior IP Exclusions
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">Intellectual property developed by founders before joining the company that should be excluded from company ownership.</span>
+                    <span class="tooltip-content">Intellectual property developed by founders before joining the company that should be excluded from assignment to the company.</span>
                   </span>
                 </label>
                 <select id="priorIp" class="form-input">
@@ -1121,14 +1235,6 @@
               </div>
             </div>
             
-            <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Roles & Commitment</button>
-              <button type="button" class="btn btn-next">Next: Restrictive Covenants</button>
-            </div>
-          </div>
-          
-          <!-- Restrictive Covenants Section -->
-          <div id="covenants-tab" class="tab-content">
             <div class="form-section">
               <h2 class="form-section-title">Restrictive Covenants</h2>
               
@@ -1136,15 +1242,16 @@
                 <label for="nonCompete">
                   Non-Compete Provision
                   <span class="tooltip-icon">?
-                    <span class="tooltip-content">Restricts founders from working with competitors during and after their involvement with the company.</span>
+                    <span class="tooltip-content">Restricts founders from working with competitors during and after their involvement with the company. Note that non-compete provisions may have limited enforceability in some states, particularly California.</span>
                   </span>
                 </label>
                 <select id="nonCompete" class="form-input">
                   <option value="none">No Non-Compete</option>
-                  <option value="limited" selected>Limited Non-Compete</option>
-                  <option value="extensive">Extensive Non-Compete</option>
+                  <option value="limited" selected>Limited Non-Compete (1 Year, Geographic Restrictions)</option>
+                  <option value="extensive">Extensive Non-Compete (2+ Years, Broader Restrictions)</option>
                   <option value="custom">Custom Non-Compete</option>
                 </select>
+                <div id="nonCompeteWarning" class="warning-message" style="display: none;">Note: Non-compete provisions have limited enforceability in some states. In California, they are generally unenforceable except in very limited circumstances like business sales.</div>
               </div>
               
               <div class="form-group" id="nonCompeteDetailsGroup">
@@ -1173,14 +1280,6 @@
               </div>
             </div>
             
-            <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Intellectual Property</button>
-              <button type="button" class="btn btn-next">Next: Exit & Termination</button>
-            </div>
-          </div>
-          
-          <!-- Exit & Termination Section -->
-          <div id="exit-tab" class="tab-content">
             <div class="form-section">
               <h2 class="form-section-title">Exit & Termination</h2>
               
@@ -1247,14 +1346,6 @@
               </div>
             </div>
             
-            <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Restrictive Covenants</button>
-              <button type="button" class="btn btn-next">Next: Additional Provisions</button>
-            </div>
-          </div>
-          
-          <!-- Additional Provisions Section -->
-          <div id="additional-tab" class="tab-content">
             <div class="form-section">
               <h2 class="form-section-title">Additional Provisions</h2>
               
@@ -1273,20 +1364,8 @@
             </div>
             
             <div class="tab-navigation">
-              <button type="button" class="btn btn-prev">Previous: Exit & Termination</button>
+              <button type="button" class="btn btn-prev" data-prev="roles-tab">Previous: Roles & Terms</button>
               <div></div>
-            </div>
-            
-            <!-- Form Actions -->
-            <div class="form-actions" style="flex-direction: column; align-items: center;">
-              <div style="display: flex; gap: 10px;">
-                <div>
-                  <button type="button" id="copyBtn" class="btn btn-copy">Copy Agreement</button>
-                  <span id="copyMessage" class="copy-message">Agreement copied!</span>
-                </div>
-                <button type="button" id="downloadBtn" class="btn btn-download">Download as DOCX</button>
-              </div>
-              <button type="reset" class="btn btn-reset" style="margin-top: 10px;">Reset Form</button>
             </div>
             
             <a href="#" class="btn-consult" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
@@ -1324,24 +1403,131 @@
     document.addEventListener('DOMContentLoaded', function() {
       const form = document.getElementById('foundersForm');
       const preview = document.getElementById('agreementPreview');
-      const copyBtn = document.getElementById('copyBtn');
-      const copyMessage = document.getElementById('copyMessage');
-      const downloadBtn = document.getElementById('downloadBtn');
+      const copyBtn = document.getElementById('globalCopyBtn');
+      const copyMessage = document.getElementById('globalCopyMessage');
+      const downloadBtn = document.getElementById('globalDownloadBtn');
       const previewBox = document.querySelector('.preview-box');
       const addFounderBtn = document.getElementById('addFounderBtn');
       const foundersContainer = document.getElementById('foundersContainer');
       const totalEquityDisplay = document.getElementById('totalEquityDisplay');
       const totalEquityWarning = document.getElementById('totalEquityWarning');
+      const scrollLeft = document.getElementById('scrollLeft');
+      const scrollRight = document.getElementById('scrollRight');
+      const tabsContainer = document.querySelector('.tabs-container');
+      
+      // Tab scroll functionality
+      scrollLeft.addEventListener('click', () => {
+        tabsContainer.scrollBy({ left: -200, behavior: 'smooth' });
+      });
+      
+      scrollRight.addEventListener('click', () => {
+        tabsContainer.scrollBy({ left: 200, behavior: 'smooth' });
+      });
       
       // Current date for agreement
       const today = new Date();
       document.getElementById('agreementDate').value = today.toISOString().split('T')[0];
       
+      // Set up incorporation date warning
+      const incorporationDateInput = document.getElementById('incorporationDate');
+      incorporationDateInput.addEventListener('change', function() {
+        checkFutureDate(this.value);
+      });
+      
+      function checkFutureDate(dateValue) {
+        const warningElement = document.getElementById('futureDateWarning');
+        if (!dateValue) return;
+        
+        const selectedDate = new Date(dateValue);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1); // Set to tomorrow to avoid timezone issues
+        
+        if (selectedDate >= tomorrow) {
+          warningElement.style.display = 'block';
+        } else {
+          warningElement.style.display = 'none';
+        }
+      }
+      
+      // Setup California law warning
+      const governingLawSelect = document.getElementById('governingLaw');
+      governingLawSelect.addEventListener('change', function() {
+        const warningElement = document.getElementById('californiaLawWarning');
+        if (this.value === 'california') {
+          warningElement.style.display = 'block';
+        } else {
+          warningElement.style.display = 'none';
+        }
+      });
+      
+      // Setup non-compete warning based on state selection
+      function updateNonCompeteWarning() {
+        const governingLaw = document.getElementById('governingLaw').value;
+        const nonCompete = document.getElementById('nonCompete').value;
+        const warningElement = document.getElementById('nonCompeteWarning');
+        
+        if (nonCompete !== 'none' && (governingLaw === 'california' || governingLaw === 'north-dakota' || governingLaw === 'oklahoma')) {
+          warningElement.style.display = 'block';
+        } else {
+          warningElement.style.display = 'none';
+        }
+      }
+      
+      // Add listeners for non-compete warning
+      document.getElementById('governingLaw').addEventListener('change', updateNonCompeteWarning);
+      document.getElementById('nonCompete').addEventListener('change', updateNonCompeteWarning);
+      
+      // Initial check for non-compete warning
+      updateNonCompeteWarning();
+      
+      // Update vesting info text based on selection
+      const vestingSelect = document.getElementById('vestingSchedule');
+      vestingSelect.addEventListener('change', function() {
+        const infoElement = document.getElementById('vestingInfo');
+        switch(this.value) {
+          case 'none':
+            infoElement.innerHTML = '<strong>No Vesting:</strong> All equity is fully vested from the start. Founders own their full equity stake immediately with no risk of forfeiture if they leave.';
+            break;
+          case 'standard':
+            infoElement.innerHTML = '<strong>Standard 4-Year Vesting with 1-Year Cliff:</strong> No equity vests for the first year ("cliff period"). After 1 year, 25% vests immediately, then the remaining 75% vests in equal monthly installments over the next 3 years.';
+            break;
+          case 'noCliff':
+            infoElement.innerHTML = '<strong>4-Year Vesting without Cliff:</strong> Equity vests in equal monthly installments over 4 years, starting from month one. No cliff period means founders begin earning equity right away.';
+            break;
+          case 'fastTrack':
+            infoElement.innerHTML = '<strong>3-Year Vesting with 1-Year Cliff:</strong> No equity vests for the first year. After 1 year, 33.33% vests immediately, then the remaining 66.67% vests in equal monthly installments over the next 2 years.';
+            break;
+          case 'custom':
+            infoElement.innerHTML = '<strong>Custom Vesting Schedule:</strong> Please describe your custom vesting arrangement in detail.';
+            break;
+        }
+      });
+      
+      // Update acceleration info text
+      const accelerationSelect = document.getElementById('acceleratedVesting');
+      accelerationSelect.addEventListener('change', function() {
+        const infoElement = document.getElementById('accelerationInfo');
+        switch(this.value) {
+          case 'none':
+            infoElement.innerHTML = '<strong>No Acceleration:</strong> Vesting continues according to the normal schedule regardless of any change of control or termination events.';
+            break;
+          case 'singleTrigger':
+            infoElement.innerHTML = '<strong>Single Trigger:</strong> All unvested equity immediately vests upon a change of control event (such as acquisition or merger).';
+            break;
+          case 'doubleTrigger':
+            infoElement.innerHTML = '<strong>Double Trigger:</strong> All unvested equity vests only if two events occur: (1) a change of control event AND (2) the founder is terminated without cause or resigns for good reason within a specified period (typically 12 months) after the change of control.';
+            break;
+          case 'custom':
+            infoElement.innerHTML = '<strong>Custom Acceleration:</strong> Please describe your custom acceleration arrangement in detail.';
+            break;
+        }
+      });
+      
       // Counter for additional founders
       let founderCount = 2;
       
-      // Tab Navigation
-      const tabButtons = document.querySelectorAll('.tab-button');
+      // Main Tab Navigation
+      const mainTabButtons = document.querySelectorAll('.main-tab-button');
       const tabContents = document.querySelectorAll('.tab-content');
       const nextButtons = document.querySelectorAll('.btn-next');
       const prevButtons = document.querySelectorAll('.btn-prev');
@@ -1354,7 +1540,7 @@
         });
         
         // Deactivate all buttons
-        tabButtons.forEach(button => {
+        mainTabButtons.forEach(button => {
           button.classList.remove('active');
         });
         
@@ -1363,10 +1549,16 @@
         
         // Activate button
         document.querySelector(`[data-tab="${tabId}"]`).classList.add('active');
+        
+        // Scroll tab into view if necessary
+        const activeTabButton = document.querySelector(`[data-tab="${tabId}"]`);
+        if (activeTabButton) {
+          activeTabButton.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
       }
       
       // Setup tab button clicks
-      tabButtons.forEach(button => {
+      mainTabButtons.forEach(button => {
         button.addEventListener('click', () => {
           const tabId = button.getAttribute('data-tab');
           updateTabs(tabId);
@@ -1376,34 +1568,7 @@
       // Next button functionality
       nextButtons.forEach(button => {
         button.addEventListener('click', () => {
-          const currentTab = button.closest('.tab-content');
-          const currentTabId = currentTab.id;
-          let nextTabId;
-          
-          switch(currentTabId) {
-            case 'company-tab':
-              nextTabId = 'founders-tab';
-              break;
-            case 'founders-tab':
-              nextTabId = 'equity-tab';
-              break;
-            case 'equity-tab':
-              nextTabId = 'roles-tab';
-              break;
-            case 'roles-tab':
-              nextTabId = 'ip-tab';
-              break;
-            case 'ip-tab':
-              nextTabId = 'covenants-tab';
-              break;
-            case 'covenants-tab':
-              nextTabId = 'exit-tab';
-              break;
-            case 'exit-tab':
-              nextTabId = 'additional-tab';
-              break;
-          }
-          
+          const nextTabId = button.getAttribute('data-next');
           if (nextTabId) {
             updateTabs(nextTabId);
           }
@@ -1413,34 +1578,7 @@
       // Previous button functionality
       prevButtons.forEach(button => {
         button.addEventListener('click', () => {
-          const currentTab = button.closest('.tab-content');
-          const currentTabId = currentTab.id;
-          let prevTabId;
-          
-          switch(currentTabId) {
-            case 'founders-tab':
-              prevTabId = 'company-tab';
-              break;
-            case 'equity-tab':
-              prevTabId = 'founders-tab';
-              break;
-            case 'roles-tab':
-              prevTabId = 'equity-tab';
-              break;
-            case 'ip-tab':
-              prevTabId = 'roles-tab';
-              break;
-            case 'covenants-tab':
-              prevTabId = 'ip-tab';
-              break;
-            case 'exit-tab':
-              prevTabId = 'covenants-tab';
-              break;
-            case 'additional-tab':
-              prevTabId = 'exit-tab';
-              break;
-          }
-          
+          const prevTabId = button.getAttribute('data-prev');
           if (prevTabId) {
             updateTabs(prevTabId);
           }
@@ -1501,9 +1639,21 @@
         }
       }
       
-      // Add event listeners for equity inputs
+      // Add event listeners for equity inputs with automatic balancing
       document.querySelectorAll('.equity-input').forEach(input => {
         input.addEventListener('input', function() {
+          // If we have exactly two founders, automatically balance
+          const equityInputs = document.querySelectorAll('.equity-input');
+          if (equityInputs.length === 2) {
+            const otherInput = (this.id === 'founder1Equity') ? 
+                               document.getElementById('founder2Equity') : 
+                               document.getElementById('founder1Equity');
+            
+            // Calculate what the other founder should have
+            const thisValue = parseInt(this.value) || 0;
+            otherInput.value = 100 - thisValue;
+          }
+          
           updateTotalEquity();
         });
       });
@@ -1526,6 +1676,45 @@
           updatePreview();
         });
       });
+      
+      // Handle designated decision maker selection
+      document.getElementById('decisionMaking').addEventListener('change', function() {
+        const designatedGroup = document.getElementById('designatedDecisionMakerGroup');
+        const customGroup = document.getElementById('customDecisionGroup');
+        
+        if (this.value === 'designated') {
+          designatedGroup.style.display = 'block';
+          customGroup.style.display = 'none';
+        } else if (this.value === 'custom') {
+          designatedGroup.style.display = 'none';
+          customGroup.style.display = 'block';
+        } else {
+          designatedGroup.style.display = 'none';
+          customGroup.style.display = 'none';
+        }
+        
+        updatePreview();
+      });
+      
+      // Update designated decision maker dropdown options when founders change
+      function updateDesignatedDecisionMakerOptions() {
+        const select = document.getElementById('designatedDecisionMaker');
+        select.innerHTML = ''; // Clear existing options
+        
+        let founderNumber = 1;
+        let founderInput = document.getElementById(`founder${founderNumber}Name`);
+        
+        while (founderInput) {
+          const name = founderInput.value || `Founder ${founderNumber}`;
+          const option = document.createElement('option');
+          option.value = `founder${founderNumber}`;
+          option.textContent = name;
+          select.appendChild(option);
+          
+          founderNumber++;
+          founderInput = document.getElementById(`founder${founderNumber}Name`);
+        }
+      }
       
       // Add another founder
       addFounderBtn.addEventListener('click', function() {
@@ -1606,7 +1795,9 @@
         });
         
         // Add equity input event listener
-        newFounderSection.querySelector('.equity-input').addEventListener('input', function() {
+        const newEquityInput = newFounderSection.querySelector('.equity-input');
+        newEquityInput.addEventListener('input', function() {
+          // For more than 2 founders, we don't auto-balance
           updateTotalEquity();
         });
         
@@ -1631,7 +1822,15 @@
           const founderSection = document.getElementById(`founder${founderId}Section`);
           if (founderSection) {
             founderSection.remove();
+            // Adjust equity for 2 founders if needed
+            const remainingEquityInputs = document.querySelectorAll('.equity-input');
+            if (remainingEquityInputs.length === 2) {
+              // Reset to 50/50 split for simplicity when going back to 2 founders
+              remainingEquityInputs[0].value = 50;
+              remainingEquityInputs[1].value = 50;
+            }
             updateTotalEquity();
+            updateDesignatedDecisionMakerOptions();
             updatePreview();
           }
         });
@@ -1641,6 +1840,9 @@
         
         // Update the total equity calculation
         updateTotalEquity();
+        
+        // Update dropdown of designated decision maker
+        updateDesignatedDecisionMakerOptions();
         
         // Update preview
         updatePreview();
@@ -1669,6 +1871,7 @@
       
       // Initialize preview
       updatePreview();
+      updateDesignatedDecisionMakerOptions();
       
       // Track currently highlighted elements
       let highlightedElements = [];
@@ -1698,6 +1901,17 @@
         
         if (id === 'governingLaw') {
           document.getElementById('otherStateGroup').style.display = value === 'other' ? 'block' : 'none';
+          
+          // Update California law warning
+          const warningElement = document.getElementById('californiaLawWarning');
+          if (value === 'california') {
+            warningElement.style.display = 'block';
+          } else {
+            warningElement.style.display = 'none';
+          }
+          
+          // Update non-compete warning
+          updateNonCompeteWarning();
         }
         
         // Founder Role dependencies (for any founder)
@@ -1717,6 +1931,7 @@
         
         // Roles & Commitment dependencies
         if (id === 'decisionMaking') {
+          document.getElementById('designatedDecisionMakerGroup').style.display = value === 'designated' ? 'block' : 'none';
           document.getElementById('customDecisionGroup').style.display = value === 'custom' ? 'block' : 'none';
         }
         
@@ -1752,6 +1967,9 @@
               nonCompeteDetails.value = '';
             }
           }
+          
+          // Update non-compete warning
+          updateNonCompeteWarning();
         }
         
         if (id === 'confidentiality') {
@@ -1771,46 +1989,6 @@
           document.getElementById('customDisputeGroup').style.display = value === 'custom' ? 'block' : 'none';
         }
       }
-      
-      // Handle checkbox changes
-      document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-        checkbox.addEventListener('change', function() {
-          // Toggle the selected class
-          this.closest('.option-item').classList.toggle('selected', this.checked);
-          
-          // Clear highlights and update preview
-          clearHighlights();
-          updatePreview(this.name);
-          copyMessage.style.display = 'none';
-        });
-      });
-      
-      // Make option items clickable
-      document.querySelectorAll('.option-item').forEach(item => {
-        item.addEventListener('click', function(e) {
-          // If the user clicked directly on the checkbox, don't interfere
-          if (e.target.type === 'checkbox') return;
-          
-          // Find the checkbox inside this option item
-          const checkbox = this.querySelector('input[type="checkbox"]');
-          if (checkbox) {
-            // Toggle checkbox state
-            checkbox.checked = !checkbox.checked;
-            
-            // Toggle selected class
-            this.classList.toggle('selected', checkbox.checked);
-            
-            // Clear highlights and update preview
-            clearHighlights();
-            updatePreview(checkbox.name);
-            copyMessage.style.display = 'none';
-            
-            // Dispatch change event on checkbox
-            const event = new Event('change', { bubbles: true });
-            checkbox.dispatchEvent(event);
-          }
-        });
-      });
       
       // Initialize form dependencies
       function initFormDependencies() {
@@ -1840,6 +2018,13 @@
       // Initialize dependencies
       initFormDependencies();
       
+      // Fire events to initialize info messages
+      const vestingChange = new Event('change');
+      document.getElementById('vestingSchedule').dispatchEvent(vestingChange);
+      
+      const accelerationChange = new Event('change');
+      document.getElementById('acceleratedVesting').dispatchEvent(accelerationChange);
+      
       // Handle form reset
       form.addEventListener('reset', function() {
         // Give time for the form to reset before updating preview
@@ -1853,27 +2038,24 @@
           // Reset to original founder count
           founderCount = 2;
           
-          // Reset selected class on option items
-          document.querySelectorAll('.option-item').forEach(item => {
-            const checkbox = item.querySelector('input[type="checkbox"]');
-            if (checkbox) {
-              item.classList.toggle('selected', checkbox.checked);
-            }
-          });
-          
           // Reinitialize dependencies
           initFormDependencies();
           
-          // Update total equity
-          updateTotalEquity();
+          // Update designated decision maker dropdown
+          updateDesignatedDecisionMakerOptions();
+          
+          // Fire events to initialize info messages
+          document.getElementById('vestingSchedule').dispatchEvent(vestingChange);
+          document.getElementById('acceleratedVesting').dispatchEvent(accelerationChange);
           
           clearHighlights();
+          updateTotalEquity();
           updatePreview();
           copyMessage.style.display = 'none';
         }, 10);
       });
       
-      // Handle copy button click
+      // Handle copy button click (global copy button)
       copyBtn.addEventListener('click', function() {
         const documentText = preview.innerText;
         
@@ -1900,7 +2082,7 @@
         }, 3000);
       });
       
-      // Handle download button click
+      // Handle download button click (global download button)
       downloadBtn.addEventListener('click', function() {
         try {
           // First check if equity adds up to 100%
@@ -2331,6 +2513,7 @@
         const vestingSchedule = vestingScheduleEl.options[vestingScheduleEl.selectedIndex].text;
         const customVestingDescription = document.getElementById('customVestingDescription').value;
         
+        const acceleratedVestingEl = document.getElementById('acceleratedVesting');
         const acceleratedVesting = acceleratedVestingEl.options[acceleratedVestingEl.selectedIndex].text;
         const customAccelerationDescription = document.getElementById('customAccelerationDescription').value;
         
@@ -2339,6 +2522,15 @@
         const decisionMaking = decisionMakingEl.options[decisionMakingEl.selectedIndex].text;
         const customDecisionDescription = document.getElementById('customDecisionDescription').value;
         
+        // Get designated decision maker if applicable
+        let designatedDecisionMaker = '';
+        if (decisionMakingEl.value === 'designated') {
+          const designatedDecisionMakerEl = document.getElementById('designatedDecisionMaker');
+          if (designatedDecisionMakerEl && designatedDecisionMakerEl.selectedIndex >= 0) {
+            designatedDecisionMaker = designatedDecisionMakerEl.options[designatedDecisionMakerEl.selectedIndex].text;
+          }
+        }
+        
         const timeCommitmentEl = document.getElementById('timeCommitment');
         const timeCommitment = timeCommitmentEl.options[timeCommitmentEl.selectedIndex].text;
         const customTimeDescription = document.getElementById('customTimeDescription').value;
@@ -2346,12 +2538,6 @@
         const salariesCompensationEl = document.getElementById('salariesCompensation');
         const salariesCompensation = salariesCompensationEl.options[salariesCompensationEl.selectedIndex].text;
         const customSalaryDescription = document.getElementById('customSalaryDescription').value;
-        
-        // Get selected major decisions
-        const selectedMajorDecisions = [];
-        document.querySelectorAll('input[name="majorDecisions"]:checked').forEach(checkbox => {
-          selectedMajorDecisions.push(checkbox.closest('.option-item').querySelector('.option-label').textContent);
-        });
         
         // Get IP information
         const ipAssignmentEl = document.getElementById('ipAssignment');
@@ -2439,15 +2625,11 @@
           <div class="document-section" id="section-roles">
             <div class="section-title">4. ROLES & COMMITMENT</div>
             <div class="section-content">
-              <p><span class="field-label">4.1 Decision Making:</span> ${decisionMaking === 'Custom Structure' ? customDecisionDescription : decisionMaking === 'Majority Vote' ? 'Decisions regarding the Company\'s business shall be made by a majority vote of the Founders, with each Founder having one vote.' : decisionMaking === 'Unanimous Agreement' ? 'Decisions regarding the Company\'s business shall require unanimous agreement of all Founders.' : decisionMaking === 'Weighted by Equity' ? 'Decisions regarding the Company\'s business shall be made by a vote of the Founders weighted according to their respective equity percentages.' : 'The CEO shall have final decision-making authority on Company matters, after consultation with the other Founders.'}</p>
+              <p><span class="field-label">4.1 Decision Making:</span> ${decisionMaking === 'Custom Structure' ? customDecisionDescription : decisionMaking === 'Majority Vote (One Vote Per Founder)' ? 'Decisions regarding the Company\'s business shall be made by a majority vote of the Founders, with each Founder having one vote.' : decisionMaking === 'Unanimous Agreement' ? 'Decisions regarding the Company\'s business shall require unanimous agreement of all Founders.' : decisionMaking === 'Weighted by Equity Percentage' ? 'Decisions regarding the Company\'s business shall be made by a vote of the Founders weighted according to their respective equity percentages.' : `Decisions regarding the Company's business shall be made by ${designatedDecisionMaker} as the designated decision maker, after reasonable consultation with the other Founders.`}</p>
               
-              <p><span class="field-label">4.2 Major Decisions:</span> Notwithstanding Section 4.1, the following major decisions shall require ${decisionMaking === 'Majority Vote' || decisionMaking === 'CEO Final Authority' ? 'a majority vote of all Founders' : decisionMaking === 'Unanimous Agreement' ? 'unanimous agreement of all Founders' : 'approval according to Section 4.1 above'}:</p>
+              <p><span class="field-label">4.2 Time Commitment:</span> ${timeCommitment === 'Custom Time Commitment' ? customTimeDescription : timeCommitment === 'Full-Time (40+ hours/week)' ? 'Each Founder agrees to devote their full business time, attention, and efforts to the Company (defined as at least 40 hours per week).' : timeCommitment === 'Part-Time (Specified Hours)' ? 'Each Founder agrees to devote significant part-time efforts to the Company as specified in their individual role descriptions above.' : 'Each Founder shall devote such time and attention to the business of the Company as mutually agreed upon by the Founders, which may vary based on the needs of the Company and the individual circumstances of each Founder.'}</p>
               
-              <p>${selectedMajorDecisions.map((decision, index) => `${String.fromCharCode(97 + index)}. ${decision}`).join('<br>')}</p>
-              
-              <p><span class="field-label">4.3 Time Commitment:</span> ${timeCommitment === 'Custom Time Commitment' ? customTimeDescription : timeCommitment === 'Full-Time (40+ hours/week)' ? 'Each Founder agrees to devote their full business time, attention, and efforts to the Company (defined as at least 40 hours per week).' : timeCommitment === 'Part-Time (Specified Hours)' ? 'Each Founder agrees to devote significant part-time efforts to the Company as specified in their individual role descriptions above.' : 'Each Founder shall devote such time and attention to the business of the Company as mutually agreed upon by the Founders, which may vary based on the needs of the Company and the individual circumstances of each Founder.'}</p>
-              
-              <p><span class="field-label">4.4 Initial Salaries/Compensation:</span> ${salariesCompensation === 'Custom Compensation Plan' ? customSalaryDescription : salariesCompensation === 'No Initial Salary' ? 'The Founders agree that they will not receive any salary or other monetary compensation until the Company has secured sufficient funding or generated adequate revenue, as determined by decision-making procedures outlined in Section 4.1.' : salariesCompensation === 'Equal Salaries' ? 'The Founders shall receive equal salaries once the Company has secured sufficient funding or generated adequate revenue.' : salariesCompensation === 'Proportional to Contribution' ? 'The Founders shall receive salaries proportional to their respective contributions, as determined by the decision-making procedures outlined in Section 4.1.' : 'The Founders shall receive salaries based on their respective roles and market rates for comparable positions, once the Company has secured sufficient funding or generated adequate revenue.'}</p>
+              <p><span class="field-label">4.3 Initial Salaries/Compensation:</span> ${salariesCompensation === 'Custom Compensation Plan' ? customSalaryDescription : salariesCompensation === 'No Initial Salary' ? 'The Founders agree that they will not receive any salary or other monetary compensation until the Company has secured sufficient funding or generated adequate revenue, as determined by decision-making procedures outlined in Section 4.1.' : salariesCompensation === 'Equal Salaries' ? 'The Founders shall receive equal salaries once the Company has secured sufficient funding or generated adequate revenue.' : salariesCompensation === 'Proportional to Contribution' ? 'The Founders shall receive salaries proportional to their respective contributions, as determined through the decision-making process described above.' : 'The Founders shall receive salaries based on their respective roles and market rates for comparable positions, once the Company has secured sufficient funding or generated adequate revenue.'}</p>
             </div>
           </div>
           
@@ -2483,7 +2665,7 @@
               
               <p><span class="field-label">7.2 Founder Termination:</span> ${founderTermination === 'Custom Termination Process' ? customTerminationDescription : founderTermination === 'By Majority of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company upon the affirmative vote of a majority of the other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : founderTermination === 'By Supermajority (e.g., 2/3) of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company upon the affirmative vote of at least two-thirds (2/3) of the other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : founderTermination === 'By Unanimous Vote of Other Founders' ? 'A Founder may be terminated from their role and duties with the Company only upon the unanimous vote of all other Founders. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.' : 'A Founder may be terminated from their role and duties with the Company upon the decision of the Board of Directors. Upon such termination, the terminated Founder\'s rights to unvested equity shall cease, and the Company shall have the option to repurchase vested equity at Fair Market Value.'}</p>
               
-              <p><span class="field-label">7.3 Dispute Resolution:</span> ${disputeResolution === 'Custom Dispute Resolution' ? customDisputeDescription : disputeResolution === 'Mediation First, Then Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall first be submitted to confidential mediation in accordance with the rules of a mutually agreeable mediation service. If the dispute is not resolved through mediation within sixty (60) days from the date of submission to mediation, the dispute shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of mediation and arbitration shall be shared equally by the parties involved in the dispute.' : disputeResolution === 'Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of arbitration shall be shared equally by the parties involved in the dispute.' : 'Any dispute arising out of or relating to this Agreement shall be resolved exclusively through the federal and state courts located in the jurisdiction specified in Section 1.5, and each party hereby consents to the jurisdiction of such courts.'}</p>
+              <p><span class="field-label">7.3 Dispute Resolution:</span> ${disputeResolution === 'Custom Dispute Resolution' ? customDisputeDescription : disputeResolution === 'Mediation First, Then Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall first be submitted to confidential mediation in accordance with the rules of a mutually agreeable mediation service. If the dispute is not resolved through mediation within sixty (60) days from the date of submission to mediation, the dispute shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of mediation and arbitration shall be shared equally by the parties involved in the dispute.' : disputeResolution === 'Binding Arbitration' ? 'Any dispute arising out of or relating to this Agreement shall be submitted to binding arbitration in accordance with the rules of the American Arbitration Association. The costs of arbitration shall be shared equally by the parties involved in the dispute.' : `Any dispute arising out of or relating to this Agreement shall be resolved exclusively through the federal and state courts located in the State of ${governingLaw}.`}</p>
               
               <p><span class="field-label">7.4 Death or Disability:</span> In the event of a Founder's death or disability (defined as the inability to perform their duties for a period of 180 consecutive days), such Founder or their estate shall retain all vested equity as of the date of death or disability determination. Any unvested equity shall be forfeited unless otherwise decided by the remaining Founders or Board of Directors.</p>
             </div>
@@ -2510,7 +2692,9 @@
             <div class="section-content">
               <p>IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.</p>
               
-              ${getFounderSignatureBlocks()}
+              <div class="signature-row">
+                ${getFounderSignatureBlocks()}
+              </div>
             </div>
           </div>
         `;
@@ -2569,25 +2753,22 @@
         return html;
       }
       
-      // Get HTML for founder signature blocks
+      // Get HTML for founder signature blocks - side by side
       function getFounderSignatureBlocks() {
         let html = '';
-        let founderNumber = 1;
-        let founderInput = document.getElementById(`founder${founderNumber}Name`);
+        const founderSections = document.querySelectorAll('.founder-section');
         
-        while (founderInput) {
-          const name = document.getElementById(`founder${founderNumber}Name`).value;
+        founderSections.forEach((section, index) => {
+          const founderId = section.id.match(/founder(\d+)Section/)[1];
+          const name = document.getElementById(`founder${founderId}Name`).value || `Founder ${founderId}`;
           
-          if (name) {
-            html += `
-              <p style="margin-top: 40px; margin-bottom: 5px;">________________________________</p>
-              <p style="margin-top: 5px; margin-bottom: 40px;"><strong>${name}</strong></p>
-            `;
-          }
-          
-          founderNumber++;
-          founderInput = document.getElementById(`founder${founderNumber}Name`);
-        }
+          html += `
+            <div class="signature-block">
+              <div class="signature-line"></div>
+              <p><strong>${name}</strong></p>
+            </div>
+          `;
+        });
         
         return html;
       }
@@ -2610,7 +2791,7 @@
           sectionId = 'section-founders';
         } else if (['equityForm', 'vestingSchedule', 'customVestingDescription', 'acceleratedVesting', 'customAccelerationDescription'].includes(changedField)) {
           sectionId = 'section-equity';
-        } else if (['decisionMaking', 'customDecisionDescription', 'timeCommitment', 'customTimeDescription', 'salariesCompensation', 'customSalaryDescription', 'majorDecisions'].includes(changedField)) {
+        } else if (['decisionMaking', 'designatedDecisionMaker', 'customDecisionDescription', 'timeCommitment', 'customTimeDescription', 'salariesCompensation', 'customSalaryDescription'].includes(changedField)) {
           sectionId = 'section-roles';
         } else if (['ipAssignment', 'customIpDescription', 'priorIp', 'priorIpDetails'].includes(changedField)) {
           sectionId = 'section-ip';
@@ -2659,19 +2840,17 @@
                 fieldLabel = '3.3 Accelerated Vesting:';
                 break;
               case 'decisionMaking':
+              case 'designatedDecisionMaker':
               case 'customDecisionDescription':
                 fieldLabel = '4.1 Decision Making:';
                 break;
-              case 'majorDecisions':
-                fieldLabel = '4.2 Major Decisions:';
-                break;
               case 'timeCommitment':
               case 'customTimeDescription':
-                fieldLabel = '4.3 Time Commitment:';
+                fieldLabel = '4.2 Time Commitment:';
                 break;
               case 'salariesCompensation':
               case 'customSalaryDescription':
-                fieldLabel = '4.4 Initial Salaries/Compensation:';
+                fieldLabel = '4.3 Initial Salaries/Compensation:';
                 break;
               case 'ipAssignment':
               case 'customIpDescription':
