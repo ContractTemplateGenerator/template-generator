@@ -160,7 +160,12 @@
         
         .highlight {
             background-color: var(--highlight-color);
-            transition: background-color 1s;
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .fade-highlight {
+            background-color: transparent;
+            transition: background-color 1s ease-out;
         }
         
         .buttons {
@@ -669,93 +674,259 @@ ${customText}`;
             // After the document is generated, find and highlight the relevant part
             setTimeout(() => {
                 const previewDoc = document.getElementById('preview-document');
-                const sections = previewDoc.children;
                 
-                let targetSection = null;
+                // First clear any existing highlights
+                const existingHighlights = previewDoc.querySelectorAll('.highlight');
+                existingHighlights.forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                
+                // Get value of changed element
                 let elementValue = element.value;
-                
-                // For checkboxes, get the checked state
                 if (element.type === 'checkbox') {
                     elementValue = element.checked.toString();
                 }
                 
-                // Find the section that contains the value of the changed element
-                for (let i = 0; i < sections.length; i++) {
-                    const section = sections[i];
-                    if (section.innerHTML.includes(elementValue) || 
-                        (elementId === 'conf-info' && section.tagName === 'H3' && section.textContent.includes('Confidential Information')) ||
-                        (elementId === 'governing-law' && section.tagName === 'H3' && section.textContent.includes('Governing Law')) ||
-                        (elementId === 'dispute-resolution' && section.tagName === 'H3' && section.textContent.includes('Dispute Resolution')) ||
-                        (elementId === 'controlling-language' && section.tagName === 'H3' && section.textContent.includes('Controlling Language'))) {
-                        targetSection = section;
-                        break;
-                    }
-                }
+                // Find the relevant section based on element ID
+                let targetText = '';
+                let targetElement = null;
                 
-                if (targetSection) {
-                    // Create a specific highlight spot
-                    let highlightSpan;
-                    
-                    // Add the highlight class to the specific text
-                    if (elementId === 'agreement-term' || elementId === 'survival-term') {
-                        const termSection = document.querySelector('h3:contains("Term")').nextElementSibling;
-                        const termText = termSection.innerHTML;
-                        
-                        // Replace the term value with a highlighted version
-                        const newText = termText.replace(
-                            new RegExp(`${elementValue}( years)`), 
-                            `<span class="highlight">${elementValue}$1</span>`
-                        );
-                        
-                        targetSection.innerHTML = newText;
-                    } else if (elementId === 'conf-info' || elementId === 'governing-law' || 
-                               elementId === 'dispute-resolution' || elementId === 'controlling-language') {
-                        // For dropdowns that change entire sections
-                        targetSection.classList.add('highlight');
-                        
-                        // Scroll to make it visible if needed
-                        if (!isElementInViewport(targetSection)) {
-                            targetSection.scrollIntoView({behavior: 'smooth', block: 'center'});
-                        }
-                    } else if (elementId.startsWith('include-')) {
-                        // For checkboxes that toggle sections
-                        const sectionId = elementId.replace('include-', '').replace(/-([a-z])/g, function (g) { 
-                            return g[1].toUpperCase(); 
+                if (elementId === 'discloser-name' || elementId === 'discloser-name-ru') {
+                    // Find disclosing party name in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        const strong = column.querySelectorAll('strong');
+                        strong.forEach(el => {
+                            if (el.textContent === elementValue) {
+                                targetElement = el;
+                                targetElement.classList.add('highlight');
+                            }
                         });
-                        
-                        // Find the corresponding section
-                        let sectionHeader;
-                        switch (sectionId) {
-                            case 'returnDestroy':
-                                sectionHeader = document.querySelector('h3:contains("Return")');
-                                break;
-                            case 'injunctiveRelief':
-                                sectionHeader = document.querySelector('h3:contains("Injunctive")');
-                                break;
-                            case 'noLicense':
-                                sectionHeader = document.querySelector('h3:contains("License")');
-                                break;
-                            case 'noObligation':
-                                sectionHeader = document.querySelector('h3:contains("Obligation")');
-                                break;
-                        }
-                        
-                        if (sectionHeader) {
-                            sectionHeader.classList.add('highlight');
-                            
-                            // Scroll to make it visible if needed
-                            if (!isElementInViewport(sectionHeader)) {
-                                sectionHeader.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    });
+                } 
+                else if (elementId === 'recipient-name' || elementId === 'recipient-name-ru') {
+                    // Find recipient name in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        const strong = column.querySelectorAll('strong');
+                        strong.forEach(el => {
+                            if (el.textContent === elementValue) {
+                                targetElement = el;
+                                targetElement.classList.add('highlight');
+                            }
+                        });
+                    });
+                }
+                else if (elementId === 'effective-date') {
+                    // Find effective date in both columns
+                    const dateSections = previewDoc.querySelectorAll('.section-title');
+                    dateSections.forEach(section => {
+                        if (section.textContent.includes('EFFECTIVE DATE') || section.textContent.includes('ДАТА ВСТУПЛЕНИЯ В СИЛУ')) {
+                            const parent = section.parentElement;
+                            if (parent && parent.textContent.includes(elementValue)) {
+                                // Create a text node with the highlighted date
+                                const text = parent.innerHTML;
+                                parent.innerHTML = text.replace(
+                                    elementValue,
+                                    `<span class="highlight">${elementValue}</span>`
+                                );
+                                targetElement = parent.querySelector('.highlight');
                             }
                         }
-                    } else {
-                        // For text inputs
-                        targetSection.innerHTML = targetSection.innerHTML.replace(
-                            elementValue, 
-                            `<span class="highlight">${elementValue}</span>`
-                        );
+                    });
+                }
+                else if (elementId === 'purpose' || elementId === 'purpose-ru') {
+                    // Find purpose text in the corresponding column
+                    const isEnglish = elementId === 'purpose';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('PERMITTED USE')) || 
+                            (!isEnglish && section.textContent.includes('ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ'))) {
+                            const parent = section.parentElement;
+                            if (parent && parent.textContent.includes(elementValue)) {
+                                // Create a text node with the highlighted purpose
+                                const text = parent.innerHTML;
+                                parent.innerHTML = text.replace(
+                                    elementValue,
+                                    `<span class="highlight">${elementValue}</span>`
+                                );
+                                targetElement = parent.querySelector('.highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId === 'conf-info' || elementId === 'conf-info-ru') {
+                    // Highlight the entire confidential information section
+                    const isEnglish = elementId === 'conf-info';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('CONFIDENTIAL INFORMATION')) || 
+                            (!isEnglish && section.textContent.includes('КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId === 'protection-period') {
+                    // Find protection period in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        if (column.textContent.includes(`${elementValue} years`) || 
+                            column.textContent.includes(`${elementValue} года`)) {
+                            const text = column.innerHTML;
+                            column.innerHTML = text.replace(
+                                new RegExp(`${elementValue}(?= years| года)`, 'g'),
+                                `<span class="highlight">${elementValue}</span>`
+                            );
+                            targetElement = column.querySelector('.highlight');
+                        }
+                    });
+                }
+                else if (elementId === 'termination-notice') {
+                    // Find termination notice in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        if (column.textContent.includes(`${elementValue} days`) || 
+                            column.textContent.includes(`${elementValue} дней`)) {
+                            const text = column.innerHTML;
+                            column.innerHTML = text.replace(
+                                new RegExp(`${elementValue}(?= days| дней)`, 'g'),
+                                `<span class="highlight">${elementValue}</span>`
+                            );
+                            targetElement = column.querySelector('.highlight');
+                        }
+                    });
+                }
+                else if (elementId === 'governing-law' || elementId === 'governing-law-ru') {
+                    // Highlight the entire governing law section
+                    const isEnglish = elementId === 'governing-law';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('GOVERNING LAW')) || 
+                            (!isEnglish && section.textContent.includes('ПРИМЕНИМОЕ ПРАВО'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId.startsWith('include-')) {
+                    // For checkboxes that toggle sections
+                    const isEnglish = !elementId.endsWith('-ru');
+                    const sectionType = elementId.replace('include-', '').replace(/-ru$/, '');
+                    
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                                   
+                    let sectionTitle;
+                    switch (sectionType) {
+                        case 'return-destroy':
+                            // Already included in protection period section
+                            sectionTitle = isEnglish ? 'PROTECTION PERIOD AND RETURN' : 'СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ';
+                            break;
+                        case 'no-warranty':
+                            sectionTitle = isEnglish ? 'NO WARRANTIES' : 'НЕТ ГАРАНТИЙ';
+                            break;
+                        case 'severability':
+                            sectionTitle = isEnglish ? 'SEVERABILITY' : 'НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ';
+                            break;
+                    }
+                    
+                    if (sectionTitle) {
+                        const sections = column.querySelectorAll('.section-title');
+                        sections.forEach(section => {
+                            if (section.textContent.includes(sectionTitle)) {
+                                section.classList.add('highlight');
+                                targetElement = section;
+                                
+                                // Also highlight the paragraph text after the section title
+                                let nextSibling = section.nextSibling;
+                                while (nextSibling && nextSibling.nodeType !== 1) {
+                                    nextSibling = nextSibling.nextSibling;
+                                }
+                                if (nextSibling) {
+                                    nextSibling.classList.add('highlight');
+                                }
+                            }
+                        });
                     }
                 }
+                else if (elementId === 'controlling-language' || elementId === 'controlling-language-ru') {
+                    // Highlight the entire controlling language section
+                    const isEnglish = elementId === 'controlling-language';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('PREVAILING LANGUAGE')) || 
+                            (!isEnglish && section.textContent.includes('ПРЕОБЛАДАЮЩИЙ ЯЗЫК'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                
+                // If a target element was found and highlighted, scroll it into view if needed
+                if (targetElement && !isElementInViewport(targetElement)) {
+                    targetElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+                
+                // Remove highlights after a delay
+                setTimeout(() => {
+                    const highlights = previewDoc.querySelectorAll('.highlight');
+                    highlights.forEach(el => {
+                        el.classList.add('fade-highlight');
+                    });
+                    
+                    // Reset the highlight after animation completes
+                    setTimeout(() => {
+                        highlights.forEach(el => {
+                            el.classList.remove('highlight');
+                            el.classList.remove('fade-highlight');
+                        });
+                    }, 1000);
+                }, 2000);
             }, 100);
         }
         
@@ -899,6 +1070,66 @@ ${customText}`;
         }
         
         // Event listeners
+        // Function to sync input values between languages
+        function syncInputValue(englishId, russianId) {
+            const englishInput = document.getElementById(englishId);
+            const russianInput = document.getElementById(russianId);
+            
+            if (englishInput && russianInput) {
+                // When editing English field, update Russian field
+                englishInput.addEventListener('input', function() {
+                    russianInput.value = this.value;
+                });
+                
+                // When editing Russian field, update English field
+                russianInput.addEventListener('input', function() {
+                    englishInput.value = this.value;
+                });
+            }
+        }
+        
+        // Initialize sync between language fields
+        function initializeLanguageSync() {
+            // Sync text inputs
+            syncInputValue('discloser-name', 'discloser-name-ru');
+            syncInputValue('discloser-address', 'discloser-address-ru');
+            syncInputValue('recipient-name', 'recipient-name-ru');
+            syncInputValue('recipient-address', 'recipient-address-ru');
+            
+            // Sync textareas
+            syncInputValue('purpose', 'purpose-ru');
+            syncInputValue('custom-conf-info', 'custom-conf-info-ru');
+            
+            // Sync selects 
+            syncInputValue('conf-info', 'conf-info-ru');
+            syncInputValue('governing-law', 'governing-law-ru');
+            syncInputValue('jurisdiction', 'jurisdiction-ru');
+            syncInputValue('controlling-language', 'controlling-language-ru');
+            
+            // Sync checkboxes
+            const syncCheckbox = function(englishId, russianId) {
+                const englishCheckbox = document.getElementById(englishId);
+                const russianCheckbox = document.getElementById(russianId);
+                
+                if (englishCheckbox && russianCheckbox) {
+                    englishCheckbox.addEventListener('change', function() {
+                        russianCheckbox.checked = this.checked;
+                    });
+                    
+                    russianCheckbox.addEventListener('change', function() {
+                        englishCheckbox.checked = this.checked;
+                    });
+                }
+            };
+            
+            syncCheckbox('include-return-destroy', 'include-return-destroy-ru');
+            syncCheckbox('include-no-warranty', 'include-no-warranty-ru');
+            syncCheckbox('include-severability', 'include-severability-ru');
+        }
+        
+        // Call initialization
+        initializeLanguageSync();
+        
         document.getElementById('lang-en').addEventListener('click', function() {
             document.getElementById('lang-en').classList.add('active');
             document.getElementById('lang-ru').classList.remove('active');
@@ -995,7 +1226,126 @@ ${customText}`;
         
         // Download PDF functionality
         document.getElementById('download-btn').addEventListener('click', function() {
-            alert('PDF download would be implemented here. In a real implementation, this would convert the HTML to PDF.');
+            // First, create a clean version of the document without any highlight styling
+            const previewDoc = document.getElementById('preview-document');
+            const cleanDocContent = previewDoc.innerHTML;
+            
+            // Create print-optimized HTML
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>NDA Agreement</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            padding: 40px;
+                            max-width: 1200px;
+                            margin: 0 auto;
+                        }
+                        .dual-column {
+                            display: flex;
+                            width: 100%;
+                        }
+                        .column {
+                            width: 50%;
+                            padding: 10px;
+                            vertical-align: top;
+                        }
+                        .left-column {
+                            border-right: 1px solid #ccc;
+                        }
+                        .section-title {
+                            text-transform: uppercase;
+                            font-weight: bold;
+                            margin-top: 15px;
+                            margin-bottom: 10px;
+                        }
+                        .signatures {
+                            margin-top: 30px;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                            .dual-column {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanDocContent}
+                </body>
+                </html>
+            `;
+            
+            // Create a Blob with the print content
+            const blob = new Blob([printContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            // Check if the browser supports the print API
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1 || 
+                navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
+                // Create an iframe for printing
+                const printFrame = document.createElement('iframe');
+                printFrame.style.display = 'none';
+                printFrame.src = url;
+                
+                document.body.appendChild(printFrame);
+                printFrame.onload = function() {
+                    // Get filename from disclosing and receiving party names
+                    let discloserName = document.getElementById('discloser-name').value || 'Disclosing-Party';
+                    let recipientName = document.getElementById('recipient-name').value || 'Receiving-Party';
+                    
+                    // Clean up names for filenames
+                    discloserName = discloserName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 15);
+                    recipientName = recipientName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 15);
+                    
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const filename = `NDA-${discloserName}-${recipientName}-${dateStr}.pdf`;
+                    
+                    setTimeout(function() {
+                        try {
+                            printFrame.contentWindow.focus();
+                            printFrame.contentWindow.print();
+                            alert(`To save as PDF: Please select "Save as PDF" as your printer option and save the file as "${filename}"`);
+                        } catch (err) {
+                            console.error('Printing failed', err);
+                            
+                            // Fallback for browsers without print support
+                            const saveLink = document.createElement('a');
+                            saveLink.href = url;
+                            saveLink.download = 'NDA-Agreement.html';
+                            saveLink.click();
+                            
+                            alert('PDF printing not supported in your browser. The NDA has been downloaded as an HTML file that you can open and print to PDF.');
+                        }
+                        
+                        // Clean up
+                        setTimeout(function() {
+                            document.body.removeChild(printFrame);
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    }, 500);
+                };
+            } else {
+                // Fallback for other browsers
+                const saveLink = document.createElement('a');
+                saveLink.href = url;
+                saveLink.download = 'NDA-Agreement.html';
+                saveLink.click();
+                
+                alert('PDF printing not supported in your browser. The NDA has been downloaded as an HTML file that you can open and print to PDF.');
+                
+                // Clean up
+                setTimeout(function() {
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
         });
         
         // Initialize
