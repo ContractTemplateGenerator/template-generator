@@ -11,6 +11,7 @@
             --text-color: #333;
             --light-gray: #f5f5f5;
             --border-color: #ddd;
+            --checkbox-spacing: 5px;
         }
         
         * {
@@ -87,6 +88,21 @@
         
         .form-group {
             margin-bottom: 15px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .checkbox-text {
+            margin-left: var(--checkbox-spacing);
         }
         
         label {
@@ -360,34 +376,34 @@
             </div>
             
             <div class="tab-content" id="tab-additional">
-                <div class="form-group">
-                    <label class="en-text">
+                <div class="form-group checkbox-group">
+                    <label class="en-text checkbox-label">
                         <input type="checkbox" id="include-return-destroy" checked>
-                        Include Return/Destruction of Materials
+                        <span class="checkbox-text">Include Return/Destruction of Materials</span>
                     </label>
-                    <label class="ru-text" style="display: none;">
+                    <label class="ru-text checkbox-label" style="display: none;">
                         <input type="checkbox" id="include-return-destroy-ru" checked>
-                        Включить Возврат/Уничтожение Материалов
+                        <span class="checkbox-text">Включить Возврат/Уничтожение Материалов</span>
                     </label>
                 </div>
-                <div class="form-group">
-                    <label class="en-text">
+                <div class="form-group checkbox-group">
+                    <label class="en-text checkbox-label">
                         <input type="checkbox" id="include-no-warranty" checked>
-                        Include No Warranty Clause
+                        <span class="checkbox-text">Include No Warranty Clause</span>
                     </label>
-                    <label class="ru-text" style="display: none;">
+                    <label class="ru-text checkbox-label" style="display: none;">
                         <input type="checkbox" id="include-no-warranty-ru" checked>
-                        Включить Отсутствие Гарантий
+                        <span class="checkbox-text">Включить Отсутствие Гарантий</span>
                     </label>
                 </div>
-                <div class="form-group">
-                    <label class="en-text">
+                <div class="form-group checkbox-group">
+                    <label class="en-text checkbox-label">
                         <input type="checkbox" id="include-severability" checked>
-                        Include Severability Clause
+                        <span class="checkbox-text">Include Severability Clause</span>
                     </label>
-                    <label class="ru-text" style="display: none;">
+                    <label class="ru-text checkbox-label" style="display: none;">
                         <input type="checkbox" id="include-severability-ru" checked>
-                        Включить Независимость Положений
+                        <span class="checkbox-text">Включить Независимость Положений</span>
                     </label>
                 </div>
                 <div class="form-group">
@@ -396,12 +412,10 @@
                     <select id="controlling-language" class="en-placeholder">
                         <option value="english">English</option>
                         <option value="russian">Russian</option>
-                        <option value="both">Both Equally</option>
                     </select>
                     <select id="controlling-language-ru" class="ru-placeholder" style="display: none;">
                         <option value="english">Английский</option>
                         <option value="russian">Русский</option>
-                        <option value="both">Оба в Равной Степени</option>
                     </select>
                 </div>
             </div>
@@ -1071,21 +1085,148 @@ ${customText}`;
         
         // Event listeners
         // Function to sync input values between languages
-        function syncInputValue(englishId, russianId) {
+        function syncInputValue(englishId, russianId, shouldTranslate = false) {
             const englishInput = document.getElementById(englishId);
             const russianInput = document.getElementById(russianId);
             
             if (englishInput && russianInput) {
                 // When editing English field, update Russian field
                 englishInput.addEventListener('input', function() {
-                    russianInput.value = this.value;
+                    if (shouldTranslate) {
+                        // Use translation function for the purpose field
+                        translateText(this.value, 'en', 'ru')
+                            .then(translatedText => {
+                                russianInput.value = translatedText;
+                            })
+                            .catch(error => {
+                                console.error('Translation error:', error);
+                                // Fall back to copying original text if translation fails
+                                russianInput.value = this.value;
+                            });
+                    } else {
+                        // For other fields, simply copy the value
+                        russianInput.value = this.value;
+                    }
                 });
                 
                 // When editing Russian field, update English field
                 russianInput.addEventListener('input', function() {
-                    englishInput.value = this.value;
+                    if (shouldTranslate) {
+                        // Use translation function for the purpose field
+                        translateText(this.value, 'ru', 'en')
+                            .then(translatedText => {
+                                englishInput.value = translatedText;
+                            })
+                            .catch(error => {
+                                console.error('Translation error:', error);
+                                // Fall back to copying original text if translation fails
+                                englishInput.value = this.value;
+                            });
+                    } else {
+                        // For other fields, simply copy the value
+                        englishInput.value = this.value;
+                    }
                 });
             }
+        }
+        
+        // Function to translate text using a free translation API
+        async function translateText(text, sourceLang, targetLang) {
+            if (!text || text.trim() === '') {
+                return '';
+            }
+            
+            // For demo purposes, we'll use a simple dictionary-based translation for common phrases
+            // In a production environment, you would integrate with a proper translation API
+            
+            const commonPhrases = {
+                // English to Russian translations
+                'joint venture': 'совместное предприятие',
+                'business partnership': 'деловое партнерство',
+                'product development': 'разработка продукта',
+                'software development': 'разработка программного обеспечения',
+                'marketing campaign': 'маркетинговая кампания',
+                'investment opportunity': 'инвестиционная возможность',
+                'merger': 'слияние',
+                'acquisition': 'приобретение',
+                'consulting services': 'консультационные услуги',
+                'project evaluation': 'оценка проекта',
+                'market research': 'исследование рынка',
+                
+                // Russian to English translations
+                'совместное предприятие': 'joint venture',
+                'деловое партнерство': 'business partnership',
+                'разработка продукта': 'product development',
+                'разработка программного обеспечения': 'software development',
+                'маркетинговая кампания': 'marketing campaign',
+                'инвестиционная возможность': 'investment opportunity',
+                'слияние': 'merger',
+                'приобретение': 'acquisition',
+                'консультационные услуги': 'consulting services',
+                'оценка проекта': 'project evaluation',
+                'исследование рынка': 'market research'
+            };
+            
+            // Check if the exact phrase exists in our dictionary
+            if (commonPhrases[text.toLowerCase()]) {
+                return commonPhrases[text.toLowerCase()];
+            }
+            
+            // Try to find and replace known phrases within the text
+            let translatedText = text;
+            
+            if (sourceLang === 'en' && targetLang === 'ru') {
+                Object.keys(commonPhrases).forEach(phrase => {
+                    if (phrase.length > 3 && text.toLowerCase().includes(phrase)) {
+                        const regex = new RegExp(phrase, 'gi');
+                        translatedText = translatedText.replace(regex, commonPhrases[phrase]);
+                    }
+                });
+            } else if (sourceLang === 'ru' && targetLang === 'en') {
+                Object.keys(commonPhrases).forEach(phrase => {
+                    const engPhrase = commonPhrases[phrase];
+                    if (text.includes(phrase)) {
+                        const regex = new RegExp(phrase, 'g');
+                        translatedText = translatedText.replace(regex, engPhrase);
+                    }
+                });
+            }
+            
+            // If we made any translations, return the result
+            if (translatedText !== text) {
+                return translatedText;
+            }
+            
+            // If no translation was found in our dictionary, return original text
+            return text;
+            
+            // In a production environment, use a proper translation API, for example:
+            /*
+            try {
+                const response = await fetch(`https://translation-api.example.com/translate`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_API_KEY'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        source: sourceLang,
+                        target: targetLang
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Translation API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                return data.translatedText;
+            } catch (error) {
+                console.error('Translation API error:', error);
+                return text; // Return original text if translation fails
+            }
+            */
         }
         
         // Initialize sync between language fields
@@ -1096,8 +1237,8 @@ ${customText}`;
             syncInputValue('recipient-name', 'recipient-name-ru');
             syncInputValue('recipient-address', 'recipient-address-ru');
             
-            // Sync textareas
-            syncInputValue('purpose', 'purpose-ru');
+            // Sync textareas (with translation for purpose)
+            syncInputValue('purpose', 'purpose-ru', true); // Enable translation for purpose field
             syncInputValue('custom-conf-info', 'custom-conf-info-ru');
             
             // Sync selects 
