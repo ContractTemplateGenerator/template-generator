@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual Language NDA Generator - English/Russian</title>
+    <style>
+        :root {
+            --primary-color: #0069ff;
+            --highlight-color: #ffff00;
+            --text-color: #333;
+            --light-gray: #f5f5f5;
+            --border-color: #ddd;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .form-section {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .preview-section {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 700px;
+            overflow-y: auto;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+        
+        .language-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .toggle-btn {
+            background-color: var(--light-gray);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .toggle-btn:first-child {
+            border-radius: 4px 0 0 4px;
+        }
+        
+        .toggle-btn:last-child {
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .toggle-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tab {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            border-bottom: none;
+            margin-right: 5px;
+            border-radius: 4px 4px 0 0;
+        }
+        
+        .tab.active {
+            background-color: white;
+            border-color: var(--border-color);
+            border-bottom: 1px solid white;
+            margin-bottom: -1px;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .preview-content {
+            padding: 20px;
+            line-height: 1.8;
+        }
+        
+        .highlight {
+            background-color: var(--highlight-color);
+            transition: background-color 0.3s ease-in-out;
+        }
+        
+        .fade-highlight {
+            background-color: transparent;
+            transition: background-color 1s ease-out;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        
+        #preview-document {
+            font-size: 14px;
+        }
+        
+        .section-row {
+            display: flex;
+            width: 100%;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .column {
+            width: 50%;
+            padding: 10px;
+            vertical-align: top;
+        }
+        
+        .left-column {
+            border-right: 1px solid #ccc;
+        }
+        
+        .full-width {
+            width: 100%;
+        }
+        
+        .signatures-row {
+            display: block;
+            margin-top: 20px;
+        }
+        
+        .section-title {
+            text-transform: uppercase;
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+        
+        hr.separator {
+            border: none;
+            border-top: 1px dashed #ccc;
+            margin: 10px 0;
+        }
+        
+        .signatures {
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .section-row {
+                flex-direction: column;
+            }
+            
+            .column {
+                width: 100%;
+            }
+            
+            .left-column {
+                border-right: none;
+                border-bottom: 1px solid #ccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Dual Language NDA Generator (English/Russian)</h1>
+    
+    <div class="language-toggle">
+        <button class="toggle-btn active" id="lang-en">English</button>
+        <button class="toggle-btn" id="lang-ru">Русский</button>
+    </div>
+    
+    <div class="container">
+        <div class="form-section">
+            <div class="tabs">
+                <div class="tab active en-text" data-tab="parties">Parties</div>
+                <div class="tab ru-text" data-tab="parties" style="display: none;">Стороны</div>
+                <div class="tab en-text" data-tab="agreement">Agreement</div>
+                <div class="tab ru-text" data-tab="agreement" style="display: none;">Соглашение</div>
+                <div class="tab en-text" data-tab="term">Term & Jurisdiction</div>
+                <div class="tab ru-text" data-tab="term" style="display: none;">Срок и Юрисдикция</div>
+                <div class="tab en-text" data-tab="additional">Additional Terms</div>
+                <div class="tab ru-text" data-tab="additional" style="display: none;">Дополнительные Условия</div>
+            </div>
+            
+            <div class="tab-content active" id="tab-parties">
+                <div class="form-group">
+                    <label for="discloser-name" class="en-text">Disclosing Party Name:</label>
+                    <label for="discloser-name" class="ru-text" style="display: none;">Наименование Раскрывающей Стороны:</label>
+                    <input type="text" id="discloser-name" placeholder="Company/Individual Name" class="en-placeholder">
+                    <input type="text" id="discloser-name-ru" placeholder="Название Компании/ФИО" class="ru-placeholder" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label for="discloser-address" class="en-text">Disclosing Party Address:</label>
+                    <label for="discloser-address" class="ru-text" style="display: none;">Адрес Раскрывающей Стороны:</label>
+                    <input type="text" id="discloser-address" placeholder="Full Address" class="en-placeholder">
+                    <input type="text" id="discloser-address-ru" placeholder="Полный Адрес" class="ru-placeholder" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label for="recipient-name" class="en-text">Receiving Party Name:</label>
+                    <label for="recipient-name" class="ru-text" style="display: none;">Наименование Получателя:</label>
+                    <input type="text" id="recipient-name" placeholder="Company/Individual Name" class="en-placeholder">
+                    <input type="text" id="recipient-name-ru" placeholder="Название Компании/ФИО" class="ru-placeholder" style="display: none;">
+                </div>
+                <div class="form-group">
+                    <label for="recipient-address" class="en-text">Receiving Party Address:</label>
+                    <label for="recipient-address" class="ru-text" style="display: none;">Адрес Получателя:</label>
+                    <input type="text" id="recipient-address" placeholder="Full Address" class="en-placeholder">
+                    <input type="text" id="recipient-address-ru" placeholder="Полный Адрес" class="ru-placeholder" style="display: none;">
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-agreement">
+                <div class="form-group">
+                    <label for="effective-date" class="en-text">Effective Date:</label>
+                    <label for="effective-date" class="ru-text" style="display: none;">Дата Вступления в Силу:</label>
+                    <input type="date" id="effective-date">
+                </div>
+                <div class="form-group">
+                    <label for="purpose" class="en-text">Purpose of Disclosure:</label>
+                    <label for="purpose" class="ru-text" style="display: none;">Цель Раскрытия:</label>
+                    <textarea id="purpose" placeholder="Describe the purpose for sharing confidential information" class="en-placeholder"></textarea>
+                    <textarea id="purpose-ru" placeholder="Опишите цель обмена конфиденциальной информацией" class="ru-placeholder" style="display: none;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="conf-info" class="en-text">Definition of Confidential Information:</label>
+                    <label for="conf-info" class="ru-text" style="display: none;">Определение Конфиденциальной Информации:</label>
+                    <select id="conf-info" class="en-placeholder">
+                        <option value="broad">Broad Definition</option>
+                        <option value="medium">Medium Definition</option>
+                        <option value="narrow">Narrow Definition</option>
+                        <option value="custom">Custom Definition</option>
+                    </select>
+                    <select id="conf-info-ru" class="ru-placeholder" style="display: none;">
+                        <option value="broad">Широкое Определение</option>
+                        <option value="medium">Среднее Определение</option>
+                        <option value="narrow">Узкое Определение</option>
+                        <option value="custom">Пользовательское Определение</option>
+                    </select>
+                </div>
+                <div class="form-group" id="custom-conf-info-group" style="display: none;">
+                    <label for="custom-conf-info" class="en-text">Custom Definition:</label>
+                    <label for="custom-conf-info" class="ru-text" style="display: none;">Пользовательское Определение:</label>
+                    <textarea id="custom-conf-info" placeholder="Enter custom definition of confidential information" class="en-placeholder"></textarea>
+                    <textarea id="custom-conf-info-ru" placeholder="Введите пользовательское определение конфиденциальной информации" class="ru-placeholder" style="display: none;"></textarea>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-term">
+                <div class="form-group">
+                    <label for="protection-period" class="en-text">Protection Period (years):</label>
+                    <label for="protection-period" class="ru-text" style="display: none;">Срок Защиты (лет):</label>
+                    <input type="number" id="protection-period" min="1" max="10" value="2">
+                </div>
+                <div class="form-group">
+                    <label for="termination-notice" class="en-text">Termination Notice Period (days):</label>
+                    <label for="termination-notice" class="ru-text" style="display: none;">Период Уведомления о Расторжении (дней):</label>
+                    <input type="number" id="termination-notice" min="1" max="90" value="30">
+                </div>
+                <div class="form-group">
+                    <label for="governing-law" class="en-text">Governing Law:</label>
+                    <label for="governing-law" class="ru-text" style="display: none;">Применимое Право:</label>
+                    <select id="governing-law" class="en-placeholder">
+                        <option value="california">California, USA</option>
+                        <option value="delaware">Delaware, USA</option>
+                        <option value="newyork">New York, USA</option>
+                        <option value="russia">Russian Federation</option>
+                    </select>
+                    <select id="governing-law-ru" class="ru-placeholder" style="display: none;">
+                        <option value="california">Калифорния, США</option>
+                        <option value="delaware">Делавэр, США</option>
+                        <option value="newyork">Нью-Йорк, США</option>
+                        <option value="russia">Российская Федерация</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="jurisdiction" class="en-text">Jurisdiction:</label>
+                    <label for="jurisdiction" class="ru-text" style="display: none;">Место Рассмотрения Споров:</label>
+                    <select id="jurisdiction" class="en-placeholder">
+                        <option value="los-angeles">Los Angeles, CA</option>
+                        <option value="new-york">New York, NY</option>
+                        <option value="wilmington">Wilmington, DE</option>
+                        <option value="moscow">Moscow, Russia</option>
+                    </select>
+                    <select id="jurisdiction-ru" class="ru-placeholder" style="display: none;">
+                        <option value="los-angeles">Лос-Анджелес, Калифорния</option>
+                        <option value="new-york">Нью-Йорк, Нью-Йорк</option>
+                        <option value="wilmington">Уилмингтон, Делавэр</option>
+                        <option value="moscow">Москва, Россия</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="tab-additional">
+                <div class="form-group">
+                    <label class="en-text">
+                        <input type="checkbox" id="include-return-destroy" checked>
+                        Include Return/Destruction of Materials
+                    </label>
+                    <label class="ru-text" style="display: none;">
+                        <input type="checkbox" id="include-return-destroy-ru" checked>
+                        Включить Возврат/Уничтожение Материалов
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="en-text">
+                        <input type="checkbox" id="include-no-warranty" checked>
+                        Include No Warranty Clause
+                    </label>
+                    <label class="ru-text" style="display: none;">
+                        <input type="checkbox" id="include-no-warranty-ru" checked>
+                        Включить Отсутствие Гарантий
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label class="en-text">
+                        <input type="checkbox" id="include-severability" checked>
+                        Include Severability Clause
+                    </label>
+                    <label class="ru-text" style="display: none;">
+                        <input type="checkbox" id="include-severability-ru" checked>
+                        Включить Независимость Положений
+                    </label>
+                </div>
+                <div class="form-group">
+                    <label for="controlling-language" class="en-text">Legally Controlling Language:</label>
+                    <label for="controlling-language" class="ru-text" style="display: none;">Преобладающий Язык:</label>
+                    <select id="controlling-language" class="en-placeholder">
+                        <option value="english">English</option>
+                        <option value="russian">Russian</option>
+                        <option value="both">Both Equally</option>
+                    </select>
+                    <select id="controlling-language-ru" class="ru-placeholder" style="display: none;">
+                        <option value="english">Английский</option>
+                        <option value="russian">Русский</option>
+                        <option value="both">Оба в Равной Степени</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" id="prev-btn">Previous</button>
+                <button class="btn" id="next-btn">Next</button>
+            </div>
+            
+            <div class="buttons">
+                <button class="btn" id="download-btn">Download PDF</button>
+            </div>
+        </div>
+        
+        <div class="preview-section">
+            <h2>Live Preview</h2>
+            <div id="preview-document" class="preview-content"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Document template objects for both languages
+        const templates = {
+            english: {
+                title: "NON-DISCLOSURE AGREEMENT",
+                parties: (discloserName, discloserAddress, recipientName, recipientAddress, effectiveDate) => {
+                    return `This Agreement is made by <strong>${discloserName}</strong> (the "Disclosing Party"), and <strong>${recipientName}</strong> (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
+                },
+                effectiveDate: (effectiveDate) => {
+                    return `<div class="section-title">1. EFFECTIVE DATE</div>
+The effective date of this Agreement is ${effectiveDate}.`;
+                },
+                confidentialInfo: {
+                    broad: `<div class="section-title">2. CONFIDENTIAL INFORMATION</div>
+"Confidential Information" disclosed under this Agreement is defined as any information, technical data or know-how furnished, whether in written, oral, electronic or other form by the Disclosing Party to the Receiving Party that (a) is marked, accompanied or supported by documents clearly and conspicuously designating such documents as "confidential", "internal use" or the equivalent; (b) is identified by the Disclosing Party as confidential before, during or promptly after the presentation or communication; or (c) should reasonably be known by Receiving Party to be confidential.`,
+                    
+                    medium: `<div class="section-title">2. CONFIDENTIAL INFORMATION</div>
+"Confidential Information" disclosed under this Agreement is defined as any non-public information that relates to the actual or anticipated business or research and development of the Disclosing Party, technical data, trade secrets or know-how, including, but not limited to, research, product plans, products, services, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, marketing, finances or other business information disclosed by the Disclosing Party either directly or indirectly in writing, orally or by inspection of parts or equipment.`,
+                    
+                    narrow: `<div class="section-title">2. CONFIDENTIAL INFORMATION</div>
+"Confidential Information" disclosed under this Agreement is defined as only that information which is (a) disclosed in writing and marked as confidential at the time of disclosure, or (b) disclosed in any other manner and identified as confidential at the time of disclosure and also summarized and designated as confidential in a written memorandum delivered to the Receiving Party within thirty (30) days of the disclosure.`,
+                    
+                    custom: (customText) => {
+                        return `<div class="section-title">2. CONFIDENTIAL INFORMATION</div>
+${customText}`;
+                    }
+                },
+                term: (terminationNotice) => {
+                    return `<div class="section-title">3. TERM AND TERMINATION</div>
+This Agreement shall remain in effect until it is terminated by a Party with ${terminationNotice} days prior written notice; provided, however, that no Party shall terminate this Agreement if the Parties have a direct agreement still in effect. The terms and conditions of this Agreement shall survive any such termination with respect to Confidential Information that is disclosed prior to the effective date of termination.`;
+                },
+                
+                permittedUse: (purpose) => {
+                    return `<div class="section-title">4. PERMITTED USE AND DISCLOSURE</div>
+Receiving Party will use Confidential Information only for the purpose of and in connection with ${purpose} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
+                },
+                
+                protectionPeriod: (protectionPeriod) => {
+                    return `<div class="section-title">5. PROTECTION PERIOD AND RETURN</div>
+Unless the Parties otherwise agree in writing, a Receiving Party's duty to protect Confidential Information expires ${protectionPeriod} years from the date of disclosure. Upon the Disclosing Party's written request, Receiving Party will promptly return or destroy all Confidential Information received from the Disclosing Party, together with all copies.`;
+                },
+                
+                exclusions: `<div class="section-title">6. EXCLUSIONS</div>
+Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.`,
+                
+                noWarranty: `<div class="section-title">7. NO WARRANTIES</div>
+The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.`,
+                
+                governingLaw: {
+                    california: `<div class="section-title">8. GOVERNING LAW</div>
+This Agreement shall be governed by the law of the State of California, USA. Los Angeles, CA is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
+                    
+                    delaware: `<div class="section-title">8. GOVERNING LAW</div>
+This Agreement shall be governed by the law of the State of Delaware, USA. Wilmington, DE is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
+                    
+                    newyork: `<div class="section-title">8. GOVERNING LAW</div>
+This Agreement shall be governed by the law of the State of New York, USA. New York, NY is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
+                    
+                    russia: `<div class="section-title">8. GOVERNING LAW</div>
+This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`
+                },
+                
+                severability: `<div class="section-title">9. SEVERABILITY</div>
+If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.`,
+                
+                controllingLanguage: {
+                    english: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the English version shall prevail.`,
+                    
+                    russian: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`,
+                    
+                    both: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, both versions shall be equally authoritative.`
+                },
+                
+                signatures: `<div class="section-title">IN WITNESS WHEREOF</div>
+The Parties hereto have executed this Agreement.
+
+<div class="signatures">
+<strong>Disclosing Party:</strong>
+
+By: _________________________________
+Name: ______________________________
+Title:________________________________
+Date: _______________________________
+
+<strong>Receiving Party:</strong>
+
+By: _________________________________
+Name: ______________________________
+Title:________________________________
+Date: _______________________________
+</div>`
+            },
+            
+            russian: {
+                title: "СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ",
+                parties: (discloserName, discloserAddress, recipientName, recipientAddress, effectiveDate) => {
+                    return `Это Соглашение заключено между <strong>${discloserName}</strong> ("Раскрывающая Сторона") и <strong>${recipientName}</strong> ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
+                },
+                effectiveDate: (effectiveDate) => {
+                    return `<div class="section-title">1. ДАТА ВСТУПЛЕНИЯ В СИЛУ</div>
+Дата вступления в силу настоящего Соглашения ${effectiveDate}.`;
+                },
+                confidentialInfo: {
+                    broad: `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
+"Конфиденциальная Информация" по данному Соглашению означает любую информацию, технические спецификации или ноу-хау, раскрытые в письменной, устной, электронной или другой форме Раскрывающей Стороной Получателю, которые (а) помечены, сопровождены или подпадают под действие документов ясно помеченных "конфиденциально", "для внутреннего пользования" и т.п.; (b) обозначены как конфиденциальные Раскрывающей Стороной до, во время или после раскрытия или сообщения; или (c) конфиденьциальность которых Получатель должен осознать.`,
+                    
+                    medium: `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
+"Конфиденциальная Информация" по данному Соглашению означает любую непубличную информацию, которая относится к фактической или ожидаемой деловой деятельности или исследованиям и разработкам Раскрывающей Стороны, техническим данным, коммерческой тайне или ноу-хау, включая, помимо прочего, исследования, планы продуктов, продукты, услуги, списки клиентов, рынки, программное обеспечение, разработки, изобретения, процессы, формулы, технологии, дизайны, чертежи, инженерные решения, маркетинг, финансы или другую деловую информацию, раскрытую Раскрывающей Сторо��ой прямо или косвенно в письменной форме, устно или путем осмотра деталей или оборудования.`,
+                    
+                    narrow: `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
+"Конфиденциальная Информация" по данному Соглашению означает только ту информацию, которая (а) раскрыта в письменной форме и помечена как конфиденциальная в момент раскрытия, или (б) раскрыта любым другим способом и обозначена как конфиденциальная в момент раскрытия, а также резюмирована и обозначена как конфиденциальная в письменном меморандуме, направленном Получателю в течение тридцати (30) дней после раскрытия.`,
+                    
+                    custom: (customText) => {
+                        return `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
+${customText}`;
+                    }
+                },
+                term: (terminationNotice) => {
+                    return `<div class="section-title">3. СРОК ДЕЙСТВИЯ И РАСТОРЖЕНИЕ</div>
+Данное Соглашение остается в силе до расторжения любой Стороной по предварительному письменному уведомлению за ${terminationNotice} дней; но ни одна Сторона не может расторгнуть данное Соглашение если между Сторонами заключено другое действующее прямое соглашение. В случае расторжения данного Соглашения, его условия продолжат действовать в отношении Конфиденциальной Информации, раскрытой до даты вступления в силу расторжения.`;
+                },
+                
+                permittedUse: (purpose) => {
+                    return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
+Получатель может пользоваться Конфиденциальной Информацией только для ${purpose} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
+                },
+                
+                protectionPeriod: (protectionPeriod) => {
+                    return `<div class="section-title">5. СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ</div>
+При отсутствии письменной договоренности между Сторонами об ином, обязанность Получателя о неразглашении Конфиденциальной Информации истекает через ${protectionPeriod} года после ее предоставления. По письменному распоряжению Раскрывающей Стороны Получатель должен незамедлительно вернуть или уничтожить всю полученную Конфиденциальную Информацию и все ее копии.`;
+                },
+                
+                exclusions: `<div class="section-title">6. ИСКЛЮЧЕНИЯ</div>
+Конфиденциальная Информация не включает информацию, которая: (a) является или становится общедоступной не по вине Получателя; (b) во время разглашения находилась в правомерном распоряжении Получателя без ограничений на её использование и разглашение; или (c) информацию, правомерно полученную Получателя от третьего лица без ограничений на использование и разглашение.`,
+                
+                noWarranty: `<div class="section-title">7. НЕТ ГАРАНТИЙ</div>
+Конфиденциальная Информация предоставлена без каких-либо гарантий. Раскрывающая Сторона не несет ответственности за прямой или косвенный ущерб, понесенный Получателем информации при использовании Конфиденциальной Информации. Вся предоставленная Конфиденциальная Информация остается собственностью Раскрывающей Стороны.`,
+                
+                governingLaw: {
+                    california: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+Настоящее соглашение регулируется законодательством штата California, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Los Angeles, CA.`,
+                    
+                    delaware: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+Настоящее соглашение регулируется законодательством штата Delaware, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Wilmington, DE.`,
+                    
+                    newyork: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать New York, NY.`,
+                    
+                    russia: `<div class="section-title">8. П��ИМЕНИМОЕ ПРАВО</div>
+Настоящее соглашение регулируется законодательством Российской Федерации. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Москву, Россия.`
+                },
+                
+                severability: `<div class="section-title">9. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</div>
+Если какое-либо положение настоящего Соглашения становится незаконным или необеспеченным принудительной силой в суде соответствующей юрисдикции, это не повлияет на юридическую силу или возможность принудительного исполнения какого-либо другого положения настоящего Соглашения в наибольшей разрешенной законом степени.`,
+                
+                controllingLanguage: {
+                    english: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на английском языке будет иметь преимущественную силу.`,
+                    
+                    russian: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`,
+                    
+                    both: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, обе версии будут иметь одинаковую юридическую силу.`
+                },
+                
+                signatures: `<div class="section-title">В ПОДТВЕРЖДЕНИЕ ВЫШЕИЗЛОЖЕННОГО</div>
+Стороны заключили настоящее Соглашение.
+
+<div class="signatures">
+<strong>Раскрывающая Сторона:</strong>
+
+Подпись: _____________________________
+Ф.И.О: _______________________________
+Должность:___________________________
+Дата: ________________________________
+
+<strong>Получатель:</strong>
+
+Подпись: _____________________________
+Ф.И.О: _______________________________
+Должность:___________________________
+Дата: ________________________________
+</div>`
+            }
+        };
+        
+        // State variables
+        let currentLanguage = 'english';
+        let currentTab = 'parties';
+        let lastChangedElement = null;
+        
+        // Helper functions
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString(currentLanguage === 'english' ? 'en-US' : 'ru-RU', options);
+        }
+        
+        function setActiveTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Deactivate all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Activate the selected tab
+            document.querySelector(`#tab-${tabId}`).classList.add('active');
+            document.querySelector(`.tab[data-tab="${tabId}"]`).classList.add('active');
+            
+            currentTab = tabId;
+            
+            // Update navigation buttons
+            updateNavButtons();
+        }
+        
+        function updateNavButtons() {
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
+            
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            
+            prevBtn.disabled = currentIndex === 0;
+            nextBtn.disabled = currentIndex === tabs.length - 1;
+            
+            prevBtn.style.opacity = prevBtn.disabled ? '0.5' : '1';
+            nextBtn.style.opacity = nextBtn.disabled ? '0.5' : '1';
+        }
+        
+        function highlightChanges(elementId) {
+            // Store the last changed element
+            lastChangedElement = elementId;
+            
+            // Get the element that changed
+            const element = document.getElementById(elementId);
+            if (!element) return;
+            
+            // Generate the document again
+            generateDocument();
+            
+            // After the document is generated, find and highlight the relevant part
+            setTimeout(() => {
+                const previewDoc = document.getElementById('preview-document');
+                
+                // First clear any existing highlights
+                const existingHighlights = previewDoc.querySelectorAll('.highlight');
+                existingHighlights.forEach(el => {
+                    el.classList.remove('highlight');
+                });
+                
+                // Get value of changed element
+                let elementValue = element.value;
+                if (element.type === 'checkbox') {
+                    elementValue = element.checked.toString();
+                }
+                
+                // Find the relevant section based on element ID
+                let targetText = '';
+                let targetElement = null;
+                
+                if (elementId === 'discloser-name' || elementId === 'discloser-name-ru') {
+                    // Find disclosing party name in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        const strong = column.querySelectorAll('strong');
+                        strong.forEach(el => {
+                            if (el.textContent === elementValue) {
+                                targetElement = el;
+                                targetElement.classList.add('highlight');
+                            }
+                        });
+                    });
+                } 
+                else if (elementId === 'recipient-name' || elementId === 'recipient-name-ru') {
+                    // Find recipient name in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        const strong = column.querySelectorAll('strong');
+                        strong.forEach(el => {
+                            if (el.textContent === elementValue) {
+                                targetElement = el;
+                                targetElement.classList.add('highlight');
+                            }
+                        });
+                    });
+                }
+                else if (elementId === 'effective-date') {
+                    // Find effective date in both columns
+                    const dateSections = previewDoc.querySelectorAll('.section-title');
+                    dateSections.forEach(section => {
+                        if (section.textContent.includes('EFFECTIVE DATE') || section.textContent.includes('ДАТА ВСТУПЛЕНИЯ В СИЛУ')) {
+                            const parent = section.parentElement;
+                            if (parent && parent.textContent.includes(elementValue)) {
+                                // Create a text node with the highlighted date
+                                const text = parent.innerHTML;
+                                parent.innerHTML = text.replace(
+                                    elementValue,
+                                    `<span class="highlight">${elementValue}</span>`
+                                );
+                                targetElement = parent.querySelector('.highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId === 'purpose' || elementId === 'purpose-ru') {
+                    // Find purpose text in the corresponding column
+                    const isEnglish = elementId === 'purpose';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('PERMITTED USE')) || 
+                            (!isEnglish && section.textContent.includes('ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ'))) {
+                            const parent = section.parentElement;
+                            if (parent && parent.textContent.includes(elementValue)) {
+                                // Create a text node with the highlighted purpose
+                                const text = parent.innerHTML;
+                                parent.innerHTML = text.replace(
+                                    elementValue,
+                                    `<span class="highlight">${elementValue}</span>`
+                                );
+                                targetElement = parent.querySelector('.highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId === 'conf-info' || elementId === 'conf-info-ru') {
+                    // Highlight the entire confidential information section
+                    const isEnglish = elementId === 'conf-info';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('CONFIDENTIAL INFORMATION')) || 
+                            (!isEnglish && section.textContent.includes('КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId === 'protection-period') {
+                    // Find protection period in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        if (column.textContent.includes(`${elementValue} years`) || 
+                            column.textContent.includes(`${elementValue} года`)) {
+                            const text = column.innerHTML;
+                            column.innerHTML = text.replace(
+                                new RegExp(`${elementValue}(?= years| года)`, 'g'),
+                                `<span class="highlight">${elementValue}</span>`
+                            );
+                            targetElement = column.querySelector('.highlight');
+                        }
+                    });
+                }
+                else if (elementId === 'termination-notice') {
+                    // Find termination notice in both columns
+                    const columns = previewDoc.querySelectorAll('.column');
+                    columns.forEach(column => {
+                        if (column.textContent.includes(`${elementValue} days`) || 
+                            column.textContent.includes(`${elementValue} дней`)) {
+                            const text = column.innerHTML;
+                            column.innerHTML = text.replace(
+                                new RegExp(`${elementValue}(?= days| дней)`, 'g'),
+                                `<span class="highlight">${elementValue}</span>`
+                            );
+                            targetElement = column.querySelector('.highlight');
+                        }
+                    });
+                }
+                else if (elementId === 'governing-law' || elementId === 'governing-law-ru') {
+                    // Highlight the entire governing law section
+                    const isEnglish = elementId === 'governing-law';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('GOVERNING LAW')) || 
+                            (!isEnglish && section.textContent.includes('ПРИМЕНИМОЕ ПРАВО'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                else if (elementId.startsWith('include-')) {
+                    // For checkboxes that toggle sections
+                    const isEnglish = !elementId.endsWith('-ru');
+                    const sectionType = elementId.replace('include-', '').replace(/-ru$/, '');
+                    
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                                   
+                    let sectionTitle;
+                    switch (sectionType) {
+                        case 'return-destroy':
+                            // Already included in protection period section
+                            sectionTitle = isEnglish ? 'PROTECTION PERIOD AND RETURN' : 'СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ';
+                            break;
+                        case 'no-warranty':
+                            sectionTitle = isEnglish ? 'NO WARRANTIES' : 'НЕТ ГАРАНТИЙ';
+                            break;
+                        case 'severability':
+                            sectionTitle = isEnglish ? 'SEVERABILITY' : 'НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ';
+                            break;
+                    }
+                    
+                    if (sectionTitle) {
+                        const sections = column.querySelectorAll('.section-title');
+                        sections.forEach(section => {
+                            if (section.textContent.includes(sectionTitle)) {
+                                section.classList.add('highlight');
+                                targetElement = section;
+                                
+                                // Also highlight the paragraph text after the section title
+                                let nextSibling = section.nextSibling;
+                                while (nextSibling && nextSibling.nodeType !== 1) {
+                                    nextSibling = nextSibling.nextSibling;
+                                }
+                                if (nextSibling) {
+                                    nextSibling.classList.add('highlight');
+                                }
+                            }
+                        });
+                    }
+                }
+                else if (elementId === 'controlling-language' || elementId === 'controlling-language-ru') {
+                    // Highlight the entire controlling language section
+                    const isEnglish = elementId === 'controlling-language';
+                    const column = isEnglish ? 
+                                   previewDoc.querySelector('.left-column') : 
+                                   previewDoc.querySelector('.right-column');
+                    
+                    const sectionTitles = column.querySelectorAll('.section-title');
+                    sectionTitles.forEach(section => {
+                        if ((isEnglish && section.textContent.includes('PREVAILING LANGUAGE')) || 
+                            (!isEnglish && section.textContent.includes('ПРЕОБЛАДАЮЩИЙ ЯЗЫК'))) {
+                            section.classList.add('highlight');
+                            targetElement = section;
+                            
+                            // Also highlight the paragraph text after the section title
+                            let nextSibling = section.nextSibling;
+                            while (nextSibling && nextSibling.nodeType !== 1) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+                            if (nextSibling) {
+                                nextSibling.classList.add('highlight');
+                            }
+                        }
+                    });
+                }
+                
+                // If a target element was found and highlighted, scroll it into view if needed
+                if (targetElement && !isElementInViewport(targetElement)) {
+                    targetElement.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+                
+                // Remove highlights after a delay
+                setTimeout(() => {
+                    const highlights = previewDoc.querySelectorAll('.highlight');
+                    highlights.forEach(el => {
+                        el.classList.add('fade-highlight');
+                    });
+                    
+                    // Reset the highlight after animation completes
+                    setTimeout(() => {
+                        highlights.forEach(el => {
+                            el.classList.remove('highlight');
+                            el.classList.remove('fade-highlight');
+                        });
+                    }, 1000);
+                }, 2000);
+            }, 100);
+        }
+        
+        function isElementInViewport(el) {
+            const rect = el.getBoundingClientRect();
+            const container = document.querySelector('.preview-section');
+            const containerRect = container.getBoundingClientRect();
+            
+            return (
+                rect.top >= containerRect.top &&
+                rect.left >= containerRect.left &&
+                rect.bottom <= containerRect.bottom &&
+                rect.right <= containerRect.right
+            );
+        }
+        
+        // Function to sync input values between languages
+        function syncInputValue(englishId, russianId) {
+            const englishInput = document.getElementById(englishId);
+            const russianInput = document.getElementById(russianId);
+            
+            if (englishInput && russianInput) {
+                // When editing English field, update Russian field
+                englishInput.addEventListener('input', function() {
+                    russianInput.value = this.value;
+                });
+                
+                // When editing Russian field, update English field
+                russianInput.addEventListener('input', function() {
+                    englishInput.value = this.value;
+                });
+            }
+        }
+        
+        // Initialize sync between language fields
+        function initializeLanguageSync() {
+            // Sync text inputs
+            syncInputValue('discloser-name', 'discloser-name-ru');
+            syncInputValue('discloser-address', 'discloser-address-ru');
+            syncInputValue('recipient-name', 'recipient-name-ru');
+            syncInputValue('recipient-address', 'recipient-address-ru');
+            
+            // Sync textareas
+            syncInputValue('purpose', 'purpose-ru');
+            syncInputValue('custom-conf-info', 'custom-conf-info-ru');
+            
+            // Sync selects 
+            syncInputValue('conf-info', 'conf-info-ru');
+            syncInputValue('governing-law', 'governing-law-ru');
+            syncInputValue('jurisdiction', 'jurisdiction-ru');
+            syncInputValue('controlling-language', 'controlling-language-ru');
+            
+            // Sync checkboxes
+            const syncCheckbox = function(englishId, russianId) {
+                const englishCheckbox = document.getElementById(englishId);
+                const russianCheckbox = document.getElementById(russianId);
+                
+                if (englishCheckbox && russianCheckbox) {
+                    englishCheckbox.addEventListener('change', function() {
+                        russianCheckbox.checked = this.checked;
+                    });
+                    
+                    russianCheckbox.addEventListener('change', function() {
+                        englishCheckbox.checked = this.checked;
+                    });
+                }
+            };
+            
+            syncCheckbox('include-return-destroy', 'include-return-destroy-ru');
+            syncCheckbox('include-no-warranty', 'include-no-warranty-ru');
+            syncCheckbox('include-severability', 'include-severability-ru');
+        }
+        
+        // New document generation function with aligned sections
+        function generateDocument() {
+            let discloserName, recipientName, purpose, customConfInfo;
+            
+            if (currentLanguage === 'english') {
+                discloserName = document.getElementById('discloser-name').value || '[Disclosing Party Name]';
+                recipientName = document.getElementById('recipient-name').value || '[Receiving Party Name]';
+                purpose = document.getElementById('purpose').value || '[Purpose of Disclosure]';
+                customConfInfo = document.getElementById('custom-conf-info').value;
+            } else {
+                discloserName = document.getElementById('discloser-name-ru').value || '[Наименование Раскрывающей Стороны]';
+                recipientName = document.getElementById('recipient-name-ru').value || '[Наименование Получателя]';
+                purpose = document.getElementById('purpose-ru').value || '[Цель Раскрытия]';
+                customConfInfo = document.getElementById('custom-conf-info-ru').value;
+            }
+            
+            const effectiveDate = formatDate(document.getElementById('effective-date').value) || '[Effective Date]';
+            const confInfoType = currentLanguage === 'english' ? 
+                                document.getElementById('conf-info').value : 
+                                document.getElementById('conf-info-ru').value;
+            const protectionPeriod = document.getElementById('protection-period').value || '2';
+            const terminationNotice = document.getElementById('termination-notice').value || '30';
+            const governingLaw = currentLanguage === 'english' ? 
+                                document.getElementById('governing-law').value : 
+                                document.getElementById('governing-law-ru').value;
+            const includeReturnDestroy = currentLanguage === 'english' ? 
+                                        document.getElementById('include-return-destroy').checked : 
+                                        document.getElementById('include-return-destroy-ru').checked;
+            const includeNoWarranty = currentLanguage === 'english' ? 
+                                    document.getElementById('include-no-warranty').checked : 
+                                    document.getElementById('include-no-warranty-ru').checked;
+            const includeSeverability = currentLanguage === 'english' ? 
+                                       document.getElementById('include-severability').checked : 
+                                       document.getElementById('include-severability-ru').checked;
+            const controllingLanguage = currentLanguage === 'english' ? 
+                                       document.getElementById('controlling-language').value : 
+                                       document.getElementById('controlling-language-ru').value;
+            
+            // Create aligned sections
+            let documentContent = '';
+            
+            // Title section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    <h2>${templates.english.title}</h2>
+                </div>
+                <div class="column right-column">
+                    <h2>${templates.russian.title}</h2>
+                </div>
+            </div>`;
+            
+            // Parties section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.parties(discloserName, '', recipientName, '', effectiveDate)}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.parties(discloserName, '', recipientName, '', effectiveDate)}
+                </div>
+            </div>`;
+            
+            // Effective Date section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.effectiveDate(effectiveDate)}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.effectiveDate(effectiveDate)}
+                </div>
+            </div>`;
+            
+            // Confidential Information section
+            let enConfInfo, ruConfInfo;
+            if (confInfoType === 'custom') {
+                enConfInfo = templates.english.confidentialInfo.custom(customConfInfo);
+                ruConfInfo = templates.russian.confidentialInfo.custom(customConfInfo);
+            } else {
+                enConfInfo = templates.english.confidentialInfo[confInfoType];
+                ruConfInfo = templates.russian.confidentialInfo[confInfoType];
+            }
+            
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${enConfInfo}
+                </div>
+                <div class="column right-column">
+                    ${ruConfInfo}
+                </div>
+            </div>`;
+            
+            // Term section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.term(terminationNotice)}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.term(terminationNotice)}
+                </div>
+            </div>`;
+            
+            // Permitted Use section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.permittedUse(purpose)}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.permittedUse(purpose)}
+                </div>
+            </div>`;
+            
+            // Protection Period section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.protectionPeriod(protectionPeriod)}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.protectionPeriod(protectionPeriod)}
+                </div>
+            </div>`;
+            
+            // Exclusions section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.exclusions}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.exclusions}
+                </div>
+            </div>`;
+            
+            // No Warranty section (conditional)
+            if (includeNoWarranty) {
+                documentContent += `
+                <div class="section-row">
+                    <div class="column left-column">
+                        ${templates.english.noWarranty}
+                    </div>
+                    <div class="column right-column">
+                        ${templates.russian.noWarranty}
+                    </div>
+                </div>`;
+            }
+            
+            // Governing Law section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.governingLaw[governingLaw]}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.governingLaw[governingLaw]}
+                </div>
+            </div>`;
+            
+            // Severability section (conditional)
+            if (includeSeverability) {
+                documentContent += `
+                <div class="section-row">
+                    <div class="column left-column">
+                        ${templates.english.severability}
+                    </div>
+                    <div class="column right-column">
+                        ${templates.russian.severability}
+                    </div>
+                </div>`;
+            }
+            
+            // Controlling Language section
+            documentContent += `
+            <div class="section-row">
+                <div class="column left-column">
+                    ${templates.english.controllingLanguage[controllingLanguage]}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.controllingLanguage[controllingLanguage]}
+                </div>
+            </div>`;
+            
+            // Signatures section - show both languages side by side
+            documentContent += `
+            <div class="section-row signatures-row">
+                <div class="column left-column">
+                    ${templates.english.signatures}
+                </div>
+                <div class="column right-column">
+                    ${templates.russian.signatures}
+                </div>
+            </div>`;
+            
+            document.getElementById('preview-document').innerHTML = documentContent;
+        }
+        
+        // Call initialization
+        initializeLanguageSync();
+        
+        document.getElementById('lang-en').addEventListener('click', function() {
+            document.getElementById('lang-en').classList.add('active');
+            document.getElementById('lang-ru').classList.remove('active');
+            currentLanguage = 'english';
+            
+            // Show English tab headers
+            document.querySelectorAll('.en-text').forEach(el => {
+                el.style.display = 'block';
+            });
+            
+            // Hide Russian tab headers
+            document.querySelectorAll('.ru-text').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show English field placeholders
+            document.querySelectorAll('.en-placeholder').forEach(el => {
+                el.style.display = 'block';
+            });
+            
+            // Hide Russian field placeholders
+            document.querySelectorAll('.ru-placeholder').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            generateDocument();
+        });
+        
+        document.getElementById('lang-ru').addEventListener('click', function() {
+            document.getElementById('lang-ru').classList.add('active');
+            document.getElementById('lang-en').classList.remove('active');
+            currentLanguage = 'russian';
+            
+            // Hide English tab headers
+            document.querySelectorAll('.en-text').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show Russian tab headers
+            document.querySelectorAll('.ru-text').forEach(el => {
+                el.style.display = 'block';
+            });
+            
+            // Hide English field placeholders
+            document.querySelectorAll('.en-placeholder').forEach(el => {
+                el.style.display = 'none';
+            });
+            
+            // Show Russian field placeholders
+            document.querySelectorAll('.ru-placeholder').forEach(el => {
+                el.style.display = 'block';
+            });
+            
+            generateDocument();
+        });
+        
+        // Tab navigation
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                setActiveTab(this.getAttribute('data-tab'));
+            });
+        });
+        
+        // Previous/Next buttons
+        document.getElementById('prev-btn').addEventListener('click', function() {
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            if (currentIndex > 0) {
+                setActiveTab(tabs[currentIndex - 1]);
+            }
+        });
+        
+        document.getElementById('next-btn').addEventListener('click', function() {
+            const tabs = ['parties', 'agreement', 'term', 'additional'];
+            const currentIndex = tabs.indexOf(currentTab);
+            if (currentIndex < tabs.length - 1) {
+                setActiveTab(tabs[currentIndex + 1]);
+            }
+        });
+        
+        // Conditional display for custom definition
+        document.getElementById('conf-info').addEventListener('change', function() {
+            document.getElementById('custom-conf-info-group').style.display = 
+                this.value === 'custom' ? 'block' : 'none';
+            highlightChanges('conf-info');
+        });
+        
+        // Input change events
+        document.querySelectorAll('input, select, textarea').forEach(input => {
+            input.addEventListener('change', function() {
+                highlightChanges(this.id);
+            });
+        });
+        
+        // Download PDF functionality
+        document.getElementById('download-btn').addEventListener('click', function() {
+            // First, create a clean version of the document without any highlight styling
+            const previewDoc = document.getElementById('preview-document');
+            const cleanDocContent = previewDoc.innerHTML;
+            
+            // Create print-optimized HTML
+            const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>NDA Agreement</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            line-height: 1.6;
+                            color: #333;
+                            padding: 40px;
+                            max-width: 1200px;
+                            margin: 0 auto;
+                        }
+                        .section-row {
+                            display: flex;
+                            width: 100%;
+                            align-items: flex-start;
+                            margin-bottom: 15px;
+                        }
+                        .column {
+                            width: 50%;
+                            padding: 10px;
+                            vertical-align: top;
+                        }
+                        .left-column {
+                            border-right: 1px solid #ccc;
+                        }
+                        .section-title {
+                            text-transform: uppercase;
+                            font-weight: bold;
+                            margin-top: 15px;
+                            margin-bottom: 10px;
+                        }
+                        .signatures {
+                            margin-top: 30px;
+                        }
+                        @media print {
+                            body {
+                                padding: 0;
+                            }
+                            .section-row {
+                                page-break-inside: avoid;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${cleanDocContent}
+                </body>
+                </html>
+            `;
+            
+            // Create a Blob with the print content
+            const blob = new Blob([printContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            // Check if the browser supports the print API
+            if (navigator.userAgent.toLowerCase().indexOf('chrome') > -1 || 
+                navigator.userAgent.toLowerCase().indexOf('safari') > -1) {
+                // Create an iframe for printing
+                const printFrame = document.createElement('iframe');
+                printFrame.style.display = 'none';
+                printFrame.src = url;
+                
+                document.body.appendChild(printFrame);
+                printFrame.onload = function() {
+                    // Get filename from disclosing and receiving party names
+                    let discloserName = document.getElementById('discloser-name').value || 'Disclosing-Party';
+                    let recipientName = document.getElementById('recipient-name').value || 'Receiving-Party';
+                    
+                    // Clean up names for filenames
+                    discloserName = discloserName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 15);
+                    recipientName = recipientName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 15);
+                    
+                    const now = new Date();
+                    const dateStr = now.toISOString().split('T')[0];
+                    const filename = `NDA-${discloserName}-${recipientName}-${dateStr}.pdf`;
+                    
+                    setTimeout(function() {
+                        try {
+                            printFrame.contentWindow.focus();
+                            printFrame.contentWindow.print();
+                            alert(`To save as PDF: Please select "Save as PDF" as your printer option and save the file as "${filename}"`);
+                        } catch (err) {
+                            console.error('Printing failed', err);
+                            
+                            // Fallback for browsers without print support
+                            const saveLink = document.createElement('a');
+                            saveLink.href = url;
+                            saveLink.download = 'NDA-Agreement.html';
+                            saveLink.click();
+                            
+                            alert('PDF printing not supported in your browser. The NDA has been downloaded as an HTML file that you can open and print to PDF.');
+                        }
+                        
+                        // Clean up
+                        setTimeout(function() {
+                            document.body.removeChild(printFrame);
+                            URL.revokeObjectURL(url);
+                        }, 1000);
+                    }, 500);
+                };
+            } else {
+                // Fallback for other browsers
+                const saveLink = document.createElement('a');
+                saveLink.href = url;
+                saveLink.download = 'NDA-Agreement.html';
+                saveLink.click();
+                
+                alert('PDF printing not supported in your browser. The NDA has been downloaded as an HTML file that you can open and print to PDF.');
+                
+                // Clean up
+                setTimeout(function() {
+                    URL.revokeObjectURL(url);
+                }, 100);
+            }
+        });
+        
+        // Initialize
+        setActiveTab('parties');
+        generateDocument();
+    </script>
+</body>
+</html>
