@@ -1,0 +1,3254 @@
+<!-- Improved Unified Paywall for AI Contract Clause Generators -->
+<style>
+/* Paywall related styles */
+.contract-tools-paywall-container {
+position: relative;
+margin-bottom: 40px;
+border: 1px solid #ddd;
+border-radius: 8px;
+padding: 20px;
+background: #f9f9f9;
+}
+
+.contract-tools-header {
+text-align: center;
+margin-bottom: 20px;
+}
+
+.contract-tools-header h3 {
+font-size: 22px;
+color: #2c3e50;
+margin-bottom: 10px;
+}
+
+.contract-tools-header p {
+color: #555;
+max-width: 800px;
+margin: 0 auto;
+}
+
+/* Fixed paywall modal styles */
+.paywall-overlay {
+display: none; /* Initially hidden, will be shown via JS */
+flex-direction: column;
+align-items: center;
+justify-content: center;
+position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+width: 90%;
+max-width: 500px;
+background: white;
+z-index: 1000;
+padding: 25px;
+text-align: center;
+border-radius: 8px;
+box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+}
+
+/* Close button for payment modal */
+.paywall-close {
+position: absolute;
+top: 10px;
+right: 10px;
+width: 25px;
+height: 25px;
+background: #f1f1f1;
+border-radius: 50%;
+text-align: center;
+line-height: 25px;
+font-size: 16px;
+cursor: pointer;
+z-index: 1001;
+}
+
+.paywall-close:hover {
+background: #e1e1e1;
+}
+
+/* Semi-transparent background overlay */
+.paywall-backdrop {
+display: none; /* Initially hidden, will be shown via JS */
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0,0,0,0.7);
+z-index: 999;
+}
+
+.premium-badge {
+position: absolute;
+top: 20px;
+right: 20px;
+background: #2c3e50;
+color: white;
+padding: 5px 10px;
+border-radius: 4px;
+font-size: 12px;
+font-weight: bold;
+display: none;
+z-index: 50;
+}
+
+.lock-icon {
+font-size: 40px;
+margin-bottom: 15px;
+color: #2c3e50;
+}
+
+.paywall-title {
+font-size: 22px;
+font-weight: bold;
+margin-bottom: 10px;
+color: #2c3e50;
+}
+
+.paywall-description {
+margin-bottom: 15px;
+max-width: 400px;
+font-size: 14px;
+}
+
+.features-list {
+text-align: left;
+margin: 0 auto 20px;
+max-width: 400px;
+font-size: 14px;
+}
+
+.features-list li {
+margin-bottom: 6px;
+position: relative;
+padding-left: 22px;
+}
+
+.features-list li:before {
+content: "✓";
+position: absolute;
+left: 0;
+color: #27ae60;
+font-weight: bold;
+}
+
+.payment-container {
+margin-bottom: 15px;
+}
+
+.success-overlay {
+display: none;
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: rgba(0,0,0,0.8);
+z-index: 1000;
+align-items: center;
+justify-content: center;
+}
+
+.success-message {
+background: white;
+padding: 25px;
+border-radius: 8px;
+max-width: 400px;
+text-align: center;
+}
+
+.success-icon {
+font-size: 40px;
+color: #27ae60;
+margin-bottom: 15px;
+}
+
+.success-title {
+font-size: 22px;
+margin-bottom: 15px;
+color: #2c3e50;
+}
+
+.success-description {
+margin-bottom: 20px;
+color: #555;
+font-size: 14px;
+}
+
+.success-button {
+background: #27ae60;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 4px;
+font-size: 16px;
+cursor: pointer;
+}
+
+.success-button:hover {
+background: #219653;
+}
+
+/* Modified preview fade effect */
+.preview-fade {
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: linear-gradient(to bottom, rgba(255,255,255,0.1) 70%, rgba(255,255,255,0.9) 100%);
+pointer-events: none;
+z-index: 50;
+}
+
+/* Specific generator adjustments */
+.clause-generator .preview-column {
+position: relative;
+}
+
+.clause-generator .preview-content {
+position: relative;
+user-select: none;
+}
+
+/* Fixed button styles to ensure they're truly disabled until payment */
+.clause-generator .copy-btn {
+opacity: 0.6;
+cursor: not-allowed;
+pointer-events: auto; /* We'll control the behavior with our event listeners */
+}
+
+/* New Buy Button */
+.unlock-button {
+background: #3498db;
+color: white;
+border: none;
+padding: 10px 20px;
+border-radius: 4px;
+font-size: 16px;
+font-weight: bold;
+cursor: pointer;
+position: absolute;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 60;
+box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.unlock-button:hover {
+background: #2980b9;
+}
+
+/* For development testing only */
+.test-mode-btn {
+position: fixed;
+bottom: 10px;
+right: 10px;
+background: #e74c3c;
+color: white;
+border: none;
+padding: 5px 10px;
+border-radius: 4px;
+z-index: 1000;
+cursor: pointer;
+font-size: 12px;
+display: none;
+}
+
+/* Tabs Navigation for Multiple Generators */
+.tools-tabs-container {
+margin-bottom: 20px;
+}
+
+.tools-tabs {
+display: flex;
+border-bottom: 1px solid #ddd;
+margin-bottom: 20px;
+}
+
+.tools-tab {
+padding: 10px 15px;
+cursor: pointer;
+border: 1px solid transparent;
+border-bottom: none;
+margin-right: 5px;
+border-radius: 4px 4px 0 0;
+font-weight: 500;
+color: #555;
+}
+
+.tools-tab:hover {
+background-color: #f5f5f5;
+}
+
+.tools-tab.active {
+background-color: white;
+border-color: #ddd;
+color: #2c3e50;
+margin-bottom: -1px;
+padding-bottom: 11px;
+}
+
+.tools-tab-content {
+display: none;
+}
+
+.tools-tab-content.active {
+display: block;
+}
+
+/* Fix for PayPal button alignment - ensure content is displayed horizontally */
+.paypal-button-container {
+width: 100% !important;
+}
+
+.paypal-button {
+flex-direction: row !important;
+width: 100% !important;
+}
+
+#paypal-container {
+width: 230px;
+margin: 0 auto;
+}
+
+/* Base Styles - WordPress Compatible */
+.clause-generator {
+font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+max-width: 100%;
+margin: 0 auto 20px;
+color: #333;
+box-sizing: border-box;
+}
+
+.clause-generator * {
+box-sizing: border-box;
+}
+
+/* Two-column layout */
+.generator-container {
+display: flex;
+flex-wrap: wrap;
+gap: 20px;
+}
+
+.form-column {
+flex: 1;
+min-width: 300px;
+max-height: 550px;
+overflow-y: auto;
+padding-right: 10px;
+}
+
+.preview-column {
+flex: 1;
+min-width: 300px;
+}
+
+/* Form Elements - Compact */
+.form-group {
+margin-bottom: 10px;
+}
+
+.form-label {
+display: block;
+font-weight: 500;
+margin-bottom: 3px;
+font-size: 14px;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+width: 100%;
+padding: 6px 8px;
+border: 1px solid #ddd;
+border-radius: 4px;
+font-size: 14px;
+line-height: 1.3;
+}
+
+.form-select {
+height: 32px;
+}
+
+.form-hint {
+font-size: 11px;
+color: #666;
+margin-top: 2px;
+}
+
+/* Radio Groups */
+.radio-group {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+margin-bottom: 8px;
+}
+
+.radio-item {
+display: flex;
+align-items: center;
+margin-bottom: 0;
+}
+
+.radio-item input[type="radio"] {
+margin-right: 4px;
+}
+
+.radio-label {
+font-size: 13px;
+}
+
+/* Checkbox Groups */
+.checkbox-group {
+display: flex;
+flex-direction: column;
+gap: 6px;
+margin-bottom: 8px;
+}
+
+.checkbox-item {
+display: flex;
+align-items: flex-start;
+margin-bottom: 0;
+}
+
+.checkbox-item input[type="checkbox"] {
+margin-right: 6px;
+margin-top: 2px;
+}
+
+.checkbox-label {
+font-size: 13px;
+}
+
+/* Section Headers - Compact */
+.section-header {
+font-size: 15px;
+font-weight: 600;
+color: #2c3e50;
+margin: 12px 0 8px;
+padding-bottom: 4px;
+border-bottom: 1px solid #eee;
+}
+
+/* Preview Section */
+.preview-header {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 8px;
+border-bottom: 2px solid #2c3e50;
+padding-bottom: 6px;
+}
+
+.preview-title {
+font-size: 15px;
+font-weight: 600;
+color: #2c3e50;
+}
+
+.preview-note {
+font-size: 11px;
+color: #666;
+font-style: italic;
+}
+
+.preview-content {
+background-color: #fff;
+border: 1px solid #ddd;
+border-radius: 4px;
+padding: 12px;
+margin-bottom: 10px;
+font-size: 14px;
+line-height: 1.4;
+height: 450px;
+overflow-y: auto;
+}
+
+.preview-content p {
+margin-bottom: 8px;
+margin-top: 8px;
+}
+
+.highlight {
+background-color: #ffff00;
+transition: background-color 0.5s ease-in-out;
+}
+
+/* Copy and Word Doc Buttons Container */
+.button-container {
+display: flex;
+gap: 10px;
+}
+
+/* Copy Button */
+.copy-btn {
+flex: 1;
+padding: 8px;
+background-color: #2c3e50;
+color: white;
+border: none;
+border-radius: 4px;
+font-size: 14px;
+font-weight: 500;
+cursor: pointer;
+text-align: center;
+text-decoration: none;
+}
+
+.copy-btn:hover {
+background-color: #1a252f;
+}
+
+.copy-icon {
+display: inline-block;
+margin-right: 6px;
+vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+.generator-container {
+flex-direction: column;
+}
+
+.form-column {
+max-height: none;
+overflow-y: visible;
+}
+
+.preview-content {
+height: 300px;
+}
+}
+</style>
+
+<div id="contract-tools-container" class="contract-tools-paywall-container">
+<div class="contract-tools-header">
+<h3>AI Contract Clause Generators</h3>
+<p>Create customized AI-related contract clauses tailored to your specific business situation. All three professional-grade contract clause generators are included in one purchase.</p>
+</div>
+
+<!-- Premium Badge (shown after payment) -->
+<div id="premium-badge" class="premium-badge">PREMIUM UNLOCKED</div>
+
+<!-- Tabs for Multiple Generators -->
+<div class="tools-tabs-container">
+<div class="tools-tabs">
+<div class="tools-tab active" data-tab="ai-output">AI Output Clause</div>
+<div class="tools-tab" data-tab="indemnification">AI Indemnification</div>
+<div class="tools-tab" data-tab="data-privacy">Data Privacy & Confidentiality</div>
+</div>
+</div>
+
+<!-- New backdrop overlay -->
+<div id="paywall-backdrop" class="paywall-backdrop"></div>
+
+<!-- Paywall Overlay - Now a popup with close button -->
+<div id="paywall-overlay" class="paywall-overlay">
+<div id="paywall-close" class="paywall-close">✕</div>
+<div class="lock-icon">🔒</div>
+<h2 class="paywall-title">Unlock All Generators</h2>
+<p class="paywall-description">Get immediate access to all three professionally-drafted AI contract clause generators.</p>
+
+<ul class="features-list">
+<li>Create custom AI Output clauses</li>
+<li>Generate Indemnification clauses</li>
+<li>Draft Data Privacy & Confidentiality provisions</li>
+<li>Download MS Word documents</li>
+<li>Unlimited use for all contracts</li>
+</ul>
+
+<div id="paypal-container" class="payment-container">
+<style>.pp-WCUW68ZGHDWP6{text-align:center;border:none;border-radius:0.25rem;min-width:11.625rem;padding:0 2rem;height:2.625rem;font-weight:bold;background-color:#FFD140;color:#000000;font-family:"Helvetica Neue",Arial,sans-serif;font-size:1rem;line-height:1.25rem;cursor:pointer;}</style> 
+<form action="https://www.paypal.com/ncp/payment/WCUW68ZGHDWP6" method="post" target="_blank" style="display:inline-grid;justify-items:center;align-content:start;gap:0.5rem;"> 
+<input class="pp-WCUW68ZGHDWP6" type="submit" value="Buy Now" /> 
+<img src=https://www.paypalobjects.com/images/Debit_Credit_APM.svg alt="cards" /> 
+<section style="font-size: 0.75rem;"> Powered by <img src="https://www.paypalobjects.com/paypal-ui/logos/svg/paypal-wordmark-color.svg" alt="paypal" style="height:0.875rem;vertical-align:middle;"/></section> 
+</form>
+</div>
+</div>
+
+<!-- Success Overlay (shown after successful payment) -->
+<div id="success-overlay" class="success-overlay">
+<div class="success-message">
+<div class="success-icon">✓</div>
+<h2 class="success-title">Payment Successful!</h2>
+<p class="success-description">You now have full access to all three AI contract clause generators.</p>
+<button id="success-button" class="success-button">Start Using Your Generators</button>
+</div>
+</div>
+
+<!-- Tab Content Containers -->
+<div id="ai-output-tab" class="tools-tab-content active">
+<!-- AI Output Clause Generator Will Be Here -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Output Clause Generator</title>
+</head>
+<body>
+<div class="clause-generator" id="ai-output-generator">
+<div class="generator-container">
+<!-- Form Column -->
+<div class="form-column">
+<!-- Contract Information -->
+<div class="section-header">Contract Information</div>
+
+<div class="form-group">
+<label class="form-label" for="agreementType">Agreement Type</label>
+<select id="agreementType" class="form-select" onchange="aiOutputGenerator.updatePreview('agreementType')">
+<option value="services" selected>Service Agreement</option>
+<option value="development">Development Agreement</option>
+<option value="consulting">Consulting Agreement</option>
+<option value="content">Content Creation Agreement</option>
+<option value="marketing">Marketing Agreement</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="providerName">Provider/Contractor Name</label>
+<input type="text" id="providerName" class="form-input" value="Provider" placeholder="Enter name of service provider" onkeyup="aiOutputGenerator.updatePreview('providerName')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="clientName">Client Name</label>
+<input type="text" id="clientName" class="form-input" value="Client" placeholder="Enter name of client" onkeyup="aiOutputGenerator.updatePreview('clientName')">
+<div class="form-hint">The term used in your agreement for the receiving party</div>
+</div>
+
+<!-- AI Usage Scope -->
+<div class="section-header">AI Usage Scope</div>
+
+<div class="form-group">
+<label class="form-label" for="aiDisclosureLevel">AI Disclosure Level</label>
+<select id="aiDisclosureLevel" class="form-select" onchange="aiOutputGenerator.updatePreview('aiDisclosureLevel')">
+<option value="comprehensive" selected>Comprehensive Disclosure</option>
+<option value="general">General Disclosure</option>
+<option value="minimal">Minimal Disclosure</option>
+</select>
+<div class="form-hint">How detailed your AI usage disclosure should be</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">AI Usage Types</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="aiTypeContentGeneration" checked onclick="aiOutputGenerator.updatePreview('aiTypeContentGeneration')">
+<span class="checkbox-label">Content Generation</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="aiTypeDataAnalysis" checked onclick="aiOutputGenerator.updatePreview('aiTypeDataAnalysis')">
+<span class="checkbox-label">Data Analysis/Processing</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="aiTypeCodeAssistance" onclick="aiOutputGenerator.updatePreview('aiTypeCodeAssistance')">
+<span class="checkbox-label">Code Generation/Assistance</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="aiTypeImageGeneration" onclick="aiOutputGenerator.updatePreview('aiTypeImageGeneration')">
+<span class="checkbox-label">Image Generation</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="aiContentPercentage">Approximate AI Content Percentage</label>
+<select id="aiContentPercentage" class="form-select" onchange="aiOutputGenerator.updatePreview('aiContentPercentage')">
+<option value="less-than-20">Less than 20%</option>
+<option value="20-to-50" selected>20% to 50%</option>
+<option value="50-to-80">50% to 80%</option>
+<option value="more-than-80">More than 80%</option>
+<option value="varies-by-project">Varies by project/deliverable</option>
+<option value="not-disclosed">Not specified</option>
+</select>
+</div>
+
+<!-- Client Acknowledgment -->
+<div class="section-header">Client Acknowledgment</div>
+
+<div class="form-group">
+<label class="form-label" for="acknowledgmentLevel">Acknowledgment Level</label>
+<select id="acknowledgmentLevel" class="form-select" onchange="aiOutputGenerator.updatePreview('acknowledgmentLevel')">
+<option value="explicit">Explicit Consent Required</option>
+<option value="informed" selected>Informed Acknowledgment</option>
+<option value="simple">Simple Notification</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="clientApprovalRights">Client Approval Rights</label>
+<select id="clientApprovalRights" class="form-select" onchange="aiOutputGenerator.updatePreview('clientApprovalRights')">
+<option value="full-approval">Full Approval Required</option>
+<option value="limited-approval" selected>Limited Approval Rights</option>
+<option value="no-approval">No Special Approval Required</option>
+</select>
+<div class="form-hint">Client's rights to review or approve AI content</div>
+</div>
+
+<!-- Intellectual Property & Warranties -->
+<div class="section-header">Intellectual Property & Warranties</div>
+
+<div class="form-group">
+<label class="form-label" for="ipOwnership">IP Ownership Approach</label>
+<select id="ipOwnership" class="form-select" onchange="aiOutputGenerator.updatePreview('ipOwnership')">
+<option value="client-full-ownership" selected>Client Full Ownership</option>
+<option value="client-limited-ownership">Client Limited Ownership</option>
+<option value="license-only">License to Client Only</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="warrantyLevel">Warranty Level</label>
+<select id="warrantyLevel" class="form-select" onchange="aiOutputGenerator.updatePreview('warrantyLevel')">
+<option value="no-warranty">No Specific Warranties</option>
+<option value="limited-warranty" selected>Limited Warranties</option>
+<option value="standard-warranty">Standard Warranties</option>
+</select>
+<div class="form-hint">Level of warranty for AI-generated content</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">Specific Warranty Disclaimers</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="warrantyDisclaimerCopyright" checked onclick="aiOutputGenerator.updatePreview('warrantyDisclaimerCopyright')">
+<span class="checkbox-label">Copyright/Originality Disclaimer</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="warrantyDisclaimerAccuracy" checked onclick="aiOutputGenerator.updatePreview('warrantyDisclaimerAccuracy')">
+<span class="checkbox-label">Accuracy/Completeness Disclaimer</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="warrantyDisclaimerFitness" onclick="aiOutputGenerator.updatePreview('warrantyDisclaimerFitness')">
+<span class="checkbox-label">Fitness for Purpose Disclaimer</span>
+</label>
+</div>
+</div>
+
+<!-- Liability Limitations -->
+<div class="section-header">Liability Limitations</div>
+
+<div class="form-group">
+<label class="form-label" for="liabilityLimitation">Liability Limitation Scope</label>
+<select id="liabilityLimitation" class="form-select" onchange="aiOutputGenerator.updatePreview('liabilityLimitation')">
+<option value="fees-paid" selected>Limited to Fees Paid</option>
+<option value="direct-damages">Direct Damages Only</option>
+<option value="custom-cap">Custom Liability Cap</option>
+</select>
+</div>
+
+<div class="form-group" id="customCapGroup" style="display:none;">
+<label class="form-label" for="customLiabilityCap">Custom Liability Cap Amount</label>
+<input type="text" id="customLiabilityCap" class="form-input" value="$10,000" placeholder="Enter custom liability cap" onkeyup="aiOutputGenerator.updatePreview('customLiabilityCap')">
+</div>
+
+<div class="form-group">
+<label class="form-label">Additional Liability Provisions</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="liabilitySpecialDamages" checked onclick="aiOutputGenerator.updatePreview('liabilitySpecialDamages')">
+<span class="checkbox-label">Exclude Special/Consequential Damages</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="liabilityIndemnification" onclick="aiOutputGenerator.updatePreview('liabilityIndemnification')">
+<span class="checkbox-label">Include Indemnification for IP Claims</span>
+</label>
+</div>
+</div>
+
+</div>
+
+<!-- Preview Column -->
+<div class="preview-column">
+<div class="preview-header">
+<div class="preview-title">AI Output Clause Preview</div>
+<div class="preview-note">Updates as you complete the form</div>
+</div>
+
+<div class="preview-content" id="preview">
+<!-- Preview content will be populated by JavaScript -->
+</div>
+
+<div class="button-container">
+<button id="copyBtn" class="copy-btn" onclick="aiOutputGenerator.handleCopyClick()">
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+COPY CLAUSE
+</button>
+<button id="msWordBtn" class="copy-btn" onclick="aiOutputGenerator.generateWordDoc()">MS WORD DOC</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Create a namespace to avoid global scope pollution in WordPress
+var aiOutputGenerator = {
+// Initialize the generator
+init: function() {
+    // Initialize special conditional fields
+    this.handleLiabilityLimitationChange();
+    
+    // Generate initial preview
+    this.updatePreview();
+    
+    // Set up event listeners for conditional fields
+    document.getElementById('liabilityLimitation').addEventListener('change', this.handleLiabilityLimitationChange.bind(this));
+},
+
+// Handle liability limitation change
+handleLiabilityLimitationChange: function() {
+    const limitationType = document.getElementById('liabilityLimitation').value;
+    const customCapGroup = document.getElementById('customCapGroup');
+    
+    customCapGroup.style.display = limitationType === 'custom-cap' ? 'block' : 'none';
+    this.updatePreview('liabilityLimitation');
+},
+
+// Generate clause text
+generateClause: function() {
+    // Get agreement information
+    const agreementType = document.getElementById('agreementType').value;
+    const agreementTypeText = document.getElementById('agreementType').options[document.getElementById('agreementType').selectedIndex].text;
+    const providerName = document.getElementById('providerName').value;
+    const clientName = document.getElementById('clientName').value;
+    
+    // Get AI usage scope
+    const aiDisclosureLevel = document.getElementById('aiDisclosureLevel').value;
+    const aiTypeContentGeneration = document.getElementById('aiTypeContentGeneration').checked;
+    const aiTypeDataAnalysis = document.getElementById('aiTypeDataAnalysis').checked;
+    const aiTypeCodeAssistance = document.getElementById('aiTypeCodeAssistance').checked;
+    const aiTypeImageGeneration = document.getElementById('aiTypeImageGeneration').checked;
+    const aiContentPercentage = document.getElementById('aiContentPercentage').value;
+    
+    // Get client acknowledgment settings
+    const acknowledgmentLevel = document.getElementById('acknowledgmentLevel').value;
+    const clientApprovalRights = document.getElementById('clientApprovalRights').value;
+    
+    // Get IP & warranties settings
+    const ipOwnership = document.getElementById('ipOwnership').value;
+    const warrantyLevel = document.getElementById('warrantyLevel').value;
+    const warrantyDisclaimerCopyright = document.getElementById('warrantyDisclaimerCopyright').checked;
+    const warrantyDisclaimerAccuracy = document.getElementById('warrantyDisclaimerAccuracy').checked;
+    const warrantyDisclaimerFitness = document.getElementById('warrantyDisclaimerFitness').checked;
+    
+    // Get liability limitations
+    const liabilityLimitation = document.getElementById('liabilityLimitation').value;
+    const customLiabilityCap = document.getElementById('customLiabilityCap').value;
+    const liabilitySpecialDamages = document.getElementById('liabilitySpecialDamages').checked;
+    const liabilityIndemnification = document.getElementById('liabilityIndemnification').checked;
+    
+    // Build clause title
+    let clauseTitle = 'AI-GENERATED CONTENT DISCLOSURE, ACKNOWLEDGMENT, AND LIMITATION OF LIABILITY';
+    
+    // Build AI usage disclosure language
+    let aiUsageList = [];
+    if (aiTypeContentGeneration) aiUsageList.push("generating text content");
+    if (aiTypeDataAnalysis) aiUsageList.push("processing or analyzing data");
+    if (aiTypeCodeAssistance) aiUsageList.push("generating or assisting with code development");
+    if (aiTypeImageGeneration) aiUsageList.push("generating or editing images");
+    
+    let aiUsageLanguage = '';
+    if (aiUsageList.length === 1) {
+        aiUsageLanguage = aiUsageList[0];
+    } else if (aiUsageList.length === 2) {
+        aiUsageLanguage = aiUsageList.join(" and ");
+    } else if (aiUsageList.length > 2) {
+        const lastUsage = aiUsageList.pop();
+        aiUsageLanguage = aiUsageList.join(", ") + ", and " + lastUsage;
+    } else {
+        aiUsageLanguage = "assisting with deliverables";
+    }
+    
+    // Build AI disclosure paragraph based on disclosure level
+    let disclosureText = '';
+    switch (aiDisclosureLevel) {
+        case 'comprehensive':
+            disclosureText = `<p>a) <u>AI Usage Disclosure</u>. ${providerName} discloses that it may utilize artificial intelligence ("AI") and machine learning technologies when providing services under this ${agreementTypeText}, including but not limited to ${aiUsageLanguage}. The use of such technologies may represent approximately `;
+            
+            switch (aiContentPercentage) {
+                case 'less-than-20':
+                    disclosureText += "less than 20% of the final deliverables";
+                    break;
+                case '20-to-50':
+                    disclosureText += "between 20% and 50% of the final deliverables";
+                    break;
+                case '50-to-80':
+                    disclosureText += "between 50% and 80% of the final deliverables";
+                    break;
+                case 'more-than-80':
+                    disclosureText += "more than 80% of the final deliverables";
+                    break;
+                case 'varies-by-project':
+                    disclosureText += "a percentage of the final deliverables that will vary by project";
+                    break;
+                case 'not-disclosed':
+                    disclosureText += "a portion of the final deliverables";
+                    break;
+            }
+            
+            disclosureText += `. ${providerName} employs commercially reasonable methods to review, edit, fact-check, and refine any AI-generated content used in deliverables. For clarity, all AI-generated content used in deliverables is reviewed by humans before delivery to ${clientName}.</p>`;
+            break;
+            
+        case 'general':
+            disclosureText = `<p>a) <u>AI Usage Disclosure</u>. ${providerName} may utilize artificial intelligence ("AI") and machine learning technologies in the course of providing services under this ${agreementTypeText}. Such technologies may be used for ${aiUsageLanguage}. All AI-generated content is reviewed by ${providerName}'s personnel before delivery to ${clientName}.</p>`;
+            break;
+            
+        case 'minimal':
+            disclosureText = `<p>a) <u>AI Usage Disclosure</u>. ${providerName} may utilize artificial intelligence and machine learning technologies in the course of providing services under this ${agreementTypeText}. All deliverables are reviewed by ${providerName} before delivery to ${clientName}.</p>`;
+            break;
+    }
+    
+    // Build client acknowledgment paragraph based on acknowledgment level
+    let acknowledgmentText = '';
+    switch (acknowledgmentLevel) {
+        case 'explicit':
+            acknowledgmentText = `<p>b) <u>Client Acknowledgment and Consent</u>. ${clientName} explicitly acknowledges, understands, and consents to ${providerName}'s use of AI technologies in the creation of deliverables as described in subsection (a) above. ${clientName} acknowledges that AI-generated content may have inherent limitations, including potential factual inaccuracies, inconsistencies, or other imperfections. By accepting deliverables under this ${agreementTypeText}, ${clientName} is deemed to have provided its consent to the inclusion of AI-generated content in such deliverables.</p>`;
+            break;
+            
+        case 'informed':
+            acknowledgmentText = `<p>b) <u>Client Acknowledgment</u>. ${clientName} acknowledges and understands that ${providerName} may use AI technologies in the creation of deliverables as described in subsection (a) above. ${clientName} understands that AI-generated content may have inherent limitations and that ${providerName} will employ reasonable efforts to review and refine such content before delivery.</p>`;
+            break;
+            
+        case 'simple':
+            acknowledgmentText = `<p>b) <u>Client Acknowledgment</u>. ${clientName} acknowledges ${providerName}'s use of AI technologies as described above and accepts deliverables that may include AI-generated content.</p>`;
+            break;
+    }
+    
+    // Build client approval rights paragraph based on approval option
+    let approvalRightsText = '';
+    switch (clientApprovalRights) {
+        case 'full-approval':
+            approvalRightsText = `<p>c) <u>Client Approval Rights</u>. ${clientName} shall have the right to review and approve all deliverables containing AI-generated content before final acceptance. If ${clientName} reasonably objects to any AI-generated content, ${providerName} shall make commercially reasonable efforts to modify or replace such content to address ${clientName}'s concerns. If ${providerName} is unable to address such concerns after reasonable attempts, ${clientName} may reject the deliverable and request a deliverable without AI-generated content, subject to potential adjustments to project scope, timeline, and fees as may be reasonably necessary.</p>`;
+            break;
+            
+        case 'limited-approval':
+            approvalRightsText = `<p>c) <u>Client Approval Rights</u>. ${clientName} shall have the right to review deliverables and request reasonable revisions in accordance with the revision process set forth elsewhere in this ${agreementTypeText}. ${clientName}'s general revision rights shall apply to AI-generated content in the same manner as they apply to other content. ${providerName} shall make commercially reasonable efforts to address any specific concerns regarding AI-generated content raised by ${clientName}.</p>`;
+            break;
+            
+        case 'no-approval':
+            approvalRightsText = `<p>c) <u>Client Approval Rights</u>. ${clientName}'s approval rights for deliverables shall be as set forth elsewhere in this ${agreementTypeText}. No special or additional approval rights apply specifically to AI-generated content.</p>`;
+            break;
+    }
+    
+    // Build IP ownership paragraph based on ownership option
+    let ipOwnershipText = '';
+    switch (ipOwnership) {
+        case 'client-full-ownership':
+            ipOwnershipText = `<p>d) <u>Ownership of AI-Generated Content</u>. Subject to payment of all applicable fees, all AI-generated content included in final deliverables shall be deemed a "work made for hire" to the extent possible under applicable law and shall be owned exclusively by ${clientName}. To the extent any such content cannot be deemed a "work made for hire," ${providerName} hereby assigns to ${clientName} all right, title, and interest in and to such content, including all intellectual property rights therein.</p>`;
+            break;
+            
+        case 'client-limited-ownership':
+            ipOwnershipText = `<p>d) <u>Ownership of AI-Generated Content</u>. Subject to payment of all applicable fees, ${clientName} shall own the final form of all deliverables containing AI-generated content as actually delivered by ${providerName}. However, ${providerName} retains ownership of: (i) all preliminary drafts and iterations of AI-generated content not included in final deliverables; (ii) any methodologies, processes, or techniques used to generate or refine AI-generated content; and (iii) any underlying training data, prompts, or instructions used to generate such content.</p>`;
+            break;
+            
+        case 'license-only':
+            ipOwnershipText = `<p>d) <u>License to AI-Generated Content</u>. Subject to payment of all applicable fees, ${providerName} grants ${clientName} a perpetual, worldwide, non-exclusive license to use, reproduce, distribute, display, and create derivative works based upon the AI-generated content included in final deliverables. ${providerName} retains ownership of all AI-generated content and all intellectual property rights therein. ${clientName} may not resell, sublicense, or redistribute the AI-generated content except as reasonably necessary for ${clientName}'s own business purposes.</p>`;
+            break;
+    }
+    
+    // Build warranty paragraph based on warranty level and specific disclaimers
+    let warrantyText = '';
+    switch (warrantyLevel) {
+        case 'no-warranty':
+            warrantyText = `<p>e) <u>Limited Warranties and Disclaimers</u>. THE AI-GENERATED CONTENT IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND. ${providerName} MAKES NO REPRESENTATIONS OR WARRANTIES, EXPRESS OR IMPLIED, REGARDING THE AI-GENERATED CONTENT OR ITS USE, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE.</p>`;
+            break;
+            
+        case 'limited-warranty':
+            warrantyText = `<p>e) <u>Limited Warranties and Disclaimers</u>. ${providerName} represents and warrants that it has the right to provide the AI-generated content to ${clientName} as contemplated by this ${agreementTypeText}. However, due to the nature of AI technologies, ${providerName} `;
+            
+            // Add specific disclaimers
+            let disclaimers = [];
+            
+            if (warrantyDisclaimerCopyright) disclaimers.push("does not warrant that the AI-generated content is entirely original or free from potential third-party copyright claims");
+            if (warrantyDisclaimerAccuracy) disclaimers.push("does not warrant the accuracy, completeness, or reliability of the AI-generated content");
+            if (warrantyDisclaimerFitness) disclaimers.push("does not warrant that the AI-generated content will be fit for any particular purpose or meet ${clientName}'s specific requirements");
+            
+            // Format the disclaimers
+            if (disclaimers.length === 1) {
+                warrantyText += disclaimers[0] + '.';
+            } else if (disclaimers.length === 2) {
+                warrantyText += disclaimers[0] + ' and ' + disclaimers[1] + '.';
+            } else if (disclaimers.length > 2) {
+                const lastDisclaimer = disclaimers.pop();
+                warrantyText += disclaimers.join(", ") + ", or " + lastDisclaimer + '.';
+            } else {
+                warrantyText += 'disclaims any other warranties, express or implied, not explicitly stated in this Agreement.';
+            }
+            
+            warrantyText += ` EXCEPT AS EXPRESSLY SET FORTH IN THIS SUBSECTION, THE AI-GENERATED CONTENT IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND.</p>`;
+            break;
+            
+        case 'standard-warranty':
+            warrantyText = `<p>e) <u>Warranties</u>. ${providerName} represents and warrants that: (i) it has the right to provide the AI-generated content to ${clientName} as contemplated by this ${agreementTypeText}; (ii) to the best of ${providerName}'s knowledge, the AI-generated content does not infringe upon the intellectual property rights of any third party; and (iii) ${providerName} has implemented reasonable procedures to review and verify the AI-generated content before delivery. Due to the inherent nature of AI technologies, ${clientName} acknowledges that AI-generated content may contain unintentional errors or inaccuracies that may require correction.</p>`;
+            break;
+    }
+    
+    // Build liability limitation paragraph based on limitation option
+    let liabilityText = '';
+    switch (liabilityLimitation) {
+        case 'fees-paid':
+            liabilityText = `<p>f) <u>Limitation of Liability for AI-Generated Content</u>. IN NO EVENT SHALL ${providerName}'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THE AI-GENERATED CONTENT, WHETHER IN CONTRACT, TORT, OR UNDER ANY OTHER THEORY OF LIABILITY, EXCEED THE TOTAL AMOUNT PAID BY ${clientName} TO ${providerName} UNDER THIS ${agreementTypeText.toUpperCase()}.`;
+            break;
+            
+        case 'direct-damages':
+            liabilityText = `<p>f) <u>Limitation of Liability for AI-Generated Content</u>. ${providerName}'S LIABILITY ARISING OUT OF OR RELATED TO THE AI-GENERATED CONTENT SHALL BE LIMITED TO DIRECT DAMAGES ONLY, AND IN NO EVENT SHALL EXCEED THE TOTAL AMOUNT PAID BY ${clientName} TO ${providerName} UNDER THIS ${agreementTypeText.toUpperCase()}.`;
+            break;
+            
+        case 'custom-cap':
+            liabilityText = `<p>f) <u>Limitation of Liability for AI-Generated Content</u>. IN NO EVENT SHALL ${providerName}'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THE AI-GENERATED CONTENT, WHETHER IN CONTRACT, TORT, OR UNDER ANY OTHER THEORY OF LIABILITY, EXCEED ${customLiabilityCap}.`;
+            break;
+    }
+    
+    // Add special damages exclusion if selected
+    if (liabilitySpecialDamages) {
+        liabilityText += ` IN NO EVENT SHALL ${providerName} BE LIABLE FOR ANY CONSEQUENTIAL, INCIDENTAL, INDIRECT, EXEMPLARY, SPECIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOST PROFITS, LOSS OF USE, OR LOSS OF DATA, ARISING OUT OF OR IN CONNECTION WITH THE AI-GENERATED CONTENT, WHETHER OR NOT ${providerName} HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.`;
+    }
+    
+    liabilityText += `</p>`;
+    
+    // Add indemnification paragraph if selected
+    let indemnificationText = '';
+    if (liabilityIndemnification) {
+        indemnificationText = `<p>g) <u>Indemnification</u>. ${providerName} shall defend, indemnify, and hold harmless ${clientName} from and against any third-party claims, actions, suits, or proceedings alleging that the AI-generated content as delivered by ${providerName} and used in accordance with this ${agreementTypeText} infringes upon the intellectual property rights of a third party, and shall pay all settlements entered into and damages awarded against ${clientName} to the extent based on such a claim; provided that ${clientName}: (i) promptly gives written notice of the claim to ${providerName}; (ii) gives ${providerName} sole control of the defense and settlement of the claim; and (iii) provides to ${providerName} all reasonable assistance at ${providerName}'s expense. If the AI-generated content is, or in ${providerName}'s opinion is likely to be, claimed to infringe any third-party intellectual property rights, ${providerName} may, at its option and expense: (a) procure the right for ${clientName} to continue using it; (b) replace or modify it so that it becomes non-infringing; or (c) terminate ${clientName}'s right to use it and refund any amount paid for the affected deliverable. The above remedies constitute ${clientName}'s sole remedy for third-party infringement claims related to the AI-generated content.</p>`;
+    }
+    
+    // Build the complete clause
+    let clause = `
+<p><strong>${clauseTitle}</strong></p>
+
+${disclosureText}
+
+${acknowledgmentText}
+
+${approvalRightsText}
+
+${ipOwnershipText}
+
+${warrantyText}
+
+${liabilityText}
+`;
+
+    // Add indemnification paragraph if selected
+    if (liabilityIndemnification) {
+        clause += `\n${indemnificationText}`;
+    }
+
+    return clause;
+},
+
+// Update the preview
+updatePreview: function(changedField) {
+    // Clear previous highlights
+    this.clearHighlights();
+    
+    // Generate new clause text
+    const clauseText = this.generateClause();
+    
+    // Update preview
+    document.getElementById('preview').innerHTML = clauseText;
+    
+    // If a field was changed, highlight the relevant text
+    if (changedField) {
+        this.highlightChangedText(changedField);
+    }
+},
+
+// Clear highlights
+clearHighlights: function() {
+    const highlightElements = document.getElementsByClassName('highlight');
+    while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+    }
+},
+
+// Find text in document and highlight it
+findAndHighlightText: function(searchText) {
+    if (!searchText) return;
+    
+    const previewElement = document.getElementById('preview');
+    const previewHTML = previewElement.innerHTML;
+    
+    // A simpler approach for WordPress compatibility
+    if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+            new RegExp(this.escapeRegExp(searchText), 'g'),
+            '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+            const highlightElements = document.getElementsByClassName('highlight');
+            if (highlightElements.length > 0) {
+                const firstHighlight = highlightElements[0];
+                if (firstHighlight) {
+                    firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
+        }, 100);
+    }
+},
+
+// Escape special regex characters
+escapeRegExp: function(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+},
+
+// Highlight changed text based on field
+highlightChangedText: function(changedField) {
+    const self = this;
+    
+    switch (changedField) {
+        case 'agreementType':
+            // Highlight the agreement type text
+            const agreementTypeElement = document.getElementById('agreementType');
+            const agreementTypeText = agreementTypeElement.options[agreementTypeElement.selectedIndex].text;
+            this.findAndHighlightText(agreementTypeText);
+            break;
+        case 'providerName':
+            this.findAndHighlightText(document.getElementById('providerName').value);
+            break;
+        case 'clientName':
+            this.findAndHighlightText(document.getElementById('clientName').value);
+            break;
+        case 'aiDisclosureLevel':
+            // Different highlight based on disclosure level
+            const disclosureLevel = document.getElementById('aiDisclosureLevel').value;
+            if (disclosureLevel === 'comprehensive') {
+                this.findAndHighlightText("AI Usage Disclosure");
+            } else if (disclosureLevel === 'general') {
+                this.findAndHighlightText("may utilize artificial intelligence");
+            } else {
+                this.findAndHighlightText("AI Usage Disclosure");
+            }
+            break;
+        case 'aiTypeContentGeneration':
+        case 'aiTypeDataAnalysis':
+        case 'aiTypeCodeAssistance':
+        case 'aiTypeImageGeneration':
+            // Highlight based on AI usage types
+            if (document.getElementById('aiTypeContentGeneration').checked) 
+                this.findAndHighlightText("generating text content");
+            if (document.getElementById('aiTypeDataAnalysis').checked)
+                this.findAndHighlightText("processing or analyzing data");
+            if (document.getElementById('aiTypeCodeAssistance').checked)
+                this.findAndHighlightText("generating or assisting with code development");
+            if (document.getElementById('aiTypeImageGeneration').checked)
+                this.findAndHighlightText("generating or editing images");
+            break;
+        case 'aiContentPercentage':
+            // Highlight percentage text
+            const percentage = document.getElementById('aiContentPercentage').value;
+            switch (percentage) {
+                case 'less-than-20':
+                    this.findAndHighlightText("less than 20% of the final deliverables");
+                    break;
+                case '20-to-50':
+                    this.findAndHighlightText("between 20% and 50% of the final deliverables");
+                    break;
+                case '50-to-80':
+                    this.findAndHighlightText("between 50% and 80% of the final deliverables");
+                    break;
+                case 'more-than-80':
+                    this.findAndHighlightText("more than 80% of the final deliverables");
+                    break;
+                case 'varies-by-project':
+                    this.findAndHighlightText("a percentage of the final deliverables that will vary by project");
+                    break;
+                case 'not-disclosed':
+                    this.findAndHighlightText("a portion of the final deliverables");
+                    break;
+            }
+            break;
+        case 'acknowledgmentLevel':
+            // Highlight based on acknowledgment level
+            const ackLevel = document.getElementById('acknowledgmentLevel').value;
+            if (ackLevel === 'explicit') {
+                this.findAndHighlightText("explicitly acknowledges, understands, and consents");
+            } else if (ackLevel === 'informed') {
+                this.findAndHighlightText("acknowledges and understands");
+            } else {
+                this.findAndHighlightText("Client Acknowledgment");
+            }
+            break;
+        case 'clientApprovalRights':
+            // Highlight based on approval rights
+            const approvalRights = document.getElementById('clientApprovalRights').value;
+            if (approvalRights === 'full-approval') {
+                this.findAndHighlightText("right to review and approve all deliverables");
+            } else if (approvalRights === 'limited-approval') {
+                this.findAndHighlightText("right to review deliverables");
+            } else {
+                this.findAndHighlightText("approval rights for deliverables shall be as set forth elsewhere");
+            }
+            break;
+        case 'ipOwnership':
+            // Highlight based on IP ownership approach
+            const ownership = document.getElementById('ipOwnership').value;
+            if (ownership === 'client-full-ownership') {
+                this.findAndHighlightText("work made for hire");
+            } else if (ownership === 'client-limited-ownership') {
+                this.findAndHighlightText("shall own the final form of all deliverables");
+            } else {
+                this.findAndHighlightText("grants");
+            }
+            break;
+        case 'warrantyLevel':
+            // Highlight based on warranty level
+            const warrantyLevel = document.getElementById('warrantyLevel').value;
+            if (warrantyLevel === 'no-warranty') {
+                this.findAndHighlightText("AS IS");
+            } else if (warrantyLevel === 'limited-warranty') {
+                this.findAndHighlightText("Limited Warranties and Disclaimers");
+            } else {
+                this.findAndHighlightText("Warranties");
+            }
+            break;
+        case 'warrantyDisclaimerCopyright':
+        case 'warrantyDisclaimerAccuracy':
+        case 'warrantyDisclaimerFitness':
+            // Highlight specific warranty disclaimers
+            if (document.getElementById('warrantyDisclaimerCopyright').checked)
+                this.findAndHighlightText("does not warrant that the AI-generated content is entirely original");
+            if (document.getElementById('warrantyDisclaimerAccuracy').checked)
+                this.findAndHighlightText("does not warrant the accuracy");
+            if (document.getElementById('warrantyDisclaimerFitness').checked)
+                this.findAndHighlightText("does not warrant that the AI-generated content will be fit for any particular purpose");
+            break;
+        case 'liabilityLimitation':
+        case 'customLiabilityCap':
+            // Highlight based on liability limitation
+            const liabilityType = document.getElementById('liabilityLimitation').value;
+            if (liabilityType === 'fees-paid') {
+                this.findAndHighlightText("EXCEED THE TOTAL AMOUNT PAID");
+            } else if (liabilityType === 'direct-damages') {
+                this.findAndHighlightText("LIMITED TO DIRECT DAMAGES ONLY");
+            } else {
+                this.findAndHighlightText(document.getElementById('customLiabilityCap').value);
+            }
+            break;
+        case 'liabilitySpecialDamages':
+            // Highlight special damages exclusion
+            if (document.getElementById('liabilitySpecialDamages').checked) {
+                this.findAndHighlightText("CONSEQUENTIAL, INCIDENTAL, INDIRECT, EXEMPLARY, SPECIAL, OR PUNITIVE DAMAGES");
+            }
+            break;
+        case 'liabilityIndemnification':
+            // Highlight indemnification
+            if (document.getElementById('liabilityIndemnification').checked) {
+                this.findAndHighlightText("Indemnification");
+            }
+            break;
+    }
+    
+    // Remove highlights after 3 seconds
+    setTimeout(function() {
+        self.clearHighlights();
+    }, 3000);
+},
+
+// Generate MS Word document
+generateWordDoc: function() {
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                  "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                  "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+    const footer = "</body></html>";
+    const content = document.getElementById('preview').innerHTML;
+    const sourceHTML = header + content + footer;
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    
+    // Create a download link and trigger it
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = 'AIOutputClause.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+},
+
+// Handle copy button click
+handleCopyClick: function() {
+    const text = document.getElementById('preview').innerText;
+    const copyBtn = document.getElementById('copyBtn');
+    const originalText = copyBtn.innerHTML;
+    
+    try {
+        // Modern approach
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                copyBtn.innerHTML = 'COPIED!';
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        // Fallback approach
+        else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyBtn.innerHTML = 'COPIED!';
+            setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+    } catch(err) {
+        alert('Please select and copy the text manually.');
+    }
+}
+};
+
+// Start the generator when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+aiOutputGenerator.init();
+});
+
+// Initialize immediately as well (for WordPress)
+aiOutputGenerator.init();
+</script>
+</body>
+</html>
+
+<div class="preview-fade" id="ai-output-fade"></div>
+<button id="ai-output-unlock" class="unlock-button">Unlock All Generators ($9.99)</button>
+</div>
+
+<div id="indemnification-tab" class="tools-tab-content">
+<!-- AI Indemnification Clause Generator -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Indemnification Clause Generator</title>
+</head>
+<body>
+<div class="clause-generator" id="ai-indemnification-generator">
+<div class="generator-container">
+<!-- Form Column -->
+<div class="form-column">
+<!-- Contract Information -->
+<div class="section-header">Contract Information</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_agreementType">Agreement Type</label>
+<select id="indem_agreementType" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('agreementType')">
+<option value="services" selected>Service Agreement</option>
+<option value="development">Development Agreement</option>
+<option value="license">License Agreement</option>
+<option value="saas">SaaS Agreement</option>
+<option value="consulting">Consulting Agreement</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_providerName">Provider/Developer Name</label>
+<input type="text" id="indem_providerName" class="form-input" value="Provider" placeholder="Enter name of service provider" onkeyup="aiIndemnificationGenerator.updatePreview('providerName')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_clientName">Client Name</label>
+<input type="text" id="indem_clientName" class="form-input" value="Client" placeholder="Enter name of client" onkeyup="aiIndemnificationGenerator.updatePreview('clientName')">
+<div class="form-hint">The term used in your agreement for the receiving party</div>
+</div>
+
+<!-- Indemnification Type & Scope -->
+<div class="section-header">Indemnification Type & Scope</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_indemnificationType">Indemnification Type</label>
+<select id="indem_indemnificationType" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('indemnificationType')">
+<option value="provider-to-client" selected>Provider Indemnifies Client</option>
+<option value="client-to-provider">Client Indemnifies Provider</option>
+<option value="mutual">Mutual Indemnification</option>
+</select>
+<div class="form-hint">Direction of the indemnification obligation</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">AI-Specific Claims Covered</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="indem_claimsCopyright" checked onclick="aiIndemnificationGenerator.updatePreview('claimsCopyright')">
+<span class="checkbox-label">Copyright Infringement</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_claimsTrademark" checked onclick="aiIndemnificationGenerator.updatePreview('claimsTrademark')">
+<span class="checkbox-label">Trademark Infringement</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_claimsDataPrivacy" checked onclick="aiIndemnificationGenerator.updatePreview('claimsDataPrivacy')">
+<span class="checkbox-label">Data Privacy Violations</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_claimsMisrepresentation" onclick="aiIndemnificationGenerator.updatePreview('claimsMisrepresentation')">
+<span class="checkbox-label">AI Output Misrepresentation</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_claimsRegulatoryFines" onclick="aiIndemnificationGenerator.updatePreview('claimsRegulatoryFines')">
+<span class="checkbox-label">Regulatory Fines/Penalties</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_claimsThirdPartyOnly">Third-Party Claims Only</label>
+<select id="indem_claimsThirdPartyOnly" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('claimsThirdPartyOnly')">
+<option value="thirdPartyOnly" selected>Third-Party Claims Only</option>
+<option value="directAndThirdParty">Direct and Third-Party Claims</option>
+</select>
+<div class="form-hint">Whether to limit indemnification to third-party claims only</div>
+</div>
+
+<!-- Exceptions & Conditions -->
+<div class="section-header">Exceptions & Conditions</div>
+
+<div class="form-group">
+<label class="form-label">Indemnification Exceptions</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="indem_exceptionClientModification" checked onclick="aiIndemnificationGenerator.updatePreview('exceptionClientModification')">
+<span class="checkbox-label">Client Modification of AI Output</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_exceptionClientMisuse" checked onclick="aiIndemnificationGenerator.updatePreview('exceptionClientMisuse')">
+<span class="checkbox-label">Client Misuse of AI System</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_exceptionThirdPartyContent" checked onclick="aiIndemnificationGenerator.updatePreview('exceptionThirdPartyContent')">
+<span class="checkbox-label">Third-Party Content Provided by Client</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_exceptionClientPrompts" onclick="aiIndemnificationGenerator.updatePreview('exceptionClientPrompts')">
+<span class="checkbox-label">Client-Provided Prompts or Instructions</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="indem_exceptionWillfullMisconduct" onclick="aiIndemnificationGenerator.updatePreview('exceptionWillfullMisconduct')">
+<span class="checkbox-label">Willful Misconduct/Gross Negligence</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_clientObligations">Client Cooperation Requirements</label>
+<select id="indem_clientObligations" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('clientObligations')">
+<option value="standard" selected>Standard Cooperation</option>
+<option value="extensive">Extensive Cooperation</option>
+<option value="minimal">Minimal Cooperation</option>
+</select>
+<div class="form-hint">Level of cooperation required from the indemnified party</div>
+</div>
+
+<!-- Procedural Requirements -->
+<div class="section-header">Procedural Requirements</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_noticeRequirement">Notice Requirement</label>
+<select id="indem_noticeRequirement" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('noticeRequirement')">
+<option value="prompt" selected>Prompt Notice</option>
+<option value="immediate">Immediate Notice</option>
+<option value="specific">Specific Timeframe</option>
+</select>
+</div>
+
+<div class="form-group" id="indem_specificTimeframeGroup" style="display:none;">
+<label class="form-label" for="indem_specificTimeframe">Specific Timeframe</label>
+<input type="text" id="indem_specificTimeframe" class="form-input" value="10 business days" placeholder="Enter specific timeframe" onkeyup="aiIndemnificationGenerator.updatePreview('specificTimeframe')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_defenseControl">Control of Defense</label>
+<select id="indem_defenseControl" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('defenseControl')">
+<option value="indemnifier" selected>Indemnifying Party Controls</option>
+<option value="indemnified">Indemnified Party Controls</option>
+<option value="joint">Joint Control</option>
+</select>
+<div class="form-hint">Who controls the defense of indemnified claims</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_settlementApproval">Settlement Approval</label>
+<select id="indem_settlementApproval" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('settlementApproval')">
+<option value="with-approval" selected>With Indemnified Party Approval</option>
+<option value="reasonable">No Unreasonable Withholding</option>
+<option value="sole-discretion">At Indemnifier's Sole Discretion</option>
+</select>
+</div>
+
+<!-- Liability Caps -->
+<div class="section-header">Liability Caps & Remedies</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_liabilityCap">Liability Cap</label>
+<select id="indem_liabilityCap" class="form-select" onchange="aiIndemnificationGenerator.handleLiabilityCapChange()">
+<option value="no-cap">No Cap (Unlimited)</option>
+<option value="fees-paid" selected>Fees Paid</option>
+<option value="fees-multiplier">Multiple of Fees</option>
+<option value="fixed-amount">Fixed Amount</option>
+<option value="insurance">Insurance Coverage</option>
+</select>
+</div>
+
+<div class="form-group" id="indem_feesMultiplierGroup" style="display:none;">
+<label class="form-label" for="indem_feesMultiplier">Fees Multiplier</label>
+<input type="text" id="indem_feesMultiplier" class="form-input" value="2x" placeholder="Enter multiplier (e.g., 2x)" onkeyup="aiIndemnificationGenerator.updatePreview('feesMultiplier')">
+</div>
+
+<div class="form-group" id="indem_fixedAmountGroup" style="display:none;">
+<label class="form-label" for="indem_fixedAmount">Fixed Amount</label>
+<input type="text" id="indem_fixedAmount" class="form-input" value="$100,000" placeholder="Enter amount" onkeyup="aiIndemnificationGenerator.updatePreview('fixedAmount')">
+</div>
+
+<div class="form-group" id="indem_insuranceAmountGroup" style="display:none;">
+<label class="form-label" for="indem_insuranceAmount">Insurance Amount</label>
+<input type="text" id="indem_insuranceAmount" class="form-input" value="$1,000,000" placeholder="Enter insurance amount" onkeyup="aiIndemnificationGenerator.updatePreview('insuranceAmount')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="indem_remedies">Additional Remedies</label>
+<select id="indem_remedies" class="form-select" onchange="aiIndemnificationGenerator.updatePreview('remedies')">
+<option value="standard" selected>Standard Remedies</option>
+<option value="replacement">Replacement/Modification Option</option>
+<option value="termination">Termination Option</option>
+<option value="both">Both Replacement and Termination</option>
+</select>
+<div class="form-hint">Additional options for resolving indemnified claims</div>
+</div>
+
+</div>
+
+<!-- Preview Column -->
+<div class="preview-column">
+<div class="preview-header">
+<div class="preview-title">AI Indemnification Clause Preview</div>
+<div class="preview-note">Updates as you complete the form</div>
+</div>
+
+<div class="preview-content" id="indem_preview">
+<!-- Preview content will be populated by JavaScript -->
+</div>
+
+<div class="button-container">
+<button id="indem_copyBtn" class="copy-btn" onclick="aiIndemnificationGenerator.handleCopyClick()">
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+COPY CLAUSE
+</button>
+<button id="indem_msWordBtn" class="copy-btn" onclick="aiIndemnificationGenerator.generateWordDoc()">MS WORD DOC</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Create a namespace to avoid global scope pollution in WordPress
+var aiIndemnificationGenerator = {
+// Initialize the generator
+init: function() {
+    // Initialize special conditional fields
+    this.handleLiabilityCapChange();
+    this.handleNoticeRequirementChange();
+    
+    // Generate initial preview
+    this.updatePreview();
+    
+    // Set up event listeners for conditional fields
+    document.getElementById('indem_liabilityCap').addEventListener('change', this.handleLiabilityCapChange.bind(this));
+    document.getElementById('indem_noticeRequirement').addEventListener('change', this.handleNoticeRequirementChange.bind(this));
+},
+
+// Handle liability cap type change
+handleLiabilityCapChange: function() {
+    const capType = document.getElementById('indem_liabilityCap').value;
+    const feesMultiplierGroup = document.getElementById('indem_feesMultiplierGroup');
+    const fixedAmountGroup = document.getElementById('indem_fixedAmountGroup');
+    const insuranceAmountGroup = document.getElementById('indem_insuranceAmountGroup');
+    
+    feesMultiplierGroup.style.display = capType === 'fees-multiplier' ? 'block' : 'none';
+    fixedAmountGroup.style.display = capType === 'fixed-amount' ? 'block' : 'none';
+    insuranceAmountGroup.style.display = capType === 'insurance' ? 'block' : 'none';
+    
+    this.updatePreview('liabilityCap');
+},
+
+// Handle notice requirement change
+handleNoticeRequirementChange: function() {
+    const noticeType = document.getElementById('indem_noticeRequirement').value;
+    const specificTimeframeGroup = document.getElementById('indem_specificTimeframeGroup');
+    
+    specificTimeframeGroup.style.display = noticeType === 'specific' ? 'block' : 'none';
+    
+    this.updatePreview('noticeRequirement');
+},
+
+// Generate clause text
+generateClause: function() {
+    // Get agreement information
+    const agreementType = document.getElementById('indem_agreementType').value;
+    const agreementTypeText = document.getElementById('indem_agreementType').options[document.getElementById('indem_agreementType').selectedIndex].text;
+    const providerName = document.getElementById('indem_providerName').value;
+    const clientName = document.getElementById('indem_clientName').value;
+    
+    // Get indemnification type & scope
+    const indemnificationType = document.getElementById('indem_indemnificationType').value;
+    const claimsCopyright = document.getElementById('indem_claimsCopyright').checked;
+    const claimsTrademark = document.getElementById('indem_claimsTrademark').checked;
+    const claimsDataPrivacy = document.getElementById('indem_claimsDataPrivacy').checked;
+    const claimsMisrepresentation = document.getElementById('indem_claimsMisrepresentation').checked;
+    const claimsRegulatoryFines = document.getElementById('indem_claimsRegulatoryFines').checked;
+    const claimsThirdPartyOnly = document.getElementById('indem_claimsThirdPartyOnly').value === 'thirdPartyOnly';
+    
+    // Get exceptions & conditions
+    const exceptionClientModification = document.getElementById('indem_exceptionClientModification').checked;
+    const exceptionClientMisuse = document.getElementById('indem_exceptionClientMisuse').checked;
+    const exceptionThirdPartyContent = document.getElementById('indem_exceptionThirdPartyContent').checked;
+    const exceptionClientPrompts = document.getElementById('indem_exceptionClientPrompts').checked;
+    const exceptionWillfullMisconduct = document.getElementById('indem_exceptionWillfullMisconduct').checked;
+    const clientObligations = document.getElementById('indem_clientObligations').value;
+    
+    // Get procedural requirements
+    const noticeRequirement = document.getElementById('indem_noticeRequirement').value;
+    const specificTimeframe = document.getElementById('indem_specificTimeframe').value;
+    const defenseControl = document.getElementById('indem_defenseControl').value;
+    const settlementApproval = document.getElementById('indem_settlementApproval').value;
+    
+    // Get liability caps & remedies
+    const liabilityCap = document.getElementById('indem_liabilityCap').value;
+    const feesMultiplier = document.getElementById('indem_feesMultiplier').value;
+    const fixedAmount = document.getElementById('indem_fixedAmount').value;
+    const insuranceAmount = document.getElementById('indem_insuranceAmount').value;
+    const remedies = document.getElementById('indem_remedies').value;
+    
+    // Build clause title
+    let clauseTitle = 'AI INDEMNIFICATION AND LIABILITY';
+    
+    // Determine the indemnifying and indemnified parties
+    let indemnifyingParty = '';
+    let indemnifiedParty = '';
+    let indemnifyingPartyFull = '';
+    let indemnifiedPartyFull = '';
+    
+    switch (indemnificationType) {
+        case 'provider-to-client':
+            indemnifyingParty = providerName;
+            indemnifiedParty = clientName;
+            indemnifyingPartyFull = providerName;
+            indemnifiedPartyFull = `${clientName}, its affiliates, officers, directors, employees, agents, successors, and assigns`;
+            break;
+        case 'client-to-provider':
+            indemnifyingParty = clientName;
+            indemnifiedParty = providerName;
+            indemnifyingPartyFull = clientName;
+            indemnifiedPartyFull = `${providerName}, its affiliates, officers, directors, employees, agents, successors, and assigns`;
+            break;
+        case 'mutual':
+            indemnifyingParty = "Each party";
+            indemnifiedParty = "the other party";
+            indemnifyingPartyFull = "Each party";
+            indemnifiedPartyFull = "the other party, its affiliates, officers, directors, employees, agents, successors, and assigns";
+            break;
+    }
+    
+    // Build covered claims language
+    let coveredClaimsList = [];
+    if (claimsCopyright) coveredClaimsList.push("copyright or other intellectual property infringement");
+    if (claimsTrademark) coveredClaimsList.push("trademark infringement");
+    if (claimsDataPrivacy) coveredClaimsList.push("data privacy violations");
+    if (claimsMisrepresentation) coveredClaimsList.push("misrepresentation or inaccuracies in AI-generated output");
+    if (claimsRegulatoryFines) coveredClaimsList.push("regulatory fines or penalties");
+    
+    let coveredClaimsText = '';
+    if (coveredClaimsList.length === 1) {
+        coveredClaimsText = coveredClaimsList[0];
+    } else if (coveredClaimsList.length === 2) {
+        coveredClaimsText = coveredClaimsList.join(" and ");
+    } else if (coveredClaimsList.length > 2) {
+        const lastClaim = coveredClaimsList.pop();
+        coveredClaimsText = coveredClaimsList.join(", ") + ", and " + lastClaim;
+    } else {
+        coveredClaimsText = "claims arising from the AI technologies";
+    }
+    
+    // Build third-party claims language
+    let thirdPartyClaimsText = claimsThirdPartyOnly ? "third-party" : "third-party or direct";
+    
+    // Build indemnification paragraph
+    let indemnificationText = '';
+    if (indemnificationType === 'mutual') {
+        indemnificationText = `<p>a) <u>Mutual Indemnification</u>. ${indemnifyingPartyFull} shall defend, indemnify, and hold harmless ${indemnifiedPartyFull} from and against any and all ${thirdPartyClaimsText} claims, actions, proceedings, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to ${coveredClaimsText} resulting from the indemnifying party's AI technologies or services, subject to the exceptions and limitations set forth herein.</p>`;
+    } else {
+        indemnificationText = `<p>a) <u>Indemnification</u>. ${indemnifyingPartyFull} shall defend, indemnify, and hold harmless ${indemnifiedPartyFull} from and against any and all ${thirdPartyClaimsText} claims, actions, proceedings, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to ${coveredClaimsText} resulting from ${indemnifyingParty}'s AI technologies or services, subject to the exceptions and limitations set forth herein.</p>`;
+    }
+    
+    // Build exceptions paragraph
+    let exceptionsList = [];
+    if (exceptionClientModification) exceptionsList.push(`${clientName}'s modification of the AI-generated output`);
+    if (exceptionClientMisuse) exceptionsList.push(`${clientName}'s misuse or improper use of the AI system or output contrary to ${providerName}'s instructions or documentation`);
+    if (exceptionThirdPartyContent) exceptionsList.push(`third-party content, data, or information provided by ${clientName}`);
+    if (exceptionClientPrompts) exceptionsList.push(`prompts, instructions, or requirements provided by ${clientName}`);
+    if (exceptionWillfullMisconduct) exceptionsList.push(`the indemnified party's willful misconduct or gross negligence`);
+    
+    let exceptionsText = '';
+    if (exceptionsList.length > 0) {
+        exceptionsText = `<p>b) <u>Exceptions to Indemnification</u>. The indemnification obligations set forth above shall not apply to claims arising from or related to: `;
+        
+        if (exceptionsList.length === 1) {
+            exceptionsText += exceptionsList[0] + ".";
+        } else if (exceptionsList.length === 2) {
+            exceptionsText += exceptionsList.join("; or ") + ".";
+        } else {
+            const lastException = exceptionsList.pop();
+            exceptionsText += exceptionsList.join("; ") + "; or " + lastException + ".";
+        }
+        
+        exceptionsText += `</p>`;
+    } else {
+        exceptionsText = `<p>b) <u>Exceptions to Indemnification</u>. The indemnification obligations set forth above shall be subject to the limitations set forth elsewhere in this ${agreementTypeText}.</p>`;
+    }
+    
+    // Build notice & procedure paragraph
+    let noticeText = '';
+    switch (noticeRequirement) {
+        case 'prompt':
+            noticeText = "promptly";
+            break;
+        case 'immediate':
+            noticeText = "immediately";
+            break;
+        case 'specific':
+            noticeText = `within ${specificTimeframe}`;
+            break;
+    }
+    
+    let defenseControlText = '';
+    switch (defenseControl) {
+        case 'indemnifier':
+            defenseControlText = `The indemnifying party shall have sole control of the defense and settlement of any indemnified claim`;
+            break;
+        case 'indemnified':
+            defenseControlText = `The indemnified party shall have the right to control the defense and settlement of any indemnified claim, at the indemnifying party's expense`;
+            break;
+        case 'joint':
+            defenseControlText = `The parties shall cooperate in good faith regarding the defense and settlement of any indemnified claim`;
+            break;
+    }
+    
+    let settlementText = '';
+    switch (settlementApproval) {
+        case 'with-approval':
+            settlementText = `provided that the indemnifying party shall not enter into any settlement that adversely affects the indemnified party's rights or interests without the indemnified party's prior written approval`;
+            break;
+        case 'reasonable':
+            settlementText = `provided that the indemnifying party shall not enter into any settlement that adversely affects the indemnified party's rights or interests without the indemnified party's prior written approval, which shall not be unreasonably withheld, conditioned, or delayed`;
+            break;
+        case 'sole-discretion':
+            settlementText = `and may enter into settlements in its sole discretion`;
+            break;
+    }
+    
+    let cooperationText = '';
+    switch (clientObligations) {
+        case 'standard':
+            cooperationText = `The indemnified party shall provide reasonable cooperation to the indemnifying party in the defense of any indemnified claim, at the indemnifying party's expense.`;
+            break;
+        case 'extensive':
+            cooperationText = `The indemnified party shall provide comprehensive cooperation to the indemnifying party in the defense of any indemnified claim, including but not limited to providing access to relevant documents and information, making personnel available for interviews or testimony, and executing any documents reasonably necessary for the defense, all at the indemnifying party's expense.`;
+            break;
+        case 'minimal':
+            cooperationText = `The indemnified party shall provide such cooperation as may be reasonably necessary for the indemnifying party to defend any indemnified claim.`;
+            break;
+    }
+    
+    let procedureText = `<p>c) <u>Procedure</u>. The indemnified party shall notify the indemnifying party ${noticeText} of any claim for which indemnification is sought. ${defenseControlText}, ${settlementText}. ${cooperationText}</p>`;
+    
+    // Build liability cap paragraph
+    let capText = '';
+    
+    switch (liabilityCap) {
+        case 'no-cap':
+            capText = `<p>d) <u>Liability Cap</u>. The indemnifying party's liability under this indemnification provision shall not be subject to any cap or limitation.</p>`;
+            break;
+        case 'fees-paid':
+            capText = `<p>d) <u>Liability Cap</u>. Notwithstanding anything to the contrary herein, the indemnifying party's aggregate liability under this indemnification provision shall not exceed the total amount of fees paid by ${clientName} to ${providerName} under this ${agreementTypeText} during the twelve (12) month period immediately preceding the event giving rise to the claim.</p>`;
+            break;
+        case 'fees-multiplier':
+            capText = `<p>d) <u>Liability Cap</u>. Notwithstanding anything to the contrary herein, the indemnifying party's aggregate liability under this indemnification provision shall not exceed ${feesMultiplier} times the total amount of fees paid by ${clientName} to ${providerName} under this ${agreementTypeText} during the twelve (12) month period immediately preceding the event giving rise to the claim.</p>`;
+            break;
+        case 'fixed-amount':
+            capText = `<p>d) <u>Liability Cap</u>. Notwithstanding anything to the contrary herein, the indemnifying party's aggregate liability under this indemnification provision shall not exceed ${fixedAmount}.</p>`;
+            break;
+        case 'insurance':
+            capText = `<p>d) <u>Liability Cap</u>. The indemnifying party shall maintain insurance coverage with a reputable insurance carrier in an amount not less than ${insuranceAmount} to cover its indemnification obligations hereunder. Notwithstanding anything to the contrary herein, the indemnifying party's aggregate liability under this indemnification provision shall not exceed the amount of such insurance coverage.</p>`;
+            break;
+    }
+    
+    // Build remedies paragraph
+    let remediesText = '';
+    
+    switch (remedies) {
+        case 'standard':
+            remediesText = `<p>e) <u>Remedies</u>. The remedies provided in this section shall be the indemnified party's sole and exclusive remedies with respect to the claims and liabilities addressed by this indemnification provision.</p>`;
+            break;
+        case 'replacement':
+            remediesText = `<p>e) <u>Remedies</u>. If any AI-generated output becomes, or in the indemnifying party's opinion is likely to become, the subject of a claim covered by this indemnification provision, the indemnifying party may, at its option and expense: (i) procure for the indemnified party the right to continue using the AI-generated output; (ii) replace or modify the AI-generated output to make it non-infringing; or (iii) if options (i) and (ii) are not commercially reasonable, provide a refund for the portion of fees attributable to the affected AI-generated output.</p>`;
+            break;
+        case 'termination':
+            remediesText = `<p>e) <u>Remedies</u>. If any AI-generated output becomes, or in the indemnifying party's opinion is likely to become, the subject of a claim covered by this indemnification provision, the indemnified party may, upon written notice to the indemnifying party, terminate this ${agreementTypeText} and receive a pro-rated refund of any prepaid fees for the unexpired portion of the term.</p>`;
+            break;
+        case 'both':
+            remediesText = `<p>e) <u>Remedies</u>. If any AI-generated output becomes, or in the indemnifying party's opinion is likely to become, the subject of a claim covered by this indemnification provision, the indemnifying party may, at its option and expense: (i) procure for the indemnified party the right to continue using the AI-generated output; (ii) replace or modify the AI-generated output to make it non-infringing; or (iii) if options (i) and (ii) are not commercially reasonable, terminate this ${agreementTypeText} and provide a pro-rated refund of any prepaid fees for the unexpired portion of the term.</p>`;
+            break;
+    }
+    
+    // Build the complete clause
+    let clause = `
+<p><strong>${clauseTitle}</strong></p>
+
+${indemnificationText}
+
+${exceptionsText}
+
+${procedureText}
+
+${capText}
+
+${remediesText}
+`;
+
+    return clause;
+},
+
+// Update the preview
+updatePreview: function(changedField) {
+    // Clear previous highlights
+    this.clearHighlights();
+    
+    // Generate new clause text
+    const clauseText = this.generateClause();
+    
+    // Update preview
+    document.getElementById('indem_preview').innerHTML = clauseText;
+    
+    // If a field was changed, highlight the relevant text
+    if (changedField) {
+        this.highlightChangedText(changedField);
+    }
+},
+
+// Clear highlights
+clearHighlights: function() {
+    const highlightElements = document.getElementsByClassName('highlight');
+    while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+    }
+},
+
+// Find text in document and highlight it
+findAndHighlightText: function(searchText) {
+    if (!searchText) return;
+    
+    const previewElement = document.getElementById('indem_preview');
+    const previewHTML = previewElement.innerHTML;
+    
+    // A simpler approach for WordPress compatibility
+    if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+            new RegExp(this.escapeRegExp(searchText), 'g'),
+            '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+            const highlightElements = document.getElementsByClassName('highlight');
+            if (highlightElements.length > 0) {
+                const firstHighlight = highlightElements[0];
+                if (firstHighlight) {
+                    firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
+        }, 100);
+    }
+},
+
+// Escape special regex characters
+escapeRegExp: function(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+},
+
+// Highlight changed text based on field
+highlightChangedText: function(changedField) {
+    const self = this;
+    
+    switch (changedField) {
+        case 'agreementType':
+            // Highlight the agreement type text
+            const agreementTypeElement = document.getElementById('indem_agreementType');
+            const agreementTypeText = agreementTypeElement.options[agreementTypeElement.selectedIndex].text;
+            this.findAndHighlightText(agreementTypeText);
+            break;
+        case 'providerName':
+            this.findAndHighlightText(document.getElementById('indem_providerName').value);
+            break;
+        case 'clientName':
+            this.findAndHighlightText(document.getElementById('indem_clientName').value);
+            break;
+        case 'indemnificationType':
+            const indemnificationType = document.getElementById('indem_indemnificationType').value;
+            if (indemnificationType === 'mutual') {
+                this.findAndHighlightText("Mutual Indemnification");
+            } else {
+                this.findAndHighlightText("Indemnification");
+            }
+            break;
+        case 'claimsCopyright':
+            if (document.getElementById('indem_claimsCopyright').checked) {
+                this.findAndHighlightText("copyright or other intellectual property infringement");
+            }
+            break;
+        case 'claimsTrademark':
+            if (document.getElementById('indem_claimsTrademark').checked) {
+                this.findAndHighlightText("trademark infringement");
+            }
+            break;
+        case 'claimsDataPrivacy':
+            if (document.getElementById('indem_claimsDataPrivacy').checked) {
+                this.findAndHighlightText("data privacy violations");
+            }
+            break;
+        case 'claimsMisrepresentation':
+            if (document.getElementById('indem_claimsMisrepresentation').checked) {
+                this.findAndHighlightText("misrepresentation or inaccuracies in AI-generated output");
+            }
+            break;
+        case 'claimsRegulatoryFines':
+            if (document.getElementById('indem_claimsRegulatoryFines').checked) {
+                this.findAndHighlightText("regulatory fines or penalties");
+            }
+            break;
+        case 'claimsThirdPartyOnly':
+            const thirdPartyOnly = document.getElementById('indem_claimsThirdPartyOnly').value === 'thirdPartyOnly';
+            if (thirdPartyOnly) {
+                this.findAndHighlightText("third-party claims");
+            } else {
+                this.findAndHighlightText("third-party or direct claims");
+            }
+            break;
+        case 'exceptionClientModification':
+        case 'exceptionClientMisuse':
+        case 'exceptionThirdPartyContent':
+        case 'exceptionClientPrompts':
+        case 'exceptionWillfullMisconduct':
+            if (document.getElementById('indem_exceptionClientModification').checked) {
+                this.findAndHighlightText("modification of the AI-generated output");
+            }
+            if (document.getElementById('indem_exceptionClientMisuse').checked) {
+                this.findAndHighlightText("misuse or improper use of the AI system");
+            }
+            if (document.getElementById('indem_exceptionThirdPartyContent').checked) {
+                this.findAndHighlightText("third-party content, data, or information");
+            }
+            if (document.getElementById('indem_exceptionClientPrompts').checked) {
+                this.findAndHighlightText("prompts, instructions, or requirements");
+            }
+            if (document.getElementById('indem_exceptionWillfullMisconduct').checked) {
+                this.findAndHighlightText("willful misconduct or gross negligence");
+            }
+            break;
+        case 'clientObligations':
+            const obligation = document.getElementById('indem_clientObligations').value;
+            if (obligation === 'standard') {
+                this.findAndHighlightText("reasonable cooperation");
+            } else if (obligation === 'extensive') {
+                this.findAndHighlightText("comprehensive cooperation");
+            } else {
+                this.findAndHighlightText("such cooperation as may be reasonably necessary");
+            }
+            break;
+        case 'noticeRequirement':
+        case 'specificTimeframe':
+            const noticeType = document.getElementById('indem_noticeRequirement').value;
+            if (noticeType === 'prompt') {
+                this.findAndHighlightText("promptly");
+            } else if (noticeType === 'immediate') {
+                this.findAndHighlightText("immediately");
+            } else if (noticeType === 'specific') {
+                this.findAndHighlightText("within " + document.getElementById('indem_specificTimeframe').value);
+            }
+            break;
+        case 'defenseControl':
+            const defenseControl = document.getElementById('indem_defenseControl').value;
+            if (defenseControl === 'indemnifier') {
+                this.findAndHighlightText("shall have sole control of the defense");
+            } else if (defenseControl === 'indemnified') {
+                this.findAndHighlightText("shall have the right to control the defense");
+            } else {
+                this.findAndHighlightText("shall cooperate in good faith regarding the defense");
+            }
+            break;
+        case 'settlementApproval':
+            const settlementApproval = document.getElementById('indem_settlementApproval').value;
+            if (settlementApproval === 'with-approval') {
+                this.findAndHighlightText("prior written approval");
+            } else if (settlementApproval === 'reasonable') {
+                this.findAndHighlightText("which shall not be unreasonably withheld");
+            } else {
+                this.findAndHighlightText("sole discretion");
+            }
+            break;
+        case 'liabilityCap':
+        case 'feesMultiplier':
+        case 'fixedAmount':
+        case 'insuranceAmount':
+            const capType = document.getElementById('indem_liabilityCap').value;
+            if (capType === 'no-cap') {
+                this.findAndHighlightText("shall not be subject to any cap or limitation");
+            } else if (capType === 'fees-paid') {
+                this.findAndHighlightText("shall not exceed the total amount of fees paid");
+            } else if (capType === 'fees-multiplier') {
+                this.findAndHighlightText(document.getElementById('indem_feesMultiplier').value + " times the total amount");
+            } else if (capType === 'fixed-amount') {
+                this.findAndHighlightText(document.getElementById('indem_fixedAmount').value);
+            } else if (capType === 'insurance') {
+                this.findAndHighlightText(document.getElementById('indem_insuranceAmount').value);
+            }
+            break;
+        case 'remedies':
+            const remediesType = document.getElementById('indem_remedies').value;
+            if (remediesType === 'standard') {
+                this.findAndHighlightText("sole and exclusive remedies");
+            } else if (remediesType === 'replacement') {
+                this.findAndHighlightText("replace or modify the AI-generated output");
+            } else if (remediesType === 'termination') {
+                this.findAndHighlightText("terminate this");
+            } else {
+                this.findAndHighlightText("at its option and expense");
+            }
+            break;
+    }
+    
+    // Remove highlights after 3 seconds
+    setTimeout(function() {
+        self.clearHighlights();
+    }, 3000);
+},
+
+// Generate MS Word document
+generateWordDoc: function() {
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                  "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                  "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+    const footer = "</body></html>";
+    const content = document.getElementById('indem_preview').innerHTML;
+    const sourceHTML = header + content + footer;
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    
+    // Create a download link and trigger it
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = 'AIIndemnificationClause.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+},
+
+// Handle copy button click
+handleCopyClick: function() {
+    const text = document.getElementById('indem_preview').innerText;
+    const copyBtn = document.getElementById('indem_copyBtn');
+    const originalText = copyBtn.innerHTML;
+    
+    try {
+        // Modern approach
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                copyBtn.innerHTML = 'COPIED!';
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        // Fallback approach
+        else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyBtn.innerHTML = 'COPIED!';
+            setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+    } catch(err) {
+        alert('Please select and copy the text manually.');
+    }
+}
+};
+
+// Start the generator when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+aiIndemnificationGenerator.init();
+});
+
+// Initialize immediately as well (for WordPress)
+aiIndemnificationGenerator.init();
+</script>
+</body>
+</html>
+
+<div class="preview-fade" id="indemnification-fade"></div>
+<button id="indemnification-unlock" class="unlock-button">Unlock All Generators ($9.99)</button>
+</div>
+
+
+<div id="data-privacy-tab" class="tools-tab-content">
+<!-- AI Data Privacy & Confidentiality Clause Generator -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>AI Data Privacy & Confidentiality Clause Generator</title>
+</head>
+<body>
+<div class="clause-generator" id="ai-privacy-generator">
+<div class="generator-container">
+<!-- Form Column -->
+<div class="form-column">
+<!-- Contract Information -->
+<div class="section-header">Contract Information</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_agreementType">Agreement Type</label>
+<select id="privacy_agreementType" class="form-select" onchange="aiPrivacyGenerator.updatePreview('agreementType')">
+<option value="services" selected>Service Agreement</option>
+<option value="development">Development Agreement</option>
+<option value="saas">SaaS Agreement</option>
+<option value="license">License Agreement</option>
+<option value="consulting">Consulting Agreement</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_providerName">Provider/Developer Name</label>
+<input type="text" id="privacy_providerName" class="form-input" value="Provider" placeholder="Enter name of service provider" onkeyup="aiPrivacyGenerator.updatePreview('providerName')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_clientName">Client Name</label>
+<input type="text" id="privacy_clientName" class="form-input" value="Client" placeholder="Enter name of client" onkeyup="aiPrivacyGenerator.updatePreview('clientName')">
+<div class="form-hint">The term used in your agreement for the receiving party</div>
+</div>
+
+<!-- Data Collection & Usage -->
+<div class="section-header">Data Collection & Usage</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_dataDisclosure">Data Collection Disclosure</label>
+<select id="privacy_dataDisclosure" class="form-select" onchange="aiPrivacyGenerator.updatePreview('dataDisclosure')">
+<option value="comprehensive" selected>Comprehensive Disclosure</option>
+<option value="standard">Standard Disclosure</option>
+<option value="minimal">Minimal Disclosure</option>
+</select>
+<div class="form-hint">How detailed your data collection disclosure will be</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">Data Types Collected</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_dataTypeInput" checked onclick="aiPrivacyGenerator.updatePreview('dataTypeInput')">
+<span class="checkbox-label">User Input Data</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_dataTypeOutput" checked onclick="aiPrivacyGenerator.updatePreview('dataTypeOutput')">
+<span class="checkbox-label">AI Output Data</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_dataTypeUsage" checked onclick="aiPrivacyGenerator.updatePreview('dataTypeUsage')">
+<span class="checkbox-label">Usage Statistics</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_dataTypePerformance" onclick="aiPrivacyGenerator.updatePreview('dataTypePerformance')">
+<span class="checkbox-label">Performance Metrics</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_dataTypeFeedback" onclick="aiPrivacyGenerator.updatePreview('dataTypeFeedback')">
+<span class="checkbox-label">User Feedback</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_dataUsage">Data Usage Purpose</label>
+<select id="privacy_dataUsage" class="form-select" onchange="aiPrivacyGenerator.updatePreview('dataUsage')">
+<option value="limited" selected>Service Provision Only</option>
+<option value="moderate">Service & Improvement</option>
+<option value="extensive">Service, Improvement & Training</option>
+<option value="commercial">Commercial Use & AI Training</option>
+</select>
+<div class="form-hint">How collected data will be used</div>
+</div>
+
+<!-- Training Data Provisions -->
+<div class="section-header">Training Data Provisions</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_trainingDataRights">Training Data Rights</label>
+<select id="privacy_trainingDataRights" class="form-select" onchange="aiPrivacyGenerator.updatePreview('trainingDataRights')">
+<option value="no-rights">No Rights to Train AI</option>
+<option value="limited-rights" selected>Limited Training Rights</option>
+<option value="full-rights">Full Training Rights</option>
+<option value="perpetual-rights">Perpetual Training Rights</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_dataAnonymization">Data Anonymization</label>
+<select id="privacy_dataAnonymization" class="form-select" onchange="aiPrivacyGenerator.updatePreview('dataAnonymization')">
+<option value="full-anonymization" selected>Full Anonymization</option>
+<option value="partial-anonymization">Partial Anonymization</option>
+<option value="aggregation">Aggregation Only</option>
+<option value="no-anonymization">No Anonymization Required</option>
+</select>
+<div class="form-hint">How data must be processed before use</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_clientApproval">Client Approval for Training</label>
+<select id="privacy_clientApproval" class="form-select" onchange="aiPrivacyGenerator.updatePreview('clientApproval')">
+<option value="explicit-approval">Explicit Approval Required</option>
+<option value="opt-out" selected>Opt-Out Available</option>
+<option value="no-approval">No Approval Required</option>
+</select>
+</div>
+
+<!-- Confidentiality Provisions -->
+<div class="section-header">Confidentiality Provisions</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_confidentialityScope">Confidentiality Scope</label>
+<select id="privacy_confidentialityScope" class="form-select" onchange="aiPrivacyGenerator.updatePreview('confidentialityScope')">
+<option value="all-information" selected>All Information</option>
+<option value="marked-information">Marked Information</option>
+<option value="defined-categories">Defined Categories</option>
+</select>
+</div>
+
+<div class="form-group">
+<label class="form-label">AI-Specific Confidential Information</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_confInputData" checked onclick="aiPrivacyGenerator.updatePreview('confInputData')">
+<span class="checkbox-label">Input Data</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_confOutputData" checked onclick="aiPrivacyGenerator.updatePreview('confOutputData')">
+<span class="checkbox-label">AI Output</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_confPrompts" checked onclick="aiPrivacyGenerator.updatePreview('confPrompts')">
+<span class="checkbox-label">Prompt Templates/Engineering</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_confModelParams" onclick="aiPrivacyGenerator.updatePreview('confModelParams')">
+<span class="checkbox-label">Model Parameters</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_confTrainingMethods" onclick="aiPrivacyGenerator.updatePreview('confTrainingMethods')">
+<span class="checkbox-label">Training Methods</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_confidentialityTerm">Confidentiality Term</label>
+<select id="privacy_confidentialityTerm" class="form-select" onchange="aiPrivacyGenerator.updatePreview('confidentialityTerm')">
+<option value="agreement-term">Agreement Term</option>
+<option value="term-plus-1">Term + 1 Year</option>
+<option value="term-plus-3" selected>Term + 3 Years</option>
+<option value="term-plus-5">Term + 5 Years</option>
+<option value="perpetual">Perpetual</option>
+</select>
+</div>
+
+<!-- Compliance & Security -->
+<div class="section-header">Compliance & Security</div>
+
+<div class="form-group">
+<label class="form-label">Applicable Privacy Laws</label>
+<div class="checkbox-group">
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_lawGDPR" checked onclick="aiPrivacyGenerator.updatePreview('lawGDPR')">
+<span class="checkbox-label">GDPR</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_lawCCPA" checked onclick="aiPrivacyGenerator.updatePreview('lawCCPA')">
+<span class="checkbox-label">CCPA/CPRA</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_lawHIPAA" onclick="aiPrivacyGenerator.updatePreview('lawHIPAA')">
+<span class="checkbox-label">HIPAA</span>
+</label>
+<label class="checkbox-item">
+<input type="checkbox" id="privacy_lawCOPPA" onclick="aiPrivacyGenerator.updatePreview('lawCOPPA')">
+<span class="checkbox-label">COPPA</span>
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_dataRetention">Data Retention Period</label>
+<select id="privacy_dataRetention" class="form-select" onchange="aiPrivacyGenerator.updatePreview('dataRetention')">
+<option value="minimum-necessary">Minimum Necessary</option>
+<option value="specific-period" selected>Specific Period</option>
+<option value="agreement-term">Agreement Term</option>
+<option value="indefinite">Indefinite with Safeguards</option>
+</select>
+</div>
+
+<div class="form-group" id="privacy_retentionPeriodGroup">
+<label class="form-label" for="privacy_retentionPeriod">Retention Period</label>
+<input type="text" id="privacy_retentionPeriod" class="form-input" value="24 months" placeholder="Enter retention period" onkeyup="aiPrivacyGenerator.updatePreview('retentionPeriod')">
+</div>
+
+<div class="form-group">
+<label class="form-label" for="privacy_securityMeasures">Security Measures</label>
+<select id="privacy_securityMeasures" class="form-select" onchange="aiPrivacyGenerator.updatePreview('securityMeasures')">
+<option value="industry-standard" selected>Industry Standard</option>
+<option value="enhanced">Enhanced Security</option>
+<option value="specific">Specific Requirements</option>
+<option value="compliance-based">Compliance-Based</option>
+</select>
+</div>
+
+</div>
+
+<!-- Preview Column -->
+<div class="preview-column">
+<div class="preview-header">
+<div class="preview-title">AI Data Privacy & Confidentiality Clause Preview</div>
+<div class="preview-note">Updates as you complete the form</div>
+</div>
+
+<div class="preview-content" id="privacy_preview">
+<!-- Preview content will be populated by JavaScript -->
+</div>
+
+<div class="button-container">
+<button id="privacy_copyBtn" class="copy-btn" onclick="aiPrivacyGenerator.handleCopyClick()">
+<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="copy-icon">
+<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+</svg>
+COPY CLAUSE
+</button>
+<button id="privacy_msWordBtn" class="copy-btn" onclick="aiPrivacyGenerator.generateWordDoc()">MS WORD DOC</button>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+// Create a namespace to avoid global scope pollution in WordPress
+var aiPrivacyGenerator = {
+// Initialize the generator
+init: function() {
+    // Initialize special conditional fields
+    this.handleDataRetentionChange();
+    
+    // Generate initial preview
+    this.updatePreview();
+    
+    // Set up event listeners for conditional fields
+    document.getElementById('privacy_dataRetention').addEventListener('change', this.handleDataRetentionChange.bind(this));
+},
+
+// Handle data retention change
+handleDataRetentionChange: function() {
+    const retentionType = document.getElementById('privacy_dataRetention').value;
+    const retentionPeriodGroup = document.getElementById('privacy_retentionPeriodGroup');
+    
+    retentionPeriodGroup.style.display = retentionType === 'specific-period' ? 'block' : 'none';
+    
+    this.updatePreview('dataRetention');
+},
+
+// Generate clause text
+generateClause: function() {
+    // Get agreement information
+    const agreementType = document.getElementById('privacy_agreementType').value;
+    const agreementTypeText = document.getElementById('privacy_agreementType').options[document.getElementById('privacy_agreementType').selectedIndex].text;
+    const providerName = document.getElementById('privacy_providerName').value;
+    const clientName = document.getElementById('privacy_clientName').value;
+    
+    // Get data collection & usage settings
+    const dataDisclosure = document.getElementById('privacy_dataDisclosure').value;
+    const dataTypeInput = document.getElementById('privacy_dataTypeInput').checked;
+    const dataTypeOutput = document.getElementById('privacy_dataTypeOutput').checked;
+    const dataTypeUsage = document.getElementById('privacy_dataTypeUsage').checked;
+    const dataTypePerformance = document.getElementById('privacy_dataTypePerformance').checked;
+    const dataTypeFeedback = document.getElementById('privacy_dataTypeFeedback').checked;
+    const dataUsage = document.getElementById('privacy_dataUsage').value;
+    
+    // Get training data provisions
+    const trainingDataRights = document.getElementById('privacy_trainingDataRights').value;
+    const dataAnonymization = document.getElementById('privacy_dataAnonymization').value;
+    const clientApproval = document.getElementById('privacy_clientApproval').value;
+    
+    // Get confidentiality provisions
+    const confidentialityScope = document.getElementById('privacy_confidentialityScope').value;
+    const confInputData = document.getElementById('privacy_confInputData').checked;
+    const confOutputData = document.getElementById('privacy_confOutputData').checked;
+    const confPrompts = document.getElementById('privacy_confPrompts').checked;
+    const confModelParams = document.getElementById('privacy_confModelParams').checked;
+    const confTrainingMethods = document.getElementById('privacy_confTrainingMethods').checked;
+    const confidentialityTerm = document.getElementById('privacy_confidentialityTerm').value;
+    
+    // Get compliance & security
+    const lawGDPR = document.getElementById('privacy_lawGDPR').checked;
+    const lawCCPA = document.getElementById('privacy_lawCCPA').checked;
+    const lawHIPAA = document.getElementById('privacy_lawHIPAA').checked;
+    const lawCOPPA = document.getElementById('privacy_lawCOPPA').checked;
+    const dataRetention = document.getElementById('privacy_dataRetention').value;
+    const retentionPeriod = document.getElementById('privacy_retentionPeriod').value;
+    const securityMeasures = document.getElementById('privacy_securityMeasures').value;
+    
+    // Build clause title
+    let clauseTitle = 'AI DATA PRIVACY AND CONFIDENTIALITY';
+    
+    // Build data types collected list
+    let dataTypesList = [];
+    if (dataTypeInput) dataTypesList.push("input data provided to the AI system");
+    if (dataTypeOutput) dataTypesList.push("AI-generated outputs");
+    if (dataTypeUsage) dataTypesList.push("usage statistics");
+    if (dataTypePerformance) dataTypesList.push("performance metrics");
+    if (dataTypeFeedback) dataTypesList.push("user feedback");
+    
+    let dataTypesText = '';
+    if (dataTypesList.length === 1) {
+        dataTypesText = dataTypesList[0];
+    } else if (dataTypesList.length === 2) {
+        dataTypesText = dataTypesList.join(" and ");
+    } else if (dataTypesList.length > 2) {
+        const lastType = dataTypesList.pop();
+        dataTypesText = dataTypesList.join(", ") + ", and " + lastType;
+    } else {
+        dataTypesText = "data related to the AI services";
+    }
+    
+    // Build data collection paragraph based on disclosure level
+    let dataCollectionText = '';
+    switch (dataDisclosure) {
+        case 'comprehensive':
+            dataCollectionText = `<p>a) <u>Data Collection</u>. ${providerName} may collect and process ${dataTypesText} in connection with the AI services provided under this ${agreementTypeText}. ${clientName} acknowledges and agrees that the functioning of the AI services requires the collection and processing of certain data, and hereby authorizes ${providerName} to collect and process such data in accordance with this clause and applicable law. ${providerName} shall provide detailed documentation regarding its data collection practices upon ${clientName}'s reasonable request, including the categories of data collected, the methods of collection, and the purposes of processing.</p>`;
+            break;
+            
+        case 'standard':
+            dataCollectionText = `<p>a) <u>Data Collection</u>. ${providerName} may collect and process ${dataTypesText} in connection with the AI services provided under this ${agreementTypeText}. ${clientName} acknowledges that the functioning of the AI services requires the collection and processing of certain data, and authorizes ${providerName} to collect and process such data in accordance with this clause and applicable law.</p>`;
+            break;
+            
+        case 'minimal':
+            dataCollectionText = `<p>a) <u>Data Collection</u>. ${providerName} may collect and process data in connection with the AI services provided under this ${agreementTypeText}, including ${dataTypesText}. ${clientName} authorizes such collection and processing as necessary for the provision of services.</p>`;
+            break;
+    }
+    
+    // Build data usage paragraph based on usage option
+    let dataUsageText = '';
+    switch (dataUsage) {
+        case 'limited':
+            dataUsageText = `<p>b) <u>Data Usage</u>. ${providerName} shall use the collected data solely for the purpose of providing the AI services to ${clientName} as set forth in this ${agreementTypeText}. ${providerName} shall not use the collected data for any other purpose, including but not limited to improving or training its AI systems, without ${clientName}'s prior written consent.</p>`;
+            break;
+            
+        case 'moderate':
+            dataUsageText = `<p>b) <u>Data Usage</u>. ${providerName} may use the collected data for (i) providing the AI services to ${clientName} as set forth in this ${agreementTypeText}; and (ii) improving the AI services provided to ${clientName}. ${providerName} shall not use the collected data for training its AI systems or for providing services to other customers without ${clientName}'s prior written consent.</p>`;
+            break;
+            
+        case 'extensive':
+            dataUsageText = `<p>b) <u>Data Usage</u>. ${providerName} may use the collected data for (i) providing the AI services to ${clientName} as set forth in this ${agreementTypeText}; (ii) improving the AI services; and (iii) training and improving its AI systems generally, subject to the training data provisions set forth in subsection (c) below.</p>`;
+            break;
+            
+        case 'commercial':
+            dataUsageText = `<p>b) <u>Data Usage</u>. ${providerName} may use the collected data for commercial purposes, including but not limited to (i) providing the AI services to ${clientName}; (ii) improving the AI services; (iii) training and improving its AI systems generally; and (iv) developing new products and services, subject to the training data provisions set forth in subsection (c) below.</p>`;
+            break;
+    }
+    
+    // Build training data rights paragraph based on rights option
+    let trainingDataText = '';
+    switch (trainingDataRights) {
+        case 'no-rights':
+            trainingDataText = `<p>c) <u>Training Data Rights</u>. ${providerName} shall not use any data provided by or collected from ${clientName} for training its AI models without ${clientName}'s express written consent. This prohibition includes both the initial training of AI models and any subsequent fine-tuning or other improvements.</p>`;
+            break;
+            
+        case 'limited-rights':
+            trainingDataText = `<p>c) <u>Training Data Rights</u>. ${providerName} may use data provided by or collected from ${clientName} for training its AI models, subject to the following limitations: `;
+            
+            // Add anonymization requirements
+            switch (dataAnonymization) {
+                case 'full-anonymization':
+                    trainingDataText += `(i) ${providerName} shall fully anonymize all such data prior to use for training, removing all personally identifiable information and any information that could reasonably be used to identify ${clientName} or its customers, users, or employees; `;
+                    break;
+                case 'partial-anonymization':
+                    trainingDataText += `(i) ${providerName} shall anonymize all personally identifiable information within such data prior to use for training, while maintaining the association with ${clientName} for service improvement purposes; `;
+                    break;
+                case 'aggregation':
+                    trainingDataText += `(i) ${providerName} shall use such data only in an aggregated form combined with data from other sources, without specifically identifying ${clientName}; `;
+                    break;
+                case 'no-anonymization':
+                    trainingDataText += `(i) ${providerName} may use such data in its identifiable form for targeted improvement of ${clientName}'s services; `;
+                    break;
+            }
+            
+            // Add client approval requirements
+            switch (clientApproval) {
+                case 'explicit-approval':
+                    trainingDataText += `(ii) ${providerName} shall obtain ${clientName}'s explicit written approval prior to using any data for training purposes; `;
+                    break;
+                case 'opt-out':
+                    trainingDataText += `(ii) ${clientName} may opt out of allowing its data to be used for training purposes upon written notice to ${providerName}; `;
+                    break;
+                case 'no-approval':
+                    trainingDataText += `(ii) ${providerName} may use such data for training without seeking additional approval; `;
+                    break;
+            }
+            
+            trainingDataText += `and (iii) ${providerName} shall maintain appropriate records of its use of ${clientName}'s data for training purposes.</p>`;
+            break;
+            
+        case 'full-rights':
+            trainingDataText = `<p>c) <u>Training Data Rights</u>. ${providerName} shall have the right to use data provided by or collected from ${clientName} for training, fine-tuning, and otherwise improving its AI models during the term of this ${agreementTypeText}, subject to the anonymization and confidentiality requirements set forth herein. ${clientName} grants ${providerName} a non-exclusive, royalty-free license to use such data for these purposes.</p>`;
+            break;
+            
+        case 'perpetual-rights':
+            trainingDataText = `<p>c) <u>Training Data Rights</u>. ${providerName} shall have the perpetual right to use data provided by or collected from ${clientName} for training, fine-tuning, and otherwise improving its AI models. This right shall survive the termination or expiration of this ${agreementTypeText}. ${clientName} grants ${providerName} a perpetual, non-exclusive, royalty-free license to use such data for these purposes, subject to the anonymization and confidentiality requirements set forth herein.</p>`;
+            break;
+    }
+    
+    // Build confidentiality scope paragraph
+    let confidentialScopeText = '';
+    
+    switch (confidentialityScope) {
+        case 'all-information':
+            confidentialScopeText = `<p>d) <u>Confidentiality Scope</u>. All information exchanged between the parties in connection with this ${agreementTypeText}, including but not limited to the data provided by ${clientName} to ${providerName} and the outputs generated by ${providerName}'s AI services, shall be deemed confidential information ("Confidential Information") and shall be subject to the confidentiality obligations set forth herein.</p>`;
+            break;
+            
+        case 'marked-information':
+            confidentialScopeText = `<p>d) <u>Confidentiality Scope</u>. Information exchanged between the parties that is marked as "Confidential" or with a similar designation, or that would reasonably be understood to be confidential given the nature of the information and the circumstances of disclosure, shall be deemed confidential information ("Confidential Information") and shall be subject to the confidentiality obligations set forth herein.</p>`;
+            break;
+            
+        case 'defined-categories':
+            confidentialScopeText = `<p>d) <u>Confidentiality Scope</u>. The following categories of information shall be deemed confidential information ("Confidential Information") and shall be subject to the confidentiality obligations set forth herein: `;
+            
+            // Build list of confidential categories
+            let confCategories = [];
+            if (confInputData) confCategories.push("data provided by or collected from " + clientName);
+            if (confOutputData) confCategories.push("outputs generated by " + providerName + "'s AI services");
+            if (confPrompts) confCategories.push("prompt templates and engineering techniques");
+            if (confModelParams) confCategories.push("AI model parameters and configurations");
+            if (confTrainingMethods) confCategories.push("AI training methodologies and approaches");
+            
+            // Format the confidentiality categories
+            if (confCategories.length === 1) {
+                confidentialScopeText += confCategories[0] + ".";
+            } else if (confCategories.length === 2) {
+                confidentialScopeText += confCategories.join(" and ") + ".";
+            } else if (confCategories.length > 2) {
+                const lastCat = confCategories.pop();
+                confidentialScopeText += confCategories.join(", ") + ", and " + lastCat + ".";
+            } else {
+                confidentialScopeText += "data and information exchanged between the parties in connection with the AI services.";
+            }
+            
+            confidentialScopeText += `</p>`;
+            break;
+    }
+    
+    // Build confidentiality obligations paragraph
+    let confidentialityTermText = '';
+    switch (confidentialityTerm) {
+        case 'agreement-term':
+            confidentialityTermText = "during the term of this " + agreementTypeText;
+            break;
+        case 'term-plus-1':
+            confidentialityTermText = "during the term of this " + agreementTypeText + " and for a period of one (1) year thereafter";
+            break;
+        case 'term-plus-3':
+            confidentialityTermText = "during the term of this " + agreementTypeText + " and for a period of three (3) years thereafter";
+            break;
+        case 'term-plus-5':
+            confidentialityTermText = "during the term of this " + agreementTypeText + " and for a period of five (5) years thereafter";
+            break;
+        case 'perpetual':
+            confidentialityTermText = "in perpetuity";
+            break;
+    }
+    
+    let confidentialObligationsText = `<p>e) <u>Confidentiality Obligations</u>. Each party shall maintain the confidentiality of the other party's Confidential Information ${confidentialityTermText} and shall not disclose such Confidential Information to any third party without the prior written consent of the disclosing party. Each party shall use the same degree of care to protect the other party's Confidential Information as it uses to protect its own confidential information of a similar nature, but in no event less than reasonable care. Each party may disclose the other party's Confidential Information only to its employees, agents, and contractors who have a need to know such information and who are bound by confidentiality obligations at least as restrictive as those set forth herein.</p>`;
+    
+    // Build compliance paragraph
+    let complianceText = '<p>f) <u>Compliance with Privacy Laws</u>. ';
+    
+    // Add specific laws if selected
+    let lawsList = [];
+    if (lawGDPR) lawsList.push("the General Data Protection Regulation (GDPR)");
+    if (lawCCPA) lawsList.push("the California Consumer Privacy Act (CCPA) and the California Privacy Rights Act (CPRA)");
+    if (lawHIPAA) lawsList.push("the Health Insurance Portability and Accountability Act (HIPAA)");
+    if (lawCOPPA) lawsList.push("the Children's Online Privacy Protection Act (COPPA)");
+    
+    if (lawsList.length > 0) {
+        complianceText += `${providerName} shall comply with all applicable data protection and privacy laws, including but not limited to `;
+        
+        if (lawsList.length === 1) {
+            complianceText += lawsList[0];
+        } else if (lawsList.length === 2) {
+            complianceText += lawsList.join(" and ");
+        } else {
+            const lastLaw = lawsList.pop();
+            complianceText += lawsList.join(", ") + ", and " + lastLaw;
+        }
+        
+        complianceText += `, when collecting, processing, and storing data from or about ${clientName}.`;
+    } else {
+        complianceText += `${providerName} shall comply with all applicable data protection and privacy laws when collecting, processing, and storing data from or about ${clientName}.`;
+    }
+    
+    // Add data subject rights if GDPR is selected
+    if (lawGDPR) {
+        complianceText += ` ${providerName} shall assist ${clientName} in fulfilling its obligations to respond to requests from data subjects exercising their rights under applicable privacy laws.`;
+    }
+    
+    complianceText += '</p>';
+    
+    // Build data retention paragraph
+    let retentionText = '<p>g) <u>Data Retention and Deletion</u>. ';
+    
+    switch (dataRetention) {
+        case 'minimum-necessary':
+            retentionText += `${providerName} shall retain ${clientName}'s data only for as long as necessary to provide the AI services under this ${agreementTypeText}. Upon termination or expiration of this ${agreementTypeText}, or upon ${clientName}'s request, ${providerName} shall promptly delete or return all of ${clientName}'s data, except as required by applicable law.`;
+            break;
+        case 'specific-period':
+            retentionText += `${providerName} shall retain ${clientName}'s data for a period of ${retentionPeriod} after collection, after which it shall be securely deleted unless retention is required by applicable law or unless ${clientName} provides written consent for continued retention.`;
+            break;
+        case 'agreement-term':
+            retentionText += `${providerName} shall retain ${clientName}'s data for the duration of this ${agreementTypeText}, after which it shall be securely deleted within thirty (30) days, except as required by applicable law.`;
+            break;
+        case 'indefinite':
+            retentionText += `${providerName} may retain ${clientName}'s data indefinitely for the purposes specified in this clause, subject to appropriate security measures and compliance with applicable law. ${clientName} may request deletion of its data at any time, and ${providerName} shall comply with such requests except to the extent that retention is required by applicable law.`;
+            break;
+    }
+    
+    retentionText += '</p>';
+    
+    // Build security measures paragraph
+    let securityText = '<p>h) <u>Security Measures</u>. ';
+    
+    switch (securityMeasures) {
+        case 'industry-standard':
+            securityText += `${providerName} shall implement and maintain appropriate technical and organizational security measures to protect ${clientName}'s data from unauthorized access, disclosure, alteration, and destruction. Such measures shall be consistent with industry standards and best practices for the protection of similar types of data.`;
+            break;
+        case 'enhanced':
+            securityText += `${providerName} shall implement and maintain enhanced technical and organizational security measures to protect ${clientName}'s data, including but not limited to encryption at rest and in transit, access controls, authentication mechanisms, regular security assessments, and incident response procedures. ${providerName} shall ensure that its security measures evolve in response to emerging threats and vulnerabilities.`;
+            break;
+        case 'specific':
+            securityText += `${providerName} shall implement and maintain the specific security measures agreed upon by the parties in a separate security addendum or schedule, which is incorporated by reference into this ${agreementTypeText}. Such measures shall include, at a minimum, encryption, access controls, authentication, monitoring, and regular security testing.`;
+            break;
+        case 'compliance-based':
+            securityText += `${providerName} shall implement and maintain security measures that comply with the requirements of applicable laws, regulations, and industry standards, including but not limited to ISO 27001, SOC 2 Type II, and the security requirements of the privacy laws referenced in subsection (f) above.`;
+            break;
+    }
+    
+    securityText += '</p>';
+    
+    // Build data breach paragraph
+    let dataBreachText = `<p>i) <u>Data Breach Notification</u>. ${providerName} shall notify ${clientName} without undue delay, and in any event within seventy-two (72) hours, after becoming aware of any breach of security leading to the accidental or unlawful destruction, loss, alteration, unauthorized disclosure of, or access to, ${clientName}'s data. Such notification shall describe the nature of the breach, the categories and approximate number of data records concerned, the likely consequences of the breach, and the measures taken or proposed to address the breach and mitigate its possible adverse effects.</p>`;
+    
+    // Build the complete clause
+    let clause = `
+<p><strong>${clauseTitle}</strong></p>
+
+${dataCollectionText}
+
+${dataUsageText}
+
+${trainingDataText}
+
+${confidentialScopeText}
+
+${confidentialObligationsText}
+
+${complianceText}
+
+${retentionText}
+
+${securityText}
+
+${dataBreachText}
+`;
+
+    return clause;
+},
+
+// Update the preview
+updatePreview: function(changedField) {
+    // Clear previous highlights
+    this.clearHighlights();
+    
+    // Generate new clause text
+    const clauseText = this.generateClause();
+    
+    // Update preview
+    document.getElementById('privacy_preview').innerHTML = clauseText;
+    
+    // If a field was changed, highlight the relevant text
+    if (changedField) {
+        this.highlightChangedText(changedField);
+    }
+},
+
+// Clear highlights
+clearHighlights: function() {
+    const highlightElements = document.getElementsByClassName('highlight');
+    while (highlightElements.length > 0) {
+        const element = highlightElements[0];
+        const text = element.textContent;
+        const textNode = document.createTextNode(text);
+        element.parentNode.replaceChild(textNode, element);
+    }
+},
+
+// Find text in document and highlight it
+findAndHighlightText: function(searchText) {
+    if (!searchText) return;
+    
+    const previewElement = document.getElementById('privacy_preview');
+    const previewHTML = previewElement.innerHTML;
+    
+    // A simpler approach for WordPress compatibility
+    if (previewHTML.indexOf(searchText) >= 0) {
+        const newHTML = previewHTML.replace(
+            new RegExp(this.escapeRegExp(searchText), 'g'),
+            '<span class="highlight">' + searchText + '</span>'
+        );
+        
+        previewElement.innerHTML = newHTML;
+        
+        // Try to scroll to the highlighted element
+        setTimeout(function() {
+            const highlightElements = document.getElementsByClassName('highlight');
+            if (highlightElements.length > 0) {
+                const firstHighlight = highlightElements[0];
+                if (firstHighlight) {
+                    firstHighlight.scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            }
+        }, 100);
+    }
+},
+
+// Escape special regex characters
+escapeRegExp: function(string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+},
+
+// Highlight changed text based on field
+highlightChangedText: function(changedField) {
+    const self = this;
+    
+    switch (changedField) {
+        case 'agreementType':
+            // Highlight the agreement type text
+            const agreementTypeElement = document.getElementById('privacy_agreementType');
+            const agreementTypeText = agreementTypeElement.options[agreementTypeElement.selectedIndex].text;
+            this.findAndHighlightText(agreementTypeText);
+            break;
+        case 'providerName':
+            this.findAndHighlightText(document.getElementById('privacy_providerName').value);
+            break;
+        case 'clientName':
+            this.findAndHighlightText(document.getElementById('privacy_clientName').value);
+            break;
+        case 'dataDisclosure':
+            // Highlight based on disclosure level
+            const disclosureLevel = document.getElementById('privacy_dataDisclosure').value;
+            if (disclosureLevel === 'comprehensive') {
+                this.findAndHighlightText("shall provide detailed documentation");
+            } else if (disclosureLevel === 'standard') {
+                this.findAndHighlightText("acknowledges that the functioning of the AI services");
+            } else {
+                this.findAndHighlightText("authorizes such collection and processing");
+            }
+            break;
+        case 'dataTypeInput':
+        case 'dataTypeOutput':
+        case 'dataTypeUsage':
+        case 'dataTypePerformance':
+        case 'dataTypeFeedback':
+            // Highlight based on data types
+            if (document.getElementById('privacy_dataTypeInput').checked)
+                this.findAndHighlightText("input data provided to the AI system");
+            if (document.getElementById('privacy_dataTypeOutput').checked)
+                this.findAndHighlightText("AI-generated outputs");
+            if (document.getElementById('privacy_dataTypeUsage').checked)
+                this.findAndHighlightText("usage statistics");
+            if (document.getElementById('privacy_dataTypePerformance').checked)
+                this.findAndHighlightText("performance metrics");
+            if (document.getElementById('privacy_dataTypeFeedback').checked)
+                this.findAndHighlightText("user feedback");
+            break;
+        case 'dataUsage':
+            // Highlight based on data usage
+            const usageType = document.getElementById('privacy_dataUsage').value;
+            if (usageType === 'limited') {
+                this.findAndHighlightText("solely for the purpose of providing");
+            } else if (usageType === 'moderate') {
+                this.findAndHighlightText("improving the AI services");
+            } else if (usageType === 'extensive') {
+                this.findAndHighlightText("training and improving its AI systems generally");
+            } else {
+                this.findAndHighlightText("commercial purposes");
+            }
+            break;
+        case 'trainingDataRights':
+            // Highlight based on training rights
+            const trainingRights = document.getElementById('privacy_trainingDataRights').value;
+            if (trainingRights === 'no-rights') {
+                this.findAndHighlightText("shall not use any data provided by or collected from");
+            } else if (trainingRights === 'limited-rights') {
+                this.findAndHighlightText("subject to the following limitations");
+            } else if (trainingRights === 'full-rights') {
+                this.findAndHighlightText("shall have the right to use data provided by or collected from");
+            } else {
+                this.findAndHighlightText("shall have the perpetual right to use data");
+            }
+            break;
+        case 'dataAnonymization':
+            // Highlight based on anonymization
+            const anonType = document.getElementById('privacy_dataAnonymization').value;
+            if (anonType === 'full-anonymization') {
+                this.findAndHighlightText("fully anonymize all such data");
+            } else if (anonType === 'partial-anonymization') {
+                this.findAndHighlightText("anonymize all personally identifiable information");
+            } else if (anonType === 'aggregation') {
+                this.findAndHighlightText("use such data only in an aggregated form");
+            } else {
+                this.findAndHighlightText("may use such data in its identifiable form");
+            }
+            break;
+        case 'clientApproval':
+            // Highlight based on client approval
+            const approvalType = document.getElementById('privacy_clientApproval').value;
+            if (approvalType === 'explicit-approval') {
+                this.findAndHighlightText("explicit written approval");
+            } else if (approvalType === 'opt-out') {
+                this.findAndHighlightText("may opt out of");
+            } else {
+                this.findAndHighlightText("may use such data for training without seeking additional approval");
+            }
+            break;
+        case 'confidentialityScope':
+            // Highlight based on confidentiality scope
+            const scopeType = document.getElementById('privacy_confidentialityScope').value;
+            if (scopeType === 'all-information') {
+                this.findAndHighlightText("All information exchanged between the parties");
+            } else if (scopeType === 'marked-information') {
+                this.findAndHighlightText("marked as \"Confidential\"");
+            } else {
+                this.findAndHighlightText("The following categories of information");
+            }
+            break;
+        case 'confInputData':
+        case 'confOutputData':
+        case 'confPrompts':
+        case 'confModelParams':
+        case 'confTrainingMethods':
+            // Highlight confidentiality categories
+            if (document.getElementById('privacy_confInputData').checked)
+                this.findAndHighlightText("data provided by or collected from");
+            if (document.getElementById('privacy_confOutputData').checked)
+                this.findAndHighlightText("outputs generated by");
+            if (document.getElementById('privacy_confPrompts').checked)
+                this.findAndHighlightText("prompt templates and engineering techniques");
+            if (document.getElementById('privacy_confModelParams').checked)
+                this.findAndHighlightText("AI model parameters and configurations");
+            if (document.getElementById('privacy_confTrainingMethods').checked)
+                this.findAndHighlightText("AI training methodologies and approaches");
+            break;
+        case 'confidentialityTerm':
+            // Highlight confidentiality term
+            const termType = document.getElementById('privacy_confidentialityTerm').value;
+            let termText = "";
+            switch (termType) {
+                case 'agreement-term':
+                    termText = "during the term of this"; break;
+                case 'term-plus-1':
+                    termText = "and for a period of one (1) year thereafter"; break;
+                case 'term-plus-3':
+                    termText = "and for a period of three (3) years thereafter"; break;
+                case 'term-plus-5':
+                    termText = "and for a period of five (5) years thereafter"; break;
+                case 'perpetual':
+                    termText = "in perpetuity"; break;
+            }
+            this.findAndHighlightText(termText);
+            break;
+        case 'lawGDPR':
+        case 'lawCCPA':
+        case 'lawHIPAA':
+        case 'lawCOPPA':
+            // Highlight privacy laws
+            if (document.getElementById('privacy_lawGDPR').checked)
+                this.findAndHighlightText("General Data Protection Regulation (GDPR)");
+            if (document.getElementById('privacy_lawCCPA').checked)
+                this.findAndHighlightText("California Consumer Privacy Act (CCPA)");
+            if (document.getElementById('privacy_lawHIPAA').checked)
+                this.findAndHighlightText("Health Insurance Portability and Accountability Act (HIPAA)");
+            if (document.getElementById('privacy_lawCOPPA').checked)
+                this.findAndHighlightText("Children's Online Privacy Protection Act (COPPA)");
+            break;
+        case 'dataRetention':
+        case 'retentionPeriod':
+            // Highlight data retention
+            const retentionType = document.getElementById('privacy_dataRetention').value;
+            if (retentionType === 'minimum-necessary') {
+                this.findAndHighlightText("only for as long as necessary");
+            } else if (retentionType === 'specific-period') {
+                this.findAndHighlightText("for a period of " + document.getElementById('privacy_retentionPeriod').value);
+            } else if (retentionType === 'agreement-term') {
+                this.findAndHighlightText("for the duration of this");
+            } else {
+                this.findAndHighlightText("may retain");
+            }
+            break;
+        case 'securityMeasures':
+            // Highlight security measures
+            const securityType = document.getElementById('privacy_securityMeasures').value;
+            if (securityType === 'industry-standard') {
+                this.findAndHighlightText("consistent with industry standards");
+            } else if (securityType === 'enhanced') {
+                this.findAndHighlightText("enhanced technical and organizational security measures");
+            } else if (securityType === 'specific') {
+                this.findAndHighlightText("specific security measures agreed upon by the parties");
+            } else {
+                this.findAndHighlightText("comply with the requirements of applicable laws");
+            }
+            break;
+    }
+    
+    // Remove highlights after 3 seconds
+    setTimeout(function() {
+        self.clearHighlights();
+    }, 3000);
+},
+
+// Generate MS Word document
+generateWordDoc: function() {
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' " +
+                  "xmlns:w='urn:schemas-microsoft-com:office:word' " +
+                  "xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Word Document</title></head><body>";
+    const footer = "</body></html>";
+    const content = document.getElementById('privacy_preview').innerHTML;
+    const sourceHTML = header + content + footer;
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    
+    // Create a download link and trigger it
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = 'AIDataPrivacyClause.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+},
+
+// Handle copy button click
+handleCopyClick: function() {
+    const text = document.getElementById('privacy_preview').innerText;
+    const copyBtn = document.getElementById('privacy_copyBtn');
+    const originalText = copyBtn.innerHTML;
+    
+    try {
+        // Modern approach
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(text).then(function() {
+                copyBtn.innerHTML = 'COPIED!';
+                setTimeout(function() {
+                    copyBtn.innerHTML = originalText;
+                }, 2000);
+            });
+        }
+        // Fallback approach
+        else {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            copyBtn.innerHTML = 'COPIED!';
+            setTimeout(function() {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+    } catch(err) {
+        alert('Please select and copy the text manually.');
+    }
+}
+};
+
+// Start the generator when the page loads
+document.addEventListener('DOMContentLoaded', function() {
+aiPrivacyGenerator.init();
+});
+
+// Initialize immediately as well (for WordPress)
+aiPrivacyGenerator.init();
+</script>
+</body>
+</html>
+
+<div class="preview-fade" id="data-privacy-fade"></div>
+<button id="data-privacy-unlock" class="unlock-button">Unlock All Generators ($9.99)</button>
+</div>
+<!-- PayPal integration removed as we're using direct hosted button now -->
+
+<script>
+(function() {
+// State variables
+let isPaid = false;
+
+// UI Elements
+const paywallOverlay = document.getElementById('paywall-overlay');
+const paywallBackdrop = document.getElementById('paywall-backdrop');
+const paywallClose = document.getElementById('paywall-close');
+const premiumBadge = document.getElementById('premium-badge');
+const successOverlay = document.getElementById('success-overlay');
+const successButton = document.getElementById('success-button');
+const aiOutputFade = document.getElementById('ai-output-fade');
+const unlockButtons = document.querySelectorAll('.unlock-button');
+
+// Tab System
+const tabs = document.querySelectorAll('.tools-tab');
+const tabContents = document.querySelectorAll('.tools-tab-content');
+
+// Initialize the page
+function init() {
+    // Check if already paid
+    checkPaidStatus();
+    
+    // Render PayPal button
+    initializePayPalButton();
+    
+    // Initialize tabs
+    initializeTabs();
+    
+    // Set up success overlay button
+    setupSuccessButton();
+    
+    // Set up unlock buttons
+    setupUnlockButtons();
+    
+    // Set up close button for paywall
+    setupPaywallClose();
+    
+    // Disable copy and MS Word buttons until paid
+    disableButtonsUntilPaid();
+    
+    // Set up test mode
+    setupTestMode();
+}
+
+// Check if user has already paid
+function checkPaidStatus() {
+    if (localStorage.getItem('aiContractGeneratorsPaid') === 'true') {
+        isPaid = true;
+        markAsPaid();
+    }
+}
+
+// Initialize tabs
+function initializeTabs() {
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            tab.classList.add('active');
+            const tabId = tab.getAttribute('data-tab');
+            document.getElementById(`${tabId}-tab`).classList.add('active');
+        });
+    });
+}
+
+// Disable copy and MS Word buttons until paid
+function disableButtonsUntilPaid() {
+    // Using event capturing to prevent default behavior
+    document.addEventListener('click', function(e) {
+        if (!isPaid && (e.target.classList.contains('copy-btn') || e.target.closest('.copy-btn'))) {
+            e.preventDefault();
+            e.stopPropagation();
+            showPaywall();
+            return false;
+        }
+    }, true);
+}
+
+// Set up PayPal return handling
+function initializePayPalButton() {
+    // Check if returning from PayPal with success parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('payment') === 'success') {
+        // Mark as paid and show success message
+        markAsPaid();
+        showSuccess();
+    }
+    
+    // Note: We're using the direct hosted button HTML/CSS now, 
+    // so we don't need to render the button with JS
+}
+
+// Set up unlock buttons
+function setupUnlockButtons() {
+    unlockButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            showPaywall();
+        });
+    });
+}
+
+// Set up paywall close button
+function setupPaywallClose() {
+    paywallClose.addEventListener('click', function() {
+        hidePaywall();
+    });
+    
+    // Also close when clicking on backdrop
+    paywallBackdrop.addEventListener('click', function() {
+        hidePaywall();
+    });
+}
+
+// Show paywall popup
+function showPaywall() {
+    paywallOverlay.style.display = 'flex';
+    paywallBackdrop.style.display = 'block';
+}
+
+// Hide paywall popup
+function hidePaywall() {
+    paywallOverlay.style.display = 'none';
+    paywallBackdrop.style.display = 'none';
+}
+
+// Set up success button
+function setupSuccessButton() {
+    successButton.addEventListener('click', function() {
+        successOverlay.style.display = 'none';
+    });
+}
+
+// Setup test mode for development
+function setupTestMode() {
+    // URL parameter method
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('testMode') === 'dev12345') {
+        const testBtn = document.createElement('button');
+        testBtn.innerText = "TEST MODE: Simulate Payment";
+        testBtn.className = "test-mode-btn";
+        testBtn.style.display = "block";
+        testBtn.addEventListener('click', function() {
+            markAsPaid();
+            showSuccess();
+        });
+        document.body.appendChild(testBtn);
+    }
+    
+    // Console method
+    window.testPaymentSuccess = function() {
+        markAsPaid();
+        showSuccess();
+        console.log("Payment test mode activated");
+    }
+}
+
+// Function to mark as paid
+function markAsPaid() {
+    isPaid = true;
+    localStorage.setItem('aiContractGeneratorsPaid', 'true');
+    
+    // Hide paywall and backdrop
+    paywallOverlay.style.display = 'none';
+    paywallBackdrop.style.display = 'none';
+    
+    // Show premium badge
+    premiumBadge.style.display = 'block';
+    
+    // Remove fade effects
+    const fadeElements = document.querySelectorAll('.preview-fade');
+    fadeElements.forEach(el => {
+        el.style.display = 'none';
+    });
+    
+    // Hide unlock buttons
+    unlockButtons.forEach(btn => {
+        btn.style.display = 'none';
+    });
+    
+    // Enable copy buttons and Word buttons
+    const copyBtns = document.querySelectorAll('.copy-btn');
+    copyBtns.forEach(btn => {
+        btn.style.opacity = '1';
+        btn.style.cursor = 'pointer';
+        if (btn.hasAttribute('disabled')) {
+            btn.removeAttribute('disabled');
+        }
+    });
+    
+    // Enable selection in preview panes
+    const previewContents = document.querySelectorAll('.preview-content');
+    previewContents.forEach(preview => {
+        preview.style.userSelect = 'text';
+    });
+}
+
+// Function to show success overlay
+function showSuccess() {
+    successOverlay.style.display = 'flex';
+}
+
+// Initialize the page
+init();
+
+// Make the markAsPaid function globally available for generators to access
+window.markContractGeneratorAsPaid = markAsPaid;
+})();
+</script>
