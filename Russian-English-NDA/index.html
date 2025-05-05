@@ -726,4 +726,57 @@
                     <div class="hint-text en-text">Select a predefined purpose or choose "Other" to specify your own</div>
                     <div class="hint-text ru-text" style="display: none;">Выберите готовую цель или выберите "Другое" для указания своей</div>
                 </div>
-<div class="form-group"><script>
+<div class="form-group">
+<script>
+    // Add event listeners for the purpose dropdowns
+    document.getElementById('purpose').addEventListener('change', function() {
+        document.getElementById('custom-purpose-group').style.display = 
+            this.value === 'other' ? 'block' : 'none';
+        highlightChanges('purpose');
+    });
+    
+    document.getElementById('purpose-ru').addEventListener('change', function() {
+        document.getElementById('custom-purpose-group').style.display = 
+            this.value === 'other' ? 'block' : 'none';
+        highlightChanges('purpose-ru');
+    });
+    
+    // Make sure custom purpose field is hidden by default
+    document.getElementById('custom-purpose-group').style.display = 'none';
+    
+    // Sync custom purpose textareas
+    document.getElementById('custom-purpose').addEventListener('input', function() {
+        document.getElementById('custom-purpose-ru').value = this.value;
+        highlightChanges('custom-purpose');
+    });
+    
+    document.getElementById('custom-purpose-ru').addEventListener('input', function() {
+        document.getElementById('custom-purpose').value = this.value;
+        highlightChanges('custom-purpose-ru');
+    });
+    
+    // Modify the generateDocument function to handle the custom purpose
+    const originalGenerateDocument = window.generateDocument || function() {};
+    
+    window.generateDocument = function() {
+        // Get purpose value based on dropdown or custom field
+        const purposeSelect = document.getElementById('purpose');
+        const purposeSelectRu = document.getElementById('purpose-ru');
+        let purpose, purposeRu;
+        
+        if (purposeSelect.value === 'other' || purposeSelectRu.value === 'other') {
+            purpose = document.getElementById('custom-purpose').value || '[Custom Purpose]';
+            purposeRu = document.getElementById('custom-purpose-ru').value || '[Пользовательская Цель]';
+        } else {
+            purpose = purposeSelect.options[purposeSelect.selectedIndex].value;
+            purposeRu = purposeSelectRu.options[purposeSelectRu.selectedIndex].value;
+        }
+        
+        // Store these values for use in the original function
+        window.currentPurpose = purpose;
+        window.currentPurposeRu = purposeRu;
+        
+        // Call the original function
+        originalGenerateDocument();
+    };
+</script>
