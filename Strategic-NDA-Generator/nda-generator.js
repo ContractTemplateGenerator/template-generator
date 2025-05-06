@@ -139,13 +139,10 @@ const StrategicNDAGenerator = () => {
   // State to track what text was last changed (for highlighting)
   const [lastChanged, setLastChanged] = React.useState(null);
   
-  // State for copy success message
-  const [copySuccess, setCopySuccess] = React.useState(false);
-  
   // Ref for preview content div
   const previewRef = React.useRef(null);
   
-  // Tabs configuration - removed final preview tab
+  // Tabs configuration
   const tabs = [
     { id: 'parties', label: 'Parties' },
     { id: 'agreement', label: 'Agreement Details' },
@@ -153,7 +150,8 @@ const StrategicNDAGenerator = () => {
     { id: 'obligations', label: 'Obligations' },
     { id: 'remedies', label: 'Remedies' },
     { id: 'disputes', label: 'Dispute Resolution' },
-    { id: 'misc', label: 'Miscellaneous' }
+    { id: 'misc', label: 'Miscellaneous' },
+    { id: 'preview', label: 'Final Preview' }
   ];
   
   // Handle input changes
@@ -197,20 +195,6 @@ const StrategicNDAGenerator = () => {
   // Jump to specific tab
   const goToTab = (index) => {
     setCurrentTab(index);
-  };
-  
-  // Handle copy to clipboard functionality
-  const copyToClipboard = () => {
-    const textArea = document.createElement("textarea");
-    textArea.value = ndaText;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand("copy");
-    document.body.removeChild(textArea);
-    
-    // Show success message briefly
-    setCopySuccess(true);
-    setTimeout(() => setCopySuccess(false), 2000);
   };
   
   // Function to get disclosing party display name
@@ -1459,6 +1443,53 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                   </label>
                 </div>
               </div>
+            </div>
+          )}
+          
+          {/* Final Preview Tab */}
+          {currentTab === 7 && (
+            <div>
+              <h2 className="section-title">Final Preview</h2>
+              
+              <div className="info-box">
+                <div className="info-box-header">
+                  <Icon name="alert-circle" className="info-box-icon" />
+                  <div>
+                    <p className="info-box-title"><strong>Final Step:</strong> Review your completed NDA and make any necessary adjustments.</p>
+                    <p className="info-box-content">You can go back to any previous tab to make changes. Your NDA will update in real-time.</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="card">
+                <h3 className="card-title">Download Options</h3>
+                <p style={{fontSize: "0.875rem", marginBottom: "1rem"}}>Your NDA is ready! You can copy the text or use your browser's print function to save as PDF.</p>
+                <button
+                  className="nav-button next-button"
+                  onClick={() => {
+                    // Copy to clipboard functionality would go here in a real implementation
+                    const textArea = document.createElement("textarea");
+                    textArea.value = ndaText;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand("copy");
+                    document.body.removeChild(textArea);
+                    alert("NDA text copied to clipboard!");
+                  }}
+                  style={{marginBottom: "1rem"}}
+                >
+                  <Icon name="copy" style={{marginRight: "0.25rem"}} /> Copy NDA Text
+                </button>
+                
+                <a 
+                  href="https://terms.law/call/" 
+                  target="_blank" 
+                  className="nav-button prev-button"
+                  style={{display: "inline-flex", textDecoration: "none"}}
+                >
+                  <Icon name="calendar" style={{marginRight: "0.25rem"}} /> Schedule Consultation
+                </a>
+              </div>
               
               <div className="card">
                 <h3 className="card-title">Important Notes:</h3>
@@ -1472,7 +1503,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             </div>
           )}
           
-          {/* Navigation buttons with integrated copy button */}
+          {/* Navigation buttons */}
           <div className="navigation-buttons">
             <button
               onClick={prevTab}
@@ -1484,44 +1515,20 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             </button>
             
             <button
-              onClick={copyToClipboard}
-              className="nav-button copy-button"
-              style={{
-                backgroundColor: copySuccess ? '#059669' : '#4f46e5',
-                color: 'white',
-                transition: 'background-color 0.3s'
-              }}
-            >
-              <Icon name={copySuccess ? "check" : "copy"} style={{marginRight: "0.25rem"}} />
-              {copySuccess ? "Copied!" : "Copy NDA"}
-            </button>
-            
-            <a 
-              href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" 
-              target="_blank" 
-              className="nav-button consult-button"
-              style={{
-                backgroundColor: '#1a56db',
-                color: 'white',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center'
-              }}
-            >
-              <Icon name="calendar" style={{marginRight: "0.25rem"}} />
-              Consult Attorney
-            </a>
-            
-            <button
               onClick={nextTab}
-              className={`nav-button next-button`}
-              disabled={currentTab === tabs.length - 1}
-              style={{
-                visibility: currentTab === tabs.length - 1 ? 'hidden' : 'visible'
-              }}
+              className={`nav-button ${currentTab === tabs.length - 1 ? 'complete-button' : 'next-button'}`}
             >
-              Next
-              <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
+              {currentTab === tabs.length - 1 ? (
+                <>
+                  <Icon name="check" style={{marginRight: "0.25rem"}} />
+                  Finalize
+                </>
+              ) : (
+                <>
+                  Next
+                  <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
+                </>
+              )}
             </button>
           </div>
         </div>
