@@ -541,6 +541,22 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
     }
   };
 
+  // Function to copy text to clipboard
+  const copyToClipboard = () => {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = ndaText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      alert("NDA text copied to clipboard!");
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+      alert("Failed to copy text. Please try again or select and copy manually.");
+    }
+  };
+
   // Render the component
   return (
     <div className="container">
@@ -1466,16 +1482,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                 <p style={{fontSize: "0.875rem", marginBottom: "1rem"}}>Your NDA is ready! You can copy the text or use your browser's print function to save as PDF.</p>
                 <button
                   className="nav-button next-button"
-                  onClick={() => {
-                    // Copy to clipboard functionality would go here in a real implementation
-                    const textArea = document.createElement("textarea");
-                    textArea.value = ndaText;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                    alert("NDA text copied to clipboard!");
-                  }}
+                  onClick={copyToClipboard}
                   style={{marginBottom: "1rem"}}
                 >
                   <Icon name="copy" style={{marginRight: "0.25rem"}} /> Copy NDA Text
@@ -1503,7 +1510,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             </div>
           )}
           
-          {/* Navigation buttons */}
+          {/* Navigation buttons - always show regardless of tab */}
           <div className="navigation-buttons">
             <button
               onClick={prevTab}
