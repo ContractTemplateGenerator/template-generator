@@ -14,6 +14,49 @@ const Icon = ({ name, className = "" }) => {
   return <i ref={iconRef} data-feather={name} className={className}></i>;
 };
 
+// Tooltip component for showing explanations
+const Tooltip = ({ text, children }) => {
+  const [isVisible, setIsVisible] = React.useState(false);
+  
+  return (
+    <div className="tooltip-container">
+      <div 
+        className="tooltip-trigger"
+        onMouseEnter={() => setIsVisible(true)}
+        onMouseLeave={() => setIsVisible(false)}
+      >
+        {children}
+        <Icon name="help-circle" className="tooltip-icon" />
+      </div>
+      {isVisible && (
+        <div className="tooltip-content">
+          {text}
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Risk indicator component
+const RiskIndicator = ({ level, text }) => {
+  const colors = {
+    low: "#059669",
+    medium: "#eab308",
+    high: "#dc2626"
+  };
+  
+  return (
+    <div className="risk-indicator">
+      <div 
+        className="risk-dot" 
+        style={{ backgroundColor: colors[level] }}
+        title={text}
+      ></div>
+      {level === "high" && <span className="risk-text">{text}</span>}
+    </div>
+  );
+};
+
 // Main NDA Generator component
 const StrategicNDAGenerator = () => {
   // State for form values
@@ -470,6 +513,34 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
     }
   }, [highlightedNDA]);
 
+  // Tooltips content
+  const tooltips = {
+    disclosingPartyType: "For businesses, using a company as the disclosing party offers stronger protection as it keeps ownership of confidential information with the entity, not an individual. For individuals, personal liability is clear but ensure you actually own what you're protecting.",
+    usePseudonyms: "Using pseudonyms for privacy requires a side letter clearly identifying all parties. All parties must sign both the main NDA and the side letter for enforceability (a lesson from the Stormy Daniels case).",
+    monetaryConsideration: "Including monetary consideration can strengthen an NDA by providing clear value exchange. However, be cautious - if the amount is excessive or if it appears to be 'hush money', it might raise legal concerns.",
+    liquidatedDamages: "Liquidated damages must be a reasonable estimate of potential harm, not a penalty. The $1M per breach in Stormy Daniels NDA was likely unenforceable. Courts may void excessive amounts.",
+    disputeResolution: "Arbitration keeps disputes private but can be seen as one-sided if not balanced. Court litigation is public but may offer more procedural protections. Consider which best serves your situation.",
+    term: "Courts increasingly favor reasonable time limits over perpetual obligations. For most business information, 2-5 years is reasonable. Trade secrets may warrant longer protection."
+  };
+
+  // Risk level assessments for certain options
+  const getRiskLevel = (option) => {
+    switch(option) {
+      case 'usePseudonyms': 
+        return { level: "medium", text: "Using pseudonyms adds complexity and requires careful implementation" };
+      case 'liquidatedDamages':
+        return { level: "high", text: "Liquidated damages must be reasonable or courts may void them" };
+      case 'liquidatedDamagesAmount':
+        return parseInt(formData.liquidatedDamagesAmount) > 25000 
+          ? { level: "high", text: "This amount may be viewed as an excessive penalty" }
+          : { level: "low", text: "This appears to be a reasonable estimate of potential harm" };
+      case 'arbitration':
+        return { level: "medium", text: "Ensure arbitration terms are balanced to avoid being deemed unconscionable" };
+      default:
+        return null;
+    }
+  };
+
   // Render the component
   return (
     <div className="container">
@@ -512,7 +583,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label">
+                <div className="checkbox-label-with-tooltip">
                   <input
                     type="checkbox"
                     id="usePseudonyms"
@@ -522,6 +593,13 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="usePseudonyms">Use pseudonyms for privacy</label>
+                  <Tooltip text={tooltips.usePseudonyms} />
+                  {formData.usePseudonyms && getRiskLevel('usePseudonyms') && (
+                    <RiskIndicator 
+                      level={getRiskLevel('usePseudonyms').level} 
+                      text={getRiskLevel('usePseudonyms').text} 
+                    />
+                  )}
                 </div>
                 {formData.usePseudonyms && (
                   <div className="checkbox-group" style={{backgroundColor: "#fffbeb", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #fef3c7"}}>
@@ -557,7 +635,10 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               <div className="form-group">
                 <h3 className="card-title">Disclosing Party</h3>
                 <div className="form-group">
-                  <label className="form-label">Type</label>
+                  <div className="form-label-with-tooltip">
+                    <label className="form-label">Type</label>
+                    <Tooltip text={tooltips.disclosingPartyType} />
+                  </div>
                   <select
                     name="disclosingPartyType"
                     value={formData.disclosingPartyType}
@@ -768,7 +849,10 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <label className="form-label">Duration of Agreement</label>
+                <div className="form-label-with-tooltip">
+                  <label className="form-label">Duration of Agreement</label>
+                  <Tooltip text={tooltips.term} />
+                </div>
                 <div className="form-row">
                   <input
                     type="number"
@@ -792,7 +876,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label">
+                <div className="checkbox-label-with-tooltip">
                   <input
                     type="checkbox"
                     id="monetaryConsideration"
@@ -802,6 +886,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="monetaryConsideration">Include monetary consideration</label>
+                  <Tooltip text={tooltips.monetaryConsideration} />
                 </div>
                 
                 {formData.monetaryConsideration && (
@@ -1120,7 +1205,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label">
+                <div className="checkbox-label-with-tooltip">
                   <input
                     type="checkbox"
                     id="liquidatedDamages"
@@ -1130,6 +1215,13 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="liquidatedDamages">Include liquidated damages</label>
+                  <Tooltip text={tooltips.liquidatedDamages} />
+                  {formData.liquidatedDamages && getRiskLevel('liquidatedDamages') && (
+                    <RiskIndicator 
+                      level={getRiskLevel('liquidatedDamages').level} 
+                      text={getRiskLevel('liquidatedDamages').text} 
+                    />
+                  )}
                 </div>
                 
                 {formData.liquidatedDamages && (
@@ -1146,10 +1238,11 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     <p className="help-text">
                       This amount should be a reasonable estimate of the harm that might result from a breach, not a penalty.
                     </p>
-                    {formData.liquidatedDamagesAmount && parseInt(formData.liquidatedDamagesAmount) > 25000 && (
-                      <p className="alert-warning">
-                        Warning: High liquidated damages may be viewed as an unenforceable penalty by courts.
-                      </p>
+                    {formData.liquidatedDamagesAmount && getRiskLevel('liquidatedDamagesAmount') && (
+                      <RiskIndicator 
+                        level={getRiskLevel('liquidatedDamagesAmount').level} 
+                        text={getRiskLevel('liquidatedDamagesAmount').text} 
+                      />
                     )}
                   </div>
                 )}
@@ -1173,7 +1266,10 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <label className="form-label">How should disputes be resolved?</label>
+                <div className="form-label-with-tooltip">
+                  <label className="form-label">How should disputes be resolved?</label>
+                  <Tooltip text={tooltips.disputeResolution} />
+                </div>
                 <div className="radio-group">
                   <label className="radio-label">
                     <input
@@ -1196,6 +1292,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Binding Arbitration
+                    {formData.disputeResolution === 'arbitration' && getRiskLevel('arbitration') && (
+                      <RiskIndicator 
+                        level={getRiskLevel('arbitration').level} 
+                        text={getRiskLevel('arbitration').text} 
+                      />
+                    )}
                   </label>
                 </div>
               </div>
@@ -1431,7 +1533,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
           </div>
         </div>
         
-        {/* Preview Panel */}
+        {/* Preview Panel - adjusted height to match form panel */}
         <div className="preview-panel" ref={previewRef}>
           <div className="preview-content">
             <h2>Live Preview</h2>
