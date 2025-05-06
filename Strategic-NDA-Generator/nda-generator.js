@@ -139,16 +139,10 @@ const StrategicNDAGenerator = () => {
   // State to track what text was last changed (for highlighting)
   const [lastChanged, setLastChanged] = React.useState(null);
   
-  // State for copy success message
-  const [copySuccess, setCopySuccess] = React.useState(false);
-  
-  // State for error message
-  const [errorMessage, setErrorMessage] = React.useState('');
-  
   // Ref for preview content div
   const previewRef = React.useRef(null);
   
-  // Tabs configuration
+  // Tabs configuration - removed the Final Preview tab
   const tabs = [
     { id: 'parties', label: 'Parties' },
     { id: 'agreement', label: 'Agreement Details' },
@@ -156,9 +150,19 @@ const StrategicNDAGenerator = () => {
     { id: 'obligations', label: 'Obligations' },
     { id: 'remedies', label: 'Remedies' },
     { id: 'disputes', label: 'Dispute Resolution' },
-    { id: 'misc', label: 'Miscellaneous' },
-    { id: 'preview', label: 'Final Preview' }
+    { id: 'misc', label: 'Miscellaneous' }
   ];
+  
+  // Copy to clipboard function
+  const copyToClipboard = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = ndaText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    alert("NDA text copied to clipboard!");
+  };
   
   // Handle input changes
   const handleChange = (e) => {
@@ -188,7 +192,6 @@ const StrategicNDAGenerator = () => {
   const nextTab = () => {
     if (currentTab < tabs.length - 1) {
       setCurrentTab(currentTab + 1);
-      window.scrollTo(0, 0);
     }
   };
   
@@ -196,20 +199,12 @@ const StrategicNDAGenerator = () => {
   const prevTab = () => {
     if (currentTab > 0) {
       setCurrentTab(currentTab - 1);
-      window.scrollTo(0, 0);
     }
   };
   
   // Jump to specific tab
   const goToTab = (index) => {
-    try {
-      setCurrentTab(index);
-      window.scrollTo(0, 0);
-      setErrorMessage('');
-    } catch (error) {
-      setErrorMessage('An error occurred while navigating. Please try again.');
-      console.error("Navigation error:", error);
-    }
+    setCurrentTab(index);
   };
   
   // Function to get disclosing party display name
@@ -228,53 +223,18 @@ const StrategicNDAGenerator = () => {
     return formData.receivingPartyName;
   };
   
-  // Function to copy text to clipboard
-  const copyToClipboard = (text) => {
-    try {
-      // Create a temporary textarea element to hold the text
-      const textArea = document.createElement("textarea");
-      textArea.value = text;
-      
-      // Make the textarea out of viewport
-      textArea.style.position = "fixed";
-      textArea.style.left = "-999999px";
-      textArea.style.top = "-999999px";
-      
-      document.body.appendChild(textArea);
-      textArea.focus();
-      textArea.select();
-      
-      // Execute copy command
-      const successful = document.execCommand('copy');
-      
-      // Remove the textarea
-      document.body.removeChild(textArea);
-      
-      if (successful) {
-        setCopySuccess(true);
-        setTimeout(() => setCopySuccess(false), 3000);
-      } else {
-        throw new Error("Copy command failed");
-      }
-    } catch (err) {
-      console.error('Failed to copy: ', err);
-      setErrorMessage('Failed to copy to clipboard. Please try selecting and copying the text manually.');
-    }
-  };
-  
   // Function to generate NDA text
   const generateNDA = () => {
-    try {
-      const dp = getDisclosingPartyName();
-      const rp = getReceivingPartyName();
+    const dp = getDisclosingPartyName();
+    const rp = getReceivingPartyName();
+    
+    // Generate NDA sections
+    const ndaSections = {
+      // Title section
+      title: `MUTUAL NON-DISCLOSURE AGREEMENT`,
       
-      // Generate NDA sections
-      const ndaSections = {
-        // Title section
-        title: `MUTUAL NON-DISCLOSURE AGREEMENT`,
-        
-        // Introduction
-        introduction: `This Non-Disclosure Agreement (the "Agreement") is entered into as of ${formData.effectiveDate} (the "Effective Date") by and between:
+      // Introduction
+      introduction: `This Non-Disclosure Agreement (the "Agreement") is entered into as of ${formData.effectiveDate} (the "Effective Date") by and between:
 
 ${formData.disclosingPartyType === 'individual' ? 
 `${formData.disclosingPartyName}, an individual with an address at ${formData.disclosingPartyAddress}` : 
@@ -288,21 +248,21 @@ ${formData.receivingPartyType === 'individual' ?
 `${formData.receivingPartyName}, a ${formData.state} ${formData.receivingPartyType} with its principal address at ${formData.receivingPartyAddress}`}
 ${formData.usePseudonyms ? `(referred to herein as "${formData.receivingPartyPseudonym}")` : ''}`,
 
-        // Recitals
-        recitals: `WHEREAS, the parties wish to explore ${formData.purpose || "a potential business relationship"} (the "Purpose"); and
+      // Recitals
+      recitals: `WHEREAS, the parties wish to explore ${formData.purpose || "a potential business relationship"} (the "Purpose"); and
 
 WHEREAS, in connection with the Purpose, each party may disclose to the other certain confidential and proprietary information, and the parties wish to protect such information in accordance with this Agreement.
 
 NOW, THEREFORE, in consideration of ${formData.monetaryConsideration ? `the payment of $${formData.considerationAmount} and ` : ''}the mutual promises and covenants contained herein and other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:`,
 
-        // Pseudonym declaration (if applicable)
-        pseudonymDeclaration: formData.usePseudonyms ? 
-        `1. IDENTITY OF PARTIES.
-        
+      // Pseudonym declaration (if applicable)
+      pseudonymDeclaration: formData.usePseudonyms ? 
+      `1. IDENTITY OF PARTIES.
+      
 This Agreement involves the use of pseudonyms for privacy purposes only. The true identities of the parties are as stated in the preamble of this Agreement and are fully known to both parties. The use of pseudonyms is not intended to obscure legal responsibility or liability under this Agreement. Both parties acknowledge they are entering into this Agreement with full knowledge of the other party's identity, notwithstanding the use of pseudonyms for convenience.` : '',
 
-        // Definition of Confidential Information
-        definitionOfConfidentialInfo: `${formData.usePseudonyms ? '2' : '1'}. DEFINITION OF CONFIDENTIAL INFORMATION.
+      // Definition of Confidential Information
+      definitionOfConfidentialInfo: `${formData.usePseudonyms ? '2' : '1'}. DEFINITION OF CONFIDENTIAL INFORMATION.
 
 "Confidential Information" means any non-public information that relates to the ${formData.confidentialInfoType === 'business' ? 'business, technical, or financial affairs' : 'personal affairs or private matters'} of either party (the "Disclosing Party") which is disclosed to the other party (the "Receiving Party"), either directly or indirectly, in writing, orally or by inspection of tangible objects${formData.confidentialInfoType === 'business' ? ', including without limitation:' : '.'} 
 ${formData.confidentialInfoType === 'business' ? `
@@ -313,16 +273,16 @@ ${formData.includeFinancialInfo ? `${['(a)', '(b)', '(c)', '(d)'][([formData.inc
 ${formData.includeTechnicalInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo, formData.includeFinancialInfo].filter(Boolean).length)]}`+ ' technical information, specifications, designs, and prototypes;' : ''}
 ${formData.includeCustomInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo, formData.includeFinancialInfo, formData.includeTechnicalInfo].filter(Boolean).length)]}`+ ` ${formData.customConfidentialInfo};` : ''}` : ''}`,
 
-        // Exclusions
-        exclusions: `${formData.usePseudonyms ? '3' : '2'}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.
+      // Exclusions
+      exclusions: `${formData.usePseudonyms ? '3' : '2'}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.
 
 Confidential Information shall not include any information that: 
 ${formData.publicDomainExclusion ? '(a) is or becomes generally available to the public through no fault of the Receiving Party;' : ''}
 ${formData.independentDevelopmentExclusion ? `${formData.publicDomainExclusion ? '(b)' : '(a)'} is or becomes known to the Receiving Party on a non-confidential basis through a third party who is not bound by an obligation of confidentiality with respect to such information or is independently developed by the Receiving Party without reference to the Disclosing Party's Confidential Information;` : ''}
 ${formData.rightfulPossessionExclusion ? `${['(a)', '(b)', '(c)'][([formData.publicDomainExclusion, formData.independentDevelopmentExclusion].filter(Boolean).length)]}`+ ' was in the Receiving Party\'s rightful possession prior to receiving it from the Disclosing Party;' : ''}`,
 
-        // Obligations
-        obligations: `${formData.usePseudonyms ? '4' : '3'}. OBLIGATIONS OF RECEIVING PARTY.
+      // Obligations
+      obligations: `${formData.usePseudonyms ? '4' : '3'}. OBLIGATIONS OF RECEIVING PARTY.
 
 The Receiving Party shall:
 ${formData.nonDisclosure ? `(a) maintain the confidentiality of the Disclosing Party's Confidential Information with at least the same degree of care that it uses to protect its own confidential information, but in no case less than reasonable care;
@@ -333,8 +293,8 @@ ${formData.nonUse ? `${formData.nonDisclosure ? '(c)' : '(a)'} not use the Discl
 
 ${formData.returnDocuments ? `${['(a)', '(b)', '(c)', '(d)'][([formData.nonDisclosure && true, formData.nonDisclosure && true, formData.nonUse].filter(Boolean).length)]}`+ ' upon the termination or completion of the Purpose, or upon the Disclosing Party\'s request, promptly return or destroy all Confidential Information and any copies, notes, or other materials incorporating such Confidential Information (and confirm such destruction in writing if requested).' : ''}`,
 
-        // Permitted Disclosures (Carveouts)
-        permittedDisclosures: `${formData.usePseudonyms ? '5' : '4'}. PERMITTED DISCLOSURES.
+      // Permitted Disclosures (Carveouts)
+      permittedDisclosures: `${formData.usePseudonyms ? '5' : '4'}. PERMITTED DISCLOSURES.
 
 Notwithstanding any other provisions of this Agreement:
 
@@ -346,13 +306,13 @@ ${formData.includeGovInvestigationCarveout ? `${['(a)', '(b)', '(c)'][([formData
 
 This Agreement does not limit either party's right to disclose information relating to this Agreement or the Purpose to its attorneys, accountants, and other advisors bound by professional obligations of confidentiality.`,
 
-        // Term
-        term: `${formData.usePseudonyms ? '6' : '5'}. TERM.
+      // Term
+      term: `${formData.usePseudonyms ? '6' : '5'}. TERM.
 
 This Agreement shall commence on the Effective Date and remain in effect for a period of ${formData.term} ${formData.termUnit} thereafter (the "Term"). The confidentiality obligations set forth in this Agreement shall survive the expiration or termination of this Agreement for a period of ${formData.term} ${formData.termUnit} from the date of such expiration or termination.`,
 
-        // Remedies
-        remedies: `${formData.usePseudonyms ? '7' : '6'}. REMEDIES.
+      // Remedies
+      remedies: `${formData.usePseudonyms ? '7' : '6'}. REMEDIES.
 
 ${formData.injunctiveRelief ? `The Receiving Party acknowledges that any breach of this Agreement may cause irreparable harm to the Disclosing Party for which monetary damages may not be an adequate remedy. Accordingly, in addition to any other remedies available at law or in equity, the Disclosing Party shall be entitled to seek injunctive relief to enforce the terms of this Agreement.` : ''}
 
@@ -360,8 +320,8 @@ ${formData.monetaryDamages ? `${formData.injunctiveRelief ? '\n\n' : ''}The Disc
 
 ${formData.liquidatedDamages ? `${(formData.injunctiveRelief || formData.monetaryDamages) ? '\n\n' : ''}In the event of a breach of this Agreement, the breaching party shall pay to the non-breaching party, as liquidated damages and not as a penalty, the sum of $${formData.liquidatedDamagesAmount} per breach. The parties acknowledge that the harm caused by a breach of this Agreement would be difficult to ascertain precisely and that this amount represents a reasonable estimation of the harm that would be caused.` : ''}`,
 
-        // Dispute Resolution
-        disputeResolution: `${formData.usePseudonyms ? '8' : '7'}. DISPUTE RESOLUTION.
+      // Dispute Resolution
+      disputeResolution: `${formData.usePseudonyms ? '8' : '7'}. DISPUTE RESOLUTION.
 
 ${formData.disputeResolution === 'litigation' ? 
   `Any dispute arising out of or relating to this Agreement shall be resolved through proceedings filed in the appropriate state or federal courts located in ${formData.arbitrationCounty ? `${formData.arbitrationCounty} County, ${formData.state}` : formData.state}. Each party hereby irrevocably submits to the jurisdiction of such courts.` 
@@ -369,8 +329,8 @@ ${formData.disputeResolution === 'litigation' ?
   `Any dispute arising out of or relating to this Agreement shall be resolved through binding arbitration administered by ${formData.arbitrationProvider} in accordance with its then-current arbitration rules. The arbitration shall be conducted by a single arbitrator, and shall take place in ${formData.arbitrationLocation ? formData.arbitrationLocation : `${formData.arbitrationCounty} County, ${formData.state}`}. The decision of the arbitrator shall be final and binding, and judgment on the award may be entered in any court having jurisdiction. Each party shall bear its own costs in the arbitration, and shall share equally the costs of the arbitrator and the arbitration facilities.`
 }`,
 
-        // Miscellaneous
-        miscellaneous: `${formData.usePseudonyms ? '9' : '8'}. MISCELLANEOUS.
+      // Miscellaneous
+      miscellaneous: `${formData.usePseudonyms ? '9' : '8'}. MISCELLANEOUS.
 
 ${formData.governing ? `(a) Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.state}, without regard to conflicts of law principles.
 
@@ -384,8 +344,8 @@ ${formData.governing ? `(a) Governing Law. This Agreement shall be governed by a
 
 ` : ''}${formData.attorneyFees ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.governing, formData.entireAgreement, formData.amendment, formData.waiver, formData.severability].filter(Boolean).length)]} Attorneys' Fees. In any action to enforce this Agreement, the prevailing party shall be entitled to recover its costs and attorneys' fees in addition to any other relief granted.` : ''}`,
 
-        // Signature Block
-        signatureBlock: `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
+      // Signature Block
+      signatureBlock: `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
 
 ${formData.disclosingPartyType === 'individual' ? formData.disclosingPartyName : formData.disclosingPartyName}
 
@@ -399,8 +359,8 @@ By: __________________________
 ${formData.receivingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}
 ${formData.usePseudonyms ? `\nAlso known as: "${formData.receivingPartyPseudonym}"` : ''}`,
 
-        // Side Letter (if using pseudonyms)
-        sideLetter: formData.usePseudonyms ? `EXHIBIT A - IDENTITY CONFIRMATION LETTER
+      // Side Letter (if using pseudonyms)
+      sideLetter: formData.usePseudonyms ? `EXHIBIT A - IDENTITY CONFIRMATION LETTER
 
 This Identity Confirmation Letter (the "Side Letter") is executed concurrently with the Non-Disclosure Agreement dated ${formData.effectiveDate} (the "Agreement") and incorporates the same by reference.
 
@@ -421,10 +381,10 @@ ${formData.receivingPartyName}
 
 By: __________________________
 ${formData.receivingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}` : ''
-      };
-      
-      // Compile full NDA
-      let fullNDA = `${ndaSections.title}
+    };
+    
+    // Compile full NDA
+    let fullNDA = `${ndaSections.title}
 
 ${ndaSections.introduction}
 
@@ -449,148 +409,117 @@ ${ndaSections.miscellaneous}
 ${ndaSections.signatureBlock}
 ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
 
-      return fullNDA;
-    } catch (error) {
-      console.error("Error generating NDA:", error);
-      setErrorMessage("Error generating NDA. Please try again.");
-      return "An error occurred while generating the NDA. Please refresh the page and try again.";
-    }
+    return fullNDA;
   };
 
   // Generate the NDA text
-  let ndaText = "";
-  try {
-    ndaText = generateNDA();
-  } catch (error) {
-    console.error("Error in NDA text generation:", error);
-    ndaText = "Error generating NDA. Please refresh and try again.";
-  }
+  const ndaText = generateNDA();
   
   // Get section that should be highlighted based on current tab
   const getSectionToHighlight = () => {
-    try {
-      switch (tabs[currentTab].id) {
-        case 'parties':
-          if (lastChanged === 'disclosingPartyName' || lastChanged === 'disclosingPartyType' || 
-              lastChanged === 'disclosingPartyAddress' || lastChanged === 'receivingPartyName' || 
-              lastChanged === 'receivingPartyType' || lastChanged === 'receivingPartyAddress' ||
-              lastChanged === 'usePseudonyms' || lastChanged === 'disclosingPartyPseudonym' || 
-              lastChanged === 'receivingPartyPseudonym') {
-            return 'introduction';
-          }
-          return null;
-        case 'agreement':
-          if (lastChanged === 'effectiveDate' || lastChanged === 'purpose' || 
-              lastChanged === 'monetaryConsideration' || lastChanged === 'considerationAmount') {
-            return 'recitals';
-          } else if (lastChanged === 'term' || lastChanged === 'termUnit') {
-            return 'term';
-          }
-          return null;
-        case 'confidential':
-          if (lastChanged === 'confidentialInfoType' || lastChanged === 'includeTradeSecrets' || 
-              lastChanged === 'includeBusinessPlans' || lastChanged === 'includeCustomerInfo' || 
-              lastChanged === 'includeFinancialInfo' || lastChanged === 'includeTechnicalInfo' || 
-              lastChanged === 'includeCustomInfo' || lastChanged === 'customConfidentialInfo') {
-            return 'definitionOfConfidentialInfo';
-          } else if (lastChanged === 'publicDomainExclusion' || lastChanged === 'independentDevelopmentExclusion' || 
-                    lastChanged === 'rightfulPossessionExclusion') {
-            return 'exclusions';
-          }
-          return null;
-        case 'obligations':
-          if (lastChanged === 'nonDisclosure' || lastChanged === 'nonUse' || lastChanged === 'returnDocuments') {
-            return 'obligations';
-          } else if (lastChanged === 'includeCourtOrderCarveout' || lastChanged === 'includeWhistleblowerCarveout' || 
-                    lastChanged === 'includeGovInvestigationCarveout') {
-            return 'permittedDisclosures';
-          }
-          return null;
-        case 'remedies':
-          if (lastChanged === 'injunctiveRelief' || lastChanged === 'monetaryDamages' || 
-              lastChanged === 'liquidatedDamages' || lastChanged === 'liquidatedDamagesAmount') {
-            return 'remedies';
-          }
-          return null;
-        case 'disputes':
-          if (lastChanged === 'disputeResolution' || lastChanged === 'arbitrationProvider' || 
-              lastChanged === 'arbitrationLocation' || lastChanged === 'arbitrationCounty') {
-            return 'disputeResolution';
-          }
-          return null;
-        case 'misc':
-          if (lastChanged === 'attorneyFees' || lastChanged === 'severability' || 
-              lastChanged === 'entireAgreement' || lastChanged === 'amendment' || 
-              lastChanged === 'waiver' || lastChanged === 'governing') {
-            return 'miscellaneous';
-          }
-          return null;
-        default:
-          return null;
-      }
-    } catch (error) {
-      console.error("Error getting highlighted section:", error);
-      return null;
+    switch (tabs[currentTab].id) {
+      case 'parties':
+        if (lastChanged === 'disclosingPartyName' || lastChanged === 'disclosingPartyType' || 
+            lastChanged === 'disclosingPartyAddress' || lastChanged === 'receivingPartyName' || 
+            lastChanged === 'receivingPartyType' || lastChanged === 'receivingPartyAddress' ||
+            lastChanged === 'usePseudonyms' || lastChanged === 'disclosingPartyPseudonym' || 
+            lastChanged === 'receivingPartyPseudonym') {
+          return 'introduction';
+        }
+        return null;
+      case 'agreement':
+        if (lastChanged === 'effectiveDate' || lastChanged === 'purpose' || 
+            lastChanged === 'monetaryConsideration' || lastChanged === 'considerationAmount') {
+          return 'recitals';
+        } else if (lastChanged === 'term' || lastChanged === 'termUnit') {
+          return 'term';
+        }
+        return null;
+      case 'confidential':
+        if (lastChanged === 'confidentialInfoType' || lastChanged === 'includeTradeSecrets' || 
+            lastChanged === 'includeBusinessPlans' || lastChanged === 'includeCustomerInfo' || 
+            lastChanged === 'includeFinancialInfo' || lastChanged === 'includeTechnicalInfo' || 
+            lastChanged === 'includeCustomInfo' || lastChanged === 'customConfidentialInfo') {
+          return 'definitionOfConfidentialInfo';
+        } else if (lastChanged === 'publicDomainExclusion' || lastChanged === 'independentDevelopmentExclusion' || 
+                  lastChanged === 'rightfulPossessionExclusion') {
+          return 'exclusions';
+        }
+        return null;
+      case 'obligations':
+        if (lastChanged === 'nonDisclosure' || lastChanged === 'nonUse' || lastChanged === 'returnDocuments') {
+          return 'obligations';
+        } else if (lastChanged === 'includeCourtOrderCarveout' || lastChanged === 'includeWhistleblowerCarveout' || 
+                  lastChanged === 'includeGovInvestigationCarveout') {
+          return 'permittedDisclosures';
+        }
+        return null;
+      case 'remedies':
+        if (lastChanged === 'injunctiveRelief' || lastChanged === 'monetaryDamages' || 
+            lastChanged === 'liquidatedDamages' || lastChanged === 'liquidatedDamagesAmount') {
+          return 'remedies';
+        }
+        return null;
+      case 'disputes':
+        if (lastChanged === 'disputeResolution' || lastChanged === 'arbitrationProvider' || 
+            lastChanged === 'arbitrationLocation' || lastChanged === 'arbitrationCounty') {
+          return 'disputeResolution';
+        }
+        return null;
+      case 'misc':
+        if (lastChanged === 'attorneyFees' || lastChanged === 'severability' || 
+            lastChanged === 'entireAgreement' || lastChanged === 'amendment' || 
+            lastChanged === 'waiver' || lastChanged === 'governing') {
+          return 'miscellaneous';
+        }
+        return null;
+      default:
+        return null;
     }
   };
   
   // Create a highlighted version of the NDA
   const createHighlightedNDA = () => {
-    try {
-      const sectionToHighlight = getSectionToHighlight();
-      if (!sectionToHighlight) return ndaText;
-      
-      const sections = {
-        title: /MUTUAL NON-DISCLOSURE AGREEMENT/,
-        introduction: /This Non-Disclosure Agreement.*?(?=WHEREAS)/s,
-        recitals: /WHEREAS.*?(?=\d\.)/s,
-        pseudonymDeclaration: /1\. IDENTITY OF PARTIES.*?(?=\d\.)/s,
-        definitionOfConfidentialInfo: /(?:\d)\. DEFINITION OF CONFIDENTIAL INFORMATION.*?(?=\d\.)/s,
-        exclusions: /(?:\d)\. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.*?(?=\d\.)/s,
-        obligations: /(?:\d)\. OBLIGATIONS OF RECEIVING PARTY.*?(?=\d\.)/s,
-        permittedDisclosures: /(?:\d)\. PERMITTED DISCLOSURES.*?(?=\d\.)/s,
-        term: /(?:\d)\. TERM.*?(?=\d\.)/s,
-        remedies: /(?:\d)\. REMEDIES.*?(?=\d\.)/s,
-        disputeResolution: /(?:\d)\. DISPUTE RESOLUTION.*?(?=\d\.)/s,
-        miscellaneous: /(?:\d)\. MISCELLANEOUS.*?(?=IN WITNESS WHEREOF)/s,
-        signatureBlock: /IN WITNESS WHEREOF.*?(?=EXHIBIT A|$)/s,
-        sideLetter: /EXHIBIT A.*?$/s
-      };
-      
-      // Find and highlight the section
-      if (sections[sectionToHighlight]) {
-        return ndaText.replace(sections[sectionToHighlight], match => 
-          `<span class="highlighted-text">${match}</span>`
-        );
-      }
-      
-      return ndaText;
-    } catch (error) {
-      console.error("Error creating highlighted NDA:", error);
-      return ndaText;
+    const sectionToHighlight = getSectionToHighlight();
+    if (!sectionToHighlight) return ndaText;
+    
+    const sections = {
+      title: /MUTUAL NON-DISCLOSURE AGREEMENT/,
+      introduction: /This Non-Disclosure Agreement.*?(?=WHEREAS)/s,
+      recitals: /WHEREAS.*?(?=\d\.)/s,
+      pseudonymDeclaration: /1\. IDENTITY OF PARTIES.*?(?=\d\.)/s,
+      definitionOfConfidentialInfo: /(?:\d)\. DEFINITION OF CONFIDENTIAL INFORMATION.*?(?=\d\.)/s,
+      exclusions: /(?:\d)\. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.*?(?=\d\.)/s,
+      obligations: /(?:\d)\. OBLIGATIONS OF RECEIVING PARTY.*?(?=\d\.)/s,
+      permittedDisclosures: /(?:\d)\. PERMITTED DISCLOSURES.*?(?=\d\.)/s,
+      term: /(?:\d)\. TERM.*?(?=\d\.)/s,
+      remedies: /(?:\d)\. REMEDIES.*?(?=\d\.)/s,
+      disputeResolution: /(?:\d)\. DISPUTE RESOLUTION.*?(?=\d\.)/s,
+      miscellaneous: /(?:\d)\. MISCELLANEOUS.*?(?=IN WITNESS WHEREOF)/s,
+      signatureBlock: /IN WITNESS WHEREOF.*?(?=EXHIBIT A|$)/s,
+      sideLetter: /EXHIBIT A.*?$/s
+    };
+    
+    // Find and highlight the section
+    if (sections[sectionToHighlight]) {
+      return ndaText.replace(sections[sectionToHighlight], match => 
+        `<span class="highlighted-text">${match}</span>`
+      );
     }
+    
+    return ndaText;
   };
   
   // Create highlightable content
-  let highlightedNDA = "";
-  try {
-    highlightedNDA = createHighlightedNDA();
-  } catch (error) {
-    console.error("Error in highlighting:", error);
-    highlightedNDA = ndaText;
-  }
+  const highlightedNDA = createHighlightedNDA();
   
   // Effect to scroll to highlighted text
   React.useEffect(() => {
-    try {
-      if (previewRef.current) {
-        const highlightedElement = previewRef.current.querySelector('.highlighted-text');
-        if (highlightedElement) {
-          highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
+    if (previewRef.current) {
+      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-    } catch (error) {
-      console.error("Error scrolling to highlighted text:", error);
     }
   }, [highlightedNDA]);
 
@@ -630,14 +559,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
         <h1>Strategic NDA Generator</h1>
         <p>Create a legally sound non-disclosure agreement that avoids common pitfalls</p>
       </div>
-      
-      {/* Error message */}
-      {errorMessage && (
-        <div className="error-message">
-          <p>{errorMessage}</p>
-          <button onClick={() => setErrorMessage('')}>Dismiss</button>
-        </div>
-      )}
       
       {/* Tab navigation */}
       <div className="tab-navigation">
@@ -1532,45 +1453,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                   </label>
                 </div>
               </div>
-            </div>
-          )}
-          
-          {/* Final Preview Tab */}
-          {currentTab === 7 && (
-            <div>
-              <h2 className="section-title">Final Preview</h2>
-              
-              <div className="info-box">
-                <div className="info-box-header">
-                  <Icon name="alert-circle" className="info-box-icon" />
-                  <div>
-                    <p className="info-box-title"><strong>Final Step:</strong> Review your completed NDA and make any necessary adjustments.</p>
-                    <p className="info-box-content">You can go back to any previous tab to make changes. Your NDA will update in real-time.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <h3 className="card-title">Download Options</h3>
-                <p style={{fontSize: "0.875rem", marginBottom: "1rem"}}>Your NDA is ready! You can copy the text or use your browser's print function to save as PDF.</p>
-                <button
-                  className="nav-button next-button"
-                  onClick={() => copyToClipboard(ndaText)}
-                  style={{marginBottom: "1rem"}}
-                >
-                  <Icon name="copy" style={{marginRight: "0.25rem"}} /> 
-                  {copySuccess ? "Copied!" : "Copy NDA Text"}
-                </button>
-                
-                <a 
-                  href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" 
-                  target="_blank" 
-                  className="nav-button prev-button"
-                  style={{display: "inline-flex", textDecoration: "none"}}
-                >
-                  <Icon name="calendar" style={{marginRight: "0.25rem"}} /> Schedule Consultation
-                </a>
-              </div>
               
               <div className="card">
                 <h3 className="card-title">Important Notes:</h3>
@@ -1580,6 +1462,18 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                   <li style={{marginBottom: "0.5rem"}}>If you're in California, be aware of special laws restricting NDAs in certain contexts (sexual harassment, etc.).</li>
                   <li>Keep a copy of the signed agreement for your records.</li>
                 </ul>
+              </div>
+              
+              <div className="card">
+                <h3 className="card-title">Need Assistance?</h3>
+                <a 
+                  href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" 
+                  target="_blank" 
+                  className="nav-button prev-button"
+                  style={{display: "inline-flex", textDecoration: "none"}}
+                >
+                  <Icon name="calendar" style={{marginRight: "0.25rem"}} /> Schedule Consultation
+                </a>
               </div>
             </div>
           )}
@@ -1595,21 +1489,22 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               Previous
             </button>
             
+            {/* Copy button - always visible between Previous and Next buttons */}
+            <button
+              onClick={copyToClipboard}
+              className="nav-button copy-button"
+            >
+              <Icon name="copy" style={{marginRight: "0.25rem"}} />
+              Copy NDA
+            </button>
+            
             <button
               onClick={nextTab}
-              className={`nav-button ${currentTab === tabs.length - 1 ? 'complete-button' : 'next-button'}`}
+              className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
+              disabled={currentTab === tabs.length - 1}
             >
-              {currentTab === tabs.length - 1 ? (
-                <>
-                  <Icon name="check" style={{marginRight: "0.25rem"}} />
-                  Finalize
-                </>
-              ) : (
-                <>
-                  Next
-                  <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
-                </>
-              )}
+              Next
+              <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
             </button>
           </div>
         </div>
@@ -1629,44 +1524,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
   );
 };
 
-// Error handling wrapper for the main app
-const ErrorBoundary = ({ children }) => {
-  const [hasError, setHasError] = React.useState(false);
-  
-  React.useEffect(() => {
-    const errorHandler = (error) => {
-      console.error("Global error caught:", error);
-      setHasError(true);
-    };
-    
-    window.addEventListener('error', errorHandler);
-    
-    return () => window.removeEventListener('error', errorHandler);
-  }, []);
-  
-  if (hasError) {
-    return (
-      <div className="error-boundary">
-        <h2>Something went wrong</h2>
-        <p>An error occurred while running the NDA Generator. Please refresh the page to try again.</p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="nav-button next-button"
-        >
-          Refresh Page
-        </button>
-      </div>
-    );
-  }
-  
-  return children;
-};
-
-// Render the app with error boundary
+// Render the app
 const root = document.getElementById('root');
 const reactRoot = ReactDOM.createRoot(root);
-reactRoot.render(
-  <ErrorBoundary>
-    <StrategicNDAGenerator />
-  </ErrorBoundary>
-);
+reactRoot.render(<StrategicNDAGenerator />);
