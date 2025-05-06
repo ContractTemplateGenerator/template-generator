@@ -150,8 +150,7 @@ const StrategicNDAGenerator = () => {
     { id: 'obligations', label: 'Obligations' },
     { id: 'remedies', label: 'Remedies' },
     { id: 'disputes', label: 'Dispute Resolution' },
-    { id: 'misc', label: 'Miscellaneous' },
-    { id: 'preview', label: 'Final Preview' }
+    { id: 'misc', label: 'Miscellaneous' }
   ];
   
   // Handle input changes
