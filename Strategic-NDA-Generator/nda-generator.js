@@ -14,49 +14,6 @@ const Icon = ({ name, className = "" }) => {
   return <i ref={iconRef} data-feather={name} className={className}></i>;
 };
 
-// Tooltip component for showing explanations
-const Tooltip = ({ text, children }) => {
-  const [isVisible, setIsVisible] = React.useState(false);
-  
-  return (
-    <div className="tooltip-container">
-      <div 
-        className="tooltip-trigger"
-        onMouseEnter={() => setIsVisible(true)}
-        onMouseLeave={() => setIsVisible(false)}
-      >
-        {children}
-        <Icon name="help-circle" className="tooltip-icon" />
-      </div>
-      {isVisible && (
-        <div className="tooltip-content">
-          {text}
-        </div>
-      )}
-    </div>
-  );
-};
-
-// Risk indicator component
-const RiskIndicator = ({ level, text }) => {
-  const colors = {
-    low: "#059669",
-    medium: "#eab308",
-    high: "#dc2626"
-  };
-  
-  return (
-    <div className="risk-indicator">
-      <div 
-        className="risk-dot" 
-        style={{ backgroundColor: colors[level] }}
-        title={text}
-      ></div>
-      {level === "high" && <span className="risk-text">{text}</span>}
-    </div>
-  );
-};
-
 // Main NDA Generator component
 const StrategicNDAGenerator = () => {
   // State for form values
@@ -194,6 +151,17 @@ const StrategicNDAGenerator = () => {
   // Jump to specific tab
   const goToTab = (index) => {
     setCurrentTab(index);
+  };
+
+  // Copy NDA text to clipboard
+  const copyToClipboard = () => {
+    const textArea = document.createElement("textarea");
+    textArea.value = ndaText;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    alert("NDA text copied to clipboard!");
   };
   
   // Function to get disclosing party display name
@@ -512,34 +480,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
     }
   }, [highlightedNDA]);
 
-  // Tooltips content
-  const tooltips = {
-    disclosingPartyType: "For businesses, using a company as the disclosing party offers stronger protection as it keeps ownership of confidential information with the entity, not an individual. For individuals, personal liability is clear but ensure you actually own what you're protecting.",
-    usePseudonyms: "Using pseudonyms for privacy requires a side letter clearly identifying all parties. All parties must sign both the main NDA and the side letter for enforceability (a lesson from the Stormy Daniels case).",
-    monetaryConsideration: "Including monetary consideration can strengthen an NDA by providing clear value exchange. However, be cautious - if the amount is excessive or if it appears to be 'hush money', it might raise legal concerns.",
-    liquidatedDamages: "Liquidated damages must be a reasonable estimate of potential harm, not a penalty. The $1M per breach in Stormy Daniels NDA was likely unenforceable. Courts may void excessive amounts.",
-    disputeResolution: "Arbitration keeps disputes private but can be seen as one-sided if not balanced. Court litigation is public but may offer more procedural protections. Consider which best serves your situation.",
-    term: "Courts increasingly favor reasonable time limits over perpetual obligations. For most business information, 2-5 years is reasonable. Trade secrets may warrant longer protection."
-  };
-
-  // Risk level assessments for certain options
-  const getRiskLevel = (option) => {
-    switch(option) {
-      case 'usePseudonyms': 
-        return { level: "medium", text: "Using pseudonyms adds complexity and requires careful implementation" };
-      case 'liquidatedDamages':
-        return { level: "high", text: "Liquidated damages must be reasonable or courts may void them" };
-      case 'liquidatedDamagesAmount':
-        return parseInt(formData.liquidatedDamagesAmount) > 25000 
-          ? { level: "high", text: "This amount may be viewed as an excessive penalty" }
-          : { level: "low", text: "This appears to be a reasonable estimate of potential harm" };
-      case 'arbitration':
-        return { level: "medium", text: "Ensure arbitration terms are balanced to avoid being deemed unconscionable" };
-      default:
-        return null;
-    }
-  };
-
   // Render the component
   return (
     <div className="container">
@@ -582,7 +522,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label-with-tooltip">
+                <div className="checkbox-label">
                   <input
                     type="checkbox"
                     id="usePseudonyms"
@@ -592,13 +532,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="usePseudonyms">Use pseudonyms for privacy</label>
-                  <Tooltip text={tooltips.usePseudonyms} />
-                  {formData.usePseudonyms && getRiskLevel('usePseudonyms') && (
-                    <RiskIndicator 
-                      level={getRiskLevel('usePseudonyms').level} 
-                      text={getRiskLevel('usePseudonyms').text} 
-                    />
-                  )}
                 </div>
                 {formData.usePseudonyms && (
                   <div className="checkbox-group" style={{backgroundColor: "#fffbeb", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #fef3c7"}}>
@@ -634,10 +567,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               <div className="form-group">
                 <h3 className="card-title">Disclosing Party</h3>
                 <div className="form-group">
-                  <div className="form-label-with-tooltip">
-                    <label className="form-label">Type</label>
-                    <Tooltip text={tooltips.disclosingPartyType} />
-                  </div>
+                  <label className="form-label">Type</label>
                   <select
                     name="disclosingPartyType"
                     value={formData.disclosingPartyType}
@@ -848,10 +778,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <div className="form-label-with-tooltip">
-                  <label className="form-label">Duration of Agreement</label>
-                  <Tooltip text={tooltips.term} />
-                </div>
+                <label className="form-label">Duration of Agreement</label>
                 <div className="form-row">
                   <input
                     type="number"
@@ -875,7 +802,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label-with-tooltip">
+                <div className="checkbox-label">
                   <input
                     type="checkbox"
                     id="monetaryConsideration"
@@ -885,7 +812,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="monetaryConsideration">Include monetary consideration</label>
-                  <Tooltip text={tooltips.monetaryConsideration} />
                 </div>
                 
                 {formData.monetaryConsideration && (
@@ -1204,7 +1130,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="card">
-                <div className="checkbox-label-with-tooltip">
+                <div className="checkbox-label">
                   <input
                     type="checkbox"
                     id="liquidatedDamages"
@@ -1214,13 +1140,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     className="form-checkbox"
                   />
                   <label htmlFor="liquidatedDamages">Include liquidated damages</label>
-                  <Tooltip text={tooltips.liquidatedDamages} />
-                  {formData.liquidatedDamages && getRiskLevel('liquidatedDamages') && (
-                    <RiskIndicator 
-                      level={getRiskLevel('liquidatedDamages').level} 
-                      text={getRiskLevel('liquidatedDamages').text} 
-                    />
-                  )}
                 </div>
                 
                 {formData.liquidatedDamages && (
@@ -1237,11 +1156,10 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     <p className="help-text">
                       This amount should be a reasonable estimate of the harm that might result from a breach, not a penalty.
                     </p>
-                    {formData.liquidatedDamagesAmount && getRiskLevel('liquidatedDamagesAmount') && (
-                      <RiskIndicator 
-                        level={getRiskLevel('liquidatedDamagesAmount').level} 
-                        text={getRiskLevel('liquidatedDamagesAmount').text} 
-                      />
+                    {formData.liquidatedDamagesAmount && parseInt(formData.liquidatedDamagesAmount) > 25000 && (
+                      <p className="alert-warning">
+                        Warning: High liquidated damages may be viewed as an unenforceable penalty by courts.
+                      </p>
                     )}
                   </div>
                 )}
@@ -1265,10 +1183,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <div className="form-label-with-tooltip">
-                  <label className="form-label">How should disputes be resolved?</label>
-                  <Tooltip text={tooltips.disputeResolution} />
-                </div>
+                <label className="form-label">How should disputes be resolved?</label>
                 <div className="radio-group">
                   <label className="radio-label">
                     <input
@@ -1291,12 +1206,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Binding Arbitration
-                    {formData.disputeResolution === 'arbitration' && getRiskLevel('arbitration') && (
-                      <RiskIndicator 
-                        level={getRiskLevel('arbitration').level} 
-                        text={getRiskLevel('arbitration').text} 
-                      />
-                    )}
                   </label>
                 </div>
               </div>
@@ -1445,63 +1354,6 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             </div>
           )}
           
-          {/* Final Preview Tab */}
-          {currentTab === 7 && (
-            <div>
-              <h2 className="section-title">Final Preview</h2>
-              
-              <div className="info-box">
-                <div className="info-box-header">
-                  <Icon name="alert-circle" className="info-box-icon" />
-                  <div>
-                    <p className="info-box-title"><strong>Final Step:</strong> Review your completed NDA and make any necessary adjustments.</p>
-                    <p className="info-box-content">You can go back to any previous tab to make changes. Your NDA will update in real-time.</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card">
-                <h3 className="card-title">Download Options</h3>
-                <p style={{fontSize: "0.875rem", marginBottom: "1rem"}}>Your NDA is ready! You can copy the text or use your browser's print function to save as PDF.</p>
-                <button
-                  className="nav-button next-button"
-                  onClick={() => {
-                    // Copy to clipboard functionality would go here in a real implementation
-                    const textArea = document.createElement("textarea");
-                    textArea.value = ndaText;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    document.execCommand("copy");
-                    document.body.removeChild(textArea);
-                    alert("NDA text copied to clipboard!");
-                  }}
-                  style={{marginBottom: "1rem"}}
-                >
-                  <Icon name="copy" style={{marginRight: "0.25rem"}} /> Copy NDA Text
-                </button>
-                
-                <a 
-                  href="https://terms.law/call/" 
-                  target="_blank" 
-                  className="nav-button prev-button"
-                  style={{display: "inline-flex", textDecoration: "none"}}
-                >
-                  <Icon name="calendar" style={{marginRight: "0.25rem"}} /> Schedule Consultation
-                </a>
-              </div>
-              
-              <div className="card">
-                <h3 className="card-title">Important Notes:</h3>
-                <ul style={{listStyle: "disc", paddingLeft: "1.25rem", fontSize: "0.875rem"}}>
-                  <li style={{marginBottom: "0.5rem"}}>Ensure all parties sign the NDA (including any side letter if using pseudonyms).</li>
-                  <li style={{marginBottom: "0.5rem"}}>This generator provides a template - consider consulting with an attorney before finalizing.</li>
-                  <li style={{marginBottom: "0.5rem"}}>If you're in California, be aware of special laws restricting NDAs in certain contexts (sexual harassment, etc.).</li>
-                  <li>Keep a copy of the signed agreement for your records.</li>
-                </ul>
-              </div>
-            </div>
-          )}
-          
           {/* Navigation buttons */}
           <div className="navigation-buttons">
             <button
@@ -1513,26 +1365,31 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               Previous
             </button>
             
+            {/* Copy to clipboard button (added between Previous and Next) */}
+            <button
+              onClick={copyToClipboard}
+              className="nav-button"
+              style={{
+                backgroundColor: "#4f46e5", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <Icon name="copy" style={{marginRight: "0.25rem"}} />
+              Copy to Clipboard
+            </button>
+            
             <button
               onClick={nextTab}
-              className={`nav-button ${currentTab === tabs.length - 1 ? 'complete-button' : 'next-button'}`}
+              className="nav-button next-button"
             >
-              {currentTab === tabs.length - 1 ? (
-                <>
-                  <Icon name="check" style={{marginRight: "0.25rem"}} />
-                  Finalize
-                </>
-              ) : (
-                <>
-                  Next
-                  <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
-                </>
-              )}
+              Next
+              <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
             </button>
           </div>
         </div>
         
-        {/* Preview Panel - adjusted height to match form panel */}
+        {/* Preview Panel */}
         <div className="preview-panel" ref={previewRef}>
           <div className="preview-content">
             <h2>Live Preview</h2>
