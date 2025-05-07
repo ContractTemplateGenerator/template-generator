@@ -177,8 +177,14 @@ const StrategicNDAGenerator = () => {
   // Download NDA as Word document
   const downloadAsWord = () => {
     try {
-      // Call the function from docx-generator.js
-      generateWordDoc(ndaText, formData);
+      // Access the globally available function from docx-generator.js
+      if (typeof window.generateWordDoc === 'function') {
+        window.generateWordDoc(ndaText, formData);
+      } else {
+        // Fallback if the function isn't available in the global scope
+        console.error("generateWordDoc function not found in global scope");
+        alert("Word document generation is not available. Please try using the copy option instead.");
+      }
     } catch (error) {
       console.error("Error generating Word document:", error);
       alert("Error generating Word document. Please try again or use the copy option.");
