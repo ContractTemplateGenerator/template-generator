@@ -203,17 +203,19 @@ const StrategicNDAGenerator = () => {
       // Introduction
       introduction: `This Non-Disclosure Agreement (the "Agreement") is entered into as of ${formData.effectiveDate} (the "Effective Date") by and between:
 
-${formData.disclosingPartyType === 'individual' ? 
-`${formData.disclosingPartyName}, an individual with an address at ${formData.disclosingPartyAddress}` : 
-`${formData.disclosingPartyName}, a ${formData.state} ${formData.disclosingPartyType} with its principal address at ${formData.disclosingPartyAddress}`}
-${formData.usePseudonyms ? `(referred to herein as "${formData.disclosingPartyPseudonym}")` : ''}
+${formData.usePseudonyms ? 
+  `${formData.disclosingPartyPseudonym || 'DISCLOSING PARTY'}, ${formData.disclosingPartyType === 'individual' ? 'an individual' : `a ${formData.state} ${formData.disclosingPartyType}`}` : 
+  `${formData.disclosingPartyType === 'individual' ? 
+    `${formData.disclosingPartyName}, an individual with an address at ${formData.disclosingPartyAddress}` : 
+    `${formData.disclosingPartyName}, a ${formData.state} ${formData.disclosingPartyType} with its principal address at ${formData.disclosingPartyAddress}`}`}
 
 and
 
-${formData.receivingPartyType === 'individual' ? 
-`${formData.receivingPartyName}, an individual with an address at ${formData.receivingPartyAddress}` : 
-`${formData.receivingPartyName}, a ${formData.state} ${formData.receivingPartyType} with its principal address at ${formData.receivingPartyAddress}`}
-${formData.usePseudonyms ? `(referred to herein as "${formData.receivingPartyPseudonym}")` : ''}`,
+${formData.usePseudonyms ? 
+  `${formData.receivingPartyPseudonym || 'RECEIVING PARTY'}, ${formData.receivingPartyType === 'individual' ? 'an individual' : `a ${formData.state} ${formData.receivingPartyType}`}` : 
+  `${formData.receivingPartyType === 'individual' ? 
+    `${formData.receivingPartyName}, an individual with an address at ${formData.receivingPartyAddress}` : 
+    `${formData.receivingPartyName}, a ${formData.state} ${formData.receivingPartyType} with its principal address at ${formData.receivingPartyAddress}`}`}`,
 
       // Recitals
       recitals: `WHEREAS, the parties wish to explore ${formData.purpose || "a potential business relationship"} (the "Purpose"); and
@@ -314,28 +316,39 @@ ${formData.governing ? `(a) Governing Law. This Agreement shall be governed by a
       // Signature Block
       signatureBlock: `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
 
-${formData.disclosingPartyType === 'individual' ? formData.disclosingPartyName : formData.disclosingPartyName}
+${formData.usePseudonyms ? 
+  `${formData.disclosingPartyPseudonym || 'DISCLOSING PARTY'}
+  
+By: __________________________
+${formData.disclosingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}
+
+${formData.receivingPartyPseudonym || 'RECEIVING PARTY'}
+
+By: __________________________
+${formData.receivingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}` 
+  : 
+  `${formData.disclosingPartyName}
 
 By: __________________________
 ${formData.disclosingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}
-${formData.usePseudonyms ? `\nAlso known as: "${formData.disclosingPartyPseudonym}"` : ''}
 
-${formData.receivingPartyType === 'individual' ? formData.receivingPartyName : formData.receivingPartyName}
+${formData.receivingPartyName}
 
 By: __________________________
-${formData.receivingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}
-${formData.usePseudonyms ? `\nAlso known as: "${formData.receivingPartyPseudonym}"` : ''}`,
+${formData.receivingPartyType !== 'individual' ? 'Name: ________________________\nTitle: _________________________' : 'Signature'}`}`,
 
       // Side Letter (if using pseudonyms)
-      sideLetter: formData.usePseudonyms ? `EXHIBIT A - IDENTITY CONFIRMATION LETTER
+      sideLetter: formData.usePseudonyms ? `
+\f
+EXHIBIT A - IDENTITY CONFIRMATION LETTER
 
 This Identity Confirmation Letter (the "Side Letter") is executed concurrently with the Non-Disclosure Agreement dated ${formData.effectiveDate} (the "Agreement") and incorporates the same by reference.
 
 This Side Letter confirms that:
 
-1. The party referred to as "${formData.disclosingPartyPseudonym}" in the Agreement is ${formData.disclosingPartyName}.
+1. The party referred to as "${formData.disclosingPartyPseudonym || 'DISCLOSING PARTY'}" in the Agreement is ${formData.disclosingPartyName}, ${formData.disclosingPartyType === 'individual' ? `an individual with an address at ${formData.disclosingPartyAddress}` : `a ${formData.state} ${formData.disclosingPartyType} with its principal address at ${formData.disclosingPartyAddress}`}.
 
-2. The party referred to as "${formData.receivingPartyPseudonym}" in the Agreement is ${formData.receivingPartyName}.
+2. The party referred to as "${formData.receivingPartyPseudonym || 'RECEIVING PARTY'}" in the Agreement is ${formData.receivingPartyName}, ${formData.receivingPartyType === 'individual' ? `an individual with an address at ${formData.receivingPartyAddress}` : `a ${formData.state} ${formData.receivingPartyType} with its principal address at ${formData.receivingPartyAddress}`}.
 
 Both parties acknowledge that this Side Letter must be signed by all parties to be effective, and that the use of pseudonyms in the Agreement does not reduce or limit either party's obligations or liabilities under the Agreement.
 
