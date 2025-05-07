@@ -174,6 +174,17 @@ const StrategicNDAGenerator = () => {
     alert("NDA text copied to clipboard!");
   };
   
+  // Download NDA as Word document
+  const downloadAsWord = () => {
+    try {
+      // Call the function from docx-generator.js
+      generateWordDoc(ndaText, formData);
+    } catch (error) {
+      console.error("Error generating Word document:", error);
+      alert("Error generating Word document. Please try again or use the copy option.");
+    }
+  };
+  
   // Function to get disclosing party display name
   const getDisclosingPartyName = () => {
     if (formData.usePseudonyms && formData.disclosingPartyPseudonym) {
@@ -1451,7 +1462,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               Previous
             </button>
             
-            {/* Copy to clipboard button (added between Previous and Next) */}
+            {/* Copy to clipboard button */}
             <button
               onClick={copyToClipboard}
               className="nav-button"
@@ -1463,6 +1474,20 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             >
               <Icon name="copy" style={{marginRight: "0.25rem"}} />
               Copy to Clipboard
+            </button>
+            
+            {/* Download MS Word button */}
+            <button
+              onClick={downloadAsWord}
+              className="nav-button"
+              style={{
+                backgroundColor: "#2563eb", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <Icon name="file-text" style={{marginRight: "0.25rem"}} />
+              Download MS Word
             </button>
             
             <button

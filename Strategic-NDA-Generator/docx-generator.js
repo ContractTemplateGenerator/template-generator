@@ -10,8 +10,18 @@ function generateWordDoc(ndaText, formData) {
     }]
   });
   
+  // Split main agreement text and side letter
+  let mainText = ndaText;
+  let sideLetterText = '';
+  
+  if (formData.usePseudonyms) {
+    const parts = ndaText.split(/\f/);
+    mainText = parts[0];
+    sideLetterText = parts.length > 1 ? parts[1] : '';
+  }
+  
   // Title
-  const children = [
+  const mainChildren = [
     new Paragraph({
       text: "MUTUAL NON-DISCLOSURE AGREEMENT",
       heading: HeadingLevel.HEADING_1,
@@ -23,20 +33,10 @@ function generateWordDoc(ndaText, formData) {
     })
   ];
   
-  // Split main agreement text and side letter
-  let mainText = ndaText;
-  let sideLetterText = '';
-  
-  if (formData.usePseudonyms) {
-    const parts = ndaText.split(/\f/);
-    mainText = parts[0];
-    sideLetterText = parts.length > 1 ? parts[1] : '';
-  }
-  
   // Add main agreement paragraphs
   mainText.split('\n\n').forEach(para => {
     if (para.trim()) {
-      children.push(
+      mainChildren.push(
         new Paragraph({
           children: [new TextRun(para)],
           spacing: { after: 300 }
@@ -48,12 +48,21 @@ function generateWordDoc(ndaText, formData) {
   // Add main document section
   doc.addSection({
     properties: {},
-    children: children
+    children: mainChildren
   });
   
-  // If using pseudonyms, add side letter on a new page
+  // If using pseudonyms, add side letter on a new page with page break
   if (formData.usePseudonyms && sideLetterText) {
     const sideLetterChildren = [
+      // Add a page break before the side letter
+      new Paragraph({
+        children: [
+          new TextRun({
+            text: "",
+            break: 1
+          })
+        ]
+      }),
       new Paragraph({
         text: "EXHIBIT A - IDENTITY CONFIRMATION LETTER",
         heading: HeadingLevel.HEADING_1,
@@ -76,7 +85,7 @@ function generateWordDoc(ndaText, formData) {
       }
     });
     
-    // Add side letter section
+    // Add side letter to the same section but with a page break before it
     doc.addSection({
       properties: {},
       children: sideLetterChildren
