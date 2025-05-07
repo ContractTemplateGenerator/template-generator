@@ -14,6 +14,16 @@ const Icon = ({ name, className = "" }) => {
   return <i ref={iconRef} data-feather={name} className={className}></i>;
 };
 
+// Tooltip component for displaying helpful information
+const Tooltip = ({ text, children }) => {
+  return (
+    <div className="tooltip-container">
+      {children}
+      <div className="tooltip-text">{text}</div>
+    </div>
+  );
+};
+
 // Main NDA Generator component
 const StrategicNDAGenerator = () => {
   // State for form values
@@ -511,7 +521,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Parties Information</h2>
               
-              <div className="info-box">
+              <div className="info-box critical-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -531,7 +541,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     onChange={handleChange}
                     className="form-checkbox"
                   />
-                  <label htmlFor="usePseudonyms">Use pseudonyms for privacy</label>
+                  <label htmlFor="usePseudonyms">
+                    Use pseudonyms for privacy
+                    <Tooltip text="Pseudonyms can protect identity in sensitive NDAs, but require proper implementation with a side letter signed by all parties. The Stormy Daniels NDA used 'David Dennison' and 'Peggy Peterson' but failed to secure all signatures.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
+                  </label>
                 </div>
                 {formData.usePseudonyms && (
                   <div className="checkbox-group" style={{backgroundColor: "#fffbeb", padding: "0.75rem", borderRadius: "0.375rem", border: "1px solid #fef3c7"}}>
@@ -683,7 +698,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Agreement Details</h2>
               
-              <div className="info-box">
+              <div className="info-box warning-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -778,7 +793,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <label className="form-label">Duration of Agreement</label>
+                <label className="form-label">
+                  Duration of Agreement
+                  <Tooltip text="The Stormy Daniels NDA had no time limitation, which courts increasingly view as unreasonable. For most business information, 2-5 years is typical. Including a reasonable time limit makes your NDA more enforceable.">
+                    <Icon name="help-circle" className="info-icon" />
+                  </Tooltip>
+                </label>
                 <div className="form-row">
                   <input
                     type="number"
@@ -811,7 +831,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     onChange={handleChange}
                     className="form-checkbox"
                   />
-                  <label htmlFor="monetaryConsideration">Include monetary consideration</label>
+                  <label htmlFor="monetaryConsideration">
+                    Include monetary consideration
+                    <Tooltip text="The Stormy Daniels NDA included $130,000 in monetary consideration, which created evidence of a valid contract. Monetary consideration (payment) can strengthen an NDA, but must be properly documented. In the Stormy case, the payment came through an LLC rather than directly from Trump, creating ambiguity about who was bound.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
+                  </label>
                 </div>
                 
                 {formData.monetaryConsideration && (
@@ -839,7 +864,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Confidential Information</h2>
               
-              <div className="info-box">
+              <div className="info-box warning-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -850,7 +875,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <label className="form-label">Type of Confidential Information</label>
+                <label className="form-label">
+                  Type of Confidential Information
+                  <Tooltip text="The Stormy Daniels NDA attempted to protect personal information but was overly broad. Defining confidential information clearly helps courts understand exactly what is being protected and makes the NDA more enforceable.">
+                    <Icon name="help-circle" className="info-icon" />
+                  </Tooltip>
+                </label>
                 <div className="radio-group">
                   <label className="radio-label">
                     <input
@@ -862,6 +892,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Business Information
+                    <Tooltip text="Trade secrets, financials, customer lists, and other commercial information. Courts are most familiar with and likely to enforce NDAs in business contexts.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="radio-label">
                     <input
@@ -873,6 +906,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Personal Information
+                    <Tooltip text="Private affairs, personal matters, or sensitive information about an individual. Personal NDAs can face higher scrutiny, especially if they might conceal matters of public concern.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                 </div>
               </div>
@@ -970,6 +1006,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Information that is or becomes publicly available without breach
+                    <Tooltip text="This standard exclusion prevents enforcing an NDA on information that becomes public through no fault of the receiving party. The Stormy Daniels NDA lacked this carveout, which would have prevented enforcement once the information became public knowledge.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -980,6 +1019,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Information independently developed or lawfully received from third parties
+                    <Tooltip text="This exclusion prevents an NDA from restricting information legitimately obtained from other sources. Without this, a party could be unfairly restricted from using information they developed independently or received legally elsewhere.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -990,6 +1032,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Information in rightful possession prior to disclosure
+                    <Tooltip text="This exclusion protects a party from being restricted from using information they already rightfully possessed before the NDA. Without this, you could be prevented from using your own pre-existing knowledge.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                 </div>
               </div>
@@ -1001,7 +1046,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Obligations & Permitted Disclosures</h2>
               
-              <div className="info-box">
+              <div className="info-box critical-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -1059,6 +1104,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Court order/subpoena disclosure (with notice to other party)
+                    <Tooltip text="Courts won't enforce NDAs that forbid compliance with legal orders. This carveout allows disclosure when required by court order, while preserving confidentiality by requiring notice to the other party so they can seek a protective order if appropriate.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -1069,6 +1117,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Whistleblower protection carveout
+                    <Tooltip text="Laws like the Defend Trade Secrets Act require whistleblower immunities in confidentiality agreements. This carveout ensures the NDA doesn't prevent reporting possible violations of law to appropriate government agencies.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="checkbox-label">
                     <input
@@ -1079,6 +1130,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Government investigation disclosure carveout
+                    <Tooltip text="Courts will not enforce NDAs that prevent cooperation with government investigations. This carveout explicitly preserves the right to provide information to or testify before government agencies, preventing the NDA from being used to obstruct justice.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                 </div>
                 <p className="help-text">
@@ -1093,7 +1147,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Remedies</h2>
               
-              <div className="info-box">
+              <div className="info-box critical-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -1139,7 +1193,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                     onChange={handleChange}
                     className="form-checkbox"
                   />
-                  <label htmlFor="liquidatedDamages">Include liquidated damages</label>
+                  <label htmlFor="liquidatedDamages">
+                    Include liquidated damages
+                    <Tooltip text="The Stormy Daniels NDA included a $1,000,000 per breach liquidated damages clause that was likely unenforceable as an excessive penalty. Courts require liquidated damages to be a reasonable estimate of potential harm, not a penalty designed to terrorize the other party.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
+                  </label>
                 </div>
                 
                 {formData.liquidatedDamages && (
@@ -1172,7 +1231,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Dispute Resolution</h2>
               
-              <div className="info-box">
+              <div className="info-box warning-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -1183,7 +1242,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
               </div>
               
               <div className="form-group">
-                <label className="form-label">How should disputes be resolved?</label>
+                <label className="form-label">
+                  How should disputes be resolved?
+                  <Tooltip text="The Stormy Daniels NDA contained a one-sided arbitration clause that gave Trump's side unilateral power to select the arbitration location. This imbalance contributed to the agreement's problems. A fair dispute resolution mechanism enhances enforceability.">
+                    <Icon name="help-circle" className="info-icon" />
+                  </Tooltip>
+                </label>
                 <div className="radio-group">
                   <label className="radio-label">
                     <input
@@ -1195,6 +1259,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Court Litigation
+                    <Tooltip text="Litigation means disputes are resolved in public courts. This provides more procedural protections but less privacy than arbitration. Court proceedings are typically public records.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="radio-label">
                     <input
@@ -1206,6 +1273,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="mr-2"
                     />
                     Binding Arbitration
+                    <Tooltip text="Arbitration is private dispute resolution outside the court system. While it offers confidentiality and sometimes faster resolution, it must be balanced and fair to both parties to be enforceable. One-sided arbitration provisions risk being deemed unconscionable.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                 </div>
               </div>
@@ -1276,7 +1346,7 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
             <div>
               <h2 className="section-title">Miscellaneous Provisions</h2>
               
-              <div className="info-box">
+              <div className="info-box security-clause">
                 <div className="info-box-header">
                   <Icon name="alert-circle" className="info-box-icon" />
                   <div>
@@ -1338,6 +1408,9 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                       className="form-checkbox"
                     />
                     Severability (preserve agreement if parts invalidated)
+                    <Tooltip text="A strong severability clause is essential. If a court finds certain provisions unenforceable (like the $1M liquidated damages in Stormy's NDA), this clause helps preserve the rest of the agreement. Without severability, one invalid provision could void the entire NDA.">
+                      <Icon name="help-circle" className="info-icon" />
+                    </Tooltip>
                   </label>
                   <label className="checkbox-label">
                     <input
