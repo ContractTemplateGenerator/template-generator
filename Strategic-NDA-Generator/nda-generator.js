@@ -177,16 +177,25 @@ const StrategicNDAGenerator = () => {
   // Download NDA as Word document
   const downloadAsWord = () => {
     try {
-      // Access the globally available function from docx-generator.js
+      console.log("Download MS Word button clicked");
+      
+      // Make sure NDA text is available
+      if (!ndaText) {
+        console.error("NDA text is empty");
+        alert("Cannot generate document - NDA text is empty. Please check the form data.");
+        return;
+      }
+      
+      // Check if the function is available on window
       if (typeof window.generateWordDoc === 'function') {
+        console.log("Calling generateWordDoc function");
         window.generateWordDoc(ndaText, formData);
       } else {
-        // Fallback if the function isn't available in the global scope
-        console.error("generateWordDoc function not found in global scope");
+        console.error("generateWordDoc function not found");
         alert("Word document generation is not available. Please try using the copy option instead.");
       }
     } catch (error) {
-      console.error("Error generating Word document:", error);
+      console.error("Error in downloadAsWord:", error);
       alert("Error generating Word document. Please try again or use the copy option.");
     }
   };
