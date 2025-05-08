@@ -1,7 +1,7 @@
-// Function to generate MS Word document using a simpler approach
+// Function to generate MS Word document
 window.generateWordDoc = function(ndaText, formData) {
   try {
-    console.log("Starting Word document generation with alternative method...");
+    console.log("Starting Word document generation...");
     
     // Create HTML content that can be rendered in Word
     let htmlContent = `
@@ -15,7 +15,7 @@ window.generateWordDoc = function(ndaText, formData) {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 1in;
+    margin: 0.5in;
   }
   h1 {
     text-align: center;
@@ -30,17 +30,16 @@ window.generateWordDoc = function(ndaText, formData) {
   p {
     margin-bottom: 10pt;
   }
-  .page-break {
-    page-break-before: always;
-    height: 0;
-    display: block;
-    clear: both;
+  @page Section2 {
+    mso-page-orientation: portrait;
+    size: 8.5in 11.0in;
+    margin: 0.5in 0.5in 0.5in 0.5in;
+    mso-header-margin: .5in;
+    mso-footer-margin: .5in;
+    mso-header: h2;
+    mso-footer: f2;
   }
-  .exhibit-header {
-    margin-top: 1in;
-    font-weight: bold;
-    text-align: center;
-  }
+  div.Section2 { page: Section2; }
 </style>
 </head>
 <body>
@@ -51,7 +50,7 @@ window.generateWordDoc = function(ndaText, formData) {
     let sideLetterText = '';
     
     if (formData.usePseudonyms) {
-      const parts = ndaText.split(/\\f/);
+      const parts = ndaText.split(/\f/);
       mainText = parts[0];
       sideLetterText = parts.length > 1 ? parts[1] : '';
     }
@@ -67,26 +66,20 @@ window.generateWordDoc = function(ndaText, formData) {
     
     // Add side letter on a new page if applicable
     if (formData.usePseudonyms && sideLetterText) {
-      // Add page break
-      htmlContent += '<div class="page-break"></div>';
+      // Add Word-specific section break for a new page
+      htmlContent += '<br clear="all" style="page-break-before:always">';
+      htmlContent += '<div class="Section2">';
       
-      // Add exhibit header with proper styling
-      htmlContent += '<h1 class="exhibit-header">EXHIBIT A - IDENTITY CONFIRMATION LETTER</h1>';
-      
-      // Process side letter text (skip the first line which is the header)
-      const sideLetterLines = sideLetterText.trim().split('\n\n');
-      const sideLetterContent = sideLetterLines.slice(1).join('\n\n'); // Skip the first line (header)
-      
-      const sideLetterHtml = sideLetterContent
+      // Process side letter text
+      const sideLetterHtml = sideLetterText
+        .trim()
         .split('\n\n')
         .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
         .join('');
       
       // Add side letter to HTML content
       htmlContent += sideLetterHtml;
-      
-      // Add side letter to HTML content
-      htmlContent += sideLetterHtml;
+      htmlContent += '</div>';
     }
     
     // Close HTML document
