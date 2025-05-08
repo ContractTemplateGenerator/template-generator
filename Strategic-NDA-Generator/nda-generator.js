@@ -234,7 +234,7 @@ const StrategicNDAGenerator = () => {
     // Generate NDA sections
     const ndaSections = {
       // Title section
-      title: `MUTUAL NON-DISCLOSURE AGREEMENT`,
+      title: `<center><strong>MUTUAL NON-DISCLOSURE AGREEMENT</strong></center>`,
       
       // Introduction
       introduction: `This Non-Disclosure Agreement (the "Agreement") is entered into as of ${formData.effectiveDate} (the "Effective Date") by and between:
@@ -262,12 +262,12 @@ NOW, THEREFORE, in consideration of ${formData.monetaryConsideration ? `the paym
 
       // Pseudonym declaration (if applicable)
       pseudonymDeclaration: formData.usePseudonyms ? 
-      `1. IDENTITY OF PARTIES.
+      `<strong>1. IDENTITY OF PARTIES.</strong>
       
 This Agreement involves the use of pseudonyms for privacy purposes only. The true identities of the parties are as stated in the preamble of this Agreement and are fully known to both parties. The use of pseudonyms is not intended to obscure legal responsibility or liability under this Agreement. Both parties acknowledge they are entering into this Agreement with full knowledge of the other party's identity, notwithstanding the use of pseudonyms for convenience.` : '',
 
       // Definition of Confidential Information
-      definitionOfConfidentialInfo: `${formData.usePseudonyms ? '2' : '1'}. DEFINITION OF CONFIDENTIAL INFORMATION.
+      definitionOfConfidentialInfo: `<strong>${formData.usePseudonyms ? '2' : '1'}. DEFINITION OF CONFIDENTIAL INFORMATION.</strong>
 
 "Confidential Information" means any non-public information that relates to the ${formData.confidentialInfoType === 'business' ? 'business, technical, or financial affairs' : 'personal affairs or private matters'} of either party (the "Disclosing Party") which is disclosed to the other party (the "Receiving Party"), either directly or indirectly, in writing, orally or by inspection of tangible objects${(formData.confidentialInfoType === 'business' || formData.confidentialInfoType === 'personal') ? ', including without limitation:' : '.'} 
 ${formData.confidentialInfoType === 'business' ? `
@@ -287,7 +287,7 @@ ${formData.includeCorrespondenceInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(
 ${formData.includeCustomPersonalInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)'][([formData.includeIdentityInfo, formData.includeContactInfo, formData.includeFinancialPersonalInfo, formData.includeHealthInfo, formData.includeRelationshipInfo, formData.includeCorrespondenceInfo].filter(Boolean).length)]}`+ ` ${formData.customPersonalInfo};` : ''}` : ''}`,
 
       // Exclusions
-      exclusions: `${formData.usePseudonyms ? '3' : '2'}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.
+      exclusions: `<strong>${formData.usePseudonyms ? '3' : '2'}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.</strong>
 
 Confidential Information shall not include any information that: 
 ${formData.publicDomainExclusion ? '(a) is or becomes generally available to the public through no fault of the Receiving Party;' : ''}
@@ -295,7 +295,7 @@ ${formData.independentDevelopmentExclusion ? `${formData.publicDomainExclusion ?
 ${formData.rightfulPossessionExclusion ? `${['(a)', '(b)', '(c)'][([formData.publicDomainExclusion, formData.independentDevelopmentExclusion].filter(Boolean).length)]}`+ ' was in the Receiving Party\'s rightful possession prior to receiving it from the Disclosing Party;' : ''}`,
 
       // Obligations
-      obligations: `${formData.usePseudonyms ? '4' : '3'}. OBLIGATIONS OF RECEIVING PARTY.
+      obligations: `<strong>${formData.usePseudonyms ? '4' : '3'}. OBLIGATIONS OF RECEIVING PARTY.</strong>
 
 The Receiving Party shall:
 ${formData.nonDisclosure ? `(a) maintain the confidentiality of the Disclosing Party's Confidential Information with at least the same degree of care that it uses to protect its own confidential information, but in no case less than reasonable care;
@@ -307,7 +307,7 @@ ${formData.nonUse ? `${formData.nonDisclosure ? '(c)' : '(a)'} not use the Discl
 ${formData.returnDocuments ? `${['(a)', '(b)', '(c)', '(d)'][([formData.nonDisclosure && true, formData.nonDisclosure && true, formData.nonUse].filter(Boolean).length)]}`+ ' upon the termination or completion of the Purpose, or upon the Disclosing Party\'s request, promptly return or destroy all Confidential Information and any copies, notes, or other materials incorporating such Confidential Information (and confirm such destruction in writing if requested).' : ''}`,
 
       // Permitted Disclosures (Carveouts)
-      permittedDisclosures: `${formData.usePseudonyms ? '5' : '4'}. PERMITTED DISCLOSURES.
+      permittedDisclosures: `<strong>${formData.usePseudonyms ? '5' : '4'}. PERMITTED DISCLOSURES.</strong>
 
 Notwithstanding any other provisions of this Agreement:
 
@@ -320,12 +320,12 @@ ${formData.includeGovInvestigationCarveout ? `${['(a)', '(b)', '(c)'][([formData
 This Agreement does not limit either party's right to disclose information relating to this Agreement or the Purpose to its attorneys, accountants, and other advisors bound by professional obligations of confidentiality.`,
 
       // Term
-      term: `${formData.usePseudonyms ? '6' : '5'}. TERM.
+      term: `<strong>${formData.usePseudonyms ? '6' : '5'}. TERM.</strong>
 
 This Agreement shall commence on the Effective Date and remain in effect for a period of ${formData.term} ${formData.termUnit} thereafter (the "Term"). The confidentiality obligations set forth in this Agreement shall survive the expiration or termination of this Agreement for a period of ${formData.term} ${formData.termUnit} from the date of such expiration or termination.`,
 
       // Remedies
-      remedies: `${formData.usePseudonyms ? '7' : '6'}. REMEDIES.
+      remedies: `<strong>${formData.usePseudonyms ? '7' : '6'}. REMEDIES.</strong>
 
 ${formData.injunctiveRelief ? `The Receiving Party acknowledges that any breach of this Agreement may cause irreparable harm to the Disclosing Party for which monetary damages may not be an adequate remedy. Accordingly, in addition to any other remedies available at law or in equity, the Disclosing Party shall be entitled to seek injunctive relief to enforce the terms of this Agreement.` : ''}
 
@@ -334,7 +334,7 @@ ${formData.monetaryDamages ? `${formData.injunctiveRelief ? '\n\n' : ''}The Disc
 ${formData.liquidatedDamages ? `${(formData.injunctiveRelief || formData.monetaryDamages) ? '\n\n' : ''}In the event of a breach of this Agreement, the breaching party shall pay to the non-breaching party, as liquidated damages and not as a penalty, the sum of $${formData.liquidatedDamagesAmount} per breach. The parties acknowledge that the harm caused by a breach of this Agreement would be difficult to ascertain precisely and that this amount represents a reasonable estimation of the harm that would be caused.` : ''}`,
 
       // Dispute Resolution
-      disputeResolution: `${formData.usePseudonyms ? '8' : '7'}. DISPUTE RESOLUTION.
+      disputeResolution: `<strong>${formData.usePseudonyms ? '8' : '7'}. DISPUTE RESOLUTION.</strong>
 
 ${formData.disputeResolution === 'litigation' ? 
   `Any dispute arising out of or relating to this Agreement shall be resolved through proceedings filed in the appropriate state or federal courts located in ${formData.arbitrationCounty ? `${formData.arbitrationCounty} County, ${formData.state}` : formData.state}. Each party hereby irrevocably submits to the jurisdiction of such courts.` 
@@ -343,7 +343,7 @@ ${formData.disputeResolution === 'litigation' ?
 }`,
 
       // Miscellaneous
-      miscellaneous: `${formData.usePseudonyms ? '9' : '8'}. MISCELLANEOUS.
+      miscellaneous: `<strong>${formData.usePseudonyms ? '9' : '8'}. MISCELLANEOUS.</strong>
 
 ${formData.governing ? `(a) Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.state}, without regard to conflicts of law principles.
 
@@ -358,7 +358,7 @@ ${formData.governing ? `(a) Governing Law. This Agreement shall be governed by a
 ` : ''}${formData.attorneyFees ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.governing, formData.entireAgreement, formData.amendment, formData.waiver, formData.severability].filter(Boolean).length)]} Attorneys' Fees. In any action to enforce this Agreement, the prevailing party shall be entitled to recover its costs and attorneys' fees in addition to any other relief granted.` : ''}`,
 
       // Signature Block
-      signatureBlock: `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
+      signatureBlock: `<strong>IN WITNESS WHEREOF</strong>, the parties have executed this Agreement as of the Effective Date.
 
 ${formData.usePseudonyms ? 
   `${formData.disclosingPartyPseudonym || 'DISCLOSING PARTY'}
@@ -386,7 +386,7 @@ ${formData.receivingPartyType !== 'individual' ? 'Name: ________________________
 
 \f
 
-EXHIBIT A - IDENTITY CONFIRMATION LETTER
+<center><strong>EXHIBIT A - IDENTITY CONFIRMATION LETTER</strong></center>
 
 This Identity Confirmation Letter (the "Side Letter") is executed concurrently with the Non-Disclosure Agreement dated ${formData.effectiveDate} (the "Agreement") and incorporates the same by reference.
 

@@ -30,6 +30,12 @@ window.generateWordDoc = function(ndaText, formData) {
   p {
     margin-bottom: 10pt;
   }
+  strong {
+    font-weight: bold;
+  }
+  center {
+    text-align: center;
+  }
   @page Section2 {
     mso-page-orientation: portrait;
     size: 8.5in 11.0in;
