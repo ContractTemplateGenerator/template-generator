@@ -64,6 +64,16 @@ const StrategicNDAGenerator = () => {
     includeCustomInfo: false,
     customConfidentialInfo: '',
     
+    // Personal Information Types
+    includeIdentityInfo: true,
+    includeContactInfo: true,
+    includeFinancialPersonalInfo: true,
+    includeHealthInfo: true,
+    includeRelationshipInfo: true,
+    includeCorrespondenceInfo: true,
+    includeCustomPersonalInfo: false,
+    customPersonalInfo: '',
+    
     // Exclusions
     publicDomainExclusion: true,
     independentDevelopmentExclusion: true,
@@ -259,14 +269,22 @@ This Agreement involves the use of pseudonyms for privacy purposes only. The tru
       // Definition of Confidential Information
       definitionOfConfidentialInfo: `${formData.usePseudonyms ? '2' : '1'}. DEFINITION OF CONFIDENTIAL INFORMATION.
 
-"Confidential Information" means any non-public information that relates to the ${formData.confidentialInfoType === 'business' ? 'business, technical, or financial affairs' : 'personal affairs or private matters'} of either party (the "Disclosing Party") which is disclosed to the other party (the "Receiving Party"), either directly or indirectly, in writing, orally or by inspection of tangible objects${formData.confidentialInfoType === 'business' ? ', including without limitation:' : '.'} 
+"Confidential Information" means any non-public information that relates to the ${formData.confidentialInfoType === 'business' ? 'business, technical, or financial affairs' : 'personal affairs or private matters'} of either party (the "Disclosing Party") which is disclosed to the other party (the "Receiving Party"), either directly or indirectly, in writing, orally or by inspection of tangible objects${(formData.confidentialInfoType === 'business' || formData.confidentialInfoType === 'personal') ? ', including without limitation:' : '.'} 
 ${formData.confidentialInfoType === 'business' ? `
 ${formData.includeTradeSecrets ? '(a) trade secrets, inventions, ideas, processes, formulas, source and object codes, data, programs, other works of authorship, know-how, improvements, discoveries, developments, designs and techniques;' : ''}
 ${formData.includeBusinessPlans ? `${formData.includeTradeSecrets ? '(b)' : '(a)'} business plans, marketing plans, financials, forecasts, personnel information, and strategic information;` : ''}
 ${formData.includeCustomerInfo ? `${formData.includeTradeSecrets || formData.includeBusinessPlans ? (formData.includeTradeSecrets && formData.includeBusinessPlans ? '(c)' : '(b)') : '(a)'} customer lists, customer data, and customer information;` : ''}
 ${formData.includeFinancialInfo ? `${['(a)', '(b)', '(c)', '(d)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo].filter(Boolean).length)]}`+ ' financial information and pricing;' : ''}
 ${formData.includeTechnicalInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo, formData.includeFinancialInfo].filter(Boolean).length)]}`+ ' technical information, specifications, designs, and prototypes;' : ''}
-${formData.includeCustomInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo, formData.includeFinancialInfo, formData.includeTechnicalInfo].filter(Boolean).length)]}`+ ` ${formData.customConfidentialInfo};` : ''}` : ''}`,
+${formData.includeCustomInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.includeTradeSecrets, formData.includeBusinessPlans, formData.includeCustomerInfo, formData.includeFinancialInfo, formData.includeTechnicalInfo].filter(Boolean).length)]}`+ ` ${formData.customConfidentialInfo};` : ''}` : ''}
+${formData.confidentialInfoType === 'personal' ? `
+${formData.includeIdentityInfo ? '(a) identity information, including but not limited to names, dates of birth, and personal identification numbers or documents;' : ''}
+${formData.includeContactInfo ? `${formData.includeIdentityInfo ? '(b)' : '(a)'} contact information, including but not limited to addresses, phone numbers, email addresses, and social media handles;` : ''}
+${formData.includeFinancialPersonalInfo ? `${['(a)', '(b)', '(c)'][([formData.includeIdentityInfo, formData.includeContactInfo].filter(Boolean).length)]}`+ ' financial information, including but not limited to bank account details, credit card information, income data, and transaction history;' : ''}
+${formData.includeHealthInfo ? `${['(a)', '(b)', '(c)', '(d)'][([formData.includeIdentityInfo, formData.includeContactInfo, formData.includeFinancialPersonalInfo].filter(Boolean).length)]}`+ ' health and medical information, including but not limited to medical history, conditions, treatments, and insurance information;' : ''}
+${formData.includeRelationshipInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)'][([formData.includeIdentityInfo, formData.includeContactInfo, formData.includeFinancialPersonalInfo, formData.includeHealthInfo].filter(Boolean).length)]}`+ ' relationship and personal life details, including but not limited to marital status, family information, and lifestyle information;' : ''}
+${formData.includeCorrespondenceInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)'][([formData.includeIdentityInfo, formData.includeContactInfo, formData.includeFinancialPersonalInfo, formData.includeHealthInfo, formData.includeRelationshipInfo].filter(Boolean).length)]}`+ ' communications and correspondence, including but not limited to emails, text messages, and any other personal written or recorded communications;' : ''}
+${formData.includeCustomPersonalInfo ? `${['(a)', '(b)', '(c)', '(d)', '(e)', '(f)', '(g)'][([formData.includeIdentityInfo, formData.includeContactInfo, formData.includeFinancialPersonalInfo, formData.includeHealthInfo, formData.includeRelationshipInfo, formData.includeCorrespondenceInfo].filter(Boolean).length)]}`+ ` ${formData.customPersonalInfo};` : ''}` : ''}`,
 
       // Exclusions
       exclusions: `${formData.usePseudonyms ? '3' : '2'}. EXCLUSIONS FROM CONFIDENTIAL INFORMATION.
@@ -445,7 +463,11 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
         if (lastChanged === 'confidentialInfoType' || lastChanged === 'includeTradeSecrets' || 
             lastChanged === 'includeBusinessPlans' || lastChanged === 'includeCustomerInfo' || 
             lastChanged === 'includeFinancialInfo' || lastChanged === 'includeTechnicalInfo' || 
-            lastChanged === 'includeCustomInfo' || lastChanged === 'customConfidentialInfo') {
+            lastChanged === 'includeCustomInfo' || lastChanged === 'customConfidentialInfo' ||
+            lastChanged === 'includeIdentityInfo' || lastChanged === 'includeContactInfo' ||
+            lastChanged === 'includeFinancialPersonalInfo' || lastChanged === 'includeHealthInfo' ||
+            lastChanged === 'includeRelationshipInfo' || lastChanged === 'includeCorrespondenceInfo' ||
+            lastChanged === 'includeCustomPersonalInfo' || lastChanged === 'customPersonalInfo') {
           return 'definitionOfConfidentialInfo';
         } else if (lastChanged === 'publicDomainExclusion' || lastChanged === 'independentDevelopmentExclusion' || 
                   lastChanged === 'rightfulPossessionExclusion') {
@@ -1026,6 +1048,106 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
                           onChange={handleChange}
                           className="form-input"
                           placeholder="Describe other confidential information"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+              
+              {formData.confidentialInfoType === 'personal' && (
+                <div className="card">
+                  <h3 className="card-title">Types of Personal Information to Protect</h3>
+                  <div>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeIdentityInfo"
+                        checked={formData.includeIdentityInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Identity information (name, date of birth, personal identification)
+                      <Tooltip text="Includes government-issued IDs, SSN, passport information, and other identity documents.">
+                        <Icon name="help-circle" className="info-icon" />
+                      </Tooltip>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeContactInfo"
+                        checked={formData.includeContactInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Contact information (address, phone number, email)
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeFinancialPersonalInfo"
+                        checked={formData.includeFinancialPersonalInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Financial information (account details, income, transactions)
+                      <Tooltip text="Includes bank account information, credit card numbers, income information, and financial transaction history.">
+                        <Icon name="help-circle" className="info-icon" />
+                      </Tooltip>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeHealthInfo"
+                        checked={formData.includeHealthInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Health and medical information
+                      <Tooltip text="Note: Health information may be subject to additional legal protections like HIPAA in the US.">
+                        <Icon name="help-circle" className="info-icon" />
+                      </Tooltip>
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeRelationshipInfo"
+                        checked={formData.includeRelationshipInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Relationship and personal life details
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeCorrespondenceInfo"
+                        checked={formData.includeCorrespondenceInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Communications and correspondence
+                    </label>
+                    <label className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        name="includeCustomPersonalInfo"
+                        checked={formData.includeCustomPersonalInfo}
+                        onChange={handleChange}
+                        className="form-checkbox"
+                      />
+                      Other (specify below)
+                    </label>
+                    
+                    {formData.includeCustomPersonalInfo && (
+                      <div className="checkbox-group">
+                        <input
+                          type="text"
+                          name="customPersonalInfo"
+                          value={formData.customPersonalInfo}
+                          onChange={handleChange}
+                          className="form-input"
+                          placeholder="Describe other personal information"
                         />
                       </div>
                     )}
