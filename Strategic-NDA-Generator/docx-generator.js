@@ -32,6 +32,14 @@ window.generateWordDoc = function(ndaText, formData) {
   }
   .page-break {
     page-break-before: always;
+    height: 0;
+    display: block;
+    clear: both;
+  }
+  .exhibit-header {
+    margin-top: 1in;
+    font-weight: bold;
+    text-align: center;
   }
 </style>
 </head>
@@ -62,11 +70,20 @@ window.generateWordDoc = function(ndaText, formData) {
       // Add page break
       htmlContent += '<div class="page-break"></div>';
       
-      // Process side letter text
-      const sideLetterHtml = sideLetterText
+      // Add exhibit header with proper styling
+      htmlContent += '<h1 class="exhibit-header">EXHIBIT A - IDENTITY CONFIRMATION LETTER</h1>';
+      
+      // Process side letter text (skip the first line which is the header)
+      const sideLetterLines = sideLetterText.trim().split('\n\n');
+      const sideLetterContent = sideLetterLines.slice(1).join('\n\n'); // Skip the first line (header)
+      
+      const sideLetterHtml = sideLetterContent
         .split('\n\n')
         .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
         .join('');
+      
+      // Add side letter to HTML content
+      htmlContent += sideLetterHtml;
       
       // Add side letter to HTML content
       htmlContent += sideLetterHtml;

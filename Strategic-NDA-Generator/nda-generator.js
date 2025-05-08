@@ -383,7 +383,9 @@ ${formData.receivingPartyType !== 'individual' ? 'Name: ________________________
 
       // Side Letter (if using pseudonyms)
       sideLetter: formData.usePseudonyms ? `
+
 \f
+
 EXHIBIT A - IDENTITY CONFIRMATION LETTER
 
 This Identity Confirmation Letter (the "Side Letter") is executed concurrently with the Non-Disclosure Agreement dated ${formData.effectiveDate} (the "Agreement") and incorporates the same by reference.
