@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - SMLLC Generator</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        h1 {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        .check-item {
+            margin-bottom: 10px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .failure {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+        .warning {
+            background-color: #fff3cd;
+            border-color: #ffeeba;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0069d9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SMLLC Generator Debug Page</h1>
+        
+        <div id="results">
+            <p>Running diagnostics...</p>
+        </div>
+        
+        <button id="testReact">Test React Rendering</button>
+        <button id="testFeather">Test Feather Icons</button>
+        <button id="checkFiles">Check File Availability</button>
+        <button id="testDocx">Test DOCX Generation</button>
+        
+        <div id="reactTest"></div>
+    </div>
+    
+    <script>
+        // Function to add result items
+        function addResult(message, status) {
+            const resultsDiv = document.getElementById('results');
+            const item = document.createElement('div');
+            item.className = `check-item ${status}`;
+            item.textContent = message;
+            resultsDiv.appendChild(item);
+        }
+        
+        // Run basic diagnostics
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear initial message
+            document.getElementById('results').innerHTML = '';
+            
+            // Check JavaScript
+            addResult('JavaScript is enabled', 'success');
+            
+            // Check React availability
+            if (typeof React !== 'undefined' && typeof ReactDOM !== 'undefined') {
+                addResult('React and ReactDOM are available', 'success');
+            } else {
+                addResult('React and/or ReactDOM are not loaded', 'failure');
+            }
+            
+            // Check Babel availability
+            if (typeof Babel !== 'undefined') {
+                addResult('Babel is available', 'success');
+            } else {
+                addResult('Babel is not loaded', 'failure');
+            }
+            
+            // Check Feather Icons availability
+            if (typeof feather !== 'undefined') {
+                addResult('Feather Icons is available', 'success');
+            } else {
+                addResult('Feather Icons is not loaded', 'failure');
+            }
+            
+            // Display browser information
+            addResult(`Browser: ${navigator.userAgent}`, 'info');
+        });
+        
+        // Test React rendering
+        document.getElementById('testReact').addEventListener('click', function() {
+            try {
+                const domContainer = document.getElementById('reactTest');
+                domContainer.innerHTML = '';
+                
+                // Create simple React component
+                const element = React.createElement('div', null, 
+                    React.createElement('h2', null, 'React Test Component'),
+                    React.createElement('p', null, 'This is rendered by React')
+                );
+                
+                ReactDOM.render(element, domContainer);
+                addResult('React rendering test passed', 'success');
+            } catch (error) {
+                addResult(`React rendering test failed: ${error.message}`, 'failure');
+                console.error(error);
+            }
+        });
+        
+        // Test Feather Icons
+        document.getElementById('testFeather').addEventListener('click', function() {
+            try {
+                const domContainer = document.getElementById('reactTest');
+                domContainer.innerHTML = '<i data-feather="alert-circle"></i>';
+                feather.replace();
+                addResult('Feather Icons test passed', 'success');
+            } catch (error) {
+                addResult(`Feather Icons test failed: ${error.message}`, 'failure');
+                console.error(error);
+            }
+        });
+        
+        // Check file availability
+        document.getElementById('checkFiles').addEventListener('click', function() {
+            const files = [
+                'index.html',
+                'styles.css',
+                'smllc-oa-generator.js',
+                'docx-generator.js'
+            ];
+            
+            files.forEach(file => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('HEAD', file, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            addResult(`${file} is available`, 'success');
+                        } else {
+                            addResult(`${file} returned status ${xhr.status}`, 'failure');
+                        }
+                    }
+                };
+                xhr.send();
+            });
+        });
+        
+        // Test DOCX generation
+        document.getElementById('testDocx').addEventListener('click', function() {
+            try {
+                if (typeof window.generateWordDoc === 'function') {
+                    addResult('DOCX generator function is available', 'success');
+                    // Create a minimal test
+                    window.generateWordDoc('Test document content', {
+                        companyName: 'Test Company',
+                        stateOfFormation: 'Test State'
+                    });
+                } else {
+                    addResult('DOCX generator function is not available', 'failure');
+                }
+            } catch (error) {
+                addResult(`DOCX generator test failed: ${error.message}`, 'failure');
+                console.error(error);
+            }
+        });
+    </script>
+    
+    <!-- Load React and ReactDOM -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <!-- Load Babel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <!-- Load Feather Icons -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <!-- Load docx generator -->
+    <script src="docx-generator.js"></script>
+</body>
+</html>

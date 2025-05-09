@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple SMLLC Operating Agreement Generator | terms.law</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.5;
+            color: #1f2937;
+            background-color: #f9fafb;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 0;
+            margin-bottom: 1.5rem;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #111827;
+        }
+        
+        .generator {
+            display: flex;
+            gap: 2rem;
+            align-items: flex-start;
+        }
+        
+        .form-panel {
+            flex: 1;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            min-width: 500px;
+        }
+        
+        .preview-panel {
+            flex: 1;
+            position: sticky;
+            top: 1.5rem;
+            max-height: calc(100vh - 3rem);
+            overflow-y: auto;
+            background-color: #ffffff;
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+        }
+        
+        .form-heading {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #111827;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+        
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.625rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+        
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .form-hint {
+            margin-top: 0.375rem;
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+        
+        .form-warning {
+            margin-top: 0.375rem;
+            font-size: 0.75rem;
+            color: #f59e0b;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+        
+        .button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.625rem 1.25rem;
+            border: 1px solid transparent;
+            border-radius: 0.25rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+        
+        .button-primary {
+            background-color: #2563eb;
+            color: #ffffff;
+        }
+        
+        .button-primary:hover {
+            background-color: #1d4ed8;
+        }
+        
+        .button-secondary {
+            background-color: #4f46e5;
+            color: #ffffff;
+        }
+        
+        .button-secondary:hover {
+            background-color: #4338ca;
+        }
+        
+        .button-success {
+            background-color: #10b981;
+            color: #ffffff;
+        }
+        
+        .button-success:hover {
+            background-color: #059669;
+        }
+        
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            padding: 1.5rem;
+            background-color: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.25rem;
+            max-height: calc(100vh - 10rem);
+            overflow-y: auto;
+        }
+        
+        @media (max-width: 1100px) {
+            .generator {
+                flex-direction: column;
+            }
+            
+            .form-panel, .preview-panel {
+                width: 100%;
+                min-width: 0;
+            }
+            
+            .preview-panel {
+                margin-top: 1.5rem;
+                position: static;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <h1 class="logo">Single-Member LLC Operating Agreement Generator</h1>
+            </div>
+        </header>
+        
+        <div class="generator">
+            <!-- Form Panel -->
+            <div class="form-panel">
+                <h2 class="form-heading">Create Your Operating Agreement</h2>
+                
+                <form id="agreementForm">
+                    <!-- Basic Information Section -->
+                    <div class="form-group">
+                        <label class="form-label" for="companyName">Company Name</label>
+                        <input type="text" id="companyName" name="companyName" class="form-input" placeholder="e.g. Acme Consulting, LLC" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="stateOfFormation">State of Formation</label>
+                        <select id="stateOfFormation" name="stateOfFormation" class="form-select" required>
+                            <option value="">Select State</option>
+                            <option value="Alabama">Alabama</option>
+                            <option value="Alaska">Alaska</option>
+                            <option value="Arizona">Arizona</option>
+                            <option value="Arkansas">Arkansas</option>
+                            <option value="California">California</option>
+                            <option value="Colorado">Colorado</option>
+                            <option value="Connecticut">Connecticut</option>
+                            <option value="Delaware">Delaware</option>
+                            <option value="Florida">Florida</option>
+                            <option value="Georgia">Georgia</option>
+                            <option value="Hawaii">Hawaii</option>
+                            <option value="Idaho">Idaho</option>
+                            <option value="Illinois">Illinois</option>
+                            <option value="Indiana">Indiana</option>
+                            <option value="Iowa">Iowa</option>
+                            <option value="Kansas">Kansas</option>
+                            <option value="Kentucky">Kentucky</option>
+                            <option value="Louisiana">Louisiana</option>
+                            <option value="Maine">Maine</option>
+                            <option value="Maryland">Maryland</option>
+                            <option value="Massachusetts">Massachusetts</option>
+                            <option value="Michigan">Michigan</option>
+                            <option value="Minnesota">Minnesota</option>
+                            <option value="Mississippi">Mississippi</option>
+                            <option value="Missouri">Missouri</option>
+                            <option value="Montana">Montana</option>
+                            <option value="Nebraska">Nebraska</option>
+                            <option value="Nevada">Nevada</option>
+                            <option value="New Hampshire">New Hampshire</option>
+                            <option value="New Jersey">New Jersey</option>
+                            <option value="New Mexico">New Mexico</option>
+                            <option value="New York">New York</option>
+                            <option value="North Carolina">North Carolina</option>
+                            <option value="North Dakota">North Dakota</option>
+                            <option value="Ohio">Ohio</option>
+                            <option value="Oklahoma">Oklahoma</option>
+                            <option value="Oregon">Oregon</option>
+                            <option value="Pennsylvania">Pennsylvania</option>
+                            <option value="Rhode Island">Rhode Island</option>
+                            <option value="South Carolina">South Carolina</option>
+                            <option value="South Dakota">South Dakota</option>
+                            <option value="Tennessee">Tennessee</option>
+                            <option value="Texas">Texas</option>
+                            <option value="Utah">Utah</option>
+                            <option value="Vermont">Vermont</option>
+                            <option value="Virginia">Virginia</option>
+                            <option value="Washington">Washington</option>
+                            <option value="West Virginia">West Virginia</option>
+                            <option value="Wisconsin">Wisconsin</option>
+                            <option value="Wyoming">Wyoming</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="memberName">Member Name</label>
+                        <input type="text" id="memberName" name="memberName" class="form-input" placeholder="e.g. Jane Smith" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="principalAddress">Principal Office Address</label>
+                        <textarea id="principalAddress" name="principalAddress" class="form-textarea" placeholder="Street Address, City, State, ZIP" required></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label" for="formationDate">Formation Date</label>
+                        <input type="text" id="formationDate" name="formationDate" class="form-input" placeholder="e.g. January 15, 2025" required>
+                    </div>
+                    
+                    <div class="button-group">
+                        <button type="button" id="previewButton" class="button button-primary">Generate Preview</button>
+                        <button type="button" id="copyButton" class="button button-secondary">Copy to Clipboard</button>
+                        <a href="https://terms.law/call/" target="_blank" class="button button-success">Schedule Consultation</a>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <h2 class="form-heading">Document Preview</h2>
+                <pre id="documentPreview" class="document-preview">Complete the form and click "Generate Preview" to see your Operating Agreement.</pre>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const previewButton = document.getElementById('previewButton');
+            const copyButton = document.getElementById('copyButton');
+            const documentPreview = document.getElementById('documentPreview');
+            
+            previewButton.addEventListener('click', function() {
+                const companyName = document.getElementById('companyName').value;
+                const stateOfFormation = document.getElementById('stateOfFormation').value;
+                const memberName = document.getElementById('memberName').value;
+                const principalAddress = document.getElementById('principalAddress').value;
+                const formationDate = document.getElementById('formationDate').value;
+                
+                if (!companyName || !stateOfFormation || !memberName || !principalAddress || !formationDate) {
+                    alert('Please fill in all required fields.');
+                    return;
+                }
+                
+                // Format today's date
+                const today = new Date();
+                const formattedDate = today.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Generate document
+                const documentText = `
+OPERATING AGREEMENT
+OF
+${companyName.toUpperCase()}
+A ${stateOfFormation} SINGLE-MEMBER LIMITED LIABILITY COMPANY
+
+This Operating Agreement (the "Agreement") is made and entered into as of ${formattedDate} by and for the benefit of ${memberName} (the "Member"), as the sole member of ${companyName} (the "Company"), a single-member limited liability company organized under the laws of the State of ${stateOfFormation}.
+
+ARTICLE 1
+FORMATION OF THE LIMITED LIABILITY COMPANY
+
+1.1. Formation. The Company was formed on ${formationDate} when Articles of Organization were filed with the Secretary of State of ${stateOfFormation} in accordance with the laws of the State of ${stateOfFormation}.
+
+1.2. Name. The name of the Company is ${companyName}.
+
+1.3. Principal Place of Business. The principal place of business of the Company shall be located at ${principalAddress}, or such other location as determined by the Member.
+
+1.4. Registered Office and Agent. The registered office of the Company shall be located at ${principalAddress}, and the registered agent shall be ${memberName}.
+
+1.5. Term. The Company shall continue perpetually unless dissolved in accordance with this Agreement or as otherwise provided by law.
+
+1.6. Purpose. The purpose of the Company is to engage in any lawful business activity for which Limited Liability Companies may be organized in the State.
+
+1.7. Intent. It is the intent of the Member that the Company be operated in a manner consistent with its treatment as a "disregarded entity" for federal and state income tax purposes. The Member shall not take any action inconsistent with the treatment of the Company as a disregarded entity for tax purposes.
+
+ARTICLE 2
+MEMBER INFORMATION
+
+2.1. Member. The name and address of the sole Member of the Company is:
+Name: ${memberName}
+Address: ${principalAddress}
+
+ARTICLE 3
+CAPITAL CONTRIBUTIONS AND DISTRIBUTIONS
+
+3.1. Initial Capital Contribution. The Member has contributed cash and/or property to the Company as an initial capital contribution.
+
+3.2. Additional Capital Contributions. Additional capital contributions are not required from the Member. However, the Member may make additional capital contributions at their discretion.
+
+3.3. Capital Accounts. A capital account shall be maintained for the Member in accordance with applicable tax regulations.
+
+3.4. Distributions. Distributions of cash or other assets shall be made to the Member at times determined by the Member, but no less than quarterly. Distributions shall be made only when the Company has sufficient cash that exceeds its current and anticipated expenses, including reasonable reserves for future expenses, liabilities, and contingencies.
+
+ARTICLE 4
+MANAGEMENT AND OPERATIONS
+
+4.1. Management. The business and affairs of the Company shall be managed by ${memberName} (the "Manager").
+
+4.2. Authority of Manager. The Manager shall have full and complete authority, power, and discretion to manage and control the business, affairs, and properties of the Company, to make all decisions regarding those matters, and to perform any and all other acts or activities customary or incidental to the management of the Company's business.
+
+4.3. Banking. All funds of the Company shall be deposited in a bank account or accounts in the name of the Company. Withdrawals from such accounts shall require the signature of ${memberName}.
+
+4.4. Fiscal Year. The fiscal year of the Company shall end on December 31.
+
+4.5. Books and Records. The Company shall maintain complete and accurate books and records of the Company's business and affairs as required by applicable law, and such books and records shall be available for inspection by the Member at any time.
+
+4.6. Indemnification. The Company shall indemnify the Member to the fullest extent permitted by law against all claims and liabilities arising in connection with the business of the Company.
+
+ARTICLE 5
+TRANSFER OF MEMBERSHIP INTEREST
+
+5.1. Transfer Restrictions. The Member may transfer all or any portion of the Member's interest in the Company at any time. Any transferee shall immediately become a Member of the Company upon the completion of the transfer.
+
+5.2. Death or Incapacity of Member. In the event of the death or incapacity of the Member, the Member's estate, heir, or legal representative shall become the successor Member of the Company.
+
+ARTICLE 6
+DISSOLUTION AND WINDING UP
+
+6.1. Dissolution. The Company shall be dissolved upon the occurrence of any of the following events:
+   (a) The written decision of the Member to dissolve the Company;
+   (b) The death or incapacity of the Member, unless provision is made for the succession of a new Member;
+   (c) The bankruptcy or insolvency of the Member; or
+   (d) As otherwise required by law.
+
+6.2. Winding Up. Upon dissolution, the Company shall cease carrying on its business, except as necessary to wind up its business and affairs. The Member shall be responsible for winding up the affairs of the Company and shall take full account of the Company's assets and liabilities.
+
+6.3. Distribution of Assets. Upon the winding up of the Company, the assets shall be distributed as follows:
+   (a) To creditors, including the Member if a creditor, in satisfaction of the Company's liabilities; and
+   (b) To the Member.
+
+ARTICLE 7
+MISCELLANEOUS PROVISIONS
+
+7.1. Amendment. This Agreement may not be amended by the Manager. Any amendment requires the written consent of the Member.
+
+7.2. Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${stateOfFormation}.
+
+7.3. Entire Agreement. This Agreement constitutes the entire agreement of the Member with respect to the Company and supersedes all prior agreements or understandings with respect to the Company, whether written or oral.
+
+7.4. Severability. If any provision of this Agreement is held to be illegal, invalid, or unenforceable, such provision shall be fully severable, and this Agreement shall be construed as if such provision had never been a part of this Agreement, with the remaining provisions remaining in full force and effect.
+
+7.5. Binding Effect. This Agreement shall be binding upon and inure to the benefit of the Member, the Member's heirs, successors, assigns, and personal representatives.
+
+7.6. Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
+
+7.7. Electronic Signatures. Electronic signatures shall be deemed to be original signatures for all purposes of this Agreement.
+
+IN WITNESS WHEREOF, the undersigned, being the sole Member of the Company, has executed this Operating Agreement as of the date first written above.
+
+
+MEMBER:
+
+_______________________________
+${memberName}
+${formattedDate}
+`;
+                
+                documentPreview.textContent = documentText;
+            });
+            
+            copyButton.addEventListener('click', function() {
+                try {
+                    const documentText = documentPreview.textContent;
+                    navigator.clipboard.writeText(documentText);
+                    alert('Document copied to clipboard!');
+                } catch (error) {
+                    console.error('Error copying to clipboard:', error);
+                    alert('Unable to copy to clipboard. Please try again.');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
