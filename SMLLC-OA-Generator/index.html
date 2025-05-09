@@ -44,6 +44,20 @@
             );
         };
         
+        // Helper function to determine if "A" or "An" should be used with state names
+        const getStateArticle = (stateName) => {
+            if (!stateName) return "A";
+            
+            // List of states that should use "An" based on their pronunciation
+            const anStates = [
+                "Alabama", "Alaska", "Arizona", "Arkansas", 
+                "Idaho", "Illinois", "Indiana", "Iowa", 
+                "Ohio", "Oklahoma", "Oregon", "Utah"
+            ];
+            
+            return anStates.includes(stateName) ? "An" : "A";
+        };
+        
         // Word document generation functionality
         window.generateWordDoc = function(documentText, formData) {
             try {
@@ -61,7 +75,7 @@
             font-family: Calibri, Arial, sans-serif;
             font-size: 12pt;
             line-height: 1.5;
-            margin: 1in;
+            margin: 0.5in;
           }
           h1 {
             text-align: center;
@@ -70,6 +84,7 @@
             margin-bottom: 20pt;
           }
           h2 {
+            text-align: center;
             font-size: 14pt;
             font-weight: bold;
             margin-top: 14pt;
@@ -77,6 +92,12 @@
           }
           p {
             margin-bottom: 10pt;
+          }
+          .center {
+            text-align: center;
+          }
+          .bold {
+            font-weight: bold;
           }
           .page-break {
             page-break-before: always;
@@ -91,12 +112,13 @@
         <body>
         `;
         
-                // Process document text - convert newlines to HTML paragraphs and handle section headers
+                // Process document text - apply centering and bold to titles and headings
                 const processedText = documentText
-                  .replace(/\n\n([A-Z][A-Z\s]+[A-Z])\n\n/g, '<h2>$1</h2>\n\n') // Convert section titles to h2
+                  .replace(/\n\n(OPERATING AGREEMENT[\s\S]*?COMPANY)\n\n/g, '<h1>$1</h1>\n\n')
+                  .replace(/\n\n(ARTICLE \d+[\s\S]*?)\n\n/g, '<h2>$1</h2>\n\n')
                   .split('\n\n')
                   .map(para => {
-                    if (para.startsWith('<h2>')) return para;
+                    if (para.startsWith('<h1>') || para.startsWith('<h2>')) return para;
                     return para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '';
                   })
                   .join('');
@@ -396,11 +418,14 @@
                 // Use principal address if registered office address is empty
                 const actualRegisteredOfficeAddress = registeredOfficeAddress || principalOfficeAddress;
                 
+                // Determine A vs An for state name
+                const stateArticle = getStateArticle(stateOfFormation);
+                
                 return `
 OPERATING AGREEMENT
 OF
 ${companyName.toUpperCase()}
-A ${stateOfFormation} SINGLE-MEMBER LIMITED LIABILITY COMPANY
+${stateArticle} ${stateOfFormation} SINGLE-MEMBER LIMITED LIABILITY COMPANY
 
 This Operating Agreement (the "Agreement") is made and entered into as of ${effectiveDate || formattedDate} by and for the benefit of ${memberName} (the "Member"), as the sole member of ${companyName} (the "Company"), a single-member limited liability company organized under the laws of the State of ${stateOfFormation}.
 
