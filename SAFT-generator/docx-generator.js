@@ -16,7 +16,7 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 1in;
+    /* No custom margins, use Word defaults */
   }
   h1 {
     text-align: center;
@@ -62,8 +62,21 @@ window.generateWordDoc = function(documentText, formData) {
     
     // Process main text - convert newlines to HTML paragraphs
     const processText = (text) => {
+      // First find and format the title (SIMPLE AGREEMENT FOR FUTURE TOKENS)
+      let processedText = text;
+      
+      // Handle the title (first line)
+      const lines = processedText.split('\n\n');
+      if (lines.length > 0 && lines[0].includes('SIMPLE AGREEMENT FOR FUTURE TOKENS')) {
+        lines[0] = `<h1>${lines[0]}</h1>`;
+        processedText = lines.join('\n\n');
+      }
+      
       // Handle section headers (lines that end with a colon)
-      let processedText = text.replace(/^([A-Z][A-Za-z\s]+):$/gm, '<h2>$1</h2>');
+      processedText = processedText.replace(/^([A-Z][A-Za-z\s]+):$/gm, '<h2>$1</h2>');
+      
+      // Handle numeric section headers (e.g., "1. EVENTS")
+      processedText = processedText.replace(/^(\d+\.\s+[A-Z][A-Za-z\s]+)$/gm, '<h2>$1</h2>');
       
       // Process remaining paragraphs
       return processedText
@@ -73,7 +86,7 @@ window.generateWordDoc = function(documentText, formData) {
           if (!para) return '';
           
           // Check if this paragraph is already a header
-          if (para.startsWith('<h2>')) return para;
+          if (para.startsWith('<h1>') || para.startsWith('<h2>')) return para;
           
           // Regular paragraph
           return `<p>${para.replace(/\n/g, '<br>')}</p>`;
