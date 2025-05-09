@@ -28,8 +28,7 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
         name: '',
         address: '',
         contributionAmount: '',
-        ownershipPercentage: '',
-        taxId: '', // SSN or EIN
+        ownershipPercentage: '100',
       }
     ],
     
@@ -39,6 +38,7 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
         name: '',
         address: '',
         isAlsoMember: true,
+        memberId: -1, // -1 means manually entered, otherwise index of member
       }
     ],
     
@@ -65,7 +65,6 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
     // Dispute Resolution
     disputeResolution: 'mediation-then-arbitration', // 'litigation', 'arbitration', 'mediation-then-arbitration'
     lawGoverning: 'California',
-    venueForDisputes: 'Los Angeles County',
   });
   
   // State for tracking tabs
@@ -76,8 +75,8 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
   // Tabs configuration
   const tabs = [
     { id: 'company-info', label: 'Company Information' },
-    { id: 'business-details', label: 'Business Details' },
     { id: 'member-info', label: 'Member Information' },
+    { id: 'business-details', label: 'Business Details' },
     { id: 'management-capital', label: 'Management & Capital' },
     { id: 'distributions-transfer', label: 'Distributions & Transfer' },
     { id: 'dissolution-amendments', label: 'Dissolution & Amendments' }
@@ -154,6 +153,43 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
       [field]: value
     };
     
+    // If changing ownership percentage, recalculate other members' percentages
+    if (field === 'ownershipPercentage') {
+      const newPercentage = parseFloat(value) || 0;
+      const oldPercentage = parseFloat(updatedMembers[index].ownershipPercentage) || 0;
+      const percentageDiff = newPercentage - oldPercentage;
+      
+      // Only recalculate if we have more than one member
+      if (updatedMembers.length > 1 && percentageDiff !== 0) {
+        // Calculate total percentage of other members
+        const otherMembersTotal = updatedMembers.reduce((total, member, i) => {
+          if (i !== index) {
+            return total + (parseFloat(member.ownershipPercentage) || 0);
+          }
+          return total;
+        }, 0);
+        
+        // Distribute the difference proportionally among other members
+        if (otherMembersTotal > 0) {
+          updatedMembers.forEach((member, i) => {
+            if (i !== index) {
+              const currentPercentage = parseFloat(member.ownershipPercentage) || 0;
+              const proportion = currentPercentage / otherMembersTotal;
+              const adjustment = percentageDiff * proportion * -1;
+              member.ownershipPercentage = Math.max(0, (currentPercentage + adjustment)).toFixed(2);
+              
+              // Remove trailing zeros
+              if (member.ownershipPercentage.endsWith('.00')) {
+                member.ownershipPercentage = member.ownershipPercentage.split('.')[0];
+              } else if (member.ownershipPercentage.endsWith('0')) {
+                member.ownershipPercentage = member.ownershipPercentage.slice(0, -1);
+              }
+            }
+          });
+        }
+      }
+    }
+    
     setFormData(prev => ({
       ...prev,
       members: updatedMembers
@@ -164,16 +200,32 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
   
   // Add a new member
   const addMember = () => {
+    // Calculate equal distribution of ownership percentages
+    const currentMembers = [...formData.members];
+    const newTotalMembers = currentMembers.length + 1;
+    const equalPercentage = (100 / newTotalMembers).toFixed(2);
+    
+    // Adjust existing members' percentages
+    currentMembers.forEach(member => {
+      member.ownershipPercentage = equalPercentage;
+      
+      // Remove trailing zeros
+      if (member.ownershipPercentage.endsWith('.00')) {
+        member.ownershipPercentage = member.ownershipPercentage.split('.')[0];
+      } else if (member.ownershipPercentage.endsWith('0')) {
+        member.ownershipPercentage = member.ownershipPercentage.slice(0, -1);
+      }
+    });
+    
     setFormData(prev => ({
       ...prev,
       members: [
-        ...prev.members,
+        ...currentMembers,
         {
           name: '',
           address: '',
           contributionAmount: '',
-          ownershipPercentage: '',
-          taxId: '',
+          ownershipPercentage: equalPercentage,
         }
       ]
     }));
@@ -183,11 +235,48 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
   const removeMember = (index) => {
     if (formData.members.length > 1) {
       const updatedMembers = [...formData.members];
+      const removedPercentage = parseFloat(updatedMembers[index].ownershipPercentage) || 0;
+      
+      // Remove the member
       updatedMembers.splice(index, 1);
+      
+      // Redistribute the removed member's percentage among remaining members
+      if (removedPercentage > 0) {
+        const remainingCount = updatedMembers.length;
+        const addPercentage = removedPercentage / remainingCount;
+        
+        updatedMembers.forEach(member => {
+          const currentPercentage = parseFloat(member.ownershipPercentage) || 0;
+          member.ownershipPercentage = (currentPercentage + addPercentage).toFixed(2);
+          
+          // Remove trailing zeros
+          if (member.ownershipPercentage.endsWith('.00')) {
+            member.ownershipPercentage = member.ownershipPercentage.split('.')[0];
+          } else if (member.ownershipPercentage.endsWith('0')) {
+            member.ownershipPercentage = member.ownershipPercentage.slice(0, -1);
+          }
+        });
+      }
+      
+      // Update managers if any refer to this member
+      const updatedManagers = [...formData.managers];
+      updatedManagers.forEach(manager => {
+        if (manager.memberId === index) {
+          // Reset to manual entry
+          manager.memberId = -1;
+          manager.name = '';
+          manager.address = '';
+          manager.isAlsoMember = false;
+        } else if (manager.memberId > index) {
+          // Adjust indices for managers referring to members after the removed one
+          manager.memberId -= 1;
+        }
+      });
       
       setFormData(prev => ({
         ...prev,
-        members: updatedMembers
+        members: updatedMembers,
+        managers: updatedManagers
       }));
     }
   };
@@ -195,10 +284,37 @@ const CaliforniaLLCOperatingAgreementGenerator = () => {
   // Handle manager form changes
   const handleManagerChange = (index, field, value) => {
     const updatedManagers = [...formData.managers];
-    updatedManagers[index] = {
-      ...updatedManagers[index],
-      [field]: value
-    };
+    
+    if (field === 'memberId') {
+      const memberId = parseInt(value);
+      
+      if (memberId >= 0) {
+        // Selected an existing member, copy their information
+        const selectedMember = formData.members[memberId];
+        updatedManagers[index] = {
+          ...updatedManagers[index],
+          memberId: memberId,
+          name: selectedMember.name,
+          address: selectedMember.address,
+          isAlsoMember: true
+        };
+      } else {
+        // Selected "Other", reset fields for manual entry
+        updatedManagers[index] = {
+          ...updatedManagers[index],
+          memberId: -1,
+          name: '',
+          address: '',
+          isAlsoMember: false
+        };
+      }
+    } else {
+      // Normal field update
+      updatedManagers[index] = {
+        ...updatedManagers[index],
+        [field]: value
+      };
+    }
     
     setFormData(prev => ({
       ...prev,
@@ -281,8 +397,7 @@ PURPOSE AND POWERS
     ${index + 1}. ${member.name || `[MEMBER ${index + 1} NAME]`}
        Address: ${member.address || `[MEMBER ${index + 1} ADDRESS]`}
        Initial Capital Contribution: $${member.contributionAmount || '0.00'}
-       Ownership Percentage: ${member.ownershipPercentage || '0'}%
-       Tax Identification Number: ${member.taxId || `[MEMBER ${index + 1} TAX ID]`}`;
+       Ownership Percentage: ${member.ownershipPercentage || '0'}%`;
       }
     });
     
@@ -478,10 +593,10 @@ MISCELLANEOUS
 
 9.3 Dispute Resolution. Any dispute arising out of or relating to this Agreement shall be resolved by ${
       formData.disputeResolution === 'litigation' 
-        ? 'litigation in the courts of ' + (formData.venueForDisputes || 'Los Angeles County, California') 
+        ? 'litigation in the courts of the State of ' + (formData.lawGoverning || 'California') 
         : formData.disputeResolution === 'arbitration' 
-          ? 'binding arbitration in ' + (formData.venueForDisputes || 'Los Angeles County, California') + ' in accordance with the rules of the American Arbitration Association' 
-          : 'mediation in ' + (formData.venueForDisputes || 'Los Angeles County, California') + ' and, if mediation is unsuccessful, by binding arbitration in accordance with the rules of the American Arbitration Association'
+          ? 'binding arbitration in the State of ' + (formData.lawGoverning || 'California') + ' in accordance with the rules of the American Arbitration Association' 
+          : 'mediation in the State of ' + (formData.lawGoverning || 'California') + ' and, if mediation is unsuccessful, by binding arbitration in accordance with the rules of the American Arbitration Association'
     }.
 
 9.4 Severability. If any provision of this Agreement is held to be invalid or unenforceable, such provision shall be struck and the remaining provisions shall be enforced.
@@ -876,6 +991,93 @@ ${signatureBlock}`;
           </select>
         </div>
         
+        {formData.managementType === 'manager-managed' && (
+          <div className="managers-section">
+            <h4>Manager Information</h4>
+            <p className="tab-description">Since you selected Manager-Managed, please add information about each manager.</p>
+            
+            {formData.managers.map((manager, index) => (
+              <div key={index} className="member-card">
+                <h4>Manager {index + 1}</h4>
+                
+                <div className="form-group">
+                  <label>
+                    Manager Selection
+                    <div className="tooltip">
+                      <i data-feather="info" className="info-icon"></i>
+                      <span className="tooltiptext">Select an existing member or choose "Other" to enter a manager who is not a member.</span>
+                    </div>
+                  </label>
+                  <select
+                    value={manager.memberId}
+                    onChange={(e) => handleManagerChange(index, 'memberId', e.target.value)}
+                  >
+                    <option value="-1">Other (Enter manually)</option>
+                    {formData.members.map((member, i) => (
+                      <option key={i} value={i} disabled={!member.name}>
+                        {member.name || `Member ${i+1} (No name entered)`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {manager.memberId === -1 && (
+                  <>
+                    <div className="form-group">
+                      <label>Full Name*</label>
+                      <input 
+                        type="text" 
+                        value={manager.name} 
+                        onChange={(e) => handleManagerChange(index, 'name', e.target.value)} 
+                        placeholder="e.g., Jane Smith"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label>Address*</label>
+                      <input 
+                        type="text" 
+                        value={manager.address} 
+                        onChange={(e) => handleManagerChange(index, 'address', e.target.value)} 
+                        placeholder="e.g., 123 Main St, Los Angeles, CA 90001"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label className="checkbox-label">
+                        <input 
+                          type="checkbox" 
+                          checked={manager.isAlsoMember} 
+                          onChange={(e) => handleManagerChange(index, 'isAlsoMember', e.target.checked)}
+                        />
+                        <span>This manager is also a member of the LLC</span>
+                      </label>
+                    </div>
+                  </>
+                )}
+                
+                {formData.managers.length > 1 && (
+                  <button 
+                    type="button" 
+                    className="remove-button" 
+                    onClick={() => removeManager(index)}
+                  >
+                    <i data-feather="trash-2"></i> Remove Manager
+                  </button>
+                )}
+              </div>
+            ))}
+            
+            <button 
+              type="button" 
+              className="add-button" 
+              onClick={addManager}
+            >
+              <i data-feather="plus-circle"></i> Add Manager
+            </button>
+          </div>
+        )}
+        
         <div className="warning-box">
           <strong>California Tax Notice:</strong> California LLCs are subject to an annual $800 minimum franchise tax, regardless of income or activity, due by the 15th day of the 4th month after the tax year begins.
         </div>
@@ -885,10 +1087,27 @@ ${signatureBlock}`;
   
   // Render member information tab
   const renderMemberInfoTab = () => {
+    // Calculate current total percentage
+    const totalPercentage = formData.members.reduce((sum, member) => {
+      return sum + (parseFloat(member.ownershipPercentage) || 0);
+    }, 0).toFixed(2);
+    
     return (
       <div className="form-tab">
         <h3>Member Information</h3>
         <p className="tab-description">Add information about each member of the LLC. Every LLC must have at least one member.</p>
+        
+        <div className="total-percentage-display">
+          <span className={totalPercentage == 100 ? 'percentage-ok' : 'percentage-warning'}>
+            Total Ownership: {totalPercentage}%
+            {totalPercentage != 100 && 
+              <div className="tooltip">
+                <i data-feather="alert-circle" className="warning-icon"></i>
+                <span className="tooltiptext">Total ownership should equal exactly 100%</span>
+              </div>
+            }
+          </span>
+        </div>
         
         {formData.members.map((member, index) => (
           <div key={index} className="member-card">
@@ -936,32 +1155,37 @@ ${signatureBlock}`;
                   Ownership Percentage (%)*
                   <div className="tooltip">
                     <i data-feather="info" className="info-icon"></i>
-                    <span className="tooltiptext">The member's percentage ownership in the LLC. All members' percentages should total 100%.</span>
+                    <span className="tooltiptext">The member's percentage ownership in the LLC. All members' percentages automatically adjust to total 100%.</span>
                   </div>
                 </label>
-                <input 
-                  type="text" 
-                  value={member.ownershipPercentage} 
-                  onChange={(e) => handleMemberChange(index, 'ownershipPercentage', e.target.value)} 
-                  placeholder="e.g., 50"
-                />
-              </div>
-            </div>
-            
-            <div className="form-group">
-              <label>
-                Tax ID Number (SSN or EIN)
-                <div className="tooltip">
-                  <i data-feather="info" className="info-icon"></i>
-                  <span className="tooltiptext">For individuals: Social Security Number. For entities: Employer Identification Number.</span>
+                <div className="percentage-input-container">
+                  <input 
+                    type="number" 
+                    min="0"
+                    max="100"
+                    step="1"
+                    value={member.ownershipPercentage} 
+                    onChange={(e) => handleMemberChange(index, 'ownershipPercentage', e.target.value)} 
+                    placeholder="e.g., 50"
+                  />
+                  <div className="percentage-controls">
+                    <button 
+                      type="button" 
+                      className="percentage-control" 
+                      onClick={() => handleMemberChange(index, 'ownershipPercentage', (parseFloat(member.ownershipPercentage) || 0) + 1)}
+                    >
+                      <i data-feather="chevron-up" className="percentage-icon"></i>
+                    </button>
+                    <button 
+                      type="button" 
+                      className="percentage-control" 
+                      onClick={() => handleMemberChange(index, 'ownershipPercentage', Math.max(0, (parseFloat(member.ownershipPercentage) || 0) - 1))}
+                    >
+                      <i data-feather="chevron-down" className="percentage-icon"></i>
+                    </button>
+                  </div>
                 </div>
-              </label>
-              <input 
-                type="text" 
-                value={member.taxId} 
-                onChange={(e) => handleMemberChange(index, 'taxId', e.target.value)} 
-                placeholder="e.g., XXX-XX-XXXX or XX-XXXXXXX"
-              />
+              </div>
             </div>
             
             {formData.members.length > 1 && (
@@ -985,76 +1209,9 @@ ${signatureBlock}`;
         </button>
         
         <div className="info-box">
-          <strong>Note:</strong> Ensure that all members' ownership percentages total 100%. Capital contributions and ownership percentages don't have to be proportional.
+          <strong>Note:</strong> When you add or remove members, ownership percentages are automatically adjusted to maintain a 100% total. You can fine-tune percentages using the up/down arrows.
         </div>
       </div>
-    );
-  };
-  
-  // Render manager information for manager-managed LLCs
-  const renderManagerSection = () => {
-    if (formData.managementType !== 'manager-managed') return null;
-    
-    return (
-      <>
-        <h4>Manager Information</h4>
-        <p className="tab-description">Add information about each manager of the LLC.</p>
-        
-        {formData.managers.map((manager, index) => (
-          <div key={index} className="member-card">
-            <h4>Manager {index + 1}</h4>
-            
-            <div className="form-group">
-              <label>Full Name*</label>
-              <input 
-                type="text" 
-                value={manager.name} 
-                onChange={(e) => handleManagerChange(index, 'name', e.target.value)} 
-                placeholder="e.g., Jane Smith"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Address*</label>
-              <input 
-                type="text" 
-                value={manager.address} 
-                onChange={(e) => handleManagerChange(index, 'address', e.target.value)} 
-                placeholder="e.g., 123 Main St, Los Angeles, CA 90001"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  checked={manager.isAlsoMember} 
-                  onChange={(e) => handleManagerChange(index, 'isAlsoMember', e.target.checked)}
-                />
-                <span>This manager is also a member of the LLC</span>
-              </label>
-            </div>
-            
-            {formData.managers.length > 1 && (
-              <button 
-                type="button" 
-                className="remove-button" 
-                onClick={() => removeManager(index)}
-              >
-                <i data-feather="trash-2"></i> Remove Manager
-              </button>
-            )}
-          </div>
-        ))}
-        
-        <button 
-          type="button" 
-          className="add-button" 
-          onClick={addManager}
-        >
-          <i data-feather="plus-circle"></i> Add Manager
-        </button>
-      </>
     );
   };
   
@@ -1063,8 +1220,6 @@ ${signatureBlock}`;
     return (
       <div className="form-tab">
         <h3>Management & Capital</h3>
-        
-        {renderManagerSection()}
         
         <h4>Capital Requirements</h4>
         
@@ -1104,6 +1259,10 @@ ${signatureBlock}`;
             <option value="proportional">Proportional to Ownership</option>
             <option value="fixed-schedule">According to Fixed Schedule</option>
           </select>
+        </div>
+        
+        <div className="info-box">
+          <strong>Capital Contribution Information:</strong> Capital contributions can include cash, property, services performed, promissory notes, or other obligations to contribute. Members typically contribute assets in exchange for ownership percentages.
         </div>
         
         <div className="warning-box">
@@ -1236,7 +1395,7 @@ ${signatureBlock}`;
             Dissolution Events
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Events that trigger dissolution of the LLC. Hold Ctrl/Cmd to select multiple options.</span>
+              <span className="tooltiptext">Events that trigger dissolution of the LLC. Hold Ctrl/Cmd to select multiple options. It's recommended to include at least "Mutual Agreement" and "Regulatory Dissolution".</span>
             </div>
           </label>
           <select 
@@ -1260,7 +1419,7 @@ ${signatureBlock}`;
             Liquidation Preference
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">How remaining assets will be distributed to members upon dissolution.</span>
+              <span className="tooltiptext">Equal: Assets are distributed based on ownership percentages. Prioritized: Some members receive assets before others (useful if some members contributed more capital or have special rights).</span>
             </div>
           </label>
           <select 
@@ -1273,6 +1432,10 @@ ${signatureBlock}`;
           </select>
         </div>
         
+        <div className="info-box">
+          <strong>Dissolution Process:</strong> When an LLC dissolves, it stops conducting business but continues to exist until all affairs are properly wound up. This includes paying creditors, distributing remaining assets, and filing required paperwork with the state.
+        </div>
+        
         <h4>Amendments & Dispute Resolution</h4>
         
         <div className="form-group">
@@ -1280,7 +1443,7 @@ ${signatureBlock}`;
             Amendment Requirements
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Approval level required to amend the Operating Agreement.</span>
+              <span className="tooltiptext">The voting threshold needed to change the operating agreement. Higher thresholds provide more stability but less flexibility. Unanimous voting gives any single member veto power.</span>
             </div>
           </label>
           <select 
@@ -1299,7 +1462,7 @@ ${signatureBlock}`;
             Dispute Resolution Method
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Method for resolving disputes between members or with the LLC.</span>
+              <span className="tooltiptext">Litigation: Traditional court proceedings (most expensive, public record). Arbitration: Private judges, faster than courts but binding. Mediation-then-Arbitration: Attempt non-binding mediation first, then proceed to binding arbitration if needed (recommended).</span>
             </div>
           </label>
           <select 
@@ -1314,25 +1477,69 @@ ${signatureBlock}`;
         </div>
         
         <div className="form-group">
-          <label>Governing Law</label>
-          <input 
-            type="text" 
+          <label>
+            Governing Law
+            <div className="tooltip">
+              <i data-feather="info" className="info-icon"></i>
+              <span className="tooltiptext">The state law that will apply to legal interpretations of your agreement. For California LLCs, this is typically California.</span>
+            </div>
+          </label>
+          <select 
             name="lawGoverning" 
             value={formData.lawGoverning} 
-            onChange={handleChange} 
-            placeholder="e.g., California"
-          />
-        </div>
-        
-        <div className="form-group">
-          <label>Venue for Disputes</label>
-          <input 
-            type="text" 
-            name="venueForDisputes" 
-            value={formData.venueForDisputes} 
-            onChange={handleChange} 
-            placeholder="e.g., Los Angeles County, California"
-          />
+            onChange={handleChange}
+          >
+            <option value="Alabama">Alabama</option>
+            <option value="Alaska">Alaska</option>
+            <option value="Arizona">Arizona</option>
+            <option value="Arkansas">Arkansas</option>
+            <option value="California">California</option>
+            <option value="Colorado">Colorado</option>
+            <option value="Connecticut">Connecticut</option>
+            <option value="Delaware">Delaware</option>
+            <option value="Florida">Florida</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Hawaii">Hawaii</option>
+            <option value="Idaho">Idaho</option>
+            <option value="Illinois">Illinois</option>
+            <option value="Indiana">Indiana</option>
+            <option value="Iowa">Iowa</option>
+            <option value="Kansas">Kansas</option>
+            <option value="Kentucky">Kentucky</option>
+            <option value="Louisiana">Louisiana</option>
+            <option value="Maine">Maine</option>
+            <option value="Maryland">Maryland</option>
+            <option value="Massachusetts">Massachusetts</option>
+            <option value="Michigan">Michigan</option>
+            <option value="Minnesota">Minnesota</option>
+            <option value="Mississippi">Mississippi</option>
+            <option value="Missouri">Missouri</option>
+            <option value="Montana">Montana</option>
+            <option value="Nebraska">Nebraska</option>
+            <option value="Nevada">Nevada</option>
+            <option value="New Hampshire">New Hampshire</option>
+            <option value="New Jersey">New Jersey</option>
+            <option value="New Mexico">New Mexico</option>
+            <option value="New York">New York</option>
+            <option value="North Carolina">North Carolina</option>
+            <option value="North Dakota">North Dakota</option>
+            <option value="Ohio">Ohio</option>
+            <option value="Oklahoma">Oklahoma</option>
+            <option value="Oregon">Oregon</option>
+            <option value="Pennsylvania">Pennsylvania</option>
+            <option value="Rhode Island">Rhode Island</option>
+            <option value="South Carolina">South Carolina</option>
+            <option value="South Dakota">South Dakota</option>
+            <option value="Tennessee">Tennessee</option>
+            <option value="Texas">Texas</option>
+            <option value="Utah">Utah</option>
+            <option value="Vermont">Vermont</option>
+            <option value="Virginia">Virginia</option>
+            <option value="Washington">Washington</option>
+            <option value="West Virginia">West Virginia</option>
+            <option value="Wisconsin">Wisconsin</option>
+            <option value="Wyoming">Wyoming</option>
+          </select>
         </div>
         
         <div className="warning-box">
@@ -1348,9 +1555,9 @@ ${signatureBlock}`;
       case 0:
         return renderCompanyInfoTab();
       case 1:
-        return renderBusinessDetailsTab();
-      case 2:
         return renderMemberInfoTab();
+      case 2:
+        return renderBusinessDetailsTab();
       case 3:
         return renderManagementCapitalTab();
       case 4:
@@ -1421,11 +1628,28 @@ ${signatureBlock}`;
               >
                 <i data-feather="file-text"></i> Download Word
               </button>
+              
+              <a 
+                href="https://terms.law/call/" 
+                target="_blank" 
+                className="nav-button"
+                style={{
+                  backgroundColor: "#059669", 
+                  color: "white",
+                  border: "none",
+                  textDecoration: "none",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center"
+                }}
+              >
+                <i data-feather="calendar"></i> Schedule Consult
+              </a>
             </div>
             
             <button
               onClick={nextTab}
-              className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'completed' : ''}`}
+              className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
               disabled={currentTab === tabs.length - 1}
             >
               Next <i data-feather="chevron-right"></i>
