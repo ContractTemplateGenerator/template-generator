@@ -392,13 +392,11 @@ PURPOSE AND POWERS
     // Article III - Members and Capital Contributions
     let membersList = '';
     formData.members.forEach((member, index) => {
-      if (member.name || index === 0) {
-        membersList += `
+      membersList += `
     ${index + 1}. ${member.name || `[MEMBER ${index + 1} NAME]`}
        Address: ${member.address || `[MEMBER ${index + 1} ADDRESS]`}
        Initial Capital Contribution: $${member.contributionAmount || '0.00'}
        Ownership Percentage: ${member.ownershipPercentage || '0'}%`;
-      }
     });
     
     const articleMembers = `ARTICLE III
@@ -442,12 +440,10 @@ MANAGEMENT
       // Manager-managed LLC
       let managersList = '';
       formData.managers.forEach((manager, index) => {
-        if (manager.name || index === 0) {
-          managersList += `
+        managersList += `
     ${index + 1}. ${manager.name || `[MANAGER ${index + 1} NAME]`}
        Address: ${manager.address || `[MANAGER ${index + 1} ADDRESS]`}
        ${manager.isAlsoMember ? 'This Manager is also a Member of the Company.' : 'This Manager is not a Member of the Company.'}`;
-        }
       });
       
       managementArticle = `ARTICLE IV
@@ -661,9 +657,6 @@ ${signatureBlock}`;
       fiscalYearEnd: /(?<=The Company's fiscal year shall end on ).*?(?=\.)/g,
       terminationDate: /(?<=shall continue ).*?(?= unless)/g,
       
-      // Member Information (special handling below)
-      // For each member.X.Y field
-      
       // Management structure
       managementType: formData.managementType === 'member-managed' 
         ? /ARTICLE IV\nMANAGEMENT\n\n4\.1 Management by Members.*?(?=4\.2)/s
@@ -682,7 +675,6 @@ ${signatureBlock}`;
       amendmentRequirement: /(?<=This Agreement may be amended by the approval of Members holding ).*?(?= of the Ownership)/g,
       disputeResolution: /(?<=Any dispute arising out of or relating to this Agreement shall be resolved by ).*?(?=\.)/g,
       lawGoverning: /(?<=This Agreement shall be governed by and construed in accordance with the laws of the State of ).*?(?=\.)/g,
-      venueForDisputes: /(?<=by (litigation|arbitration|mediation) in ).*?(?= in accordance)/g,
     };
     
     // Special handling for member and manager fields
@@ -691,25 +683,23 @@ ${signatureBlock}`;
       const index = parseInt(parts[1]);
       const field = parts[2];
       
-      // Different regex based on which member field was changed
-      let regex;
-      const memberPattern = new RegExp(`${index + 1}\\. .*?(?=${index + 2}\\. |ARTICLE IV|\\})`, 's');
+      // Look for the specific member in the Members section
+      const memberPattern = new RegExp(`3\\.1 Initial Members and Capital Contributions\\.[\\s\\S]*?${index + 1}\\. .*?(?=${index + 2}\\. |\\n\\n3\\.2)`, 's');
       const memberSection = memberPattern.exec(documentText);
       
       if (memberSection && memberSection[0]) {
         let memberText = memberSection[0];
         
         // Create regex for specific fields within the member section
+        let regex;
         if (field === 'name') {
           regex = new RegExp(`${index + 1}\\. .*?(?=\\s+Address:)`, 's');
         } else if (field === 'address') {
-          regex = /(?<=Address: ).*?(?=\n)/g;
+          regex = new RegExp(`Address: .*?(?=\\s+Initial Capital|$)`, 'g');
         } else if (field === 'contributionAmount') {
-          regex = /(?<=Initial Capital Contribution: \$).*?(?=\n)/g;
+          regex = /(?<=Initial Capital Contribution: \$).*?(?=\s+|$)/g;
         } else if (field === 'ownershipPercentage') {
-          regex = /(?<=Ownership Percentage: ).*?(?=%)/g;
-        } else if (field === 'taxId') {
-          regex = /(?<=Tax Identification Number: ).*?(?=\n|$)/g;
+          regex = /(?<=Ownership Percentage: ).*?(?=%|$)/g;
         }
         
         // Replace the highlighted section in the member text
@@ -725,26 +715,26 @@ ${signatureBlock}`;
     }
     
     // Special handling for manager fields
-    if (lastChanged.startsWith('managers.') && formData.managementType === 'manager-managed') {
+    if (lastChanged.startsWith('managers.')) {
       const parts = lastChanged.split('.');
       const index = parseInt(parts[1]);
       const field = parts[2];
       
-      // Different regex based on which manager field was changed
-      let regex;
-      const managerPattern = new RegExp(`${index + 1}\\. .*?(?=${index + 2}\\. |4\\.3|\\})`, 's');
+      // Look for the specific manager in the Managers section
+      const managerPattern = new RegExp(`4\\.2 Initial Managers\\.[\\s\\S]*?${index + 1}\\. .*?(?=${index + 2}\\. |\\n\\n4\\.3|The term)`, 's');
       const managerSection = managerPattern.exec(documentText);
       
       if (managerSection && managerSection[0]) {
         let managerText = managerSection[0];
         
         // Create regex for specific fields within the manager section
-        if (field === 'name') {
-          regex = new RegExp(`${index + 1}\\. .*?(?=\\s+Address:)`, 's');
+        let regex;
+        if (field === 'name' || field === 'memberId') {
+          regex = new RegExp(`${index + 1}\\. .*?(?=\\s+Address:|$)`, 's');
         } else if (field === 'address') {
-          regex = /(?<=Address: ).*?(?=\n)/g;
+          regex = /(?<=Address: ).*?(?=\s+This Manager|$)/g;
         } else if (field === 'isAlsoMember') {
-          regex = /This Manager is.*?(?=\n|$)/g;
+          regex = /This Manager is.*?(?=\s|$)/g;
         }
         
         // Replace the highlighted section in the manager text
@@ -916,7 +906,7 @@ ${signatureBlock}`;
             Business Purpose
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Describe the primary activities of your LLC. You can use the general purpose provided or be more specific.</span>
+              <span className="tooltiptext">Most California LLCs use a general purpose clause to maintain flexibility. You can be more specific if your business is in a regulated industry or has licensing requirements.</span>
             </div>
           </label>
           <textarea 
@@ -933,7 +923,7 @@ ${signatureBlock}`;
             Fiscal Year End
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">The end date of your LLC's fiscal year. Most LLCs use December 31 (calendar year).</span>
+              <span className="tooltiptext">This is your LLC's accounting year. Most businesses use December 31 to match the calendar year, but you may choose another date to align with your industry's business cycle or tax planning needs.</span>
             </div>
           </label>
           <input 
@@ -956,7 +946,7 @@ ${signatureBlock}`;
             <span>Perpetual Duration</span>
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">If checked, the LLC will exist indefinitely. If unchecked, specify an end date below.</span>
+              <span className="tooltiptext">Most LLCs choose perpetual duration for maximum flexibility. Only select a specific end date if you have a clear reason, such as a project-specific LLC or tax benefits in certain jurisdictions.</span>
             </div>
           </label>
         </div>
@@ -978,7 +968,7 @@ ${signatureBlock}`;
             Management Structure*
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Member-managed: All members participate in running the business. Manager-managed: Designated managers (who may or may not be members) run the business.</span>
+              <span className="tooltiptext">Member-managed: All members participate in day-to-day business decisions (good for small LLCs with active owners). Manager-managed: Specific individuals (members or non-members) run the business (better for LLCs with passive investors or complex operations).</span>
             </div>
           </label>
           <select 
@@ -1228,7 +1218,7 @@ ${signatureBlock}`;
             Additional Capital Requirements
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Determines how decisions about requiring additional capital contributions are made.</span>
+              <span className="tooltiptext">None: Members can never be forced to contribute more capital. Majority: Owners of >50% can require additional contributions. Unanimous: All members must agree to any capital calls. Most LLCs choose None or Unanimous to protect minority members.</span>
             </div>
           </label>
           <select 
@@ -1247,7 +1237,7 @@ ${signatureBlock}`;
             Return of Capital Contributions
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Determines how capital contributions will be returned to members.</span>
+              <span className="tooltiptext">Discretion: Management decides when/if to return capital. Proportional: Returns based on ownership percentages. Fixed Schedule: Returns according to a predetermined timeline. Most LLCs select Discretion for maximum flexibility.</span>
             </div>
           </label>
           <select 
@@ -1285,7 +1275,7 @@ ${signatureBlock}`;
             Distribution Method
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">How profits will be distributed among members.</span>
+              <span className="tooltiptext">Proportional: Profits distributed based on ownership percentages. Custom: Allows for special allocations that differ from ownership percentages (requires advanced accounting).</span>
             </div>
           </label>
           <select 
@@ -1303,7 +1293,7 @@ ${signatureBlock}`;
             Distribution Schedule
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">How often profit distributions will be made.</span>
+              <span className="tooltiptext">How often profit distributions will be made. This is a default schedule; the LLC can always make special distributions as needed.</span>
             </div>
           </label>
           <select 
@@ -1322,7 +1312,7 @@ ${signatureBlock}`;
             Distribution Approval
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Required approval level for making distributions.</span>
+              <span className="tooltiptext">Who must approve profit distributions. Majority is more flexible, while unanimous gives every member control over distributions.</span>
             </div>
           </label>
           <select 
@@ -1342,7 +1332,7 @@ ${signatureBlock}`;
             Transfer Restrictions
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Limitations on members' ability to transfer their ownership interests.</span>
+              <span className="tooltiptext">Right of First Refusal: Existing members get first opportunity to buy. Unanimous Approval: All members must approve any transfer. No Restrictions: Members can freely transfer interests (not recommended for most LLCs).</span>
             </div>
           </label>
           <select 
@@ -1361,7 +1351,7 @@ ${signatureBlock}`;
             Membership Interest Valuation Method
             <div className="tooltip">
               <i data-feather="info" className="info-icon"></i>
-              <span className="tooltiptext">Method used to determine the value of a membership interest for transfers, buyouts, etc.</span>
+              <span className="tooltiptext">Book Value: Based on company's balance sheet (simplest but may undervalue). Appraisal: Independent expert valuation (most accurate but expensive). Formula: Preset calculation based on earnings (balance of simplicity and fairness).</span>
             </div>
           </label>
           <select 
