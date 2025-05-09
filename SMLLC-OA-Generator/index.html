@@ -128,12 +128,12 @@
         
         // Main Generator Component
         const SMOAGenerator = () => {
-            // Tab configuration
+            // Tab configuration - simplified tabs
             const tabs = [
                 { id: 'company-info', label: 'Company Information' },
                 { id: 'business-details', label: 'Business Details' },
                 { id: 'member-details', label: 'Member Details' },
-                { id: 'capital-contributions', label: 'Capital & Distributions' },
+                { id: 'capital-distributions', label: 'Capital & Distributions' },
                 { id: 'management', label: 'Management' },
                 { id: 'dissolution', label: 'Dissolution & Amendments' }
             ];
@@ -141,7 +141,7 @@
             // State for current tab
             const [currentTab, setCurrentTab] = useState(0);
             
-            // State for form data
+            // State for form data - removed unnecessary fields
             const [formData, setFormData] = useState({
                 // Company Information
                 companyName: "",
@@ -159,20 +159,16 @@
                 // Member Details
                 memberName: "",
                 memberAddress: "",
-                memberTaxId: "",
-                isUSCitizen: true,
                 
                 // Capital & Distributions
-                initialCapitalContribution: "",
+                initialCapitalContribution: "1,000",
                 additionalCapitalRequired: false,
                 profitDistributionFrequency: "quarterly",
                 distributionLimitations: true,
                 
                 // Management
-                managerName: "",
                 useManagerName: false,
-                bankAccountSignatory: "",
-                bankAccountSignatoryIsThirdParty: false,
+                managerName: "",
                 
                 // Dissolution & Amendments
                 allowAmendmentByManager: false,
@@ -195,6 +191,11 @@
                 const text = generateDocument(formData);
                 setDocumentText(text);
             }, [formData]);
+
+            // Initial generation on component mount
+            useEffect(() => {
+                setDocumentText(generateDocument(formData));
+            }, []);
             
             // Handle input changes
             const handleChange = (e) => {
@@ -241,11 +242,6 @@
             // Download as Word function
             const downloadAsWord = () => {
                 try {
-                    if (!documentText) {
-                        alert("Please fill out the form to generate the document first.");
-                        return;
-                    }
-                    
                     window.generateWordDoc(documentText, formData);
                 } catch (error) {
                     console.error("Error generating Word document:", error);
@@ -266,7 +262,7 @@
                 }
                 
                 // Member Details fields
-                if (['memberName', 'memberAddress', 'memberTaxId', 'isUSCitizen'].includes(lastChanged)) {
+                if (['memberName', 'memberAddress'].includes(lastChanged)) {
                     return 'member-details';
                 }
                 
@@ -276,7 +272,7 @@
                 }
                 
                 // Management fields
-                if (['managerName', 'useManagerName', 'bankAccountSignatory', 'bankAccountSignatoryIsThirdParty'].includes(lastChanged)) {
+                if (['managerName', 'useManagerName'].includes(lastChanged)) {
                     return 'management';
                 }
                 
@@ -310,9 +306,7 @@
                     },
                     'member-details': {
                         memberName: formData.memberName ? new RegExp(`(${formData.memberName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null,
-                        memberAddress: formData.memberAddress ? new RegExp(`(${formData.memberAddress.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null,
-                        memberTaxId: formData.memberTaxId ? new RegExp(`(${formData.memberTaxId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null,
-                        isUSCitizen: new RegExp(`(${formData.isUSCitizen ? 'is' : 'is not'} a U.S. citizen)`, 'g')
+                        memberAddress: formData.memberAddress ? new RegExp(`(${formData.memberAddress.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null
                     },
                     'capital-distributions': {
                         initialCapitalContribution: formData.initialCapitalContribution ? new RegExp(`(\\$${formData.initialCapitalContribution.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null,
@@ -322,9 +316,7 @@
                     },
                     'management': {
                         managerName: (formData.useManagerName ? formData.managerName : formData.memberName) ? 
-                            new RegExp(`(${(formData.useManagerName ? formData.managerName : formData.memberName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null,
-                        bankAccountSignatory: formData.bankAccountSignatory ? 
-                            new RegExp(`(${formData.bankAccountSignatory.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null
+                            new RegExp(`(${(formData.useManagerName ? formData.managerName : formData.memberName).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'g') : null
                     },
                     'dissolution-amendments': {
                         allowAmendmentByManager: new RegExp(`(${formData.allowAmendmentByManager ? 'may' : 'may not'} be amended by the Manager)`, 'g'),
@@ -361,22 +353,34 @@
                 }
             }, [highlightedText, lastChanged]);
             
-            // Generate document text
+            // Generate document text - always generate even with partial data
             const generateDocument = (data) => {
                 const { 
-                    companyName, stateOfFormation, principalOfficeAddress, formationDate, effectiveDate,
-                    businessPurpose, fiscalYearEnd, registeredAgent, registeredOfficeAddress,
-                    memberName, memberAddress, memberTaxId, isUSCitizen,
-                    initialCapitalContribution, additionalCapitalRequired, profitDistributionFrequency, distributionLimitations,
-                    managerName, useManagerName, bankAccountSignatory, bankAccountSignatoryIsThirdParty,
-                    allowAmendmentByManager, specifySucessorMember, successorMemberName, successorMemberAddress
+                    companyName = "[Company Name]", 
+                    stateOfFormation = "[State]", 
+                    principalOfficeAddress = "[Principal Office Address]", 
+                    formationDate = "[Formation Date]",
+                    effectiveDate = "",
+                    businessPurpose = "engaging in any lawful business activity for which Limited Liability Companies may be organized in the State.",
+                    fiscalYearEnd = "December 31",
+                    registeredAgent = "",
+                    registeredOfficeAddress = "",
+                    memberName = "[Member Name]",
+                    memberAddress = "[Member Address]",
+                    initialCapitalContribution = "1,000",
+                    additionalCapitalRequired = false,
+                    profitDistributionFrequency = "quarterly",
+                    distributionLimitations = true,
+                    managerName = "",
+                    useManagerName = false,
+                    allowAmendmentByManager = false,
+                    specifySucessorMember = false,
+                    successorMemberName = "",
+                    successorMemberAddress = ""
                 } = data;
                 
                 // Use member name as manager if no manager specified
-                const actualManagerName = useManagerName ? managerName : memberName;
-                
-                // Use member name as bank signatory if none specified
-                const actualBankSignatory = bankAccountSignatory || memberName;
+                const actualManagerName = useManagerName && managerName ? managerName : memberName;
                 
                 // Format today's date
                 const today = new Date();
@@ -386,7 +390,11 @@
                     day: 'numeric'
                 });
                 
-                if (!companyName) return "Complete the form to see your Operating Agreement.";
+                // Use placeholder if registered agent is empty
+                const actualRegisteredAgent = registeredAgent || memberName;
+                
+                // Use principal address if registered office address is empty
+                const actualRegisteredOfficeAddress = registeredOfficeAddress || principalOfficeAddress;
                 
                 return `
 OPERATING AGREEMENT
@@ -405,7 +413,7 @@ FORMATION OF THE LIMITED LIABILITY COMPANY
 
 1.3. Principal Place of Business. The principal place of business of the Company shall be located at ${principalOfficeAddress}, or such other location as determined by the Member.
 
-1.4. Registered Office and Agent. The registered office of the Company shall be located at ${registeredOfficeAddress || principalOfficeAddress}, and the registered agent shall be ${registeredAgent || memberName}.
+1.4. Registered Office and Agent. The registered office of the Company shall be located at ${actualRegisteredOfficeAddress}, and the registered agent shall be ${actualRegisteredAgent}.
 
 1.5. Term. The Company shall continue perpetually unless dissolved in accordance with this Agreement or as otherwise provided by law.
 
@@ -419,9 +427,6 @@ MEMBER INFORMATION
 2.1. Member. The name and address of the sole Member of the Company is:
 Name: ${memberName}
 Address: ${memberAddress}
-Tax ID: ${memberTaxId}
-
-2.2. Citizenship. The Member ${isUSCitizen ? 'is' : 'is not'} a U.S. citizen.
 
 ARTICLE 3
 CAPITAL CONTRIBUTIONS AND DISTRIBUTIONS
@@ -443,7 +448,7 @@ MANAGEMENT AND OPERATIONS
 
 4.2. Authority of Manager. The Manager shall have full and complete authority, power, and discretion to manage and control the business, affairs, and properties of the Company, to make all decisions regarding those matters, and to perform any and all other acts or activities customary or incidental to the management of the Company's business.
 
-4.3. Banking. All funds of the Company shall be deposited in a bank account or accounts in the name of the Company. Withdrawals from such accounts shall require the signature of ${actualBankSignatory}${bankAccountSignatoryIsThirdParty ? ', who has been authorized by the Member' : ''}.
+4.3. Banking. All funds of the Company shall be deposited in a bank account or accounts in the name of the Company. Withdrawals from such accounts shall require the signature of ${actualManagerName}.
 
 4.4. Fiscal Year. The fiscal year of the Company shall end on ${fiscalYearEnd}.
 
@@ -767,42 +772,6 @@ ${formattedDate}
                                                 placeholder="Street Address, City, State, ZIP"
                                             ></textarea>
                                         </div>
-                                        
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                Member Tax ID (SSN or EIN)
-                                                <Tooltip text="For tax purposes. For most single-member LLCs, this will be the owner's Social Security Number." />
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="memberTaxId"
-                                                value={formData.memberTaxId}
-                                                onChange={handleChange}
-                                                className="form-input"
-                                                placeholder="XXX-XX-XXXX or XX-XXXXXXX"
-                                            />
-                                            <p className="form-warning">
-                                                <Icon name="alert-triangle" style={{width: "1rem", height: "1rem"}} />
-                                                Important: This document contains sensitive information. Keep it secure.
-                                            </p>
-                                        </div>
-                                        
-                                        <div className="form-group">
-                                            <div className="checkbox-group">
-                                                <input
-                                                    type="checkbox"
-                                                    name="isUSCitizen"
-                                                    checked={formData.isUSCitizen}
-                                                    onChange={handleChange}
-                                                    className="form-checkbox"
-                                                    id="isUSCitizen"
-                                                />
-                                                <label htmlFor="isUSCitizen" className="checkbox-label">
-                                                    Member is a U.S. citizen
-                                                    <Tooltip text="This information may be relevant for certain tax and legal considerations." />
-                                                </label>
-                                            </div>
-                                        </div>
                                     </div>
                                 )}
                                 
@@ -811,7 +780,7 @@ ${formattedDate}
                                     <div className="tab-content">
                                         <div className="form-group">
                                             <label className="form-label">
-                                                Initial Capital Contribution ($)
+                                                Initial Capital Contribution
                                                 <Tooltip text="The amount of money or value of assets the member initially contributes to start the LLC." />
                                             </label>
                                             <input
@@ -820,9 +789,9 @@ ${formattedDate}
                                                 value={formData.initialCapitalContribution}
                                                 onChange={handleChange}
                                                 className="form-input"
-                                                placeholder="e.g. 1000"
+                                                placeholder="e.g. 1,000"
                                             />
-                                            <p className="form-hint">Enter numbers only, no dollar signs or commas.</p>
+                                            <p className="form-hint">Enter the amount (numbers only or with commas).</p>
                                         </div>
                                         
                                         <div className="form-group">
@@ -914,40 +883,6 @@ ${formattedDate}
                                                     className="form-input"
                                                     placeholder="e.g. John Doe"
                                                 />
-                                            </div>
-                                        )}
-                                        
-                                        <div className="form-group">
-                                            <label className="form-label">
-                                                Bank Account Signatory
-                                                <Tooltip text="The person authorized to sign checks and make transactions on the company's bank accounts." />
-                                            </label>
-                                            <input
-                                                type="text"
-                                                name="bankAccountSignatory"
-                                                value={formData.bankAccountSignatory}
-                                                onChange={handleChange}
-                                                className="form-input"
-                                                placeholder="Leave blank to use Member name"
-                                            />
-                                        </div>
-                                        
-                                        {formData.bankAccountSignatory && formData.bankAccountSignatory !== formData.memberName && (
-                                            <div className="form-group">
-                                                <div className="checkbox-group">
-                                                    <input
-                                                        type="checkbox"
-                                                        name="bankAccountSignatoryIsThirdParty"
-                                                        checked={formData.bankAccountSignatoryIsThirdParty}
-                                                        onChange={handleChange}
-                                                        className="form-checkbox"
-                                                        id="bankAccountSignatoryIsThirdParty"
-                                                    />
-                                                    <label htmlFor="bankAccountSignatoryIsThirdParty" className="checkbox-label">
-                                                        Bank signatory is a third party (not the Member)
-                                                        <Tooltip text="Check this if the bank account signatory is someone other than the member." />
-                                                    </label>
-                                                </div>
                                             </div>
                                         )}
                                     </div>
