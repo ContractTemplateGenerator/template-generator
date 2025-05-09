@@ -55,7 +55,7 @@
                 "Ohio", "Oklahoma", "Oregon", "Utah"
             ];
             
-            return anStates.includes(stateName) ? "An" : "A";
+            return anStates.includes(stateName) ? "AN" : "A";
         };
         
         // Word document generation functionality
@@ -75,7 +75,7 @@
             font-family: Calibri, Arial, sans-serif;
             font-size: 12pt;
             line-height: 1.5;
-            margin: 0.5in;
+            margin: 0;
           }
           h1 {
             text-align: center;
@@ -92,6 +92,11 @@
           }
           p {
             margin-bottom: 10pt;
+          }
+          .title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16pt;
           }
           .center {
             text-align: center;
@@ -114,11 +119,11 @@
         
                 // Process document text - apply centering and bold to titles and headings
                 const processedText = documentText
-                  .replace(/\n\n(OPERATING AGREEMENT[\s\S]*?COMPANY)\n\n/g, '<h1>$1</h1>\n\n')
+                  .replace(/\n\n(OPERATING AGREEMENT[\s\S]*?COMPANY)\n\n/g, '<p class="title">$1</p>\n\n')
                   .replace(/\n\n(ARTICLE \d+[\s\S]*?)\n\n/g, '<h2>$1</h2>\n\n')
                   .split('\n\n')
                   .map(para => {
-                    if (para.startsWith('<h1>') || para.startsWith('<h2>')) return para;
+                    if (para.startsWith('<p class="title">') || para.startsWith('<h2>')) return para;
                     return para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '';
                   })
                   .join('');
@@ -378,17 +383,17 @@
             // Generate document text - always generate even with partial data
             const generateDocument = (data) => {
                 const { 
-                    companyName = "[Company Name]", 
-                    stateOfFormation = "[State]", 
-                    principalOfficeAddress = "[Principal Office Address]", 
-                    formationDate = "[Formation Date]",
+                    companyName = "[COMPANY NAME]", 
+                    stateOfFormation = "[STATE]", 
+                    principalOfficeAddress = "[PRINCIPAL OFFICE ADDRESS]", 
+                    formationDate = "[FORMATION DATE]",
                     effectiveDate = "",
                     businessPurpose = "engaging in any lawful business activity for which Limited Liability Companies may be organized in the State.",
                     fiscalYearEnd = "December 31",
                     registeredAgent = "",
                     registeredOfficeAddress = "",
-                    memberName = "[Member Name]",
-                    memberAddress = "[Member Address]",
+                    memberName = "[MEMBER NAME]",
+                    memberAddress = "[MEMBER ADDRESS]",
                     initialCapitalContribution = "1,000",
                     additionalCapitalRequired = false,
                     profitDistributionFrequency = "quarterly",
@@ -418,7 +423,7 @@
                 // Use principal address if registered office address is empty
                 const actualRegisteredOfficeAddress = registeredOfficeAddress || principalOfficeAddress;
                 
-                // Determine A vs An for state name
+                // Determine A vs An for state name (in all caps)
                 const stateArticle = getStateArticle(stateOfFormation);
                 
                 return `
