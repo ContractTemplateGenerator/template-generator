@@ -17,9 +17,7 @@ const App = () => {
     protectionPeriod: 2,
     terminationNotice: 30,
     governingLaw: 'california',
-    customGoverningLaw: '',
     jurisdiction: 'los-angeles',
-    customJurisdiction: '',
     includeReturnDestroy: true,
     includeNoWarranty: true,
     includeSeverability: true,
@@ -34,66 +32,28 @@ const App = () => {
     { id: 'parties', labelEn: 'Parties', labelRu: 'Стороны' },
     { id: 'agreement', labelEn: 'Agreement', labelRu: 'Соглашение' },
     { id: 'term', labelEn: 'Term & Jurisdiction', labelRu: 'Срок и Юрисдикция' },
-    { id: 'additional', labelEn: 'Additional Terms', labelRu: 'Дополнительн.' }
+    { id: 'additional', labelEn: 'Additional Terms', labelRu: 'Дополнительные Условия' }
   ];
   
-  // Purpose dropdown options
+  // Define purpose options with proper Russian conjugation
   const purposeOptions = {
-    english: [
-      { value: 'evaluation', label: 'Evaluation of potential business relationship' },
-      { value: 'partnership', label: 'Partnership discussion' },
-      { value: 'investment', label: 'Investment opportunity evaluation' },
-      { value: 'acquisition', label: 'Merger or acquisition discussions' },
-      { value: 'licensing', label: 'Technology licensing negotiations' },
-      { value: 'joint-venture', label: 'Joint venture exploration' },
-      { value: 'custom', label: 'Custom (specify below)' }
-    ],
-    russian: [
-      { value: 'evaluation', label: 'Оценка потенциальных деловых отношений' },
-      { value: 'partnership', label: 'Обсуждение партнерства' },
-      { value: 'investment', label: 'Оценка инвестиционных возможностей' },
-      { value: 'acquisition', label: 'Обсуждение слияния или поглощения' },
-      { value: 'licensing', label: 'Переговоры о лицензировании технологий' },
-      { value: 'joint-venture', label: 'Изучение совместного предприятия' },
-      { value: 'custom', label: 'Другое (укажите ниже)' }
-    ]
-  };
-  
-  // Definition summaries
-  const definitionSummaries = {
     english: {
-      broad: "Includes all information that should reasonably be considered confidential, even if not explicitly marked",
-      medium: "Covers non-public business information, trade secrets, and technical data related to business operations",
-      narrow: "Only protects information explicitly marked as confidential in writing or confirmed as confidential within 30 days",
-      custom: "Your own specific definition of what constitutes confidential information"
+      'evaluation': 'evaluating potential business relationship',
+      'merger': 'discussing potential merger or acquisition',
+      'investment': 'evaluating investment opportunities',
+      'partnership': 'exploring partnership possibilities',
+      'services': 'providing services to the disclosing party',
+      'employment': 'employment relationship',
+      'custom': 'Custom purpose'
     },
     russian: {
-      broad: "Включает всю информацию, которая разумно должна считаться конфиденциальной, даже если явно не обозначена",
-      medium: "Охватывает непубличную деловую информацию, коммерческие тайны и технические данные, связанные с деятельностью",
-      narrow: "Защищает только информацию, явно обозначенную как конфиденциальная в письменной форме или подтвержденную в течение 30 дней",
-      custom: "Ваше собственное определение того, что является конфиденциальной информацией"
-    }
-  };
-  
-  // Purpose explainers
-  const purposeExplainers = {
-    english: {
-      evaluation: "Confidential information can only be used to evaluate a potential business relationship and for no other purpose",
-      partnership: "Confidential information can only be used for partnership discussions and related due diligence",
-      investment: "Confidential information can only be used to evaluate investment opportunities and related financial analysis",
-      acquisition: "Confidential information can only be used for merger/acquisition discussions and due diligence",
-      licensing: "Confidential information can only be used for technology licensing negotiations and evaluation",
-      'joint-venture': "Confidential information can only be used to explore joint venture opportunities",
-      custom: "Confidential information can only be used for the specific purpose you define below"
-    },
-    russian: {
-      evaluation: "Конфиденциальная информация может использоваться только для оценки потенциальных деловых отношений",
-      partnership: "Конфиденциальная информация может использоваться только для обсуждения партнерства и связанной проверки",
-      investment: "Конфиденциальная информация может использоваться только для оценки инвестиционных возможностей",
-      acquisition: "Конфиденциальная информация может использоваться только для обсуждения слияния/поглощения",
-      licensing: "Конфиденциальная информация может использоваться только для переговоров о лицензировании технологий",
-      'joint-venture': "Конфиденциальная информация может использоваться только для изучения возможностей совместного предприятия",
-      custom: "Конфиденциальная информация может использоваться только для конкретной цели, указанной ниже"
+      'evaluation': 'оценки потенциальных деловых отношений',
+      'merger': 'обсуждения слияния или поглощения',
+      'investment': 'оценки инвестиционных возможностей',
+      'partnership': 'изучения возможностей партнерства',
+      'services': 'предоставления услуг раскрывающей стороне',
+      'employment': 'трудовых отношений',
+      'custom': 'Другая цель'
     }
   };
   
@@ -107,7 +67,7 @@ const App = () => {
     setCurrentTab(tabId);
   };
   
-  // Handle form input changes with highlighting
+  // Handle form input changes - fixed to prevent blank screen
   const handleChange = React.useCallback((e) => {
     const { name, value, type, checked } = e.target;
     setLastChangedField(name);
@@ -116,107 +76,7 @@ const App = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-    
-    // Trigger highlighting after state update
-    setTimeout(() => {
-      highlightChanges(name, value);
-    }, 100);
   }, []);
-  
-  // Function to highlight changes in preview
-  const highlightChanges = (fieldName, value) => {
-    const previewDoc = document.getElementById('preview-document');
-    if (!previewDoc) return;
-    
-    // Remove existing highlights
-    const existingHighlights = previewDoc.querySelectorAll('.highlight');
-    existingHighlights.forEach(el => {
-      el.classList.remove('highlight');
-    });
-    
-    let targetElement = null;
-    
-    // Find what to highlight based on field
-    switch(fieldName) {
-      case 'discloserName':
-      case 'recipientName':
-        const nameElements = previewDoc.querySelectorAll('strong');
-        nameElements.forEach(el => {
-          if (el.textContent === value) {
-            targetElement = el;
-            el.classList.add('highlight');
-          }
-        });
-        break;
-        
-      case 'effectiveDate':
-        const sections = previewDoc.querySelectorAll('.section-row');
-        sections.forEach(section => {
-          if (section.textContent.includes('EFFECTIVE DATE') || section.textContent.includes('ДАТА ВСТУПЛЕНИЯ')) {
-            targetElement = section;
-            section.classList.add('highlight');
-          }
-        });
-        break;
-        
-      case 'confInfoType':
-        const confSections = previewDoc.querySelectorAll('.section-row');
-        confSections.forEach(section => {
-          if (section.textContent.includes('CONFIDENTIAL INFORMATION') || section.textContent.includes('КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ')) {
-            targetElement = section;
-            section.classList.add('highlight');
-          }
-        });
-        break;
-        
-      case 'purpose':
-      case 'customPurpose':
-        const purposeSections = previewDoc.querySelectorAll('.section-row');
-        purposeSections.forEach(section => {
-          if (section.textContent.includes('PERMITTED USE') || section.textContent.includes('ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ')) {
-            targetElement = section;
-            section.classList.add('highlight');
-          }
-        });
-        break;
-        
-      case 'governingLaw':
-      case 'customGoverningLaw':
-        const govSections = previewDoc.querySelectorAll('.section-row');
-        govSections.forEach(section => {
-          if (section.textContent.includes('GOVERNING LAW') || section.textContent.includes('ПРИМЕНИМОЕ ПРАВО')) {
-            targetElement = section;
-            section.classList.add('highlight');
-          }
-        });
-        break;
-    }
-    
-    // Scroll to highlight if found
-    if (targetElement && !isElementInViewport(targetElement)) {
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-    
-    // Remove highlights after 3 seconds
-    setTimeout(() => {
-      const highlights = previewDoc.querySelectorAll('.highlight');
-      highlights.forEach(el => {
-        el.classList.remove('highlight');
-      });
-    }, 3000);
-  };
-  
-  // Check if element is in viewport
-  const isElementInViewport = (el) => {
-    const rect = el.getBoundingClientRect();
-    const preview = document.querySelector('.preview-section');
-    const previewRect = preview.getBoundingClientRect();
-    
-    return (
-      rect.top >= previewRect.top &&
-      rect.bottom <= previewRect.bottom
-    );
-  };
   
   // Handle navigation (previous/next buttons)
   const handlePrevious = () => {
@@ -256,8 +116,8 @@ const App = () => {
   const templates = {
     english: {
       title: "NON-DISCLOSURE AGREEMENT",
-      parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
-        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong>, located at ${discloserAddress || '[Disclosing Party Address]'} (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong>, located at ${recipientAddress || '[Receiving Party Address]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
+      parties: (discloserName, recipientName) => {
+        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong> (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong> (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('en-US', {
@@ -288,17 +148,8 @@ This Agreement shall remain in effect until it is terminated by a Party with ${t
       },
       
       permittedUse: (purpose) => {
-        // Handle different purpose types
-        let purposeText = '[Purpose of Disclosure]';
-        if (purpose && purpose !== 'custom') {
-          const option = purposeOptions.english.find(opt => opt.value === purpose);
-          purposeText = option ? option.label.toLowerCase() : purpose;
-        } else if (purpose === 'custom' && formData.customPurpose) {
-          purposeText = formData.customPurpose;
-        }
-        
         return `<div class="section-title">4. PERMITTED USE AND DISCLOSURE</div>
-Receiving Party will use Confidential Information only for the purpose of and in connection with ${purposeText} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
+Receiving Party will use Confidential Information only for the purpose of and in connection with ${purpose} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
@@ -323,12 +174,7 @@ This Agreement shall be governed by the law of the State of Delaware, USA. Wilmi
 This Agreement shall be governed by the law of the State of New York, USA. New York, NY is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
         
         russia: `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
-        
-        other: (customLaw, customJurisdiction) => {
-          return `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of ${customLaw || '[Governing Law]'}. ${customJurisdiction || '[Jurisdiction]'} is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`;
-        }
+This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`
       },
       
       severability: `<div class="section-title">9. SEVERABILITY</div>
@@ -339,7 +185,10 @@ If any provision of this Agreement is held invalid or unenforceable by a court o
 In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the English version shall prevail.`,
         
         russian: `<div class="section-title">10. PREVAILING LANGUAGE</div>
-In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`,
+        
+        both: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, both versions shall be equally authoritative.`
       },
       
       signatures: `<div class="section-title">IN WITNESS WHEREOF</div>
@@ -364,8 +213,8 @@ Date: _______________________________
     
     russian: {
       title: "СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ",
-      parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
-        return `Это Соглашение заключено между <strong>${discloserName || '[Disclosing Party Name]'}</strong>, расположенным по адресу ${discloserAddress || '[Адрес Раскрывающей Стороны]'} ("Раскрывающая Сторона") и <strong>${recipientName || '[Receiving Party Name]'}</strong>, расположенным по адресу ${recipientAddress || '[Адрес Получателя]'} ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
+      parties: (discloserName, recipientName) => {
+        return `Это Соглашение заключено между <strong>${discloserName || '[Disclosing Party Name]'}</strong> ("Раскрывающая Сторона") и <strong>${recipientName || '[Receiving Party Name]'}</strong> ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('ru-RU', {
@@ -396,17 +245,8 @@ ${customText || '[Пользовательское Определение Кон
       },
       
       permittedUse: (purpose) => {
-        // Handle different purpose types for Russian
-        let purposeText = '[Цель Раскрытия]';
-        if (purpose && purpose !== 'custom') {
-          const option = purposeOptions.russian.find(opt => opt.value === purpose);
-          purposeText = option ? option.label.toLowerCase() : purpose;
-        } else if (purpose === 'custom' && formData.customPurpose) {
-          purposeText = formData.customPurpose;
-        }
-        
         return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
-Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
+Получатель может пользоваться Конфиденциальной Информацией только для ${purpose} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
@@ -431,12 +271,7 @@ ${customText || '[Пользовательское Определение Кон
 Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать New York, NY.`,
         
         russia: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством Российской Федерации. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Москву, Россия.`,
-        
-        other: (customLaw, customJurisdiction) => {
-          return `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством ${customLaw || '[Применимое Право]'}. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать ${customJurisdiction || '[Юрисдикция]'}.`;
-        }
+Настоящее соглашение регулируется законодательств��м Российской Федерации. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Москву, Россия.`
       },
       
       severability: `<div class="section-title">9. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</div>
@@ -447,7 +282,10 @@ ${customText || '[Пользовательское Определение Кон
 В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на английском языке будет иметь преимущественную силу.`,
         
         russian: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
-В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`,
+        
+        both: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, обе версии будут иметь одинаковую юридическую силу.`
       },
       
       signatures: `<div class="section-title">В ПОДТВЕРЖДЕНИЕ ВЫШЕИЗЛОЖЕННОГО</div>
@@ -471,39 +309,37 @@ ${customText || '[Пользовательское Определение Кон
     }
   };
 
-  // Educational content for tooltips and notes
+  // Educational content for tooltips - improved with variety and helpfulness
   const educationalContent = {
     english: {
-      disclosureParty: "The party that owns and shares confidential information. This is typically the business or individual revealing sensitive data.",
-      receivingParty: "The party that receives confidential information. This party is obligated to protect and not misuse the information.",
-      effectiveDate: "The date when the agreement becomes legally binding. Important for calculating protection periods and understanding when obligations begin.",
-      confidentialityDefinition: "Determines what information is protected. Broader definitions protect more information but may be harder to enforce. Narrower definitions are more precise but may miss important information.",
-      purpose: "Clearly defining the purpose limits how the confidential information can be used and helps prevent misuse.",
-      protectionPeriod: "How long the receiving party must keep information confidential. Common periods are 2-5 years. Trade secrets may require indefinite protection.",
-      terminationNotice: "The number of days advance notice required to terminate the agreement. Common periods are 30-90 days.",
-      governingLaw: "Determines which jurisdiction's laws will be applied to interpret the agreement. Critical for international agreements.",
-      jurisdiction: "The specific court or location where disputes will be resolved. Should be easily accessible to both parties.",
-      returnDestroy: "Requires the receiving party to return or destroy confidential information upon request, ensuring no copies remain.",
-      noWarranty: "Protects the disclosing party from liability if the information turns out to be incorrect or causes damages.",
-      severability: "Ensures the entire agreement doesn't become invalid if one provision is found unenforceable.",
-      controllingLanguage: "In bilingual agreements, specifies which language version prevails in case of discrepancies.",
-      crossBorderTip: "Cross-border NDAs may face enforcement challenges. Consider local laws, translation accuracy, and practical enforcement mechanisms."
+      disclosureParty: "The party that owns the confidential information. Consider who has the most valuable information to protect. For example, a startup sharing its technology with potential investors would be the disclosing party.",
+      receivingParty: "The party receiving access to confidential information. They must protect it according to the agreement. Examples include investors reviewing a startup, contractors working on sensitive projects, or potential business partners.",
+      effectiveDate: "When confidentiality obligations begin. Can be the date of signing or a future date. This is important for calculating when protection periods end and when return provisions activate.",
+      confidentialityDefinition: "Broad definition: Covers almost everything shared, including oral discussions and information that should reasonably be considered confidential. Medium: Limited to specific business information like trade secrets and financial data. Narrow: Only includes information explicitly marked 'confidential' in writing.",
+      purpose: "Limits how confidential information can be used. For evaluating investments: Due diligence only. For services: Task performance only. For employment: Job duties only. This prevents misuse like copying a business model or using data for competing purposes.",
+      protectionPeriod: "After this period, the recipient has no obligation to keep information confidential. 2-3 years is standard for business information. Indefinite for trade secrets. Consider how long your information remains valuable and competitive.",
+      governingLaw: "Determines which country/state's courts will interpret the agreement. California is tech-friendly but has strong employee protection laws. Delaware favors businesses. Russia requires specific commercial secret markings.",
+      jurisdiction: "Where legal disputes must be resolved. Choose a location accessible to both parties. For international agreements, consider arbitration as an alternative to courts.",
+      returnDestroy: "Ensures no copies remain after the relationship ends. Important for protecting trade secrets. Consider exceptions for copies required by law or regulation.",
+      noWarranty: "Protects the disclosing party if information is inaccurate, incomplete, or causes problems. Important when sharing technical data or business projections that might change.",
+      severability: "If one part of the agreement is invalid, the rest remains enforceable. Critical for international agreements where some provisions might conflict with local laws.",
+      controllingLanguage: "Resolves translation discrepancies. English is common for international business. Consider choosing the language of the governing law jurisdiction.",
+      crossBorderTip: "International NDAs require special attention: Consider local confidentiality laws, translation accuracy, practical enforcement in each country, and potential need for local legal review."
     },
     russian: {
-      disclosureParty: "Сторона, которая владеет и раскрывает конфиденциальную информацию. Обычно это бизнес или лицо, раскрывающее конфиденциальные данные.",
-      receivingParty: "Сторона, которая получает конфиденциальную информацию. Эта сторона обязана защищать и не злоупотреблять информацией.",
-      effectiveDate: "Дата, когда соглашение становится юридически обязательным. Важно для расчета сроков защиты и понимания начала обязательств.",
-      confidentialityDefinition: "Определяет, какая информация защищена. Более широкие определения защищают больше информации, но их сложнее обеспечить исполнение.",
-      purpose: "Четкое определение цели ограничивает использование конфиденциальной информации и помогает предотвратить злоупотребления.",
-      protectionPeriod: "Как долго получающая сторона должна сохранять информацию конфиденциальной. Обычные сроки 2-5 лет.",
-      terminationNotice: "Количество дней предварительного уведомления для расторжения соглашения. Обычные сроки 30-90 дней.",
-      governingLaw: "Определяет, законы какой юрисдикции будут применяться для толкования соглашения. Критично для международных соглашений.",
-      jurisdiction: "Конкретный суд или место, где будут разрешаться споры. Должно быть легко доступно для обеих сторон.",
-      returnDestroy: "Требует от получающей стороны вернуть или уничтожить конфиденциальную информацию по запросу.",
-      noWarranty: "Защищает раскрывающую сторону от ответственности, если информация окажется неверной или причинит ущерб.",
-      severability: "Гарантирует, что все соглашение не станет недействительным, если одно положение будет признано неисполнимым.",
-      controllingLanguage: "В двуязычных соглашениях указывает, какая языковая версия имеет преимущество в случае расхождений.",
-      crossBorderTip: "Трансграничные соглашения о неразглашении могут столкнуться с проблемами исполнения. Учитывайте местные законы и механизмы исполнения."
+      disclosureParty: "Сторона, владеющая конфиденциальной информацией. Например, стартап, делящийся технологией с потенциальными инвесторами. Важно четко определить, кто обладает ценной информацией для защиты.",
+      receivingParty: "Сторона, получающая доступ к конфиденциальной информации. Примеры: инвесторы при проверке стартапа, подрядчики на конфиденциальных проектах, потенциальные партнеры при переговорах.",
+      effectiveDate: "Момент начала обязательств по конфиденциальности. Может быть датой подписания или будущей датой. Важно для расчета окончания защитных периодов и активации положений о возврате.",
+      confidentialityDefinition: "Широкое определение: охватывает почти всю информацию, включая устные обсуждения. Среднее: ограничено конкретной бизнес-информацией. Узкое: только информация с пометкой 'конфиденциально' в письменном виде.",
+      purpose: "Ограничивает использование конфиденциальной информации. Для инвестиций: только для due diligence. Для услуг: только для выполнения задач. Д��я трудоустройства: только для рабочих обязанностей.",
+      protectionPeriod: "После этого срока получатель не обязан хранить конфиденциальность. 2-3 года стандартно для бизнес-информации. Бессрочно для коммерческой тайны. По российскому праву неограниченные сроки могут быть проблематичны.",
+      governingLaw: "Определяет, суды какой страны/штата будут толковать соглашение. Россия требует специальную маркировку 'Коммерческая тайна'. США более гибки, но штаты различаются в подходах.",
+      jurisdiction: "Место разрешения споров. Выберите доступное для обеих сторон место. Для международных соглашений рассмотрите арбитраж вместо государственных судов.",
+      returnDestroy: "Гарантирует отсутствие копий после окончания отношений. Важно для защиты коммерческой тайны. Учтите исключения для копий, требуемых законом.",
+      noWarranty: "Защищает раскрывающую сторону, если информация неточна или вызывает проблемы. Важно при передаче технических данных или бизнес-прогнозов.",
+      severability: "Если одна часть соглашения недействительна, остальное остается в силе. Критично для международных соглашений, где некоторые положения могут противоречить местным законам.",
+      controllingLanguage: "Разрешает расхождения в переводе. Английский распространен в международном бизнесе. Рассмотрите выбор языка юрисдикции применимого права.",
+      crossBorderTip: "Международные NDA требуют особого внимания: учитывайте местные законы о конфиденциальности, точность перевода, практическое исполнение в каждой стране, возможную необходимость местной юридической проверки."
     }
   };
   
@@ -511,9 +347,7 @@ ${customText || '[Пользовательское Определение Кон
   const generateDocument = React.useCallback(() => {
     const {
       discloserName,
-      discloserAddress,
       recipientName,
-      recipientAddress,
       effectiveDate,
       purpose,
       customPurpose,
@@ -522,19 +356,24 @@ ${customText || '[Пользовательское Определение Кон
       protectionPeriod,
       terminationNotice,
       governingLaw,
-      customGoverningLaw,
-      jurisdiction,
-      customJurisdiction,
       includeNoWarranty,
       includeSeverability,
       controllingLanguage
     } = formData;
     
-    // Calculate section numbers
-    let enSectionNum = 7;
+    // Get the correct purpose text with proper conjugation
+    let purposeText = '';
+    if (purpose === 'custom') {
+      purposeText = customPurpose || '[Custom Purpose]';
+    } else {
+      purposeText = purposeOptions[currentLanguage][purpose] || purposeOptions.english[purpose];
+    }
+    
+    // Calculate section numbers based on included sections
+    let enNoWarrantyNum = "7";
     let enGovLawNum = includeNoWarranty ? "8" : "7";
     let enSeverabilityNum = (includeNoWarranty ? 8 : 7) + (includeSeverability ? 1 : 0);
-    let enControllingLangNum = enSeverabilityNum + 1;
+    let enControllingLangNum = (includeNoWarranty ? 8 : 7) + (includeSeverability ? 1 : 0) + 1;
     
     // Create document content
     let documentContent = '';
@@ -550,14 +389,14 @@ ${customText || '[Пользовательское Определение Кон
       </div>
     </div>`;
     
-    // Parties section - now includes addresses
+    // Parties section
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
-        ${templates.english.parties(discloserName, discloserAddress, recipientName, recipientAddress)}
+        ${templates.english.parties(discloserName, recipientName)}
       </div>
       <div class="column right-column">
-        ${templates.russian.parties(discloserName, discloserAddress, recipientName, recipientAddress)}
+        ${templates.russian.parties(discloserName, recipientName)}
       </div>
     </div>`;
     
@@ -603,14 +442,17 @@ ${customText || '[Пользовательское Определение Кон
       </div>
     </div>`;
     
-    // Permitted Use section
+    // Permitted Use section - Fixed to use proper conjugation
+    const englishPurpose = purposeOptions.english[purpose] || customPurpose || '[Purpose]';
+    const russianPurpose = purposeOptions.russian[purpose] || customPurpose || '[Цель]';
+    
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
-        ${templates.english.permittedUse(purpose)}
+        ${templates.english.permittedUse(englishPurpose)}
       </div>
       <div class="column right-column">
-        ${templates.russian.permittedUse(purpose)}
+        ${templates.russian.permittedUse(russianPurpose)}
       </div>
     </div>`;
     
@@ -650,25 +492,15 @@ ${customText || '[Пользовательское Определение Кон
     }
     
     // Governing Law section
-    let enGovLaw, ruGovLaw;
-    if (governingLaw === 'other') {
-      const customJuris = jurisdiction === 'other' ? customJurisdiction : jurisdiction;
-      enGovLaw = templates.english.governingLaw.other(customGoverningLaw, customJuris);
-      ruGovLaw = templates.russian.governingLaw.other(customGoverningLaw, customJuris);
-    } else {
-      enGovLaw = templates.english.governingLaw[governingLaw];
-      ruGovLaw = templates.russian.governingLaw[governingLaw];
-    }
-    
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
         <div class="section-title">${enGovLawNum}. GOVERNING LAW</div>
-        ${enGovLaw.split('</div>')[1]}
+        ${templates.english.governingLaw[governingLaw].split('</div>')[1]}
       </div>
       <div class="column right-column">
         <div class="section-title">${enGovLawNum}. ПРИМЕНИМОЕ ПРАВО</div>
-        ${ruGovLaw.split('</div>')[1]}
+        ${templates.russian.governingLaw[governingLaw].split('</div>')[1]}
       </div>
     </div>`;
     
@@ -712,13 +544,13 @@ ${customText || '[Пользовательское Определение Кон
     </div>`;
     
     return documentContent;
-  }, [formData]);
+  }, [formData, currentLanguage]);
   
   // Help icon component with tooltip
   const HelpIcon = ({ tooltip }) => (
-    <span className="help-icon">
+    <span class="help-icon">
       ?
-      <span className="help-tooltip">
+      <span class="help-tooltip">
         {tooltip}
       </span>
     </span>
@@ -841,27 +673,18 @@ ${customText || '[Пользовательское Определение Кон
                 value={formData.purpose}
                 onChange={handleChange}
               >
-                <option value="">
-                  {currentLanguage === 'english' ? 'Select purpose...' : 'Выберите цель...'}
-                </option>
-                {purposeOptions[currentLanguage].map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
+                {Object.entries(purposeOptions[currentLanguage]).map(([key, value]) => (
+                  <option key={key} value={key}>
+                    {value}
                   </option>
                 ))}
               </select>
             </div>
             
-            {formData.purpose && (
-              <div className="purpose-explainer">
-                {purposeExplainers[currentLanguage][formData.purpose]}
-              </div>
-            )}
-            
             {formData.purpose === 'custom' && (
               <div className="form-group">
                 <label htmlFor="customPurpose">
-                  {currentLanguage === 'english' ? 'Custom Purpose:' : 'Пользовательская Цель:'}
+                  {currentLanguage === 'english' ? 'Custom Purpose:' : 'Другая Цель:'}
                 </label>
                 <textarea 
                   id="customPurpose"
@@ -869,8 +692,8 @@ ${customText || '[Пользовательское Определение Кон
                   value={formData.customPurpose}
                   onChange={handleChange}
                   placeholder={currentLanguage === 'english' 
-                    ? 'Describe the specific purpose...' 
-                    : 'Опишите конкретную цель...'}
+                    ? 'Enter custom purpose for disclosure' 
+                    : 'Введите пользовательскую цель раскрытия'}
                 />
               </div>
             )}
@@ -900,12 +723,6 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
               </select>
             </div>
-            
-            {formData.confInfoType && (
-              <div className="definition-summary">
-                {definitionSummaries[currentLanguage][formData.confInfoType]}
-              </div>
-            )}
             
             {formData.confInfoType === 'custom' && (
               <div className="form-group">
@@ -948,7 +765,6 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="terminationNotice">
                 {currentLanguage === 'english' ? 'Termination Notice Period (days):' : 'Период Уведомления о Расторжении (дней):'}
-                <HelpIcon tooltip={tooltips.terminationNotice} />
               </label>
               <input 
                 type="number" 
@@ -984,27 +800,8 @@ ${customText || '[Пользовательское Определение Кон
                 <option value="russia">
                   {currentLanguage === 'english' ? 'Russian Federation' : 'Российская Федерация'}
                 </option>
-                <option value="other">
-                  {currentLanguage === 'english' ? 'Other (specify below)' : 'Другое (укажите ниже)'}
-                </option>
               </select>
             </div>
-            
-            {formData.governingLaw === 'other' && (
-              <div className="form-group">
-                <label htmlFor="customGoverningLaw">
-                  {currentLanguage === 'english' ? 'Custom Governing Law:' : 'Пользовательское Применимое Право:'}
-                </label>
-                <input 
-                  type="text" 
-                  id="customGoverningLaw"
-                  name="customGoverningLaw"
-                  value={formData.customGoverningLaw}
-                  onChange={handleChange}
-                  placeholder={currentLanguage === 'english' ? 'e.g., State of Texas' : 'например, штат Техас'}
-                />
-              </div>
-            )}
             
             <div className="form-group">
               <label htmlFor="jurisdiction">
@@ -1029,27 +826,8 @@ ${customText || '[Пользовательское Определение Кон
                 <option value="moscow">
                   {currentLanguage === 'english' ? 'Moscow, Russia' : 'Москва, Россия'}
                 </option>
-                <option value="other">
-                  {currentLanguage === 'english' ? 'Other (specify below)' : 'Другое (укажите ниже)'}
-                </option>
               </select>
             </div>
-            
-            {formData.jurisdiction === 'other' && (
-              <div className="form-group">
-                <label htmlFor="customJurisdiction">
-                  {currentLanguage === 'english' ? 'Custom Jurisdiction:' : 'Пользовательская Юрисдикция:'}
-                </label>
-                <input 
-                  type="text" 
-                  id="customJurisdiction"
-                  name="customJurisdiction"
-                  value={formData.customJurisdiction}
-                  onChange={handleChange}
-                  placeholder={currentLanguage === 'english' ? 'e.g., Houston, TX' : 'например, Хьюстон, Техас'}
-                />
-              </div>
-            )}
           </div>
         );
         
@@ -1121,6 +899,9 @@ ${customText || '[Пользовательское Определение Кон
                 <option value="russian">
                   {currentLanguage === 'english' ? 'Russian' : 'Русский'}
                 </option>
+                <option value="both">
+                  {currentLanguage === 'english' ? 'Both Equally' : 'Оба в Равной Степени'}
+                </option>
               </select>
             </div>
           </div>
@@ -1140,12 +921,15 @@ ${customText || '[Пользовательское Определение Кон
     }
   }, [formData, generateDocument]);
   
-  // Effect to initialize feather icons after render
+  // Initialize purpose to a default value
   React.useEffect(() => {
-    if (window.feather) {
-      window.feather.replace();
+    if (!formData.purpose) {
+      setFormData(prev => ({
+        ...prev,
+        purpose: 'evaluation'
+      }));
     }
-  }, [currentTab]);
+  }, []);
   
   return (
     <div className="main-container">

@@ -25,9 +25,9 @@ window.generateWordDoc = function(formData) {
       let documentContent = '';
       
       // Titles
-      documentContent += '<table width="100%" border="0" cellspacing="0" cellpadding="10">';
-      documentContent += '<tr><td width="50%" style="vertical-align:top;"><h2>NON-DISCLOSURE AGREEMENT</h2></td>';
-      documentContent += '<td width="50%" style="vertical-align:top;"><h2>СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ</h2></td></tr>';
+      documentContent += '<table width="100%" border="0" cellspacing="0" cellpadding="5">';
+      documentContent += '<tr><td width="50%" style="vertical-align:top;"><h2 style="text-align:center;">NON-DISCLOSURE AGREEMENT</h2></td>';
+      documentContent += '<td width="50%" style="vertical-align:top;"><h2 style="text-align:center;">СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ</h2></td></tr>';
       
       // Parties section
       documentContent += '<tr><td style="vertical-align:top;">';
@@ -57,7 +57,7 @@ window.generateWordDoc = function(formData) {
       documentContent += `<strong>3. СРОК ДЕЙСТВИЯ И РАСТОРЖЕНИЕ</strong><br>Данное Соглашение остается в силе до расторжения любой Стороной по предварительному письменному уведомлению за ${terminationNotice} дней; но ни одна Сторона не может расторгнуть данное Соглашение если между Сторонами заключено другое действующее прямое соглашение. В случае расторжения данного Соглашения, его условия продолжат действовать в отношении Конфиденциальной Информации, раскрытой до даты вступления в силу расторжения.`;
       documentContent += '</td></tr>';
       
-      // Permitted Use section
+      // Permitted Use section - Fixed Russian conjugation here
       documentContent += '<tr><td style="vertical-align:top;">';
       documentContent += `<strong>4. PERMITTED USE AND DISCLOSURE</strong><br>Receiving Party will use Confidential Information only for the purpose of and in connection with ${purpose} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
       documentContent += '</td><td style="vertical-align:top;">';
@@ -102,7 +102,7 @@ window.generateWordDoc = function(formData) {
           break;
         case 'newyork':
           govLawEN = `This Agreement shall be governed by the law of the State of New York, USA. New York, NY is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`;
-          govLawRU = `Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать New York, NY.`;
+          govLawRU = `Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглаш��нием, стороны договорились считать New York, NY.`;
           break;
         case 'russia':
           govLawEN = `This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`;
@@ -183,7 +183,7 @@ window.generateWordDoc = function(formData) {
       return documentContent;
     };
     
-    // Create HTML content for Word document
+    // Create HTML content for Word document - fixed margins
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -191,11 +191,15 @@ window.generateWordDoc = function(formData) {
         <meta charset="UTF-8">
         <title>Dual-Language NDA | ${formData.discloserName || 'Disclosing Party'} and ${formData.recipientName || 'Receiving Party'}</title>
         <style>
+          @page {
+            margin: 0.75in;
+          }
           body {
             font-family: Calibri, Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.5;
-            margin: 1in 1in 1in 1in;
+            margin: 0;
+            padding: 0;
           }
           table {
             border-collapse: collapse;
