@@ -5,7 +5,7 @@ const App = () => {
   const [currentTab, setCurrentTab] = React.useState('parties');
   const [formData, setFormData] = React.useState({
     discloserName: '',
-    discloserAddress: '',  
+    discloserAddress: '',
     recipientName: '',
     recipientAddress: '',
     effectiveDate: '',
@@ -16,24 +16,21 @@ const App = () => {
     protectionPeriod: 2,
     terminationNotice: 30,
     governingLaw: 'california',
+    jurisdiction: 'los-angeles',
     includeReturnDestroy: true,
     includeNoWarranty: true,
     includeSeverability: true,
     controllingLanguage: 'english',
   });
   
-  // Track what was last changed for highlighting
-  const [lastChanged, setLastChanged] = React.useState(null);
-  
   // Preview section ref for scrolling
   const previewRef = React.useRef(null);
   
-  // Define tabs - Changed "Информация" to "Стороны" and "Parties Info" to "Parties"
+  // Define tabs - balanced lengths for both languages
   const tabs = [
-    { id: 'parties', labelEn: 'Parties', labelRu: 'Стороны' },
+    { id: 'parties', labelEn: 'Parties Info', labelRu: 'Информация' },
     { id: 'terms', labelEn: 'Key Terms', labelRu: 'Условия' },
-    { id: 'additional', labelEn: 'Options', labelRu: 'Опции' },
-    { id: 'summary', labelEn: 'Summary', labelRu: 'Итог' }
+    { id: 'additional', labelEn: 'Options', labelRu: 'Опции' }
   ];
   
   // Handle language toggle
@@ -49,8 +46,6 @@ const App = () => {
   // Handle form input changes with highlighting
   const handleChange = React.useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    
-    setLastChanged(name);
     
     setFormData(prev => ({
       ...prev,
@@ -83,16 +78,7 @@ const App = () => {
       case 'recipientName':
       case 'discloserAddress':
       case 'recipientAddress':
-        // Find the first paragraph containing party names - not the title
-        const partyRows = previewElement.querySelectorAll('.section-row');
-        partyRows.forEach(row => {
-          const text = row.textContent;
-          if ((text.includes('This Agreement is made by') || text.includes('Это Соглашение заключено между')) 
-              && (text.includes(formData.discloserName) || text.includes(formData.recipientName)
-                  || text.includes('[Disclosing Party Name]') || text.includes('[Receiving Party Name]'))) {
-            sectionToHighlight = row;
-          }
-        });
+        sectionToHighlight = previewElement.querySelector('.section-row');
         break;
       case 'effectiveDate':
         const dateSections = previewElement.querySelectorAll('.section-title');
@@ -137,6 +123,7 @@ const App = () => {
         });
         break;
       case 'governingLaw':
+      case 'jurisdiction':
         const govSections = previewElement.querySelectorAll('.section-title');
         govSections.forEach(section => {
           if (section.textContent.includes('GOVERNING LAW') || section.textContent.includes('ПРИМЕНИМОЕ ПРАВО')) {
@@ -307,7 +294,7 @@ const App = () => {
     english: {
       title: "NON-DISCLOSURE AGREEMENT",
       parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
-        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong> located at ${discloserAddress || '[Disclosing Party Address]'} (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong> located at ${recipientAddress || '[Receiving Party Address]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
+        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong>, with address at ${discloserAddress || '[Disclosing Party Address]'} (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong>, with address at ${recipientAddress || '[Receiving Party Address]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('en-US', {
@@ -373,16 +360,16 @@ The Confidential Information is provided with no warranties of any kind. The Dis
       
       governingLaw: {
         california: `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of the State of California, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in Los Angeles, California.`,
+This Agreement shall be governed by the law of the State of California, USA. Los Angeles, CA is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
         
         delaware: `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of the State of Delaware, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in Wilmington, Delaware.`,
+This Agreement shall be governed by the law of the State of Delaware, USA. Wilmington, DE is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
         
         newyork: `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of the State of New York, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in New York, New York.`,
+This Agreement shall be governed by the law of the State of New York, USA. New York, NY is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
         
         russia: `<div class="section-title">8. GOVERNING LAW</div>
-This Agreement shall be governed by the law of the Russian Federation. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the courts of Moscow, Russia.`
+This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`
       },
       
       severability: `<div class="section-title">9. SEVERABILITY</div>
@@ -419,12 +406,12 @@ Date: _______________________________
     russian: {
       title: "СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ",
       parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
-        return `Это Соглашение заключено между <strong>${discloserName || '[Наименование Раскрывающей Стороны]'}</strong>, с адресом ${discloserAddress || '[Адрес Раскрывающей Стороны]'} ("Раскрывающая Сторона") и <strong>${recipientName || '[Наименование Получателя]'}</strong>, с адресом ${recipientAddress || '[Адрес Получателя]'} ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
+        return `Это Соглашение заключено между <strong>${discloserName || '[Disclosing Party Name]'}</strong>, с адресом ${discloserAddress || '[Disclosing Party Address]'} ("Раскрывающая Сторона") и <strong>${recipientName || '[Receiving Party Name]'}</strong>, с адресом ${recipientAddress || '[Receiving Party Address]'} ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('ru-RU', {
           year: 'numeric', month: 'long', day: 'numeric'
-        }) : '[Дата Вступления в Силу]';
+        }) : '[Effective Date]';
         
         return `<div class="section-title">1. ДАТА ВСТУПЛЕНИЯ В СИЛУ</div>
 Дата вступления в силу настоящего Соглашения ${formattedDate}.`;
@@ -468,7 +455,6 @@ ${customText || '[Пользовательское Определение Кон
             purposeText = '[Цель Раскрытия]';
         }
         
-        // Fixed Russian text as required (removed "между Сторонами")
         return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
 Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText}. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       },
@@ -486,16 +472,16 @@ ${customText || '[Пользовательское Определение Кон
       
       governingLaw: {
         california: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством штата Калифорния, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Лос-Анджелесе, Калифорния.`,
+Настоящее соглашение регулируется законодательством штата California, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Los Angeles, CA.`,
         
         delaware: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством штата Делавэр, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Уилмингтоне, Делавэр.`,
+Настоящее соглашение регулируется законодательством штата Delaware, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Wilmington, DE.`,
         
         newyork: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством штата Нью-Йорк, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Нью-Йорке, Нью-Йорк.`,
+Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать New York, NY.`,
         
         russia: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
-Настоящее соглашение регулируется законодательством Российской Федерации. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов Москвы, Россия.`
+Настоящее соглашение регулируется законодательством Российской Федерации. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать Москву, Россия.`
       },
       
       severability: `<div class="section-title">9. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</div>
@@ -540,36 +526,27 @@ ${customText || '[Пользовательское Определение Кон
       purpose: "Clearly defining the purpose limits how the confidential information can be used and helps prevent misuse.",
       protectionPeriod: "How long the receiving party must keep information confidential. Common periods are 2-5 years. Trade secrets may require indefinite protection.",
       governingLaw: "Determines which jurisdiction's laws will be applied to interpret the agreement. Critical for international agreements.",
+      jurisdiction: "The specific court or location where disputes will be resolved. Should be easily accessible to both parties.",
       returnDestroy: "Requires the receiving party to return or destroy confidential information upon request, ensuring no copies remain.",
       noWarranty: "Protects the disclosing party from liability if the information turns out to be incorrect or causes damages.",
       severability: "Ensures the entire agreement doesn't become invalid if one provision is found unenforceable.",
       controllingLanguage: "In bilingual agreements, specifies which language version prevails in case of discrepancies.",
-      // Dynamic explanations for confidentiality definitions
-      confInfoExplanations: {
-        broad: "This broad definition covers virtually all non-public information shared, including verbal communications and information that should reasonably be considered confidential. Ideal for protecting all types of business information but may be harder to enforce due to its wide scope.",
-        medium: "This balanced definition focuses on business-related information while providing specific examples. It includes trade secrets, technical data, and business information. Recommended for most business relationships.",
-        narrow: "This narrow definition only protects information specifically marked as confidential in writing. Provides the clearest boundaries but risks excluding important verbal disclosures. Best for limited disclosures or when dealing with highly organized documentation.",
-        custom: "A custom definition allows you to specify exactly what information should be protected based on your specific needs."
-      }
+      crossBorderTip: "Cross-border NDAs may face enforcement challenges. Consider local laws, translation accuracy, and practical enforcement mechanisms."
     },
     russian: {
       disclosureParty: "Сторона, которая владеет и раскрывает конфиденциальную информацию. Обычно это бизнес или лицо, раскрывающее конфиденциальные данные.",
       receivingParty: "Сторона, которая получает конфиденциальную информацию. Эта сторона обязана защищать и не злоупотреблять информацией.",
-      effectiveDate: "Дата, когда соглашение станов��тся юридически обязательным. Важно для расчета сроков защиты и понимания начала обязательств.",
+      effectiveDate: "Дата, когда соглашение становится юридически обязательным. Важно для расчета сроков защиты и понимания начала обязательств.",
       confidentialityDefinition: "Определяет, какая информация защищена. Более широкие определения защищают больше информации, но их сложнее обеспечить исполнение.",
       purpose: "Четкое определение цели ограничивает использование конфиденциальной информации и помогает предотвратить злоупотребления.",
       protectionPeriod: "Как долго получающая сторона должна сохранять информацию конфиденциальной. Обычные сроки 2-5 лет.",
       governingLaw: "Определяет, законы какой юрисдикции будут применяться для толкования соглашения. Критично для международных соглашений.",
+      jurisdiction: "Конкретный суд или место, где будут разрешаться споры. Должно быть легко доступно для обеих сторон.",
       returnDestroy: "Требует от получающей стороны вернуть или уничтожить конфиденциальную информацию по запросу.",
       noWarranty: "Защищает раскрывающую сторону от ответственности, если информация окажется неверной или причинит ущерб.",
-      severability: "Гарантирует, что все соглашение не станет недействительным, если одно положение будет признано неисполнимым.",
+      severability: "Гарантирует, что все соглашение не станет недействительным, если одно положение будет признано неиспол��имым.",
       controllingLanguage: "В двуязычных соглашениях указывает, какая языковая версия имеет преимущество в случае расхождений.",
-      confInfoExplanations: {
-        broad: "Это широкое определение охватывает практически всю непубличную информацию, включая устные сообщения и информацию, которую разумно считать конфиденциальной. Идеально для защиты всех типов деловой информации, но может быть сложнее в исполнении из-за широкого охвата.",
-        medium: "Это сбалансированное определение фокусируется на деловой информации с конкретными примерами. Включает коммерческую тайну, технические данные и деловую информацию. Рекомендуется для большинства деловых отношений.",
-        narrow: "Это узкое определение защищает только информацию, явно помеченную как конфиденциальная в письменной форме. Обеспечивает четкие границы, но рискует исключить важные устные раскрытия. Лучше всего для ограниченных раскрытий.",
-        custom: "Пользовательское определение позволяет указать, какая именно информация должна быть защищена, исходя из ваших конкретных потребностей."
-      }
+      crossBorderTip: "Трансграничные соглашения о неразглашении могут столкнуться с проблемами исполнения. Учитывайте местные законы и механизмы исполнения."
     }
   };
   
@@ -577,9 +554,7 @@ ${customText || '[Пользовательское Определение Кон
   const generateDocument = React.useCallback(() => {
     const {
       discloserName,
-      discloserAddress,
       recipientName,
-      recipientAddress,
       effectiveDate,
       purpose,
       customPurpose,
@@ -613,14 +588,14 @@ ${customText || '[Пользовательское Определение Кон
       </div>
     </div>`;
     
-    // Parties section - now includes addresses
+    // Parties section
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
-        ${templates.english.parties(discloserName, discloserAddress, recipientName, recipientAddress)}
+        ${templates.english.parties(discloserName, recipientName)}
       </div>
       <div class="column right-column">
-        ${templates.russian.parties(discloserName, discloserAddress, recipientName, recipientAddress)}
+        ${templates.russian.parties(discloserName, recipientName)}
       </div>
     </div>`;
     
@@ -802,6 +777,7 @@ ${customText || '[Пользовательское Определение Кон
     
     switch(currentTab) {
       case 'parties':
+        // Combined parties and agreement tab
         return (
           <div className="tab-content active">
             <div className="form-group">
@@ -928,6 +904,7 @@ ${customText || '[Пользовательское Определение Кон
         );
       
       case 'terms':
+        // Combined terms and jurisdiction info
         return (
           <div className="tab-content active">
             <div className="form-group">
@@ -955,13 +932,6 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
               </select>
             </div>
-            
-            {/* Dynamic explanation for confidentiality definitions */}
-            {formData.confInfoType !== 'custom' && (
-              <div className="form-explanation">
-                {tooltips.confInfoExplanations[formData.confInfoType]}
-              </div>
-            )}
             
             {formData.confInfoType === 'custom' && (
               <div className="form-group">
@@ -1033,6 +1003,32 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
                 <option value="russia">
                   {currentLanguage === 'english' ? 'Russian Federation' : 'Российская Федерация'}
+                </option>
+              </select>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="jurisdiction">
+                {currentLanguage === 'english' ? 'Jurisdiction:' : 'Место Рассмотрения Споров:'}
+                <HelpIcon tooltip={tooltips.jurisdiction} />
+              </label>
+              <select 
+                id="jurisdiction"
+                name="jurisdiction"
+                value={formData.jurisdiction}
+                onChange={handleChange}
+              >
+                <option value="los-angeles">
+                  {currentLanguage === 'english' ? 'Los Angeles, CA' : 'Лос-Анджелес, Калифорния'}
+                </option>
+                <option value="new-york">
+                  {currentLanguage === 'english' ? 'New York, NY' : 'Нью-Йорк, Нью-Йорк'}
+                </option>
+                <option value="wilmington">
+                  {currentLanguage === 'english' ? 'Wilmington, DE' : 'Уилмингтон, Делавэр'}
+                </option>
+                <option value="moscow">
+                  {currentLanguage === 'english' ? 'Moscow, Russia' : 'Москва, Россия'}
                 </option>
               </select>
             </div>
@@ -1124,157 +1120,9 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
               </select>
             </div>
-          </div>
-        );
-        
-      case 'summary':
-        return (
-          <div className="tab-content active">
-            <h3>{currentLanguage === 'english' ? 'Agreement Summary' : 'Итог Соглашения'}</h3>
             
-            {/* Parties Summary */}
-            <div className="summary-section">
-              <h4>{currentLanguage === 'english' ? 'Parties' : 'Стороны'}</h4>
-              <div className={`summary-item ${!formData.discloserName || !formData.discloserAddress ? 'warning-red' : 'success-green'}`}>
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Disclosing Party:' : 'Раскрывающая Сторона:'}
-                </span>
-                <span className="summary-value">
-                  {formData.discloserName || (currentLanguage === 'english' ? '[Missing]' : '[Отсутствует]')}
-                  {formData.discloserAddress && `, ${formData.discloserAddress}`}
-                </span>
-              </div>
-              <div className={`summary-item ${!formData.recipientName || !formData.recipientAddress ? 'warning-red' : 'success-green'}`}>
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Receiving Party:' : 'Получатель:'}
-                </span>
-                <span className="summary-value">
-                  {formData.recipientName || (currentLanguage === 'english' ? '[Missing]' : '[Отсутствует]')}
-                  {formData.recipientAddress && `, ${formData.recipientAddress}`}
-                </span>
-              </div>
-            </div>
-            
-            {/* Key Terms Summary */}
-            <div className="summary-section">
-              <h4>{currentLanguage === 'english' ? 'Key Terms' : 'Основные Условия'}</h4>
-              <div className={`summary-item ${!formData.effectiveDate ? 'warning-red' : 'success-green'}`}>
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Effective Date:' : 'Дата Вступления в Силу:'}
-                </span>
-                <span className="summary-value">
-                  {formData.effectiveDate || (currentLanguage === 'english' ? '[Not Set]' : '[Не Указано]')}
-                </span>
-              </div>
-              <div className="summary-item success-green">
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Purpose:' : 'Цель:'}
-                </span>
-                <span className="summary-value">
-                  {formData.purpose === 'custom' ? formData.customPurpose || 'Custom' : 
-                   formData.purpose === 'business' ? (currentLanguage === 'english' ? 'Business relationship' : 'Деловые отношения') :
-                   formData.purpose === 'services' ? (currentLanguage === 'english' ? 'Services provision' : 'Предоставление услуг') :
-                   formData.purpose === 'investment' ? (currentLanguage === 'english' ? 'Investment discussion' : 'Обсуждение инвестиций') : 
-                   formData.purpose}
-                </span>
-              </div>
-              <div className="summary-item success-green">
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Confidentiality Definition:' : 'Определение Конфиденциальности:'}
-                </span>
-                <span className="summary-value">
-                  {formData.confInfoType === 'custom' ? 'Custom' : 
-                   formData.confInfoType.charAt(0).toUpperCase() + formData.confInfoType.slice(1)}
-                </span>
-              </div>
-              <div className="summary-item success-green">
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Protection Period:' : 'Срок Защиты:'}
-                </span>
-                <span className="summary-value">
-                  {formData.protectionPeriod} {currentLanguage === 'english' ? 'years' : 'лет'}
-                </span>
-              </div>
-            </div>
-            
-            {/* Jurisdiction Summary */}
-            <div className="summary-section">
-              <h4>{currentLanguage === 'english' ? 'Jurisdiction' : 'Юрисдикция'}</h4>
-              <div className={`summary-item ${formData.governingLaw === 'russia' && formData.controllingLanguage === 'english' ? 'warning-yellow' : 'success-green'}`}>
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Governing Law:' : 'Применимое Право:'}
-                </span>
-                <span className="summary-value">
-                  {formData.governingLaw === 'california' ? (currentLanguage === 'english' ? 'California, USA' : 'Калифорния, США') :
-                   formData.governingLaw === 'delaware' ? (currentLanguage === 'english' ? 'Delaware, USA' : 'Делавэр, США') :
-                   formData.governingLaw === 'newyork' ? (currentLanguage === 'english' ? 'New York, USA' : 'Нью-Йорк, США') :
-                   formData.governingLaw === 'russia' ? (currentLanguage === 'english' ? 'Russian Federation' : 'Российская Федерация') :
-                   formData.governingLaw}
-                </span>
-              </div>
-              <div className="summary-item success-green">
-                <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Controlling Language:' : 'Преобладающий Язык:'}
-                </span>
-                <span className="summary-value">
-                  {formData.controllingLanguage === 'english' ? (currentLanguage === 'english' ? 'English' : 'Английский') :
-                   formData.controllingLanguage === 'russian' ? (currentLanguage === 'english' ? 'Russian' : 'Русский') :
-                   formData.controllingLanguage}
-                </span>
-              </div>
-              
-              {formData.governingLaw === 'russia' && formData.controllingLanguage === 'english' && (
-                <div className="summary-warning">
-                  {currentLanguage === 'english' 
-                    ? '⚠️ Note: Using English as controlling language with Russian law may create enforcement challenges'
-                    : '⚠️ Примечание: Использование английского как преобладающего языка с российским правом может создать сложности с исполнением'}
-                </div>
-              )}
-            </div>
-            
-            {/* Additional Provisions Summary */}
-            <div className="summary-section">
-              <h4>{currentLanguage === 'english' ? 'Additional Provisions' : 'Дополнительные Положения'}</h4>
-              <div className="provisions-list">
-                {formData.includeReturnDestroy && (
-                  <div className="provision-included">
-                    ✓ {currentLanguage === 'english' ? 'Return/Destruction of Materials' : 'Возврат/Уничтожение Материалов'}
-                  </div>
-                )}
-                {formData.includeNoWarranty && (
-                  <div className="provision-included">
-                    ✓ {currentLanguage === 'english' ? 'No Warranty Clause' : 'Отсутствие Гарантий'}
-                  </div>
-                )}
-                {formData.includeSeverability && (
-                  <div className="provision-included">
-                    ✓ {currentLanguage === 'english' ? 'Severability Clause' : 'Независимость Положений'}
-                  </div>
-                )}
-                {!formData.includeReturnDestroy && !formData.includeNoWarranty && !formData.includeSeverability && (
-                  <div className="provision-excluded">
-                    {currentLanguage === 'english' ? 'No additional provisions selected' : 'Дополнительные положения не выбраны'}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Final Status */}
-            <div className="summary-section">
-              <h4>{currentLanguage === 'english' ? 'Status' : 'Статус'}</h4>
-              {(!formData.discloserName || !formData.recipientName || !formData.effectiveDate) ? (
-                <div className="status-incomplete">
-                  {currentLanguage === 'english' 
-                    ? '❌ Agreement incomplete - required information missing'
-                    : '❌ Соглашение не завершено - отсутствует обязательная информация'}
-                </div>
-              ) : (
-                <div className="status-complete">
-                  {currentLanguage === 'english' 
-                    ? '✅ Agreement ready for generation'
-                    : '✅ Соглашение готово к созданию'}
-                </div>
-              )}
+            <div className="legal-note">
+              {tooltips.crossBorderTip}
             </div>
           </div>
         );
