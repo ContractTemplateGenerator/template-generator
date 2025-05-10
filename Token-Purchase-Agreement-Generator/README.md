@@ -39,6 +39,20 @@ A comprehensive Token Purchase Agreement (TPA) generator that enables users to c
 
 This generator runs entirely in the browser. No form data is sent to any server or stored beyond your browser session.
 
+## Embedding the Generator
+
+To embed this generator on your website, you can use the provided iframe.html file or simply add the following iframe code to your page:
+
+```html
+<iframe 
+    src="https://template.terms.law/Token-Purchase-Agreement-Generator/" 
+    style="width: 100%; height: 850px; border: none;"
+    title="Token Purchase Agreement Generator">
+</iframe>
+```
+
+For responsive height adjustments, use the iframe.html file which includes event listening for content height changes.
+
 ## Legal Disclaimer
 
 The template generator is provided for informational purposes only and does not constitute legal advice. Users should consult with a qualified attorney to review any agreements before use.

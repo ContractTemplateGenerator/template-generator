@@ -352,6 +352,25 @@ Title: __________________________`;
     }
   }, [highlightedText, lastChanged]);
   
+  // Effect for iframe communication
+  useEffect(() => {
+    // Send height to parent if in iframe
+    if (window.self !== window.top) {
+      const sendHeight = () => {
+        const height = document.body.scrollHeight;
+        window.parent.postMessage({ type: 'resize', height }, '*');
+      };
+      
+      // Send initial height
+      sendHeight();
+      
+      // Send height on resize
+      window.addEventListener('resize', sendHeight);
+      
+      return () => window.removeEventListener('resize', sendHeight);
+    }
+  }, []);
+  
   // Tab configuration
   const tabs = [
     { id: 'tab1', label: 'Parties & Basic Terms' },
