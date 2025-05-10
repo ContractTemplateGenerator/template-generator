@@ -25,64 +25,64 @@ window.generateWordDoc = function(formData) {
       let documentContent = '';
       
       // Titles
-      documentContent += '<table width="100%" border="0" cellspacing="0" cellpadding="5">';
-      documentContent += '<tr><td width="50%" style="vertical-align:top;"><h2 style="text-align:center;">NON-DISCLOSURE AGREEMENT</h2></td>';
-      documentContent += '<td width="50%" style="vertical-align:top;"><h2 style="text-align:center;">СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ</h2></td></tr>';
+      documentContent += '<table width="100%" border="0" cellspacing="0" cellpadding="5" style="margin-left: -30px;">';
+      documentContent += '<tr><td width="50%" style="vertical-align:top; padding-left: 10px;"><h2>NON-DISCLOSURE AGREEMENT</h2></td>';
+      documentContent += '<td width="50%" style="vertical-align:top; padding-right: 10px;"><h2>СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ</h2></td></tr>';
       
       // Parties section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `This Agreement is made by <strong>${discloserName}</strong> (the "Disclosing Party"), and <strong>${recipientName}</strong> (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `Это Соглашение заключено между <strong>${discloserName}</strong> ("Раскрывающая Сторона") и <strong>${recipientName}</strong> ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
       documentContent += '</td></tr>';
       
       // Effective Date section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>1. EFFECTIVE DATE</strong><br>The effective date of this Agreement is ${effectiveDate}.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>1. ДАТА ВСТУПЛЕНИЯ В СИЛУ</strong><br>Дата вступления в силу настоящего Соглашения ${effectiveDateRu}.`;
       documentContent += '</td></tr>';
       
       // Confidential Information section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>2. CONFIDENTIAL INFORMATION</strong><br>"Confidential Information" disclosed under this Agreement is defined as any information, technical data or know-how furnished, whether in written, oral, electronic or other form by the Disclosing Party to the Receiving Party that (a) is marked, accompanied or supported by documents clearly and conspicuously designating such documents as "confidential", "internal use" or the equivalent; (b) is identified by the Disclosing Party as confidential before, during or promptly after the presentation or communication; or (c) should reasonably be known by Receiving Party to be confidential.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</strong><br>"Конфиденциальная Информация" по данному Соглашению означает любую информацию, технические спецификации или ноу-хау, раскрытые в письменной, устной, электронной или другой форме Раскрывающей Стороной Получателю, которые (а) помечены, сопровождены или подпадают под действие документов ясно помеченных "конфиденциально", "для внутреннего пользования" и т.п.; (b) обозначены как конфиденциальные Раскрывающей Стороной до, во время или после раскрытия или сообщения; или (c) конфиденьциальность которых Получатель должен осознать.`;
       documentContent += '</td></tr>';
       
       // Term and Termination section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>3. TERM AND TERMINATION</strong><br>This Agreement shall remain in effect until it is terminated by a Party with ${terminationNotice} days prior written notice; provided, however, that no Party shall terminate this Agreement if the Parties have a direct agreement still in effect. The terms and conditions of this Agreement shall survive any such termination with respect to Confidential Information that is disclosed prior to the effective date of termination.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>3. СРОК ДЕЙСТВИЯ И РАСТОРЖЕНИЕ</strong><br>Данное Соглашение остается в силе до расторжения любой Стороной по предварительному письменному уведомлению за ${terminationNotice} дней; но ни одна Сторона не может расторгнуть данное Соглашение если между Сторонами заключено другое действующее прямое соглашение. В случае расторжения данного Соглашения, его условия продолжат действовать в отношении Конфиденциальной Информации, раскрытой до даты вступления в силу расторжения.`;
       documentContent += '</td></tr>';
       
-      // Permitted Use section - Fixed Russian conjugation here
-      documentContent += '<tr><td style="vertical-align:top;">';
+      // Permitted Use section
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>4. PERMITTED USE AND DISCLOSURE</strong><br>Receiving Party will use Confidential Information only for the purpose of and in connection with ${purpose} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</strong><br>Получатель может пользоваться Конфиденциальной Информацией только для ${purpose} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       documentContent += '</td></tr>';
       
       // Protection Period section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>5. PROTECTION PERIOD AND RETURN</strong><br>Unless the Parties otherwise agree in writing, a Receiving Party's duty to protect Confidential Information expires ${protectionPeriod} years from the date of disclosure. Upon the Disclosing Party's written request, Receiving Party will promptly return or destroy all Confidential Information received from the Disclosing Party, together with all copies.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>5. СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ</strong><br>При отсутствии письменной договоренности между Сторонами об ином, обязанность Получателя о неразглашении Конфиденциальной Информации истекает через ${protectionPeriod} года после ее предоставления. По письменному распоряжению Раскрывающей Стороны Получатель должен незамедлительно вернуть или уничтожить всю полученную Конфиденциальную Информацию и все ее копии.`;
       documentContent += '</td></tr>';
       
       // Exclusions section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>6. EXCLUSIONS</strong><br>Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>6. ИСКЛЮЧЕНИЯ</strong><br>Конфиденциальная Информация не включает информацию, которая: (a) является или становится общедоступной не по вине Получателя; (b) во время разглашения находилась в правомерном распоряжении Получателя без ограничений на её использование и разглашение; или (c) информацию, правомерно полученную Получателя от третьего лица без ограничений на использование и разглашение.`;
       documentContent += '</td></tr>';
       
       // No Warranty section
       if (formData.includeNoWarranty) {
-        documentContent += '<tr><td style="vertical-align:top;">';
+        documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
         documentContent += `<strong>7. NO WARRANTIES</strong><br>The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.`;
-        documentContent += '</td><td style="vertical-align:top;">';
+        documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
         documentContent += `<strong>7. НЕТ ГАРАНТИЙ</strong><br>Конфиденциальная Информация предоставлена без каких-либо гарантий. Раскрывающая Сторона не несет ответственности за прямой или косвенный ущерб, понесенный Получателем информации при использовании Конфиденциальной Информации. Вся предоставленная Конфиденциальная Информация остается собственностью Раскрывающей Стороны.`;
         documentContent += '</td></tr>';
       }
@@ -102,7 +102,7 @@ window.generateWordDoc = function(formData) {
           break;
         case 'newyork':
           govLawEN = `This Agreement shall be governed by the law of the State of New York, USA. New York, NY is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`;
-          govLawRU = `Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглаш��нием, стороны договорились считать New York, NY.`;
+          govLawRU = `Настоящее соглашение регулируется законодательством штата New York, США. Местом рассмотрения всех споров, возникающих в связи с настоящим соглашением, стороны договорились считать New York, NY.`;
           break;
         case 'russia':
           govLawEN = `This Agreement shall be governed by the law of the Russian Federation. Moscow, Russia is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`;
@@ -110,18 +110,18 @@ window.generateWordDoc = function(formData) {
           break;
       }
       
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>${sectionNum}. GOVERNING LAW</strong><br>${govLawEN}`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>${sectionNum}. ПРИМЕНИМОЕ ПРАВО</strong><br>${govLawRU}`;
       documentContent += '</td></tr>';
       
       // Severability section
       if (formData.includeSeverability) {
         sectionNum = (parseInt(sectionNum) + 1).toString();
-        documentContent += '<tr><td style="vertical-align:top;">';
+        documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
         documentContent += `<strong>${sectionNum}. SEVERABILITY</strong><br>If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.`;
-        documentContent += '</td><td style="vertical-align:top;">';
+        documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
         documentContent += `<strong>${sectionNum}. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</strong><br>Если какое-либо положение настоящего Соглашения становится незаконным или необеспеченным принудительной силой в суде соответствующей юрисдикции, это не повлияет на юридическую силу или возможность принудительного исполнения какого-либо другого положения настоящего Соглашения в наибольшей разрешенной законом степени.`;
         documentContent += '</td></tr>';
       }
@@ -145,14 +145,14 @@ window.generateWordDoc = function(formData) {
           break;
       }
       
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>${sectionNum}. PREVAILING LANGUAGE</strong><br>${controlLangEN}`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>${sectionNum}. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</strong><br>${controlLangRU}`;
       documentContent += '</td></tr>';
       
       // Signatures section
-      documentContent += '<tr><td style="vertical-align:top;">';
+      documentContent += '<tr><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>IN WITNESS WHEREOF</strong><br>The Parties hereto have executed this Agreement.<br><br>
         <strong>Disclosing Party:</strong><br><br>
         By: _________________________________<br>
@@ -164,7 +164,7 @@ window.generateWordDoc = function(formData) {
         Name: ______________________________<br>
         Title:________________________________<br>
         Date: _______________________________`;
-      documentContent += '</td><td style="vertical-align:top;">';
+      documentContent += '</td><td style="vertical-align:top; padding: 10px;">';
       documentContent += `<strong>В ПОДТВЕРЖДЕНИЕ ВЫШЕИЗЛОЖЕННОГО</strong><br>Стороны заключили настоящее Соглашение.<br><br>
         <strong>Раскрывающая Сторона:</strong><br><br>
         Подпись: _____________________________<br>
@@ -183,7 +183,7 @@ window.generateWordDoc = function(formData) {
       return documentContent;
     };
     
-    // Create HTML content for Word document - fixed margins
+    // Create HTML content for Word document
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -191,28 +191,24 @@ window.generateWordDoc = function(formData) {
         <meta charset="UTF-8">
         <title>Dual-Language NDA | ${formData.discloserName || 'Disclosing Party'} and ${formData.recipientName || 'Receiving Party'}</title>
         <style>
-          @page {
-            margin: 0.75in;
-          }
           body {
             font-family: Calibri, Arial, sans-serif;
             font-size: 11pt;
             line-height: 1.5;
-            margin: 0;
-            padding: 0;
+            margin: 0.5in 0.75in 0.5in 0.75in;
           }
           table {
             border-collapse: collapse;
             width: 100%;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
           }
           td {
             vertical-align: top;
-            padding: 5pt;
+            padding: 8pt;
           }
           h2 {
             font-size: 14pt;
-            margin-bottom: 15pt;
+            margin-bottom: 12pt;
             font-weight: bold;
             text-align: center;
           }
