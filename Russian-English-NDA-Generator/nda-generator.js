@@ -9,7 +9,8 @@ const App = () => {
     recipientName: '',
     recipientAddress: '',
     effectiveDate: '',
-    purpose: '',
+    purpose: 'business',
+    customPurpose: '',
     confInfoType: 'broad',
     customConfInfo: '',
     protectionPeriod: 2,
@@ -25,11 +26,11 @@ const App = () => {
   // Preview section ref for scrolling
   const previewRef = React.useRef(null);
   
-  // Define tabs - reduced from 4 to 3
+  // Define tabs - balanced lengths for both languages
   const tabs = [
-    { id: 'parties', labelEn: 'Parties & Agreement', labelRu: 'Стороны' },
-    { id: 'terms', labelEn: 'Terms & Jurisdiction', labelRu: 'Условия' },
-    { id: 'additional', labelEn: 'Additional Clauses', labelRu: 'Дополнительн.' }
+    { id: 'parties', labelEn: 'Parties Info', labelRu: 'Информация' },
+    { id: 'terms', labelEn: 'Key Terms', labelRu: 'Условия' },
+    { id: 'additional', labelEn: 'Options', labelRu: 'Опции' }
   ];
   
   // Handle language toggle
@@ -88,6 +89,7 @@ const App = () => {
         });
         break;
       case 'purpose':
+      case 'customPurpose':
         const purposeSections = previewElement.querySelectorAll('.section-title');
         purposeSections.forEach(section => {
           if (section.textContent.includes('PERMITTED USE') || section.textContent.includes('ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ')) {
@@ -322,9 +324,27 @@ ${customText || '[Custom Confidentiality Definition]'}`;
 This Agreement shall remain in effect until it is terminated by a Party with ${terminationNotice} days prior written notice; provided, however, that no Party shall terminate this Agreement if the Parties have a direct agreement still in effect. The terms and conditions of this Agreement shall survive any such termination with respect to Confidential Information that is disclosed prior to the effective date of termination.`;
       },
       
-      permittedUse: (purpose) => {
+      permittedUse: (purpose, customPurpose) => {
+        let purposeText = '';
+        switch(purpose) {
+          case 'business':
+            purposeText = 'discussing a potential business relationship';
+            break;
+          case 'services':
+            purposeText = 'enabling the Receiving Party to provide services to the Disclosing Party';
+            break;
+          case 'investment':
+            purposeText = 'discussing potential investment opportunities';
+            break;
+          case 'custom':
+            purposeText = customPurpose || '[Purpose of Disclosure]';
+            break;
+          default:
+            purposeText = '[Purpose of Disclosure]';
+        }
+        
         return `<div class="section-title">4. PERMITTED USE AND DISCLOSURE</div>
-Receiving Party will use Confidential Information only for the purpose of and in connection with ${purpose || '[Purpose of Disclosure]'} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
+Receiving Party will use Confidential Information only for the purpose of and in connection with ${purposeText} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
@@ -416,9 +436,27 @@ ${customText || '[Пользовательское Определение Кон
 Данное Соглашение остается в силе до расторжения любой Стороной по предварительному письменному уведомлению за ${terminationNotice} дней; но ни одна Сторона не может расторгнуть данное Соглашение если между Сторонами заключено другое действующее прямое соглашение. В случае расторжения данного Соглашения, его условия продолжат действовать в отношении Конфиденциальной Информации, раскрытой до даты вступления в силу расторжения.`;
       },
       
-      permittedUse: (purpose) => {
+      permittedUse: (purpose, customPurpose) => {
+        let purposeText = '';
+        switch(purpose) {
+          case 'business':
+            purposeText = 'обсуждения потенциальных деловых отношений';
+            break;
+          case 'services':
+            purposeText = 'предоставления Получателем услуг Раскрывающей Стороне';
+            break;
+          case 'investment':
+            purposeText = 'обсуждения возможностей инвестирования';
+            break;
+          case 'custom':
+            purposeText = customPurpose || '[Цель Раскрытия]';
+            break;
+          default:
+            purposeText = '[Цель Раскрытия]';
+        }
+        
         return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
-Получатель может пользоваться Конфиденциальной Информацией только для ${purpose || '[Цель Раскрытия]'} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
+Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
@@ -519,6 +557,7 @@ ${customText || '[Пользовательское Определение Кон
       recipientName,
       effectiveDate,
       purpose,
+      customPurpose,
       confInfoType,
       customConfInfo,
       protectionPeriod,
@@ -606,10 +645,10 @@ ${customText || '[Пользовательское Определение Кон
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
-        ${templates.english.permittedUse(purpose)}
+        ${templates.english.permittedUse(purpose, customPurpose)}
       </div>
       <div class="column right-column">
-        ${templates.russian.permittedUse(purpose)}
+        ${templates.russian.permittedUse(purpose, customPurpose)}
       </div>
     </div>`;
     
@@ -818,16 +857,49 @@ ${customText || '[Пользовательское Определение Кон
                 {currentLanguage === 'english' ? 'Purpose of Disclosure:' : 'Цель Раскрытия:'}
                 <HelpIcon tooltip={tooltips.purpose} />
               </label>
-              <textarea 
+              <select 
                 id="purpose"
                 name="purpose"
                 value={formData.purpose}
                 onChange={handleChange}
-                placeholder={currentLanguage === 'english' 
-                  ? 'Describe the purpose for sharing confidential information' 
-                  : 'Опишите цель обмена конфиденциальной информацией'}
-              />
+              >
+                <option value="business">
+                  {currentLanguage === 'english' 
+                    ? 'Discussing potential business relationship' 
+                    : 'Обсуждение потенциальных деловых отношений'}
+                </option>
+                <option value="services">
+                  {currentLanguage === 'english' 
+                    ? 'To enable receiving party to provide services' 
+                    : 'Для предоставления услуг получателем'}
+                </option>
+                <option value="investment">
+                  {currentLanguage === 'english' 
+                    ? 'To discuss investment opportunities' 
+                    : 'Для обсуждения инвестиционных возможностей'}
+                </option>
+                <option value="custom">
+                  {currentLanguage === 'english' ? 'Other (specify below)' : 'Другое (укажите ниже)'}
+                </option>
+              </select>
             </div>
+            
+            {formData.purpose === 'custom' && (
+              <div className="form-group">
+                <label htmlFor="customPurpose">
+                  {currentLanguage === 'english' ? 'Specify Purpose:' : 'Укажите Цель:'}
+                </label>
+                <textarea 
+                  id="customPurpose"
+                  name="customPurpose"
+                  value={formData.customPurpose}
+                  onChange={handleChange}
+                  placeholder={currentLanguage === 'english' 
+                    ? 'Enter specific purpose for sharing confidential information' 
+                    : 'Введите конкретную цель обмена конфиденциальной информацией'}
+                />
+              </div>
+            )}
           </div>
         );
       
@@ -980,6 +1052,11 @@ ${customText || '[Пользовательское Определение Кон
                   : 'Включить Возврат/Уничтожение Материалов'}
                 <HelpIcon tooltip={tooltips.returnDestroy} />
               </label>
+              <div className="checkbox-note">
+                {currentLanguage === 'english' 
+                  ? 'Adds explicit obligation to return or destroy all confidential materials upon termination. Essential for physical documents and prototypes.'
+                  : 'Добавляет явное обязательство вернуть или уничтожить все конфиденциальные материалы по окончании. Важно для физических документов и прототипов.'}
+              </div>
             </div>
             
             <div className="form-group">
@@ -996,6 +1073,11 @@ ${customText || '[Пользовательское Определение Кон
                   : 'Включить Отсутствие Гарантий'}
                 <HelpIcon tooltip={tooltips.noWarranty} />
               </label>
+              <div className="checkbox-note">
+                {currentLanguage === 'english' 
+                  ? 'Disclaims liability for accuracy or completeness of disclosed information. Recommended when sharing preliminary or unverified data.'
+                  : 'Отказ от ответственности за точность или полноту раскрытой информации. Рекомендуется при обмене предварительными или непроверенными данными.'}
+              </div>
             </div>
             
             <div className="form-group">
@@ -1012,6 +1094,11 @@ ${customText || '[Пользовательское Определение Кон
                   : 'Включить Независимость Положений'}
                 <HelpIcon tooltip={tooltips.severability} />
               </label>
+              <div className="checkbox-note">
+                {currentLanguage === 'english' 
+                  ? 'Preserves validity of remaining provisions if one section is found unenforceable. Standard in international agreements to prevent total invalidation.'
+                  : 'Сохраняет действительность остальных положений, если одно признано неисполнимым. Стандарт в международных соглашениях для предотвращения полной недействительности.'}
+              </div>
             </div>
             
             <div className="form-group">
@@ -1036,24 +1123,6 @@ ${customText || '[Пользовательское Определение Кон
             
             <div className="legal-note">
               {tooltips.crossBorderTip}
-            </div>
-            
-            <div className="legal-note" style={{marginTop: "15px"}}>
-              <strong>{currentLanguage === 'english' ? 'Important Note:' : 'Важное Примечание:'}</strong><br />
-              {currentLanguage === 'english' 
-                ? 'This bilingual NDA template is designed for international business relationships. Always have a qualified lawyer review the final agreement, especially for cross-border transactions. Consider local laws, translation accuracy, and practical enforcement mechanisms in both jurisdictions.' 
-                : 'Этот двуязычный шаблон NDA предназначен для международных деловых отношений. Всегда консультируйтесь с квалифицированным юристом перед подписанием окончательного соглашения, особенно для трансграничных сделок. Учитывайте местные законы, точность перевода и практические механизмы исполнения в обеих юрисдикциях.'}
-            </div>
-            
-            <div className="legal-note" style={{marginTop: "10px", backgroundColor: "#f0f8ff"}}>
-              <strong>{currentLanguage === 'english' ? 'Professional Legal Services:' : 'Профессиональные Юридические Услуги:'}</strong><br />
-              {currentLanguage === 'english' 
-                ? 'Need help customizing this NDA for your specific situation? Schedule a consultation with our experienced international business attorneys. We specialize in cross-border agreements and can ensure your confidential information is properly protected.' 
-                : 'Нужна помощь в адаптации этого NDA для вашей конкретной ситуации? Запишитесь на консультацию с нашими опытными юристами по международному бизнесу. Мы специализируемся на трансграничных соглашениях и можем обеспечить надлежащую защиту вашей конфиденциальной информации.'}
-              <br /><br />
-              <a href="https://terms.law/call/" target="_blank" style={{color: "#0069ff", fontWeight: "bold"}}>
-                {currentLanguage === 'english' ? '→ Schedule Your Consultation' : '→ Записаться на Консультацию'}
-              </a>
             </div>
           </div>
         );
