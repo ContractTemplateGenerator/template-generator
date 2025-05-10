@@ -990,7 +990,7 @@ ${customText || '[Пользовательское Определение Кон
                 id="protectionPeriod"
                 name="protectionPeriod"
                 min="1" 
-                max="10"
+                max="25"
                 value={formData.protectionPeriod}
                 onChange={handleChange}
               />
@@ -1183,11 +1183,14 @@ ${customText || '[Пользовательское Определение Кон
                   {currentLanguage === 'english' ? 'Confidentiality Definition:' : 'Определение Конфиденциальности:'}
                 </span>
                 <span className="summary-value">
-                  {formData.confInfoType === 'custom' ? 'Custom' : 
+                  {formData.confInfoType === 'custom' ? (currentLanguage === 'english' ? 'Custom' : 'Пользовательское') : 
+                   formData.confInfoType === 'broad' ? (currentLanguage === 'english' ? 'Broad' : 'Широкое') :
+                   formData.confInfoType === 'medium' ? (currentLanguage === 'english' ? 'Medium' : 'Среднее') :
+                   formData.confInfoType === 'narrow' ? (currentLanguage === 'english' ? 'Narrow' : 'Узкое') :
                    formData.confInfoType.charAt(0).toUpperCase() + formData.confInfoType.slice(1)}
                 </span>
               </div>
-              <div className="summary-item success-green">
+              <div className={`summary-item ${formData.protectionPeriod > 5 ? 'warning-yellow' : 'success-green'}`}>
                 <span className="summary-label">
                   {currentLanguage === 'english' ? 'Protection Period:' : 'Срок Защиты:'}
                 </span>
@@ -1195,6 +1198,14 @@ ${customText || '[Пользовательское Определение Кон
                   {formData.protectionPeriod} {currentLanguage === 'english' ? 'years' : 'лет'}
                 </span>
               </div>
+              
+              {formData.protectionPeriod > 5 && (
+                <div className="summary-warning">
+                  {currentLanguage === 'english' 
+                    ? '⚠️ Note: Protection periods longer than 5 years may be difficult to enforce in some jurisdictions'
+                    : '⚠️ Примечание: Сроки защиты более 5 лет могут быть трудно исполнимы в некоторых юрисдикциях'}
+                </div>
+              )}
             </div>
             
             {/* Jurisdiction Summary */}
@@ -1236,27 +1247,61 @@ ${customText || '[Пользовательское Определение Кон
             <div className="summary-section">
               <h4>{currentLanguage === 'english' ? 'Additional Provisions' : 'Дополнительные Положения'}</h4>
               <div className="provisions-list">
-                {formData.includeReturnDestroy && (
+                {formData.includeReturnDestroy ? (
                   <div className="provision-included">
                     ✓ {currentLanguage === 'english' ? 'Return/Destruction of Materials' : 'Возврат/Уничтожение Материалов'}
                   </div>
+                ) : (
+                  <div className="provision-excluded">
+                    ✗ {currentLanguage === 'english' ? 'Return/Destruction NOT included' : 'Возврат/Уничтожение НЕ включено'}
+                  </div>
                 )}
-                {formData.includeNoWarranty && (
+                
+                {formData.includeNoWarranty ? (
                   <div className="provision-included">
                     ✓ {currentLanguage === 'english' ? 'No Warranty Clause' : 'Отсутствие Гарантий'}
                   </div>
+                ) : (
+                  <div className="provision-excluded">
+                    ✗ {currentLanguage === 'english' ? 'No Warranty Clause NOT included' : 'Отсутствие Гарантий НЕ включено'}
+                  </div>
                 )}
-                {formData.includeSeverability && (
+                
+                {formData.includeSeverability ? (
                   <div className="provision-included">
                     ✓ {currentLanguage === 'english' ? 'Severability Clause' : 'Независимость Положений'}
                   </div>
-                )}
-                {!formData.includeReturnDestroy && !formData.includeNoWarranty && !formData.includeSeverability && (
+                ) : (
                   <div className="provision-excluded">
-                    {currentLanguage === 'english' ? 'No additional provisions selected' : 'Дополнительные положения не выбраны'}
+                    ✗ {currentLanguage === 'english' ? 'Severability Clause NOT included' : 'Независимость Положений НЕ включено'}
                   </div>
                 )}
               </div>
+              
+              {/* Warnings for excluded provisions */}
+              {!formData.includeReturnDestroy && (
+                <div className="summary-warning">
+                  {currentLanguage === 'english' 
+                    ? '⚠️ Without Return/Destruction clause: The receiving party may retain confidential materials indefinitely, even after the agreement ends. This could lead to unauthorized retention of sensitive information.'
+                    : '⚠️ Без условия о возврате/уничтожении: Получающая сторона может сохранять конфиденциальные материалы неопределенно долго, даже после окончания соглашения. Это может привести к несанкционированному хранению конфиденциальной информации.'}
+                </div>
+              )}
+              
+              {!formData.includeNoWarranty && (
+                <div className="summary-warning">
+                  {currentLanguage === 'english' 
+                    ? '⚠️ Without No Warranty clause: The disclosing party could be held liable if the confidential information is inaccurate, incomplete, or causes damages. This creates potential legal exposure.'
+                    : '⚠️ Без отказа от гарантий: Раскрывающая сторона может быть привлечена к ответственности, если конфиденциальная информация неточна, неполна или причиняет ущерб. Это создает потенциальные юридические риски.'}
+                </div>
+              )}
+              
+              {!formData.includeSeverability && (
+                <div className="summary-warning">
+                  {currentLanguage === 'english' 
+                    ? '⚠️ Without Severability clause: If any provision is found unenforceable, the entire agreement could be invalidated. This is particularly risky for international agreements where laws vary.'
+                    : '⚠️ Без независимости положений: Если какое-либо положение будет признано неисполнимым, все соглашение может быть признано недействительным. Это особенно рискованно для международных соглашений, где законы различаются.'}
+                </div>
+              )}
             </div>
             
             {/* Final Status */}
