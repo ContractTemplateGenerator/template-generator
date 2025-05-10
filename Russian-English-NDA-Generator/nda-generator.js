@@ -293,8 +293,8 @@ const App = () => {
   const templates = {
     english: {
       title: "NON-DISCLOSURE AGREEMENT",
-      parties: (discloserName, recipientName) => {
-        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong> (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong> (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
+      parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
+        return `This Agreement is made by <strong>${discloserName || '[Disclosing Party Name]'}</strong>, with address at ${discloserAddress || '[Disclosing Party Address]'} (the "Disclosing Party"), and <strong>${recipientName || '[Receiving Party Name]'}</strong>, with address at ${recipientAddress || '[Receiving Party Address]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('en-US', {
@@ -405,8 +405,8 @@ Date: _______________________________
     
     russian: {
       title: "СОГЛАШЕНИЕ О НЕРАЗГЛАШЕНИИ ИНФОРМАЦИИ",
-      parties: (discloserName, recipientName) => {
-        return `Это Соглашение заключено между <strong>${discloserName || '[Disclosing Party Name]'}</strong> ("Раскрывающая Сторона") и <strong>${recipientName || '[Receiving Party Name]'}</strong> ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
+      parties: (discloserName, discloserAddress, recipientName, recipientAddress) => {
+        return `Это Соглашение заключено между <strong>${discloserName || '[Disclosing Party Name]'}</strong>, с адресом ${discloserAddress || '[Disclosing Party Address]'} ("Раскрывающая Сторона") и <strong>${recipientName || '[Receiving Party Name]'}</strong>, с адресом ${recipientAddress || '[Receiving Party Address]'} ("Получатель"). (далее вместе именуемые "Стороны", а каждая в отдельности – "Сторона").`;
       },
       effectiveDate: (effectiveDate) => {
         const formattedDate = effectiveDate ? new Date(effectiveDate).toLocaleDateString('ru-RU', {
@@ -456,7 +456,7 @@ ${customText || '[Пользовательское Определение Кон
         }
         
         return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
-Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText} между Сторонами. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
+Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText}. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
