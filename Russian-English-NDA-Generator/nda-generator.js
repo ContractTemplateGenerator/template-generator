@@ -1016,14 +1016,14 @@ ${customText || '[Пользовательское Определение Кон
           className={`toggle-btn ${currentLanguage === 'english' ? 'active' : ''}`}
           onClick={() => toggleLanguage('english')}
         >
-          <img src="https://upload.wikimedia.org/wikipedia/en/a/a4/Flag_of_the_United_States.svg" alt="USA flag" />
+          <img src="usa-flag.svg" alt="USA flag" />
           English
         </button>
         <button 
           className={`toggle-btn ${currentLanguage === 'russian' ? 'active' : ''}`}
           onClick={() => toggleLanguage('russian')}
         >
-          <img src="https://upload.wikimedia.org/wikipedia/en/f/f3/Flag_of_Russia.svg" alt="Russian flag" />
+          <img src="russia-flag.svg" alt="Russian flag" />
           Русский
         </button>
       </div>
