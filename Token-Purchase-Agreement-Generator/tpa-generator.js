@@ -31,11 +31,14 @@ const TokenPurchaseAgreementGenerator = () => {
     token_price_type: "fixed",
     token_price: "0.10",
     token_amount: "100000",
+    payment_methods: ["fiat"],
     purchase_currency: "USD",
     custom_currency: "",
-    crypto_payment: "no",
     crypto_payment_type: "BTC",
     discount_rate: "0",
+    equity_percentage: "",
+    equity_company: "",
+    other_consideration: "",
     payment_deadline: "",
     
     // Representations & Warranties
@@ -142,9 +145,44 @@ ${formData.include_smart_contract && formData.token_smart_contract ?
   }
 })()}.
 
-3.3 Payment. ${formData.crypto_payment === "yes" ? 
-`Buyer shall pay the Purchase Price in ${formData.crypto_payment_type || "BTC"} to Seller's crypto wallet address as provided separately by Seller.` : 
-`Buyer shall pay the Purchase Price in ${currencyDisplay} to Seller's designated bank account as provided separately by Seller.`}
+3.3 Payment. ${(() => {
+  const paymentMethods = formData.payment_methods || [];
+  if (paymentMethods.length === 0) return "Buyer shall pay the Purchase Price as agreed between the Parties.";
+  
+  const paymentClauses = [];
+  
+  if (paymentMethods.includes("fiat")) {
+    const currency = formData.purchase_currency === "Other" ? (formData.custom_currency || "[Custom Currency]") : formData.purchase_currency;
+    paymentClauses.push(`Buyer shall pay ${paymentMethods.length > 1 ? "a portion of " : ""}the Purchase Price in ${currency} to Seller's designated bank account as provided separately by Seller`);
+  }
+  
+  if (paymentMethods.includes("crypto")) {
+    paymentClauses.push(`Buyer shall pay ${paymentMethods.length > 1 ? "a portion of " : ""}the Purchase Price in ${formData.crypto_payment_type || "BTC"} to Seller's crypto wallet address as provided separately by Seller`);
+  }
+  
+  if (paymentMethods.includes("equity")) {
+    const company = formData.equity_company ? formData.equity_company : "[Company Name]";
+    const percentage = formData.equity_percentage ? formData.equity_percentage : "[Percentage]";
+    paymentClauses.push(`Buyer shall transfer ${paymentMethods.length > 1 ? "a portion of " : ""}the Purchase Price as ${percentage}% equity ownership in ${company} to Seller`);
+  }
+  
+  if (paymentMethods.includes("other")) {
+    const otherConsideration = formData.other_consideration ? 
+      formData.other_consideration : 
+      "other consideration as mutually agreed between the Parties";
+    paymentClauses.push(`Buyer shall provide ${paymentMethods.length > 1 ? "a portion of " : ""}the Purchase Price as ${otherConsideration}`);
+  }
+  
+  // Format the payment clauses with proper conjunction
+  if (paymentClauses.length === 1) {
+    return paymentClauses[0] + ".";
+  } else if (paymentClauses.length === 2) {
+    return paymentClauses.join(" and ") + ".";
+  } else {
+    const lastClause = paymentClauses.pop();
+    return paymentClauses.join(", ") + ", and " + lastClause + ".";
+  }
+})()}
 
 3.4 Payment Deadline. Buyer shall pay the Purchase Price in full on or before ${formData.payment_deadline || "[Deadline Date]"}.
 
@@ -963,9 +1001,9 @@ Title: __________________________`;
               </div>
               {formData.token_price && formData.token_amount && (
                 <span className="form-hint">
-                  <strong>Total purchase amount:</strong> {(parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2)} {formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency}
+                  <strong>Total purchase amount:</strong> {(parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2)} {formData.payment_methods.includes("fiat") ? (formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency) : "units of value"}
                   {formData.token_price_type === "discounted" && formData.discount_rate && 
-                    ` (After ${formData.discount_rate}% discount: ${(parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate)/100)).toFixed(2)} ${formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency})`
+                    ` (After ${formData.discount_rate}% discount: ${(parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate)/100)).toFixed(2)} ${formData.payment_methods.includes("fiat") ? (formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency) : "units of value"})`
                   }
                 </span>
               )}
@@ -1008,80 +1046,132 @@ Title: __________________________`;
               </div>
             )}
             
+            <h3>Payment Methods</h3>
             <div className="form-group">
-              <label htmlFor="purchase_currency">
-                Purchase Currency
-                <InfoTooltip content="The currency in which the purchase price will be paid. This affects regulatory implications and banking considerations." />
+              <label>
+                Payment Method(s)
+                <InfoTooltip content="Select one or more methods of payment. You can choose multiple options for mixed payment structures." />
               </label>
-              <select
-                id="purchase_currency"
-                name="purchase_currency"
-                className="form-control"
-                value={formData.purchase_currency}
-                onChange={handleChange}
-              >
-                <option value="USD">US Dollar (USD)</option>
-                <option value="EUR">Euro (EUR)</option>
-                <option value="GBP">British Pound (GBP)</option>
-                <option value="CHF">Swiss Franc (CHF)</option>
-                <option value="SGD">Singapore Dollar (SGD)</option>
-                <option value="JPY">Japanese Yen (JPY)</option>
-                <option value="CNY">Chinese Yuan (CNY)</option>
-                <option value="AUD">Australian Dollar (AUD)</option>
-                <option value="CAD">Canadian Dollar (CAD)</option>
-                <option value="Other">Other (specify)</option>
-              </select>
-              
-              {formData.purchase_currency === "Other" && (
-                <div className="form-group" style={{marginTop: "0.5rem"}}>
-                  <label htmlFor="custom_currency">Custom Currency</label>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
                   <input
-                    type="text"
-                    id="custom_currency"
-                    name="custom_currency"
-                    className="form-control"
-                    value={formData.custom_currency}
-                    onChange={handleChange}
-                    placeholder="e.g., INR, BRL, KRW"
+                    type="checkbox"
+                    name="payment_methods_fiat"
+                    className="checkbox-input"
+                    checked={formData.payment_methods.includes("fiat")}
+                    onChange={(e) => {
+                      const updatedMethods = e.target.checked 
+                        ? [...formData.payment_methods, "fiat"] 
+                        : formData.payment_methods.filter(m => m !== "fiat");
+                      setFormData({...formData, payment_methods: updatedMethods});
+                      setLastChanged("payment_methods");
+                    }}
                   />
-                </div>
+                  Fiat Currency
+                </label>
+              </div>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="payment_methods_crypto"
+                    className="checkbox-input"
+                    checked={formData.payment_methods.includes("crypto")}
+                    onChange={(e) => {
+                      const updatedMethods = e.target.checked 
+                        ? [...formData.payment_methods, "crypto"] 
+                        : formData.payment_methods.filter(m => m !== "crypto");
+                      setFormData({...formData, payment_methods: updatedMethods});
+                      setLastChanged("payment_methods");
+                    }}
+                  />
+                  Cryptocurrency
+                </label>
+              </div>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="payment_methods_equity"
+                    className="checkbox-input"
+                    checked={formData.payment_methods.includes("equity")}
+                    onChange={(e) => {
+                      const updatedMethods = e.target.checked 
+                        ? [...formData.payment_methods, "equity"] 
+                        : formData.payment_methods.filter(m => m !== "equity");
+                      setFormData({...formData, payment_methods: updatedMethods});
+                      setLastChanged("payment_methods");
+                    }}
+                  />
+                  Equity/Ownership Transfer
+                </label>
+              </div>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="payment_methods_other"
+                    className="checkbox-input"
+                    checked={formData.payment_methods.includes("other")}
+                    onChange={(e) => {
+                      const updatedMethods = e.target.checked 
+                        ? [...formData.payment_methods, "other"] 
+                        : formData.payment_methods.filter(m => m !== "other");
+                      setFormData({...formData, payment_methods: updatedMethods});
+                      setLastChanged("payment_methods");
+                    }}
+                  />
+                  Other Consideration
+                </label>
+              </div>
+              {formData.payment_methods.length === 0 && (
+                <div className="form-error">Please select at least one payment method</div>
               )}
             </div>
             
-            <div className="form-group">
-              <label>
-                Cryptocurrency Payment
-                <InfoTooltip content="Whether payment will be made in cryptocurrency instead of fiat currency. This can affect banking requirements and regulatory classification." />
-              </label>
-              <div className="radio-group">
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="crypto_payment"
-                    className="radio-input"
-                    value="yes"
-                    checked={formData.crypto_payment === "yes"}
-                    onChange={handleChange}
-                  />
-                  Yes, payment will be in cryptocurrency
+            {formData.payment_methods.includes("fiat") && (
+              <div className="form-group">
+                <label htmlFor="purchase_currency">
+                  Fiat Currency
+                  <InfoTooltip content="The currency in which the purchase price will be paid. This affects regulatory implications and banking considerations." />
                 </label>
+                <select
+                  id="purchase_currency"
+                  name="purchase_currency"
+                  className="form-control"
+                  value={formData.purchase_currency}
+                  onChange={handleChange}
+                >
+                  <option value="USD">US Dollar (USD)</option>
+                  <option value="EUR">Euro (EUR)</option>
+                  <option value="GBP">British Pound (GBP)</option>
+                  <option value="CHF">Swiss Franc (CHF)</option>
+                  <option value="SGD">Singapore Dollar (SGD)</option>
+                  <option value="JPY">Japanese Yen (JPY)</option>
+                  <option value="CNY">Chinese Yuan (CNY)</option>
+                  <option value="AUD">Australian Dollar (AUD)</option>
+                  <option value="CAD">Canadian Dollar (CAD)</option>
+                  <option value="Other">Other (specify)</option>
+                </select>
+                
+                {formData.purchase_currency === "Other" && (
+                  <div className="form-group" style={{marginTop: "0.5rem"}}>
+                    <label htmlFor="custom_currency">Custom Currency</label>
+                    <input
+                      type="text"
+                      id="custom_currency"
+                      name="custom_currency"
+                      className="form-control"
+                      value={formData.custom_currency}
+                      onChange={handleChange}
+                      placeholder="e.g., INR, BRL, KRW"
+                    />
+                  </div>
+                )}
               </div>
-              <div className="radio-group">
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="crypto_payment"
-                    className="radio-input"
-                    value="no"
-                    checked={formData.crypto_payment === "no"}
-                    onChange={handleChange}
-                  />
-                  No, payment will be in fiat currency
-                </label>
-              </div>
-            </div>
+            )}
             
-            {formData.crypto_payment === "yes" && (
+            {formData.payment_methods.includes("crypto") && (
               <div className="form-group">
                 <label htmlFor="crypto_payment_type">
                   Cryptocurrency Type
@@ -1109,6 +1199,65 @@ Title: __________________________`;
               </div>
             )}
             
+            {formData.payment_methods.includes("equity") && (
+              <>
+                <div className="form-group">
+                  <label htmlFor="equity_percentage">
+                    Equity Percentage
+                    <InfoTooltip content="The percentage of ownership in the company being transferred as payment." />
+                  </label>
+                  <div className="percentage-input-container">
+                    <input
+                      type="number"
+                      id="equity_percentage"
+                      name="equity_percentage"
+                      className="form-control"
+                      value={formData.equity_percentage}
+                      onChange={handleChange}
+                      min="0.01"
+                      max="100"
+                      step="0.1"
+                      placeholder="5"
+                    />
+                    <span className="percentage-sign">%</span>
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <label htmlFor="equity_company">
+                    Company/Entity Name
+                    <InfoTooltip content="The name of the company or entity whose equity is being transferred." />
+                  </label>
+                  <input
+                    type="text"
+                    id="equity_company"
+                    name="equity_company"
+                    className="form-control"
+                    value={formData.equity_company}
+                    onChange={handleChange}
+                    placeholder="e.g., Acme Technologies Inc."
+                  />
+                </div>
+              </>
+            )}
+            
+            {formData.payment_methods.includes("other") && (
+              <div className="form-group">
+                <label htmlFor="other_consideration">
+                  Other Consideration
+                  <InfoTooltip content="Describe any other form of payment or value transfer involved in this transaction." />
+                </label>
+                <textarea
+                  id="other_consideration"
+                  name="other_consideration"
+                  className="form-control"
+                  value={formData.other_consideration}
+                  onChange={handleChange}
+                  placeholder="Example: Provision of technical services valued at $50,000, or transfer of intellectual property rights to [specific IP]"
+                ></textarea>
+              </div>
+            )}
+            
             <div className="form-group">
               <label htmlFor="payment_deadline">
                 Payment Deadline
@@ -1126,7 +1275,7 @@ Title: __________________________`;
             </div>
             
             <div className="regulatory-info">
-              <strong>Regulatory Note:</strong> Record-keeping is essential for token sales. Maintain detailed records of all payments, including amounts, dates, and wallet addresses to ensure compliance with AML/KYC regulations. Different jurisdictions have specific requirements for crypto payments.
+              <strong>Regulatory Note:</strong> Record-keeping is essential for token sales. Maintain detailed records of all payments, including amounts, dates, and wallet addresses to ensure compliance with AML/KYC regulations. Different jurisdictions have specific requirements for crypto payments and non-cash consideration.
             </div>
           </div>
         );
