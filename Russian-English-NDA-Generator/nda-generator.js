@@ -44,8 +44,8 @@ const App = () => {
     setCurrentTab(tabId);
   };
   
-  // Handle form input changes
-  const handleChange = (e) => {
+  // Handle form input changes - fixed to prevent blank screen
+  const handleChange = React.useCallback((e) => {
     const { name, value, type, checked } = e.target;
     setLastChangedField(name);
     
@@ -53,7 +53,7 @@ const App = () => {
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
-  };
+  }, []);
   
   // Handle navigation (previous/next buttons)
   const handlePrevious = () => {
@@ -209,7 +209,7 @@ Date: _______________________________
 "Конфиденциальная Информация" по данному Соглашению означает любую непубличную информацию, которая относится к фактической или ожидаемой деловой деятельности или исследованиям и разработкам Раскрывающей Стороны, техническим данным, коммерческой тайне или ноу-хау, включая, помимо прочего, исследования, планы продуктов, продукты, услуги, списки клиентов, рынки, программное обеспечение, разработки, изобретения, процессы, формулы, технологии, дизайны, чертежи, инженерные решения, маркетинг, финансы или другую деловую информацию, раскрытую Раскрывающей Стороной прямо или косвенно в письменной форме, устно или путем осмотра деталей или оборудования.`,
         
         narrow: `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
-"Конфиденциальная Информация" по данному Соглашению означает только ту информацию, которая (а) раскрыта в письменной форме и помечена как конфиденциальная в момент раскрытия, или (б) раскрыта любым другим способом и обозначена как конфиденциальная в момент раскрытия, а также резюмирована и обозначена как конфиденциальная в письменном меморандуме, направленном Получателю в течение тридцати (30) дней после ра��крытия.`,
+"Конфиденциальная Информация" по данному Соглашению означает только ту информацию, которая (а) раскрыта в письменной форме и помечена как конфиденциальная в момент раскрытия, или (б) раскрыта любым другим способом и обозначена как конфиденциальная в момент раскрытия, а также резюмирована и обозначена как конфиденциальная в письменном меморандуме, направленном Получателю в теч��ние тридцати (30) дней после раскрытия.`,
         
         custom: (customText) => {
           return `<div class="section-title">2. КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ</div>
@@ -289,43 +289,39 @@ ${customText || '[Пользовательское Определение Кон
   // Educational content for tooltips and notes
   const educationalContent = {
     english: {
-      confidentialityDefinition: "The definition of confidential information determines what information is protected. A broader definition provides more protection to the disclosing party, while a narrower definition provides more certainty to the receiving party.",
-      protectionPeriod: "The protection period is the duration for which the receiving party must keep the information confidential. In the US, 2-5 years is common for most business information, while trade secrets may require indefinite protection.",
-      governingLaw: "Governing law determines which jurisdiction's laws will be applied to interpret the agreement. This is particularly important in international agreements where legal frameworks may differ significantly.",
-      controllingLanguage: "In bilingual agreements, the controlling language clause specifies which language version will prevail in case of discrepancies or translation issues.",
-      russianLawNote: "Under Russian law, confidential information (commercial secrets) requires specific marking and internal protection measures to be enforceable. Russian courts may require documentation of these measures.",
-      usLawNote: "Under US law, reasonable efforts to maintain secrecy are required to protect trade secrets. Courts consider factors such as confidentiality agreements, limited access, and security measures.",
-      crossBorderEnforcement: "Cross-border NDAs may face enforcement challenges due to differences in legal systems. Key factors for enforceability include clear definitions, reasonable scope, specific jurisdiction clauses, and mutual benefit.",
+      disclosureParty: "The party that owns and shares confidential information. This is typically the business or individual revealing sensitive data.",
+      receivingParty: "The party that receives confidential information. This party is obligated to protect and not misuse the information.",
+      effectiveDate: "The date when the agreement becomes legally binding. Important for calculating protection periods and understanding when obligations begin.",
+      confidentialityDefinition: "Determines what information is protected. Broader definitions protect more information but may be harder to enforce. Narrower definitions are more precise but may miss important information.",
+      purpose: "Clearly defining the purpose limits how the confidential information can be used and helps prevent misuse.",
+      protectionPeriod: "How long the receiving party must keep information confidential. Common periods are 2-5 years. Trade secrets may require indefinite protection.",
+      governingLaw: "Determines which jurisdiction's laws will be applied to interpret the agreement. Critical for international agreements.",
+      jurisdiction: "The specific court or location where disputes will be resolved. Should be easily accessible to both parties.",
+      returnDestroy: "Requires the receiving party to return or destroy confidential information upon request, ensuring no copies remain.",
+      noWarranty: "Protects the disclosing party from liability if the information turns out to be incorrect or causes damages.",
+      severability: "Ensures the entire agreement doesn't become invalid if one provision is found unenforceable.",
+      controllingLanguage: "In bilingual agreements, specifies which language version prevails in case of discrepancies.",
+      crossBorderTip: "Cross-border NDAs may face enforcement challenges. Consider local laws, translation accuracy, and practical enforcement mechanisms."
     },
     russian: {
-      confidentialityDefinition: "Определение конфиденциальной информации определяет, какая информация защищена. Более широкое определение обеспечивает большую защиту раскрывающей стороне, а более узкое определение обеспечивает большую определенность получателю.",
-      protectionPeriod: "Срок защиты — это период, в течение которого получатель должен сохранять информацию конфиденциальной. В США 2-5 лет являются обычным сроком для большинства деловой информации, в то время как для коммерческой тайны может потребоваться неопределенная защита.",
-      governingLaw: "Применимое право определяет, законы какой юрисдикции будут применяться для толкования соглашения. Это особенно важно в международных соглашениях, где правовые системы могут существенно различаться.",
-      controllingLanguage: "В двуязычных соглашениях пункт о преобладающем языке указывает, какая языковая версия будет иметь преимущественную силу в случае расхождений или проблем с переводом.",
-      russianLawNote: "По российскому законодательству конфиденциальная информация (коммерческая тайна) требует специальной маркировки и внутренних мер защиты для обеспечения юридической силы. Российские суды могут потребовать документального подтверждения этих мер.",
-      usLawNote: "По законодательству США для защиты коммерческой тайны требуются разумные усилия по сохранению секретности. Суды учитывают такие факторы, как соглашения о конфиденциальности, ограниченный доступ и меры безопасности.",
-      crossBorderEnforcement: "Трансграничные соглашения о неразглашении могут столкнуться с проблемами обеспечения исполнения из-за различий в правовых системах. Ключевыми факторами для обеспечения исполнимости являются четкие определения, разумный объем, конкретные оговорки о юрисдикции и взаимная выгода.",
-    }
-  };
-  
-  // Legal differences between US and Russian law on NDAs
-  const legalDifferences = {
-    english: {
-      definition: "US law generally recognizes both oral and written NDAs, while Russian law requires written form for commercial secret protection.",
-      requirements: "Russian law requires specific 'Commercial Secret' markings on documents to be fully protected. US law focuses more on reasonable steps to maintain secrecy.",
-      duration: "Under Russian law, indefinite confidentiality obligations may be challenging to enforce. US courts generally accept reasonable time periods based on the nature of information.",
-      damages: "US courts may award punitive damages for NDA breaches, while Russian courts typically limit damages to actual proven losses."
-    },
-    russian: {
-      definition: "Законодательство США обычно признает как устные, так и письменные соглашения о неразглашении, в то время как российское законодательство требует письменной формы для защиты коммерческой тайны.",
-      requirements: "Российское законодательство требует специальной маркировки 'Коммерческая тайна' на документах для полной защиты. Законодательство США больше ориентировано на разумные меры по сохранению секретности.",
-      duration: "По российскому законодательству бессрочные обязательства о конфиденциальности могут быть сложны в обеспечении исполнения. Суды США обычно принимают разумные сроки в зависимости от характера информации.",
-      damages: "Суды США могут присудить штрафные убытки за нарушение соглашения о неразглашении, в то время как российские суды обычно ограничивают убытки фактически доказанными потерями."
+      disclosureParty: "Сторона, которая владеет и раскрывает конфиденциальную информацию. Обычно это бизнес или лицо, раскрывающее конфиденциальные данные.",
+      receivingParty: "Сторона, которая получает конфиденциальную информацию. Эта сторона обязана защищать и не злоупотреблять информацией.",
+      effectiveDate: "Дата, когда соглашение становится юридически обязательным. Важно для расчета сроков защиты и понимания начала обязательств.",
+      confidentialityDefinition: "Определяет, какая информация защищена. Более широкие определения защищают больше информации, но их сложнее обеспечить исполнение.",
+      purpose: "Четкое определение цели ограничивает использование конфиденциальной информации и помогает предотвратить злоупотребления.",
+      protectionPeriod: "Как долго получающая сторона должна сохранять информацию конфиденциальной. Обычные сроки 2-5 лет.",
+      governingLaw: "Определяет, законы какой юрисдикции будут применяться для толкования соглашения. Критично для международных соглашений.",
+      jurisdiction: "Конкретный суд или место, где будут разрешаться споры. Должно быть легко доступно для обеих сторон.",
+      returnDestroy: "Требует от получающей стороны вернуть или уничтожить конфиденциальную информацию по запросу.",
+      noWarranty: "Защищает раскрывающую сторону от ответственности, если информация окажется неверной или причинит ущерб.",
+      severability: "Гарантирует, что все соглашение не станет недействительным, если одно положение будет признано неисполнимым.",
+      controllingLanguage: "В двуязычных соглашениях указывает, какая языковая версия имеет преимущество в случае расхождений.",
+      crossBorderTip: "Трансграничные соглашения о неразглашении могут столкнуться с проблемами исполнения. Учитывайте местные законы и механизмы исполнения."
     }
   };
   
   // Generate document based on form data
-  const generateDocument = () => {
+  const generateDocument = React.useCallback(() => {
     const {
       discloserName,
       recipientName,
@@ -513,124 +509,16 @@ ${customText || '[Пользовательское Определение Кон
     </div>`;
     
     return documentContent;
-  };
+  }, [formData]);
   
-  // Function to highlight changes
-  const highlightChanges = () => {
-    // If no field was changed recently, don't highlight anything
-    if (!lastChangedField) return;
-    
-    // Get the highlighted document HTML
-    const documentHtml = generateDocument();
-    const previewElement = document.getElementById('preview-document');
-    previewElement.innerHTML = documentHtml;
-    
-    // Find elements to highlight based on the last changed field
-    let elementsToHighlight = [];
-    
-    switch(lastChangedField) {
-      case 'discloserName':
-        elementsToHighlight = previewElement.querySelectorAll(`strong:contains("${formData.discloserName}")`);
-        break;
-      case 'recipientName':
-        elementsToHighlight = previewElement.querySelectorAll(`strong:contains("${formData.recipientName}")`);
-        break;
-      case 'effectiveDate':
-        const enDate = new Date(formData.effectiveDate).toLocaleDateString('en-US', {
-          year: 'numeric', month: 'long', day: 'numeric'
-        });
-        const ruDate = new Date(formData.effectiveDate).toLocaleDateString('ru-RU', {
-          year: 'numeric', month: 'long', day: 'numeric'
-        });
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("EFFECTIVE DATE"), .section-row:contains("ДАТА ВСТУПЛЕНИЯ В СИЛУ")`);
-        break;
-      case 'purpose':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("PERMITTED USE"), .section-row:contains("ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ")`);
-        break;
-      case 'confInfoType':
-      case 'customConfInfo':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("CONFIDENTIAL INFORMATION"), .section-row:contains("КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ")`);
-        break;
-      case 'protectionPeriod':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("PROTECTION PERIOD"), .section-row:contains("СРОК НЕРАЗГЛАШЕНИЯ")`);
-        break;
-      case 'terminationNotice':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("TERM AND TERMINATION"), .section-row:contains("СРОК ДЕЙСТВИЯ")`);
-        break;
-      case 'governingLaw':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("GOVERNING LAW"), .section-row:contains("ПРИМЕНИМОЕ ПРАВО")`);
-        break;
-      case 'includeNoWarranty':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("NO WARRANTIES"), .section-row:contains("НЕТ ГАРАНТИЙ")`);
-        break;
-      case 'includeSeverability':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("SEVERABILITY"), .section-row:contains("НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ")`);
-        break;
-      case 'controllingLanguage':
-        elementsToHighlight = previewElement.querySelectorAll(`.section-row:contains("PREVAILING LANGUAGE"), .section-row:contains("ПРЕОБЛАДАЮЩИЙ ЯЗЫК")`);
-        break;
-      default:
-        return;
-    }
-    
-    // Add highlight class to elements
-    elementsToHighlight.forEach(el => {
-      el.classList.add('highlight');
-      
-      // Scroll to first highlighted element if needed
-      if (elementsToHighlight.length > 0 && previewRef.current) {
-        const firstHighlight = elementsToHighlight[0];
-        
-        // Check if element is outside the visible area
-        const container = previewRef.current;
-        const containerRect = container.getBoundingClientRect();
-        const elementRect = firstHighlight.getBoundingClientRect();
-        
-        if (elementRect.top < containerRect.top || elementRect.bottom > containerRect.bottom) {
-          firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }
-    });
-    
-    // Remove highlight after a delay
-    setTimeout(() => {
-      elementsToHighlight.forEach(el => {
-        el.classList.add('fade-highlight');
-      });
-      
-      setTimeout(() => {
-        elementsToHighlight.forEach(el => {
-          el.classList.remove('highlight');
-          el.classList.remove('fade-highlight');
-        });
-      }, 1000);
-    }, 2000);
-    
-    // Reset lastChangedField after highlighting
-    setLastChangedField(null);
-  };
-  
-  // Effect to generate document on form changes
-  React.useEffect(() => {
-    if (lastChangedField) {
-      highlightChanges();
-    } else {
-      const documentHtml = generateDocument();
-      const previewElement = document.getElementById('preview-document');
-      if (previewElement) {
-        previewElement.innerHTML = documentHtml;
-      }
-    }
-  }, [formData, lastChangedField]);
-  
-  // Info icon component with tooltip
-  const InfoTooltip = ({ content }) => (
-    <div className="tooltip-container">
-      <i data-feather="info" className="info-icon"></i>
-      <div className="tooltip">
-        {content}
-      </div>
-    </div>
+  // Help icon component with tooltip
+  const HelpIcon = ({ tooltip }) => (
+    <span class="help-icon">
+      ?
+      <span class="help-tooltip">
+        {tooltip}
+      </span>
+    </span>
   );
   
   // Render tabs
@@ -661,6 +549,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="discloserName">
                 {currentLanguage === 'english' ? 'Disclosing Party Name:' : 'Наименование Раскрывающей Стороны:'}
+                <HelpIcon tooltip={tooltips.disclosureParty} />
               </label>
               <input 
                 type="text" 
@@ -689,6 +578,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="recipientName">
                 {currentLanguage === 'english' ? 'Receiving Party Name:' : 'Наименование Получателя:'}
+                <HelpIcon tooltip={tooltips.receivingParty} />
               </label>
               <input 
                 type="text" 
@@ -714,11 +604,8 @@ ${customText || '[Пользовательское Определение Кон
               />
             </div>
             
-            {/* Cross-border enforcement note */}
             <div className="legal-note">
-              {currentLanguage === 'english' 
-                ? 'Note: For cross-border NDAs, use the legal entity name exactly as it appears in official registration documents to ensure enforceability.' 
-                : 'Примечание: Для трансграничных соглашений о неразглашении используйте название юридического лица точно так, как оно указано в официальных регистрационных документах, чтобы обеспечить исполнимость.'}
+              {tooltips.crossBorderTip}
             </div>
           </div>
         );
@@ -729,6 +616,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="effectiveDate">
                 {currentLanguage === 'english' ? 'Effective Date:' : 'Дата Вступления в Силу:'}
+                <HelpIcon tooltip={tooltips.effectiveDate} />
               </label>
               <input 
                 type="date" 
@@ -742,6 +630,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="purpose">
                 {currentLanguage === 'english' ? 'Purpose of Disclosure:' : 'Цель Раскрытия:'}
+                <HelpIcon tooltip={tooltips.purpose} />
               </label>
               <textarea 
                 id="purpose"
@@ -757,7 +646,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="confInfoType">
                 {currentLanguage === 'english' ? 'Definition of Confidential Information:' : 'Определение Конфиденциальной Информации:'}
-                <InfoTooltip content={tooltips.confidentialityDefinition} />
+                <HelpIcon tooltip={tooltips.confidentialityDefinition} />
               </label>
               <select 
                 id="confInfoType"
@@ -796,12 +685,6 @@ ${customText || '[Пользовательское Определение Кон
                 />
               </div>
             )}
-            
-            {/* Legal difference highlight */}
-            <div className="legal-difference">
-              <strong>{currentLanguage === 'english' ? 'Legal Difference:' : 'Юридическое Различие:'}</strong><br />
-              {currentLanguage === 'english' ? legalDifferences.english.definition : legalDifferences.russian.definition}
-            </div>
           </div>
         );
         
@@ -811,7 +694,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="protectionPeriod">
                 {currentLanguage === 'english' ? 'Protection Period (years):' : 'Срок Защиты (лет):'}
-                <InfoTooltip content={tooltips.protectionPeriod} />
+                <HelpIcon tooltip={tooltips.protectionPeriod} />
               </label>
               <input 
                 type="number" 
@@ -842,7 +725,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="governingLaw">
                 {currentLanguage === 'english' ? 'Governing Law:' : 'Применимое Право:'}
-                <InfoTooltip content={tooltips.governingLaw} />
+                <HelpIcon tooltip={tooltips.governingLaw} />
               </label>
               <select 
                 id="governingLaw"
@@ -868,6 +751,7 @@ ${customText || '[Пользовательское Определение Кон
             <div className="form-group">
               <label htmlFor="jurisdiction">
                 {currentLanguage === 'english' ? 'Jurisdiction:' : 'Место Рассмотрения Споров:'}
+                <HelpIcon tooltip={tooltips.jurisdiction} />
               </label>
               <select 
                 id="jurisdiction"
@@ -889,19 +773,6 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
               </select>
             </div>
-            
-            {/* Legal note about jurisdiction */}
-            <div className="legal-note">
-              {currentLanguage === 'english' 
-                ? (formData.governingLaw === 'russia' ? tooltips.russianLawNote : tooltips.usLawNote)
-                : (formData.governingLaw === 'russia' ? tooltips.russianLawNote : tooltips.usLawNote)}
-            </div>
-            
-            {/* Legal difference highlight */}
-            <div className="legal-difference">
-              <strong>{currentLanguage === 'english' ? 'Legal Difference:' : 'Юридическое Различие:'}</strong><br />
-              {currentLanguage === 'english' ? legalDifferences.english.duration : legalDifferences.russian.duration}
-            </div>
           </div>
         );
         
@@ -920,6 +791,7 @@ ${customText || '[Пользовательское Определение Кон
                 {currentLanguage === 'english' 
                   ? 'Include Return/Destruction of Materials' 
                   : 'Включить Возврат/Уничтожение Материалов'}
+                <HelpIcon tooltip={tooltips.returnDestroy} />
               </label>
             </div>
             
@@ -935,6 +807,7 @@ ${customText || '[Пользовательское Определение Кон
                 {currentLanguage === 'english' 
                   ? 'Include No Warranty Clause' 
                   : 'Включить Отсутствие Гарантий'}
+                <HelpIcon tooltip={tooltips.noWarranty} />
               </label>
             </div>
             
@@ -950,13 +823,14 @@ ${customText || '[Пользовательское Определение Кон
                 {currentLanguage === 'english' 
                   ? 'Include Severability Clause' 
                   : 'Включить Независимость Положений'}
+                <HelpIcon tooltip={tooltips.severability} />
               </label>
             </div>
             
             <div className="form-group">
               <label htmlFor="controllingLanguage">
                 {currentLanguage === 'english' ? 'Legally Controlling Language:' : 'Преобладающий Язык:'}
-                <InfoTooltip content={tooltips.controllingLanguage} />
+                <HelpIcon tooltip={tooltips.controllingLanguage} />
               </label>
               <select 
                 id="controllingLanguage"
@@ -975,26 +849,6 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
               </select>
             </div>
-            
-            {/* Cross-border enforcement note */}
-            <div className="legal-note">
-              <strong>
-                {currentLanguage === 'english' ? 'Cross-Border Enforcement:' : 'Трансграничное Обеспечение Исполнения:'}
-              </strong><br />
-              {currentLanguage === 'english' ? tooltips.crossBorderEnforcement : tooltips.crossBorderEnforcement}
-            </div>
-            
-            {/* Legal difference highlight */}
-            <div className="legal-difference">
-              <strong>{currentLanguage === 'english' ? 'Legal Difference:' : 'Юридическое Различие:'}</strong><br />
-              {currentLanguage === 'english' ? legalDifferences.english.requirements : legalDifferences.russian.requirements}
-            </div>
-            
-            {/* Additional information on damages */}
-            <div className="legal-difference">
-              <strong>{currentLanguage === 'english' ? 'Damages:' : 'Убытки:'}</strong><br />
-              {currentLanguage === 'english' ? legalDifferences.english.damages : legalDifferences.russian.damages}
-            </div>
           </div>
         );
         
@@ -1003,29 +857,39 @@ ${customText || '[Пользовательское Определение Кон
     }
   };
   
+  // Effect to render document on form changes
+  React.useEffect(() => {
+    const documentHtml = generateDocument();
+    const previewElement = document.getElementById('preview-document');
+    if (previewElement) {
+      previewElement.innerHTML = documentHtml;
+    }
+  }, [formData, generateDocument]);
+  
   return (
     <div className="main-container">
-      <h1>
-        {currentLanguage === 'english' 
-          ? 'Dual Language NDA Generator (English/Russian)' 
-          : 'Генератор Двуязычного Соглашения о Неразглашении (Английский/Русский)'}
-      </h1>
-      
-      <div className="language-toggle">
-        <button 
-          className={`toggle-btn ${currentLanguage === 'english' ? 'active' : ''}`}
-          onClick={() => toggleLanguage('english')}
-        >
-          <img src="usa-flag.svg" alt="USA flag" />
-          English
-        </button>
-        <button 
-          className={`toggle-btn ${currentLanguage === 'russian' ? 'active' : ''}`}
-          onClick={() => toggleLanguage('russian')}
-        >
-          <img src="russia-flag.svg" alt="Russian flag" />
-          Русский
-        </button>
+      <div className="header-container">
+        <div className="flag-toggle-container">
+          <button 
+            className={`flag-btn ${currentLanguage === 'english' ? 'active' : ''}`}
+            onClick={() => toggleLanguage('english')}
+          >
+            <img src="usa-flag.svg" alt="USA" className="flag-icon" />
+            English
+          </button>
+          <button 
+            className={`flag-btn ${currentLanguage === 'russian' ? 'active' : ''}`}
+            onClick={() => toggleLanguage('russian')}
+          >
+            <img src="russia-flag.svg" alt="RUS" className="flag-icon" />
+            Русский
+          </button>
+        </div>
+        <h1>
+          {currentLanguage === 'english' 
+            ? 'Dual Language NDA Generator' 
+            : 'Генератор Двуязычного Соглашения о Неразглашении'}
+        </h1>
       </div>
       
       <div className="content-container">
@@ -1037,7 +901,7 @@ ${customText || '[Пользовательское Определение Кон
           {renderFormFields()}
           
           {/* Navigation buttons */}
-          <div className="button-container">
+          <div className="button-row">
             <button 
               className={`btn secondary ${currentTab === tabs[0].id ? 'disabled' : ''}`}
               onClick={handlePrevious}
@@ -1047,23 +911,21 @@ ${customText || '[Пользовательское Определение Кон
               {currentLanguage === 'english' ? 'Previous' : 'Назад'}
             </button>
             
-            <div className="button-row">
-              <button 
-                className="btn"
-                onClick={copyToClipboard}
-              >
-                <i data-feather="copy"></i>
-                {currentLanguage === 'english' ? 'Copy to Clipboard' : 'Копировать'}
-              </button>
-              
-              <button 
-                className="btn success"
-                onClick={downloadAsWord}
-              >
-                <i data-feather="file-text"></i>
-                {currentLanguage === 'english' ? 'Download MS Word' : 'Скачать MS Word'}
-              </button>
-            </div>
+            <button 
+              className="btn"
+              onClick={copyToClipboard}
+            >
+              <i data-feather="copy"></i>
+              {currentLanguage === 'english' ? 'Copy' : 'Копировать'}
+            </button>
+            
+            <button 
+              className="btn success"
+              onClick={downloadAsWord}
+            >
+              <i data-feather="file-text"></i>
+              {currentLanguage === 'english' ? 'MS Word' : 'MS Word'}
+            </button>
             
             <button 
               className={`btn ${currentTab === tabs[tabs.length - 1].id ? 'disabled' : ''}`}
@@ -1084,61 +946,6 @@ ${customText || '[Пользовательское Определение Кон
     </div>
   );
 };
-
-// Extend jQuery-like contains selector for highlighting
-if (typeof Element.prototype.matches !== 'function') {
-  Element.prototype.matches = Element.prototype.msMatchesSelector || Element.prototype.mozMatchesSelector || Element.prototype.webkitMatchesSelector || function matches(selector) {
-    var element = this;
-    var elements = (element.document || element.ownerDocument).querySelectorAll(selector);
-    var index = 0;
-    
-    while (elements[index] && elements[index] !== element) {
-      ++index;
-    }
-    
-    return Boolean(elements[index]);
-  };
-}
-
-if (typeof NodeList.prototype.forEach !== 'function') {
-  NodeList.prototype.forEach = Array.prototype.forEach;
-}
-
-// Add :contains selector functionality
-if (typeof document.querySelectorAll !== 'undefined') {
-  // Store the original method
-  const originalQuerySelectorAll = Element.prototype.querySelectorAll;
-  
-  // Override querySelectorAll to handle :contains
-  Element.prototype.querySelectorAll = function(selector) {
-    if (selector.indexOf(':contains(') !== -1) {
-      // Parse out the text to search for
-      const match = selector.match(/:contains\(["']?([^"')]+)["']?\)/);
-      
-      if (match) {
-        const searchText = match[1];
-        const newSelector = selector.replace(/:contains\(["']?([^"')]+)["']?\)/, '');
-        
-        // Get elements matching the rest of the selector
-        const elements = originalQuerySelectorAll.call(this, newSelector || '*');
-        const result = [];
-        
-        // Filter for elements containing the text
-        for (let i = 0; i < elements.length; i++) {
-          const element = elements[i];
-          if (element.textContent.indexOf(searchText) !== -1) {
-            result.push(element);
-          }
-        }
-        
-        return result;
-      }
-    }
-    
-    // For normal selectors, use the original method
-    return originalQuerySelectorAll.call(this, selector);
-  };
-}
 
 // Render the app
 ReactDOM.render(<App />, document.getElementById('root'));
