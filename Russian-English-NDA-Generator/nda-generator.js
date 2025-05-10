@@ -198,10 +198,7 @@ If any provision of this Agreement is held invalid or unenforceable by a court o
 In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the English version shall prevail.`,
         
         russian: `<div class="section-title">10. PREVAILING LANGUAGE</div>
-In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`,
-        
-        both: `<div class="section-title">10. PREVAILING LANGUAGE</div>
-In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, both versions shall be equally authoritative.`
+In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`
       },
       
       signatures: `<div class="section-title">IN WITNESS WHEREOF</div>
@@ -295,10 +292,7 @@ ${customText || '[Пользовательское Определение Кон
 В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на английском языке будет иметь преимущественную силу.`,
         
         russian: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
-В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`,
-        
-        both: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
-В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, обе версии будут иметь одинаковую юридическую силу.`
+В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`
       },
       
       signatures: `<div class="section-title">В ПОДТВЕРЖДЕНИЕ ВЫШЕИЗЛОЖЕННОГО</div>
@@ -520,16 +514,18 @@ ${customText || '[Пользовательское Определение Кон
       </div>`;
     }
     
-    // Controlling Language section
+    // Controlling Language section - handle fallback for removed "both" option
+    const validControllingLanguage = (controllingLanguage === 'english' || controllingLanguage === 'russian') ? controllingLanguage : 'english';
+    
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
         <div class="section-title">${enControllingLangNum}. PREVAILING LANGUAGE</div>
-        ${templates.english.controllingLanguage[controllingLanguage].split('</div>')[1]}
+        ${templates.english.controllingLanguage[validControllingLanguage].split('</div>')[1]}
       </div>
       <div class="column right-column">
         <div class="section-title">${enControllingLangNum}. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
-        ${templates.russian.controllingLanguage[controllingLanguage].split('</div>')[1]}
+        ${templates.russian.controllingLanguage[validControllingLanguage].split('</div>')[1]}
       </div>
     </div>`;
     
@@ -872,9 +868,6 @@ ${customText || '[Пользовательское Определение Кон
                 </option>
                 <option value="russian">
                   {currentLanguage === 'english' ? 'Russian' : 'Русский'}
-                </option>
-                <option value="both">
-                  {currentLanguage === 'english' ? 'Both Equally' : 'Оба в Равной Степени'}
                 </option>
               </select>
             </div>
