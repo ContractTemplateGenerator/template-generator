@@ -3,7 +3,6 @@ const App = () => {
   // Define state
   const [currentLanguage, setCurrentLanguage] = React.useState('english');
   const [currentTab, setCurrentTab] = React.useState('parties');
-  const [lastChangedField, setLastChangedField] = React.useState(null);
   const [formData, setFormData] = React.useState({
     discloserName: '',
     discloserAddress: '',
@@ -28,9 +27,9 @@ const App = () => {
   
   // Define tabs - reduced from 4 to 3
   const tabs = [
-    { id: 'parties', labelEn: 'Parties & Agreement', labelRu: 'Стороны и Соглашение' },
-    { id: 'terms', labelEn: 'Terms & Jurisdiction', labelRu: 'Условия и Юрисдикция' },
-    { id: 'additional', labelEn: 'Additional Clauses', labelRu: 'Дополнительные Положения' }
+    { id: 'parties', labelEn: 'Parties & Agreement', labelRu: 'Стороны' },
+    { id: 'terms', labelEn: 'Terms & Jurisdiction', labelRu: 'Условия' },
+    { id: 'additional', labelEn: 'Additional Clauses', labelRu: 'Дополнительн.' }
   ];
   
   // Handle language toggle
@@ -43,16 +42,138 @@ const App = () => {
     setCurrentTab(tabId);
   };
   
-  // Handle form input changes - fixed to prevent blank screen
+  // Handle form input changes with highlighting
   const handleChange = React.useCallback((e) => {
     const { name, value, type, checked } = e.target;
-    setLastChangedField(name);
     
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }));
+    
+    // Trigger highlighting after state update
+    setTimeout(() => {
+      highlightChangedSection(name);
+    }, 100);
   }, []);
+  
+  // Highlight and scroll to changed section
+  const highlightChangedSection = (fieldName) => {
+    const previewElement = document.getElementById('preview-document');
+    if (!previewElement) return;
+    
+    // Remove any existing highlights
+    const existingHighlights = previewElement.querySelectorAll('.highlight');
+    existingHighlights.forEach(el => {
+      el.classList.remove('highlight');
+      el.classList.remove('fade-highlight');
+    });
+    
+    // Determine which section to highlight based on field name
+    let sectionToHighlight = null;
+    
+    switch(fieldName) {
+      case 'discloserName':
+      case 'recipientName':
+      case 'discloserAddress':
+      case 'recipientAddress':
+        sectionToHighlight = previewElement.querySelector('.section-row');
+        break;
+      case 'effectiveDate':
+        const dateSections = previewElement.querySelectorAll('.section-title');
+        dateSections.forEach(section => {
+          if (section.textContent.includes('EFFECTIVE DATE') || section.textContent.includes('ДАТА ВСТУПЛЕНИЯ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'purpose':
+        const purposeSections = previewElement.querySelectorAll('.section-title');
+        purposeSections.forEach(section => {
+          if (section.textContent.includes('PERMITTED USE') || section.textContent.includes('ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'confInfoType':
+      case 'customConfInfo':
+        const confSections = previewElement.querySelectorAll('.section-title');
+        confSections.forEach(section => {
+          if (section.textContent.includes('CONFIDENTIAL INFORMATION') || section.textContent.includes('КОНФИДЕНЦИАЛЬНАЯ ИНФОРМАЦИЯ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'protectionPeriod':
+        const protectionSections = previewElement.querySelectorAll('.section-title');
+        protectionSections.forEach(section => {
+          if (section.textContent.includes('PROTECTION PERIOD') || section.textContent.includes('СРОК НЕРАЗГЛАШЕНИЯ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'terminationNotice':
+        const termSections = previewElement.querySelectorAll('.section-title');
+        termSections.forEach(section => {
+          if (section.textContent.includes('TERM AND TERMINATION') || section.textContent.includes('СРОК ДЕЙСТВИЯ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'governingLaw':
+      case 'jurisdiction':
+        const govSections = previewElement.querySelectorAll('.section-title');
+        govSections.forEach(section => {
+          if (section.textContent.includes('GOVERNING LAW') || section.textContent.includes('ПРИМЕНИМОЕ ПРАВО')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'includeNoWarranty':
+        const warrantySections = previewElement.querySelectorAll('.section-title');
+        warrantySections.forEach(section => {
+          if (section.textContent.includes('NO WARRANTIES') || section.textContent.includes('НЕТ ГАРАНТИЙ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'includeSeverability':
+        const severabilitySections = previewElement.querySelectorAll('.section-title');
+        severabilitySections.forEach(section => {
+          if (section.textContent.includes('SEVERABILITY') || section.textContent.includes('НЕЗАВИСИМОСТЬ')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+      case 'controllingLanguage':
+        const langSections = previewElement.querySelectorAll('.section-title');
+        langSections.forEach(section => {
+          if (section.textContent.includes('PREVAILING LANGUAGE') || section.textContent.includes('ПРЕОБЛАДАЮЩИЙ ЯЗЫК')) {
+            sectionToHighlight = section.parentElement;
+          }
+        });
+        break;
+    }
+    
+    if (sectionToHighlight) {
+      // Add highlight class
+      sectionToHighlight.classList.add('highlight');
+      
+      // Scroll into view
+      sectionToHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      
+      // Remove highlight after 2 seconds
+      setTimeout(() => {
+        sectionToHighlight.classList.add('fade-highlight');
+        sectionToHighlight.classList.remove('highlight');
+        
+        // Remove all highlight classes after fade
+        setTimeout(() => {
+          sectionToHighlight.classList.remove('fade-highlight');
+        }, 1000);
+      }, 2000);
+    }
+  };
   
   // Handle navigation (previous/next buttons)
   const handlePrevious = () => {
@@ -78,40 +199,81 @@ const App = () => {
         return;
       }
       
-      const docText = previewElement.innerText || previewElement.textContent;
+      // Get text content, removing HTML tags
+      const docText = previewElement.textContent || previewElement.innerText;
       
-      if (!docText) {
-        alert('No document content to copy. Please try again.');
+      if (!docText || docText.trim().length === 0) {
+        alert('No document content to copy. Please fill in the form first.');
         return;
       }
       
       // Try using the modern clipboard API first
       if (navigator.clipboard && window.isSecureContext) {
-        await navigator.clipboard.writeText(docText);
-        alert('Document copied to clipboard successfully!');
-      } else {
-        // Fallback for older browsers or non-secure contexts
-        const textArea = document.createElement('textarea');
-        textArea.value = docText;
-        textArea.style.position = 'fixed';
-        textArea.style.left = '-999999px';
-        textArea.style.top = '-999999px';
-        document.body.appendChild(textArea);
-        textArea.focus();
-        textArea.select();
-        
         try {
-          document.execCommand('copy');
+          await navigator.clipboard.writeText(docText);
           alert('Document copied to clipboard successfully!');
+          return;
         } catch (err) {
-          alert('Failed to copy document. Please try selecting and copying manually.');
-        } finally {
-          document.body.removeChild(textArea);
+          console.log('Modern clipboard API failed, trying fallback...');
         }
+      }
+      
+      // Fallback method using a temporary textarea
+      const textArea = document.createElement('textarea');
+      textArea.value = docText;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      textArea.focus();
+      textArea.select();
+      
+      try {
+        const successful = document.execCommand('copy');
+        if (successful) {
+          alert('Document copied to clipboard successfully!');
+        } else {
+          throw new Error('execCommand failed');
+        }
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        
+        // Final fallback - show the text in a modal for manual copying
+        const modal = document.createElement('div');
+        modal.style.cssText = `
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+          max-width: 90%;
+          max-height: 80vh;
+          overflow: auto;
+          z-index: 10000;
+        `;
+        
+        modal.innerHTML = `
+          <h3 style="margin-bottom: 10px;">Copy Document Manually</h3>
+          <p style="margin-bottom: 10px;">Select all text below and copy manually (Ctrl+C or Cmd+C):</p>
+          <textarea style="width: 100%; height: 300px; border: 1px solid #ccc; padding: 10px;" readonly>${docText}</textarea>
+          <button onclick="this.parentElement.remove()" style="margin-top: 10px; padding: 8px 16px; background: #0069ff; color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+        `;
+        
+        document.body.appendChild(modal);
+        
+        // Select all text in the textarea
+        const textarea = modal.querySelector('textarea');
+        textarea.focus();
+        textarea.select();
+      } finally {
+        document.body.removeChild(textArea);
       }
     } catch (err) {
       console.error('Copy failed:', err);
-      alert('Failed to copy document. Please try selecting and copying manually.');
+      alert('Failed to copy document. Please try selecting the text manually from the preview.');
     }
   };
   
@@ -874,6 +1036,24 @@ ${customText || '[Пользовательское Определение Кон
             
             <div className="legal-note">
               {tooltips.crossBorderTip}
+            </div>
+            
+            <div className="legal-note" style={{marginTop: "15px"}}>
+              <strong>{currentLanguage === 'english' ? 'Important Note:' : 'Важное Примечание:'}</strong><br />
+              {currentLanguage === 'english' 
+                ? 'This bilingual NDA template is designed for international business relationships. Always have a qualified lawyer review the final agreement, especially for cross-border transactions. Consider local laws, translation accuracy, and practical enforcement mechanisms in both jurisdictions.' 
+                : 'Этот двуязычный шаблон NDA предназначен для международных деловых отношений. Всегда консультируйтесь с квалифицированным юристом перед подписанием окончательного соглашения, особенно для трансграничных сделок. Учитывайте местные законы, точность перевода и практические механизмы исполнения в обеих юрисдикциях.'}
+            </div>
+            
+            <div className="legal-note" style={{marginTop: "10px", backgroundColor: "#f0f8ff"}}>
+              <strong>{currentLanguage === 'english' ? 'Professional Legal Services:' : 'Профессиональные Юридические Услуги:'}</strong><br />
+              {currentLanguage === 'english' 
+                ? 'Need help customizing this NDA for your specific situation? Schedule a consultation with our experienced international business attorneys. We specialize in cross-border agreements and can ensure your confidential information is properly protected.' 
+                : 'Нужна помощь в адаптации этого NDA для вашей конкретной ситуации? Запишитесь на консультацию с нашими опытными юристами по международному бизнесу. Мы специализируемся на трансграничных соглашениях и можем обеспечить надлежащую защиту вашей конфиденциальной информации.'}
+              <br /><br />
+              <a href="https://terms.law/call/" target="_blank" style={{color: "#0069ff", fontWeight: "bold"}}>
+                {currentLanguage === 'english' ? '→ Schedule Your Consultation' : '→ Записаться на Консультацию'}
+              </a>
             </div>
           </div>
         );
