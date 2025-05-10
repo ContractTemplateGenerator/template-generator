@@ -118,7 +118,7 @@ function processTextWithFormatting(text) {
       return `<p class="bold">${para.replace(/\n/g, '<br>')}</p>`;
     }
     
-    // Handle regular paragraphs
+    // Handle regular paragraphs (not bold)
     return `<p>${para.replace(/\n/g, '<br>')}</p>`;
   }).join('');
 }

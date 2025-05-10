@@ -22,15 +22,17 @@ const TokenPurchaseAgreementGenerator = () => {
     token_type: "utility",
     token_network: "Ethereum",
     token_smart_contract: "",
-    token_total_supply: "",
+    include_smart_contract: true,
+    token_total_supply: "1000000",
     token_description: "",
     governance_rights: "no",
     
     // Purchase Specifics
     token_price_type: "fixed",
-    token_price: "",
-    token_amount: "",
+    token_price: "0.10",
+    token_amount: "100000",
     purchase_currency: "USD",
+    custom_currency: "",
     crypto_payment: "no",
     crypto_payment_type: "BTC",
     discount_rate: "0",
@@ -40,18 +42,23 @@ const TokenPurchaseAgreementGenerator = () => {
     buyer_accredited: "yes",
     seller_ownership: "yes",
     compliance_laws: "yes",
+    us_law_applies: true,
     
     // Covenants & Conditions
     token_use_restriction: "no",
+    restriction_type: "standard",
+    custom_restrictions: "",
     lock_up_period: "0",
     vesting_schedule: "no",
+    vesting_preset: "standard",
     vesting_period: "",
     vesting_cliff: "",
     
     // Closing Terms
     closing_conditions: [],
     termination_rights: [],
-    governing_law: "",
+    governing_law: "Delaware",
+    custom_governing_law: "",
     dispute_resolution: "litigation",
     arbitration_venue: ""
   });
@@ -67,6 +74,10 @@ const TokenPurchaseAgreementGenerator = () => {
   
   // Function to generate document text based on form data
   const generateDocumentText = () => {
+    // Define common variables
+    const currencyDisplay = formData.purchase_currency === "Other" ? 
+      (formData.custom_currency || "[Custom Currency]") : formData.purchase_currency;
+    
     let document = `TOKEN PURCHASE AGREEMENT
 
 This Token Purchase Agreement (the "Agreement") is made and entered into as of ${formData.effective_date || "[Date]"} (the "Effective Date") by and between:
@@ -93,13 +104,19 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinaf
 
 1.2 "${formData.token_symbol || "TOKEN"}" means the digital tokens created by Seller on the Blockchain with the symbol "${formData.token_symbol || "TOKEN"}" and the characteristics described in Section 2.
 
-1.3 "Smart Contract" means the smart contract deployed at address ${formData.token_smart_contract || "[Contract Address]"} on the Blockchain.
+${formData.include_smart_contract && formData.token_smart_contract ? 
+`1.3 "Smart Contract" means the smart contract deployed at address ${formData.token_smart_contract} on the Blockchain.
 
 1.4 "Purchase Price" means the amount set forth in Section 3 to be paid by Buyer to Seller for the purchase of the Tokens.
 
 1.5 "Securities Act" means the Securities Act of 1933, as amended.
 
-1.6 "Transfer" means to sell, assign, transfer, pledge, hypothecate or otherwise dispose of, whether voluntarily or by operation of law.
+1.6 "Transfer" means to sell, assign, transfer, pledge, hypothecate or otherwise dispose of, whether voluntarily or by operation of law.` : 
+`1.3 "Purchase Price" means the amount set forth in Section 3 to be paid by Buyer to Seller for the purchase of the Tokens.
+
+1.4 "Securities Act" means the Securities Act of 1933, as amended.
+
+1.5 "Transfer" means to sell, assign, transfer, pledge, hypothecate or otherwise dispose of, whether voluntarily or by operation of law.`}
 
 2. TOKEN CHARACTERISTICS
 
@@ -117,17 +134,17 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinaf
 
 3.2 Purchase Price. The purchase price for the Tokens shall be ${(() => {
   if (formData.token_price_type === "fixed") {
-    return `${formData.token_price || "[Amount]"} ${formData.purchase_currency || "USD"} per Token, for a total of ${formData.token_price && formData.token_amount ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2) : "[Total Amount]"} ${formData.purchase_currency || "USD"}`;
+    return `${formData.token_price || "[Amount]"} ${currencyDisplay} per Token, for a total of ${formData.token_price && formData.token_amount ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2) : "[Total Amount]"} ${currencyDisplay}`;
   } else if (formData.token_price_type === "tiered") {
-    return `determined according to the tiered pricing schedule set forth in Schedule A, for a total of ${formData.token_price && formData.token_amount ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2) : "[Total Amount]"} ${formData.purchase_currency || "USD"}`;
+    return `determined according to the tiered pricing schedule set forth in Schedule A, for a total of ${formData.token_price && formData.token_amount ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2) : "[Total Amount]"} ${currencyDisplay}`;
   } else {
-    return `${formData.token_price || "[Amount]"} ${formData.purchase_currency || "USD"} per Token, with a discount of ${formData.discount_rate || "0"}%, for a total of ${formData.token_price && formData.token_amount && formData.discount_rate ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate) / 100)).toFixed(2) : "[Total Amount]"} ${formData.purchase_currency || "USD"}`;
+    return `${formData.token_price || "[Amount]"} ${currencyDisplay} per Token, with a discount of ${formData.discount_rate || "0"}%, for a total of ${formData.token_price && formData.token_amount && formData.discount_rate ? (parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate) / 100)).toFixed(2) : "[Total Amount]"} ${currencyDisplay}`;
   }
 })()}.
 
 3.3 Payment. ${formData.crypto_payment === "yes" ? 
 `Buyer shall pay the Purchase Price in ${formData.crypto_payment_type || "BTC"} to Seller's crypto wallet address as provided separately by Seller.` : 
-`Buyer shall pay the Purchase Price in ${formData.purchase_currency || "USD"} to Seller's designated bank account as provided separately by Seller.`}
+`Buyer shall pay the Purchase Price in ${currencyDisplay} to Seller's designated bank account as provided separately by Seller.`}
 
 3.4 Payment Deadline. Buyer shall pay the Purchase Price in full on or before ${formData.payment_deadline || "[Deadline Date]"}.
 
@@ -155,18 +172,34 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinaf
 
 5.2 Authorization. The execution, delivery, and performance of this Agreement by Buyer has been duly authorized by all necessary action and does not conflict with any agreement, instrument, or understanding to which Buyer is a party or by which it is bound.
 
-5.3 Accredited Investor Status. ${formData.buyer_accredited === "yes" ? 
+${formData.us_law_applies ? `5.3 Accredited Investor Status. ${formData.buyer_accredited === "yes" ? 
 `Buyer is an "accredited investor" as that term is defined in Rule 501(a) of Regulation D promulgated under the Securities Act.` : 
 `Buyer may not qualify as an "accredited investor" as that term is defined in Rule 501(a) of Regulation D promulgated under the Securities Act, and acknowledges the increased risks associated with this investment.`}
 
-5.4 Investment Purpose. Buyer is acquiring the Tokens for its own account and for investment purposes only, and not with a view to, or for resale in connection with, any distribution thereof within the meaning of the Securities Act.
+5.4 Investment Purpose. Buyer is acquiring the Tokens for its own account and for investment purposes only, and not with a view to, or for resale in connection with, any distribution thereof within the meaning of the Securities Act.` : 
+`5.3 Investment Purpose. Buyer is acquiring the Tokens for its own account and for investment purposes only, and not with a view to resale or distribution.`}
 
-5.5 Knowledge and Risks. Buyer has sufficient knowledge, experience, and expertise in financial and business matters, blockchain technology, cryptographic tokens, and other digital assets, and is capable of evaluating the merits and risks of entering into this Agreement and purchasing the Tokens.
+5.${formData.us_law_applies ? '5' : '4'} Knowledge and Risks. Buyer has sufficient knowledge, experience, and expertise in financial and business matters, blockchain technology, cryptographic tokens, and other digital assets, and is capable of evaluating the merits and risks of entering into this Agreement and purchasing the Tokens.
 
 6. RESTRICTIONS ON TRANSFER
 
 6.1 Transfer Restrictions. ${formData.token_use_restriction === "yes" ? 
-`Buyer shall not Transfer any of the Tokens except in compliance with this Agreement and applicable securities laws.` : 
+(() => {
+  switch(formData.restriction_type) {
+    case "standard":
+      return `Buyer shall not Transfer any of the Tokens except in compliance with this Agreement and applicable securities laws.`;
+    case "region":
+      return `Buyer shall not Transfer any of the Tokens to persons or entities located in Restricted Territories, as defined in Schedule B, or in violation of applicable securities laws.`;
+    case "kyc":
+      return `Buyer shall not Transfer any of the Tokens except to recipients who have completed the same know-your-customer (KYC) and anti-money laundering (AML) verification procedures as the Buyer.`;
+    case "accredited":
+      return `Buyer shall not Transfer any of the Tokens except to recipients that qualify as "accredited investors" as defined in Rule 501(a) of Regulation D promulgated under the Securities Act.`;
+    case "custom":
+      return formData.custom_restrictions || `Buyer shall not Transfer any of the Tokens except in compliance with this Agreement and applicable securities laws.`;
+    default:
+      return `Buyer shall not Transfer any of the Tokens except in compliance with this Agreement and applicable securities laws.`;
+  }
+})() : 
 `Buyer may Transfer the Tokens without restriction, provided such Transfer complies with applicable securities laws.`}
 
 6.2 Lock-Up Period. ${formData.lock_up_period && parseInt(formData.lock_up_period) > 0 ? 
@@ -174,14 +207,27 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements hereinaf
 `There is no lock-up period restricting the Transfer of Tokens by Buyer.`}
 
 6.3 Vesting Schedule. ${formData.vesting_schedule === "yes" ? 
-`The Tokens shall vest to Buyer according to the following schedule: ${formData.vesting_period || "[Period]"} with a cliff of ${formData.vesting_cliff || "[Cliff Period]"}.` : 
+(() => {
+  switch(formData.vesting_preset) {
+    case "standard":
+      return `The Tokens shall vest to Buyer according to the following schedule: ${formData.vesting_period || "48 months"} with a cliff of ${formData.vesting_cliff || "12 months"}.`;
+    case "linear":
+      return `The Tokens shall vest linearly to Buyer over a period of ${formData.vesting_period || "48 months"} with no cliff period.`;
+    case "milestone":
+      return `The Tokens shall vest to Buyer upon achievement of specific project milestones as set forth in Schedule C.`;
+    case "custom":
+      return `The Tokens shall vest to Buyer according to the following schedule: ${formData.vesting_period || "[Period]"} with a cliff of ${formData.vesting_cliff || "[Cliff Period]"}.`;
+    default:
+      return `The Tokens shall vest to Buyer according to the following schedule: ${formData.vesting_period || "[Period]"} with a cliff of ${formData.vesting_cliff || "[Cliff Period]"}.`;
+  }
+})() : 
 `The Tokens shall be fully vested upon delivery to Buyer.`}
 
 7. CONDITIONS TO CLOSING
 
 7.1 Conditions to Obligations of Seller. The obligation of Seller to sell and deliver the Tokens to Buyer at Closing is subject to the fulfillment, prior to or at Closing, of each of the following conditions:
 ${formData.closing_conditions && formData.closing_conditions.length > 0 ? 
-formData.closing_conditions.map((condition, index) => `\n   (a) ${condition}`).join('') : 
+formData.closing_conditions.map((condition, index) => `\n   (${String.fromCharCode(97 + index)}) ${condition}`).join('') : 
 `\n   (a) Buyer shall have performed and complied with all agreements and conditions required by this Agreement to be performed or complied with by it prior to or at Closing.\n   (b) Buyer shall have paid the Purchase Price in full.`}
 
 7.2 Conditions to Obligations of Buyer. The obligation of Buyer to purchase the Tokens and to pay the Purchase Price at Closing is subject to the fulfillment, prior to or at Closing, of each of the following conditions:
@@ -202,11 +248,11 @@ formData.termination_rights.map((right, index) => `\n   (${String.fromCharCode(9
 
 9.1 Notices. All notices and other communications hereunder shall be in writing and shall be deemed given if delivered personally or by commercial delivery service, or sent via email (with confirmation of receipt) to the Parties at the addresses provided by each Party to the other.
 
-9.2 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of ${formData.governing_law || "[Jurisdiction]"} without giving effect to any choice or conflict of law provision or rule.
+9.2 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of ${formData.governing_law === "Other" ? (formData.custom_governing_law || "[Jurisdiction]") : formData.governing_law || "[Jurisdiction]"} without giving effect to any choice or conflict of law provision or rule.
 
 9.3 Dispute Resolution. ${formData.dispute_resolution === "arbitration" ? 
 `Any dispute arising out of or in connection with this Agreement shall be referred to and finally resolved by arbitration administered by [Arbitration Body] in accordance with its rules. The seat of arbitration shall be ${formData.arbitration_venue || "[Venue]"}. The number of arbitrators shall be [Number]. The language of the arbitration shall be English.` : 
-`Any dispute arising out of or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts of ${formData.governing_law || "[Jurisdiction]"}.`}
+`Any dispute arising out of or in connection with this Agreement shall be subject to the exclusive jurisdiction of the courts of ${formData.governing_law === "Other" ? (formData.custom_governing_law || "[Jurisdiction]") : formData.governing_law || "[Jurisdiction]"}.`}
 
 9.4 Entire Agreement. This Agreement constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior and contemporaneous understandings and agreements, whether written or oral.
 
@@ -616,7 +662,7 @@ Title: __________________________`;
             <div className="form-group">
               <label htmlFor="token_name">
                 Token Name
-                <InfoTooltip content="The full name of your token (e.g., 'Ethereum')." />
+                <InfoTooltip content="The full name of your token (e.g., 'Ethereum', 'Bitcoin')." />
               </label>
               <input
                 type="text"
@@ -632,7 +678,7 @@ Title: __________________________`;
             <div className="form-group">
               <label htmlFor="token_symbol">
                 Token Symbol
-                <InfoTooltip content="The trading symbol or ticker for your token (e.g., 'ETH')." />
+                <InfoTooltip content="The trading symbol or ticker for your token (e.g., 'ETH', 'BTC'). Usually 3-4 letters." />
               </label>
               <input
                 type="text"
@@ -648,7 +694,7 @@ Title: __________________________`;
             <div className="form-group">
               <label htmlFor="token_type">
                 Token Type
-                <InfoTooltip content="The classification of your token, which affects legal treatment." />
+                <InfoTooltip content="The classification of your token has significant legal implications. Utility tokens are the most common and generally face less regulatory scrutiny compared to security tokens." />
               </label>
               <select
                 id="token_type"
@@ -664,21 +710,21 @@ Title: __________________________`;
                 <option value="non-fungible">Non-Fungible Token (NFT)</option>
               </select>
               {formData.token_type === "security" && (
-                <WarningIndicator content="Security tokens are subject to securities regulations and may require registration or exemption." />
+                <WarningIndicator content="Security tokens are subject to securities regulations and may require registration or exemption under laws like the Securities Act of 1933." />
               )}
               <span className="form-hint">
-                {formData.token_type === "utility" && "Utility tokens provide access to a product or service."}
-                {formData.token_type === "security" && "Security tokens represent ownership in an asset and may be subject to securities regulations."}
-                {formData.token_type === "governance" && "Governance tokens provide voting rights in a protocol or platform."}
-                {formData.token_type === "payment" && "Payment tokens are designed to be used as a medium of exchange."}
-                {formData.token_type === "non-fungible" && "NFTs represent unique digital assets."}
+                {formData.token_type === "utility" && "Utility tokens provide access to a product or service (e.g., access to a platform, ability to use certain features)."}
+                {formData.token_type === "security" && "Security tokens represent ownership in an asset and may be subject to securities regulations. They often represent ownership shares, dividend rights, or profit-sharing arrangements."}
+                {formData.token_type === "governance" && "Governance tokens provide voting rights in a protocol or platform (e.g., voting on protocol upgrades, parameter changes, or treasury allocations)."}
+                {formData.token_type === "payment" && "Payment tokens are designed primarily to be used as a medium of exchange within a specific ecosystem."}
+                {formData.token_type === "non-fungible" && "NFTs represent unique digital assets with distinct characteristics, unlike fungible tokens which are interchangeable."}
               </span>
             </div>
             
             <div className="form-group">
               <label htmlFor="token_network">
                 Blockchain Network
-                <InfoTooltip content="The blockchain platform where your token exists." />
+                <InfoTooltip content="The blockchain platform where your token exists. Different networks have different technical capabilities, gas costs, and community reach." />
               </label>
               <select
                 id="token_network"
@@ -693,49 +739,84 @@ Title: __________________________`;
                 <option value="Polygon">Polygon</option>
                 <option value="Avalanche">Avalanche</option>
                 <option value="Cardano">Cardano</option>
+                <option value="Arbitrum">Arbitrum</option>
+                <option value="Optimism">Optimism</option>
+                <option value="Base">Base</option>
                 <option value="Other">Other</option>
               </select>
             </div>
             
             <div className="form-group">
-              <label htmlFor="token_smart_contract">
-                Smart Contract Address
-                <InfoTooltip content="The blockchain address where the token's smart contract is deployed." />
-              </label>
-              <input
-                type="text"
-                id="token_smart_contract"
-                name="token_smart_contract"
-                className="form-control"
-                value={formData.token_smart_contract}
-                onChange={handleChange}
-                placeholder="0x123abc..."
-              />
-              <span className="form-hint">If not yet deployed, you can leave this blank and update it later.</span>
+              <div className="checkbox-group">
+                <label className="checkbox-label">
+                  <input
+                    type="checkbox"
+                    name="include_smart_contract"
+                    checked={formData.include_smart_contract}
+                    onChange={(e) => setFormData({...formData, include_smart_contract: e.target.checked})}
+                    className="checkbox-input"
+                  />
+                  Include Smart Contract Address
+                </label>
+              </div>
+              
+              {formData.include_smart_contract && (
+                <>
+                  <label htmlFor="token_smart_contract">
+                    Smart Contract Address
+                    <InfoTooltip content="The blockchain address where the token's smart contract is deployed. This is a unique identifier for your token on the blockchain (e.g., '0x1234...')." />
+                  </label>
+                  <input
+                    type="text"
+                    id="token_smart_contract"
+                    name="token_smart_contract"
+                    className="form-control"
+                    value={formData.token_smart_contract}
+                    onChange={handleChange}
+                    placeholder="0x123abc..."
+                  />
+                  <span className="form-hint">If not yet deployed, you can leave this blank and update it later.</span>
+                </>
+              )}
             </div>
             
             <div className="form-group">
               <label htmlFor="token_total_supply">
                 Total Token Supply
-                <InfoTooltip content="The maximum number of tokens that will ever exist." />
+                <InfoTooltip content="The maximum number of tokens that will ever exist. Common supply amounts include 100 million or 1 billion for utility tokens, but this varies widely based on tokenomics." />
               </label>
               <div className="input-wrapper">
                 <input
-                  type="text"
+                  type="number"
                   id="token_total_supply"
                   name="token_total_supply"
                   className="form-control"
                   value={formData.token_total_supply}
                   onChange={handleChange}
                   placeholder="1,000,000"
+                  min="1"
+                  step="500000"
                 />
+                <div className="number-controls">
+                  <button type="button" onClick={() => {
+                    const newValue = parseInt(formData.token_total_supply || 0) + 500000;
+                    setFormData({...formData, token_total_supply: newValue.toString()});
+                    setLastChanged("token_total_supply");
+                  }}>▲</button>
+                  <button type="button" onClick={() => {
+                    const newValue = Math.max(1, parseInt(formData.token_total_supply || 0) - 500000);
+                    setFormData({...formData, token_total_supply: newValue.toString()});
+                    setLastChanged("token_total_supply");
+                  }}>▼</button>
+                </div>
               </div>
+              <span className="form-hint">Common values: 10,000,000 (10M), 100,000,000 (100M), 1,000,000,000 (1B)</span>
             </div>
             
             <div className="form-group">
               <label htmlFor="token_description">
                 Token Description & Utility
-                <InfoTooltip content="Describe what the token does and what rights or access it provides to holders." />
+                <InfoTooltip content="A clear description of what your token does, what rights it provides, and how it will be used in your ecosystem." />
               </label>
               <textarea
                 id="token_description"
@@ -743,14 +824,15 @@ Title: __________________________`;
                 className="form-control"
                 value={formData.token_description}
                 onChange={handleChange}
-                placeholder="Describe the purpose, functionality, and utility of your token..."
+                placeholder="Example: provides holders with access to the platform's premium features, including advanced analytics, reduced transaction fees, and priority customer support."
               ></textarea>
+              <span className="form-hint">Be specific about the utility or rights the token provides to its holders.</span>
             </div>
             
             <div className="form-group">
               <label>
                 Governance Rights
-                <InfoTooltip content="Whether token holders have voting rights in the protocol." />
+                <InfoTooltip content="Governance rights allow token holders to vote on protocol changes, proposals, or other decisions affecting the ecosystem. This can impact the token's regulatory classification." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -778,6 +860,9 @@ Title: __________________________`;
                   No, tokens do not include governance rights
                 </label>
               </div>
+              {formData.governance_rights === "yes" && (
+                <span className="form-hint">Governance rights may influence regulatory classification. Tokens with significant governance rights may face additional regulatory scrutiny.</span>
+              )}
             </div>
             
             <div className="regulatory-info">
@@ -793,23 +878,40 @@ Title: __________________________`;
             <div className="form-group">
               <label htmlFor="token_amount">
                 Number of Tokens Being Purchased
-                <InfoTooltip content="The quantity of tokens the buyer is purchasing under this agreement." />
+                <InfoTooltip content="The quantity of tokens the buyer is purchasing under this agreement. This should be a specific number rather than a percentage of total supply." />
               </label>
-              <input
-                type="text"
-                id="token_amount"
-                name="token_amount"
-                className="form-control"
-                value={formData.token_amount}
-                onChange={handleChange}
-                placeholder="10,000"
-              />
+              <div className="input-wrapper">
+                <input
+                  type="number"
+                  id="token_amount"
+                  name="token_amount"
+                  className="form-control"
+                  value={formData.token_amount}
+                  onChange={handleChange}
+                  placeholder="10,000"
+                  min="1"
+                  step="10000"
+                />
+                <div className="number-controls">
+                  <button type="button" onClick={() => {
+                    const newValue = parseInt(formData.token_amount || 0) + 10000;
+                    setFormData({...formData, token_amount: newValue.toString()});
+                    setLastChanged("token_amount");
+                  }}>▲</button>
+                  <button type="button" onClick={() => {
+                    const newValue = Math.max(1, parseInt(formData.token_amount || 0) - 10000);
+                    setFormData({...formData, token_amount: newValue.toString()});
+                    setLastChanged("token_amount");
+                  }}>▼</button>
+                </div>
+              </div>
+              <span className="form-hint">This is usually a percentage of the total token supply (e.g., 100,000 tokens = 1% of a 10M supply)</span>
             </div>
             
             <div className="form-group">
               <label htmlFor="token_price_type">
                 Pricing Method
-                <InfoTooltip content="How the token price is determined for this sale." />
+                <InfoTooltip content="How the token price is determined for this sale. Different pricing methods are used for different investment stages and investor types." />
               </label>
               <select
                 id="token_price_type"
@@ -823,33 +925,47 @@ Title: __________________________`;
                 <option value="discounted">Discounted Price</option>
               </select>
               <span className="form-hint">
-                {formData.token_price_type === "fixed" && "A single price per token."}
-                {formData.token_price_type === "tiered" && "Different price points based on purchase quantity."}
-                {formData.token_price_type === "discounted" && "A discounted price from a standard rate."}
+                {formData.token_price_type === "fixed" && "A single price per token (e.g., $0.10 per token). Most common for private sales."}
+                {formData.token_price_type === "tiered" && "Different price points based on purchase quantity (e.g., $0.10 for first 10,000 tokens, $0.09 for next 10,000). Common for early-stage investors."}
+                {formData.token_price_type === "discounted" && "A discounted price from a standard rate (e.g., 20% discount from public sale price). Often used for strategic investors."}
               </span>
             </div>
             
             <div className="form-group">
               <label htmlFor="token_price">
                 Token Price
-                <InfoTooltip content="The price per token in the selected currency." />
+                <InfoTooltip content="The price per token in the selected currency. Early-stage token sales typically range from $0.01 to $1.00 depending on the project stage and tokenomics." />
               </label>
               <div className="input-wrapper">
                 <input
-                  type="text"
+                  type="number"
                   id="token_price"
                   name="token_price"
                   className="form-control"
                   value={formData.token_price}
                   onChange={handleChange}
-                  placeholder="0.50"
+                  placeholder="0.10"
+                  min="0.0001"
+                  step="0.01"
                 />
+                <div className="number-controls">
+                  <button type="button" onClick={() => {
+                    const newValue = Math.max(0.0001, parseFloat(formData.token_price || 0) + 0.01).toFixed(4);
+                    setFormData({...formData, token_price: newValue.toString()});
+                    setLastChanged("token_price");
+                  }}>▲</button>
+                  <button type="button" onClick={() => {
+                    const newValue = Math.max(0.0001, parseFloat(formData.token_price || 0) - 0.01).toFixed(4);
+                    setFormData({...formData, token_price: newValue.toString()});
+                    setLastChanged("token_price");
+                  }}>▼</button>
+                </div>
               </div>
               {formData.token_price && formData.token_amount && (
                 <span className="form-hint">
-                  Total purchase amount: {(parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2)} {formData.purchase_currency}
+                  <strong>Total purchase amount:</strong> {(parseFloat(formData.token_price) * parseFloat(formData.token_amount)).toFixed(2)} {formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency}
                   {formData.token_price_type === "discounted" && formData.discount_rate && 
-                    ` (After ${formData.discount_rate}% discount: ${(parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate)/100)).toFixed(2)} ${formData.purchase_currency})`
+                    ` (After ${formData.discount_rate}% discount: ${(parseFloat(formData.token_price) * parseFloat(formData.token_amount) * (1 - parseFloat(formData.discount_rate)/100)).toFixed(2)} ${formData.purchase_currency === "Other" ? formData.custom_currency : formData.purchase_currency})`
                   }
                 </span>
               )}
@@ -859,7 +975,7 @@ Title: __________________________`;
               <div className="form-group">
                 <label htmlFor="discount_rate">
                   Discount Rate (%)
-                  <InfoTooltip content="The percentage discount from the standard price." />
+                  <InfoTooltip content="The percentage discount from the standard price. Typical discounts range from 10-30% for early investors, with higher discounts (up to 50%) for strategic partners." />
                 </label>
                 <div className="percentage-input-container">
                   <input
@@ -871,18 +987,31 @@ Title: __________________________`;
                     onChange={handleChange}
                     min="0"
                     max="100"
-                    step="1"
+                    step="5"
                     placeholder="20"
                   />
                   <span className="percentage-sign">%</span>
+                  <div className="number-controls">
+                    <button type="button" onClick={() => {
+                      const newValue = Math.min(100, parseInt(formData.discount_rate || 0) + 5);
+                      setFormData({...formData, discount_rate: newValue.toString()});
+                      setLastChanged("discount_rate");
+                    }}>▲</button>
+                    <button type="button" onClick={() => {
+                      const newValue = Math.max(0, parseInt(formData.discount_rate || 0) - 5);
+                      setFormData({...formData, discount_rate: newValue.toString()});
+                      setLastChanged("discount_rate");
+                    }}>▼</button>
+                  </div>
                 </div>
+                <span className="form-hint">Common discount rates: 10%, 20%, 30%, 40%, 50%</span>
               </div>
             )}
             
             <div className="form-group">
               <label htmlFor="purchase_currency">
                 Purchase Currency
-                <InfoTooltip content="The currency in which the purchase price will be paid." />
+                <InfoTooltip content="The currency in which the purchase price will be paid. This affects regulatory implications and banking considerations." />
               </label>
               <select
                 id="purchase_currency"
@@ -897,13 +1026,32 @@ Title: __________________________`;
                 <option value="CHF">Swiss Franc (CHF)</option>
                 <option value="SGD">Singapore Dollar (SGD)</option>
                 <option value="JPY">Japanese Yen (JPY)</option>
+                <option value="CNY">Chinese Yuan (CNY)</option>
+                <option value="AUD">Australian Dollar (AUD)</option>
+                <option value="CAD">Canadian Dollar (CAD)</option>
+                <option value="Other">Other (specify)</option>
               </select>
+              
+              {formData.purchase_currency === "Other" && (
+                <div className="form-group" style={{marginTop: "0.5rem"}}>
+                  <label htmlFor="custom_currency">Custom Currency</label>
+                  <input
+                    type="text"
+                    id="custom_currency"
+                    name="custom_currency"
+                    className="form-control"
+                    value={formData.custom_currency}
+                    onChange={handleChange}
+                    placeholder="e.g., INR, BRL, KRW"
+                  />
+                </div>
+              )}
             </div>
             
             <div className="form-group">
               <label>
                 Cryptocurrency Payment
-                <InfoTooltip content="Whether payment will be made in cryptocurrency." />
+                <InfoTooltip content="Whether payment will be made in cryptocurrency instead of fiat currency. This can affect banking requirements and regulatory classification." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -937,7 +1085,7 @@ Title: __________________________`;
               <div className="form-group">
                 <label htmlFor="crypto_payment_type">
                   Cryptocurrency Type
-                  <InfoTooltip content="The specific cryptocurrency to be used for payment." />
+                  <InfoTooltip content="The specific cryptocurrency to be used for payment. Stablecoins provide price stability, while other cryptocurrencies may introduce price volatility risk." />
                 </label>
                 <select
                   id="crypto_payment_type"
@@ -953,14 +1101,18 @@ Title: __________________________`;
                   <option value="SOL">Solana (SOL)</option>
                   <option value="BNB">Binance Coin (BNB)</option>
                   <option value="XRP">XRP</option>
+                  <option value="ADA">Cardano (ADA)</option>
+                  <option value="DOGE">Dogecoin (DOGE)</option>
+                  <option value="DOT">Polkadot (DOT)</option>
                 </select>
+                <span className="form-hint">Stablecoins (USDT, USDC) are often preferred to avoid price volatility issues.</span>
               </div>
             )}
             
             <div className="form-group">
               <label htmlFor="payment_deadline">
                 Payment Deadline
-                <InfoTooltip content="The date by which the buyer must pay the purchase price." />
+                <InfoTooltip content="The date by which the buyer must pay the purchase price. This should typically be at least 1-2 weeks from signing to allow for wire transfers or cryptocurrency transactions." />
               </label>
               <input
                 type="date"
@@ -970,10 +1122,11 @@ Title: __________________________`;
                 value={formData.payment_deadline}
                 onChange={handleChange}
               />
+              <span className="form-hint">If left blank, the agreement will state a deadline must be specified before signing.</span>
             </div>
             
             <div className="regulatory-info">
-              <strong>Regulatory Note:</strong> Record-keeping is essential for token sales. Maintain detailed records of all payments, including amounts, dates, and wallet addresses to ensure compliance with AML/KYC regulations.
+              <strong>Regulatory Note:</strong> Record-keeping is essential for token sales. Maintain detailed records of all payments, including amounts, dates, and wallet addresses to ensure compliance with AML/KYC regulations. Different jurisdictions have specific requirements for crypto payments.
             </div>
           </div>
         );
@@ -981,11 +1134,31 @@ Title: __________________________`;
       case 3: // Representations & Warranties
         return (
           <div className="form-section">
+            <div className="form-group">
+              <label>
+                Applicable Law
+                <InfoTooltip content="Select whether US securities laws apply to this token purchase. This affects certain representations and warranties in the agreement." />
+              </label>
+              <div className="radio-group">
+                <label className="radio-label">
+                  <input
+                    type="checkbox"
+                    name="us_law_applies"
+                    className="checkbox-input"
+                    checked={formData.us_law_applies}
+                    onChange={(e) => setFormData({...formData, us_law_applies: e.target.checked})}
+                  />
+                  US securities laws apply to this transaction
+                </label>
+              </div>
+              <span className="form-hint">If the seller, buyer, or offering has US connections, US securities laws likely apply.</span>
+            </div>
+            
             <h3>Seller Representations</h3>
             <div className="form-group">
               <label>
                 Token Ownership
-                <InfoTooltip content="Whether the seller owns the tokens or rights to issue them." />
+                <InfoTooltip content="Whether the seller currently owns the tokens being sold or will create/mint them in the future. This affects the nature of the legal commitment." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -1013,14 +1186,19 @@ Title: __________________________`;
                   Seller will create/mint the tokens
                 </label>
               </div>
+              <span className="form-hint">
+                {formData.seller_ownership === "yes" ? 
+                  "If tokens already exist, the seller represents having clear title to transfer them." :
+                  "If tokens will be created later, this is more like a presale or future commitment."}
+              </span>
             </div>
             
             <div className="form-group">
               <label>
                 Compliance with Laws
-                <InfoTooltip content="Whether the token sale complies with applicable laws and regulations." />
+                <InfoTooltip content="The level of certainty the seller provides regarding legal compliance. Full compliance representations carry higher legal risk for the seller than 'reasonable steps' language." />
                 {formData.token_type === "security" && (
-                  <WarningIndicator content="Security tokens require special consideration for legal compliance." />
+                  <WarningIndicator content="Security tokens require special consideration for legal compliance, including potential registration requirements or exemptions under securities laws." />
                 )}
               </label>
               <div className="radio-group">
@@ -1049,47 +1227,65 @@ Title: __________________________`;
                   Seller represents reasonable steps toward compliance
                 </label>
               </div>
+              <span className="form-hint">
+                {formData.compliance_laws === "yes" ? 
+                  "A stronger representation that may be difficult to make given regulatory uncertainty in many jurisdictions." :
+                  "A more measured representation acknowledging the evolving regulatory landscape for tokens."}
+              </span>
             </div>
             
-            <h3>Buyer Representations</h3>
-            <div className="form-group">
-              <label>
-                Accredited Investor Status
-                <InfoTooltip content="Whether the buyer qualifies as an accredited investor under securities regulations." />
-                {formData.token_type === "security" && (
-                  <WarningIndicator content="For security tokens, non-accredited investors may face restrictions." />
-                )}
-              </label>
-              <div className="radio-group">
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="buyer_accredited"
-                    className="radio-input"
-                    value="yes"
-                    checked={formData.buyer_accredited === "yes"}
-                    onChange={handleChange}
-                  />
-                  Buyer is an accredited investor
-                </label>
-              </div>
-              <div className="radio-group">
-                <label className="radio-label">
-                  <input
-                    type="radio"
-                    name="buyer_accredited"
-                    className="radio-input"
-                    value="no"
-                    checked={formData.buyer_accredited === "no"}
-                    onChange={handleChange}
-                  />
-                  Buyer is not an accredited investor
-                </label>
-              </div>
-            </div>
+            {formData.us_law_applies && (
+              <>
+                <h3>Buyer Representations</h3>
+                <div className="form-group">
+                  <label>
+                    Accredited Investor Status
+                    <InfoTooltip content="Under US securities laws, 'accredited investors' can participate in certain exempt offerings that non-accredited investors cannot. This significantly impacts the type of offering that can be conducted." />
+                    {formData.token_type === "security" && (
+                      <WarningIndicator content="For security tokens, selling to non-accredited investors may require registration with the SEC or strict compliance with exemptions like Regulation CF or Regulation A+." />
+                    )}
+                  </label>
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="buyer_accredited"
+                        className="radio-input"
+                        value="yes"
+                        checked={formData.buyer_accredited === "yes"}
+                        onChange={handleChange}
+                      />
+                      Buyer is an accredited investor
+                    </label>
+                  </div>
+                  <div className="radio-group">
+                    <label className="radio-label">
+                      <input
+                        type="radio"
+                        name="buyer_accredited"
+                        className="radio-input"
+                        value="no"
+                        checked={formData.buyer_accredited === "no"}
+                        onChange={handleChange}
+                      />
+                      Buyer is not an accredited investor
+                    </label>
+                  </div>
+                  <div className="regulatory-info" style={{marginTop: "0.5rem"}}>
+                    <strong>Accredited Investor Definition:</strong> Under SEC rules, an individual accredited investor must meet one of these criteria:
+                    <ul style={{marginTop: "0.25rem", paddingLeft: "1.5rem"}}>
+                      <li>Net worth over $1 million (excluding primary residence), alone or with spouse</li>
+                      <li>Income exceeding $200,000 (or $300,000 with spouse) in each of the two most recent years</li>
+                      <li>Certain professional certifications or credentials</li>
+                      <li>Certain positions in private funds or companies issuing securities</li>
+                    </ul>
+                  </div>
+                </div>
+              </>
+            )}
             
             <div className="regulatory-info">
-              <strong>Regulatory Note:</strong> In the US, an "accredited investor" generally includes individuals with net worth over $1 million (excluding primary residence) or income exceeding $200,000 in each of the two most recent years. For security tokens, this status is particularly important as it affects which exemptions from registration may be available.
+              <strong>Regulatory Note:</strong> Representations and warranties allocate risk between parties and establish a legal basis for claims if statements prove untrue. The appropriate representations depend on token type, offering structure, and applicable jurisdictions. For security tokens, additional representations regarding compliance with specific exemptions (e.g., Regulation D, S, A+, or CF) may be necessary.
             </div>
           </div>
         );
@@ -1101,7 +1297,7 @@ Title: __________________________`;
             <div className="form-group">
               <label>
                 Token Use Restriction
-                <InfoTooltip content="Whether there are restrictions on how the buyer can transfer the tokens." />
+                <InfoTooltip content="Whether there are restrictions on how the buyer can transfer the tokens. Restrictions are common for compliance with securities laws and to prevent market disruption." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -1129,31 +1325,97 @@ Title: __________________________`;
                   No transfer restrictions
                 </label>
               </div>
+              {formData.token_type === "security" && formData.token_use_restriction === "no" && (
+                <span className="form-hint" style={{color: "var(--warning-color)"}}>
+                  Warning: Security tokens typically require transfer restrictions to maintain compliance with securities laws.
+                </span>
+              )}
             </div>
+            
+            {formData.token_use_restriction === "yes" && (
+              <div className="form-group">
+                <label htmlFor="restriction_type">
+                  Restriction Type
+                  <InfoTooltip content="Different types of transfer restrictions serve different legal and business purposes." />
+                </label>
+                <select
+                  id="restriction_type"
+                  name="restriction_type"
+                  className="form-control"
+                  value={formData.restriction_type}
+                  onChange={handleChange}
+                >
+                  <option value="standard">Standard Securities Law Compliance</option>
+                  <option value="region">Restricted Territories</option>
+                  <option value="kyc">KYC/AML Verification Required</option>
+                  <option value="accredited">Accredited Investors Only</option>
+                  <option value="custom">Custom Restrictions</option>
+                </select>
+                
+                <span className="form-hint">
+                  {formData.restriction_type === "standard" && "Basic restriction requiring compliance with securities laws for any transfers."}
+                  {formData.restriction_type === "region" && "Prevents transfers to persons in specified restricted territories (e.g., sanctioned countries)."}
+                  {formData.restriction_type === "kyc" && "Requires recipients to complete KYC/AML verification before receiving tokens."}
+                  {formData.restriction_type === "accredited" && "Limits transfers only to recipients who qualify as accredited investors."}
+                  {formData.restriction_type === "custom" && "Define your own custom transfer restrictions."}
+                </span>
+                
+                {formData.restriction_type === "custom" && (
+                  <textarea
+                    id="custom_restrictions"
+                    name="custom_restrictions"
+                    className="form-control"
+                    value={formData.custom_restrictions}
+                    onChange={handleChange}
+                    placeholder="Specify custom transfer restrictions..."
+                    style={{marginTop: "0.5rem"}}
+                  ></textarea>
+                )}
+              </div>
+            )}
             
             <div className="form-group">
               <label htmlFor="lock_up_period">
                 Lock-Up Period (months)
-                <InfoTooltip content="Period during which the buyer cannot transfer or sell the tokens." />
+                <InfoTooltip content="Period during which the buyer cannot transfer or sell the tokens. Lock-up periods help prevent market disruption and are often required by exchanges before listing." />
               </label>
-              <input
-                type="number"
-                id="lock_up_period"
-                name="lock_up_period"
-                className="form-control"
-                value={formData.lock_up_period}
-                onChange={handleChange}
-                min="0"
-                placeholder="6"
-              />
-              <span className="form-hint">0 means no lock-up period</span>
+              <div className="input-wrapper">
+                <input
+                  type="number"
+                  id="lock_up_period"
+                  name="lock_up_period"
+                  className="form-control"
+                  value={formData.lock_up_period}
+                  onChange={handleChange}
+                  min="0"
+                  max="60"
+                  step="1"
+                  placeholder="6"
+                />
+                <div className="number-controls">
+                  <button type="button" onClick={() => {
+                    const newValue = parseInt(formData.lock_up_period || 0) + 1;
+                    setFormData({...formData, lock_up_period: newValue.toString()});
+                    setLastChanged("lock_up_period");
+                  }}>▲</button>
+                  <button type="button" onClick={() => {
+                    const newValue = Math.max(0, parseInt(formData.lock_up_period || 0) - 1);
+                    setFormData({...formData, lock_up_period: newValue.toString()});
+                    setLastChanged("lock_up_period");
+                  }}>▼</button>
+                </div>
+              </div>
+              <span className="form-hint">
+                Common lock-up periods: 0 (none), 3, 6, 12, or 24 months. 
+                Private sales typically have longer lock-ups than public sales.
+              </span>
             </div>
             
             <h3>Vesting Schedule</h3>
             <div className="form-group">
               <label>
                 Include Vesting Schedule
-                <InfoTooltip content="Whether tokens will vest over time rather than transferring all at once." />
+                <InfoTooltip content="Vesting schedules release tokens gradually over time, protecting the project from 'dump and run' investors and aligning long-term incentives." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -1186,41 +1448,77 @@ Title: __________________________`;
             {formData.vesting_schedule === "yes" && (
               <>
                 <div className="form-group">
-                  <label htmlFor="vesting_period">
-                    Vesting Period
-                    <InfoTooltip content="The total time period over which tokens will vest (e.g., '36 months', '4 years')." />
+                  <label htmlFor="vesting_preset">
+                    Vesting Structure
+                    <InfoTooltip content="Different vesting structures serve different purposes. Standard linear vesting is most common, but milestone-based vesting can align with project development." />
                   </label>
-                  <input
-                    type="text"
-                    id="vesting_period"
-                    name="vesting_period"
+                  <select
+                    id="vesting_preset"
+                    name="vesting_preset"
                     className="form-control"
-                    value={formData.vesting_period}
+                    value={formData.vesting_preset}
                     onChange={handleChange}
-                    placeholder="48 months"
-                  />
+                  >
+                    <option value="standard">Standard Linear Vesting with Cliff</option>
+                    <option value="linear">Linear Vesting (No Cliff)</option>
+                    <option value="milestone">Milestone-Based Vesting</option>
+                    <option value="custom">Custom Vesting Schedule</option>
+                  </select>
+                  
+                  <span className="form-hint">
+                    {formData.vesting_preset === "standard" && "Tokens begin vesting after a cliff period, then vest linearly over time. Common for team and investor tokens."}
+                    {formData.vesting_preset === "linear" && "Tokens vest continuously from day one without a cliff period. More investor-friendly approach."}
+                    {formData.vesting_preset === "milestone" && "Tokens vest upon achievement of specific project milestones rather than time periods."}
+                    {formData.vesting_preset === "custom" && "Create a custom vesting arrangement tailored to your needs."}
+                  </span>
                 </div>
                 
-                <div className="form-group">
-                  <label htmlFor="vesting_cliff">
-                    Vesting Cliff
-                    <InfoTooltip content="Initial period before any tokens vest (e.g., '12 months')." />
-                  </label>
-                  <input
-                    type="text"
-                    id="vesting_cliff"
-                    name="vesting_cliff"
-                    className="form-control"
-                    value={formData.vesting_cliff}
-                    onChange={handleChange}
-                    placeholder="12 months"
-                  />
-                </div>
+                {(formData.vesting_preset === "standard" || formData.vesting_preset === "linear" || formData.vesting_preset === "custom") && (
+                  <div className="form-group">
+                    <label htmlFor="vesting_period">
+                      Vesting Period
+                      <InfoTooltip content="The total time period over which tokens will vest. Longer periods (36-48 months) are common for team and early investors, shorter periods (6-12 months) for later stage investors." />
+                    </label>
+                    <input
+                      type="text"
+                      id="vesting_period"
+                      name="vesting_period"
+                      className="form-control"
+                      value={formData.vesting_period}
+                      onChange={handleChange}
+                      placeholder="48 months"
+                    />
+                    <span className="form-hint">
+                      Common examples: "12 months", "24 months", "36 months", "48 months"
+                    </span>
+                  </div>
+                )}
+                
+                {(formData.vesting_preset === "standard" || formData.vesting_preset === "custom") && (
+                  <div className="form-group">
+                    <label htmlFor="vesting_cliff">
+                      Vesting Cliff
+                      <InfoTooltip content="Initial period before any tokens vest. After the cliff, a portion vests immediately, then the remainder vests according to the schedule. Standard cliffs are 6-12 months." />
+                    </label>
+                    <input
+                      type="text"
+                      id="vesting_cliff"
+                      name="vesting_cliff"
+                      className="form-control"
+                      value={formData.vesting_cliff}
+                      onChange={handleChange}
+                      placeholder="12 months"
+                    />
+                    <span className="form-hint">
+                      Common examples: "6 months", "12 months", "18 months"
+                    </span>
+                  </div>
+                )}
               </>
             )}
             
             <div className="regulatory-info">
-              <strong>Regulatory Note:</strong> Vesting schedules and lock-up periods are common in token sales to align incentives and prevent immediate market selling pressure. These restrictions should be clearly disclosed to buyers and may affect the regulatory classification of the token.
+              <strong>Regulatory Note:</strong> Vesting schedules and lock-up periods are common in token sales to align incentives and prevent immediate market selling pressure. These restrictions can be implemented through smart contract functionality or legal agreements, but technological restrictions are often more effective than contractual ones. In some jurisdictions, the presence of vesting and lock-up may affect the regulatory classification of the token.
             </div>
           </div>
         );
@@ -1232,8 +1530,36 @@ Title: __________________________`;
             <div className="form-group">
               <label htmlFor="closing_conditions">
                 Additional Closing Conditions
-                <InfoTooltip content="Specific conditions that must be met before the transaction is completed." />
+                <InfoTooltip content="Specific conditions that must be met before the transaction is completed. These protect both parties by ensuring certain requirements are satisfied." />
               </label>
+              <div className="preset-selector">
+                <div>Add common conditions:</div>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newConditions = [...formData.closing_conditions, "Receipt of legal opinion confirming the token's regulatory status"];
+                  setFormData(prev => ({ ...prev, closing_conditions: newConditions }));
+                  setLastChanged("closing_conditions");
+                }}>Legal Opinion</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newConditions = [...formData.closing_conditions, "Completion of Buyer's due diligence to Buyer's satisfaction"];
+                  setFormData(prev => ({ ...prev, closing_conditions: newConditions }));
+                  setLastChanged("closing_conditions");
+                }}>Due Diligence</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newConditions = [...formData.closing_conditions, "Seller providing proof of token smart contract audit by a reputable security firm"];
+                  setFormData(prev => ({ ...prev, closing_conditions: newConditions }));
+                  setLastChanged("closing_conditions");
+                }}>Smart Contract Audit</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newConditions = [...formData.closing_conditions, "Buyer providing proof of funds from legitimate sources"];
+                  setFormData(prev => ({ ...prev, closing_conditions: newConditions }));
+                  setLastChanged("closing_conditions");
+                }}>Proof of Funds</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newConditions = [...formData.closing_conditions, "Completion of KYC/AML verification of Buyer"];
+                  setFormData(prev => ({ ...prev, closing_conditions: newConditions }));
+                  setLastChanged("closing_conditions");
+                }}>KYC/AML</button>
+              </div>
               <textarea
                 id="closing_conditions"
                 name="closing_conditions"
@@ -1247,16 +1573,44 @@ Title: __________________________`;
                   }));
                   setLastChanged("closing_conditions");
                 }}
-                placeholder="Enter each condition on a new line..."
+                placeholder="Enter additional conditions here (one per line)
+Example: Seller obtaining all necessary regulatory approvals
+Example: Completion of token listing on at least one exchange"
               ></textarea>
-              <span className="form-hint">Standard conditions (payment, compliance) are included automatically.</span>
+              <span className="form-hint">
+                Standard conditions (payment, compliance with agreement terms) are included automatically.
+                The additional conditions you add here provide further protections for either party.
+              </span>
             </div>
             
             <div className="form-group">
               <label htmlFor="termination_rights">
                 Additional Termination Rights
-                <InfoTooltip content="Circumstances under which either party can terminate the agreement." />
+                <InfoTooltip content="Circumstances under which either party can terminate the agreement before closing. These provide exit options if certain events occur." />
               </label>
+              <div className="preset-selector">
+                <div>Add common termination rights:</div>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newRights = [...formData.termination_rights, "By Buyer if total market capitalization of similar tokens decreases by more than 30% before Closing"];
+                  setFormData(prev => ({ ...prev, termination_rights: newRights }));
+                  setLastChanged("termination_rights");
+                }}>Market Change</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newRights = [...formData.termination_rights, "By either Party if any governmental authority prohibits the transaction"];
+                  setFormData(prev => ({ ...prev, termination_rights: newRights }));
+                  setLastChanged("termination_rights");
+                }}>Regulatory Action</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newRights = [...formData.termination_rights, "By Buyer if Seller fails to achieve [milestone] by [date]"];
+                  setFormData(prev => ({ ...prev, termination_rights: newRights }));
+                  setLastChanged("termination_rights");
+                }}>Missed Milestone</button>
+                <button type="button" className="preset-button" onClick={() => {
+                  const newRights = [...formData.termination_rights, "By Seller if the token smart contract audit reveals critical security vulnerabilities"];
+                  setFormData(prev => ({ ...prev, termination_rights: newRights }));
+                  setLastChanged("termination_rights");
+                }}>Security Issue</button>
+              </div>
               <textarea
                 id="termination_rights"
                 name="termination_rights"
@@ -1270,32 +1624,73 @@ Title: __________________________`;
                   }));
                   setLastChanged("termination_rights");
                 }}
-                placeholder="Enter each termination right on a new line..."
+                placeholder="Enter additional termination rights here (one per line)
+Example: By Buyer if Seller materially changes the token's functionality
+Example: By Seller if Buyer fails to provide required KYC documentation within 14 days"
               ></textarea>
-              <span className="form-hint">Standard termination rights (mutual consent, deadline) are included automatically.</span>
+              <span className="form-hint">
+                Standard termination rights (mutual consent, failure to close by deadline) are included automatically.
+                The rights you add here address specific scenarios relevant to your transaction.
+              </span>
             </div>
             
             <h3>Governing Law & Dispute Resolution</h3>
             <div className="form-group">
               <label htmlFor="governing_law">
                 Governing Law
-                <InfoTooltip content="The jurisdiction whose laws will govern the agreement." />
+                <InfoTooltip content="The jurisdiction whose laws will govern the agreement. Consider jurisdictions with clear regulatory frameworks for blockchain/crypto transactions." />
               </label>
-              <input
-                type="text"
+              <select
                 id="governing_law"
                 name="governing_law"
                 className="form-control"
                 value={formData.governing_law}
                 onChange={handleChange}
-                placeholder="State of Delaware, United States"
-              />
+              >
+                <option value="Delaware">Delaware, United States</option>
+                <option value="New York">New York, United States</option>
+                <option value="California">California, United States</option>
+                <option value="Wyoming">Wyoming, United States</option>
+                <option value="Singapore">Singapore</option>
+                <option value="England and Wales">England and Wales</option>
+                <option value="Switzerland">Switzerland</option>
+                <option value="British Virgin Islands">British Virgin Islands</option>
+                <option value="Cayman Islands">Cayman Islands</option>
+                <option value="Other">Other (specify)</option>
+              </select>
+              
+              {formData.governing_law === "Other" && (
+                <div className="form-group" style={{marginTop: "0.5rem"}}>
+                  <label htmlFor="custom_governing_law">Custom Jurisdiction</label>
+                  <input
+                    type="text"
+                    id="custom_governing_law"
+                    name="custom_governing_law"
+                    className="form-control"
+                    value={formData.custom_governing_law}
+                    onChange={handleChange}
+                    placeholder="e.g., Malta, Liechtenstein, Gibraltar"
+                  />
+                </div>
+              )}
+              
+              <span className="form-hint">
+                {formData.governing_law === "Delaware" && "Delaware has well-established corporate law and is crypto-friendly. Common for US entities."}
+                {formData.governing_law === "New York" && "New York has extensive financial services law but stricter crypto regulations (BitLicense)."}
+                {formData.governing_law === "California" && "California has strong consumer protection laws that may affect token sales."}
+                {formData.governing_law === "Wyoming" && "Wyoming has passed favorable blockchain legislation and LLC laws."}
+                {formData.governing_law === "Singapore" && "Singapore has a clear regulatory framework for digital tokens and is a major crypto hub."}
+                {formData.governing_law === "England and Wales" && "England has well-developed commercial law and FCA guidance on crypto assets."}
+                {formData.governing_law === "Switzerland" && "Switzerland has progressive blockchain regulations and is home to 'Crypto Valley'."}
+                {formData.governing_law === "British Virgin Islands" && "BVI offers tax benefits but with less regulatory clarity for tokens."}
+                {formData.governing_law === "Cayman Islands" && "Cayman Islands is popular for token issuers seeking tax benefits and flexibility."}
+              </span>
             </div>
             
             <div className="form-group">
               <label>
                 Dispute Resolution Method
-                <InfoTooltip content="How disputes under the agreement will be resolved." />
+                <InfoTooltip content="How disputes under the agreement will be resolved. Arbitration is often preferred for international transactions and greater confidentiality." />
               </label>
               <div className="radio-group">
                 <label className="radio-label">
@@ -1323,13 +1718,17 @@ Title: __________________________`;
                   Arbitration
                 </label>
               </div>
+              <span className="form-hint">
+                {formData.dispute_resolution === "litigation" && "Litigation is typically conducted in public courts with established procedures. It may be less expensive initially but can become costly if appeals are filed."}
+                {formData.dispute_resolution === "arbitration" && "Arbitration is typically private, potentially faster, and the decision is usually final with limited appeal rights. It's often preferred for international transactions."}
+              </span>
             </div>
             
             {formData.dispute_resolution === "arbitration" && (
               <div className="form-group">
                 <label htmlFor="arbitration_venue">
                   Arbitration Venue
-                  <InfoTooltip content="The location where arbitration will take place." />
+                  <InfoTooltip content="The location where arbitration will take place. Consider venues with established arbitration centers and cryptocurrency expertise." />
                 </label>
                 <input
                   type="text"
@@ -1338,13 +1737,14 @@ Title: __________________________`;
                   className="form-control"
                   value={formData.arbitration_venue}
                   onChange={handleChange}
-                  placeholder="San Francisco, California"
+                  placeholder="e.g., Singapore, London, New York"
                 />
+                <span className="form-hint">Common venues include Singapore, London, New York, Hong Kong, and Geneva.</span>
               </div>
             )}
             
             <div className="regulatory-info">
-              <strong>Regulatory Note:</strong> Due to the global nature of blockchain technology, jurisdictional issues can be complex in token sales. Consider carefully which governing law and dispute resolution mechanisms are most appropriate for your situation. Some jurisdictions are more crypto-friendly than others.
+              <strong>Regulatory Note:</strong> Due to the global nature of blockchain technology, jurisdictional issues can be complex in token sales. Consider carefully which governing law and dispute resolution mechanisms are most appropriate for your situation. Some jurisdictions like Singapore, Switzerland, and Wyoming have developed specific legal frameworks for digital assets, which can provide greater clarity. The choice of governing law may significantly impact how the token is regulated and what compliance obligations apply.
             </div>
           </div>
         );
