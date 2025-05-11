@@ -14,7 +14,6 @@ const App = () => {
     confInfoType: 'broad',
     customConfInfo: '',
     protectionPeriod: 2,
-    terminationNotice: 30,
     governingLaw: 'california',
     includeReturnDestroy: true,
     includeNoWarranty: true,
@@ -124,14 +123,6 @@ const App = () => {
         const protectionSections = previewElement.querySelectorAll('.section-title');
         protectionSections.forEach(section => {
           if (section.textContent.includes('PROTECTION PERIOD') || section.textContent.includes('СРОК НЕРАЗГЛАШЕНИЯ')) {
-            sectionToHighlight = section.parentElement;
-          }
-        });
-        break;
-      case 'terminationNotice':
-        const termSections = previewElement.querySelectorAll('.section-title');
-        termSections.forEach(section => {
-          if (section.textContent.includes('TERM AND TERMINATION') || section.textContent.includes('СРОК ДЕЙСТВИЯ')) {
             sectionToHighlight = section.parentElement;
           }
         });
@@ -332,10 +323,6 @@ The effective date of this Agreement is ${formattedDate}.`;
 ${customText || '[Custom Confidentiality Definition]'}`;
         }
       },
-      term: (terminationNotice) => {
-        return `<div class="section-title">3. TERM AND TERMINATION</div>
-This Agreement shall remain in effect until it is terminated by a Party with ${terminationNotice} days prior written notice; provided, however, that no Party shall terminate this Agreement if the Parties have a direct agreement still in effect. The terms and conditions of this Agreement shall survive any such termination with respect to Confidential Information that is disclosed prior to the effective date of termination.`;
-      },
       
       permittedUse: (purpose, customPurpose) => {
         let purposeText = '';
@@ -356,43 +343,43 @@ This Agreement shall remain in effect until it is terminated by a Party with ${t
             purposeText = '[Purpose of Disclosure]';
         }
         
-        return `<div class="section-title">4. PERMITTED USE AND DISCLOSURE</div>
+        return `<div class="section-title">3. PERMITTED USE AND DISCLOSURE</div>
 Receiving Party will use Confidential Information only for the purpose of and in connection with ${purposeText} between the Parties. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
-        return `<div class="section-title">5. PROTECTION PERIOD AND RETURN</div>
+        return `<div class="section-title">4. PROTECTION PERIOD AND RETURN</div>
 Unless the Parties otherwise agree in writing, a Receiving Party's duty to protect Confidential Information expires ${protectionPeriod} years from the date of disclosure. Upon the Disclosing Party's written request, Receiving Party will promptly return or destroy all Confidential Information received from the Disclosing Party, together with all copies.`;
       },
       
-      exclusions: `<div class="section-title">6. EXCLUSIONS</div>
+      exclusions: `<div class="section-title">5. EXCLUSIONS</div>
 Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.`,
       
-      noWarranty: `<div class="section-title">7. NO WARRANTIES</div>
+      noWarranty: `<div class="section-title">6. NO WARRANTIES</div>
 The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.`,
       
       governingLaw: {
-        california: `<div class="section-title">8. GOVERNING LAW</div>
+        california: `<div class="section-title">7. GOVERNING LAW AND JURISDICTION</div>
 This Agreement shall be governed by the law of the State of California, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in Los Angeles, California.`,
         
-        delaware: `<div class="section-title">8. GOVERNING LAW</div>
+        delaware: `<div class="section-title">7. GOVERNING LAW AND JURISDICTION</div>
 This Agreement shall be governed by the law of the State of Delaware, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in Wilmington, Delaware.`,
         
-        newyork: `<div class="section-title">8. GOVERNING LAW</div>
+        newyork: `<div class="section-title">7. GOVERNING LAW AND JURISDICTION</div>
 This Agreement shall be governed by the law of the State of New York, USA, without regard to its conflict of law provisions. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the state and federal courts located in New York, New York.`,
         
-        russia: `<div class="section-title">8. GOVERNING LAW</div>
+        russia: `<div class="section-title">7. GOVERNING LAW AND JURISDICTION</div>
 This Agreement shall be governed by the law of the Russian Federation. All disputes arising from this Agreement shall be subject to the exclusive jurisdiction of the courts of Moscow, Russia.`
       },
       
-      severability: `<div class="section-title">9. SEVERABILITY</div>
+      severability: `<div class="section-title">8. SEVERABILITY</div>
 If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.`,
       
       controllingLanguage: {
-        english: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+        english: `<div class="section-title">9. PREVAILING LANGUAGE</div>
 In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the English version shall prevail.`,
         
-        russian: `<div class="section-title">10. PREVAILING LANGUAGE</div>
+        russian: `<div class="section-title">9. PREVAILING LANGUAGE</div>
 In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Russian translation, the Russian version shall prevail.`
       },
       
@@ -444,10 +431,6 @@ Date: _______________________________
 ${customText || '[Пользовательское Определение Конфиденциальности]'}`;
         }
       },
-      term: (terminationNotice) => {
-        return `<div class="section-title">3. СРОК ДЕЙСТВИЯ И РАСТОРЖЕНИЕ</div>
-Данное Соглашение остается в силе до расторжения любой Стороной по предварительному письменному уведомлению за ${terminationNotice} дней; но ни одна Сторона не может расторгнуть данное Соглашение если между Сторонами заключено другое действующее прямое соглашение. В случае расторжения данного Соглашения, его условия продолжат действовать в отношении Конфиденциальной Информации, раскрытой до даты вступления в силу расторжения.`;
-      },
       
       permittedUse: (purpose, customPurpose) => {
         let purposeText = '';
@@ -469,44 +452,44 @@ ${customText || '[Пользовательское Определение Кон
         }
         
         // Fixed Russian text as required (removed "между Сторонами")
-        return `<div class="section-title">4. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
+        return `<div class="section-title">3. ДОПУСТИМОЕ ИСПОЛЬЗОВАНИЕ И РАЗГЛАШЕНИЕ</div>
 Получатель может пользоваться Конфиденциальной Информацией только для ${purposeText}. Получатель может разгласить Конфиденциальную Информацию своим директорам, должностным лицам, консультантам и агентам ("Представителям"), но только если этим лицам необходимо ее знать в ходе работы на Получателя для потенциальных или продолжения текущих деловых сделок Сторон и если на этих лиц возложена обязанность сохранения конфиденциальности в неменьшем объеме, чем эта обязанность возложена данным Соглашением на самого Получателя. Получатель несет полную ответственность за любое нарушение данного Соглашения своими Представителями. Получатель обязан обеспечивать конфиденциальность информации разумными мерами предосторожности, сопоставимыми с теми мерами, которыми он охраняет собственную конфиденциальную информацию. Получатель может разглашать Конфиденциальную информацию только в случаях, оговоренных данным Соглашением.`;
       },
       
       protectionPeriod: (protectionPeriod) => {
-        return `<div class="section-title">5. СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ</div>
+        return `<div class="section-title">4. СРОК НЕРАЗГЛАШЕНИЯ И ВОЗВРАТ</div>
 При отсутствии письменной договоренности между Сторонами об ином, обязанность Получателя о неразглашении Конфиденциальной Информации истекает через ${protectionPeriod} года после ее предоставления. По письменному распоряжению Раскрывающей Стороны Получатель должен незамедлительно вернуть или уничтожить всю полученную Конфиденциальную Информацию и все ее копии.`;
       },
       
-      exclusions: `<div class="section-title">6. ИСКЛЮЧЕНИЯ</div>
+      exclusions: `<div class="section-title">5. ИСКЛЮЧЕНИЯ</div>
 Конфиденциальная Информация не включает информацию, которая: (a) является или становится общедоступной не по вине Получателя; (b) во время разглашения находилась в правомерном распоряжении Получателя без ограничений на её использование и разглашение; или (c) информацию, правомерно полученную Получателя от третьего лица без ограничений на использование и разглашение.`,
       
-      noWarranty: `<div class="section-title">7. НЕТ ГАРАНТИЙ</div>
+      noWarranty: `<div class="section-title">6. НЕТ ГАРАНТИЙ</div>
 Конфиденциальная Информация предоставлена без каких-либо гарантий. Раскрывающая Сторона не несет ответственности за прямой или косвенный ущерб, понесенный Получателем информации при использовании Конфиденциальной Информации. Вся предоставленная Конфиденциальная Информация остается собственностью Раскрывающей Стороны.`,
       
       governingLaw: {
-        california: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+        california: `<div class="section-title">7. ПРИМЕНИМОЕ ПРАВО И ЮРИСДИКЦИЯ</div>
 Настоящее соглашение регулируется законодательством штата Калифорния, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Лос-Анджелесе, Калифорния.`,
         
-        delaware: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+        delaware: `<div class="section-title">7. ПРИМЕНИМОЕ ПРАВО И ЮРИСДИКЦИЯ</div>
 Настоящее соглашение регулируется законодательством штата Делавэр, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Уилмингтоне, Делавэр.`,
         
-        newyork: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+        newyork: `<div class="section-title">7. ПРИМЕНИМОЕ ПРАВО И ЮРИСДИКЦИЯ</div>
 Настоящее соглашение регулируется законодательством штата Нью-Йорк, США, без учета его положений о коллизионном праве. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов штата и федеральных судов, расположенных в Нью-Йорке, Нью-Йорк.`,
         
-        russia: `<div class="section-title">8. ПРИМЕНИМОЕ ПРАВО</div>
+        russia: `<div class="section-title">7. ПРИМЕНИМОЕ ПРАВО И ЮРИСДИКЦИЯ</div>
 Настоящее соглашение регулируется законодательством Российской Федерации. Все споры, возникающие из настоящего соглашения, подлежат исключительной юрисдикции судов Москвы, Россия.`
       },
       
-      severability: `<div class="section-title">9. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</div>
+      severability: `<div class="section-title">8. НЕЗАВИСИМОСТЬ ПОЛОЖЕНИЙ</div>
 Если какое-либо положение настоящего Соглашения становится незаконным или необеспеченным принудительной силой в суде соответствующей юрисдикции, это не повлияет на юридическую силу или возможность принудительного исполнения какого-либо другого положения настоящего Соглашения в наибольшей разрешенной законом степени.`,
       
       controllingLanguage: {
-        english: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+        english: `<div class="section-title">9. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
 В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на английском языке будет иметь преимущественную силу.`,
         
-        russian: `<div class="section-title">10. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
-В случае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`
+        russian: `<div class="section-title">9. ПРЕОБЛАДАЮЩИЙ ЯЗЫК</div>
+В с��учае возникновения противоречия, разночтения, несоответствия или неясности между текстом настоящего Соглашения на английском языке и русским переводом, текст на русском языке будет иметь преимущественную силу.`
       },
       
       signatures: `<div class="section-title">В ПОДТВЕРЖДЕНИЕ ВЫШЕИЗЛОЖЕННОГО</div>
@@ -586,7 +569,6 @@ ${customText || '[Пользовательское Определение Кон
       confInfoType,
       customConfInfo,
       protectionPeriod,
-      terminationNotice,
       governingLaw,
       includeNoWarranty,
       includeSeverability,
@@ -594,10 +576,10 @@ ${customText || '[Пользовательское Определение Кон
     } = formData;
     
     // Calculate section numbers based on included sections
-    let enNoWarrantyNum = "7";
-    let enGovLawNum = includeNoWarranty ? "8" : "7";
-    let enSeverabilityNum = (includeNoWarranty ? 8 : 7) + (includeSeverability ? 1 : 0);
-    let enControllingLangNum = (includeNoWarranty ? 8 : 7) + (includeSeverability ? 1 : 0) + 1;
+    let enNoWarrantyNum = "6";
+    let enGovLawNum = includeNoWarranty ? "7" : "6";
+    let enSeverabilityNum = (includeNoWarranty ? 7 : 6) + (includeSeverability ? 1 : 0);
+    let enControllingLangNum = (includeNoWarranty ? 7 : 6) + (includeSeverability ? 1 : 0) + 1;
     
     // Create document content
     let documentContent = '';
@@ -655,17 +637,6 @@ ${customText || '[Пользовательское Определение Кон
       </div>
     </div>`;
     
-    // Term section
-    documentContent += `
-    <div class="section-row">
-      <div class="column left-column">
-        ${templates.english.term(terminationNotice)}
-      </div>
-      <div class="column right-column">
-        ${templates.russian.term(terminationNotice)}
-      </div>
-    </div>`;
-    
     // Permitted Use section
     documentContent += `
     <div class="section-row">
@@ -716,11 +687,11 @@ ${customText || '[Пользовательское Определение Кон
     documentContent += `
     <div class="section-row">
       <div class="column left-column">
-        <div class="section-title">${enGovLawNum}. GOVERNING LAW</div>
+        <div class="section-title">${enGovLawNum}. GOVERNING LAW AND JURISDICTION</div>
         ${templates.english.governingLaw[governingLaw].split('</div>')[1]}
       </div>
       <div class="column right-column">
-        <div class="section-title">${enGovLawNum}. ПРИМЕНИМОЕ ПРАВО</div>
+        <div class="section-title">${enGovLawNum}. ПРИМЕНИМОЕ ПРАВО И ЮРИСДИКЦИЯ</div>
         ${templates.russian.governingLaw[governingLaw].split('</div>')[1]}
       </div>
     </div>`;
@@ -959,7 +930,21 @@ ${customText || '[Пользовательское Определение Кон
             {/* Dynamic explanation for confidentiality definitions */}
             {formData.confInfoType !== 'custom' && (
               <div className="form-explanation">
-                {tooltips.confInfoExplanations[formData.confInfoType]}
+                {formData.confInfoType === 'broad' && (
+                  currentLanguage === 'english' 
+                    ? 'This broad definition covers virtually all non-public information shared, including verbal communications and information that should reasonably be considered confidential. Ideal for protecting all types of business information but may be harder to enforce due to its wide scope.'
+                    : 'Это широкое определение охватывает практически всю непубличную информацию, включая устные сообщения и информацию, которую разумно считать конфиденциальной. Идеально для защиты всех типов деловой информации, но может быть сложнее в исполнении из-за широкого охвата.'
+                )}
+                {formData.confInfoType === 'medium' && (
+                  currentLanguage === 'english' 
+                    ? 'This balanced definition focuses on business-related information while providing specific examples. It includes trade secrets, technical data, and business information. Recommended for most business relationships.'
+                    : 'Это сбалансированное определение фокусируется на деловой информации с конкретными примерами. Включает коммерческую тайну, технические данные и деловую информацию. Рекомендуется для большинства деловых отношений.'
+                )}
+                {formData.confInfoType === 'narrow' && (
+                  currentLanguage === 'english' 
+                    ? 'This narrow definition only protects information specifically marked as confidential in writing. Provides the clearest boundaries but risks excluding important verbal disclosures. Best for limited disclosures or when dealing with highly organized documentation.'
+                    : 'Это узкое определение защищает только информацию, явно помеченную как конфиденциальная в письменной форме. Обеспечивает четкие границы, но рискует исключить важные устные раскрытия. Лучше всего для ограниченных раскрытий.'
+                )}
               </div>
             )}
             
@@ -997,23 +982,8 @@ ${customText || '[Пользовательское Определение Кон
             </div>
             
             <div className="form-group">
-              <label htmlFor="terminationNotice">
-                {currentLanguage === 'english' ? 'Termination Notice Period (days):' : 'Период Уведомления о Расторжении (дней):'}
-              </label>
-              <input 
-                type="number" 
-                id="terminationNotice"
-                name="terminationNotice"
-                min="1" 
-                max="90"
-                value={formData.terminationNotice}
-                onChange={handleChange}
-              />
-            </div>
-            
-            <div className="form-group">
               <label htmlFor="governingLaw">
-                {currentLanguage === 'english' ? 'Governing Law:' : 'Применимое Право:'}
+                {currentLanguage === 'english' ? 'Governing Law & Jurisdiction:' : 'Применимое Право и Юрисдикция:'}
                 <HelpIcon tooltip={tooltips.governingLaw} />
               </label>
               <select 
@@ -1035,6 +1005,13 @@ ${customText || '[Пользовательское Определение Кон
                   {currentLanguage === 'english' ? 'Russian Federation' : 'Российская Федерация'}
                 </option>
               </select>
+            </div>
+            
+            {/* Explanation for governing law */}
+            <div className="form-explanation">
+              {currentLanguage === 'english' 
+                ? 'This choice determines which country\'s laws will interpret the agreement and which courts will handle disputes. Consider where assets are located, where enforcement will occur, and the legal sophistication of each jurisdiction. US states typically offer more predictable contract enforcement than many international jurisdictions.'
+                : 'Этот выбор определяет, законы какой страны будут толковать соглашение и какие суды будут рассматривать споры. Учитывайте, где находятся активы, где будет происходить исполнение, и правовую развитость каждой юрисдикции. Штаты США обычно предлагают более предсказуемое исполнение контрактов, чем многие международные юрисдикции.'}
             </div>
           </div>
         );
@@ -1213,7 +1190,7 @@ ${customText || '[Пользовательское Определение Кон
               <h4>{currentLanguage === 'english' ? 'Jurisdiction' : 'Юрисдикция'}</h4>
               <div className={`summary-item ${formData.governingLaw === 'russia' && formData.controllingLanguage === 'english' ? 'warning-yellow' : 'success-green'}`}>
                 <span className="summary-label">
-                  {currentLanguage === 'english' ? 'Governing Law:' : 'Применимое Право:'}
+                  {currentLanguage === 'english' ? 'Governing Law & Jurisdiction:' : 'Применимое Право и Юрисдикция:'}
                 </span>
                 <span className="summary-value">
                   {formData.governingLaw === 'california' ? (currentLanguage === 'english' ? 'California, USA' : 'Калифорния, США') :
