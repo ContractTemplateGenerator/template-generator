@@ -30,7 +30,6 @@ const App = () => {
     purpose: '',
     confidentialityType: 'broad',
     protectionPeriod: '2',
-    terminationNoticeDays: '30',
     governingLaw: 'california',
     includeExclusions: true,
     includeNoWarranties: true,
@@ -69,81 +68,180 @@ const App = () => {
     }));
   };
   
-  // Generate document text
-  const generateDocumentText = () => {
-    let text = `**NON-DISCLOSURE AGREEMENT                 ACUERDO DE CONFIDENCIALIDAD**
-
-This Agreement is made by **${formData.disclosingPartyName || '[Disclosing Party Name]'}** (the "Disclosing Party"), and **${formData.receivingPartyName || '[Receiving Party Name]'}** (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").
-
-Este Acuerdo es celebrado por **${formData.disclosingPartyName || '[Nombre de la Parte Divulgadora]'}** (la "Parte Divulgadora"), y **${formData.receivingPartyName || '[Nombre de la Parte Receptora]'}** (la "Parte Receptora"). (cada una, una "Parte" y, en conjunto, las "Partes").
-
-**1. EFFECTIVE DATE                       1. FECHA DE ENTRADA EN VIGOR**
-The effective date of this Agreement is ${formData.effectiveDate || '[Effective Date]'}.
-La fecha de entrada en vigor de este Acuerdo es ${formData.effectiveDate || '[Fecha de Entrada en Vigor]'}.
-
-**2. CONFIDENTIAL INFORMATION             2. INFORMACIÓN CONFIDENCIAL**
-"Confidential Information" disclosed under this Agreement is defined as ${getConfidentialityDefinition()}
-"Información Confidencial" divulgada bajo este Acuerdo se define como ${getConfidentialityDefinitionSpanish()}
-
-**3. TERM AND TERMINATION                 3. VIGENCIA Y TERMINACIÓN**
-This Agreement shall remain in effect until it is terminated by a Party with ${formData.terminationNoticeDays} days prior written notice; provided, however, that no Party shall terminate this Agreement if the Parties have a direct agreement still in effect. The terms and conditions of this Agreement shall survive any such termination with respect to Confidential Information that is disclosed prior to the effective date of termination.
-
-Este Acuerdo permanecerá vigente hasta que sea terminado por una Parte con ${formData.terminationNoticeDays} días de aviso previo por escrito; sin embargo, ninguna Parte podrá terminar este Acuerdo si las Partes tienen un acuerdo directo aún vigente. Los términos y condiciones de este Acuerdo sobrevivirán cualquier terminación con respecto a la Información Confidencial que se divulgue antes de la fecha efectiva de terminación.
-
-**4. PERMITTED USE AND DISCLOSURE         4. USO Y DIVULGACIÓN PERMITIDOS**
-Receiving Party will use Confidential Information only for the purpose of ${formData.purpose || '[Purpose of Disclosure]'}. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.
-
-La Parte Receptora utilizará la Información Confidencial únicamente para el propósito de ${formData.purpose || '[Propósito de la Divulgación]'}. La Parte Receptora podrá divulgar Información Confidencial a sus directores, funcionarios, empleados, contratistas, asesores y agentes, siempre que dichas personas tengan la necesidad de conocerla en su trabajo para la Parte Receptora en el desarrollo de la transacción comercial potencial o continua o relación entre las Partes, y estén sujetos a obligaciones de confidencialidad al menos tan restrictivas como las impuestas a la Parte Receptora en este Acuerdo (colectivamente, "Representantes"). La Parte Receptora es totalmente responsable de cualquier incumplimiento de este Acuerdo por parte de sus Representantes. La Parte Receptora utilizará el mismo grado de cuidado, pero no menos que un grado razonable de cuidado, que la Parte Receptora utiliza con respecto a su propia información similar para proteger la Información Confidencial. La Parte Receptora solo podrá divulgar información confidencial según lo autorizado por este Acuerdo.
-
-**5. PROTECTION PERIOD AND RETURN         5. PERÍODO DE PROTECCIÓN Y DEVOLUCIÓN**
-Unless the Parties otherwise agree in writing, a Receiving Party's duty to protect Confidential Information expires ${formData.protectionPeriod} years from the date of disclosure. Upon the Disclosing Party's written request, Receiving Party will promptly return or destroy all Confidential Information received from the Disclosing Party, together with all copies.
-
-A menos que las Partes acuerden lo contrario por escrito, el deber de la Parte Receptora de proteger la Información Confidencial expira ${formData.protectionPeriod} años desde la fecha de divulgación. A solicitud escrita de la Parte Divulgadora, la Parte Receptora devolverá o destruirá prontamente toda la Información Confidencial recibida de la Parte Divulgadora, junto con todas las copias.
-
-${formData.includeExclusions ? `**6. EXCLUSIONS                           6. EXCLUSIONES**
-Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.
-
-La Información Confidencial no incluirá información que: (a) sea o se convierta en parte del dominio público sin culpa de la Parte Receptora; (b) estuviera legítimamente en posesión de la Parte Receptora al momento de la divulgación, sin restricción en cuanto a su uso o divulgación; o (c) la Parte Receptora reciba legítimamente de un tercero que tenga el derecho de divulgarla y que la proporcione sin restricción en cuanto a su uso o divulgación.
-
-` : ''}${formData.includeNoWarranties ? `**7. NO WARRANTIES                        7. SIN GARANTÍAS**
-The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.
-
-La Información Confidencial se proporciona sin garantías de ningún tipo. La Parte Divulgadora no es responsable de los daños directos o indirectos que ocurran a la Parte Receptora al usar la Información Confidencial. Toda la Información Confidencial divulgada seguirá siendo propiedad de la Parte Divulgadora.
-
-` : ''}**8. GOVERNING LAW                        8. LEY APLICABLE**
-This Agreement shall be governed by the law of ${getGoverningLaw()}. ${getJurisdiction()} is agreed upon as place of jurisdiction for all disputes arising from this Agreement.
-
-Este Acuerdo se regirá por la ley de ${getGoverningLawSpanish()}. ${getJurisdictionSpanish()} se acuerda como lugar de jurisdicción para todas las disputas que surjan de este Acuerdo.
-
-${formData.includeSeverability ? `**9. SEVERABILITY                         9. DIVISIBILIDAD**
-If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.
-
-Si alguna disposición de este Acuerdo es considerada inválida o inejecutable por un tribunal de jurisdicción competente, las disposiciones restantes de este Acuerdo permanecerán en pleno vigor y efecto, y la disposición afectada se interpretará de manera que sea ejecutable en la máxima medida permitida por la ley.
-
-` : ''}${formData.includeLanguageClause ? `**10. PREVAILING LANGUAGE                 10. IDIOMA PREDOMINANTE**
-In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Spanish translation, the English version shall prevail.
-
-En caso de cualquier conflicto, discrepancia, inconsistencia o ambigüedad entre la versión en inglés de este Acuerdo y la traducción al español, prevalecerá la versión en inglés.
-
-` : ''}**IN WITNESS WHEREOF                      EN FE DE LO CUAL**
-The Parties hereto have executed this Agreement.
-Las Partes han ejecutado este Acuerdo.
-
-**Disclosing Party / Parte Divulgadora:**
-
-By: _________________________________    Por: _________________________________
-Name: ______________________________     Nombre: ______________________________
-Title:________________________________    Título: _______________________________
-Date: _______________________________    Fecha: _______________________________
-
-**Receiving Party / Parte Receptora:**
-
-By: _________________________________    Por: _________________________________
-Name: ______________________________     Nombre: ______________________________
-Title:________________________________    Título: _______________________________
-Date: _______________________________    Fecha: _______________________________`;
+  // Generate document sections for side-by-side preview
+  const generateDocumentSections = () => {
+    const sections = [];
     
-    return text;
+    // Header
+    sections.push({
+      english: "NON-DISCLOSURE AGREEMENT",
+      spanish: "ACUERDO DE CONFIDENCIALIDAD",
+      isHeader: true
+    });
+    
+    // Parties
+    sections.push({
+      english: `This Agreement is made by ${formData.disclosingPartyName || '[Disclosing Party Name]'} (the "Disclosing Party"), and ${formData.receivingPartyName || '[Receiving Party Name]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`,
+      spanish: `Este Acuerdo es celebrado por ${formData.disclosingPartyName || '[Nombre de la Parte Divulgadora]'} (la "Parte Divulgadora"), y ${formData.receivingPartyName || '[Nombre de la Parte Receptora]'} (la "Parte Receptora"). (cada una, una "Parte" y, en conjunto, las "Partes").`
+    });
+    
+    // Effective Date
+    sections.push({
+      english: "1. EFFECTIVE DATE",
+      spanish: "1. FECHA DE ENTRADA EN VIGOR",
+      isTitle: true
+    });
+    sections.push({
+      english: `The effective date of this Agreement is ${formData.effectiveDate || '[Effective Date]'}.`,
+      spanish: `La fecha de entrada en vigor de este Acuerdo es ${formData.effectiveDate || '[Fecha de Entrada en Vigor]'}.`
+    });
+    
+    // Confidential Information
+    sections.push({
+      english: "2. CONFIDENTIAL INFORMATION",
+      spanish: "2. INFORMACIÓN CONFIDENCIAL",
+      isTitle: true
+    });
+    sections.push({
+      english: `"Confidential Information" disclosed under this Agreement is defined as ${getConfidentialityDefinition()}`,
+      spanish: `"Información Confidencial" divulgada bajo este Acuerdo se define como ${getConfidentialityDefinitionSpanish()}`
+    });
+    
+    // Permitted Use
+    sections.push({
+      english: "3. PERMITTED USE AND DISCLOSURE",
+      spanish: "3. USO Y DIVULGACIÓN PERMITIDOS",
+      isTitle: true
+    });
+    sections.push({
+      english: `Receiving Party will use Confidential Information only for the purpose of ${formData.purpose || '[Purpose of Disclosure]'}. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`,
+      spanish: `La Parte Receptora utilizará la Información Confidencial únicamente para el propósito de ${formData.purpose || '[Propósito de la Divulgación]'}. La Parte Receptora podrá divulgar Información Confidencial a sus directores, funcionarios, empleados, contratistas, asesores y agentes, siempre que dichas personas tengan la necesidad de conocerla en su trabajo para la Parte Receptora en el desarrollo de la transacción comercial potencial o continua o relación entre las Partes, y estén sujetos a obligaciones de confidencialidad al menos tan restrictivas como las impuestas a la Parte Receptora en este Acuerdo (colectivamente, "Representantes"). La Parte Receptora es totalmente responsable de cualquier incumplimiento de este Acuerdo por parte de sus Representantes. La Parte Receptora utilizará el mismo grado de cuidado, pero no menos que un grado razonable de cuidado, que la Parte Receptora utiliza con respecto a su propia información similar para proteger la Información Confidencial. La Parte Receptora solo podrá divulgar información confidencial según lo autorizado por este Acuerdo.`
+    });
+    
+    // Protection Period
+    sections.push({
+      english: "4. PROTECTION PERIOD AND RETURN",
+      spanish: "4. PERÍODO DE PROTECCIÓN Y DEVOLUCIÓN",
+      isTitle: true
+    });
+    sections.push({
+      english: `Unless the Parties otherwise agree in writing, a Receiving Party's duty to protect Confidential Information expires ${formData.protectionPeriod} years from the date of disclosure. Upon the Disclosing Party's written request, Receiving Party will promptly return or destroy all Confidential Information received from the Disclosing Party, together with all copies.`,
+      spanish: `A menos que las Partes acuerden lo contrario por escrito, el deber de la Parte Receptora de proteger la Información Confidencial expira ${formData.protectionPeriod} años desde la fecha de divulgación. A solicitud escrita de la Parte Divulgadora, la Parte Receptora devolverá o destruirá prontamente toda la Información Confidencial recibida de la Parte Divulgadora, junto con todas las copias.`
+    });
+    
+    // Exclusions
+    if (formData.includeExclusions) {
+      sections.push({
+        english: "5. EXCLUSIONS",
+        spanish: "5. EXCLUSIONES",
+        isTitle: true
+      });
+      sections.push({
+        english: `Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.`,
+        spanish: `La Información Confidencial no incluirá información que: (a) sea o se convierta en parte del dominio público sin culpa de la Parte Receptora; (b) estuviera legítimamente en posesión de la Parte Receptora al momento de la divulgación, sin restricción en cuanto a su uso o divulgación; o (c) la Parte Receptora reciba legítimamente de un tercero que tenga el derecho de divulgarla y que la proporcione sin restricción en cuanto a su uso o divulgación.`
+      });
+    }
+    
+    // No Warranties
+    if (formData.includeNoWarranties) {
+      sections.push({
+        english: `${formData.includeExclusions ? '6' : '5'}. NO WARRANTIES`,
+        spanish: `${formData.includeExclusions ? '6' : '5'}. SIN GARANTÍAS`,
+        isTitle: true
+      });
+      sections.push({
+        english: `The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.`,
+        spanish: `La Información Confidencial se proporciona sin garantías de ningún tipo. La Parte Divulgadora no es responsable de los daños directos o indirectos que ocurran a la Parte Receptora al usar la Información Confidencial. Toda la Información Confidencial divulgada seguirá siendo propiedad de la Parte Divulgadora.`
+      });
+    }
+    
+    // Governing Law
+    let clauseNum = 5;
+    if (formData.includeExclusions) clauseNum++;
+    if (formData.includeNoWarranties) clauseNum++;
+    
+    sections.push({
+      english: `${clauseNum}. GOVERNING LAW`,
+      spanish: `${clauseNum}. LEY APLICABLE`,
+      isTitle: true
+    });
+    sections.push({
+      english: `This Agreement shall be governed by the law of ${getGoverningLaw()}. ${getJurisdiction()} is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
+      spanish: `Este Acuerdo se regirá por la ley de ${getGoverningLawSpanish()}. ${getJurisdictionSpanish()} se acuerda como lugar de jurisdicción para todas las disputas que surjan de este Acuerdo.`
+    });
+    
+    // Severability
+    if (formData.includeSeverability) {
+      clauseNum++;
+      sections.push({
+        english: `${clauseNum}. SEVERABILITY`,
+        spanish: `${clauseNum}. DIVISIBILIDAD`,
+        isTitle: true
+      });
+      sections.push({
+        english: `If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.`,
+        spanish: `Si alguna disposición de este Acuerdo es considerada inválida o inejecutable por un tribunal de jurisdicción competente, las disposiciones restantes de este Acuerdo permanecerán en pleno vigor y efecto, y la disposición afectada se interpretará de manera que sea ejecutable en la máxima medida permitida por la ley.`
+      });
+    }
+    
+    // Language Clause
+    if (formData.includeLanguageClause) {
+      clauseNum++;
+      sections.push({
+        english: `${clauseNum}. PREVAILING LANGUAGE`,
+        spanish: `${clauseNum}. IDIOMA PREDOMINANTE`,
+        isTitle: true
+      });
+      sections.push({
+        english: `In case of any conflict, discrepancy, inconsistency or ambiguity between the English text version of this Agreement and Spanish translation, the English version shall prevail.`,
+        spanish: `En caso de cualquier conflicto, discrepancia, inconsistencia o ambigüedad entre la versión en inglés de este Acuerdo y la traducción al español, prevalecerá la versión en inglés.`
+      });
+    }
+    
+    // Signature block
+    sections.push({
+      english: "IN WITNESS WHEREOF",
+      spanish: "EN FE DE LO CUAL",
+      isTitle: true
+    });
+    sections.push({
+      english: "The Parties hereto have executed this Agreement.",
+      spanish: "Las Partes han ejecutado este Acuerdo."
+    });
+    
+    sections.push({
+      english: "Disclosing Party:",
+      spanish: "Parte Divulgadora:",
+      isTitle: true
+    });
+    sections.push({
+      english: `By: _________________________________
+Name: ______________________________
+Title:________________________________
+Date: _______________________________`,
+      spanish: `Por: _________________________________
+Nombre: ______________________________
+Título: _______________________________
+Fecha: _______________________________`
+    });
+    
+    sections.push({
+      english: "Receiving Party:",
+      spanish: "Parte Receptora:",
+      isTitle: true
+    });
+    sections.push({
+      english: `By: _________________________________
+Name: ______________________________
+Title:________________________________
+Date: _______________________________`,
+      spanish: `Por: _________________________________
+Nombre: ______________________________
+Título: _______________________________
+Fecha: _______________________________`
+    });
+    
+    return sections;
   };
   
   // Helper functions for confidentiality definitions
@@ -214,79 +312,20 @@ Date: _______________________________    Fecha: _______________________________`
     }
   };
   
-  // Determine which section to highlight based on last changed field
-  const getSectionToHighlight = () => {
-    switch (currentTab) {
-      case 0: // Parties tab
-        if (lastChanged === 'disclosingPartyName' || lastChanged === 'receivingPartyName') {
-          return 'parties';
-        }
-        return null;
-      case 1: // Key Terms tab
-        if (lastChanged === 'effectiveDate') {
-          return 'effectiveDate';
-        }
-        if (lastChanged === 'purpose' || lastChanged === 'confidentialityType') {
-          return 'confidentiality';
-        }
-        if (lastChanged === 'protectionPeriod') {
-          return 'protectionPeriod';
-        }
-        return null;
-      case 2: // Options tab
-        if (lastChanged === 'terminationNoticeDays') {
-          return 'termination';
-        }
-        if (lastChanged === 'governingLaw') {
-          return 'governingLaw';
-        }
-        return null;
-      default:
-        return null;
-    }
-  };
-  
-  // Create highlighted text
-  const createHighlightedText = () => {
-    const text = generateDocumentText();
-    const sectionToHighlight = getSectionToHighlight();
-    
-    if (!sectionToHighlight) return text;
-    
-    // Define patterns for different sections
-    const patterns = {
-      parties: formData.receivingPartyName ? 
-        new RegExp(`(\\*\\*${formData.disclosingPartyName}\\*\\*|\\*\\*${formData.receivingPartyName}\\*\\*)`, 'g') : 
-        new RegExp(`(\\*\\*${formData.disclosingPartyName}\\*\\*)`, 'g'),
-      effectiveDate: new RegExp(`(${formData.effectiveDate})`, 'g'),
-      confidentiality: /("Confidential Information".*?)\./,
-      protectionPeriod: new RegExp(`(${formData.protectionPeriod} years)`, 'g'),
-      termination: new RegExp(`(${formData.terminationNoticeDays} days)`, 'g'),
-      governingLaw: new RegExp(`(${getGoverningLaw()}|${getJurisdiction()})`, 'g')
-    };
-    
-    if (patterns[sectionToHighlight]) {
-      return text.replace(patterns[sectionToHighlight], match => 
-        `<span class="highlighted-text">${match}</span>`
-      );
-    }
-    
-    return text;
-  };
-  
-  // Scroll to highlighted text
-  React.useEffect(() => {
-    if (previewRef.current) {
-      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
-      if (highlightedElement) {
-        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [lastChanged, currentTab]);
-  
   // Copy to clipboard
   const copyToClipboard = () => {
-    const text = generateDocumentText().replace(/\*\*/g, ''); // Remove markdown
+    const sections = generateDocumentSections();
+    let text = '';
+    sections.forEach(section => {
+      if (section.isHeader) {
+        text += `${section.english}                    ${section.spanish}\n\n`;
+      } else if (section.isTitle) {
+        text += `${section.english}                    ${section.spanish}\n`;
+      } else {
+        text += `${section.english}\n${section.spanish}\n\n`;
+      }
+    });
+    
     navigator.clipboard.writeText(text).then(() => {
       alert(t('Document copied to clipboard!', '¡Documento copiado al portapapeles!'));
     });
@@ -295,8 +334,8 @@ Date: _______________________________    Fecha: _______________________________`
   // Download as Word
   const downloadAsWord = () => {
     try {
-      const text = generateDocumentText();
-      window.generateWordDoc(text, formData);
+      const sections = generateDocumentSections();
+      window.generateWordDoc(sections, formData);
     } catch (error) {
       console.error('Error generating Word document:', error);
       alert(t('Error generating Word document. Please try again.', 'Error al generar el documento Word. Por favor, inténtelo de nuevo.'));
@@ -320,8 +359,7 @@ Date: _______________________________    Fecha: _______________________________`
     setCurrentTab(index);
   };
   
-  const documentText = generateDocumentText();
-  const highlightedText = createHighlightedText();
+  const sections = generateDocumentSections();
   
   return (
     <div className="container">
@@ -568,28 +606,6 @@ Date: _______________________________    Fecha: _______________________________`
               
               <div className="form-group">
                 <div className="label-with-help">
-                  <label htmlFor="terminationNoticeDays">{t('Termination Notice (days)', 'Aviso de Terminación (días)')}</label>
-                  <div className="help-icon">
-                    <Icon name="help-circle" size={16} />
-                    <div className="tooltip">
-                      {t('Days of notice required to terminate', 'Días de aviso requeridos para terminar')}
-                    </div>
-                  </div>
-                </div>
-                <input
-                  type="number"
-                  id="terminationNoticeDays"
-                  name="terminationNoticeDays"
-                  className="form-control"
-                  value={formData.terminationNoticeDays}
-                  onChange={handleChange}
-                  min="1"
-                  max="90"
-                />
-              </div>
-              
-              <div className="form-group">
-                <div className="label-with-help">
                   <label htmlFor="governingLaw">{t('Governing Law', 'Ley Aplicable')}</label>
                   <div className="help-icon">
                     <Icon name="help-circle" size={16} />
@@ -752,11 +768,18 @@ Date: _______________________________    Fecha: _______________________________`
             <div className="preview-header">
               {t('Live Preview', 'Vista Previa en Vivo')}
             </div>
-            <div ref={previewRef}>
-              <pre 
-                className="document-preview"
-                dangerouslySetInnerHTML={{ __html: highlightedText }}
-              />
+            <div ref={previewRef} className="dual-column-preview">
+              <table className="preview-table">
+                <tbody>
+                  {sections.map((section, index) => (
+                    <tr key={index} className={section.isTitle ? 'title-row' : ''}>
+                      <td className="english-column">{section.english}</td>
+                      <td className="separator"></td>
+                      <td className="spanish-column">{section.spanish}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
