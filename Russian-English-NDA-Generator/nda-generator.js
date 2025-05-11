@@ -1306,6 +1306,382 @@ ${customText || '[Пользовательское Определение Кон
     }
   };
   
+  // Render comprehensive instructional content
+  const renderInstructionalContent = () => {
+    return (
+      <div className="instruction-content">
+        {/* Header section */}
+        <div className="instruction-header">
+          <h2>{currentLanguage === 'english' ? 'Dual Language NDA Generator Guide' : 'Руководство по Генератору Двуязычного NDA'}</h2>
+          <p className="instruction-subtitle">
+            {currentLanguage === 'english' 
+              ? 'Create legally binding NDAs in English and Russian with proper structure and terminology'
+              : 'Создавайте юридически обязательные NDA на английском и русском языках с правильной структурой и терминологией'}
+          </p>
+        </div>
+        
+        {/* Risk Spectrum Card */}
+        <div className="instruction-card risk-spectrum">
+          <h3>{currentLanguage === 'english' ? 'Legal Risk Spectrum' : 'Спектр Юридических Рисков'}</h3>
+          <div className="risk-levels">
+            <div className="risk-level low">
+              <div className="risk-icon">🛡️</div>
+              <h4>{currentLanguage === 'english' ? 'Low Risk' : 'Низкий Риск'}</h4>
+              <ul>
+                <li>{currentLanguage === 'english' ? 'Company-to-company NDA' : 'NDA между компаниями'}</li>
+                <li>{currentLanguage === 'english' ? 'All standard provisions included' : 'Все стандартные положения включены'}</li>
+                <li>{currentLanguage === 'english' ? 'Narrow confidentiality definition' : 'Узкое определение конфиденциальности'}</li>
+              </ul>
+            </div>
+            <div className="risk-level medium">
+              <div className="risk-icon">⚠️</div>
+              <h4>{currentLanguage === 'english' ? 'Medium Risk' : 'Средний Риск'}</h4>
+              <ul>
+                <li>{currentLanguage === 'english' ? 'Mixed company/individual parties' : 'Смешанные стороны (компания/физлицо)'}</li>
+                <li>{currentLanguage === 'english' ? 'Some provisions excluded' : 'Некоторые положения исключены'}</li>
+                <li>{currentLanguage === 'english' ? 'Broad confidentiality scope' : 'Широкий охват конфиденциальности'}</li>
+              </ul>
+            </div>
+            <div className="risk-level high">
+              <div className="risk-icon">🚨</div>
+              <h4>{currentLanguage === 'english' ? 'High Risk' : 'Высокий Риск'}</h4>
+              <ul>
+                <li>{currentLanguage === 'english' ? 'Individual-to-individual NDA' : 'NDA между физлицами'}</li>
+                <li>{currentLanguage === 'english' ? 'Key provisions missing' : 'Ключевые положения отсутствуют'}</li>
+                <li>{currentLanguage === 'english' ? 'Cross-border conflicting laws' : 'Конфликт законов разных стран'}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        {/* Party Type Decision Tree */}
+        <div className="instruction-card decision-tree">
+          <h3>{currentLanguage === 'english' ? 'Choosing Party Types' : 'Выбор Типа Сторон'}</h3>
+          <div className="tree-container">
+            <div className="tree-node root">
+              <div className="node-content">
+                {currentLanguage === 'english' ? 'Who is signing?' : 'Кто подписывает?'}
+              </div>
+              <div className="tree-branches">
+                <div className="branch-left">
+                  <div className="tree-node">
+                    <div className="node-content company">
+                      {currentLanguage === 'english' ? 'Company Entity' : 'Юридическое Лицо'}
+                    </div>
+                    <div className="node-details">
+                      <p>{currentLanguage === 'english' 
+                        ? 'Use full legal name: "ABC Corp.", "XYZ LLC"' 
+                        : 'Полное юридическое название: "ООО ABC", "АО XYZ"'}</p>
+                      <p className="benefit">✓ {currentLanguage === 'english' 
+                        ? 'Limited liability protection' 
+                        : 'Ограниченная ответственность'}</p>
+                      <p className="benefit">✓ {currentLanguage === 'english' 
+                        ? 'Corporate continuity' 
+                        : 'Корпоративная преемственность'}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="branch-right">
+                  <div className="tree-node">
+                    <div className="node-content individual">
+                      {currentLanguage === 'english' ? 'Individual Person' : 'Физическое Лицо'}
+                    </div>
+                    <div className="node-details">
+                      <p>{currentLanguage === 'english' 
+                        ? 'Use full name: "John A. Smith"' 
+                        : 'Полное имя: "Иванов Иван Иванович"'}</p>
+                      <p className="warning">⚠️ {currentLanguage === 'english' 
+                        ? 'Personal liability exposure' 
+                        : 'Личная ответственность'}</p>
+                      <p className="warning">⚠️ {currentLanguage === 'english' 
+                        ? 'No corporate protection' 
+                        : 'Нет корпоративной защиты'}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Key Provisions Selector */}
+        <div className="instruction-card provisions-guide">
+          <h3>{currentLanguage === 'english' ? 'Key Provisions Impact' : 'Влияние Ключевых Положений'}</h3>
+          <div className="provisions-grid">
+            <div className="provision-item">
+              <div className="provision-icon">📦</div>
+              <h4>{currentLanguage === 'english' ? 'Return/Destruction' : 'Возврат/Уничтожение'}</h4>
+              <div className="provision-impact">
+                <div className="impact-with">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'With:' : 'С:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'Materials must be returned/destroyed on demand' 
+                    : 'Материалы должны быть возвращены/уничтожены по требованию'}</p>
+                </div>
+                <div className="impact-without">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'Without:' : 'Без:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'Recipient can keep materials indefinitely' 
+                    : 'Получатель может хранить материалы неограниченно'}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="provision-item">
+              <div className="provision-icon">🛡️</div>
+              <h4>{currentLanguage === 'english' ? 'No Warranty' : 'Отсутствие Гарантий'}</h4>
+              <div className="provision-impact">
+                <div className="impact-with">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'With:' : 'С:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'No liability for inaccurate information' 
+                    : 'Нет ответственности за неточную информацию'}</p>
+                </div>
+                <div className="impact-without">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'Without:' : 'Без:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'Potential liability for damages from bad info' 
+                    : 'Возможная ответственность за ущерб от плохой информации'}</p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="provision-item">
+              <div className="provision-icon">✂️</div>
+              <h4>{currentLanguage === 'english' ? 'Severability' : 'Независимость Положений'}</h4>
+              <div className="provision-impact">
+                <div className="impact-with">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'With:' : 'С:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'Invalid provisions don\'t void entire agreement' 
+                    : 'Недействительные положения не отменяют все соглашение'}</p>
+                </div>
+                <div className="impact-without">
+                  <span className="impact-label">{currentLanguage === 'english' ? 'Without:' : 'Без:'}</span>
+                  <p>{currentLanguage === 'english' 
+                    ? 'One invalid provision can void entire NDA' 
+                    : 'Одно недействительное положение может отменить весь NDA'}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Address Format Guide */}
+        <div className="instruction-card address-guide">
+          <h3>{currentLanguage === 'english' ? 'Address Format Guide' : 'Руководство по Формату Адресов'}</h3>
+          <div className="address-examples">
+            <div className="address-column">
+              <h4>{currentLanguage === 'english' ? 'US Format' : 'Формат США'}</h4>
+              <div className="address-example">
+                <div className="address-label">{currentLanguage === 'english' ? 'Company:' : 'Компания:'}</div>
+                <div className="address-text">123 Business St, Suite 500<br/>Los Angeles, CA 90001, USA</div>
+              </div>
+              <div className="address-example">
+                <div className="address-label">{currentLanguage === 'english' ? 'Individual:' : 'Физлицо:'}</div>
+                <div className="address-text">456 Residential Ave, Apt 12<br/>New York, NY 10001, USA</div>
+              </div>
+            </div>
+            <div className="address-column">
+              <h4>{currentLanguage === 'english' ? 'Russian Format' : 'Формат РФ'}</h4>
+              <div className="address-example">
+                <div className="address-label">{currentLanguage === 'english' ? 'Company:' : 'Компания:'}</div>
+                <div className="address-text">123456, г. Москва,<br/>ул. Тверская, д. 1, офис 100</div>
+              </div>
+              <div className="address-example">
+                <div className="address-label">{currentLanguage === 'english' ? 'Individual:' : 'Физлицо:'}</div>
+                <div className="address-text">190000, г. Санкт-Петербург,<br/>Невский пр., д. 28, кв. 15</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Jurisdiction Compatibility Matrix */}
+        <div className="instruction-card jurisdiction-matrix">
+          <h3>{currentLanguage === 'english' ? 'Law & Language Compatibility' : 'Совместимость Права и Языка'}</h3>
+          <div className="matrix-container">
+            <table className="compatibility-matrix">
+              <thead>
+                <tr>
+                  <th>{currentLanguage === 'english' ? 'Governing Law' : 'Применимое Право'}</th>
+                  <th>{currentLanguage === 'english' ? 'English Control' : 'Английский Контроль'}</th>
+                  <th>{currentLanguage === 'english' ? 'Russian Control' : 'Русский Контроль'}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>California</td>
+                  <td className="compat-good">✓ {currentLanguage === 'english' ? 'Optimal' : 'Оптимально'}</td>
+                  <td className="compat-poor">⚠️ {currentLanguage === 'english' ? 'Unusual' : 'Необычно'}</td>
+                </tr>
+                <tr>
+                  <td>Delaware</td>
+                  <td className="compat-good">✓ {currentLanguage === 'english' ? 'Optimal' : 'Оптимально'}</td>
+                  <td className="compat-poor">⚠️ {currentLanguage === 'english' ? 'Unusual' : 'Необычно'}</td>
+                </tr>
+                <tr>
+                  <td>New York</td>
+                  <td className="compat-good">✓ {currentLanguage === 'english' ? 'Optimal' : 'Оптимально'}</td>
+                  <td className="compat-poor">⚠️ {currentLanguage === 'english' ? 'Unusual' : 'Необычно'}</td>
+                </tr>
+                <tr>
+                  <td>{currentLanguage === 'english' ? 'Russian Federation' : 'Российская Федерация'}</td>
+                  <td className="compat-medium">⚡ {currentLanguage === 'english' ? 'Possible' : 'Возможно'}</td>
+                  <td className="compat-good">✓ {currentLanguage === 'english' ? 'Optimal' : 'Оптимально'}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        
+        {/* Confidentiality Scope Selector */}
+        <div className="instruction-card scope-selector">
+          <h3>{currentLanguage === 'english' ? 'Confidentiality Scope Selector' : 'Выбор Объема Конфиденциальности'}</h3>
+          <div className="scope-options">
+            <div className="scope-option narrow">
+              <div className="scope-header">
+                <div className="scope-icon">🎯</div>
+                <h4>{currentLanguage === 'english' ? 'Narrow' : 'Узкий'}</h4>
+              </div>
+              <div className="scope-details">
+                <p>{currentLanguage === 'english' 
+                  ? 'Only written + marked confidential' 
+                  : 'Только письменное + помеченное конфиденциальным'}</p>
+                <div className="scope-best-for">
+                  <strong>{currentLanguage === 'english' ? 'Best for:' : 'Лучше для:'}</strong>
+                  <ul>
+                    <li>{currentLanguage === 'english' ? 'Document exchanges' : 'Обмен документами'}</li>
+                    <li>{currentLanguage === 'english' ? 'Due diligence' : 'Due diligence'}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="scope-option medium">
+              <div className="scope-header">
+                <div className="scope-icon">⚖️</div>
+                <h4>{currentLanguage === 'english' ? 'Medium' : 'Средний'}</h4>
+              </div>
+              <div className="scope-details">
+                <p>{currentLanguage === 'english' 
+                  ? 'Business info, trade secrets, technical data' 
+                  : 'Деловая информация, коммерческие тайны, технические данные'}</p>
+                <div className="scope-best-for">
+                  <strong>{currentLanguage === 'english' ? 'Best for:' : 'Лучше для:'}</strong>
+                  <ul>
+                    <li>{currentLanguage === 'english' ? 'Business partnerships' : 'Деловые партнерства'}</li>
+                    <li>{currentLanguage === 'english' ? 'Joint ventures' : 'Совместные предприятия'}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div className="scope-option broad">
+              <div className="scope-header">
+                <div className="scope-icon">🌐</div>
+                <h4>{currentLanguage === 'english' ? 'Broad' : 'Широкий'}</h4>
+              </div>
+              <div className="scope-details">
+                <p>{currentLanguage === 'english' 
+                  ? 'All info that should be confidential' 
+                  : 'Вся информация, которая должна быть конфиденциальной'}</p>
+                <div className="scope-best-for">
+                  <strong>{currentLanguage === 'english' ? 'Best for:' : 'Лучше для:'}</strong>
+                  <ul>
+                    <li>{currentLanguage === 'english' ? 'Early negotiations' : 'Ранние переговоры'}</li>
+                    <li>{currentLanguage === 'english' ? 'Verbal discussions' : 'Устные обсуждения'}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Protection Period Timeline */}
+        <div className="instruction-card timeline-card">
+          <h3>{currentLanguage === 'english' ? 'Protection Period Guidelines' : 'Рекомендации по Срокам Защиты'}</h3>
+          <div className="timeline-container">
+            <div className="timeline-item green">
+              <div className="timeline-marker">1-2</div>
+              <div className="timeline-content">
+                <h4>{currentLanguage === 'english' ? 'Years' : 'Года'}</h4>
+                <p>{currentLanguage === 'english' 
+                  ? 'Standard for most business information' 
+                  : 'Стандарт для большинства деловой информации'}</p>
+              </div>
+            </div>
+            <div className="timeline-item yellow">
+              <div className="timeline-marker">3-5</div>
+              <div className="timeline-content">
+                <h4>{currentLanguage === 'english' ? 'Years' : 'Лет'}</h4>
+                <p>{currentLanguage === 'english' 
+                  ? 'For valuable trade secrets and technical data' 
+                  : 'Для ценных коммерческих тайн и технических данных'}</p>
+              </div>
+            </div>
+            <div className="timeline-item orange">
+              <div className="timeline-marker">5-10</div>
+              <div className="timeline-content">
+                <h4>{currentLanguage === 'english' ? 'Years' : 'Лет'}</h4>
+                <p>{currentLanguage === 'english' 
+                  ? 'May face enforceability challenges' 
+                  : 'Могут возникнуть проблемы с исполнимостью'}</p>
+              </div>
+            </div>
+            <div className="timeline-item red">
+              <div className="timeline-marker">10+</div>
+              <div className="timeline-content">
+                <h4>{currentLanguage === 'english' ? 'Years' : 'Лет'}</h4>
+                <p>{currentLanguage === 'english' 
+                  ? 'Often considered unreasonable by courts' 
+                  : 'Часто считается неразумным судами'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        {/* Tips Section */}
+        <div className="instruction-card tips-card">
+          <h3>{currentLanguage === 'english' ? 'Expert Tips' : 'Советы Эксперта'}</h3>
+          <div className="tips-grid">
+            <div className="tip-item">
+              <div className="tip-icon">💡</div>
+              <p>{currentLanguage === 'english' 
+                ? 'Always use the company name if acting on behalf of a company to avoid personal liability' 
+                : 'Всегда используйте название компании, если действуете от имени компании, чтобы избежать личной ответственности'}</p>
+            </div>
+            <div className="tip-item">
+              <div className="tip-icon">💡</div>
+              <p>{currentLanguage === 'english' 
+                ? 'For international deals, match governing law with controlling language when possible' 
+                : 'Для международных сделок по возможности согласовывайте применимое право с контролирующим языком'}</p>
+            </div>
+            <div className="tip-item">
+              <div className="tip-icon">💡</div>
+              <p>{currentLanguage === 'english' 
+                ? 'Include full legal addresses - P.O. boxes are generally not acceptable' 
+                : 'Указывайте полные юридические адреса - почтовые ящики обычно не приемлемы'}</p>
+            </div>
+            <div className="tip-item">
+              <div className="tip-icon">💡</div>
+              <p>{currentLanguage === 'english' 
+                ? 'Consider narrower confidentiality scope for clearer enforceability' 
+                : 'Рассмотрите более узкий объем конфиденциальности для лучшей исполнимости'}</p>
+            </div>
+          </div>
+        </div>
+        
+        {/* Bottom CTA */}
+        <div className="instruction-footer">
+          <p>{currentLanguage === 'english' 
+            ? 'Need help with complex NDAs or have specific questions?' 
+            : 'Нужна помощь со сложными NDA или есть конкретные вопросы?'}</p>
+          <button className="cta-button" onClick={() => window.open('https://terms.law/call/', '_blank')}>
+            {currentLanguage === 'english' ? 'Schedule a Consultation' : 'Записаться на Консультацию'}
+          </button>
+        </div>
+      </div>
+    );
+  };
+  
   // Effect to render document on form changes
   React.useEffect(() => {
     const documentHtml = generateDocument();
@@ -1400,6 +1776,11 @@ ${customText || '[Пользовательское Определение Кон
           <h2>{currentLanguage === 'english' ? 'Live Preview' : 'Предварительный Просмотр'}</h2>
           <div id="preview-document" className="preview-content"></div>
         </div>
+      </div>
+      
+      {/* New instructional screen */}
+      <div className="instruction-screen">
+        {renderInstructionalContent()}
       </div>
     </div>
   );
