@@ -2,6 +2,24 @@ window.generateWordDoc = function(sections, formData) {
   try {
     console.log("Starting Word document generation...");
     
+    // Function to format dates
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return dateString;
+      
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      
+      // Format for both languages
+      const englishDate = date.toLocaleDateString('en-US', options);
+      const spanishDate = date.toLocaleDateString('es-ES', options);
+      
+      return { 
+        english: englishDate,
+        spanish: spanishDate 
+      };
+    };
+    
     // Create HTML content that can be rendered in Word
     let htmlContent = `
 <!DOCTYPE html>
@@ -56,6 +74,18 @@ window.generateWordDoc = function(sections, formData) {
     sections.forEach((section, index) => {
       htmlContent += '<tr>';
       
+      // For effective date section, we need to format the date
+      let englishContent = section.english;
+      let spanishContent = section.spanish;
+      
+      if (section.english && section.english.includes('effective date') && !section.isTitle && formData.effectiveDate) {
+        const formattedDates = formatDate(formData.effectiveDate);
+        englishContent = section.english.replace(/\[Effective Date\]/, formattedDates.english)
+          .replace(formData.effectiveDate, formattedDates.english);
+        spanishContent = section.spanish.replace(/\[Fecha de Entrada en Vigor\]/, formattedDates.spanish)
+          .replace(formData.effectiveDate, formattedDates.spanish);
+      }
+      
       // English column
       htmlContent += '<td width="48%" style="padding: 10pt; vertical-align: top;';
       if (section.isHeader) {
@@ -64,13 +94,13 @@ window.generateWordDoc = function(sections, formData) {
       htmlContent += '">';
       
       if (section.isHeader) {
-        htmlContent += '<h2 style="text-align: center;">' + section.english + '</h2>';
+        htmlContent += '<h2 style="text-align: center;">' + englishContent + '</h2>';
       } else if (section.isTitle && section.isSignature) {
-        htmlContent += '<strong class="signature">' + section.english + '</strong>';
+        htmlContent += '<strong class="signature" style="text-transform: uppercase;">' + englishContent + '</strong>';
       } else if (section.isTitle) {
-        htmlContent += '<strong>' + section.english + '</strong>';
+        htmlContent += '<strong>' + englishContent + '</strong>';
       } else {
-        htmlContent += section.english.replace(/\n/g, '<br>');
+        htmlContent += englishContent.replace(/\n/g, '<br>');
       }
       
       htmlContent += '</td>';
@@ -86,13 +116,13 @@ window.generateWordDoc = function(sections, formData) {
       htmlContent += '">';
       
       if (section.isHeader) {
-        htmlContent += '<h2 style="text-align: center;">' + section.spanish + '</h2>';
+        htmlContent += '<h2 style="text-align: center;">' + spanishContent + '</h2>';
       } else if (section.isTitle && section.isSignature) {
-        htmlContent += '<strong class="signature">' + section.spanish + '</strong>';
+        htmlContent += '<strong class="signature" style="text-transform: uppercase;">' + spanishContent + '</strong>';
       } else if (section.isTitle) {
-        htmlContent += '<strong>' + section.spanish + '</strong>';
+        htmlContent += '<strong>' + spanishContent + '</strong>';
       } else {
-        htmlContent += section.spanish.replace(/\n/g, '<br>');
+        htmlContent += spanishContent.replace(/\n/g, '<br>');
       }
       
       htmlContent += '</td>';

@@ -49,6 +49,19 @@ const App = () => {
   // Translation function
   const t = (englishText, spanishText) => language === 'en' ? englishText : spanishText;
   
+  // Format date function (Month Day, Year)
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    
+    return language === 'en' 
+      ? date.toLocaleDateString('en-US', options) 
+      : date.toLocaleDateString('es-ES', options);
+  };
+  
   // US States for governing law
   const usStates = [
     { value: 'alabama', label: 'Alabama' },
@@ -218,8 +231,8 @@ const App = () => {
       isTitle: true
     });
     sections.push({
-      english: `The effective date of this Agreement is ${formData.effectiveDate || '[Effective Date]'}.`,
-      spanish: `La fecha de entrada en vigor de este Acuerdo es ${formData.effectiveDate || '[Fecha de Entrada en Vigor]'}.`
+      english: `The effective date of this Agreement is ${formData.effectiveDate ? formatDate(formData.effectiveDate) : '[Effective Date]'}.`,
+      spanish: `La fecha de entrada en vigor de este Acuerdo es ${formData.effectiveDate ? formatDate(formData.effectiveDate) : '[Fecha de Entrada en Vigor]'}.`
     });
     
     // Confidential Information
@@ -258,6 +271,7 @@ const App = () => {
     });
     
     // Exclusions
+    let clauseNum = 5;
     if (formData.includeExclusions) {
       sections.push({
         english: "5. EXCLUSIONS",
@@ -268,6 +282,7 @@ const App = () => {
         english: `Confidential Information will not include any information that: (a) is or becomes part of the public domain through no fault of Receiving Party; (b) was rightfully in Receiving Party's possession at the time of disclosure, without restriction as to use or disclosure; or (c) Receiving Party rightfully receives from a third party who has the right to disclose it and who provides it without restriction as to use or disclosure.`,
         spanish: `La Información Confidencial no incluirá información que: (a) sea o se convierta en parte del dominio público sin culpa de la Parte Receptora; (b) estuviera legítimamente en posesión de la Parte Receptora al momento de la divulgación, sin restricción en cuanto a su uso o divulgación; o (c) la Parte Receptora reciba legítimamente de un tercero que tenga el derecho de divulgarla y que la proporcione sin restricción en cuanto a su uso o divulgación.`
       });
+      clauseNum++;
     }
     
     // No Warranties
@@ -281,13 +296,10 @@ const App = () => {
         english: `The Confidential Information is provided with no warranties of any kind. The Disclosing Party is not liable for direct or indirect damages, which occur to the Receiving Party while using the Confidential Information. All Confidential Information disclosed will remain property of the Disclosing Party.`,
         spanish: `La Información Confidencial se proporciona sin garantías de ningún tipo. La Parte Divulgadora no es responsable de los daños directos o indirectos que ocurran a la Parte Receptora al usar la Información Confidencial. Toda la Información Confidencial divulgada seguirá siendo propiedad de la Parte Divulgadora.`
       });
+      clauseNum++;
     }
     
     // Governing Law
-    let clauseNum = 5;
-    if (formData.includeExclusions) clauseNum++;
-    if (formData.includeNoWarranties) clauseNum++;
-    
     sections.push({
       english: `${clauseNum}. GOVERNING LAW`,
       spanish: `${clauseNum}. LEY APLICABLE`,
@@ -297,10 +309,10 @@ const App = () => {
       english: `This Agreement shall be governed by the law of ${getGoverningLaw()}. ${getJurisdiction()} is agreed upon as place of jurisdiction for all disputes arising from this Agreement.`,
       spanish: `Este Acuerdo se regirá por la ley de ${getGoverningLawSpanish()}. ${getJurisdictionSpanish()} se acuerda como lugar de jurisdicción para todas las disputas que surjan de este Acuerdo.`
     });
+    clauseNum++;
     
     // Severability
     if (formData.includeSeverability) {
-      clauseNum++;
       sections.push({
         english: `${clauseNum}. SEVERABILITY`,
         spanish: `${clauseNum}. DIVISIBILIDAD`,
@@ -310,11 +322,11 @@ const App = () => {
         english: `If any provision of this Agreement is held invalid or unenforceable by a court of competent jurisdiction, the remaining provisions of this Agreement will remain in full force and effect, and the provision affected will be construed so as to be enforceable to the maximum extent permissible by law.`,
         spanish: `Si alguna disposición de este Acuerdo es considerada inválida o inejecutable por un tribunal de jurisdicción competente, las disposiciones restantes de este Acuerdo permanecerán en pleno vigor y efecto, y la disposición afectada se interpretará de manera que sea ejecutable en la máxima medida permitida por la ley.`
       });
+      clauseNum++;
     }
     
     // Language Clause
     if (formData.includeLanguageClause) {
-      clauseNum++;
       sections.push({
         english: `${clauseNum}. PREVAILING LANGUAGE`,
         spanish: `${clauseNum}. IDIOMA PREDOMINANTE`,
@@ -598,21 +610,69 @@ Fecha: _______________________________`
   
   // Copy to clipboard
   const copyToClipboard = () => {
-    const sections = generateDocumentSections();
-    let text = '';
-    sections.forEach(section => {
-      if (section.isHeader) {
-        text += `${section.english}                    ${section.spanish}\n\n`;
-      } else if (section.isTitle) {
-        text += `${section.english}                    ${section.spanish}\n`;
+    try {
+      const sections = generateDocumentSections();
+      let text = '';
+      
+      sections.forEach(section => {
+        if (section.isHeader) {
+          text += `${section.english}                    ${section.spanish}\n\n`;
+        } else if (section.isTitle) {
+          text += `${section.english}                    ${section.spanish}\n`;
+        } else {
+          text += `${section.english}\n${section.spanish}\n\n`;
+        }
+      });
+      
+      // Use modern clipboard API with fallback
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text)
+          .then(() => {
+            alert(t('Document copied to clipboard!', '¡Documento copiado al portapapeles!'));
+          })
+          .catch(err => {
+            console.error('Failed to copy: ', err);
+            fallbackCopyToClipboard(text);
+          });
       } else {
-        text += `${section.english}\n${section.spanish}\n\n`;
+        fallbackCopyToClipboard(text);
       }
-    });
-    
-    navigator.clipboard.writeText(text).then(() => {
-      alert(t('Document copied to clipboard!', '¡Documento copiado al portapapeles!'));
-    });
+    } catch (error) {
+      console.error('Error during copy operation:', error);
+      alert(t('Error copying to clipboard. Please try again.', 'Error al copiar al portapapeles. Por favor, inténtelo de nuevo.'));
+    }
+  };
+  
+  // Fallback copy method
+  const fallbackCopyToClipboard = (text) => {
+    try {
+      // Create temporary element
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      
+      // Make the textarea out of viewport
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-999999px';
+      textArea.style.top = '-999999px';
+      document.body.appendChild(textArea);
+      
+      // Select and copy
+      textArea.focus();
+      textArea.select();
+      const successful = document.execCommand('copy');
+      
+      // Clean up
+      document.body.removeChild(textArea);
+      
+      if (successful) {
+        alert(t('Document copied to clipboard!', '¡Documento copiado al portapapeles!'));
+      } else {
+        throw new Error('Copy command failed');
+      }
+    } catch (err) {
+      console.error('Fallback copy failed:', err);
+      alert(t('Unable to copy to clipboard. Please try another browser.', 'No se puede copiar al portapapeles. Por favor, intente con otro navegador.'));
+    }
   };
   
   // Download as Word
@@ -814,6 +874,11 @@ Fecha: _______________________________`
                   value={formData.effectiveDate}
                   onChange={handleChange}
                 />
+                {formData.effectiveDate && (
+                  <div className="date-format-display">
+                    {t('Will display as:', 'Se mostrará como:')} {formatDate(formData.effectiveDate)}
+                  </div>
+                )}
               </div>
               
               <div className="form-group">
@@ -847,7 +912,7 @@ Fecha: _______________________________`
                     onChange={handleChange}
                     rows="2"
                     style={{ marginTop: '10px' }}
-                    placeholder={t('Enter custom purpose', 'Ingrese propósito personalizado')}
+                    placeholder={t('e.g., evaluating potential acquisition of Company X', 'p. ej., evaluar la posible adquisición de la Empresa X')}
                   />
                 )}
               </div>
@@ -989,11 +1054,13 @@ Fecha: _______________________________`
                     />
                     <span>{t('Include standard exclusions clause', 'Incluir cláusula de exclusiones estándar')}</span>
                   </label>
-                  {!formData.includeExclusions && (
-                    <span className="checkbox-warning">
-                      {t('⚠️ Omitting exclusions may make all information confidential', '⚠️ Omitir exclusiones puede hacer que toda la información sea confidencial')}
-                    </span>
-                  )}
+                  <div className={formData.includeExclusions ? 'clause-included-info' : 'checkbox-warning'}>
+                    {formData.includeExclusions 
+                      ? t('✓ Provides exceptions for public information and information already known to receiving party', 
+                          '✓ Proporciona excepciones para información pública e información ya conocida por la parte receptora')
+                      : t('⚠️ Without exclusions, all information may be considered confidential, even publicly available information', 
+                          '⚠️ Sin exclusiones, toda la información puede considerarse confidencial, incluso información disponible públicamente')}
+                  </div>
                   
                   <label className="checkbox-label">
                     <input
@@ -1004,6 +1071,13 @@ Fecha: _______________________________`
                     />
                     <span>{t('Include no warranties clause', 'Incluir cláusula sin garantías')}</span>
                   </label>
+                  <div className={formData.includeNoWarranties ? 'clause-included-info' : 'checkbox-warning'}>
+                    {formData.includeNoWarranties 
+                      ? t('✓ Protects disclosing party from liability for information accuracy', 
+                          '✓ Protege a la parte divulgadora de responsabilidad por la exactitud de la información')
+                      : t('⚠️ Without this clause, disclosing party may have implied warranty obligations', 
+                          '⚠️ Sin esta cláusula, la parte divulgadora puede tener obligaciones implícitas de garantía')}
+                  </div>
                   
                   <label className="checkbox-label">
                     <input
@@ -1014,6 +1088,13 @@ Fecha: _______________________________`
                     />
                     <span>{t('Include severability clause', 'Incluir cláusula de divisibilidad')}</span>
                   </label>
+                  <div className={formData.includeSeverability ? 'clause-included-info' : 'checkbox-warning'}>
+                    {formData.includeSeverability 
+                      ? t('✓ Keeps agreement intact if one provision is found invalid', 
+                          '✓ Mantiene el acuerdo intacto si una disposición se considera inválida')
+                      : t('⚠️ Without severability, entire agreement could be void if one part is invalid', 
+                          '⚠️ Sin divisibilidad, todo el acuerdo podría ser nulo si una parte es inválida')}
+                  </div>
                   
                   <label className="checkbox-label">
                     <input
@@ -1024,6 +1105,13 @@ Fecha: _______________________________`
                     />
                     <span>{t('Include language preference clause (English prevails)', 'Incluir cláusula de preferencia de idioma (prevalece el inglés)')}</span>
                   </label>
+                  <div className={formData.includeLanguageClause ? 'clause-included-info' : 'checkbox-warning'}>
+                    {formData.includeLanguageClause 
+                      ? t('✓ Clarifies which language version controls in case of discrepancies', 
+                          '✓ Aclara qué versión de idioma controla en caso de discrepancias')
+                      : t('⚠️ Without language preference, interpretation issues could arise between versions', 
+                          '⚠️ Sin preferencia de idioma, podrían surgir problemas de interpretación entre versiones')}
+                  </div>
                 </div>
               </div>
             </div>
@@ -1244,7 +1332,7 @@ Fecha: _______________________________`
           <div style={{display: 'flex', gap: '10px'}}>
             <button
               onClick={copyToClipboard}
-              className="nav-button"
+              className="nav-button copy-button"
               style={{backgroundColor: '#4f46e5', color: 'white'}}
             >
               <Icon name="copy" size={16} />
