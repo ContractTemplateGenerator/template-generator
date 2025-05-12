@@ -807,7 +807,12 @@ Fecha: _______________________________`
       <div className="generator-container">
         <div className="header">
           <h1>{t('Dual-Language NDA Generator', 'Generador de Acuerdo de Confidencialidad Bilingüe')}</h1>
-          <p>{t('Create professional NDAs in English and Spanish', 'Cree acuerdos de confidencialidad profesionales en inglés y español')}</p>
+          <div style={{ maxWidth: '800px', margin: '0 auto', lineHeight: '1.5' }}>
+            <p>{t(
+              'Create legally binding non-disclosure agreements in both English and Spanish simultaneously. This tool is designed for international businesses, entrepreneurs, and legal professionals working with US and Latin American companies. Simply fill out the form to generate a professional, dual-column NDA with proper legal terminology in both languages. All documents can be easily customized, downloaded as Word files, or copied to clipboard.', 
+              'Cree acuerdos de confidencialidad legalmente vinculantes en inglés y español simultáneamente. Esta herramienta está diseñada para empresas internacionales, emprendedores y profesionales legales que trabajan con compañías de EE.UU. y América Latina. Simplemente complete el formulario para generar un acuerdo profesional de confidencialidad en formato de doble columna con terminología legal adecuada en ambos idiomas. Todos los documentos pueden personalizarse fácilmente, descargarse como archivos Word o copiarse al portapapeles.'
+            )}</p>
+          </div>
           
           <div className="language-toggle">
             <button
