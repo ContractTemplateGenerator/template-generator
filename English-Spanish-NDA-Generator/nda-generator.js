@@ -27,10 +27,12 @@ const App = () => {
     receivingPartyName: '',
     receivingPartyAddress: '',
     effectiveDate: '',
-    purpose: '',
+    purposeType: 'business',
+    customPurpose: '',
     confidentialityType: 'broad',
     protectionPeriod: '2',
     governingLaw: 'california',
+    customGoverningLaw: '',
     includeExclusions: true,
     includeNoWarranties: true,
     includeSeverability: true,
@@ -42,9 +44,97 @@ const App = () => {
   
   // Ref for preview content
   const previewRef = React.useRef(null);
+  const highlightedRef = React.useRef(null);
   
   // Translation function
   const t = (englishText, spanishText) => language === 'en' ? englishText : spanishText;
+  
+  // US States for governing law
+  const usStates = [
+    { value: 'alabama', label: 'Alabama' },
+    { value: 'alaska', label: 'Alaska' },
+    { value: 'arizona', label: 'Arizona' },
+    { value: 'arkansas', label: 'Arkansas' },
+    { value: 'california', label: 'California' },
+    { value: 'colorado', label: 'Colorado' },
+    { value: 'connecticut', label: 'Connecticut' },
+    { value: 'delaware', label: 'Delaware' },
+    { value: 'florida', label: 'Florida' },
+    { value: 'georgia', label: 'Georgia' },
+    { value: 'hawaii', label: 'Hawaii' },
+    { value: 'idaho', label: 'Idaho' },
+    { value: 'illinois', label: 'Illinois' },
+    { value: 'indiana', label: 'Indiana' },
+    { value: 'iowa', label: 'Iowa' },
+    { value: 'kansas', label: 'Kansas' },
+    { value: 'kentucky', label: 'Kentucky' },
+    { value: 'louisiana', label: 'Louisiana' },
+    { value: 'maine', label: 'Maine' },
+    { value: 'maryland', label: 'Maryland' },
+    { value: 'massachusetts', label: 'Massachusetts' },
+    { value: 'michigan', label: 'Michigan' },
+    { value: 'minnesota', label: 'Minnesota' },
+    { value: 'mississippi', label: 'Mississippi' },
+    { value: 'missouri', label: 'Missouri' },
+    { value: 'montana', label: 'Montana' },
+    { value: 'nebraska', label: 'Nebraska' },
+    { value: 'nevada', label: 'Nevada' },
+    { value: 'newhampshire', label: 'New Hampshire' },
+    { value: 'newjersey', label: 'New Jersey' },
+    { value: 'newmexico', label: 'New Mexico' },
+    { value: 'newyork', label: 'New York' },
+    { value: 'northcarolina', label: 'North Carolina' },
+    { value: 'northdakota', label: 'North Dakota' },
+    { value: 'ohio', label: 'Ohio' },
+    { value: 'oklahoma', label: 'Oklahoma' },
+    { value: 'oregon', label: 'Oregon' },
+    { value: 'pennsylvania', label: 'Pennsylvania' },
+    { value: 'rhodeisland', label: 'Rhode Island' },
+    { value: 'southcarolina', label: 'South Carolina' },
+    { value: 'southdakota', label: 'South Dakota' },
+    { value: 'tennessee', label: 'Tennessee' },
+    { value: 'texas', label: 'Texas' },
+    { value: 'utah', label: 'Utah' },
+    { value: 'vermont', label: 'Vermont' },
+    { value: 'virginia', label: 'Virginia' },
+    { value: 'washington', label: 'Washington' },
+    { value: 'westvirginia', label: 'West Virginia' },
+    { value: 'wisconsin', label: 'Wisconsin' },
+    { value: 'wyoming', label: 'Wyoming' },
+    { value: 'dc', label: 'Washington D.C.' }
+  ];
+  
+  // Spanish-speaking countries
+  const spanishCountries = [
+    { value: 'mexico', label: 'Mexico / México' },
+    { value: 'spain', label: 'Spain / España' },
+    { value: 'argentina', label: 'Argentina' },
+    { value: 'bolivia', label: 'Bolivia' },
+    { value: 'chile', label: 'Chile' },
+    { value: 'colombia', label: 'Colombia' },
+    { value: 'costarica', label: 'Costa Rica' },
+    { value: 'cuba', label: 'Cuba' },
+    { value: 'dominicanrepublic', label: 'Dominican Republic / República Dominicana' },
+    { value: 'ecuador', label: 'Ecuador' },
+    { value: 'elsalvador', label: 'El Salvador' },
+    { value: 'equatorialguinea', label: 'Equatorial Guinea / Guinea Ecuatorial' },
+    { value: 'guatemala', label: 'Guatemala' },
+    { value: 'honduras', label: 'Honduras' },
+    { value: 'nicaragua', label: 'Nicaragua' },
+    { value: 'panama', label: 'Panama / Panamá' },
+    { value: 'paraguay', label: 'Paraguay' },
+    { value: 'peru', label: 'Peru / Perú' },
+    { value: 'puertorico', label: 'Puerto Rico' },
+    { value: 'uruguay', label: 'Uruguay' },
+    { value: 'venezuela', label: 'Venezuela' }
+  ];
+  
+  // Purpose of disclosure options
+  const purposeOptions = [
+    { value: 'business', label: t('To discuss potential business relationship', 'Para discutir una posible relación comercial') },
+    { value: 'services', label: t('To enable receiving party provide services for disclosing party', 'Para permitir que la parte receptora proporcione servicios a la parte divulgadora') },
+    { value: 'custom', label: t('Other (specify)', 'Otro (especificar)') }
+  ];
   
   // Tab configuration
   const tabs = [
@@ -62,10 +152,38 @@ const App = () => {
     setLastChanged(name);
     
     // Update form data
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    if (name === 'purposeType' && value === 'custom') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        customPurpose: prev.customPurpose || prev.purpose || ''
+      }));
+    } else if (name === 'governingLaw' && value === 'custom') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        customGoverningLaw: prev.customGoverningLaw || ''
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
+  };
+  
+  // Get purpose of disclosure text
+  const getPurpose = () => {
+    switch (formData.purposeType) {
+      case 'business':
+        return 'discussing potential business relationship';
+      case 'services':
+        return 'enabling Receiving Party to provide services for Disclosing Party';
+      case 'custom':
+        return formData.customPurpose || '[Purpose of Disclosure]';
+      default:
+        return '[Purpose of Disclosure]';
+    }
   };
   
   // Generate document sections for side-by-side preview
@@ -84,6 +202,14 @@ const App = () => {
       english: `This Agreement is made by ${formData.disclosingPartyName || '[Disclosing Party Name]'} (the "Disclosing Party"), and ${formData.receivingPartyName || '[Receiving Party Name]'} (the "Receiving Party"). (each a "Party" and, collectively, the "Parties").`,
       spanish: `Este Acuerdo es celebrado por ${formData.disclosingPartyName || '[Nombre de la Parte Divulgadora]'} (la "Parte Divulgadora"), y ${formData.receivingPartyName || '[Nombre de la Parte Receptora]'} (la "Parte Receptora"). (cada una, una "Parte" y, en conjunto, las "Partes").`
     });
+    
+    // Addresses 
+    if (formData.disclosingPartyAddress || formData.receivingPartyAddress) {
+      sections.push({
+        english: `Disclosing Party Address: ${formData.disclosingPartyAddress || '[Disclosing Party Address]'}\nReceiving Party Address: ${formData.receivingPartyAddress || '[Receiving Party Address]'}`,
+        spanish: `Dirección de la Parte Divulgadora: ${formData.disclosingPartyAddress || '[Dirección de la Parte Divulgadora]'}\nDirección de la Parte Receptora: ${formData.receivingPartyAddress || '[Dirección de la Parte Receptora]'}`
+      });
+    }
     
     // Effective Date
     sections.push({
@@ -114,8 +240,10 @@ const App = () => {
       isTitle: true
     });
     sections.push({
-      english: `Receiving Party will use Confidential Information only for the purpose of ${formData.purpose || '[Purpose of Disclosure]'}. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`,
-      spanish: `La Parte Receptora utilizará la Información Confidencial únicamente para el propósito de ${formData.purpose || '[Propósito de la Divulgación]'}. La Parte Receptora podrá divulgar Información Confidencial a sus directores, funcionarios, empleados, contratistas, asesores y agentes, siempre que dichas personas tengan la necesidad de conocerla en su trabajo para la Parte Receptora en el desarrollo de la transacción comercial potencial o continua o relación entre las Partes, y estén sujetos a obligaciones de confidencialidad al menos tan restrictivas como las impuestas a la Parte Receptora en este Acuerdo (colectivamente, "Representantes"). La Parte Receptora es totalmente responsable de cualquier incumplimiento de este Acuerdo por parte de sus Representantes. La Parte Receptora utilizará el mismo grado de cuidado, pero no menos que un grado razonable de cuidado, que la Parte Receptora utiliza con respecto a su propia información similar para proteger la Información Confidencial. La Parte Receptora solo podrá divulgar información confidencial según lo autorizado por este Acuerdo.`
+      english: `Receiving Party will use Confidential Information only for the purpose of ${getPurpose()}. Receiving Party may disclose Confidential Information to its directors, officers, employees, contractors, advisors, and agents, so long as such individuals have a need to know in their work for Receiving Party in furtherance of the potential or continued business transaction or relationship between the Parties, and are bound by obligations of confidentiality at least as restrictive as those imposed on Receiving Party in this Agreement, (collectively "Representatives"). Receiving Party is fully liable for any breach of this Agreement by its Representatives. Receiving Party will use the same degree of care, but no less than a reasonable degree of care, as the Receiving Party uses with respect to its own similar information to protect the Confidential Information. Receiving Party may only disclose confidential information as authorized by this Agreement.`,
+      spanish: `La Parte Receptora utilizará la Información Confidencial únicamente para el propósito de ${getPurpose() === 'discussing potential business relationship' ? 'discutir una posible relación comercial' : 
+                (getPurpose() === 'enabling Receiving Party to provide services for Disclosing Party' ? 'permitir que la Parte Receptora proporcione servicios a la Parte Divulgadora' : 
+                formData.customPurpose || '[Propósito de la Divulgación]')}. La Parte Receptora podrá divulgar Información Confidencial a sus directores, funcionarios, empleados, contratistas, asesores y agentes, siempre que dichas personas tengan la necesidad de conocerla en su trabajo para la Parte Receptora en el desarrollo de la transacción comercial potencial o continua o relación entre las Partes, y estén sujetos a obligaciones de confidencialidad al menos tan restrictivas como las impuestas a la Parte Receptora en este Acuerdo (colectivamente, "Representantes"). La Parte Receptora es totalmente responsable de cualquier incumplimiento de este Acuerdo por parte de sus Representantes. La Parte Receptora utilizará el mismo grado de cuidado, pero no menos que un grado razonable de cuidado, que la Parte Receptora utiliza con respecto a su propia información similar para proteger la Información Confidencial. La Parte Receptora solo podrá divulgar información confidencial según lo autorizado por este Acuerdo.`
     });
     
     // Protection Period
@@ -210,9 +338,10 @@ const App = () => {
     });
     
     sections.push({
-      english: "Disclosing Party:",
-      spanish: "Parte Divulgadora:",
-      isTitle: true
+      english: "DISCLOSING PARTY:",
+      spanish: "PARTE DIVULGADORA:",
+      isTitle: true,
+      isSignature: true
     });
     sections.push({
       english: `By: _________________________________
@@ -226,9 +355,10 @@ Fecha: _______________________________`
     });
     
     sections.push({
-      english: "Receiving Party:",
-      spanish: "Parte Receptora:",
-      isTitle: true
+      english: "RECEIVING PARTY:",
+      spanish: "PARTE RECEPTORA:",
+      isTitle: true,
+      isSignature: true
     });
     sections.push({
       english: `By: _________________________________
@@ -273,23 +403,49 @@ Fecha: _______________________________`
   
   // Helper functions for governing law
   const getGoverningLaw = () => {
-    switch (formData.governingLaw) {
-      case 'california': return 'the State of California, USA';
-      case 'delaware': return 'the State of Delaware, USA';
-      case 'newyork': return 'the State of New York, USA';
-      case 'mexico': return 'Mexico';
-      default: return 'the State of California, USA';
+    if (formData.governingLaw === 'custom') {
+      return formData.customGoverningLaw || '[Custom jurisdiction]';
     }
+    
+    // Check if this is a US state
+    const usState = usStates.find(s => s.value === formData.governingLaw);
+    if (usState) {
+      return `the State of ${usState.label}, USA`;
+    }
+    
+    // Check if this is a Spanish-speaking country
+    const spanishCountry = spanishCountries.find(c => c.value === formData.governingLaw);
+    if (spanishCountry) {
+      // Extract just the country name (before the slash if present)
+      const countryName = spanishCountry.label.split(' / ')[0];
+      return countryName;
+    }
+    
+    // Default fallback
+    return 'the State of California, USA';
   };
   
   const getGoverningLawSpanish = () => {
-    switch (formData.governingLaw) {
-      case 'california': return 'el Estado de California, EE.UU.';
-      case 'delaware': return 'el Estado de Delaware, EE.UU.';
-      case 'newyork': return 'el Estado de Nueva York, EE.UU.';
-      case 'mexico': return 'México';
-      default: return 'el Estado de California, EE.UU.';
+    if (formData.governingLaw === 'custom') {
+      return formData.customGoverningLaw || '[Jurisdicción personalizada]';
     }
+    
+    // Check if this is a US state
+    const usState = usStates.find(s => s.value === formData.governingLaw);
+    if (usState) {
+      return `el Estado de ${usState.label}, EE.UU.`;
+    }
+    
+    // Check if this is a Spanish-speaking country
+    const spanishCountry = spanishCountries.find(c => c.value === formData.governingLaw);
+    if (spanishCountry) {
+      // Use Spanish name if available (after the slash)
+      const parts = spanishCountry.label.split(' / ');
+      return parts.length > 1 ? parts[1] : parts[0];
+    }
+    
+    // Default fallback
+    return 'el Estado de California, EE.UU.';
   };
   
   const getJurisdiction = () => {
@@ -297,8 +453,18 @@ Fecha: _______________________________`
       case 'california': return 'Los Angeles, CA';
       case 'delaware': return 'Wilmington, DE';
       case 'newyork': return 'New York, NY';
+      case 'florida': return 'Miami, FL';
+      case 'texas': return 'Houston, TX';
+      case 'illinois': return 'Chicago, IL';
+      case 'pennsylvania': return 'Philadelphia, PA';
       case 'mexico': return 'Mexico City';
-      default: return 'Los Angeles, CA';
+      case 'spain': return 'Madrid';
+      case 'argentina': return 'Buenos Aires';
+      case 'chile': return 'Santiago';
+      case 'colombia': return 'Bogotá';
+      case 'peru': return 'Lima';
+      case 'custom': return formData.customGoverningLaw ? `the courts of ${formData.customGoverningLaw}` : '[Jurisdiction]';
+      default: return 'the courts with jurisdiction';
     }
   };
   
@@ -307,10 +473,128 @@ Fecha: _______________________________`
       case 'california': return 'Los Ángeles, CA';
       case 'delaware': return 'Wilmington, DE';
       case 'newyork': return 'Nueva York, NY';
+      case 'florida': return 'Miami, FL';
+      case 'texas': return 'Houston, TX';
+      case 'illinois': return 'Chicago, IL';
+      case 'pennsylvania': return 'Filadelfia, PA';
       case 'mexico': return 'Ciudad de México';
-      default: return 'Los Ángeles, CA';
+      case 'spain': return 'Madrid';
+      case 'argentina': return 'Buenos Aires';
+      case 'chile': return 'Santiago';
+      case 'colombia': return 'Bogotá';
+      case 'peru': return 'Lima';
+      case 'custom': return formData.customGoverningLaw ? `los tribunales de ${formData.customGoverningLaw}` : '[Jurisdicción]';
+      default: return 'los tribunales con jurisdicción';
     }
   };
+  
+  // Determine which section to highlight based on last changed field
+  const getSectionToHighlight = () => {
+    switch (lastChanged) {
+      case 'disclosingPartyName':
+      case 'receivingPartyName':
+        return 'parties';
+      case 'disclosingPartyAddress':
+      case 'receivingPartyAddress':
+        return 'addresses';
+      case 'effectiveDate':
+        return 'effectiveDate';
+      case 'purposeType':
+      case 'customPurpose':
+        return 'purpose';
+      case 'confidentialityType':
+        return 'confidentiality';
+      case 'protectionPeriod':
+        return 'protectionPeriod';
+      case 'governingLaw':
+      case 'customGoverningLaw':
+        return 'governingLaw';
+      case 'includeExclusions':
+      case 'includeNoWarranties':
+      case 'includeSeverability':
+      case 'includeLanguageClause':
+        return 'options';
+      default:
+        return null;
+    }
+  };
+  
+  // Create highlighted sections
+  const createHighlightedSections = (sections) => {
+    if (!sections || !sections.length) return [];
+    
+    const sectionToHighlight = getSectionToHighlight();
+    if (!sectionToHighlight) return sections;
+    
+    return sections.map((section, index) => {
+      let shouldHighlight = false;
+      
+      switch (sectionToHighlight) {
+        case 'parties':
+          if (!section.isTitle && !section.isHeader && index === 1) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'addresses':
+          if (!section.isTitle && !section.isHeader && index === 2) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'effectiveDate':
+          if (section.english && section.english.includes('effective date') && !section.isTitle) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'purpose':
+          if (section.english && section.english.includes('purpose of') && !section.isTitle) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'confidentiality':
+          if (section.english && section.english.includes('"Confidential Information"')) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'protectionPeriod':
+          if (section.english && section.english.includes('expires') && !section.isTitle) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'governingLaw':
+          if (section.english && section.english.includes('governed by') && !section.isTitle) {
+            shouldHighlight = true;
+          }
+          break;
+        case 'options':
+          // This could highlight multiple sections based on which option was changed
+          if (
+            (lastChanged === 'includeExclusions' && section.english && section.english.includes('EXCLUSIONS')) ||
+            (lastChanged === 'includeNoWarranties' && section.english && section.english.includes('NO WARRANTIES')) ||
+            (lastChanged === 'includeSeverability' && section.english && section.english.includes('SEVERABILITY')) ||
+            (lastChanged === 'includeLanguageClause' && section.english && section.english.includes('PREVAILING LANGUAGE'))
+          ) {
+            shouldHighlight = true;
+          }
+          break;
+      }
+      
+      if (shouldHighlight) {
+        return {
+          ...section,
+          highlight: true
+        };
+      }
+      
+      return section;
+    });
+  };
+  
+  // Scroll to highlighted section
+  React.useEffect(() => {
+    if (highlightedRef.current) {
+      highlightedRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [lastChanged]);
   
   // Copy to clipboard
   const copyToClipboard = () => {
@@ -360,6 +644,31 @@ Fecha: _______________________________`
   };
   
   const sections = generateDocumentSections();
+  const highlightedSections = createHighlightedSections(sections);
+  
+  // Get protection period risk level
+  const getProtectionPeriodRiskLevel = () => {
+    const years = parseInt(formData.protectionPeriod);
+    if (years <= 5) return 'safe';
+    if (years <= 10) return 'moderate';
+    return 'risky';
+  };
+  
+  // Get protection period risk message
+  const getProtectionPeriodRiskMessage = () => {
+    const years = parseInt(formData.protectionPeriod);
+    if (years <= 5) return null;
+    if (years <= 10) {
+      return t(
+        'Protection periods between 5-10 years may be scrutinized by courts in some jurisdictions, but are generally enforceable for truly confidential information.',
+        'Los períodos de protección entre 5 y 10 años pueden ser examinados por los tribunales en algunas jurisdicciones, pero generalmente son ejecutables para información verdaderamente confidencial.'
+      );
+    }
+    return t(
+      'Protection periods over 10 years may be difficult to enforce in court as they can be viewed as unreasonable restraints on business.',
+      'Los períodos de protección de más de 10 años pueden ser difíciles de hacer cumplir en los tribunales, ya que pueden considerarse restricciones irrazonables para los negocios.'
+    );
+  };
   
   return (
     <div className="container">
@@ -509,7 +818,7 @@ Fecha: _______________________________`
               
               <div className="form-group">
                 <div className="label-with-help">
-                  <label htmlFor="purpose">{t('Purpose of Disclosure', 'Propósito de la Divulgación')}</label>
+                  <label htmlFor="purposeType">{t('Purpose of Disclosure', 'Propósito de la Divulgación')}</label>
                   <div className="help-icon">
                     <Icon name="help-circle" size={16} />
                     <div className="tooltip">
@@ -517,15 +826,30 @@ Fecha: _______________________________`
                     </div>
                   </div>
                 </div>
-                <textarea
-                  id="purpose"
-                  name="purpose"
+                <select
+                  id="purposeType"
+                  name="purposeType"
                   className="form-control"
-                  value={formData.purpose}
+                  value={formData.purposeType}
                   onChange={handleChange}
-                  rows="2"
-                  placeholder={t('e.g., evaluating potential business partnership', 'ej., evaluar una posible asociación comercial')}
-                />
+                >
+                  {purposeOptions.map(option => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
+                </select>
+                
+                {formData.purposeType === 'custom' && (
+                  <textarea
+                    id="customPurpose"
+                    name="customPurpose"
+                    className="form-control"
+                    value={formData.customPurpose}
+                    onChange={handleChange}
+                    rows="2"
+                    style={{ marginTop: '10px' }}
+                    placeholder={t('Enter custom purpose', 'Ingrese propósito personalizado')}
+                  />
+                )}
               </div>
               
               <div className="form-group">
@@ -592,9 +916,14 @@ Fecha: _______________________________`
                   min="1"
                   max="25"
                 />
-                {formData.protectionPeriod > 5 && (
+                {formData.protectionPeriod > 10 && (
                   <div className="warning-text">
-                    {t('⚠️ Protection periods over 5 years may be unenforceable', '⚠️ Los períodos de protección de más de 5 años pueden ser inejecutables')}
+                    {t('⚠️ Protection periods over 10 years may be unenforceable', '⚠️ Los períodos de protección de más de 10 años pueden ser inejecutables')}
+                  </div>
+                )}
+                {formData.protectionPeriod > 5 && formData.protectionPeriod <= 10 && (
+                  <div className="moderate-text">
+                    {t('ℹ️ Protection periods of 5-10 years are generally acceptable but may be scrutinized', 'ℹ️ Los períodos de protección de 5-10 años son generalmente aceptables pero pueden ser examinados')}
                   </div>
                 )}
               </div>
@@ -621,11 +950,31 @@ Fecha: _______________________________`
                   value={formData.governingLaw}
                   onChange={handleChange}
                 >
-                  <option value="california">{t('California', 'California')}</option>
-                  <option value="delaware">{t('Delaware', 'Delaware')}</option>
-                  <option value="newyork">{t('New York', 'Nueva York')}</option>
-                  <option value="mexico">{t('Mexico', 'México')}</option>
+                  <optgroup label={t('US States', 'Estados de EE.UU.')}>
+                    {usStates.map(state => (
+                      <option key={state.value} value={state.value}>{state.label}</option>
+                    ))}
+                  </optgroup>
+                  <optgroup label={t('Spanish-Speaking Countries', 'Países Hispanohablantes')}>
+                    {spanishCountries.map(country => (
+                      <option key={country.value} value={country.value}>{country.label}</option>
+                    ))}
+                  </optgroup>
+                  <option value="custom">{t('Custom (write your own)', 'Personalizado (escriba el suyo)')}</option>
                 </select>
+                
+                {formData.governingLaw === 'custom' && (
+                  <input
+                    type="text"
+                    id="customGoverningLaw"
+                    name="customGoverningLaw"
+                    className="form-control"
+                    value={formData.customGoverningLaw}
+                    onChange={handleChange}
+                    style={{ marginTop: '10px' }}
+                    placeholder={t('Enter custom jurisdiction', 'Ingrese jurisdicción personalizada')}
+                  />
+                )}
               </div>
               
               <div className="form-group">
@@ -709,13 +1058,14 @@ Fecha: _______________________________`
                   }
                 </div>
                 
-                <div className={`summary-item ${formData.protectionPeriod > 5 ? 'risky' : 'safe'}`}>
+                <div className={`summary-item ${getProtectionPeriodRiskLevel()}`}>
                   <span className="summary-label">{t('Protection Period', 'Período de Protección')}</span>
                   {formData.protectionPeriod} {t('years', 'años')}
-                  {formData.protectionPeriod > 5 && t(' - May be unenforceable', ' - Puede ser inejecutable')}
+                  {formData.protectionPeriod > 10 && t(' - May be unenforceable', ' - Puede ser inejecutable')}
+                  {formData.protectionPeriod > 5 && formData.protectionPeriod <= 10 && t(' - Monitor for enforceability', ' - Vigilar la aplicabilidad')}
                 </div>
                 
-                <div className={`summary-item ${formData.governingLaw === 'mexico' ? 'moderate' : 'safe'}`}>
+                <div className={`summary-item ${formData.governingLaw === 'custom' ? 'moderate' : 'safe'}`}>
                   <span className="summary-label">{t('Governing Law', 'Ley Aplicable')}</span>
                   {getGoverningLaw()}
                 </div>
@@ -744,21 +1094,109 @@ Fecha: _______________________________`
               
               <div style={{marginTop: '20px', padding: '15px', backgroundColor: '#f3f4f6', borderRadius: '6px'}}>
                 <h3>{t('Risk Analysis', 'Análisis de Riesgos')}</h3>
-                {formData.protectionPeriod > 5 && (
-                  <p className="warning-text">
-                    {t('Long protection period may be difficult to enforce in court.', 'Un período de protección largo puede ser difícil de hacer cumplir en los tribunales.')}
-                  </p>
+                
+                {/* Red warnings */}
+                {(
+                  !formData.disclosingPartyName || 
+                  !formData.receivingPartyName || 
+                  !formData.effectiveDate || 
+                  parseInt(formData.protectionPeriod) > 10 || 
+                  !formData.includeExclusions
+                ) && (
+                  <div className="risk-section risky">
+                    <h4>{t('High Risk Issues', 'Problemas de Alto Riesgo')}</h4>
+                    <ul>
+                      {(!formData.disclosingPartyName || !formData.receivingPartyName) && (
+                        <li className="warning-text">
+                          {t('Missing party information makes the agreement potentially unenforceable as it fails to identify the contracting parties.', 
+                            'La falta de información de las partes hace que el acuerdo sea potencialmente inejecutable, ya que no identifica a las partes contratantes.')}
+                        </li>
+                      )}
+                      {!formData.effectiveDate && (
+                        <li className="warning-text">
+                          {t('No effective date specified. This creates uncertainty about when obligations begin and may affect enforceability.', 
+                            'No se especifica fecha de entrada en vigor. Esto crea incertidumbre sobre cuándo comienzan las obligaciones y puede afectar la aplicabilidad.')}
+                        </li>
+                      )}
+                      {parseInt(formData.protectionPeriod) > 10 && (
+                        <li className="warning-text">
+                          {t('Protection period of over 10 years may be rejected by courts as an unreasonable restraint on business. Many jurisdictions have found that NDAs with excessively long durations are unenforceable, particularly if they restrict employment opportunities.', 
+                            'Un período de protección de más de 10 años puede ser rechazado por los tribunales como una restricción irrazonable para los negocios. Muchas jurisdicciones han determinado que los acuerdos de confidencialidad con duraciones excesivamente largas son inejecutables, especialmente si restringen las oportunidades de empleo.')}
+                        </li>
+                      )}
+                      {!formData.includeExclusions && (
+                        <li className="warning-text">
+                          {t('No exclusions clause means that even public information could be considered confidential. Courts typically view NDAs without standard exclusions as overly broad and potentially unenforceable.', 
+                            'La ausencia de una cláusula de exclusiones significa que incluso la información pública podría considerarse confidencial. Los tribunales generalmente consideran que los acuerdos de confidencialidad sin exclusiones estándar son excesivamente amplios y potencialmente inejecutables.')}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
                 )}
-                {!formData.includeExclusions && (
-                  <p className="warning-text">
-                    {t('Without standard exclusions, even public information might be considered confidential.', 'Sin exclusiones estándar, incluso la información pública podría considerarse confidencial.')}
-                  </p>
+                
+                {/* Yellow warnings */}
+                {(
+                  formData.confidentialityType === 'broad' || 
+                  (parseInt(formData.protectionPeriod) > 5 && parseInt(formData.protectionPeriod) <= 10) || 
+                  !formData.includeSeverability || 
+                  !formData.includeLanguageClause ||
+                  formData.governingLaw === 'custom'
+                ) && (
+                  <div className="risk-section moderate">
+                    <h4>{t('Moderate Risk Issues', 'Problemas de Riesgo Moderado')}</h4>
+                    <ul>
+                      {formData.confidentialityType === 'broad' && (
+                        <li className="moderate-text">
+                          {t('Broad confidentiality definition may be difficult to enforce if challenged. While protecting more information, courts may scrutinize overly broad definitions, especially if they cover information that should reasonably be known by the recipient.', 
+                            'Una definición amplia de confidencialidad puede ser difícil de hacer cumplir si se impugna. Si bien protege más información, los tribunales pueden examinar definiciones excesivamente amplias, especialmente si cubren información que razonablemente debería ser conocida por el receptor.')}
+                        </li>
+                      )}
+                      {parseInt(formData.protectionPeriod) > 5 && parseInt(formData.protectionPeriod) <= 10 && (
+                        <li className="moderate-text">
+                          {t('Protection period of 5-10 years is generally enforceable for truly confidential information but may be scrutinized in some jurisdictions. Consider if this duration is truly necessary for your business needs.', 
+                            'Un período de protección de 5 a 10 años generalmente es aplicable para información verdaderamente confidencial, pero puede ser examinado en algunas jurisdicciones. Considere si esta duración es realmente necesaria para sus necesidades comerciales.')}
+                        </li>
+                      )}
+                      {!formData.includeSeverability && (
+                        <li className="moderate-text">
+                          {t('Without a severability clause, if one provision is found invalid, the entire agreement could be at risk. This creates unnecessary legal vulnerability.', 
+                            'Sin una cláusula de divisibilidad, si una disposición se considera inválida, todo el acuerdo podría estar en riesgo. Esto crea una vulnerabilidad legal innecesaria.')}
+                        </li>
+                      )}
+                      {!formData.includeLanguageClause && (
+                        <li className="moderate-text">
+                          {t('No language preference clause creates ambiguity in a dual-language agreement. In case of disputes, it may be unclear which version controls interpretation.', 
+                            'La ausencia de una cláusula de preferencia de idioma crea ambigüedad en un acuerdo bilingüe. En caso de disputas, puede no estar claro qué versión controla la interpretación.')}
+                        </li>
+                      )}
+                      {formData.governingLaw === 'custom' && (
+                        <li className="moderate-text">
+                          {t('Custom governing law may create uncertainty if not clearly defined. Ensure the jurisdiction specified has clear laws regarding confidentiality agreements.', 
+                            'Una ley aplicable personalizada puede crear incertidumbre si no está claramente definida. Asegúrese de que la jurisdicción especificada tenga leyes claras sobre acuerdos de confidencialidad.')}
+                        </li>
+                      )}
+                    </ul>
+                  </div>
                 )}
-                {formData.governingLaw === 'mexico' && formData.includeLanguageClause && (
-                  <p className="warning-text">
-                    {t('Mexican law with English language preference may cause enforcement issues.', 'La ley mexicana con preferencia del idioma inglés puede causar problemas de aplicación.')}
-                  </p>
-                )}
+                
+                {/* Best practices */}
+                <div className="risk-section safe">
+                  <h4>{t('Best Practices', 'Mejores Prácticas')}</h4>
+                  <ul>
+                    <li>
+                      {t('Always ensure both parties have legal capacity to enter the agreement and clearly identify authorized signatories with proper titles.', 
+                        'Asegúrese siempre de que ambas partes tengan capacidad legal para celebrar el acuerdo e identifique claramente a los firmantes autorizados con los títulos adecuados.')}
+                    </li>
+                    <li>
+                      {t('For cross-border agreements, consult with legal counsel familiar with both jurisdictions to ensure compliance with local laws.', 
+                        'Para acuerdos transfronterizos, consulte con un asesor legal familiarizado con ambas jurisdicciones para garantizar el cumplimiento de las leyes locales.')}
+                    </li>
+                    <li>
+                      {t('Keep signed copies securely stored and ensure both parties receive fully executed original copies.', 
+                        'Mantenga las copias firmadas almacenadas de forma segura y asegúrese de que ambas partes reciban copias originales completamente ejecutadas.')}
+                    </li>
+                  </ul>
+                </div>
               </div>
             </div>
           </div>
@@ -771,11 +1209,19 @@ Fecha: _______________________________`
             <div ref={previewRef} className="dual-column-preview">
               <table className="preview-table">
                 <tbody>
-                  {sections.map((section, index) => (
-                    <tr key={index} className={section.isTitle ? 'title-row' : ''}>
-                      <td className="english-column">{section.english}</td>
+                  {highlightedSections.map((section, index) => (
+                    <tr 
+                      key={index} 
+                      className={`${section.isTitle ? 'title-row' : ''} ${section.isSignature ? 'signature-row' : ''}`}
+                      ref={section.highlight ? highlightedRef : null}
+                    >
+                      <td className={`english-column ${section.highlight ? 'highlighted-text' : ''}`}>
+                        {section.english}
+                      </td>
                       <td className="separator"></td>
-                      <td className="spanish-column">{section.spanish}</td>
+                      <td className={`spanish-column ${section.highlight ? 'highlighted-text' : ''}`}>
+                        {section.spanish}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

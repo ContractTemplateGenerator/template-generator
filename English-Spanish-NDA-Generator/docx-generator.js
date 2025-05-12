@@ -8,7 +8,7 @@ window.generateWordDoc = function(sections, formData) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Dual-Language NDA | ${formData.disclosingPartyName} and ${formData.receivingPartyName}</title>
+<title>Dual-Language NDA | ${formData.disclosingPartyName || 'Confidentiality Agreement'} and ${formData.receivingPartyName || ''}</title>
 <style>
   @page {
     margin: 0.5in;
@@ -41,6 +41,10 @@ window.generateWordDoc = function(sections, formData) {
   .page-break {
     page-break-before: always;
   }
+  .signature {
+    font-weight: bold;
+    text-transform: uppercase;
+  }
 </style>
 </head>
 <body>
@@ -61,6 +65,8 @@ window.generateWordDoc = function(sections, formData) {
       
       if (section.isHeader) {
         htmlContent += '<h2 style="text-align: center;">' + section.english + '</h2>';
+      } else if (section.isTitle && section.isSignature) {
+        htmlContent += '<strong class="signature">' + section.english + '</strong>';
       } else if (section.isTitle) {
         htmlContent += '<strong>' + section.english + '</strong>';
       } else {
@@ -81,6 +87,8 @@ window.generateWordDoc = function(sections, formData) {
       
       if (section.isHeader) {
         htmlContent += '<h2 style="text-align: center;">' + section.spanish + '</h2>';
+      } else if (section.isTitle && section.isSignature) {
+        htmlContent += '<strong class="signature">' + section.spanish + '</strong>';
       } else if (section.isTitle) {
         htmlContent += '<strong>' + section.spanish + '</strong>';
       } else {
@@ -103,7 +111,17 @@ window.generateWordDoc = function(sections, formData) {
     // Create download link and trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Dual-Language-NDA-${formData.disclosingPartyName}-${formData.receivingPartyName}.doc`;
+    
+    // Create a filename with the parties' names if available
+    let filename = 'Dual-Language-NDA';
+    if (formData.disclosingPartyName && formData.receivingPartyName) {
+      // Clean up names for filename (remove special characters)
+      const disclosingPartyName = formData.disclosingPartyName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 20);
+      const receivingPartyName = formData.receivingPartyName.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 20);
+      filename = `NDA-${disclosingPartyName}-${receivingPartyName}`;
+    }
+    
+    link.download = `${filename}.doc`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
