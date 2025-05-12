@@ -98,7 +98,7 @@ function SeparationAgreementGenerator() {
 
   // Generate document text based on form data
   const generateDocumentText = () => {
-    let text = `<h1 class="document-title">${formData.documentTitle}</h1>
+    let text = `<h1 class="document-title">${formData.documentTitle.toUpperCase()}</h1>
 
 <p>This Separation and Release Agreement (the "Agreement") is entered into by and between <strong>${formData.companyName}</strong>, a California limited liability company with its principal place of business at ${formData.companyAddress} (the "Company") and <strong>${formData.employeeName || "[EMPLOYEE NAME]"}</strong>, an individual residing at ${formData.employeeAddress || "[EMPLOYEE ADDRESS]"} (the "Employee"). The Company and Employee are collectively referred to as the "Parties."</p>
 
@@ -576,11 +576,44 @@ function SeparationAgreementGenerator() {
       // Extract the text content
       const textContent = tempDiv.textContent || tempDiv.innerText;
       
-      navigator.clipboard.writeText(textContent).then(() => {
-        alert("Document copied to clipboard!");
-      });
+      // Alternative copy method if navigator.clipboard fails
+      const copyUsingTextArea = () => {
+        const textarea = document.createElement('textarea');
+        textarea.value = textContent;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        
+        try {
+          const successful = document.execCommand('copy');
+          if (successful) {
+            alert("Document copied to clipboard!");
+          } else {
+            throw new Error("Copy command failed");
+          }
+        } catch (err) {
+          console.error("Failed to copy using execCommand:", err);
+          alert("Failed to copy to clipboard. Please try again.");
+        }
+        
+        document.body.removeChild(textarea);
+      };
+      
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(textContent)
+          .then(() => {
+            alert("Document copied to clipboard!");
+          })
+          .catch((err) => {
+            console.error("Clipboard API failed:", err);
+            copyUsingTextArea(); // Fallback
+          });
+      } else {
+        copyUsingTextArea(); // Fallback for browsers without clipboard API
+      }
     } catch (error) {
-      console.error("Failed to copy: ", error);
+      console.error("Failed to copy:", error);
       alert("Failed to copy to clipboard. Please try again.");
     }
   };
