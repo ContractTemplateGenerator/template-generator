@@ -1,5 +1,20 @@
 const { useState, useEffect, useRef } = React;
 
+// Helper function to format dates
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  
+  try {
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) return dateString;
+    
+    const options = { year: 'numeric', month: 'long', day: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  } catch (e) {
+    return dateString;
+  }
+};
+
 function SeparationAgreementGenerator() {
   // Configuration for tabs
   const tabs = [
@@ -56,6 +71,7 @@ function SeparationAgreementGenerator() {
     
     // Post-Employment
     includeConfidentiality: true,
+    confidentialityPeriod: '24', // Time in months
     includeNonSolicitation: true,
     nonSolicitationPeriod: '12',
     includeCooperation: true,
@@ -88,9 +104,9 @@ function SeparationAgreementGenerator() {
 
 <h2>RECITALS</h2>
 
-<p>WHEREAS, Employee has been employed by the Company as a ${formData.employeeTitle || "[TITLE]"} since ${formData.employeeStartDate || "[START DATE]"};</p>
+<p>WHEREAS, Employee has been employed by the Company as a ${formData.employeeTitle || "[TITLE]"} since ${formatDate(formData.employeeStartDate) || "[START DATE]"};</p>
 
-<p>WHEREAS, Employee's employment with the Company will end effective ${formData.separationDate || "[SEPARATION DATE]"} (the "Separation Date");</p>
+<p>WHEREAS, Employee's employment with the Company will end effective ${formatDate(formData.separationDate) || "[SEPARATION DATE]"} (the "Separation Date");</p>
 
 <p>WHEREAS, the Parties wish to resolve any and all disputes, claims, complaints, grievances, charges, actions, petitions, and demands that the Employee may have against the Company, including, but not limited to, any and all claims arising out of or in any way related to Employee's employment with or separation from the Company;</p>
 
@@ -108,33 +124,33 @@ function SeparationAgreementGenerator() {
         </ol>
     </li>
 
-    <li>
+    <li class="section-space">
         <strong>FINAL COMPENSATION AND BENEFITS</strong>
         <ol type="a">
-            <li><strong>Final Pay</strong>: The Company will pay Employee all accrued salary earned through the Separation Date, subject to standard payroll deductions and withholdings, on ${formData.finalPayDate || "the Company's next regular payroll date following the Separation Date"}.</li>
+            <li><strong>Final Pay</strong>: The Company will pay Employee all accrued salary earned through the Separation Date, subject to standard payroll deductions and withholdings, on ${formData.finalPayDate ? formatDate(formData.finalPayDate) : "the Company's next regular payroll date following the Separation Date"}.</li>
             ${formData.includeAccruedPTO ? formData.ptoHandling === 'payout' ? 
-            '<li><strong>Accrued Paid Time Off</strong>: The Company will pay Employee for all accrued and unused paid time off earned through the Separation Date, subject to standard payroll deductions and withholdings, on ' + (formData.finalPayDate || "the Company's next regular payroll date following the Separation Date") + '.</li>' : 
+            '<li><strong>Accrued Paid Time Off</strong>: The Company will pay Employee for all accrued and unused paid time off earned through the Separation Date, subject to standard payroll deductions and withholdings, on ' + (formData.finalPayDate ? formatDate(formData.finalPayDate) : "the Company's next regular payroll date following the Separation Date") + '.</li>' : 
             formData.ptoHandling === 'burndown' ? 
             '<li><strong>Accrued Paid Time Off</strong>: Employee will be scheduled to use all accrued and unused paid time off between the date of this Agreement and the Separation Date.</li>' : 
             formData.ptoHandling === 'both' && formData.ptoInstructions ? 
             '<li><strong>Accrued Paid Time Off</strong>: ' + formData.ptoInstructions + '</li>' : 
-            '<li><strong>Accrued Paid Time Off</strong>: The Company will pay Employee for all accrued and unused paid time off earned through the Separation Date, subject to standard payroll deductions and withholdings, on ' + (formData.finalPayDate || "the Company's next regular payroll date following the Separation Date") + '.</li>' : ''}
-            <li><strong>Benefits</strong>: Employee's eligibility to participate in the Company's group health insurance plan will end on ${formData.benefitsEndDate || "[BENEFITS END DATE]"}. Thereafter, Employee may be eligible to continue health insurance coverage under COBRA at Employee's own expense. Employee will receive information regarding COBRA continuation coverage under separate cover.</li>
+            '<li><strong>Accrued Paid Time Off</strong>: The Company will pay Employee for all accrued and unused paid time off earned through the Separation Date, subject to standard payroll deductions and withholdings, on ' + (formData.finalPayDate ? formatDate(formData.finalPayDate) : "the Company's next regular payroll date following the Separation Date") + '.</li>' : ''}
+            <li><strong>Benefits</strong>: Employee's eligibility to participate in the Company's group health insurance plan will end on ${formData.benefitsEndDate ? formatDate(formData.benefitsEndDate) : "[BENEFITS END DATE]"}. Thereafter, Employee may be eligible to continue health insurance coverage under COBRA at Employee's own expense. Employee will receive information regarding COBRA continuation coverage under separate cover.</li>
             <li><strong>Expense Reimbursement</strong>: The Company will reimburse Employee for all reasonable business expenses incurred prior to the Separation Date, provided that Employee submits all expense reports within ${formData.expenseReportDeadline} days after the Separation Date.</li>
         </ol>
     </li>
 
-    <li>
+    <li class="section-space">
         <strong>SEPARATION CONSIDERATION</strong>
         <p>In consideration for the release of claims and other promises made by Employee in this Agreement, and provided that Employee signs this Agreement and complies with its terms, the Company agrees to provide the following separation benefits, which Employee acknowledges and agrees are benefits to which Employee would not otherwise be entitled:</p>
         <ol type="a">
-            ${formData.includeExtendedBenefits ? '<li><strong>Extended Benefits</strong>: The Company will continue to provide Employee with health insurance coverage at the Company\'s expense through ' + (formData.extendedBenefitsEndDate || "[EXTENDED BENEFITS END DATE]") + '. This continuation of benefits shall be inclusive of any benefits to which Employee would be entitled under COBRA during this period. After ' + (formData.extendedBenefitsEndDate || "[EXTENDED BENEFITS END DATE]") + ', Employee may elect to continue coverage at Employee\'s own expense under COBRA.</li>' : ''}
+            ${formData.includeExtendedBenefits ? '<li><strong>Extended Benefits</strong>: The Company will continue to provide Employee with health insurance coverage at the Company\'s expense through ' + (formData.extendedBenefitsEndDate ? formatDate(formData.extendedBenefitsEndDate) : "[EXTENDED BENEFITS END DATE]") + '. This continuation of benefits shall be inclusive of any benefits to which Employee would be entitled under COBRA during this period. After ' + (formData.extendedBenefitsEndDate ? formatDate(formData.extendedBenefitsEndDate) : "[EXTENDED BENEFITS END DATE]") + ', Employee may elect to continue coverage at Employee\'s own expense under COBRA.</li>' : ''}
             ${formData.includeSeverance ? '<li><strong>Severance Payment</strong>: The Company will pay Employee a severance payment in the amount of ' + (formData.severanceAmount || "[AMOUNT]") + ', less applicable withholdings and deductions, to be paid ' + (formData.severancePaymentStructure === 'lump-sum' ? 'in a lump sum on [PAYMENT DATE]' : `in installments as follows: ${formData.installmentDetails || "[INSTALLMENT DETAILS]"}`) + '.</li>' : ''}
         </ol>
     </li>
 
     ${formData.includeGeneralRelease ? `
-    <li>
+    <li class="section-space">
         <strong>GENERAL RELEASE OF CLAIMS</strong>
         <ol type="a">
             <li>In exchange for the consideration provided in this Agreement, Employee hereby generally and completely releases the Company and its current and former directors, officers, employees, shareholders, partners, agents, attorneys, predecessors, successors, parent and subsidiary entities, insurers, affiliates, and assigns (collectively, the "Released Parties") from any and all claims, liabilities, demands, causes of action, and obligations, both known and unknown, that Employee may have or has ever had against the Released Parties, or any of them, arising out of or in any way related to events, acts, conduct, or omissions occurring prior to or on the date Employee signs this Agreement (collectively, the "Released Claims").</li>
@@ -151,7 +167,7 @@ function SeparationAgreementGenerator() {
     </li>` : ''}
 
     ${formData.includeCaliforniaSpecific ? `
-    <li>
+    <li class="section-space">
         <strong>WAIVER OF UNKNOWN CLAIMS</strong>
         <p>Employee acknowledges that Employee has read and understands Section 1542 of the California Civil Code which reads as follows:</p>
         <p>"A general release does not extend to claims that the creditor or releasing party does not know or suspect to exist in his or her favor at the time of executing the release and that, if known by him or her, would have materially affected his or her settlement with the debtor or released party."</p>
@@ -184,7 +200,7 @@ function SeparationAgreementGenerator() {
     </li>` : ''}
 
     ${formData.includeReturnOfProperty ? `
-    <li>
+    <li class="section-space">
         <strong>CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY</strong>
         <ol type="a">
             <li>Employee agrees to maintain in complete confidence the existence of this Agreement, the contents and terms of this Agreement, and the consideration for this Agreement (collectively, the "Separation Information"). Employee may disclose the Separation Information only to Employee's immediate family members, legal and financial advisors, and as required by law.</li>
@@ -193,9 +209,9 @@ function SeparationAgreementGenerator() {
     </li>` : ''}
 
     ${formData.includeConfidentiality ? `
-    <li>
+    <li class="section-space">
         <strong>CONFIDENTIALITY OBLIGATIONS</strong>
-        <p>Employee acknowledges and reaffirms Employee's continuing obligations under any Confidentiality Agreement that Employee previously executed, including but not limited to, promises to protect all confidential and proprietary information of the Company and to refrain from soliciting the Company's employees or customers for a specified period.</p>
+        <p>Employee acknowledges and reaffirms Employee's continuing obligations under any Confidentiality Agreement that Employee previously executed, including but not limited to, promises to protect all confidential and proprietary information of the Company and to refrain from soliciting the Company's employees or customers for a period of ${formData.confidentialityPeriod} months following the Separation Date.</p>
     </li>` : ''}
 
     ${formData.includeNonSolicitation ? `
@@ -288,10 +304,28 @@ function SeparationAgreementGenerator() {
     const { name, value, type, checked } = e.target;
     
     // Update form data
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      };
+      
+      // Special handling for employee age selection
+      if (name === 'employeeAge' && value === 'over40') {
+        // If employee is over 40, ensure ADEA compliance
+        return {
+          ...newData,
+          includeADEARelease: true,
+          reviewPeriod: '21',
+          revocationPeriod: '7'
+        };
+      } else if (name === 'employeeAge' && value === 'under40') {
+        // Different requirements for under 40
+        return newData;
+      }
+      
+      return newData;
+    });
     
     // Record the field that was changed for highlighting
     setLastChanged(name);
@@ -317,21 +351,23 @@ function SeparationAgreementGenerator() {
       employeeName: 'strong:contains("' + (formData.employeeName || "[EMPLOYEE NAME]") + '")',
       employeeAddress: 'p:contains("' + (formData.employeeAddress || "[EMPLOYEE ADDRESS]") + '")',
       employeeTitle: 'p:contains("' + (formData.employeeTitle || "[TITLE]") + '")',
-      employeeStartDate: 'p:contains("' + (formData.employeeStartDate || "[START DATE]") + '")',
+      employeeStartDate: 'p:contains("' + formatDate(formData.employeeStartDate) + '")',
+      employeeAge: formData.employeeAge === 'over40' ? 
+                   'li:contains("REVIEW PERIOD"), li:contains("REVOCATION PERIOD")' : null,
       
       // Separation Details
-      separationDate: 'p:contains("' + (formData.separationDate || "[SEPARATION DATE]") + '")',
+      separationDate: 'p:contains("' + formatDate(formData.separationDate) + '")',
       voluntaryResignation: 'li:contains("VOLUNTARY RESIGNATION"), li:contains("SEPARATION OF EMPLOYMENT")',
       includeNonRehire: 'li:contains("Employee acknowledges that the Company has no obligation to employ")',
       
       // Compensation
-      finalPayDate: 'li:contains("' + (formData.finalPayDate || "the Company's next regular payroll date") + '")',
+      finalPayDate: 'li:contains("' + (formatDate(formData.finalPayDate) || "the Company's next regular payroll date") + '")',
       ptoHandling: 'li:contains("Accrued Paid Time Off")',
       ptoInstructions: 'li:contains("Accrued Paid Time Off")',
       includeAccruedPTO: 'li:contains("Accrued Paid Time Off")',
-      benefitsEndDate: 'li:contains("' + (formData.benefitsEndDate || "[BENEFITS END DATE]") + '")',
+      benefitsEndDate: 'li:contains("' + (formatDate(formData.benefitsEndDate) || "[BENEFITS END DATE]") + '")',
       includeExtendedBenefits: 'li:contains("Extended Benefits")',
-      extendedBenefitsEndDate: 'li:contains("' + (formData.extendedBenefitsEndDate || "[EXTENDED BENEFITS END DATE]") + '")',
+      extendedBenefitsEndDate: 'li:contains("' + (formatDate(formData.extendedBenefitsEndDate) || "[EXTENDED BENEFITS END DATE]") + '")',
       expenseReportDeadline: 'li:contains("' + formData.expenseReportDeadline + ' days")',
       includeSeverance: 'li:contains("Severance Payment")',
       severanceAmount: 'li:contains("' + (formData.severanceAmount || "[AMOUNT]") + '")',
@@ -347,8 +383,9 @@ function SeparationAgreementGenerator() {
       
       // Post-Employment
       includeConfidentiality: 'li:contains("CONFIDENTIALITY OBLIGATIONS")',
+      confidentialityPeriod: 'p:contains("' + formData.confidentialityPeriod + ' months following")',
       includeNonSolicitation: 'li:contains("NON-SOLICITATION")',
-      nonSolicitationPeriod: 'p:contains("' + formData.nonSolicitationPeriod + ' months")',
+      nonSolicitationPeriod: 'p:contains("' + formData.nonSolicitationPeriod + ' months after")',
       includeCooperation: 'li:contains("COOPERATION")',
       includeNonDisparagement: 'li:contains("NON-DISPARAGEMENT")',
       includeReturnOfProperty: 'li:contains("RETURN OF COMPANY PROPERTY")',
@@ -472,10 +509,13 @@ function SeparationAgreementGenerator() {
             searchText = formData.employeeTitle || "[TITLE]";
             break;
           case 'employeeStartDate':
-            searchText = formData.employeeStartDate || "[START DATE]";
+            searchText = formatDate(formData.employeeStartDate) || "[START DATE]";
             break;
           case 'separationDate':
-            searchText = formData.separationDate || "[SEPARATION DATE]";
+            searchText = formatDate(formData.separationDate) || "[SEPARATION DATE]";
+            break;
+          case 'employeeAge':
+            searchText = formData.employeeAge === 'over40' ? formData.reviewPeriod : '';
             break;
           // Add more cases as needed
           default:
@@ -644,11 +684,11 @@ function SeparationAgreementGenerator() {
       });
     }
     
-    // Add specific advice based on the conversation with Kevin
+    // Add specific advice based on common best practices
     if (formData.voluntaryResignation) {
       goodPractices.push({
         title: "Framed as Voluntary Resignation",
-        description: "As discussed, framing the separation as a voluntary resignation helps the employee save face and can reduce the risk of claims."
+        description: "Framing the separation as a voluntary resignation helps the employee save face and can reduce the risk of claims."
       });
     }
     
@@ -669,33 +709,60 @@ function SeparationAgreementGenerator() {
     return { issues, warnings, goodPractices };
   };
 
-  // Help text for fields (based on conversation with Kevin)
+  // Help text for fields
   const getHelpText = (field) => {
     const helpTextMap = {
-      employeeAge: "Knowing if the employee is over 40 is important for ADEA compliance. The Age Discrimination in Employment Act requires specific review and revocation periods.",
+      employeeAge: "Knowing if the employee is over 40 is important for Age Discrimination in Employment Act (ADEA) compliance, which requires specific review and revocation periods for age-related claims releases.",
       
-      voluntaryResignation: "Framing the separation as a voluntary resignation helps the employee save face and may reduce the risk of claims. As discussed with Kevin, this is often the preferred approach for performance-related separations.",
+      voluntaryResignation: "Framing the separation as a voluntary resignation helps the employee save face and may reduce the risk of claims. This is often the preferred approach for performance-related separations.",
       
-      ptoHandling: "You can either pay out unused PTO, have the employee use it before separation (burn-down), or a combination. The burn-down approach lets you pay the same amount while the employee remains covered by benefits during that period.",
+      ptoHandling: "There are three approaches: pay out unused PTO, have the employee use it before separation (burn-down), or a combination. The burn-down approach can be cost-effective while keeping the employee covered by benefits during that period.",
       
-      reviewPeriod: "For employees over 40, ADEA requires a 21-day review period for a valid release of age claims. For younger employees, a shorter period may be appropriate but still provides proof the agreement wasn't rushed.",
+      reviewPeriod: "For employees over 40, ADEA requires a 21-day review period for a valid release of age claims. For younger employees, a shorter period (7-14 days) is common but should still provide sufficient time to consult with an attorney.",
       
-      revocationPeriod: "For employees over 40, ADEA requires a 7-day revocation period. For younger employees, a shorter period (3-5 days) is common. This cooling-off period helps show the release was voluntary.",
+      revocationPeriod: "For employees over 40, ADEA requires a 7-day revocation period. For younger employees, a shorter cooling-off period (3-5 days) helps show the release was voluntary and not signed under duress.",
       
-      includeExtendedBenefits: "As discussed with Kevin, extending benefits through the end of the month provides a clean transition. This can make the agreement more appealing to the employee without significant additional cost.",
+      includeExtendedBenefits: "Extending benefits beyond the separation date (often through the end of the month) provides a clean transition. This can make the agreement more appealing to the employee without significant additional cost.",
       
-      severancePaymentStructure: "Lump sum payments are simpler administratively. Installments can help ensure continued compliance and spread out the financial impact.",
+      severancePaymentStructure: "Lump sum payments are administratively simpler. Installments provide leverage for continued compliance with the agreement's terms and spread out the financial impact.",
       
-      includeNonRehire: "This provision prevents the employee from seeking future employment with the company. Important for employees with performance or behavioral issues as mentioned in Kevin's case."
+      includeNonRehire: "Prevents the employee from seeking future employment with the company. Important for employees with performance or behavioral issues.",
+      
+      includeGeneralRelease: "A comprehensive release of claims protects the company from future lawsuits related to the employment relationship or its termination.",
+      
+      includeADEARelease: "ADEA release is essential if the employee is 40 or older. It specifically covers age discrimination claims but requires strict compliance with timing requirements.",
+      
+      includeCaliforniaSpecific: "California Civil Code §1542 waiver ensures the release covers unknown claims that exist at the time of signing. Critical for California employees.",
+      
+      confidentialityPeriod: "Specifies how long the employee must maintain confidentiality regarding company information. Longer periods provide more protection but may face enforceability challenges if excessive.",
+      
+      includeNonSolicitation: "Prevents the employee from recruiting your other employees for a specified period after departure. Protects your workforce stability.",
+      
+      includeCooperation: "Ensures the employee will assist with transition matters and any legal proceedings where they have relevant knowledge. Valuable for continuity and risk management.",
+      
+      includeNonDisparagement: "Prevents the employee from making negative statements about your company. Protects your reputation during and after the separation.",
+      
+      includeNoAdmission: "Explicitly states that the agreement does not constitute an admission of wrongdoing. Important legal protection against the agreement being used as evidence in other contexts.",
+      
+      includeCounterparts: "Allows for signing the agreement in separate copies, which is convenient when parties are in different locations.",
+      
+      includeGoverningLaw: "Specifies which state's laws apply to the agreement. Usually the employer's principal place of business.",
+      
+      includeEntireAgreement: "Prevents claims based on alleged verbal promises or side agreements not included in the written document."
     };
     
     return helpTextMap[field] || null;
   };
 
-  // Icon for help tooltips
-  const HelpIcon = ({ text }) => (
-    <span className="help-icon" title={text}>?</span>
-  );
+  // Custom tooltip component
+  const HelpIcon = ({ field }) => {
+    const tooltipText = getHelpText(field);
+    if (!tooltipText) return null;
+    
+    return (
+      <span className="help-icon" data-tooltip={tooltipText}>?</span>
+    );
+  };
 
   // Date input component with calendar picker
   const DateInput = ({ name, value, onChange, placeholder }) => {
@@ -832,7 +899,7 @@ function SeparationAgreementGenerator() {
               <div className="form-group">
                 <label className="form-label">
                   Employee Age Range: 
-                  {getHelpText('employeeAge') && <HelpIcon text={getHelpText('employeeAge')} />}
+                  <HelpIcon field="employeeAge" />
                 </label>
                 <select
                   name="employeeAge"
@@ -844,9 +911,10 @@ function SeparationAgreementGenerator() {
                   <option value="under40">Under 40</option>
                   <option value="over40">40 or Older</option>
                 </select>
-                {getHelpText('employeeAge') && (
-                  <p className="help-text">{getHelpText('employeeAge')}</p>
-                )}
+                <p className="help-text">
+                  Important for determining appropriate review and revocation periods. 
+                  Employees 40 or older require specific protections under the Age Discrimination in Employment Act.
+                </p>
               </div>
             </div>
             
@@ -864,7 +932,7 @@ function SeparationAgreementGenerator() {
                   placeholder="June 30, 2025"
                 />
                 <p className="help-text">
-                  This is the date when employment officially ends. For the "June exit" strategy discussed with Kevin, select a date in early June.
+                  This is the date when employment officially ends. Consider choosing a date that provides a clean transition at the end of a pay period.
                 </p>
               </div>
               
@@ -878,11 +946,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="voluntaryResignation" className="checkbox-label">
-                  Frame as voluntary resignation {getHelpText('voluntaryResignation') && <HelpIcon text={getHelpText('voluntaryResignation')} />}
+                  Frame as voluntary resignation <HelpIcon field="voluntaryResignation" />
                 </label>
-                {getHelpText('voluntaryResignation') && (
-                  <p className="help-text">{getHelpText('voluntaryResignation')}</p>
-                )}
+                <p className="checkbox-explanation">
+                  Framing as a resignation helps the employee save face and may reduce the risk of claims. 
+                  This is often the preferred approach for performance-related separations.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -895,15 +964,16 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeNonRehire" className="checkbox-label">
-                  Include non-rehire provision {getHelpText('includeNonRehire') && <HelpIcon text={getHelpText('includeNonRehire')} />}
+                  Include non-rehire provision <HelpIcon field="includeNonRehire" />
                 </label>
-                {getHelpText('includeNonRehire') && (
-                  <p className="help-text">{getHelpText('includeNonRehire')}</p>
-                )}
+                <p className="checkbox-explanation">
+                  Prevents the employee from seeking future employment with the company.
+                  Important for employees with performance or behavioral issues.
+                </p>
               </div>
               
               <div className="info-box">
-                <strong>Note:</strong> As discussed with Kevin, framing the separation as a voluntary resignation is often preferred for performance-related separations. It helps the employee save face while still providing the company with the protection of a release of claims.
+                <strong>Note:</strong> Framing the separation as a voluntary resignation is often preferred for performance-related separations. It helps the employee save face while still providing the company with the protection of a release of claims.
               </div>
             </div>
             
@@ -924,7 +994,7 @@ function SeparationAgreementGenerator() {
               
               <div className="form-group">
                 <label className="form-label">
-                  PTO Handling: {getHelpText('ptoHandling') && <HelpIcon text={getHelpText('ptoHandling')} />}
+                  PTO Handling: <HelpIcon field="ptoHandling" />
                 </label>
                 <select
                   name="ptoHandling"
@@ -936,9 +1006,10 @@ function SeparationAgreementGenerator() {
                   <option value="burndown">Have employee use PTO before separation</option>
                   <option value="both">Custom approach (specify below)</option>
                 </select>
-                {getHelpText('ptoHandling') && (
-                  <p className="help-text">{getHelpText('ptoHandling')}</p>
-                )}
+                <p className="help-text">
+                  Consider having the employee use accrued PTO before separation to reduce cash outlay
+                  while maintaining benefits coverage during that period.
+                </p>
               </div>
               
               {formData.ptoHandling === 'both' && (
@@ -974,11 +1045,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeExtendedBenefits" className="checkbox-label">
-                  Include extended benefits {getHelpText('includeExtendedBenefits') && <HelpIcon text={getHelpText('includeExtendedBenefits')} />}
+                  Include extended benefits <HelpIcon field="includeExtendedBenefits" />
                 </label>
-                {getHelpText('includeExtendedBenefits') && (
-                  <p className="help-text">{getHelpText('includeExtendedBenefits')}</p>
-                )}
+                <p className="checkbox-explanation">
+                  Extending benefits beyond the separation date (typically through the end of the month)
+                  provides a clean transition and makes the agreement more appealing to the employee.
+                </p>
               </div>
               
               {formData.includeExtendedBenefits && (
@@ -990,9 +1062,6 @@ function SeparationAgreementGenerator() {
                     onChange={handleDateChange}
                     placeholder="July 31, 2025"
                   />
-                  <p className="help-text">
-                    Based on your discussion with Kevin, extending benefits through the end of June provides a clean transition.
-                  </p>
                 </div>
               )}
               
@@ -1021,6 +1090,10 @@ function SeparationAgreementGenerator() {
                 <label htmlFor="includeSeverance" className="checkbox-label">
                   Include severance payment
                 </label>
+                <p className="checkbox-explanation">
+                  A severance payment provides an incentive for the employee to sign the agreement.
+                  It must constitute consideration beyond what the employee is already entitled to receive.
+                </p>
               </div>
               
               {formData.includeSeverance && (
@@ -1039,7 +1112,7 @@ function SeparationAgreementGenerator() {
                   
                   <div className="form-group">
                     <label className="form-label">
-                      Payment Structure: {getHelpText('severancePaymentStructure') && <HelpIcon text={getHelpText('severancePaymentStructure')} />}
+                      Payment Structure: <HelpIcon field="severancePaymentStructure" />
                     </label>
                     <select
                       name="severancePaymentStructure"
@@ -1050,9 +1123,10 @@ function SeparationAgreementGenerator() {
                       <option value="lump-sum">Lump Sum</option>
                       <option value="installments">Installments</option>
                     </select>
-                    {getHelpText('severancePaymentStructure') && (
-                      <p className="help-text">{getHelpText('severancePaymentStructure')}</p>
-                    )}
+                    <p className="help-text">
+                      Lump sum payments are administratively simpler. Installments provide leverage 
+                      for continued compliance and spread out the financial impact.
+                    </p>
                   </div>
                   
                   {formData.severancePaymentStructure === 'installments' && (
@@ -1087,8 +1161,13 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeGeneralRelease" className="checkbox-label">
-                  Include general release of claims
+                  Include general release of claims <HelpIcon field="includeGeneralRelease" />
                 </label>
+                <p className="checkbox-explanation">
+                  A comprehensive release of claims protects the company from future lawsuits 
+                  related to the employment relationship or its termination. This is the primary 
+                  benefit the company receives from the agreement.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1101,8 +1180,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeADEARelease" className="checkbox-label">
-                  Include Age Discrimination in Employment Act (ADEA) release
+                  Include Age Discrimination in Employment Act (ADEA) release <HelpIcon field="includeADEARelease" />
                 </label>
+                <p className="checkbox-explanation">
+                  ADEA release is essential if the employee is 40 or older. It specifically covers age 
+                  discrimination claims but requires strict compliance with timing requirements.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1115,15 +1198,19 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeCaliforniaSpecific" className="checkbox-label">
-                  Include California-specific Civil Code Section 1542 waiver
+                  Include California-specific Civil Code Section 1542 waiver <HelpIcon field="includeCaliforniaSpecific" />
                 </label>
+                <p className="checkbox-explanation">
+                  California Civil Code §1542 waiver ensures the release covers unknown claims that 
+                  exist at the time of signing. Critical for California employees.
+                </p>
               </div>
               
               {formData.includeADEARelease && (
                 <>
                   <div className="form-group">
                     <label className="form-label">
-                      Review Period (days): {getHelpText('reviewPeriod') && <HelpIcon text={getHelpText('reviewPeriod')} />}
+                      Review Period (days): <HelpIcon field="reviewPeriod" />
                     </label>
                     <input
                       type="number"
@@ -1134,14 +1221,15 @@ function SeparationAgreementGenerator() {
                       min="7"
                       max="45"
                     />
-                    {getHelpText('reviewPeriod') && (
-                      <p className="help-text">{getHelpText('reviewPeriod')}</p>
-                    )}
+                    <p className="help-text">
+                      For employees over 40, ADEA requires a 21-day review period for a valid release of age claims.
+                      For younger employees, 7-14 days is common to ensure they have time to consult with an attorney.
+                    </p>
                   </div>
                   
                   <div className="form-group">
                     <label className="form-label">
-                      Revocation Period (days): {getHelpText('revocationPeriod') && <HelpIcon text={getHelpText('revocationPeriod')} />}
+                      Revocation Period (days): <HelpIcon field="revocationPeriod" />
                     </label>
                     <input
                       type="number"
@@ -1152,15 +1240,16 @@ function SeparationAgreementGenerator() {
                       min="7"
                       max="14"
                     />
-                    {getHelpText('revocationPeriod') && (
-                      <p className="help-text">{getHelpText('revocationPeriod')}</p>
-                    )}
+                    <p className="help-text">
+                      For employees over 40, ADEA requires a 7-day revocation period. 
+                      This cooling-off period helps show the release was voluntary and not signed under duress.
+                    </p>
                   </div>
                 </>
               )}
               
               <div className="info-box">
-                <strong>21-Day + 7-Day Period:</strong> As explained to Kevin, while the 21-day review and 7-day revocation periods may seem long, they are legally required for employees 40 or older under the Age Discrimination in Employment Act (ADEA). The employee's signature isn't enforceable without this time to consider the agreement. Importantly, these periods provide certainty that the waiver of claims is final before any severance or extended benefits are provided.
+                <strong>21-Day + 7-Day Period:</strong> While the 21-day review and 7-day revocation periods may seem long, they are legally required for employees 40 or older under the Age Discrimination in Employment Act (ADEA). The employee's signature isn't enforceable without this time to consider the agreement. Importantly, these periods provide certainty that the waiver of claims is final before any severance or extended benefits are provided.
               </div>
             </div>
             
@@ -1179,9 +1268,33 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeConfidentiality" className="checkbox-label">
-                  Include confidentiality obligations
+                  Include confidentiality obligations <HelpIcon field="includeConfidentiality" />
                 </label>
+                <p className="checkbox-explanation">
+                  Reinforces the employee's obligation to maintain confidentiality regarding company 
+                  information even after employment ends.
+                </p>
               </div>
+              
+              {formData.includeConfidentiality && (
+                <div className="form-group">
+                  <label className="form-label">
+                    Confidentiality Period (months): <HelpIcon field="confidentialityPeriod" />
+                  </label>
+                  <input
+                    type="number"
+                    name="confidentialityPeriod"
+                    value={formData.confidentialityPeriod}
+                    onChange={handleChange}
+                    className="form-input"
+                    min="1"
+                  />
+                  <p className="help-text">
+                    Specifies how long the employee must maintain confidentiality. 
+                    Typically 12-36 months, though trade secrets may be protected indefinitely.
+                  </p>
+                </div>
+              )}
               
               <div className="form-group form-checkbox-group">
                 <input
@@ -1193,17 +1306,18 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeNonSolicitation" className="checkbox-label">
-                  Include non-solicitation provision {getHelpText('includeNonSolicitation') && <HelpIcon text={getHelpText('includeNonSolicitation')} />}
+                  Include non-solicitation provision <HelpIcon field="includeNonSolicitation" />
                 </label>
-                {getHelpText('includeNonSolicitation') && (
-                  <p className="help-text">{getHelpText('includeNonSolicitation')}</p>
-                )}
+                <p className="checkbox-explanation">
+                  Prevents the employee from recruiting your other employees for a specified 
+                  period after departure. Protects your workforce stability.
+                </p>
               </div>
               
               {formData.includeNonSolicitation && (
                 <div className="form-group">
                   <label className="form-label">
-                    Non-Solicitation Period (months): {getHelpText('nonSolicitationPeriod') && <HelpIcon text={getHelpText('nonSolicitationPeriod')} />}
+                    Non-Solicitation Period (months): <HelpIcon field="nonSolicitationPeriod" />
                   </label>
                   <input
                     type="number"
@@ -1214,9 +1328,9 @@ function SeparationAgreementGenerator() {
                     min="1"
                     max="24"
                   />
-                  {getHelpText('nonSolicitationPeriod') && (
-                    <p className="help-text">{getHelpText('nonSolicitationPeriod')}</p>
-                  )}
+                  <p className="help-text">
+                    Typically 12 months. Longer periods may face enforceability challenges in some jurisdictions.
+                  </p>
                 </div>
               )}
               
@@ -1230,8 +1344,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeCooperation" className="checkbox-label">
-                  Include cooperation provision
+                  Include cooperation provision <HelpIcon field="includeCooperation" />
                 </label>
+                <p className="checkbox-explanation">
+                  Ensures the employee will assist with transition matters and any legal proceedings
+                  where they have relevant knowledge. Valuable for continuity and risk management.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1244,8 +1362,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeNonDisparagement" className="checkbox-label">
-                  Include non-disparagement provision
+                  Include non-disparagement provision <HelpIcon field="includeNonDisparagement" />
                 </label>
+                <p className="checkbox-explanation">
+                  Prevents the employee from making negative statements about your company.
+                  Protects your reputation during and after the separation.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1260,6 +1382,10 @@ function SeparationAgreementGenerator() {
                 <label htmlFor="includeReturnOfProperty" className="checkbox-label">
                   Include return of company property provision
                 </label>
+                <p className="checkbox-explanation">
+                  Ensures the employee returns all company equipment, documents, and data.
+                  Critical for protecting company property and confidential information.
+                </p>
               </div>
             </div>
             
@@ -1278,8 +1404,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeNoAdmission" className="checkbox-label">
-                  Include no admission of liability provision
+                  Include no admission of liability provision <HelpIcon field="includeNoAdmission" />
                 </label>
+                <p className="checkbox-explanation">
+                  Explicitly states that the agreement does not constitute an admission of wrongdoing.
+                  Important legal protection against the agreement being used as evidence in other contexts.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1292,8 +1422,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeGoverningLaw" className="checkbox-label">
-                  Include governing law provision
+                  Include governing law provision <HelpIcon field="includeGoverningLaw" />
                 </label>
+                <p className="checkbox-explanation">
+                  Specifies which state's laws apply to the agreement.
+                  Usually the employer's principal place of business.
+                </p>
               </div>
               
               {formData.includeGoverningLaw && (
@@ -1319,8 +1453,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeEntireAgreement" className="checkbox-label">
-                  Include entire agreement provision
+                  Include entire agreement provision <HelpIcon field="includeEntireAgreement" />
                 </label>
+                <p className="checkbox-explanation">
+                  Prevents claims based on alleged verbal promises or side agreements not included in the written document.
+                  Ensures all terms are contained in the written agreement.
+                </p>
               </div>
               
               <div className="form-group form-checkbox-group">
@@ -1333,8 +1471,12 @@ function SeparationAgreementGenerator() {
                   className="form-checkbox"
                 />
                 <label htmlFor="includeCounterparts" className="checkbox-label">
-                  Include counterparts provision
+                  Include counterparts provision <HelpIcon field="includeCounterparts" />
                 </label>
+                <p className="checkbox-explanation">
+                  Allows for signing the agreement in separate copies, which is convenient 
+                  when parties are in different locations.
+                </p>
               </div>
               
               <div className="form-group">
@@ -1415,10 +1557,10 @@ function SeparationAgreementGenerator() {
                     )}
                     
                     <div className="evaluation-section">
-                      <h3>Kevin's Situation: Recommended Approach</h3>
+                      <h3>Recommended Approach</h3>
                       <div className="evaluation-card blue-card">
                         <h4>June-Exit Strategy with PTO Burn-Down</h4>
-                        <p>Based on our previous conversations, the "June-exit separation agreement" approach appears to be the best strategy. This provides several advantages:</p>
+                        <p>For employee separations due to performance issues, the "June-exit separation agreement" approach appears to be the best strategy. This provides several advantages:</p>
                         <ul>
                           <li>Frames the departure as a voluntary resignation, helping the employee save face</li>
                           <li>Extends benefits through the end of June, providing a clean transition</li>

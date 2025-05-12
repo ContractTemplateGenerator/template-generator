@@ -12,18 +12,18 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: "Times New Roman", Times, serif;
-    font-size: 12pt;
+    font-size: 11pt;
     line-height: 1.5;
   }
   h1 {
     text-align: center;
-    font-size: 16pt;
+    font-size: 11pt;
     margin-bottom: 20pt;
     font-weight: bold;
   }
   h2 {
     text-align: center;
-    font-size: 14pt;
+    font-size: 11pt;
     margin-bottom: 12pt;
     font-weight: bold;
   }
@@ -40,6 +40,9 @@ window.generateWordDoc = function(documentText, formData) {
   }
   ol ol ol {
     list-style-type: lower-roman;
+  }
+  .section-space {
+    margin-top: 15pt;
   }
   .signature-table {
     width: 100%;
@@ -92,7 +95,25 @@ window.generateWordDoc = function(documentText, formData) {
       });
       
       // Get the processed content without highlights
-      cleanedHtml += mainContent.innerHTML;
+      let mainHtml = mainContent.innerHTML;
+      
+      // Add spacing after specific sections
+      // This adds space between sections that follow a list
+      // We target sections 2, 3, 4, 5, 9, 10 as mentioned in the feedback
+      mainHtml = mainHtml.replace(/<li>\s*<strong>FINAL COMPENSATION AND BENEFITS<\/strong>/g, 
+                                '<li class="section-space"><strong>FINAL COMPENSATION AND BENEFITS</strong>');
+      mainHtml = mainHtml.replace(/<li>\s*<strong>SEPARATION CONSIDERATION<\/strong>/g, 
+                                '<li class="section-space"><strong>SEPARATION CONSIDERATION</strong>');
+      mainHtml = mainHtml.replace(/<li>\s*<strong>GENERAL RELEASE OF CLAIMS<\/strong>/g, 
+                                '<li class="section-space"><strong>GENERAL RELEASE OF CLAIMS</strong>');
+      mainHtml = mainHtml.replace(/<li>\s*<strong>WAIVER OF UNKNOWN CLAIMS<\/strong>/g, 
+                                '<li class="section-space"><strong>WAIVER OF UNKNOWN CLAIMS</strong>');
+      mainHtml = mainHtml.replace(/<li>\s*<strong>CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY<\/strong>/g, 
+                                '<li class="section-space"><strong>CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY</strong>');
+      mainHtml = mainHtml.replace(/<li>\s*<strong>CONFIDENTIALITY OBLIGATIONS<\/strong>/g, 
+                                '<li class="section-space"><strong>CONFIDENTIALITY OBLIGATIONS</strong>');
+      
+      cleanedHtml += mainHtml;
     } else {
       // If we can't extract the content properly, use the original document text
       // but try to clean it up
@@ -101,11 +122,9 @@ window.generateWordDoc = function(documentText, formData) {
         .replace(/<\/span>/g, '');
     }
     
-    // Add the HTML content to the document
-    htmlContent += cleanedHtml;
-    
     // Replace the signature block with a table-based version for Word
-    htmlContent = htmlContent.replace(
+    // Remove any duplicate employee signature section and keep only the side-by-side version
+    cleanedHtml = cleanedHtml.replace(
       /<div class="signature-block">[\s\S]*?<\/div>/g,
       `<table class="signature-table">
         <tr>
@@ -125,7 +144,14 @@ window.generateWordDoc = function(documentText, formData) {
       </table>`
     );
     
+    // Remove any potential duplicate signature sections
+    cleanedHtml = cleanedHtml.replace(
+      /<p><strong>EMPLOYEE:[\s\S]*?Date:[\s\S]*?___+<\/p>/g, 
+      ''
+    );
+    
     // Close HTML document
+    htmlContent += cleanedHtml;
     htmlContent += '</body></html>';
     
     // Convert HTML to Blob
