@@ -10,32 +10,115 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
     <style>
-        body, html {
+        /* Additional styles for iframe */
+        html, body {
             margin: 0;
             padding: 0;
             height: 100%;
             overflow: hidden;
         }
+        
         #root {
             height: 100%;
+            overflow: hidden;
         }
+        
         .app-container {
-            min-height: 100%;
             height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .iframe-wrapper {
+        
+        .container {
             height: 100%;
+            max-height: 100%;
+            overflow: hidden;
+            padding: 0.5rem;
+        }
+        
+        .app-content {
+            height: calc(100% - 50px);
+            overflow: hidden;
+        }
+        
+        .form-panel, .preview-panel {
+            max-height: 100%;
+            overflow-y: auto;
+        }
+        
+        .help-icon {
+            position: relative;
+            display: inline-flex;
+            cursor: help;
+        }
+        
+        /* Custom tooltip */
+        .help-icon:hover::after {
+            content: attr(title);
+            position: absolute;
+            left: 100%;
+            top: -5px;
+            background: #333;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            width: 200px;
+            z-index: 10;
+            font-size: 12px;
+            font-weight: normal;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .app-content {
+                flex-direction: column;
+                height: auto;
+                overflow: visible;
+            }
+            
+            .form-panel, .preview-panel {
+                margin-bottom: 1rem;
+                max-height: none;
+                overflow: visible;
+            }
+            
+            .preview-panel {
+                height: 400px;
+                overflow: auto;
+            }
+        }
+        
+        /* Fix for WordPress integration */
+        .wp-embed-responsive .wp-has-aspect-ratio .wp-block-embed__wrapper {
+            height: 900px !important;
         }
     </style>
 </head>
 <body>
-    <div id="root" class="iframe-wrapper"></div>
+    <div id="root"></div>
     
     <script type="text/babel" src="docx-generator.js"></script>
     <script type="text/babel" src="separation-agreement-generator.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             feather.replace();
+            
+            // Add message listener for WordPress iframe communication
+            window.addEventListener('message', function(event) {
+                // Check for resize messages
+                if (event.data && event.data.type === 'resize') {
+                    // Resize logic here if needed
+                }
+            });
+            
+            // Notify parent when loaded
+            if (window.parent !== window) {
+                window.parent.postMessage({
+                    type: 'loaded',
+                    height: document.body.scrollHeight
+                }, '*');
+            }
         });
     </script>
 </body>

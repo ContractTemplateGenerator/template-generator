@@ -14,31 +14,47 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: "Times New Roman", Times, serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 1in;
   }
-  h1, h2 {
+  h1 {
     text-align: center;
     font-size: 16pt;
     margin-bottom: 20pt;
     font-weight: bold;
   }
-  h3 {
+  h2 {
+    text-align: center;
     font-size: 14pt;
-    margin-top: 14pt;
-    margin-bottom: 10pt;
+    margin-bottom: 12pt;
     font-weight: bold;
   }
   p {
     margin-bottom: 10pt;
     text-align: justify;
   }
-  .page-break {
-    page-break-before: always;
+  ol {
+    margin-left: 0.5in;
+    margin-bottom: 10pt;
+  }
+  ol ol {
+    list-style-type: lower-alpha;
+  }
+  ol ol ol {
+    list-style-type: lower-roman;
+  }
+  .signature-table {
+    width: 100%;
+    margin-top: 50px;
+    border-collapse: collapse;
+  }
+  .signature-table td {
+    width: 50%;
+    vertical-align: top;
+    padding: 10px;
   }
   .signature-line {
     border-top: 1px solid black;
     width: 250px;
-    margin-top: 50px;
+    margin-top: 40px;
     margin-bottom: 5px;
   }
 </style>
@@ -46,108 +62,68 @@ window.generateWordDoc = function(documentText, formData) {
 <body>
 `;
 
-    // Split document text if there's a form feed character (for separate pages)
-    let mainText = documentText;
-    let appendixText = '';
+    // Extract HTML content from the documentText (which is already HTML in our case)
+    // and clean it up for Word
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = documentText;
     
-    if (documentText.includes('\f')) {
-      const parts = documentText.split(/\f/);
-      mainText = parts[0];
-      appendixText = parts.length > 1 ? parts[1] : '';
+    // Extract the actual content
+    const title = tempDiv.querySelector('.document-title');
+    const mainContent = tempDiv.querySelector('.document-preview');
+    
+    // Process the HTML to make it Word-friendly
+    let cleanedHtml = '';
+    
+    // Add the title
+    if (title) {
+      cleanedHtml += `<h1>${title.textContent}</h1>`;
+    } else {
+      cleanedHtml += `<h1>${formData.documentTitle || "Separation and Release Agreement"}</h1>`;
     }
     
-    // Process the document text to convert it to HTML with proper formatting
-    // Split by line breaks, interpret ## as headings, etc.
-    const mainTextHtml = mainText
-      .split('\n\n')
-      .map(para => {
-        para = para.trim();
-        if (!para) return '';
-        
-        // Handle headings
-        if (para.startsWith('# ')) {
-          return `<h1>${para.substring(2)}</h1>`;
-        } else if (para.startsWith('## ')) {
-          return `<h2>${para.substring(3)}</h2>`;
-        } else if (para.startsWith('### ')) {
-          return `<h3>${para.substring(4)}</h3>`;
-        }
-        
-        // Handle lists
-        if (para.match(/^\d+\.\s/)) {
-          const listItems = para.split('\n').map(item => {
-            const match = item.match(/^(\d+\.\s)(.*)/);
-            if (match) {
-              return `<li>${match[2]}</li>`;
-            }
-            return `<li>${item}</li>`;
-          }).join('');
-          return `<ol>${listItems}</ol>`;
-        }
-        
-        if (para.match(/^[a-z]\.\s/) || para.match(/^[ivx]+\.\s/)) {
-          const listItems = para.split('\n').map(item => {
-            const match = item.match(/^([a-z]\.\s|[ivx]+\.\s)(.*)/);
-            if (match) {
-              return `<li>${match[2]}</li>`;
-            }
-            return `<li>${item}</li>`;
-          }).join('');
-          return `<ol style="list-style-type: lower-alpha;">${listItems}</ol>`;
-        }
-        
-        // Handle normal paragraphs
-        return `<p>${para.replace(/\n/g, '<br>')}</p>`;
-      })
-      .join('');
-    
-    // Add main text to HTML content
-    htmlContent += mainTextHtml;
-    
-    // Add appendix on a new page if applicable
-    if (appendixText) {
-      // Add page break
-      htmlContent += '<div class="page-break"></div>';
+    // Extract and process the main content
+    if (mainContent) {
+      // Remove any highlighted sections and replace with regular text
+      const highlightedTexts = mainContent.querySelectorAll('.highlighted-text');
+      highlightedTexts.forEach(highlight => {
+        const textContent = highlight.textContent;
+        const textNode = document.createTextNode(textContent);
+        highlight.parentNode.replaceChild(textNode, highlight);
+      });
       
-      // Process appendix text
-      const appendixHtml = appendixText
-        .split('\n\n')
-        .map(para => {
-          para = para.trim();
-          if (!para) return '';
-          
-          // Handle headings
-          if (para.startsWith('# ')) {
-            return `<h1>${para.substring(2)}</h1>`;
-          } else if (para.startsWith('## ')) {
-            return `<h2>${para.substring(3)}</h2>`;
-          } else if (para.startsWith('### ')) {
-            return `<h3>${para.substring(4)}</h3>`;
-          }
-          
-          // Handle normal paragraphs
-          return `<p>${para.replace(/\n/g, '<br>')}</p>`;
-        })
-        .join('');
-      
-      // Add appendix to HTML content
-      htmlContent += appendixHtml;
+      // Get the processed content without highlights
+      cleanedHtml += mainContent.innerHTML;
+    } else {
+      // If we can't extract the content properly, use the original document text
+      // but try to clean it up
+      cleanedHtml = documentText
+        .replace(/<span class="highlighted-text">/g, '')
+        .replace(/<\/span>/g, '');
     }
     
-    // Add signature lines and company info
-    htmlContent += `
-    <div class="signature-section">
-      <p><strong>COMPANY: ${formData.companyName || "THINK CIRCUITS LLC"}</strong></p>
-      <div class="signature-line"></div>
-      <p>By: ${formData.companySignatory || "Kevin Weekly"}<br>
-      Title: ${formData.companySignatoryTitle || "CEO"}<br>
-      Date: ___________________________</p>
-      
-      <p style="margin-top: 30px;"><strong>EMPLOYEE: ${formData.employeeName || "[EMPLOYEE NAME]"}</strong></p>
-      <div class="signature-line"></div>
-      <p>Date: ___________________________</p>
-    </div>
-    `;
+    // Add the HTML content to the document
+    htmlContent += cleanedHtml;
+    
+    // Replace the signature block with a table-based version for Word
+    htmlContent = htmlContent.replace(
+      /<div class="signature-block">[\s\S]*?<\/div>/g,
+      `<table class="signature-table">
+        <tr>
+          <td>
+            <p><strong>COMPANY: ${formData.companyName}</strong></p>
+            <div class="signature-line"></div>
+            <p>By: ${formData.companySignatory}</p>
+            <p>Title: ${formData.companySignatoryTitle}</p>
+            <p>Date: ___________________________</p>
+          </td>
+          <td>
+            <p><strong>EMPLOYEE: ${formData.employeeName || "[EMPLOYEE NAME]"}</strong></p>
+            <div class="signature-line"></div>
+            <p>Date: ___________________________</p>
+          </td>
+        </tr>
+      </table>`
+    );
     
     // Close HTML document
     htmlContent += '</body></html>';

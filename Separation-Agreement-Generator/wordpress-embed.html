@@ -1,31 +1,59 @@
-<!-- WordPress Shortcode Template for Separation Agreement Generator -->
-<!-- Copy this code into a HTML/Custom HTML block or create a shortcode -->
+<!-- SEPARATION AGREEMENT GENERATOR EMBED CODE -->
+<!-- Copy this code into a Custom HTML block in WordPress -->
 
-<div class="separation-agreement-generator-wrapper" style="width: 100%; height: 900px; margin: 20px 0;">
+<style>
+    .separation-agreement-generator-wrapper {
+        width: 100%;
+        height: 900px;
+        margin: 20px 0;
+        position: relative;
+        overflow: hidden;
+    }
+    .separation-agreement-generator-iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+        overflow: hidden;
+    }
+    @media screen and (max-width: 768px) {
+        .separation-agreement-generator-wrapper {
+            height: 1500px;
+        }
+    }
+</style>
+
+<div class="separation-agreement-generator-wrapper">
     <iframe 
+        class="separation-agreement-generator-iframe"
         src="https://terms.law/template-generator/Separation-Agreement-Generator/iframe.html" 
-        style="width: 100%; height: 100%; border: none; overflow: hidden;" 
         title="Separation Agreement Generator"
         scrolling="no"
         allowfullscreen>
     </iframe>
 </div>
 
-<!-- Optional: Add responsive height with JavaScript -->
 <script>
-(function() {
-    // Adjust iframe height based on window width for better mobile experience
-    function adjustIframeHeight() {
-        var iframe = document.querySelector('.separation-agreement-generator-wrapper iframe');
-        if (window.innerWidth < 768) {
-            document.querySelector('.separation-agreement-generator-wrapper').style.height = '1500px';
-        } else {
-            document.querySelector('.separation-agreement-generator-wrapper').style.height = '900px';
-        }
-    }
-    
-    // Run on load and resize
-    window.addEventListener('load', adjustIframeHeight);
-    window.addEventListener('resize', adjustIframeHeight);
-})();
+    document.addEventListener('DOMContentLoaded', function() {
+        var wrapper = document.querySelector('.separation-agreement-generator-wrapper');
+        var iframe = document.querySelector('.separation-agreement-generator-iframe');
+        
+        // Handle iframe messages
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'loaded' && event.source === iframe.contentWindow) {
+                // Adjust height based on content if needed
+                if (event.data.height) {
+                    wrapper.style.height = (event.data.height + 50) + 'px';
+                }
+            }
+        });
+        
+        // Adjust on resize
+        window.addEventListener('resize', function() {
+            if (window.innerWidth < 768) {
+                wrapper.style.height = '1500px';
+            } else {
+                wrapper.style.height = '900px';
+            }
+        });
+    });
 </script>
