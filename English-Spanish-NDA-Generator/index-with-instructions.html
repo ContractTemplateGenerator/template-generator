@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dual-Language NDA Generator (English/Spanish) | terms.law</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="minimal-mobile.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    
+    <!-- Additional styles for instructions integration -->
+    <style>
+        .instructions-divider {
+            margin: 40px 0;
+            border: 0;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.1), transparent);
+        }
+        
+        .instructions-iframe {
+            width: 100%;
+            height: 1600px;
+            border: none;
+            overflow: hidden;
+        }
+        
+        @media (max-width: 768px) {
+            .instructions-iframe {
+                height: 2800px; /* More height on mobile to accommodate stacked layout */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Generator Section -->
+    <div id="root"></div>
+    
+    <!-- Instructions Section -->
+    <hr class="instructions-divider" />
+    <iframe 
+        src="instructions.html" 
+        class="instructions-iframe" 
+        title="NDA Generator Instructions"
+        scrolling="no"
+    ></iframe>
+    
+    <script type="text/babel" src="docx-generator.js"></script>
+    <script type="text/babel" src="nda-generator.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            feather.replace();
+            
+            // Resize iframe based on content height
+            const instructionsIframe = document.querySelector('.instructions-iframe');
+            
+            // Wait for instructions to load and then adjust height
+            instructionsIframe.onload = function() {
+                try {
+                    // Try to get the height of the content in the iframe
+                    const contentHeight = instructionsIframe.contentWindow.document.body.scrollHeight;
+                    // Add a little extra padding
+                    instructionsIframe.style.height = (contentHeight + 50) + 'px';
+                } catch (e) {
+                    // If cross-origin issues, use default height
+                    console.log('Could not adjust iframe height dynamically:', e);
+                }
+            };
+            
+            // Listen for language changes in the generator to sync with instructions
+            // This creates a simple event system for cross-frame communication
+            window.addEventListener('message', function(event) {
+                if (event.data && event.data.language) {
+                    try {
+                        // Send language preference to iframe
+                        instructionsIframe.contentWindow.postMessage({
+                            language: event.data.language
+                        }, '*');
+                    } catch (e) {
+                        console.log('Could not pass language to iframe:', e);
+                    }
+                }
+            });
+        });
+    </script>
+
+    <!-- Calendly link widget -->
+    <script type="text/babel">
+        window.createCalendlyLink = function() {
+            return (
+                <a href="" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule time with me</a>
+            );
+        }
+    </script>
+    
+    <!-- Calendly required assets -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+</body>
+</html>

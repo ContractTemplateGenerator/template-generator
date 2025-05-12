@@ -812,14 +812,30 @@ Fecha: _______________________________`
           <div className="language-toggle">
             <button
               className={`flag-button ${language === 'en' ? 'active' : ''}`}
-              onClick={() => setLanguage('en')}
+              onClick={() => {
+                setLanguage('en');
+                // Notify about language change (for instructions iframe sync)
+                try {
+                  window.postMessage({ language: 'en' }, '*');
+                } catch (e) {
+                  console.log('Could not send language message:', e);
+                }
+              }}
             >
               <img src="usa-flag.svg" alt="USA" width="24" height="16" />
               English
             </button>
             <button
               className={`flag-button ${language === 'es' ? 'active' : ''}`}
-              onClick={() => setLanguage('es')}
+              onClick={() => {
+                setLanguage('es');
+                // Notify about language change (for instructions iframe sync)
+                try {
+                  window.postMessage({ language: 'es' }, '*');
+                } catch (e) {
+                  console.log('Could not send language message:', e);
+                }
+              }}
             >
               <img src="mexico-flag.svg" alt="Mexico" width="24" height="16" />
               Español
