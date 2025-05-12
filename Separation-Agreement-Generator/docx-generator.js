@@ -12,20 +12,21 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: "Times New Roman", Times, serif;
-    font-size: 12pt;
+    font-size: 11pt;
     line-height: 1.5;
+  }
+  h1, h2, h3, h4, h5, h6, p, li, td {
+    font-size: 11pt;
   }
   h1 {
     text-align: center;
-    font-size: 16pt;
-    margin-bottom: 20pt;
     font-weight: bold;
+    margin-bottom: 20pt;
   }
   h2 {
     text-align: center;
-    font-size: 14pt;
-    margin-bottom: 12pt;
     font-weight: bold;
+    margin-bottom: 12pt;
   }
   p {
     margin-bottom: 10pt;
@@ -41,6 +42,9 @@ window.generateWordDoc = function(documentText, formData) {
   ol ol ol {
     list-style-type: lower-roman;
   }
+  .section-space {
+    margin-bottom: 16pt;
+  }
   .signature-container {
     page-break-inside: avoid;
     margin-top: 50px;
@@ -53,12 +57,17 @@ window.generateWordDoc = function(documentText, formData) {
     width: 50%;
     vertical-align: top;
     padding: 10px;
+    font-size: 11pt;
   }
   .signature-line {
     border-top: 1px solid black;
     width: 250px;
     margin-top: 40px;
     margin-bottom: 5px;
+  }
+  /* Add space after numbered sections */
+  ol.agreement-sections > li {
+    margin-bottom: 16pt;
   }
 </style>
 </head>
@@ -81,7 +90,7 @@ window.generateWordDoc = function(documentText, formData) {
     if (title) {
       cleanedHtml += `<h1>${title.textContent}</h1>`;
     } else {
-      cleanedHtml += `<h1>${formData.documentTitle || "Separation and Release Agreement"}</h1>`;
+      cleanedHtml += `<h1>${formData.documentTitle || "SEPARATION AND RELEASE AGREEMENT"}</h1>`;
     }
     
     // Extract and process the main content
@@ -103,6 +112,12 @@ window.generateWordDoc = function(documentText, formData) {
         contentWithoutSignature = contentWithoutSignature.replace(/<div class="signature-block">[\s\S]*?<\/div>/, '');
       }
       
+      // Add section-space class to specific list items that need more spacing
+      contentWithoutSignature = contentWithoutSignature.replace(
+        /<li>\s*<strong>(VOLUNTARY RESIGNATION|FINAL COMPENSATION AND BENEFITS|SEPARATION CONSIDERATION|GENERAL RELEASE OF CLAIMS|CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY|CONFIDENTIALITY OBLIGATIONS)<\/strong>/g, 
+        '<li class="section-space"><strong>$1</strong>'
+      );
+      
       // Add the content without the signature block
       cleanedHtml += contentWithoutSignature;
     } else {
@@ -112,6 +127,12 @@ window.generateWordDoc = function(documentText, formData) {
         .replace(/<span class="highlighted-text">/g, '')
         .replace(/<\/span>/g, '')
         .replace(/<div class="signature-block">[\s\S]*?<\/div>/, '');
+        
+      // Add section-space class to specific sections
+      cleanedHtml = cleanedHtml.replace(
+        /<li>\s*<strong>(VOLUNTARY RESIGNATION|FINAL COMPENSATION AND BENEFITS|SEPARATION CONSIDERATION|GENERAL RELEASE OF CLAIMS|CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY|CONFIDENTIALITY OBLIGATIONS)<\/strong>/g, 
+        '<li class="section-space"><strong>$1</strong>'
+      );
     }
     
     // Add our custom signature block that stays together on one page
@@ -140,6 +161,9 @@ window.generateWordDoc = function(documentText, formData) {
     
     // Close HTML document
     htmlContent += '</body></html>';
+    
+    // Fix any remaining duplicate signature blocks (belt and suspenders approach)
+    htmlContent = htmlContent.replace(/<div class="signature-section">[\s\S]*?<\/div>\s*<\/div>\s*<div class="signature-container">/, '<div class="signature-container">');
     
     // Convert HTML to Blob
     const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
