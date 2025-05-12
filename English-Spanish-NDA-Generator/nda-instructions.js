@@ -291,6 +291,13 @@ const NDAInstructions = () => {
     }
   ];
   
+  // Effect to initialize feather icons after render
+  React.useEffect(() => {
+    if (window.feather) {
+      window.feather.replace();
+    }
+  }, []);
+  
   return (
     <div className="nda-instructions-container">
       <div className="instructions-header">
@@ -519,15 +526,11 @@ const NDAInstructions = () => {
   );
 };
 
-// Initialize the component
-document.addEventListener("DOMContentLoaded", function() {
-  const instructionsContainer = document.getElementById('nda-instructions');
-  if (instructionsContainer) {
-    ReactDOM.render(<NDAInstructions />, instructionsContainer);
-    
-    // Initialize Feather icons
-    if (window.feather) {
-      window.feather.replace();
-    }
-  }
-});
+// Make the component directly available in the global scope
+window.NDAInstructions = NDAInstructions;
+
+// Render the component when the DOM is loaded
+ReactDOM.render(
+  <NDAInstructions />,
+  document.getElementById('nda-instructions')
+);
