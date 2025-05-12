@@ -142,6 +142,12 @@ const App = () => {
     { value: 'venezuela', label: 'Venezuela' }
   ];
   
+  // Countries with weak judicial systems (limited NDA enforcement reliability)
+  const weakJudicialSystems = [
+    'elsalvador', 'guatemala', 'honduras', 'nicaragua', 'venezuela', 
+    'cuba', 'bolivia', 'paraguay', 'ecuador', 'equatorialguinea'
+  ];
+  
   // Purpose of disclosure options
   const purposeOptions = [
     { value: 'business', label: t('To discuss potential business relationship', 'Para discutir una posible relación comercial') },
@@ -156,6 +162,42 @@ const App = () => {
     { id: 'options', label: t('Options', 'Opciones') },
     { id: 'summary', label: t('Summary', 'Resumen') }
   ];
+  
+  // Get judicial risk level
+  const getJudicialRiskLevel = (governingLaw) => {
+    // All US states are safe
+    if (usStates.some(state => state.value === governingLaw)) {
+      return 'safe';
+    }
+    
+    // Rich countries with strong judiciaries are safe
+    if (governingLaw === 'spain' || 
+        governingLaw === 'mexico' || 
+        governingLaw === 'chile' || 
+        governingLaw === 'uruguay' || 
+        governingLaw === 'costarica' || 
+        governingLaw === 'argentina' || 
+        governingLaw === 'panama' || 
+        governingLaw === 'puertorico') {
+      return 'safe';
+    }
+    
+    // Countries with weak judicial systems
+    if (weakJudicialSystems.includes(governingLaw)) {
+      return 'moderate';
+    }
+    
+    // Custom jurisdictions or other countries default to moderate
+    if (governingLaw === 'custom' || 
+        governingLaw === 'colombia' || 
+        governingLaw === 'peru' || 
+        governingLaw === 'dominicanrepublic') {
+      return 'moderate';
+    }
+    
+    // Default
+    return 'safe';
+  };
   
   // Handle form changes
   const handleChange = (e) => {
@@ -475,6 +517,21 @@ Fecha: _______________________________`
       case 'chile': return 'Santiago';
       case 'colombia': return 'Bogotá';
       case 'peru': return 'Lima';
+      case 'elsalvador': return 'San Salvador';
+      case 'guatemala': return 'Guatemala City';
+      case 'honduras': return 'Tegucigalpa';
+      case 'nicaragua': return 'Managua';
+      case 'costarica': return 'San José';
+      case 'panama': return 'Panama City';
+      case 'venezuela': return 'Caracas';
+      case 'ecuador': return 'Quito';
+      case 'bolivia': return 'La Paz';
+      case 'paraguay': return 'Asunción';
+      case 'uruguay': return 'Montevideo';
+      case 'dominicanrepublic': return 'Santo Domingo';
+      case 'puertorico': return 'San Juan';
+      case 'equatorialguinea': return 'Malabo';
+      case 'cuba': return 'Havana';
       case 'custom': return formData.customGoverningLaw ? `the courts of ${formData.customGoverningLaw}` : '[Jurisdiction]';
       default: return 'the courts with jurisdiction';
     }
@@ -495,6 +552,21 @@ Fecha: _______________________________`
       case 'chile': return 'Santiago';
       case 'colombia': return 'Bogotá';
       case 'peru': return 'Lima';
+      case 'elsalvador': return 'San Salvador';
+      case 'guatemala': return 'Ciudad de Guatemala';
+      case 'honduras': return 'Tegucigalpa';
+      case 'nicaragua': return 'Managua';
+      case 'costarica': return 'San José';
+      case 'panama': return 'Ciudad de Panamá';
+      case 'venezuela': return 'Caracas';
+      case 'ecuador': return 'Quito';
+      case 'bolivia': return 'La Paz';
+      case 'paraguay': return 'Asunción';
+      case 'uruguay': return 'Montevideo';
+      case 'dominicanrepublic': return 'Santo Domingo';
+      case 'puertorico': return 'San Juan';
+      case 'equatorialguinea': return 'Malabo';
+      case 'cuba': return 'La Habana';
       case 'custom': return formData.customGoverningLaw ? `los tribunales de ${formData.customGoverningLaw}` : '[Jurisdicción]';
       default: return 'los tribunales con jurisdicción';
     }
@@ -1040,6 +1112,13 @@ Fecha: _______________________________`
                     placeholder={t('Enter custom jurisdiction', 'Ingrese jurisdicción personalizada')}
                   />
                 )}
+                
+                {weakJudicialSystems.includes(formData.governingLaw) && (
+                  <div className="moderate-text" style={{marginTop: '8px'}}>
+                    {t('⚠️ This jurisdiction may have limitations in judicial enforcement of NDAs', 
+                      '⚠️ Esta jurisdicción puede tener limitaciones en la aplicación judicial de acuerdos de confidencialidad')}
+                  </div>
+                )}
               </div>
               
               <div className="form-group">
@@ -1153,9 +1232,10 @@ Fecha: _______________________________`
                   {formData.protectionPeriod > 5 && formData.protectionPeriod <= 10 && t(' - Monitor for enforceability', ' - Vigilar la aplicabilidad')}
                 </div>
                 
-                <div className={`summary-item ${formData.governingLaw === 'custom' ? 'moderate' : 'safe'}`}>
+                <div className={`summary-item ${getJudicialRiskLevel(formData.governingLaw)}`}>
                   <span className="summary-label">{t('Governing Law', 'Ley Aplicable')}</span>
                   {getGoverningLaw()}
+                  {weakJudicialSystems.includes(formData.governingLaw) && t(' - Enforcement concerns', ' - Preocupaciones de aplicación')}
                 </div>
                 
                 <div className={`summary-item ${formData.includeExclusions ? 'safe' : 'risky'}`}>
@@ -1228,7 +1308,8 @@ Fecha: _______________________________`
                   (parseInt(formData.protectionPeriod) > 5 && parseInt(formData.protectionPeriod) <= 10) || 
                   !formData.includeSeverability || 
                   !formData.includeLanguageClause ||
-                  formData.governingLaw === 'custom'
+                  formData.governingLaw === 'custom' ||
+                  weakJudicialSystems.includes(formData.governingLaw)
                 ) && (
                   <div className="risk-section moderate">
                     <h4>{t('Moderate Risk Issues', 'Problemas de Riesgo Moderado')}</h4>
@@ -1261,6 +1342,12 @@ Fecha: _______________________________`
                         <li className="moderate-text">
                           {t('Custom governing law may create uncertainty if not clearly defined. Ensure the jurisdiction specified has clear laws regarding confidentiality agreements.', 
                             'Una ley aplicable personalizada puede crear incertidumbre si no está claramente definida. Asegúrese de que la jurisdicción especificada tenga leyes claras sobre acuerdos de confidencialidad.')}
+                        </li>
+                      )}
+                      {weakJudicialSystems.includes(formData.governingLaw) && (
+                        <li className="moderate-text">
+                          {t(`The selected jurisdiction (${getGoverningLaw()}) may have limitations in judicial enforcement of confidentiality agreements. Consider choosing a jurisdiction with stronger courts and more reliable enforcement mechanisms if possible.`, 
+                            `La jurisdicción seleccionada (${getGoverningLawSpanish()}) puede tener limitaciones en la aplicación judicial de acuerdos de confidencialidad. Considere elegir una jurisdicción con tribunales más fuertes y mecanismos de aplicación más confiables si es posible.`)}
                         </li>
                       )}
                     </ul>
