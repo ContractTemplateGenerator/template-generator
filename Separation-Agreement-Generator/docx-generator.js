@@ -12,21 +12,20 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: "Times New Roman", Times, serif;
-    font-size: 11pt;
+    font-size: 12pt;
     line-height: 1.5;
   }
   h1 {
     text-align: center;
-    font-size: 11pt;
-    font-weight: bold;
+    font-size: 16pt;
     margin-bottom: 20pt;
-    text-transform: uppercase;
+    font-weight: bold;
   }
   h2 {
     text-align: center;
-    font-size: 11pt;
-    font-weight: bold;
+    font-size: 14pt;
     margin-bottom: 12pt;
+    font-weight: bold;
   }
   p {
     margin-bottom: 10pt;
@@ -42,12 +41,12 @@ window.generateWordDoc = function(documentText, formData) {
   ol ol ol {
     list-style-type: lower-roman;
   }
-  .section-space {
-    margin-top: 15pt;
+  .signature-container {
+    page-break-inside: avoid;
+    margin-top: 50px;
   }
   .signature-table {
     width: 100%;
-    margin-top: 50px;
     border-collapse: collapse;
   }
   .signature-table td {
@@ -66,81 +65,78 @@ window.generateWordDoc = function(documentText, formData) {
 <body>
 `;
 
-    // Use consistent UPPERCASE for title
-    htmlContent += `<h1>SEPARATION AND RELEASE AGREEMENT</h1>`;
-    
     // Extract HTML content from the documentText (which is already HTML in our case)
-    // and clean it up for Word - but skip the title as we've just added it
+    // and clean it up for Word
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = documentText;
     
-    // Get all content except the title
-    const content = tempDiv.querySelector('.document-preview');
+    // Extract the actual content
+    const title = tempDiv.querySelector('.document-title');
+    const mainContent = tempDiv.querySelector('.document-preview');
     
-    if (content) {
-      // Remove the title (h1) from the content
-      const titleElement = content.querySelector('h1');
-      if (titleElement) {
-        titleElement.remove();
-      }
-      
+    // Process the HTML to make it Word-friendly
+    let cleanedHtml = '';
+    
+    // Add the title
+    if (title) {
+      cleanedHtml += `<h1>${title.textContent}</h1>`;
+    } else {
+      cleanedHtml += `<h1>${formData.documentTitle || "Separation and Release Agreement"}</h1>`;
+    }
+    
+    // Extract and process the main content
+    if (mainContent) {
       // Remove any highlighted sections and replace with regular text
-      const highlightedTexts = content.querySelectorAll('.highlighted-text');
+      const highlightedTexts = mainContent.querySelectorAll('.highlighted-text');
       highlightedTexts.forEach(highlight => {
         const textContent = highlight.textContent;
         const textNode = document.createTextNode(textContent);
         highlight.parentNode.replaceChild(textNode, highlight);
       });
       
-      // Get the processed content without highlights
-      let mainHtml = content.innerHTML;
+      // Get the content without the signature block (we'll add it separately)
+      let contentWithoutSignature = mainContent.innerHTML;
       
-      // Add spacing after specific sections
-      mainHtml = mainHtml.replace(/<li>\s*<strong>FINAL COMPENSATION AND BENEFITS<\/strong>/g, 
-                              '<li class="section-space"><strong>FINAL COMPENSATION AND BENEFITS</strong>');
-      mainHtml = mainHtml.replace(/<li>\s*<strong>SEPARATION CONSIDERATION<\/strong>/g, 
-                              '<li class="section-space"><strong>SEPARATION CONSIDERATION</strong>');
-      mainHtml = mainHtml.replace(/<li>\s*<strong>GENERAL RELEASE OF CLAIMS<\/strong>/g, 
-                              '<li class="section-space"><strong>GENERAL RELEASE OF CLAIMS</strong>');
-      mainHtml = mainHtml.replace(/<li>\s*<strong>WAIVER OF UNKNOWN CLAIMS<\/strong>/g, 
-                              '<li class="section-space"><strong>WAIVER OF UNKNOWN CLAIMS</strong>');
-      mainHtml = mainHtml.replace(/<li>\s*<strong>CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY<\/strong>/g, 
-                              '<li class="section-space"><strong>CONFIDENTIALITY AND RETURN OF COMPANY PROPERTY</strong>');
-      mainHtml = mainHtml.replace(/<li>\s*<strong>CONFIDENTIALITY OBLIGATIONS<\/strong>/g, 
-                              '<li class="section-space"><strong>CONFIDENTIALITY OBLIGATIONS</strong>');
+      // Remove the signature block from the content if it exists
+      const signatureBlock = contentWithoutSignature.match(/<div class="signature-block">[\s\S]*?<\/div>/);
+      if (signatureBlock) {
+        contentWithoutSignature = contentWithoutSignature.replace(/<div class="signature-block">[\s\S]*?<\/div>/, '');
+      }
       
-      // Add the content to the htmlContent
-      htmlContent += mainHtml;
+      // Add the content without the signature block
+      cleanedHtml += contentWithoutSignature;
     } else {
-      // Fallback if we can't extract the content properly
-      htmlContent += documentText
+      // If we can't extract the content properly, use the original document text
+      // but try to clean it up and remove the signature block
+      cleanedHtml = documentText
         .replace(/<span class="highlighted-text">/g, '')
         .replace(/<\/span>/g, '')
-        .replace(/<h1.*?>.*?<\/h1>/g, ''); // Remove the title as we've added it already
+        .replace(/<div class="signature-block">[\s\S]*?<\/div>/, '');
     }
     
-    // Remove the signature block to replace it with a proper table-based version
-    htmlContent = htmlContent.replace(/<div class="signature-block">[\s\S]*?<\/div>/g, '');
+    // Add our custom signature block that stays together on one page
+    cleanedHtml += `
+    <div class="signature-container">
+      <table class="signature-table">
+        <tr>
+          <td>
+            <p><strong>COMPANY: ${formData.companyName}</strong></p>
+            <div class="signature-line"></div>
+            <p>By: ${formData.companySignatory}</p>
+            <p>Title: ${formData.companySignatoryTitle}</p>
+            <p>Date: ___________________________</p>
+          </td>
+          <td>
+            <p><strong>EMPLOYEE: ${formData.employeeName || "[EMPLOYEE NAME]"}</strong></p>
+            <div class="signature-line"></div>
+            <p>Date: ___________________________</p>
+          </td>
+        </tr>
+      </table>
+    </div>`;
     
-    // Add properly formatted signature block table
-    htmlContent += `
-    <table class="signature-table">
-      <tr>
-        <td>
-          <p><strong>COMPANY: ${formData.companyName}</strong></p>
-          <div class="signature-line"></div>
-          <p>By: ${formData.companySignatory}</p>
-          <p>Title: ${formData.companySignatoryTitle}</p>
-          <p>Date: ___________________________</p>
-        </td>
-        <td>
-          <p><strong>EMPLOYEE: ${formData.employeeName || "[EMPLOYEE NAME]"}</strong></p>
-          <div class="signature-line"></div>
-          <p>Date: ___________________________</p>
-        </td>
-      </tr>
-    </table>
-    `;
+    // Add the HTML content to the document
+    htmlContent += cleanedHtml;
     
     // Close HTML document
     htmlContent += '</body></html>';
