@@ -21,6 +21,37 @@ const Tooltip = ({ text, children }) => {
   );
 };
 
+// Clipboard fallback function
+const copyToClipboardFallback = (text) => {
+  // Create a temporary textarea element
+  const textArea = document.createElement("textarea");
+  
+  // Set its value to the text
+  textArea.value = text;
+  
+  // Make it invisible
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  textArea.style.top = "-999999px";
+  document.body.appendChild(textArea);
+  
+  // Select and copy
+  textArea.focus();
+  textArea.select();
+  
+  let successful = false;
+  try {
+    successful = document.execCommand('copy');
+  } catch (err) {
+    console.error("execCommand error:", err);
+  }
+  
+  // Remove the temporary element
+  document.body.removeChild(textArea);
+  
+  return successful;
+};
+
 // Main App component
 const App = () => {
   // Current date for defaults
@@ -271,30 +302,11 @@ const App = () => {
     try {
       const documentText = generateDocumentText();
       
-      // Try the modern clipboard API first
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(documentText)
-          .then(() => {
-            alert("Document copied to clipboard!");
-          })
-          .catch(err => {
-            console.error("Clipboard API error:", err);
-            // Fall back to execCommand
-            const success = window.copyToClipboardFallback(documentText);
-            if (success) {
-              alert("Document copied to clipboard!");
-            } else {
-              alert("Failed to copy to clipboard. Please try again.");
-            }
-          });
+      // Use the fallback function
+      if (copyToClipboardFallback(documentText)) {
+        alert("Document copied to clipboard!");
       } else {
-        // Use fallback for browsers that don't support clipboard API
-        const success = window.copyToClipboardFallback(documentText);
-        if (success) {
-          alert("Document copied to clipboard!");
-        } else {
-          alert("Failed to copy to clipboard. Please try again.");
-        }
+        alert("Failed to copy to clipboard. Please try again or select and copy manually.");
       }
     } catch (error) {
       console.error("Error in copyToClipboard:", error);
@@ -324,15 +336,10 @@ const App = () => {
       }
       
       // Call the document generation function
-      const success = window.generateWordDoc(documentText, {
+      window.generateWordDoc(documentText, {
         documentTitle: "Credit Card Authorization Form",
         fileName: "Credit_Card_Authorization_Form"
       });
-      
-      if (!success) {
-        console.error("Word generation failed");
-        alert("Failed to generate Word document. Please try again or use the copy option.");
-      }
     } catch (error) {
       console.error("Error in downloadAsWord:", error);
       alert("Error generating Word document. Please try again or use the copy option.");
