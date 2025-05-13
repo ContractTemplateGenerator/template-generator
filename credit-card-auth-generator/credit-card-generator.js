@@ -21,37 +21,6 @@ const Tooltip = ({ text, children }) => {
   );
 };
 
-// Clipboard fallback function
-const copyToClipboardFallback = (text) => {
-  // Create a temporary textarea element
-  const textArea = document.createElement("textarea");
-  
-  // Set its value to the text
-  textArea.value = text;
-  
-  // Make it invisible
-  textArea.style.position = "fixed";
-  textArea.style.left = "-999999px";
-  textArea.style.top = "-999999px";
-  document.body.appendChild(textArea);
-  
-  // Select and copy
-  textArea.focus();
-  textArea.select();
-  
-  let successful = false;
-  try {
-    successful = document.execCommand('copy');
-  } catch (err) {
-    console.error("execCommand error:", err);
-  }
-  
-  // Remove the temporary element
-  document.body.removeChild(textArea);
-  
-  return successful;
-};
-
 // Main App component
 const App = () => {
   // Current date for defaults
@@ -297,52 +266,37 @@ const App = () => {
     return docText;
   };
 
-  // Copy document to clipboard
+  // Copy document to clipboard - direct simple approach
   const copyToClipboard = () => {
-    try {
-      const documentText = generateDocumentText();
-      
-      // Use the fallback function
-      if (copyToClipboardFallback(documentText)) {
-        alert("Document copied to clipboard!");
-      } else {
-        alert("Failed to copy to clipboard. Please try again or select and copy manually.");
-      }
-    } catch (error) {
-      console.error("Error in copyToClipboard:", error);
-      alert("Error copying to clipboard. Please try again.");
+    console.log("Copy button clicked");
+    const documentText = generateDocumentText();
+    
+    // This uses the helper function defined in index.html
+    if (window.copyTextToClipboard) {
+      window.copyTextToClipboard(documentText);
+    } else {
+      // Fallback if the function isn't available
+      const textarea = document.createElement('textarea');
+      textarea.value = documentText;
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textarea);
+      alert('Document copied to clipboard!');
     }
   };
   
-  // Download as Word document
+  // Download as Word document - direct simple approach
   const downloadAsWord = () => {
-    try {
-      console.log("Download MS Word button clicked");
-      
-      const documentText = generateDocumentText();
-      
-      // Make sure document text is available
-      if (!documentText) {
-        console.error("Document text is empty");
-        alert("Cannot generate document - text is empty. Please check the form data.");
-        return;
-      }
-      
-      // Check if window.generateWordDoc exists
-      if (typeof window.generateWordDoc !== 'function') {
-        console.error("Word generation function not found");
-        alert("Word document generation function not available. Please try again or use the copy option.");
-        return;
-      }
-      
-      // Call the document generation function
-      window.generateWordDoc(documentText, {
-        documentTitle: "Credit Card Authorization Form",
-        fileName: "Credit_Card_Authorization_Form"
-      });
-    } catch (error) {
-      console.error("Error in downloadAsWord:", error);
-      alert("Error generating Word document. Please try again or use the copy option.");
+    console.log("Download button clicked");
+    const documentText = generateDocumentText();
+    
+    // This uses the helper function defined in index.html
+    if (window.generateAndDownloadWord) {
+      window.generateAndDownloadWord(documentText, "Credit Card Authorization Form");
+    } else {
+      // Simple fallback
+      alert("Download function not available. Please try the copy option.");
     }
   };
   
@@ -1068,7 +1022,7 @@ const App = () => {
               Previous
             </button>
             
-            {/* Copy to clipboard button */}
+            {/* Simple Copy to clipboard button */}
             <button
               onClick={copyToClipboard}
               className="nav-button"
@@ -1082,7 +1036,7 @@ const App = () => {
               Copy to Clipboard
             </button>
             
-            {/* Download MS Word button */}
+            {/* Simple Download MS Word button */}
             <button
               onClick={downloadAsWord}
               className="nav-button"
