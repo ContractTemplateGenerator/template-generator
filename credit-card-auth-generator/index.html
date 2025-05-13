@@ -5,84 +5,103 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Credit Card Authorization Form Generator | terms.law</title>
     <link rel="stylesheet" href="styles.css">
+    <!-- React and Babel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <!-- Feather Icons -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 </head>
 <body>
     <div id="root"></div>
     
+    <!-- Simple, direct implementation of the document generator functions -->
     <script>
-        // Define Word document generation function directly in HTML
-        window.generateWordDoc = function(documentText, formData) {
-            try {
-                console.log("Starting Word document generation...");
-                
-                // Create HTML content that can be rendered in Word
-                let htmlContent = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-        <meta charset="UTF-8">
-        <title>${formData.documentTitle || "Credit Card Authorization Form"}</title>
-        <style>
-          body {
-            font-family: 'Times New Roman', serif;
+        // Helper function for Copy to Clipboard
+        function copyTextToClipboard(text) {
+            // Create a temporary textarea element
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            
+            // Make it invisible but part of the document
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = 0;
+            document.body.appendChild(textarea);
+            
+            // Select and copy
+            textarea.select();
+            document.execCommand('copy');
+            
+            // Clean up
+            document.body.removeChild(textarea);
+            
+            // Show success message
+            alert('Document copied to clipboard!');
+        }
+        
+        // Helper function for Word Document Generation
+        function generateAndDownloadWord(documentText, title) {
+            // Create HTML content for Word
+            const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>${title || "Credit Card Authorization Form"}</title>
+    <style>
+        body {
+            font-family: Times New Roman, serif;
             font-size: 12pt;
             line-height: 1.5;
             margin: 1in;
-          }
-          h1 {
+        }
+        h1 {
             text-align: center;
             font-size: 16pt;
             margin-bottom: 20pt;
             font-weight: bold;
-          }
-          p {
+        }
+        p {
             margin-bottom: 10pt;
-          }
-        </style>
-        </head>
-        <body>
-        `;
-                
-                // Process text - convert newlines to HTML paragraphs
-                const textHtml = documentText
-                  .split('\n\n')
-                  .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
-                  .join('');
-                
-                // Add text to HTML content
-                htmlContent += textHtml;
-                
-                // Close HTML document
-                htmlContent += '</body></html>';
-                
-                // Convert HTML to Blob
-                const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
-                
-                // Create download link and trigger download
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `${formData.fileName || 'Credit-Card-Authorization-Form'}.doc`;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                
-                console.log("Document generated and download triggered");
-                return true;
-                
-            } catch (error) {
-                console.error("Error generating Word document:", error);
-                alert("Error generating Word document. Please try again or use the copy option.");
-                return false;
-            }
-        };
+        }
+    </style>
+</head>
+<body>
+    ${documentText.split('\n\n').map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '').join('')}
+</body>
+</html>`;
+            
+            // Convert to Blob
+            const blob = new Blob([htmlContent], {type: 'application/msword'});
+            
+            // Create download link
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Credit_Card_Authorization_Form.doc';
+            
+            // Append to document, click, and remove
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            // Show success message
+            alert('Word document downloaded!');
+        }
+        
+        // Make functions globally available
+        window.copyTextToClipboard = copyTextToClipboard;
+        window.generateAndDownloadWord = generateAndDownloadWord;
     </script>
     
+    <!-- Main React component -->
+    <script type="text/babel">
+        // Credit Card Authorization Form Generator will be loaded here
+    </script>
+    
+    <!-- Load the main React component after the page loads -->
     <script type="text/babel" src="credit-card-generator.js"></script>
+    
+    <!-- Initialize Feather icons after the page loads -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             feather.replace();
