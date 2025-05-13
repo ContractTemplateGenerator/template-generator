@@ -270,14 +270,32 @@ const App = () => {
   const copyToClipboard = () => {
     try {
       const documentText = generateDocumentText();
-      navigator.clipboard.writeText(documentText)
-        .then(() => {
+      
+      // Try the modern clipboard API first
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(documentText)
+          .then(() => {
+            alert("Document copied to clipboard!");
+          })
+          .catch(err => {
+            console.error("Clipboard API error:", err);
+            // Fall back to execCommand
+            const success = window.copyToClipboardFallback(documentText);
+            if (success) {
+              alert("Document copied to clipboard!");
+            } else {
+              alert("Failed to copy to clipboard. Please try again.");
+            }
+          });
+      } else {
+        // Use fallback for browsers that don't support clipboard API
+        const success = window.copyToClipboardFallback(documentText);
+        if (success) {
           alert("Document copied to clipboard!");
-        })
-        .catch(err => {
-          console.error("Error copying to clipboard:", err);
+        } else {
           alert("Failed to copy to clipboard. Please try again.");
-        });
+        }
+      }
     } catch (error) {
       console.error("Error in copyToClipboard:", error);
       alert("Error copying to clipboard. Please try again.");
@@ -306,10 +324,15 @@ const App = () => {
       }
       
       // Call the document generation function
-      window.generateWordDoc(documentText, {
+      const success = window.generateWordDoc(documentText, {
         documentTitle: "Credit Card Authorization Form",
         fileName: "Credit_Card_Authorization_Form"
       });
+      
+      if (!success) {
+        console.error("Word generation failed");
+        alert("Failed to generate Word document. Please try again or use the copy option.");
+      }
     } catch (error) {
       console.error("Error in downloadAsWord:", error);
       alert("Error generating Word document. Please try again or use the copy option.");
