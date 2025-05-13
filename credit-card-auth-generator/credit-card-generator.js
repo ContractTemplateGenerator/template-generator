@@ -61,6 +61,8 @@ const App = () => {
     
     // Authorization
     purpose: "Monthly subscription service",
+    purposeCustom: "",
+    customPurpose: false,
     agreementDate: formattedDate,
     authorizationDuration: "Until canceled in writing",
     customDuration: "",
@@ -97,11 +99,34 @@ const App = () => {
     // Record what field was changed for highlighting
     setLastChanged(name);
     
-    // Update form data
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    // Handle special cases
+    if (name === "purpose") {
+      if (value === "custom") {
+        setFormData(prev => ({
+          ...prev,
+          customPurpose: true,
+          purpose: prev.purposeCustom || "Custom purpose"
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          customPurpose: false,
+          purpose: value
+        }));
+      }
+    } else if (name === "purposeCustom") {
+      setFormData(prev => ({
+        ...prev,
+        purposeCustom: value,
+        purpose: value
+      }));
+    } else {
+      // Update form data normally
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
   
   // Navigation functions
@@ -243,15 +268,20 @@ const App = () => {
 
   // Copy document to clipboard
   const copyToClipboard = () => {
-    const documentText = generateDocumentText();
-    navigator.clipboard.writeText(documentText)
-      .then(() => {
-        alert("Document copied to clipboard!");
-      })
-      .catch(err => {
-        console.error("Error copying to clipboard:", err);
-        alert("Failed to copy to clipboard. Please try again.");
-      });
+    try {
+      const documentText = generateDocumentText();
+      navigator.clipboard.writeText(documentText)
+        .then(() => {
+          alert("Document copied to clipboard!");
+        })
+        .catch(err => {
+          console.error("Error copying to clipboard:", err);
+          alert("Failed to copy to clipboard. Please try again.");
+        });
+    } catch (error) {
+      console.error("Error in copyToClipboard:", error);
+      alert("Error copying to clipboard. Please try again.");
+    }
   };
   
   // Download as Word document
@@ -265,6 +295,13 @@ const App = () => {
       if (!documentText) {
         console.error("Document text is empty");
         alert("Cannot generate document - text is empty. Please check the form data.");
+        return;
+      }
+      
+      // Check if window.generateWordDoc exists
+      if (typeof window.generateWordDoc !== 'function') {
+        console.error("Word generation function not found");
+        alert("Word document generation function not available. Please try again or use the copy option.");
         return;
       }
       
@@ -761,14 +798,36 @@ const App = () => {
                 <Tooltip text="Specify what products or services are being charged for.">
                   <label htmlFor="purpose">Purpose of Authorization</label>
                 </Tooltip>
-                <input 
-                  type="text" 
+                <select 
                   id="purpose" 
                   name="purpose" 
-                  value={formData.purpose} 
+                  value={formData.customPurpose ? "custom" : formData.purpose} 
                   onChange={handleChange}
-                />
+                >
+                  <option value="Monthly subscription service">Monthly subscription service</option>
+                  <option value="Annual membership fee">Annual membership fee</option>
+                  <option value="One-time product purchase">One-time product purchase</option>
+                  <option value="Recurring service payment">Recurring service payment</option>
+                  <option value="Installment payment">Installment payment</option>
+                  <option value="Security deposit">Security deposit</option>
+                  <option value="Processing fee">Processing fee</option>
+                  <option value="custom">Custom purpose...</option>
+                </select>
               </div>
+              
+              {formData.customPurpose && (
+                <div className="form-group">
+                  <label htmlFor="purposeCustom">Custom Purpose</label>
+                  <input 
+                    type="text" 
+                    id="purposeCustom" 
+                    name="purposeCustom" 
+                    value={formData.purposeCustom} 
+                    onChange={handleChange}
+                    placeholder="Enter custom purpose"
+                  />
+                </div>
+              )}
               
               <div className="form-group">
                 <label htmlFor="agreementDate">Agreement Date</label>
@@ -817,68 +876,110 @@ const App = () => {
                 <label>Additional Terms</label>
                 
                 <div className="checkbox-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      id="includeCancellation" 
-                      name="includeCancellation" 
-                      checked={formData.includeCancellation} 
-                      onChange={handleChange}
-                    />
-                    Include cancellation policy
-                  </label>
+                  <Tooltip text="Requires customers to provide advance notice before canceling the authorization.">
+                    <label className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        id="includeCancellation" 
+                        name="includeCancellation" 
+                        checked={formData.includeCancellation} 
+                        onChange={handleChange}
+                      />
+                      Include cancellation policy
+                    </label>
+                  </Tooltip>
                 </div>
                 
                 <div className="checkbox-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      id="includeRefund" 
-                      name="includeRefund" 
-                      checked={formData.includeRefund} 
+                  <Tooltip text="Specifies if and how refunds will be processed for charges made under this authorization.">
+                    <label className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        id="includeRefund" 
+                        name="includeRefund" 
+                        checked={formData.includeRefund} 
+                        onChange={handleChange}
+                      />
+                      Include refund policy
+                    </label>
+                  </Tooltip>
+                </div>
+                
+                {formData.includeRefund && (
+                  <div className="form-group" style={{marginLeft: "20px", marginTop: "10px"}}>
+                    <label htmlFor="refundPolicy">Refund Policy</label>
+                    <select 
+                      id="refundPolicy" 
+                      name="refundPolicy" 
+                      value={formData.refundPolicy} 
                       onChange={handleChange}
-                    />
-                    Include refund policy
-                  </label>
+                    >
+                      <option value="No refunds">No refunds</option>
+                      <option value="Partial refund at company's discretion">Partial refund at company's discretion</option>
+                      <option value="Full refund within 30 days">Full refund within 30 days</option>
+                      <option value="Prorated refund">Prorated refund</option>
+                      <option value="custom">Custom refund policy...</option>
+                    </select>
+                  </div>
+                )}
+                
+                {formData.includeRefund && formData.refundPolicy === "custom" && (
+                  <div className="form-group" style={{marginLeft: "20px", marginTop: "10px"}}>
+                    <label htmlFor="customRefund">Custom Refund Policy</label>
+                    <textarea 
+                      id="customRefund" 
+                      name="customRefund" 
+                      value={formData.customRefund} 
+                      onChange={handleChange}
+                      rows="3"
+                      placeholder="Enter your custom refund policy"
+                    ></textarea>
+                  </div>
+                )}
+                
+                <div className="checkbox-group">
+                  <Tooltip text="Adds a fee for any changes to the payment schedule or amount after authorization is signed.">
+                    <label className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        id="includeChangeFee" 
+                        name="includeChangeFee" 
+                        checked={formData.includeChangeFee} 
+                        onChange={handleChange}
+                      />
+                      Include change fee disclosure
+                    </label>
+                  </Tooltip>
                 </div>
                 
                 <div className="checkbox-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      id="includeChangeFee" 
-                      name="includeChangeFee" 
-                      checked={formData.includeChangeFee} 
-                      onChange={handleChange}
-                    />
-                    Include change fee disclosure
-                  </label>
+                  <Tooltip text="Clarifies that the cardholder is responsible for any fees from their card issuer related to this authorization.">
+                    <label className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        id="includeLiability" 
+                        name="includeLiability" 
+                        checked={formData.includeLiability} 
+                        onChange={handleChange}
+                      />
+                      Include liability statement
+                    </label>
+                  </Tooltip>
                 </div>
                 
                 <div className="checkbox-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      id="includeLiability" 
-                      name="includeLiability" 
-                      checked={formData.includeLiability} 
-                      onChange={handleChange}
-                    />
-                    Include liability statement
-                  </label>
-                </div>
-                
-                <div className="checkbox-group">
-                  <label className="checkbox-label">
-                    <input 
-                      type="checkbox" 
-                      id="includeGoverningLaw" 
-                      name="includeGoverningLaw" 
-                      checked={formData.includeGoverningLaw} 
-                      onChange={handleChange}
-                    />
-                    Include governing law
-                  </label>
+                  <Tooltip text="Specifies which state or jurisdiction's laws govern the authorization agreement.">
+                    <label className="checkbox-label">
+                      <input 
+                        type="checkbox" 
+                        id="includeGoverningLaw" 
+                        name="includeGoverningLaw" 
+                        checked={formData.includeGoverningLaw} 
+                        onChange={handleChange}
+                      />
+                      Include governing law
+                    </label>
+                  </Tooltip>
                 </div>
               </div>
               
@@ -893,38 +994,6 @@ const App = () => {
                     onChange={handleChange}
                     min="0"
                   />
-                </div>
-              )}
-              
-              {formData.includeRefund && (
-                <div className="form-group">
-                  <label htmlFor="refundPolicy">Refund Policy</label>
-                  <select 
-                    id="refundPolicy" 
-                    name="refundPolicy" 
-                    value={formData.refundPolicy} 
-                    onChange={handleChange}
-                  >
-                    <option value="No refunds">No refunds</option>
-                    <option value="Partial refund at company's discretion">Partial refund at company's discretion</option>
-                    <option value="Full refund within 30 days">Full refund within 30 days</option>
-                    <option value="Prorated refund">Prorated refund</option>
-                    <option value="custom">Custom refund policy...</option>
-                  </select>
-                </div>
-              )}
-              
-              {formData.includeRefund && formData.refundPolicy === "custom" && (
-                <div className="form-group">
-                  <label htmlFor="customRefund">Custom Refund Policy</label>
-                  <textarea 
-                    id="customRefund" 
-                    name="customRefund" 
-                    value={formData.customRefund} 
-                    onChange={handleChange}
-                    rows="3"
-                    placeholder="Enter your custom refund policy"
-                  ></textarea>
                 </div>
               )}
               

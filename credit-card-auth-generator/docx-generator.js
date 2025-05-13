@@ -101,9 +101,11 @@ window.generateWordDoc = function(documentText, formData) {
     document.body.removeChild(link);
     
     console.log("Document generated and download triggered");
+    return true;
     
   } catch (error) {
     console.error("Error generating Word document:", error);
     alert("Error generating Word document. Please try again or use the copy option.");
+    return false;
   }
 };
