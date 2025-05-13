@@ -21,11 +21,13 @@ window.generateWordDoc = function(documentText, formData) {
     text-align: center;
     font-size: 16pt;
     margin-bottom: 20pt;
+    font-weight: bold;
   }
   h2 {
     font-size: 14pt;
     margin-top: 14pt;
     margin-bottom: 10pt;
+    font-weight: bold;
   }
   p {
     margin-bottom: 10pt;
@@ -43,10 +45,19 @@ window.generateWordDoc = function(documentText, formData) {
   }
   .bilingual-table {
     width: 100%;
+    margin-bottom: 10pt;
   }
   .bilingual-column {
     width: 50%;
     vertical-align: top;
+    padding-right: 10pt;
+    padding-left: 10pt;
+  }
+  .bilingual-column-left {
+    border-right: 1px solid #ddd;
+  }
+  strong {
+    font-weight: bold;
   }
 </style>
 </head>

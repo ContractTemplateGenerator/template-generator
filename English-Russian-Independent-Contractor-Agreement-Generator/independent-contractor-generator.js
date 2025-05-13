@@ -1,5 +1,3 @@
-//... (continuing from the previous part)
-
             <div className="form-group">
               <label className="form-label" htmlFor="consultantCountry">
                 {language === 'en' ? 'Consultant Country' : 'Страна Консультанта'}
@@ -1095,8 +1093,8 @@
       <div className="app-header">
         <h1 className="app-title">
           {language === 'en' 
-            ? 'Independent Contractor Agreement Generator' 
-            : 'Генератор Договора с Независимым Подрядчиком'}
+            ? 'English-Russian Independent Contractor Agreement Generator' 
+            : 'Генератор Англо-Русского Договора с Независимым Подрядчиком'}
         </h1>
         <p className="app-description">
           {language === 'en'
@@ -1147,7 +1145,7 @@
               <h2>{language === 'en' ? 'Live Preview' : 'Предпросмотр'}</h2>
               <div 
                 className="document-preview"
-                dangerouslySetInnerHTML={{ __html: documentText }}
+                dangerouslySetInnerHTML={{ __html: getHighlightedDocument() }}
               ></div>
             </div>
           </div>
@@ -1223,224 +1221,6 @@
         <button onClick={togglePreview}>
           <i data-feather="eye"></i>
         </button>
-      </div>
-      
-      {/* Instructional content */}
-      <div className="instructional-content">
-        <h2>{language === 'en' ? 'Understanding Independent Contractor Agreements' : 'Понимание Договоров с Независимыми Подрядчиками'}</h2>
-        
-        <p>
-          {language === 'en'
-            ? 'An independent contractor agreement is a legal document that establishes the working relationship between a company (client) and an independent professional (contractor). This agreement is crucial for defining the scope of work, payment terms, intellectual property rights, and other important aspects of the relationship.'
-            : 'Договор с независимым подрядчиком - это юридический документ, который устанавливает рабочие отношения между компанией (клиентом) и независимым профессионалом (подрядчиком). Этот договор имеет решающее значение для определения объема работ, условий оплаты, прав интеллектуальной собственности и других важных аспектов отношений.'}
-        </p>
-        
-        <h3>{language === 'en' ? 'Employee vs. Independent Contractor' : 'Сотрудник vs. Независимый Подрядчик'}</h3>
-        
-        <p>
-          {language === 'en'
-            ? 'Properly classifying workers is critical to avoiding legal and tax issues. The distinction between employees and independent contractors varies by jurisdiction, but generally depends on the level of control and independence.'
-            : 'Правильная классификация работников имеет решающее значение для избежания юридических и налоговых проблем. Различие между сотрудниками и независимыми подрядчиками варьируется в зависимости от юрисдикции, но обычно зависит от уровня контроля и независимости.'}
-        </p>
-        
-        <div className="risk-spectrum">
-          <div className="risk-level">
-            {language === 'en' ? 'Complete Independence' : 'Полная Независимость'}
-            <div>{language === 'en' ? 'Contractor' : 'Подрядчик'}</div>
-          </div>
-          <div className="risk-level">
-            {language === 'en' ? 'Limited Control' : 'Ограниченный Контроль'}
-            <div>{language === 'en' ? 'Contractor' : 'Подрядчик'}</div>
-          </div>
-          <div className="risk-level">
-            {language === 'en' ? 'Mixed Factors' : 'Смешанные Факторы'}
-            <div>{language === 'en' ? 'Risk Zone' : 'Зона Риска'}</div>
-          </div>
-          <div className="risk-level">
-            {language === 'en' ? 'Extensive Control' : 'Обширный Контроль'}
-            <div>{language === 'en' ? 'Employee' : 'Сотрудник'}</div>
-          </div>
-          <div className="risk-level">
-            {language === 'en' ? 'Complete Control' : 'Полный Контроль'}
-            <div>{language === 'en' ? 'Employee' : 'Сотрудник'}</div>
-          </div>
-        </div>
-        
-        <h3>{language === 'en' ? 'Key Components of a Strong Agreement' : 'Ключевые Компоненты Надежного Договора'}</h3>
-        
-        <p>
-          {language === 'en'
-            ? 'A well-drafted independent contractor agreement should clearly address the following key areas:'
-            : 'Хорошо составленный договор с независимым подрядчиком должен четко определять следующие ключевые области:'}
-        </p>
-        
-        <div className="comparison-table">
-          <table>
-            <thead>
-              <tr>
-                <th>{language === 'en' ? 'Component' : 'Компонент'}</th>
-                <th>{language === 'en' ? 'Purpose' : 'Цель'}</th>
-                <th>{language === 'en' ? 'Key Considerations' : 'Ключевые Соображения'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{language === 'en' ? 'Scope of Work' : 'Объем Работ'}</td>
-                <td>{language === 'en' ? 'Defines services to be provided' : 'Определяет предоставляемые услуги'}</td>
-                <td>{language === 'en' ? 'Be specific about deliverables, timelines and acceptance criteria' : 'Будьте конкретны в отношении результатов, сроков и критериев приемки'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Payment Terms' : 'Условия Оплаты'}</td>
-                <td>{language === 'en' ? 'Establishes compensation structure' : 'Устанавливает структуру компенсации'}</td>
-                <td>{language === 'en' ? 'Specify rates, payment schedule, expenses, and invoicing procedures' : 'Укажите ставки, график платежей, расходы и процедуры выставления счетов'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'IP Rights' : 'Права ИС'}</td>
-                <td>{language === 'en' ? 'Addresses ownership of work product' : 'Рассматривает вопросы владения результатами работы'}</td>
-                <td>{language === 'en' ? 'Consider assignment provisions, licenses, and moral rights' : 'Учитывайте положения о передаче прав, лицензии и неимущественные права'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Term & Termination' : 'Срок и Расторжение'}</td>
-                <td>{language === 'en' ? 'Defines contract duration and ending conditions' : 'Определяет продолжительность контракта и условия окончания'}</td>
-                <td>{language === 'en' ? 'Include notice periods, termination for cause, and wind-down procedures' : 'Включите периоды уведомления, расторжение по причине и процедуры завершения'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Confidentiality' : 'Конфиденциальность'}</td>
-                <td>{language === 'en' ? 'Protects sensitive information' : 'Защищает конфиденциальную информацию'}</td>
-                <td>{language === 'en' ? 'Define confidential information and term of protection' : 'Определите конфиденциальную информацию и срок защиты'}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <h3>{language === 'en' ? 'US and Russian Legal Considerations' : 'Юридические Аспекты в США и России'}</h3>
-        
-        <div className="jurisdiction-matrix">
-          <div className="jurisdiction-card">
-            <h4>{language === 'en' ? 'United States' : 'Соединенные Штаты'}</h4>
-            <p>{language === 'en' ? 'Classification based on control, independence, and business integration' : 'Классификация на основе контроля, независимости и бизнес-интеграции'}</p>
-            <p>{language === 'en' ? 'IRS and Department of Labor tests for employment status' : 'Тесты Налоговой службы и Министерства труда на статус занятости'}</p>
-            <p>{language === 'en' ? 'State laws may vary significantly (e.g., California AB5)' : 'Законы штатов могут существенно различаться (например, California AB5)'}</p>
-          </div>
-          <div className="jurisdiction-card">
-            <h4>{language === 'en' ? 'Russian Federation' : 'Российская Федерация'}</h4>
-            <p>{language === 'en' ? 'Civil Code regulates independent contractor relationships' : 'Гражданский кодекс регулирует отношения с независимыми подрядчиками'}</p>
-            <p>{language === 'en' ? 'Labor Code applies to employment relationships' : 'Трудовой кодекс применяется к трудовым отношениям'}</p>
-            <p>{language === 'en' ? 'Focus on actual relationship characteristics over contractual labels' : 'Внимание на фактических характеристиках отношений, а не на договорных ярлыках'}</p>
-          </div>
-          <div className="jurisdiction-card">
-            <h4>{language === 'en' ? 'Cross-Border Considerations' : 'Трансграничные Аспекты'}</h4>
-            <p>{language === 'en' ? 'Choice of law and jurisdiction clauses are critical' : 'Решающее значение имеют положения о выборе права и юрисдикции'}</p>
-            <p>{language === 'en' ? 'Consider tax implications in both jurisdictions' : 'Учитывайте налоговые последствия в обеих юрисдикциях'}</p>
-            <p>{language === 'en' ? 'International payment regulations may apply' : 'Могут применяться международные правила платежей'}</p>
-          </div>
-        </div>
-        
-        <h3>{language === 'en' ? 'Common Pitfalls to Avoid' : 'Распространенные Ошибки, Которых Следует Избегать'}</h3>
-        
-        <p>
-          {language === 'en'
-            ? 'When creating an independent contractor agreement, be careful to avoid these common mistakes:'
-            : 'При создании договора с независимым подрядчиком будьте осторожны, чтобы избежать этих распространенных ошибок:'}
-        </p>
-        
-        <div className="comparison-table">
-          <table>
-            <thead>
-              <tr>
-                <th>{language === 'en' ? 'Pitfall' : 'Ошибка'}</th>
-                <th>{language === 'en' ? 'Risk' : 'Риск'}</th>
-                <th>{language === 'en' ? 'Prevention' : 'Предотвращение'}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>{language === 'en' ? 'Misclassification' : 'Неправильная Классификация'}</td>
-                <td>{language === 'en' ? 'Tax penalties, back wages, benefits claims' : 'Налоговые штрафы, задолженность по зарплате, требования о льготах'}</td>
-                <td>{language === 'en' ? 'Ensure relationship truly reflects independent contractor status' : 'Убедитесь, что отношения действительно отражают статус независимого подрядчика'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Vague Scope of Work' : 'Неясный Объем Работ'}</td>
-                <td>{language === 'en' ? 'Disputes over deliverables and quality' : 'Споры о результатах и качестве'}</td>
-                <td>{language === 'en' ? 'Clearly define all requirements and acceptance criteria' : 'Четко определите все требования и критерии приемки'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Inadequate IP Provisions' : 'Недостаточные Положения об ИС'}</td>
-                <td>{language === 'en' ? 'Inability to use or commercialize work product' : 'Невозможность использовать или коммерциализировать результаты работы'}</td>
-                <td>{language === 'en' ? 'Include strong assignment and work-for-hire language' : 'Включите строгие формулировки о передаче прав и работе по найму'}</td>
-              </tr>
-              <tr>
-                <td>{language === 'en' ? 'Overly Broad Restrictions' : 'Слишком Широкие Ограничения'}</td>
-                <td>{language === 'en' ? 'Unenforceable terms, potential litigation' : 'Неисполнимые условия, потенциальные судебные разбирательства'}</td>
-                <td>{language === 'en' ? 'Tailor non-compete and confidentiality terms to be reasonable' : 'Адаптируйте условия о неконкуренции и конфиденциальности, чтобы они были разумными'}</td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        
-        <div className="faq-section">
-          <h3>{language === 'en' ? 'Frequently Asked Questions' : 'Часто Задаваемые Вопросы'}</h3>
-          
-          <div className="faq-item">
-            <h4 className="faq-question">
-              {language === 'en' 
-                ? 'What happens if my independent contractor agreement is found to actually create an employment relationship?' 
-                : 'Что произойдет, если будет установлено, что мой договор с независимым подрядчиком фактически создает трудовые отношения?'}
-            </h4>
-            <div className="faq-answer">
-              <p>
-                {language === 'en'
-                  ? 'If your contractor is reclassified as an employee, you may face significant financial and legal consequences. These can include payment of back wages, overtime, benefits, and various taxes, plus potential penalties and interest. The exact implications vary by jurisdiction but can be substantial. To avoid this, ensure your working relationship truly reflects independent contractor status, with the contractor maintaining control over how they perform their work, using their own equipment, serving multiple clients, and bearing their own business expenses.'
-                  : 'Если ваш подрядчик будет переклассифицирован как сотрудник, вы можете столкнуться со значительными финансовыми и юридическими последствиями. Они могут включать выплату задолженности по заработной плате, сверхурочных, льгот и различных налогов, а также потенциальных штрафов и процентов. Точные последствия варьируются в зависимости от юрисдикции, но могут быть существенными. Чтобы избежать этого, убедитесь, что ваши рабочие отношения действительно отражают статус независимого подрядчика, при котором подрядчик сохраняет контроль над тем, как он выполняет свою работу, использует свое собственное оборудование, обслуживает нескольких клиентов и несет свои собственные деловые расходы.'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="faq-item">
-            <h4 className="faq-question">
-              {language === 'en' 
-                ? 'How enforceable are non-compete clauses in independent contractor agreements?' 
-                : 'Насколько исполнимы положения о неконкуренции в договорах с независимыми подрядчиками?'}
-            </h4>
-            <div className="faq-answer">
-              <p>
-                {language === 'en'
-                  ? 'The enforceability of non-compete clauses varies significantly by jurisdiction. In some places, like California, non-competes are generally unenforceable regardless of how they\'re written. In most other jurisdictions, non-competes for independent contractors must be narrowly tailored to protect legitimate business interests, reasonable in time (typically 1-2 years maximum), reasonable in geographic scope, and not overly restrictive of the contractor\'s ability to earn a living. With independent contractors, courts often scrutinize these provisions more carefully than with employees. Consider alternatives like robust confidentiality and non-solicitation provisions, which face fewer enforcement hurdles while still protecting your business interests.'
-                  : 'Исполнимость положений о неконкуренции значительно варьируется в зависимости от юрисдикции. В некоторых местах, например, в Калифорнии, положения о неконкуренции, как правило, неисполнимы независимо от того, как они написаны. В большинстве других юрисдикций положения о неконкуренции для независимых подрядчиков должны быть узко направлены на защиту законных деловых интересов, разумными по времени (обычно максимум 1-2 года), разумными по географическому охвату и не слишком ограничивающими возможности подрядчика зарабатывать на жизнь. С независимыми подрядчиками суды часто более тщательно проверяют эти положения, чем с сотрудниками. Рассмотрите альтернативы, такие как надежные положения о конфиденциальности и непереманивании, которые сталкиваются с меньшими препятствиями для исполнения, при этом все еще защищая ваши деловые интересы.'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="faq-item">
-            <h4 className="faq-question">
-              {language === 'en' 
-                ? 'What special considerations apply to cross-border independent contractor agreements between US and Russian parties?' 
-                : 'Какие особые соображения применяются к трансграничным договорам с независимыми подрядчиками между американскими и российскими сторонами?'}
-            </h4>
-            <div className="faq-answer">
-              <p>
-                {language === 'en'
-                  ? 'Cross-border agreements between US and Russian parties face several unique challenges. First, consider the governing law and jurisdiction clauses carefully—these determine which country\'s laws apply to disputes and where litigation occurs. Second, be aware of currency regulations and payment issues; currency conversion, international transfer fees, and banking restrictions can impact payment terms. Third, address tax implications: both countries may have reporting requirements, withholding obligations, and potential double-taxation issues. Fourth, intellectual property protection should be explicitly addressed for both jurisdictions—what constitutes a work-for-hire differs between US and Russian law. Finally, translation matters: provide accurate translations and specify which language prevails in case of discrepancies. Working with legal counsel experienced in both jurisdictions is highly recommended for such agreements.'
-                  : 'Трансграничные соглашения между американскими и российскими сторонами сталкиваются с несколькими уникальными проблемами. Во-первых, внимательно рассмотрите пункты о применимом праве и юрисдикции—они определяют, законы какой страны применяются к спорам и где происходит судебное разбирательство. Во-вторых, учитывайте валютные правила и проблемы с платежами; конвертация валюты, комиссии за международные переводы и банковские ограничения могут влиять на условия оплаты. В-третьих, учитывайте налоговые последствия: обе страны могут иметь требования к отчетности, обязательства по удержанию и потенциальные проблемы двойного налогообложения. В-четвертых, защита интеллектуальной собственности должна быть четко определена для обеих юрисдикций—то, что считается работой по найму, различается между законодательством США и России. Наконец, перевод имеет значение: обеспечьте точные переводы и укажите, какой язык имеет преимущественную силу в случае расхождений. Для таких соглашений настоятельно рекомендуется работать с юридическими консультантами, имеющими опыт работы в обеих юрисдикциях.'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="faq-item">
-            <h4 className="faq-question">
-              {language === 'en' 
-                ? 'How can I effectively protect my company\'s intellectual property when working with independent contractors?' 
-                : 'Как я могу эффективно защитить интеллектуальную собственность моей компании при работе с независимыми подрядчиками?'}
-            </h4>
-            <div className="faq-answer">
-              <p>
-                {language === 'en'
-                  ? 'To effectively protect your intellectual property when working with independent contractors, implement a multi-layered approach. First, include explicit intellectual property assignment provisions that clearly transfer all rights, title, and interest in work product to your company. Second, address moral rights with a waiver where legally permitted. Third, include provisions for contractor cooperation in securing and defending IP rights, such as assistance with patent applications. Fourth, implement robust confidentiality provisions that specifically identify your proprietary information and set reasonable protection periods. Fifth, consider including a right to inspect and approve the contractor\'s work before final payment. Finally, set clear ownership terms for pre-existing intellectual property and background technology the contractor may incorporate into their work. Remember that these provisions must be enforceable in all relevant jurisdictions, which may require tailoring for cross-border relationships.'
-                  : 'Для эффективной защиты вашей интеллектуальной собственности при работе с независимыми подрядчиками используйте многоуровневый подход. Во-первых, включите явные положения о передаче интеллектуальной собственности, которые четко передают все права, титул и интерес в результатах работы вашей компании. Во-вторых, рассмотрите неимущественные права с отказом, где это юридически разрешено. В-третьих, включите положения о сотрудничестве подрядчика в обеспечении и защите прав ИС, например, помощь с патентными заявками. В-четвертых, внедрите надежные положения о конфиденциальности, которые конкретно определяют вашу проприетарную информацию и устанавливают разумные периоды защиты. В-пятых, рассмотрите возможность включения права на проверку и утверждение работы подрядчика перед окончательной оплатой. Наконец, установите четкие условия владения ранее существовавшей интеллектуальной собственностью и фоновой технологией, которую подрядчик может включить в свою работу. Помните, что эти положения должны быть исполнимы во всех соответствующих юрисдикциях, что может потребовать адаптации для трансграничных отношений.'}
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );
