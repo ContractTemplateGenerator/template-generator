@@ -15,7 +15,7 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 0.5in;
+    margin: 0;
   }
   h1 {
     text-align: center;

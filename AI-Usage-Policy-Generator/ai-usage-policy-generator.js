@@ -1913,18 +1913,33 @@ const AIUsagePolicyGenerator = () => {
         </button>
         
         {currentTab < tabs.length - 1 && (
-          <button
-            onClick={copyToClipboard}
-            className="nav-button"
-            style={{
-              backgroundColor: "#4f46e5", 
-              color: "white",
-              border: "none"
-            }}
-          >
-            <i data-feather="copy" style={{marginRight: "0.5rem"}}></i>
-            Copy to Clipboard
-          </button>
+          <>
+            <button
+              onClick={copyToClipboard}
+              className="nav-button"
+              style={{
+                backgroundColor: "#4f46e5", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <i data-feather="copy" style={{marginRight: "0.5rem"}}></i>
+              Copy to Clipboard
+            </button>
+            
+            <button
+              onClick={downloadAsWord}
+              className="nav-button"
+              style={{
+                backgroundColor: "#2563eb", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <i data-feather="file-text" style={{marginRight: "0.5rem"}}></i>
+              Download MS Word
+            </button>
+          </>
         )}
         
         <button
