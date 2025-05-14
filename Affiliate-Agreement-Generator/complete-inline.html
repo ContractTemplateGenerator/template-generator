@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Agreement Generator | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        // Word document generation function
+        const generateWordDoc = function(documentText, formData) {
+          try {
+            console.log("Starting Word document generation...");
+            
+            // Create HTML content that can be rendered in Word
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <title>${formData.companyName || "Affiliate Agreement"}</title>
+            <style>
+              body {
+                font-family: Calibri, Arial, sans-serif;
+                font-size: 12pt;
+                line-height: 1.5;
+                margin: 0;
+              }
+              h1 {
+                text-align: center;
+                font-size: 16pt;
+                margin-bottom: 20pt;
+                font-weight: bold;
+              }
+              h2 {
+                font-size: 14pt;
+                margin-top: 14pt;
+                margin-bottom: 10pt;
+                font-weight: bold;
+              }
+              h3 {
+                font-size: 12pt;
+                margin-top: 12pt;
+                margin-bottom: 8pt;
+                font-weight: bold;
+              }
+              p {
+                margin-bottom: 10pt;
+              }
+              .page-break {
+                page-break-before: always;
+              }
+              .header {
+                text-align: center;
+                margin-bottom: 30pt;
+              }
+              .footer {
+                text-align: center;
+                margin-top: 30pt;
+                font-size: 10pt;
+                color: #666;
+              }
+              .signature-block {
+                margin-top: 50pt;
+                page-break-inside: avoid;
+              }
+              .signature-line {
+                border-top: 1px solid #000;
+                width: 80%;
+                margin-top: 30pt;
+                margin-bottom: 10pt;
+              }
+            </style>
+            </head>
+            <body>
+            `;
+
+            // Process main text
+            const mainTextHtml = documentText
+              .split('\n\n')
+              .map(para => {
+                para = para.trim();
+                if (!para) return '';
+                
+                // Check if paragraph is a heading by looking for section numbers
+                if (/^\d+\.\s[A-Z\s&]+$/.test(para)) {
+                  return `<h1>${para}</h1>`;
+                } else if (/^\d+\.\d+\s[A-Za-z\s&]+$/.test(para)) {
+                  return `<h2>${para}</h2>`;
+                }
+                
+                return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+              })
+              .join('');
+            
+            // Add main text to HTML content
+            htmlContent += mainTextHtml;
+            
+            // Close HTML document
+            htmlContent += '</body></html>';
+            
+            // Convert HTML to Blob
+            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+            
+            // Create download link and trigger download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${formData.companyName || 'Affiliate-Agreement'}-${formData.affiliateName || 'Affiliate'}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log("Document generated and download triggered");
+            
+          } catch (error) {
+            console.error("Error generating Word document:", error);
+            alert("Error generating Word document. Please try again or use the copy option.");
+          }
+        };
+
+        const { useState, useEffect, useRef } = React;
+
+        // Main component
+        const AffiliateAgreementGenerator = () => {
+          // State for form data (simplified for this example)
+          const [formData, setFormData] = useState({
+            // Company Information
+            companyName: '',
+            companyAddress: '',
+            companyWebsite: '',
+            contactEmail: '',
+            effectiveDate: '',
+            
+            // Affiliate Information
+            affiliateName: '',
+            affiliateAddress: '',
+            affiliateWebsite: '',
+            affiliateEmail: '',
+            
+            // Agreement Terms
+            agreementTerm: '12-months', // 3-months, 6-months, 12-months, 24-months, indefinite
+            
+            // Commission Structure
+            commissionType: 'percentage', // percentage, flat-fee, tiered
+            commissionRate: 10, // percentage
+          });
+          
+          // State for tracking the current tab
+          const [currentTab, setCurrentTab] = useState(0);
+          
+          // State for tracking what was last changed
+          const [lastChanged, setLastChanged] = useState(null);
+          
+          // State for the generated document text
+          const [documentText, setDocumentText] = useState('');
+          
+          // Ref for preview content div
+          const previewRef = useRef(null);
+          
+          // Tab configuration (simplified)
+          const tabs = [
+            { id: 'company-info', label: 'Company Information' },
+            { id: 'affiliate-info', label: 'Affiliate Information' },
+            { id: 'agreement-terms', label: 'Agreement Terms' },
+            { id: 'commission', label: 'Commission Structure' },
+            { id: 'preview', label: 'Final Document' }
+          ];
+          
+          // Handle input changes
+          const handleChange = (e) => {
+            const { name, value, type, checked } = e.target;
+            
+            // Record what field was changed for highlighting
+            setLastChanged(name);
+            
+            // Handle regular fields
+            setFormData(prev => ({
+              ...prev,
+              [name]: type === 'checkbox' ? checked : value
+            }));
+          };
+          
+          // Navigation functions
+          const nextTab = () => {
+            if (currentTab < tabs.length - 1) {
+              setCurrentTab(currentTab + 1);
+            }
+          };
+          
+          const prevTab = () => {
+            if (currentTab > 0) {
+              setCurrentTab(currentTab - 1);
+            }
+          };
+          
+          const goToTab = (index) => {
+            setCurrentTab(index);
+          };
+          
+          // Generate the agreement document based on form data
+          useEffect(() => {
+            // Generate agreement text based on form data
+            const generateAgreementText = () => {
+              let agreement = '';
+              
+              // Title
+              agreement += `AFFILIATE AGREEMENT\n\n`;
+              
+              // Introduction
+              agreement += `This Affiliate Agreement (the "Agreement") is entered into as of ${formData.effectiveDate || '[DATE]'} (the "Effective Date") by and between:\n\n`;
+              agreement += `${formData.companyName || '[COMPANY NAME]'}, with its principal place of business at ${formData.companyAddress || '[COMPANY ADDRESS]'} (the "Company"),\n\n`;
+              agreement += `and\n\n`;
+              agreement += `${formData.affiliateName || '[AFFILIATE NAME]'}, with its principal place of business at ${formData.affiliateAddress || '[AFFILIATE ADDRESS]'} (the "Affiliate").\n\n`;
+              agreement += `WHEREAS, Company is in the business of selling products and/or services through its website ${formData.companyWebsite || '[COMPANY WEBSITE]'};\n\n`;
+              agreement += `WHEREAS, Affiliate operates the website ${formData.affiliateWebsite || '[AFFILIATE WEBSITE]'} and wishes to participate in Company's affiliate program;\n\n`;
+              agreement += `NOW, THEREFORE, in consideration of the mutual covenants contained herein, and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:\n\n`;
+              
+              // 1. Definitions
+              agreement += `1. DEFINITIONS\n\n`;
+              agreement += `1.1 "Affiliate Program" means the Company's marketing program in which the Affiliate markets and promotes the Company's products or services in exchange for a Commission.\n\n`;
+              agreement += `1.2 "Commission" means the payment made to Affiliate for Qualified Transactions as set forth in Section 3.\n\n`;
+              agreement += `1.3 "Qualified Transaction" means a completed sale of Company's products or services to a customer referred by Affiliate through an Affiliate Link, subject to the terms of this Agreement.\n\n`;
+              
+              // 2. Term
+              agreement += `2. TERM\n\n`;
+              
+              // Add term length based on selection
+              let termText = '';
+              switch(formData.agreementTerm) {
+                case '3-months':
+                  termText = 'three (3) months';
+                  break;
+                case '6-months':
+                  termText = 'six (6) months';
+                  break;
+                case '12-months':
+                  termText = 'twelve (12) months';
+                  break;
+                case '24-months':
+                  termText = 'twenty-four (24) months';
+                  break;
+                case 'indefinite':
+                  termText = 'an indefinite period, until terminated according to the terms of this Agreement';
+                  break;
+                default:
+                  termText = '[TERM PERIOD]';
+              }
+              
+              agreement += `This Agreement shall commence on the Effective Date and shall remain in effect for ${termText}.`;
+              agreement += `\n\n`;
+              
+              // 3. Commission Structure
+              agreement += `3. COMMISSION STRUCTURE\n\n`;
+              
+              // Add commission details based on type
+              if (formData.commissionType === 'percentage') {
+                agreement += `3.1 Commission Rate\nCompany shall pay Affiliate a commission of ${formData.commissionRate || '[RATE]'}% of the net sale price for each Qualified Transaction.\n\n`;
+              } else if (formData.commissionType === 'flat-fee') {
+                agreement += `3.1 Commission Rate\nCompany shall pay Affiliate a flat fee of $${formData.flatFeeAmount || '[AMOUNT]'} for each Qualified Transaction.\n\n`;
+              }
+              
+              // Signatures
+              agreement += `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.\n\n`;
+              agreement += `${formData.companyName || 'COMPANY'}\n\n`;
+              agreement += `By: ____________________________\n`;
+              agreement += `Name: __________________________\n`;
+              agreement += `Title: ___________________________\n`;
+              agreement += `Date: ____________________________\n\n`;
+              agreement += `${formData.affiliateName || 'AFFILIATE'}\n\n`;
+              agreement += `By: ____________________________\n`;
+              agreement += `Name: __________________________\n`;
+              agreement += `Title: ___________________________\n`;
+              agreement += `Date: ____________________________\n`;
+              
+              return agreement;
+            };
+            
+            // Update the document text
+            const newDocumentText = generateAgreementText();
+            setDocumentText(newDocumentText);
+          }, [formData]);
+          
+          // Create highlighted document text for preview
+          const createHighlightedText = () => {
+            // For simplicity, no highlighting in this version
+            return documentText;
+          };
+          
+          // Get highlighted document text
+          const highlightedText = createHighlightedText();
+          
+          // Copy document to clipboard
+          const copyToClipboard = () => {
+            try {
+              navigator.clipboard.writeText(documentText);
+              alert('Agreement copied to clipboard!');
+            } catch (error) {
+              console.error('Error copying to clipboard:', error);
+              alert('Failed to copy to clipboard. Please try again.');
+            }
+          };
+          
+          // Download as Word document
+          const downloadAsWord = () => {
+            try {
+              console.log("Download MS Word button clicked");
+              
+              // Make sure document text is available
+              if (!documentText) {
+                console.error("Document text is empty");
+                alert("Cannot generate document - text is empty. Please check the form data.");
+                return;
+              }
+              
+              // Call the document generation function
+              generateWordDoc(documentText, {
+                companyName: formData.companyName || 'Affiliate-Agreement',
+                affiliateName: formData.affiliateName || 'Affiliate'
+              });
+            } catch (error) {
+              console.error("Error in downloadAsWord:", error);
+              alert("Error generating Word document. Please try again or use the copy option.");
+            }
+          };
+          
+          // Render different form sections based on current tab
+          const renderForm = () => {
+            switch(currentTab) {
+              case 0: // Company Information
+                return (
+                  <div className="form-panel">
+                    <h2>Company Information</h2>
+                    <p>Enter information about your company (the party offering the affiliate program).</p>
+                    
+                    <div className="form-group">
+                      <label htmlFor="companyName">Company Name</label>
+                      <input
+                        type="text"
+                        id="companyName"
+                        name="companyName"
+                        value={formData.companyName}
+                        onChange={handleChange}
+                        placeholder="e.g., Acme Corporation"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="companyAddress">Company Address</label>
+                      <input
+                        type="text"
+                        id="companyAddress"
+                        name="companyAddress"
+                        value={formData.companyAddress}
+                        onChange={handleChange}
+                        placeholder="Complete business address"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="companyWebsite">Company Website</label>
+                      <input
+                        type="text"
+                        id="companyWebsite"
+                        name="companyWebsite"
+                        value={formData.companyWebsite}
+                        onChange={handleChange}
+                        placeholder="e.g., https://www.acmecorp.com"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="contactEmail">Contact Email</label>
+                      <input
+                        type="text"
+                        id="contactEmail"
+                        name="contactEmail"
+                        value={formData.contactEmail}
+                        onChange={handleChange}
+                        placeholder="e.g., affiliates@acmecorp.com"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="effectiveDate">Effective Date</label>
+                      <input
+                        type="date"
+                        id="effectiveDate"
+                        name="effectiveDate"
+                        value={formData.effectiveDate}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                );
+                
+              case 1: // Affiliate Information
+                return (
+                  <div className="form-panel">
+                    <h2>Affiliate Information</h2>
+                    <p>Enter information about the affiliate (the party promoting your products or services).</p>
+                    
+                    <div className="form-group">
+                      <label htmlFor="affiliateName">Affiliate Name</label>
+                      <input
+                        type="text"
+                        id="affiliateName"
+                        name="affiliateName"
+                        value={formData.affiliateName}
+                        onChange={handleChange}
+                        placeholder="e.g., Marketing Pros LLC"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="affiliateAddress">Affiliate Address</label>
+                      <input
+                        type="text"
+                        id="affiliateAddress"
+                        name="affiliateAddress"
+                        value={formData.affiliateAddress}
+                        onChange={handleChange}
+                        placeholder="Complete affiliate address"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="affiliateWebsite">Affiliate Website</label>
+                      <input
+                        type="text"
+                        id="affiliateWebsite"
+                        name="affiliateWebsite"
+                        value={formData.affiliateWebsite}
+                        onChange={handleChange}
+                        placeholder="e.g., https://www.marketingpros.com"
+                      />
+                    </div>
+                    
+                    <div className="form-group">
+                      <label htmlFor="affiliateEmail">Affiliate Email</label>
+                      <input
+                        type="text"
+                        id="affiliateEmail"
+                        name="affiliateEmail"
+                        value={formData.affiliateEmail}
+                        onChange={handleChange}
+                        placeholder="e.g., contact@marketingpros.com"
+                      />
+                    </div>
+                  </div>
+                );
+                
+              case 2: // Agreement Terms
+                return (
+                  <div className="form-panel">
+                    <h2>Agreement Terms</h2>
+                    <p>Define the duration and renewal terms for the affiliate agreement.</p>
+                    
+                    <div className="form-group">
+                      <label>Agreement Term</label>
+                      <div className="radio-group">
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="agreementTerm"
+                            value="3-months"
+                            checked={formData.agreementTerm === '3-months'}
+                            onChange={handleChange}
+                          />
+                          3 months
+                        </label>
+                        
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="agreementTerm"
+                            value="6-months"
+                            checked={formData.agreementTerm === '6-months'}
+                            onChange={handleChange}
+                          />
+                          6 months
+                        </label>
+                        
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="agreementTerm"
+                            value="12-months"
+                            checked={formData.agreementTerm === '12-months'}
+                            onChange={handleChange}
+                          />
+                          12 months
+                        </label>
+                        
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="agreementTerm"
+                            value="24-months"
+                            checked={formData.agreementTerm === '24-months'}
+                            onChange={handleChange}
+                          />
+                          24 months
+                        </label>
+                        
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="agreementTerm"
+                            value="indefinite"
+                            checked={formData.agreementTerm === 'indefinite'}
+                            onChange={handleChange}
+                          />
+                          Indefinite (until terminated)
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                );
+                
+              case 3: // Commission Structure
+                return (
+                  <div className="form-panel">
+                    <h2>Commission Structure</h2>
+                    <p>Define how affiliates will be compensated for referrals.</p>
+                    
+                    <div className="form-group">
+                      <label>Commission Type</label>
+                      <div className="radio-group">
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="commissionType"
+                            value="percentage"
+                            checked={formData.commissionType === 'percentage'}
+                            onChange={handleChange}
+                          />
+                          Percentage of Sale
+                        </label>
+                        
+                        <label className="radio-label">
+                          <input
+                            type="radio"
+                            name="commissionType"
+                            value="flat-fee"
+                            checked={formData.commissionType === 'flat-fee'}
+                            onChange={handleChange}
+                          />
+                          Flat Fee per Sale
+                        </label>
+                      </div>
+                    </div>
+                    
+                    {formData.commissionType === 'percentage' && (
+                      <div className="form-group">
+                        <label htmlFor="commissionRate">Commission Rate (%)</label>
+                        <input
+                          type="number"
+                          id="commissionRate"
+                          name="commissionRate"
+                          value={formData.commissionRate}
+                          onChange={handleChange}
+                          min="0"
+                          step="0.1"
+                          placeholder="e.g., 10"
+                        />
+                      </div>
+                    )}
+                    
+                    {formData.commissionType === 'flat-fee' && (
+                      <div className="form-group">
+                        <label htmlFor="flatFeeAmount">Flat Fee Amount ($)</label>
+                        <input
+                          type="number"
+                          id="flatFeeAmount"
+                          name="flatFeeAmount"
+                          value={formData.flatFeeAmount}
+                          onChange={handleChange}
+                          min="0"
+                          step="0.01"
+                          placeholder="e.g., 25"
+                        />
+                      </div>
+                    )}
+                  </div>
+                );
+                
+              case 4: // Final Document
+                return (
+                  <div className="form-panel">
+                    <h2>Final Affiliate Agreement</h2>
+                    <p>Your affiliate agreement is ready! Review it below and use the buttons to copy or download.</p>
+                    
+                    <div className="form-group mt-2">
+                      <div className="navigation-buttons">
+                        <button
+                          onClick={copyToClipboard}
+                          className="nav-button"
+                          style={{
+                            backgroundColor: "#4f46e5", 
+                            color: "white",
+                            border: "none",
+                            flex: 1
+                          }}
+                        >
+                          <i data-feather="copy" style={{marginRight: "0.5rem"}}></i>
+                          Copy to Clipboard
+                        </button>
+                        
+                        <button
+                          onClick={downloadAsWord}
+                          className="nav-button"
+                          style={{
+                            backgroundColor: "#2563eb", 
+                            color: "white",
+                            border: "none",
+                            flex: 1
+                          }}
+                        >
+                          <i data-feather="file-text" style={{marginRight: "0.5rem"}}></i>
+                          Download MS Word
+                        </button>
+                      </div>
+                    </div>
+                    
+                    <div className="form-group mt-2">
+                      <p className="text-center">
+                        Need professional legal guidance on your affiliate agreement?
+                      </p>
+                      <p className="text-center">
+                        <a href="" onClick={() => {
+                          Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});
+                          return false;
+                        }}>
+                          Schedule a consultation
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                );
+                
+              default:
+                return null;
+            }
+          };
+          
+          return (
+            <div className="container">
+              <h1>Affiliate Agreement Generator</h1>
+              
+              {/* Tab navigation */}
+              <div className="tab-navigation">
+                {tabs.map((tab, index) => (
+                  <button
+                    key={tab.id}
+                    className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                    onClick={() => goToTab(index)}
+                  >
+                    {index + 1}. {tab.label}
+                  </button>
+                ))}
+              </div>
+              
+              {/* Preview container */}
+              <div className="preview-container">
+                {/* Form panel */}
+                {renderForm()}
+                
+                {/* Preview panel */}
+                <div className="preview-panel" ref={previewRef}>
+                  <div className="preview-content">
+                    <h2>Live Preview</h2>
+                    <pre 
+                      className="document-preview"
+                      dangerouslySetInnerHTML={{ __html: highlightedText }}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Navigation buttons */}
+              <div className="navigation-buttons">
+                <button
+                  onClick={prevTab}
+                  className={`nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`}
+                  disabled={currentTab === 0}
+                >
+                  <i data-feather="chevron-left" style={{marginRight: "0.5rem"}}></i>
+                  Previous
+                </button>
+                
+                {currentTab < tabs.length - 1 && (
+                  <>
+                    <button
+                      onClick={copyToClipboard}
+                      className="nav-button"
+                      style={{
+                        backgroundColor: "#4f46e5", 
+                        color: "white",
+                        border: "none"
+                      }}
+                    >
+                      <i data-feather="copy" style={{marginRight: "0.5rem"}}></i>
+                      Copy to Clipboard
+                    </button>
+                    
+                    <button
+                      onClick={downloadAsWord}
+                      className="nav-button"
+                      style={{
+                        backgroundColor: "#2563eb", 
+                        color: "white",
+                        border: "none"
+                      }}
+                    >
+                      <i data-feather="file-text" style={{marginRight: "0.5rem"}}></i>
+                      Download MS Word
+                    </button>
+                  </>
+                )}
+                
+                <button
+                  onClick={nextTab}
+                  className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
+                  disabled={currentTab === tabs.length - 1}
+                >
+                  Next
+                  <i data-feather="chevron-right" style={{marginLeft: "0.5rem"}}></i>
+                </button>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        document.addEventListener("DOMContentLoaded", function() {
+          ReactDOM.render(
+            <AffiliateAgreementGenerator />,
+            document.getElementById('root')
+          );
+          
+          // Initialize Feather icons
+          feather.replace();
+        });
+    </script>
+</body>
+</html>

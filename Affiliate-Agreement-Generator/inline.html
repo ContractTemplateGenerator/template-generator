@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Agreement Generator | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-size: 2rem;
+            text-align: center;
+            color: #4f46e5;
+            margin-bottom: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .preview-container {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .preview-title {
+            margin-top: 0;
+            color: #4f46e5;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 0.5rem;
+        }
+        
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        // Simple component
+        const SimpleAffiliateGenerator = () => {
+          const [formData, setFormData] = useState({
+            companyName: '',
+            affiliateName: ''
+          });
+          
+          const [documentText, setDocumentText] = useState(
+            `AFFILIATE AGREEMENT
+
+This Affiliate Agreement is entered into by and between:
+
+[COMPANY NAME] ("Company"),
+
+and
+
+[AFFILIATE NAME] ("Affiliate").
+
+WHEREAS, Company is in the business of selling products and/or services;
+
+WHEREAS, Affiliate wishes to participate in Company's affiliate program;
+
+NOW, THEREFORE, the parties agree as follows:
+
+1. COMMISSION
+
+Company shall pay Affiliate a commission of 10% of the net sale price for each qualified sale.
+
+2. TERM
+
+This Agreement shall remain in effect for 12 months from the effective date.`
+          );
+
+          const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData(prev => ({
+              ...prev,
+              [name]: value
+            }));
+            
+            // Update document text
+            let newText = documentText;
+            if (name === 'companyName') {
+              newText = newText.replace(/\[COMPANY NAME\]/g, value || '[COMPANY NAME]');
+            } else if (name === 'affiliateName') {
+              newText = newText.replace(/\[AFFILIATE NAME\]/g, value || '[AFFILIATE NAME]');
+            }
+            setDocumentText(newText);
+          };
+
+          return (
+            <div className="container">
+              <h1>Affiliate Agreement Generator</h1>
+              
+              <div className="form-group">
+                <label htmlFor="companyName">Company Name</label>
+                <input
+                  type="text"
+                  id="companyName"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  placeholder="e.g., Acme Corporation"
+                />
+              </div>
+              
+              <div className="form-group">
+                <label htmlFor="affiliateName">Affiliate Name</label>
+                <input
+                  type="text"
+                  id="affiliateName"
+                  name="affiliateName"
+                  value={formData.affiliateName}
+                  onChange={handleChange}
+                  placeholder="e.g., Marketing Pros LLC"
+                />
+              </div>
+              
+              <div className="preview-container">
+                <h2 className="preview-title">Preview</h2>
+                <pre className="document-preview">{documentText}</pre>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        ReactDOM.render(
+          <SimpleAffiliateGenerator />,
+          document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
