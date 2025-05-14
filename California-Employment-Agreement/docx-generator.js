@@ -1,4 +1,5 @@
 // MS Word Document Generator
+// Converts HTML content to Word document format for download
 
 window.generateWordDoc = function(documentText, formData) {
   try {

@@ -1,4 +1,6 @@
 // California Employment Agreement Generator
+// Created for terms.law - Updated May 2025
+// A comprehensive tool for creating legally compliant California employment agreements
 
 const App = () => {
   // State for form data
