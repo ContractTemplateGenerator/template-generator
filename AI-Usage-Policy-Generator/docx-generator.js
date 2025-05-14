@@ -15,7 +15,7 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 1in;
+    margin: 0.5in;
   }
   h1 {
     text-align: center;
@@ -66,20 +66,18 @@ window.generateWordDoc = function(documentText, formData) {
       appendixText = parts.length > 1 ? parts[1] : '';
     }
     
-    // Process main text - convert newlines to HTML paragraphs
+    // Process main text - convert newlines to HTML paragraphs with heading detection
     const mainTextHtml = mainText
       .split('\n\n')
       .map(para => {
         para = para.trim();
         if (!para) return '';
         
-        // Check if paragraph is a heading
-        if (para.startsWith('# ')) {
-          return `<h1>${para.substring(2).replace(/\n/g, '<br>')}</h1>`;
-        } else if (para.startsWith('## ')) {
-          return `<h2>${para.substring(3).replace(/\n/g, '<br>')}</h2>`;
-        } else if (para.startsWith('### ')) {
-          return `<h3>${para.substring(4).replace(/\n/g, '<br>')}</h3>`;
+        // Check if paragraph is a heading by looking for section numbers
+        if (/^\d+\.\s[A-Z\s&]+$/.test(para)) {
+          return `<h1>${para}</h1>`;
+        } else if (/^\d+\.\d+\s[A-Za-z\s&]+$/.test(para)) {
+          return `<h2>${para}</h2>`;
         }
         
         return `<p>${para.replace(/\n/g, '<br>')}</p>`;
@@ -94,25 +92,23 @@ window.generateWordDoc = function(documentText, formData) {
       // Add page break
       htmlContent += '<div class="page-break"></div>';
       
-      // Process appendix text
-      const appendixHtml = appendixText
-        .split('\n\n')
-        .map(para => {
-          para = para.trim();
-          if (!para) return '';
-          
-          // Check if paragraph is a heading
-          if (para.startsWith('# ')) {
-            return `<h1>${para.substring(2).replace(/\n/g, '<br>')}</h1>`;
-          } else if (para.startsWith('## ')) {
-            return `<h2>${para.substring(3).replace(/\n/g, '<br>')}</h2>`;
-          } else if (para.startsWith('### ')) {
-            return `<h3>${para.substring(4).replace(/\n/g, '<br>')}</h3>`;
-          }
-          
-          return `<p>${para.replace(/\n/g, '<br>')}</p>`;
-        })
-        .join('');
+      // Process appendix text with heading detection
+    const appendixHtml = appendixText
+      .split('\n\n')
+      .map(para => {
+        para = para.trim();
+        if (!para) return '';
+        
+        // Check if paragraph is a heading by looking for section numbers
+        if (/^\d+\.\s[A-Z\s&]+$/.test(para)) {
+          return `<h1>${para}</h1>`;
+        } else if (/^\d+\.\d+\s[A-Za-z\s&]+$/.test(para)) {
+          return `<h2>${para}</h2>`;
+        }
+        
+        return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+      })
+      .join('');
       
       // Add appendix to HTML content
       htmlContent += appendixHtml;

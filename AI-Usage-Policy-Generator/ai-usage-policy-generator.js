@@ -91,6 +91,100 @@ const AIUsagePolicyGenerator = () => {
   // State for the generated document text
   const [documentText, setDocumentText] = useState('');
   
+  // State for policy analysis
+  const [policyAnalysis, setPolicyAnalysis] = useState({
+    issues: [],
+    warnings: [],
+    strengths: [],
+    score: 100
+  });
+  
+  // Function to analyze the policy for completeness and potential issues
+  const analyzePolicyDocument = () => {
+    const analysis = {
+      issues: [],
+      warnings: [],
+      strengths: [],
+      score: 100 // Start with perfect score and deduct for issues
+    };
+    
+    // Check for missing basic information
+    if (!formData.companyName || formData.companyName.trim() === '') {
+      analysis.issues.push("Company name is missing - this should be filled in for proper identification.");
+      analysis.score -= 5;
+    }
+    
+    if (!formData.effectiveDate || formData.effectiveDate.trim() === '') {
+      analysis.issues.push("Effective date is not specified - important for compliance tracking.");
+      analysis.score -= 5;
+    }
+    
+    if (!formData.contactEmail || formData.contactEmail.trim() === '') {
+      analysis.issues.push("Contact email is missing - users need to know who to contact with questions.");
+      analysis.score -= 3;
+    }
+    
+    // Check for policy completeness
+    const selectedAiTypes = Object.values(formData.aiTypes).filter(Boolean).length;
+    if (selectedAiTypes === 0) {
+      analysis.warnings.push("No AI systems are specifically authorized - consider specifying which types of AI tools users can access.");
+      analysis.score -= 3;
+    }
+    
+    if (!formData.specificAiTools || formData.specificAiTools.trim() === '') {
+      analysis.warnings.push("No specific AI tools are mentioned - naming authorized tools helps prevent ambiguity.");
+      analysis.score -= 2;
+    }
+    
+    // Check for security measures
+    const securityCount = [
+      formData.requireAuthentication,
+      formData.accessControl,
+      formData.regularUpdates,
+      formData.encryptionRequired,
+      formData.loggingMonitoring
+    ].filter(Boolean).length;
+    
+    if (securityCount < 3) {
+      analysis.warnings.push("Limited security measures are specified - consider adding more security controls for AI systems.");
+      analysis.score -= 5;
+    }
+    
+    // Check for training requirements
+    if (!formData.initialTrainingRequired) {
+      analysis.warnings.push("Initial training is not required - training helps ensure proper AI system usage.");
+      analysis.score -= 3;
+    }
+    
+    // Check for privacy and data protections
+    if (!formData.prohibitPersonalData && !formData.prohibitConfidentialInfo) {
+      analysis.issues.push("Missing critical data protection provisions for personal and confidential information.");
+      analysis.score -= 10;
+    }
+    
+    // Identify strengths
+    if (formData.prohibitPersonalData && formData.prohibitConfidentialInfo && formData.sensitiveDataRestrictions) {
+      analysis.strengths.push("Strong data protection provisions included.");
+    }
+    
+    if (securityCount >= 4) {
+      analysis.strengths.push("Comprehensive security measures specified.");
+    }
+    
+    if (formData.initialTrainingRequired && formData.ongoingTraining) {
+      analysis.strengths.push("Complete training requirements included.");
+    }
+    
+    if (formData.reportingProcedure && formData.whistleblowerProtection) {
+      analysis.strengths.push("Well-defined reporting mechanisms for violations.");
+    }
+    
+    // Adjust score if needed
+    if (analysis.score < 0) analysis.score = 0;
+    
+    return analysis;
+  };
+  
   // Ref for preview content div
   const previewRef = useRef(null);
   
@@ -159,17 +253,22 @@ const AIUsagePolicyGenerator = () => {
       let policy = '';
       
       // Title
-      policy += `# ${formData.companyName || 'COMPANY NAME'} AI USAGE POLICY\n\n`;
+      policy += `AI USAGE POLICY\n\n`;
+      
+      // Company name
+      policy += `${formData.companyName || 'COMPANY NAME'}\n\n`;
       
       // Date
       policy += `Effective Date: ${formData.effectiveDate || '[DATE]'}\n\n`;
       
       // 1. Introduction
-      policy += `## 1. INTRODUCTION\n\n`;
+      policy += `1. INTRODUCTION\n\n`;
       policy += `This Artificial Intelligence (AI) Usage Policy ("Policy") governs the use of AI systems and tools within ${formData.companyName || 'our company'}. This Policy aims to ensure the responsible, ethical, and secure use of AI technologies while maintaining compliance with applicable laws and regulations.\n\n`;
       
+      // Rest of the policy generation code...
+      
       // 2. Scope
-      policy += `## 2. SCOPE\n\n`;
+      policy += `2. SCOPE\n\n`;
       
       // Determine policy scope text based on selection
       let scopeText = '';
@@ -199,7 +298,7 @@ const AIUsagePolicyGenerator = () => {
       policy += '.\n\n';
       
       // 3. Definitions
-      policy += `## 3. DEFINITIONS\n\n`;
+      policy += `3. DEFINITIONS\n\n`;
       policy += `For the purposes of this Policy:\n\n`;
       policy += `"AI Systems" refers to any software, application, or service that utilizes artificial intelligence, machine learning, natural language processing, computer vision, or related technologies.\n\n`;
       policy += `"Company" refers to ${formData.companyName || '[COMPANY NAME]'} and all of its subsidiaries and affiliated entities.\n\n`;
@@ -208,7 +307,7 @@ const AIUsagePolicyGenerator = () => {
       policy += `"Confidential Information" refers to any non-public information that is designated as confidential or would reasonably be understood to be confidential given the nature of the information and the circumstances of disclosure.\n\n`;
       
       // 4. AI Systems & Tools
-      policy += `## 4. AI SYSTEMS & TOOLS\n\n`;
+      policy += `4. AI SYSTEMS & TOOLS\n\n`;
       policy += `4.1 Authorized AI Systems\n\n`;
       
       // List selected AI types
@@ -248,7 +347,7 @@ const AIUsagePolicyGenerator = () => {
       policy += `Users must obtain appropriate authorization before using any AI system not explicitly approved in this Policy. Requests for new AI tools should be submitted to the IT department and will be evaluated based on security, compliance, and business need criteria.\n\n`;
       
       // 5. Acceptable Use
-      policy += `## 5. ACCEPTABLE USE\n\n`;
+      policy += `5. ACCEPTABLE USE\n\n`;
       policy += `Users may utilize approved AI systems for the following purposes:\n\n`;
       
       // Add selected acceptable uses
@@ -289,7 +388,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 6. Prohibited Use
-      policy += `## 6. PROHIBITED USE\n\n`;
+      policy += `6. PROHIBITED USE\n\n`;
       policy += `The following uses of AI systems are strictly prohibited:\n\n`;
       
       // Add selected prohibitions
@@ -325,7 +424,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 7. Data Handling & Privacy
-      policy += `## 7. DATA HANDLING & PRIVACY\n\n`;
+      policy += `7. DATA HANDLING & PRIVACY\n\n`;
       
       // Data retention
       policy += `7.1 Data Retention\n`;
@@ -374,7 +473,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 8. Security Measures
-      policy += `## 8. SECURITY MEASURES\n\n`;
+      policy += `8. SECURITY MEASURES\n\n`;
       
       if (formData.requireAuthentication) {
         policy += `8.1 Authentication\n`;
@@ -408,7 +507,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 9. Training & Compliance
-      policy += `## 9. TRAINING & COMPLIANCE\n\n`;
+      policy += `9. TRAINING & COMPLIANCE\n\n`;
       
       if (formData.initialTrainingRequired) {
         policy += `9.1 Initial Training\n`;
@@ -454,7 +553,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 10. Enforcement
-      policy += `## 10. ENFORCEMENT\n\n`;
+      policy += `10. ENFORCEMENT\n\n`;
       
       // Violation consequences
       policy += `10.1 Consequences of Violations\n`;
@@ -494,7 +593,7 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 11. Policy Updates & Review
-      policy += `## 11. POLICY UPDATES & REVIEW\n\n`;
+      policy += `11. POLICY UPDATES & REVIEW\n\n`;
       
       // Review frequency
       policy += `11.1 Review Frequency\n`;
@@ -547,14 +646,14 @@ const AIUsagePolicyGenerator = () => {
       }
       
       // 12. Contact Information
-      policy += `## 12. CONTACT INFORMATION\n\n`;
+      policy += `12. CONTACT INFORMATION\n\n`;
       policy += `For questions about this Policy, please contact:\n\n`;
       policy += `${formData.companyName || '[COMPANY NAME]'}\n`;
       policy += `${formData.businessAddress || '[BUSINESS ADDRESS]'}\n`;
       policy += `${formData.contactEmail || '[CONTACT EMAIL]'}\n\n`;
       
       // Acknowledgment
-      policy += `## 13. ACKNOWLEDGMENT\n\n`;
+      policy += `13. ACKNOWLEDGMENT\n\n`;
       policy += `I acknowledge that I have read and understand the AI Usage Policy. I agree to comply with all the terms and conditions outlined in this Policy.\n\n`;
       policy += `Name: _______________________________\n\n`;
       policy += `Signature: _______________________________\n\n`;
@@ -566,6 +665,9 @@ const AIUsagePolicyGenerator = () => {
     // Update the document text
     const newDocumentText = generatePolicyText();
     setDocumentText(newDocumentText);
+    
+    // Update policy analysis
+    setPolicyAnalysis(analyzePolicyDocument());
   }, [formData]);
   
   // Function to find text affected by the last change
@@ -1663,8 +1765,54 @@ const AIUsagePolicyGenerator = () => {
       case 10: // Final Document
         return (
           <div className="form-panel">
-            <h2>Final AI Usage Policy</h2>
-            <p>Your AI Usage Policy is ready! Review it below and use the buttons to copy or download as a Word document.</p>
+            <h2>Policy Analysis & Final Document</h2>
+            <p>Your AI Usage Policy has been analyzed for completeness, risks, and strengths:</p>
+            
+            <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: policyAnalysis.score >= 90 ? '#d1fae5' : policyAnalysis.score >= 75 ? '#fef3c7' : '#fee2e2', borderRadius: '8px' }}>
+              <h3 style={{ marginTop: 0, marginBottom: '10px', color: policyAnalysis.score >= 90 ? '#065f46' : policyAnalysis.score >= 75 ? '#92400e' : '#991b1b' }}>
+                Policy Score: {policyAnalysis.score}/100
+              </h3>
+              <p style={{ margin: 0, color: policyAnalysis.score >= 90 ? '#065f46' : policyAnalysis.score >= 75 ? '#92400e' : '#991b1b' }}>
+                {policyAnalysis.score >= 90 
+                  ? 'Excellent! Your policy is comprehensive and well-structured.' 
+                  : policyAnalysis.score >= 75 
+                    ? 'Good policy with some areas for improvement.' 
+                    : 'Your policy needs significant improvement in key areas.'}
+              </p>
+            </div>
+            
+            {policyAnalysis.issues.length > 0 && (
+              <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#fee2e2', borderRadius: '8px' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '10px', color: '#991b1b' }}>Critical Issues</h3>
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {policyAnalysis.issues.map((issue, index) => (
+                    <li key={index} style={{ marginBottom: '5px', color: '#991b1b' }}>{issue}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {policyAnalysis.warnings.length > 0 && (
+              <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#fef3c7', borderRadius: '8px' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '10px', color: '#92400e' }}>Recommendations</h3>
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {policyAnalysis.warnings.map((warning, index) => (
+                    <li key={index} style={{ marginBottom: '5px', color: '#92400e' }}>{warning}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            {policyAnalysis.strengths.length > 0 && (
+              <div style={{ marginBottom: '20px', padding: '15px', backgroundColor: '#d1fae5', borderRadius: '8px' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '10px', color: '#065f46' }}>Strengths</h3>
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {policyAnalysis.strengths.map((strength, index) => (
+                    <li key={index} style={{ marginBottom: '5px', color: '#065f46' }}>{strength}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
             
             <div className="form-group mt-2">
               <div className="navigation-buttons">
