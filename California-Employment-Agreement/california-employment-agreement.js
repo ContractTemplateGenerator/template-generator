@@ -1,6 +1,7 @@
 // California Employment Agreement Generator
 // Created for terms.law - Updated May 2025
 // A comprehensive tool for creating legally compliant California employment agreements
+// Enhanced with California-specific labor law provisions and latest compliance requirements
 
 const App = () => {
   // State for form data
@@ -8,16 +9,23 @@ const App = () => {
     // Basic Information
     employerName: "",
     employerAddress: "",
+    employerEIN: "",
     employeeName: "",
     employeeAddress: "",
+    employeeEmail: "",
+    employeePhone: "",
     startDate: "",
     position: "",
     reportingTo: "",
     employmentType: "full-time", // full-time, part-time, contract
+    isExempt: "non-exempt", // exempt, non-exempt
     workLocation: "office", // office, remote, hybrid
     customWorkLocation: "",
     atWillEmployment: true,
     probationPeriod: "90",
+    backgroundCheck: false,
+    drugTest: false,
+    employmentEligibility: true,
 
     // Compensation
     compensationType: "salary", // salary, hourly, commission, mixed
@@ -26,6 +34,9 @@ const App = () => {
     hourlyRate: "",
     overtimeEligible: "yes",
     overtimeRate: "1.5",
+    doubleTimeEligible: true,
+    mealBreakPremium: true,
+    restBreakPremium: true,
     commissionRate: "",
     commissionStructure: "",
     bonusEligible: "no",
@@ -35,16 +46,35 @@ const App = () => {
     paymentFrequency: "bi-weekly", // weekly, bi-weekly, monthly, semi-monthly
     paymentMethod: "direct-deposit", // direct-deposit, check
     expenseReimbursement: true,
+    businessExpenses: true,
+    travelExpenses: true,
+    telecomExpenses: true,
+    finalPayoutTerms: "standard", // standard, custom
+    customFinalPayoutTerms: "",
 
     // Benefits
     ptoPolicy: "accrual", // accrual, lump-sum, unlimited, none
     ptoAmount: "10",
+    ptoCarryover: true,
+    ptoCarryoverLimit: "40",
+    ptoAccrualRate: "per-pay-period", // per-pay-period, monthly, annually
+    paidHolidays: true,
     sickLeavePolicy: "legal-minimum", // legal-minimum, enhanced, combined-with-pto
     sickLeaveAmount: "3",
+    sickLeaveAccrual: true,
+    sickLeaveAccrualRate: "1", // Hours per 30 hours worked
     healthInsurance: true,
+    healthInsuranceContribution: "standard", // standard, full, custom
+    healthInsuranceWaitingPeriod: "first-of-month", // first-of-month, immediate, 30-days, 60-days, 90-days
     healthInsuranceDetails: "Standard company health insurance plan including medical, dental, and vision coverage.",
     retirementPlan: true,
     retirementPlanDetails: "401(k) plan with up to 3% employer match.",
+    fmlaEligible: true,
+    cfraEligible: true,
+    pdlEligible: true,
+    paidFamilyLeave: true,
+    workerComp: true,
+    disabilityInsurance: true,
     otherBenefits: "",
     
     // Work Schedule
@@ -52,33 +82,95 @@ const App = () => {
     workSchedule: "standard", // standard, flexible, custom
     customSchedule: "",
     mealBreaks: true,
+    mealBreakDuration: "30",
+    mealBreakPaid: false,
+    mealBreaksWaiver: false,
     restBreaks: true,
+    restBreakDuration: "10", 
+    lactationAccommodation: true,
+    reportingTimePay: true,
+    splitShiftPremium: false,
+    callbackPay: false,
+    onCallPay: false,
+    
+    // Remote Work
+    remoteWorkPolicy: "none", // none, partial, fully-remote
+    remoteWorkEquipment: "employer-provided", // employer-provided, employee-provided, reimbursed
+    remoteWorkEquipmentDetails: "",
+    remoteWorkExpenses: true,
+    remoteWorkTimeRecording: "standard", // standard, custom
+    customTimeRecordingMethod: "",
+    remoteWorkSecurity: true,
+    remoteWorkSecurityDetails: "",
+    
+    // COVID-19 Provisions
+    covidSafetyMeasures: false,
+    covidSafetyDetails: "",
+    covidVaccination: false,
+    covidVaccinationDetails: "",
+    covidTesting: false,
+    covidTestingDetails: "",
+    covidQuarantine: false,
+    covidQuarantineDetails: "",
+    covidLeave: false,
+    covidLeaveDetails: "",
     
     // Duties and Expectations
     dutiesDescription: "",
     performanceReview: true,
     performanceReviewFrequency: "annual", // quarterly, semi-annual, annual
+    performanceMetrics: "",
+    trainingRequirements: false,
+    trainingDetails: "",
     
     // Confidentiality & IP
     confidentialityAgreement: true,
     confidentialityScope: "standard", // standard, enhanced
+    confidentialityExclusions: true, // Excludes whistleblower, trade secret reporting, etc.
     ipAssignment: true,
     ipAssignmentExceptions: "",
+    ipAssignmentCaliforniaCompliance: true, // Labor Code Section 2870 compliance
     tradeSecretsProtection: true,
+    nonDisclosureTerm: "2-years", // 1-year, 2-years, 5-years, indefinite
     companyProperty: true,
+    dataPrivacy: true,
+    employeePrivacyProtections: true,
+    
+    // Policies & Compliance
+    employeeHandbook: true,
+    antiHarassmentPolicy: true,
+    nonDiscriminationPolicy: true,
+    drugFreeWorkplace: true,
+    workplaceViolencePolicy: true,
+    ethicsPolicy: true,
+    socialMediaPolicy: true,
+    byodPolicy: false,
+    byodPolicyDetails: "",
+    
+    // Dispute Resolution
+    grievanceProcedure: true,
+    grievanceProcedureDetails: "",
+    arbitrationClause: false,
+    arbitrationType: "jams", // jams, aaa, custom
+    arbitrationCustomDetails: "",
+    arbitrationOptOut: true,
+    arbitrationOptOutPeriod: "30",
+    arbitrationFees: "employer-pays",
+    classActionWaiver: false,
+    governingLaw: "California",
+    venueCounty: "",
     
     // Termination
     noticePeriod: "2-weeks", // none, 1-week, 2-weeks, 30-days, custom
     customNoticePeriod: "",
     severanceIncluded: false,
     severanceTerms: "",
+    exitInterview: false,
+    continuationOfBenefits: true,
     returnOfProperty: true,
-    
-    // Dispute Resolution
-    arbitrationClause: false,
-    arbitrationType: "jams", // jams, aaa, custom
-    arbitrationCustomDetails: "",
-    governingLaw: "California",
+    finalPayRequirements: true,
+    postEmploymentRestrictions: false,
+    postEmploymentRestrictionsDetails: "",
     
     // Miscellaneous
     entireAgreement: true,
@@ -86,6 +178,12 @@ const App = () => {
     severability: true,
     nonWaiver: true,
     electronicSignatures: true,
+    counterparts: true,
+    thirdPartyBeneficiaries: false,
+    forcesMajeure: false,
+    survivalClauses: true,
+    noticesMethod: "email", // email, mail, both
+    assignmentOfRights: "non-assignable", // non-assignable, company-only, both-parties
     
     // File Options
     fileName: "California-Employment-Agreement",
@@ -105,8 +203,12 @@ const App = () => {
     { id: 'basic-info', label: 'Basic Information' },
     { id: 'compensation', label: 'Compensation' },
     { id: 'benefits', label: 'Benefits' },
-    { id: 'duties', label: 'Duties & Schedule' },
-    { id: 'ip-confidentiality', label: 'IP & Confidentiality' },
+    { id: 'work-schedule', label: 'Work Schedule' },
+    { id: 'remote-work', label: 'Remote Work' },
+    { id: 'covid-provisions', label: 'COVID-19 Provisions' },
+    { id: 'duties', label: 'Duties & Expectations' },
+    { id: 'confidentiality-ip', label: 'Confidentiality & IP' },
+    { id: 'policies-compliance', label: 'Policies & Compliance' },
     { id: 'termination', label: 'Termination' },
     { id: 'dispute-resolution', label: 'Dispute Resolution' },
     { id: 'finalize', label: 'Finalize' }
@@ -151,7 +253,7 @@ const App = () => {
     document += `# CALIFORNIA EMPLOYMENT AGREEMENT\n\n`;
     
     // Basic Information Section
-    document += `THIS EMPLOYMENT AGREEMENT (the "Agreement") is made and entered into as of ${formatDate(formData.startDate)} by and between ${formData.employerName} (the "Employer"), with an address at ${formData.employerAddress}, and ${formData.employeeName} (the "Employee"), with an address at ${formData.employeeAddress}.\n\n`;
+    document += `THIS EMPLOYMENT AGREEMENT (the "Agreement") is made and entered into as of ${formatDate(formData.startDate)} by and between ${formData.employerName} (the "Employer"), with an address at ${formData.employerAddress}${formData.employerEIN ? `, EIN: ${formData.employerEIN}` : ""}, and ${formData.employeeName} (the "Employee"), with an address at ${formData.employeeAddress}${formData.employeeEmail ? `, email: ${formData.employeeEmail}` : ""}${formData.employeePhone ? `, phone: ${formData.employeePhone}` : ""}.\n\n`;
     
     document += `## 1. EMPLOYMENT\n\n`;
     
@@ -177,20 +279,43 @@ const App = () => {
       workLocationText = formData.customWorkLocation;
     }
     
-    document += `1.1 Position. The Employer hereby employs the Employee, and the Employee hereby accepts employment with the Employer, as a ${formData.position} on a ${employmentTypeText} basis ${workLocationText}. The Employee shall report directly to the ${formData.reportingTo}.\n\n`;
+    // Exempt status
+    let exemptStatusText = "";
+    if (formData.isExempt === "exempt") {
+      exemptStatusText = "exempt";
+    } else {
+      exemptStatusText = "non-exempt";
+    }
+    
+    document += `1.1 Position. The Employer hereby employs the Employee, and the Employee hereby accepts employment with the Employer, as a ${formData.position} on a ${employmentTypeText} basis ${workLocationText}. The Employee shall report directly to the ${formData.reportingTo}. For purposes of overtime eligibility, meal and rest breaks, and other wage and hour laws, the Employee's position is classified as ${exemptStatusText}.\n\n`;
     
     // At-will employment
     if (formData.atWillEmployment) {
-      document += `1.2 At-Will Employment. The Employee's employment with the Employer is at-will. This means that either the Employee or the Employer may terminate the employment relationship at any time, with or without cause, and with or without notice. Nothing in this Agreement or in any oral or written statement shall limit the right to terminate at-will employment. No manager, supervisor, or employee of the Employer has any authority to enter into an agreement for employment for any specified period of time or to make an agreement for employment other than at-will.\n\n`;
+      document += `1.2 At-Will Employment. The Employee's employment with the Employer is at-will. This means that either the Employee or the Employer may terminate the employment relationship at any time, with or without cause, and with or without notice. Nothing in this Agreement or in any oral or written statement shall limit the right to terminate at-will employment. No manager, supervisor, or employee of the Employer has any authority to enter into an agreement for employment for any specified period of time or to make an agreement for employment other than at-will. Only the [authorized officer/position] of the Employer has the authority to make any such agreement, and then only in writing, signed by both parties.\n\n`;
     }
     
     // Probation period
     if (formData.probationPeriod && formData.probationPeriod !== "0") {
-      document += `1.3 Probationary Period. The Employee's first ${formData.probationPeriod} days of employment shall be considered a probationary period. During this period, the Employer will evaluate the Employee's performance. During this probationary period, the Employee remains an at-will employee.\n\n`;
+      document += `1.3 Probationary Period. The Employee's first ${formData.probationPeriod} days of employment shall be considered a probationary period. During this period, the Employer will evaluate the Employee's performance, and the Employee will have the opportunity to evaluate the Employer and the position. During this probationary period, the Employee remains an at-will employee, as described in Section 1.2 above.\n\n`;
     }
     
     // Start date
     document += `1.4 Start Date. The Employee's employment under this Agreement shall begin on ${formatDate(formData.startDate)} (the "Start Date").\n\n`;
+    
+    // Employment Eligibility
+    if (formData.employmentEligibility) {
+      document += `1.5 Employment Eligibility. This offer of employment is contingent upon the Employee's submission of satisfactory proof of identity and legal authorization to work in the United States, as required by the Immigration Reform and Control Act of 1986. The Employee will be required to complete an I-9 form and provide appropriate documentation within three (3) business days of the Start Date.\n\n`;
+    }
+    
+    // Background Check
+    if (formData.backgroundCheck) {
+      document += `1.6 Background Check. This offer of employment is contingent upon the satisfactory completion of a background check, in compliance with applicable federal and California laws. Any background check will be conducted in accordance with the Fair Credit Reporting Act and applicable California law, including the California Consumer Credit Reporting Agencies Act and California Civil Code Sections 1785.1-1785.36 and 1786-1786.60.\n\n`;
+    }
+    
+    // Drug Test
+    if (formData.drugTest) {
+      document += `1.7 Drug Testing. This offer of employment is contingent upon the satisfactory completion of a pre-employment drug test, in compliance with applicable federal and California laws. Any drug testing will be conducted in accordance with California law, including appropriate notice and consent requirements.\n\n`;
+    }
     
     // Compensation Section
     document += `## 2. COMPENSATION AND BENEFITS\n\n`;
@@ -198,90 +323,230 @@ const App = () => {
     // Compensation type
     if (formData.compensationType === "salary") {
       document += `2.1 Base Salary. The Employer shall pay the Employee a base salary of $${formData.salaryAmount} per ${formData.salaryPeriod === "annual" ? "year" : formData.salaryPeriod === "monthly" ? "month" : "bi-weekly period"}, payable in accordance with the Employer's standard payroll procedures, subject to all applicable withholdings and deductions required by law.\n\n`;
+      
+      // Overtime for non-exempt salary employees
+      if (formData.isExempt === "non-exempt") {
+        document += `2.2 Overtime for Non-Exempt Employees. As a non-exempt employee paid on a salary basis, the Employee shall be eligible for overtime pay in accordance with California law. The Employee shall be paid overtime at a rate of ${formData.overtimeRate} times the Employee's regular hourly rate (calculated by dividing the weekly salary by 40 hours) for all hours worked in excess of 8 hours in a workday or 40 hours in a workweek.\n\n`;
+        
+        if (formData.doubleTimeEligible) {
+          document += `2.3 Double Time. In accordance with California law, the Employee shall be paid double the Employee's regular hourly rate for all hours worked in excess of 12 hours in a workday or for all hours worked in excess of 8 hours on the seventh consecutive day of work in a workweek.\n\n`;
+        }
+      } else {
+        document += `2.2 Exempt Status. Based on the Employee's job duties and compensation, the Employee is classified as exempt from overtime under applicable law.\n\n`;
+      }
     } else if (formData.compensationType === "hourly") {
       document += `2.1 Hourly Rate. The Employer shall pay the Employee at an hourly rate of $${formData.hourlyRate} per hour, payable in accordance with the Employer's standard payroll procedures, subject to all applicable withholdings and deductions required by law.\n\n`;
       
       // Overtime
       if (formData.overtimeEligible === "yes") {
         document += `2.2 Overtime. The Employee shall be eligible for overtime pay at a rate of ${formData.overtimeRate} times the Employee's regular hourly rate for all hours worked in excess of 8 hours in a workday or 40 hours in a workweek, in accordance with California law.\n\n`;
-      } else {
-        document += `2.2 Overtime. Based on the Employee's job duties and compensation, the Employee is classified as exempt from overtime under applicable law.\n\n`;
+        
+        if (formData.doubleTimeEligible) {
+          document += `2.3 Double Time. In accordance with California law, the Employee shall be paid double the Employee's regular hourly rate for all hours worked in excess of 12 hours in a workday or for all hours worked in excess of 8 hours on the seventh consecutive day of work in a workweek.\n\n`;
+        }
+      }
+      
+      // Meal and Rest Break Premium Pay
+      if (formData.mealBreakPremium) {
+        document += `2.4 Meal Break Premium Pay. If the Employee is not provided with a compliant meal period as required by California law, the Employee shall be entitled to one hour of pay at the Employee's regular rate of compensation for each workday that the meal period is not provided.\n\n`;
+      }
+      
+      if (formData.restBreakPremium) {
+        document += `2.5 Rest Break Premium Pay. If the Employee is not authorized and permitted to take a compliant rest period as required by California law, the Employee shall be entitled to one hour of pay at the Employee's regular rate of compensation for each workday that the rest period is not provided.\n\n`;
       }
     } else if (formData.compensationType === "commission") {
       document += `2.1 Commission. The Employee shall be paid on a commission basis according to the following structure: ${formData.commissionStructure}.\n\n`;
+      
+      document += `2.2 Commission Agreement. In accordance with California Labor Code Section 2751, a separate written commission agreement will be provided to the Employee, setting forth the method by which commissions shall be computed and paid. The commission agreement is incorporated by reference into this Employment Agreement.\n\n`;
     } else if (formData.compensationType === "mixed") {
       document += `2.1 Compensation. The Employee shall receive a base salary of $${formData.salaryAmount} per ${formData.salaryPeriod === "annual" ? "year" : formData.salaryPeriod === "monthly" ? "month" : "bi-weekly period"}, plus commission at a rate of ${formData.commissionRate} based on the following structure: ${formData.commissionStructure}.\n\n`;
       
+      document += `2.2 Commission Agreement. In accordance with California Labor Code Section 2751, a separate written commission agreement will be provided to the Employee, setting forth the method by which commissions shall be computed and paid. The commission agreement is incorporated by reference into this Employment Agreement.\n\n`;
+      
       // Overtime
-      if (formData.overtimeEligible === "yes") {
-        document += `2.2 Overtime. The Employee shall be eligible for overtime pay at a rate of ${formData.overtimeRate} times the Employee's regular hourly rate for all hours worked in excess of 8 hours in a workday or 40 hours in a workweek, in accordance with California law.\n\n`;
+      if (formData.isExempt === "non-exempt") {
+        document += `2.3 Overtime for Non-Exempt Employees. As a non-exempt employee, the Employee shall be eligible for overtime pay in accordance with California law. The Employee shall be paid overtime at a rate of ${formData.overtimeRate} times the Employee's regular hourly rate (calculated in accordance with California law, including base salary and commissions) for all hours worked in excess of 8 hours in a workday or 40 hours in a workweek.\n\n`;
+        
+        if (formData.doubleTimeEligible) {
+          document += `2.4 Double Time. In accordance with California law, the Employee shall be paid double the Employee's regular hourly rate for all hours worked in excess of 12 hours in a workday or for all hours worked in excess of 8 hours on the seventh consecutive day of work in a workweek.\n\n`;
+        }
+      } else {
+        document += `2.3 Exempt Status. Based on the Employee's job duties and compensation, the Employee is classified as exempt from overtime under applicable law.\n\n`;
       }
     }
     
     // Bonus
     if (formData.bonusEligible === "yes") {
-      document += `2.3 Bonus. The Employee may be eligible to receive bonuses according to the following structure: ${formData.bonusStructure}. All bonuses are discretionary unless expressly stated otherwise.\n\n`;
+      document += `2.6 Bonus. The Employee may be eligible to receive bonuses according to the following structure: ${formData.bonusStructure}. All bonuses are discretionary unless expressly stated otherwise. Any non-discretionary bonuses will be included in the regular rate calculation for overtime purposes in accordance with California law.\n\n`;
     }
     
     // Equity
     if (formData.equityEligible === "yes") {
-      document += `2.4 Equity. The Employee may be eligible to participate in the Employer's equity program according to the following terms: ${formData.equityDetails}. Any equity grant shall be subject to the terms and conditions of the Employer's equity plan and applicable grant agreements.\n\n`;
+      document += `2.7 Equity. The Employee may be eligible to participate in the Employer's equity program according to the following terms: ${formData.equityDetails}. Any equity grant shall be subject to the terms and conditions of the Employer's equity plan and applicable grant agreements.\n\n`;
     }
     
     // Payment information
-    document += `2.5 Payment Schedule. The Employee shall be paid on a ${formData.paymentFrequency} basis via ${formData.paymentMethod}.\n\n`;
+    document += `2.8 Payment Schedule. The Employee shall be paid on a ${formData.paymentFrequency} basis via ${formData.paymentMethod}.\n\n`;
+    
+    // Final Payout Terms
+    if (formData.finalPayoutTerms === "standard") {
+      document += `2.9 Final Paycheck. In accordance with California law, if the Employee is terminated, the Employee's final wages, including accrued but unused vacation/PTO, shall be paid immediately upon termination. If the Employee resigns with at least 72 hours' notice, the final wages shall be paid on the last day of employment. If the Employee resigns without 72 hours' notice, the final wages shall be paid within 72 hours of the resignation.\n\n`;
+    } else if (formData.finalPayoutTerms === "custom") {
+      document += `2.9 Final Paycheck. ${formData.customFinalPayoutTerms}\n\n`;
+    }
     
     // Expense reimbursement
     if (formData.expenseReimbursement) {
-      document += `2.6 Expense Reimbursement. The Employer shall reimburse the Employee for all reasonable and necessary expenses incurred by the Employee in connection with the performance of the Employee's duties and responsibilities, subject to the Employer's expense reimbursement policies and procedures.\n\n`;
+      document += `2.10 Expense Reimbursement. In accordance with California Labor Code Section 2802, the Employer shall reimburse the Employee for all necessary expenditures or losses incurred by the Employee in direct consequence of the discharge of the Employee's duties, or of the Employee's obedience to the directions of the Employer. Reimbursement for business expenses is subject to the Employer's expense reimbursement policies and procedures, which shall include appropriate documentation requirements.\n\n`;
+      
+      if (formData.businessExpenses) {
+        document += `2.11 Business Expenses. Business expenses may include, but are not limited to, business travel expenses, business meals, professional development costs, professional license fees, and business supplies. All business expenses must be pre-approved by the Employer in accordance with the Employer's expense policies.\n\n`;
+      }
+      
+      if (formData.travelExpenses) {
+        document += `2.12 Travel Expenses. The Employer shall reimburse the Employee for reasonable travel expenses incurred in connection with the Employee's duties, in accordance with the Employer's travel policy. Travel time may be compensable in accordance with California law for non-exempt employees.\n\n`;
+      }
+      
+      if (formData.telecomExpenses) {
+        document += `2.13 Telecommunication Expenses. The Employer shall reimburse the Employee for reasonable telecommunication expenses necessary for the performance of the Employee's duties, including a reasonable percentage of personal cell phone expenses if used for work purposes, in accordance with California law.\n\n`;
+      }
     }
     
     // Benefits
-    document += `2.7 Benefits. The Employee shall be eligible to participate in the Employer's benefit programs, subject to the terms and conditions of the applicable plan documents and policies. The Employer reserves the right to amend, modify, or terminate any of its benefit plans or programs at any time.\n\n`;
+    document += `2.14 Benefits. The Employee shall be eligible to participate in the Employer's benefit programs, subject to the terms and conditions of the applicable plan documents and policies. The Employer reserves the right to amend, modify, or terminate any of its benefit plans or programs at any time, except as prohibited by law.\n\n`;
     
     // PTO
     if (formData.ptoPolicy === "accrual") {
-      document += `2.8 Paid Time Off (PTO). The Employee shall accrue paid time off at a rate equivalent to ${formData.ptoAmount} days per year, in accordance with the Employer's PTO policy.\n\n`;
+      let accrualRateText = "";
+      if (formData.ptoAccrualRate === "per-pay-period") {
+        accrualRateText = "per pay period";
+      } else if (formData.ptoAccrualRate === "monthly") {
+        accrualRateText = "monthly";
+      } else if (formData.ptoAccrualRate === "annually") {
+        accrualRateText = "annually";
+      }
+      
+      document += `2.15 Paid Time Off (PTO). The Employee shall accrue paid time off at a rate equivalent to ${formData.ptoAmount} days per year, accruing ${accrualRateText}, in accordance with the Employer's PTO policy. `;
+      
+      if (formData.ptoCarryover) {
+        document += `Unused PTO may be carried over from year to year, up to a maximum accrual cap of ${formData.ptoCarryoverLimit} hours. Once the maximum accrual cap is reached, the Employee will not accrue additional PTO until the Employee's PTO balance falls below the cap. `;
+      } else {
+        document += `Unused PTO will not carry over from year to year. `;
+      }
+      
+      document += `Upon separation of employment, accrued but unused PTO will be paid out in accordance with California law.\n\n`;
     } else if (formData.ptoPolicy === "lump-sum") {
-      document += `2.8 Paid Time Off (PTO). The Employee shall receive ${formData.ptoAmount} days of paid time off per year, which shall be available at the beginning of each calendar year, in accordance with the Employer's PTO policy.\n\n`;
+      document += `2.15 Paid Time Off (PTO). The Employee shall receive ${formData.ptoAmount} days of paid time off per year, which shall be available at the beginning of each calendar year, in accordance with the Employer's PTO policy. `;
+      
+      if (formData.ptoCarryover) {
+        document += `Unused PTO may be carried over from year to year, up to a maximum accrual cap of ${formData.ptoCarryoverLimit} hours. `;
+      } else {
+        document += `Unused PTO will not carry over from year to year. `;
+      }
+      
+      document += `Upon separation of employment, accrued but unused PTO will be paid out in accordance with California law.\n\n`;
     } else if (formData.ptoPolicy === "unlimited") {
-      document += `2.8 Paid Time Off (PTO). The Employee shall be eligible for the Employer's unlimited paid time off policy, which allows the Employee to take time off as needed, subject to business needs and manager approval.\n\n`;
+      document += `2.15 Paid Time Off (PTO). The Employee shall be eligible for the Employer's unlimited paid time off policy, which allows the Employee to take time off as needed, subject to business needs and manager approval. As this is an unlimited PTO policy, no PTO will accrue, and there will be no payout of unused PTO upon separation of employment.\n\n`;
     } else if (formData.ptoPolicy === "none") {
-      document += `2.8 Paid Time Off (PTO). The Employee shall not be eligible for paid time off.\n\n`;
+      document += `2.15 Paid Time Off (PTO). The Employee shall not be eligible for paid time off.\n\n`;
+    }
+    
+    // Paid Holidays
+    if (formData.paidHolidays) {
+      document += `2.16 Paid Holidays. The Employee shall be eligible for paid holidays as designated by the Employer. The Employer's holiday schedule will be published annually.\n\n`;
     }
     
     // Sick Leave
     if (formData.sickLeavePolicy === "legal-minimum") {
-      document += `2.9 Sick Leave. The Employee shall be eligible for sick leave in accordance with California state law and local ordinances.\n\n`;
+      document += `2.17 Sick Leave. In accordance with the California Healthy Workplaces, Healthy Families Act of 2014, the Employee shall be eligible for paid sick leave. The Employee shall accrue one hour of paid sick leave for every 30 hours worked, beginning from the first day of employment. The Employee may begin using accrued sick leave on the 90th day of employment. The Employee may use up to 24 hours or 3 days (whichever is greater) of paid sick leave per year. Unused sick leave may carry over to the following year, but may be capped at 48 hours or 6 days. The Employee may use sick leave for the diagnosis, care, or treatment of an existing health condition of, or preventive care for, the Employee or the Employee's family member, or for specified purposes if the Employee is a victim of domestic violence, sexual assault, or stalking. Accrued, unused sick leave is not paid out upon separation from employment.\n\n`;
     } else if (formData.sickLeavePolicy === "enhanced") {
-      document += `2.9 Sick Leave. The Employee shall be eligible for ${formData.sickLeaveAmount} days of paid sick leave per year, in accordance with the Employer's sick leave policy and applicable law.\n\n`;
+      document += `2.17 Sick Leave. The Employee shall be eligible for ${formData.sickLeaveAmount} days of paid sick leave per year, in accordance with the Employer's sick leave policy and applicable law. `;
+      
+      if (formData.sickLeaveAccrual) {
+        document += `Sick leave shall accrue at a rate of ${formData.sickLeaveAccrualRate} hour(s) for every 30 hours worked. `;
+      } else {
+        document += `Sick leave shall be available for use at the beginning of each year. `;
+      }
+      
+      document += `The Employee may use sick leave for the diagnosis, care, or treatment of an existing health condition of, or preventive care for, the Employee or the Employee's family member, or for specified purposes if the Employee is a victim of domestic violence, sexual assault, or stalking. Accrued, unused sick leave is not paid out upon separation from employment, unless required by local ordinance.\n\n`;
     } else if (formData.sickLeavePolicy === "combined-with-pto") {
-      document += `2.9 Sick Leave. Sick leave is combined with the Employee's PTO allocation as described in Section 2.8 above.\n\n`;
+      document += `2.17 Sick Leave. Sick leave is combined with the Employee's PTO allocation as described in Section 2.15 above. The Employee may use PTO for the diagnosis, care, or treatment of an existing health condition of, or preventive care for, the Employee or the Employee's family member, or for specified purposes if the Employee is a victim of domestic violence, sexual assault, or stalking.\n\n`;
     }
     
     // Health Insurance
     if (formData.healthInsurance) {
-      document += `2.10 Health Insurance. The Employee shall be eligible to participate in the Employer's health insurance plans, subject to the terms and conditions of the applicable plan documents. ${formData.healthInsuranceDetails}\n\n`;
+      let waitingPeriodText = "";
+      
+      if (formData.healthInsuranceWaitingPeriod === "first-of-month") {
+        waitingPeriodText = "on the first day of the month following the Employee's start date";
+      } else if (formData.healthInsuranceWaitingPeriod === "immediate") {
+        waitingPeriodText = "immediately upon the Employee's start date";
+      } else if (formData.healthInsuranceWaitingPeriod === "30-days") {
+        waitingPeriodText = "after 30 days of employment";
+      } else if (formData.healthInsuranceWaitingPeriod === "60-days") {
+        waitingPeriodText = "after 60 days of employment";
+      } else if (formData.healthInsuranceWaitingPeriod === "90-days") {
+        waitingPeriodText = "after 90 days of employment";
+      }
+      
+      let contributionText = "";
+      
+      if (formData.healthInsuranceContribution === "standard") {
+        contributionText = "The Employer and the Employee shall share the cost of the premiums, as determined by the Employer.";
+      } else if (formData.healthInsuranceContribution === "full") {
+        contributionText = "The Employer shall pay 100% of the premium costs for the Employee's coverage.";
+      } else if (formData.healthInsuranceContribution === "custom") {
+        contributionText = formData.healthInsuranceDetails;
+      }
+      
+      document += `2.18 Health Insurance. The Employee shall be eligible to participate in the Employer's health insurance plans, subject to the terms and conditions of the applicable plan documents. Coverage shall begin ${waitingPeriodText}. ${contributionText} Details of the current plans are available from the Employer's Human Resources department.\n\n`;
     }
     
     // Retirement Plan
     if (formData.retirementPlan) {
-      document += `2.11 Retirement Plan. The Employee shall be eligible to participate in the Employer's retirement plan, subject to the terms and conditions of the applicable plan documents. ${formData.retirementPlanDetails}\n\n`;
+      document += `2.19 Retirement Plan. The Employee shall be eligible to participate in the Employer's retirement plan, subject to the terms and conditions of the applicable plan documents. ${formData.retirementPlanDetails}\n\n`;
+    }
+    
+    // FMLA
+    if (formData.fmlaEligible) {
+      document += `2.20 Family and Medical Leave. Upon satisfying eligibility requirements, the Employee may be eligible for family and medical leave under the federal Family and Medical Leave Act (FMLA).\n\n`;
+    }
+    
+    // CFRA
+    if (formData.cfraEligible) {
+      document += `2.21 California Family Rights Act Leave. Upon satisfying eligibility requirements, the Employee may be eligible for family and medical leave under the California Family Rights Act (CFRA).\n\n`;
+    }
+    
+    // PDL
+    if (formData.pdlEligible) {
+      document += `2.22 Pregnancy Disability Leave. In accordance with California law, female employees are entitled to up to four months of pregnancy disability leave for the period of time the employee is actually disabled by pregnancy, childbirth, or a related medical condition.\n\n`;
+    }
+    
+    // Paid Family Leave
+    if (formData.paidFamilyLeave) {
+      document += `2.23 California Paid Family Leave. The Employee may be eligible for California Paid Family Leave (PFL) benefits administered by the California Employment Development Department (EDD). PFL provides partial wage replacement for up to eight weeks when an employee takes time off from work to care for a seriously ill family member or to bond with a new child.\n\n`;
+    }
+    
+    // Workers' Compensation
+    if (formData.workerComp) {
+      document += `2.24 Workers' Compensation Insurance. The Employer maintains workers' compensation insurance coverage for work-related injuries or illnesses, as required by California law.\n\n`;
+    }
+    
+    // Disability Insurance
+    if (formData.disabilityInsurance) {
+      document += `2.25 Disability Insurance. The Employee is covered by California State Disability Insurance (SDI), which provides partial wage replacement for non-work-related injuries or illnesses. SDI is funded through employee payroll deductions, as required by California law.\n\n`;
     }
     
     // Other Benefits
     if (formData.otherBenefits) {
-      document += `2.12 Other Benefits. ${formData.otherBenefits}\n\n`;
+      document += `2.26 Other Benefits. ${formData.otherBenefits}\n\n`;
     }
     
-    // Duties and Responsibilities Section
-    document += `## 3. DUTIES AND RESPONSIBILITIES\n\n`;
-    
-    // Job duties
-    document += `3.1 Duties and Responsibilities. The Employee shall perform all duties and responsibilities associated with the position of ${formData.position}, as well as such other duties as may be assigned by the Employer from time to time. ${formData.dutiesDescription ? formData.dutiesDescription : "The Employee shall perform these duties to the best of the Employee's ability and in compliance with all applicable laws, rules, regulations, and Employer policies."}\n\n`;
+    // Work Schedule Section
+    document += `## 3. WORK SCHEDULE AND BREAKS\n\n`;
     
     // Work Schedule
-    document += `3.2 Work Schedule. `;
+    document += `3.1 Work Schedule. `;
     
     if (formData.workSchedule === "standard") {
       document += `The Employee shall work a standard schedule of approximately ${formData.hoursPerWeek} hours per week, Monday through Friday, 9:00 AM to 5:00 PM, or as otherwise determined by the Employer.\n\n`;
@@ -292,77 +557,283 @@ const App = () => {
     }
     
     // Breaks
-    if (formData.mealBreaks || formData.restBreaks) {
-      document += `3.3 Breaks. `;
+    if (formData.mealBreaks) {
+      document += `3.2 Meal Breaks. `;
       
-      if (formData.mealBreaks) {
-        document += `The Employee shall be entitled to meal breaks in accordance with California law. `;
-      }
-      
-      if (formData.restBreaks) {
-        document += `The Employee shall be entitled to rest breaks in accordance with California law.`;
+      if (formData.isExempt === "non-exempt") {
+        document += `In accordance with California law, the Employee shall be provided with an unpaid meal period of at least ${formData.mealBreakDuration} minutes when working more than five (5) hours in a workday. The meal period should begin before the end of the fifth hour of work. If the Employee works more than ten (10) hours in a workday, the Employee shall be provided with a second meal period of at least ${formData.mealBreakDuration} minutes, which should begin before the end of the tenth hour of work. `;
+        
+        if (formData.mealBreakPaid) {
+          document += `Meal breaks shall be paid by the Employer. `;
+        } else {
+          document += `Meal breaks shall be unpaid. `;
+        }
+        
+        if (formData.mealBreaksWaiver) {
+          document += `If the Employee works no more than six (6) hours in a workday, the meal period may be waived by mutual consent of the Employer and the Employee. If the Employee works more than ten (10) but no more than twelve (12) hours in a workday, the second meal period may be waived by mutual consent of the Employer and the Employee, but only if the first meal period was not waived.`;
+        }
+      } else {
+        document += `As an exempt employee, the Employee is expected to manage their meal breaks in a manner consistent with job responsibilities and workflow.`;
       }
       
       document += `\n\n`;
     }
     
+    if (formData.restBreaks) {
+      document += `3.3 Rest Breaks. `;
+      
+      if (formData.isExempt === "non-exempt") {
+        document += `In accordance with California law, the Employee shall be authorized and permitted to take a ${formData.restBreakDuration}-minute paid rest break for every four (4) hours worked or major fraction thereof. To the extent practicable, rest breaks should be taken in the middle of each work period. Rest breaks are counted as time worked, and the Employee shall be paid for such breaks.`;
+      } else {
+        document += `As an exempt employee, the Employee is expected to manage their rest breaks in a manner consistent with job responsibilities and workflow.`;
+      }
+      
+      document += `\n\n`;
+    }
+    
+    // Lactation Accommodation
+    if (formData.lactationAccommodation) {
+      document += `3.4 Lactation Accommodation. In accordance with California law, the Employer shall provide a reasonable amount of break time to accommodate an employee desiring to express breast milk for the employee's infant child. If possible, the break time should run concurrently with the Employee's regular break time. The Employer shall make reasonable efforts to provide the Employee with the use of a room or other location, other than a bathroom, in close proximity to the Employee's work area, for the Employee to express milk in private.\n\n`;
+    }
+    
+    // California-specific wage provisions
+    if (formData.reportingTimePay) {
+      document += `3.5 Reporting Time Pay. In accordance with California law, if a non-exempt employee reports to work at the Employer's request, but is furnished with less than half of the employee's usual or scheduled day's work, the employee shall be paid for half the usual or scheduled day's work, but in no event for less than two hours or more than four hours, at the employee's regular rate of pay.\n\n`;
+    }
+    
+    if (formData.splitShiftPremium) {
+      document += `3.6 Split Shift Premium. In accordance with California law, if a non-exempt employee works a split shift (a work schedule that is interrupted by non-paid, non-working periods other than meal or rest breaks), the employee shall receive a split shift premium equal to one hour at the state minimum wage, except when the employee resides at the place of employment.\n\n`;
+    }
+    
+    if (formData.callbackPay) {
+      document += `3.7 Call-Back Pay. If a non-exempt employee is called back to work after completing their regular shift and leaving the workplace, the employee shall be guaranteed a minimum of [NUMBER] hours of pay at the employee's regular rate, regardless of the number of hours actually worked during the call-back.\n\n`;
+    }
+    
+    if (formData.onCallPay) {
+      document += `3.8 On-Call Pay. If a non-exempt employee is required to remain on-call and the on-call requirements are such that the employee cannot effectively use the time for their own purposes, the on-call time shall be counted as hours worked and compensated accordingly.\n\n`;
+    }
+    
+    // Remote Work Section
+    if (formData.remoteWorkPolicy !== "none") {
+      document += `## 4. REMOTE WORK POLICY\n\n`;
+      
+      if (formData.remoteWorkPolicy === "partial") {
+        document += `4.1 Hybrid Work Arrangement. The Employee shall work partially remotely and partially in the office, as determined by the Employer. The specific in-office days and remote days will be established by the Employer based on business needs and may be subject to change with reasonable notice.\n\n`;
+      } else if (formData.remoteWorkPolicy === "fully-remote") {
+        document += `4.1 Remote Work Arrangement. The Employee shall work remotely on a full-time basis. The Employee must maintain a suitable work environment that allows for the effective performance of job duties and maintain regular communication with the Employer during established work hours.\n\n`;
+      }
+      
+      // Equipment
+      if (formData.remoteWorkEquipment === "employer-provided") {
+        document += `4.2 Equipment. The Employer shall provide the Employee with necessary equipment to perform their job duties remotely, which may include a computer, monitor, keyboard, mouse, and other necessary peripherals. All equipment provided by the Employer remains the property of the Employer and must be returned upon request or upon termination of employment. The Employee is responsible for maintaining the equipment in good condition and reporting any issues or damage immediately.\n\n`;
+      } else if (formData.remoteWorkEquipment === "employee-provided") {
+        document += `4.2 Equipment. The Employee shall use their own equipment to perform their job duties remotely. The Employee is responsible for ensuring that their equipment meets the Employer's specifications and for maintaining the equipment in good working condition.\n\n`;
+      } else if (formData.remoteWorkEquipment === "reimbursed") {
+        document += `4.2 Equipment. The Employee shall use their own equipment to perform their job duties remotely, and the Employer shall reimburse the Employee for reasonable and necessary costs associated with using personal equipment for work purposes, in accordance with California Labor Code Section 2802. The Employee must submit expense reports with appropriate documentation to receive reimbursement.\n\n`;
+      }
+      
+      if (formData.remoteWorkEquipmentDetails) {
+        document += `4.3 Equipment Details. ${formData.remoteWorkEquipmentDetails}\n\n`;
+      }
+      
+      // Expenses
+      if (formData.remoteWorkExpenses) {
+        document += `4.4 Remote Work Expenses. In accordance with California Labor Code Section 2802, the Employer shall reimburse the Employee for reasonable and necessary expenses incurred as a direct consequence of the discharge of the Employee's duties while working remotely. Reimbursable expenses may include, but are not limited to, a reasonable percentage of internet service, telephone service, office supplies, and any other necessary costs directly related to the performance of the Employee's job duties. The Employee must submit expense reports with appropriate documentation to receive reimbursement.\n\n`;
+      }
+      
+      // Time Recording
+      if (formData.isExempt === "non-exempt") {
+        document += `4.5 Time Recording. As a non-exempt employee working remotely, the Employee must accurately record all hours worked in accordance with the Employer's time-keeping policies. `;
+        
+        if (formData.remoteWorkTimeRecording === "standard") {
+          document += `The Employee shall record time using the Employer's standard time-keeping system. The Employee must record all hours worked, including any overtime hours, and take all required meal and rest breaks as required by California law.`;
+        } else if (formData.remoteWorkTimeRecording === "custom") {
+          document += `${formData.customTimeRecordingMethod}`;
+        }
+        
+        document += `\n\n`;
+      }
+      
+      // Security
+      if (formData.remoteWorkSecurity) {
+        document += `4.6 Data Security and Confidentiality. The Employee shall comply with all Employer policies and procedures regarding data security and confidentiality while working remotely. The Employee shall take all reasonable precautions to secure Employer information and equipment, including but not limited to using secure Wi-Fi networks, keeping equipment physically secure, using required password protections and security software, and immediately reporting any security incidents or breaches. `;
+        
+        if (formData.remoteWorkSecurityDetails) {
+          document += `${formData.remoteWorkSecurityDetails}`;
+        }
+        
+        document += `\n\n`;
+      }
+    }
+    
+    // COVID-19 Provisions Section
+    if (formData.covidSafetyMeasures || formData.covidVaccination || formData.covidTesting || formData.covidQuarantine || formData.covidLeave) {
+      document += `## 5. COVID-19 PROVISIONS\n\n`;
+      
+      // Safety Measures
+      if (formData.covidSafetyMeasures) {
+        document += `5.1 COVID-19 Safety Measures. ${formData.covidSafetyDetails}\n\n`;
+      }
+      
+      // Vaccination
+      if (formData.covidVaccination) {
+        document += `5.2 COVID-19 Vaccination. ${formData.covidVaccinationDetails}\n\n`;
+      }
+      
+      // Testing
+      if (formData.covidTesting) {
+        document += `5.3 COVID-19 Testing. ${formData.covidTestingDetails}\n\n`;
+      }
+      
+      // Quarantine
+      if (formData.covidQuarantine) {
+        document += `5.4 COVID-19 Quarantine. ${formData.covidQuarantineDetails}\n\n`;
+      }
+      
+      // Leave
+      if (formData.covidLeave) {
+        document += `5.5 COVID-19 Leave. ${formData.covidLeaveDetails}\n\n`;
+      }
+    }
+    
+    // Duties and Responsibilities Section
+    document += `## 6. DUTIES AND RESPONSIBILITIES\n\n`;
+    
+    // Job duties
+    document += `6.1 Duties and Responsibilities. The Employee shall perform all duties and responsibilities associated with the position of ${formData.position}, as well as such other duties as may be assigned by the Employer from time to time. ${formData.dutiesDescription ? formData.dutiesDescription : "The Employee shall perform these duties to the best of the Employee's ability and in compliance with all applicable laws, rules, regulations, and Employer policies."}\n\n`;
+    
     // Performance Reviews
     if (formData.performanceReview) {
-      document += `3.4 Performance Reviews. The Employee's performance shall be reviewed ${formData.performanceReviewFrequency === "quarterly" ? "quarterly" : formData.performanceReviewFrequency === "semi-annual" ? "semi-annually" : "annually"}. These reviews may be used to determine potential salary adjustments, bonuses, areas for improvement, and career development opportunities.\n\n`;
+      document += `6.2 Performance Reviews. The Employee's performance shall be reviewed ${formData.performanceReviewFrequency === "quarterly" ? "quarterly" : formData.performanceReviewFrequency === "semi-annual" ? "semi-annually" : "annually"}. These reviews may be used to determine potential salary adjustments, bonuses, areas for improvement, and career development opportunities.\n\n`;
+      
+      if (formData.performanceMetrics) {
+        document += `6.3 Performance Metrics. The Employee's performance will be evaluated based on the following metrics and criteria: ${formData.performanceMetrics}\n\n`;
+      }
+    }
+    
+    // Training
+    if (formData.trainingRequirements) {
+      document += `6.4 Training Requirements. ${formData.trainingDetails}\n\n`;
     }
     
     // Confidentiality and IP Section
-    document += `## 4. CONFIDENTIALITY AND INTELLECTUAL PROPERTY\n\n`;
+    document += `## 7. CONFIDENTIALITY AND INTELLECTUAL PROPERTY\n\n`;
     
     // Confidentiality
     if (formData.confidentialityAgreement) {
-      document += `4.1 Confidential Information. During the course of employment, the Employee will have access to confidential and proprietary information relating to the Employer's business ("Confidential Information"). Confidential Information includes, but is not limited to, trade secrets, business plans, marketing strategies, customer lists, financial information, product information, and other proprietary information identified as confidential by the Employer.\n\n`;
+      document += `7.1 Confidential Information. During the course of employment, the Employee will have access to confidential and proprietary information relating to the Employer's business ("Confidential Information"). Confidential Information includes, but is not limited to, trade secrets, business plans, marketing strategies, customer lists, financial information, product information, and other proprietary information identified as confidential by the Employer.\n\n`;
       
-      document += `4.2 Non-Disclosure. The Employee agrees not to disclose any Confidential Information to any person or entity, except as required in the course of performing duties for the Employer or as required by law. This obligation shall continue during the term of employment and at all times thereafter. The Employee shall not use any Confidential Information for personal benefit or for the benefit of any third party.\n\n`;
+      document += `7.2 Non-Disclosure. The Employee agrees not to disclose any Confidential Information to any person or entity, except as required in the course of performing duties for the Employer or as required by law. This obligation shall continue during the term of employment and at all times thereafter. The Employee shall not use any Confidential Information for personal benefit or for the benefit of any third party.\n\n`;
       
       if (formData.confidentialityScope === "enhanced") {
-        document += `4.3 Return of Information. Upon termination of employment, or at any time upon the Employer's request, the Employee shall return to the Employer all Confidential Information in the Employee's possession, custody, or control, including all copies, notes, or extracts thereof.\n\n`;
+        document += `7.3 Return of Information. Upon termination of employment, or at any time upon the Employer's request, the Employee shall return to the Employer all Confidential Information in the Employee's possession, custody, or control, including all copies, notes, or extracts thereof.\n\n`;
         
-        document += `4.4 Remedies. The Employee acknowledges that any breach of the confidentiality provisions of this Agreement would cause irreparable harm to the Employer, and that monetary damages would not provide an adequate remedy. Accordingly, in addition to any other remedies available, the Employer shall be entitled to seek injunctive relief to enforce these provisions.\n\n`;
+        document += `7.4 Remedies. The Employee acknowledges that any breach of the confidentiality provisions of this Agreement would cause irreparable harm to the Employer, and that monetary damages would not provide an adequate remedy. Accordingly, in addition to any other remedies available, the Employer shall be entitled to seek injunctive relief to enforce these provisions.\n\n`;
+      }
+      
+      if (formData.confidentialityExclusions) {
+        document += `7.5 Exclusions. Notwithstanding the foregoing, nothing in this Agreement prohibits the Employee from (a) reporting possible violations of federal or state law or regulation to any governmental agency or entity or self-regulatory organization, including but not limited to the Department of Justice, the Securities and Exchange Commission, Congress, and any agency Inspector General, or making other disclosures that are protected under the whistleblower provisions of federal or state law or regulation, (b) disclosing trade secrets in confidence to federal, state, or local government officials, or to an attorney, for the sole purpose of reporting or investigating a suspected violation of law, or (c) disclosing trade secrets in a document filed in a lawsuit or other proceeding, but only if the filing is made under seal and protected from public disclosure. The Employee does not need the prior authorization of the Employer to make any such reports or disclosures, and the Employee is not required to notify the Employer that the Employee has made such reports or disclosures.\n\n`;
       }
     }
     
     // Trade Secrets Protection
     if (formData.tradeSecretsProtection) {
-      document += `4.5 Trade Secrets. The Employee acknowledges that trade secrets are a valuable asset of the Employer. The Employee shall not disclose, use, or misappropriate any trade secret of the Employer, either during or after employment. This provision does not limit any rights the Employee may have under the Defend Trade Secrets Act, including immunity for disclosures made solely for the purpose of reporting or investigating a suspected violation of law.\n\n`;
+      document += `7.6 Trade Secrets. The Employee acknowledges that trade secrets are a valuable asset of the Employer. The Employee shall not disclose, use, or misappropriate any trade secret of the Employer, either during or after employment. This provision does not limit any rights the Employee may have under the Defend Trade Secrets Act, including immunity for disclosures made solely for the purpose of reporting or investigating a suspected violation of law.\n\n`;
       
-      document += `4.6 Defend Trade Secrets Act Notice. In compliance with the Defend Trade Secrets Act, the Employee is hereby notified that an individual shall not be held criminally or civilly liable under any federal or state trade secret law for the disclosure of a trade secret that: (a) is made in confidence to a federal, state, or local government official, either directly or indirectly, or to an attorney, solely for the purpose of reporting or investigating a suspected violation of law; or (b) is made in a complaint or other document filed in a lawsuit or other proceeding, if such filing is made under seal. Further, an individual who files a lawsuit for retaliation by an employer for reporting a suspected violation of law may disclose the trade secret to the attorney of the individual and use the trade secret information in the court proceeding, if the individual (a) files any document containing the trade secret under seal; and (b) does not disclose the trade secret, except pursuant to court order.\n\n`;
+      document += `7.7 Defend Trade Secrets Act Notice. In compliance with the Defend Trade Secrets Act, the Employee is hereby notified that an individual shall not be held criminally or civilly liable under any federal or state trade secret law for the disclosure of a trade secret that: (a) is made in confidence to a federal, state, or local government official, either directly or indirectly, or to an attorney, solely for the purpose of reporting or investigating a suspected violation of law; or (b) is made in a complaint or other document filed in a lawsuit or other proceeding, if such filing is made under seal. Further, an individual who files a lawsuit for retaliation by an employer for reporting a suspected violation of law may disclose the trade secret to the attorney of the individual and use the trade secret information in the court proceeding, if the individual (a) files any document containing the trade secret under seal; and (b) does not disclose the trade secret, except pursuant to court order.\n\n`;
+    }
+    
+    // Non-Disclosure Term
+    if (formData.nonDisclosureTerm !== "indefinite") {
+      document += `7.8 Term of Non-Disclosure Obligations. The Employee's obligation not to disclose Confidential Information shall continue for a period of ${formData.nonDisclosureTerm} after the termination of employment, except for trade secrets, which shall remain confidential for as long as they qualify as trade secrets under applicable law.\n\n`;
     }
     
     // Intellectual Property
     if (formData.ipAssignment) {
-      document += `4.7 Intellectual Property. The Employee agrees that all inventions, innovations, improvements, developments, methods, designs, analyses, drawings, reports, and all similar or related information (whether or not patentable) which (a) relate to the Employer's actual or anticipated business, research, and development, or existing or future products or services, and (b) are conceived, developed, or made by the Employee while employed by the Employer (collectively, "Work Product") belong to the Employer.\n\n`;
+      document += `7.9 Intellectual Property. The Employee agrees that all inventions, innovations, improvements, developments, methods, designs, analyses, drawings, reports, and all similar or related information (whether or not patentable) which (a) relate to the Employer's actual or anticipated business, research, and development, or existing or future products or services, and (b) are conceived, developed, or made by the Employee while employed by the Employer (collectively, "Work Product") belong to the Employer.\n\n`;
       
-      document += `4.8 Assignment of Rights. The Employee hereby assigns to the Employer all right, title, and interest in and to all Work Product and all related intellectual property rights, including patents, trademarks, copyrights, and trade secrets. The Employee agrees to promptly disclose all Work Product to the Employer and to assist the Employer in securing and defending its intellectual property rights.\n\n`;
+      document += `7.10 Assignment of Rights. The Employee hereby assigns to the Employer all right, title, and interest in and to all Work Product and all related intellectual property rights, including patents, trademarks, copyrights, and trade secrets. The Employee agrees to promptly disclose all Work Product to the Employer and to assist the Employer in securing and defending its intellectual property rights.\n\n`;
       
       if (formData.ipAssignmentExceptions) {
-        document += `4.9 Exceptions to Assignment. The following inventions are exempt from the assignment provisions of this Agreement: ${formData.ipAssignmentExceptions}\n\n`;
+        document += `7.11 Exceptions to Assignment. The following inventions are exempt from the assignment provisions of this Agreement: ${formData.ipAssignmentExceptions}\n\n`;
       }
       
-      document += `4.10 California Labor Code Section 2870. In accordance with California Labor Code Section 2870, this Agreement does not require the assignment of an invention that the Employee develops entirely on the Employee's own time without using the Employer's equipment, supplies, facilities, or trade secret information, except for those inventions that either: (a) relate at the time of conception or reduction to practice of the invention to the Employer's business, or actual or demonstrably anticipated research or development of the Employer; or (b) result from any work performed by the Employee for the Employer.\n\n`;
+      if (formData.ipAssignmentCaliforniaCompliance) {
+        document += `7.12 California Labor Code Section 2870. In accordance with California Labor Code Section 2870, this Agreement does not require the assignment of an invention that the Employee develops entirely on the Employee's own time without using the Employer's equipment, supplies, facilities, or trade secret information, except for those inventions that either: (a) relate at the time of conception or reduction to practice of the invention to the Employer's business, or actual or demonstrably anticipated research or development of the Employer; or (b) result from any work performed by the Employee for the Employer.\n\n`;
+        
+        document += `7.13 California Labor Code Section 2871. In accordance with California Labor Code Section 2871, the Employer hereby provides notice to the Employee that Section 2870 creates an exception to the Employee's obligation to assign inventions under certain circumstances. A copy of California Labor Code Sections 2870-2872 has been provided to the Employee or is attached to this Agreement.\n\n`;
+      }
     }
     
     // Company Property
     if (formData.companyProperty) {
-      document += `4.11 Company Property. All documents, data, records, equipment, and other physical property, whether or not pertaining to Confidential Information, which are furnished to the Employee by the Employer or are produced by the Employee in connection with the Employee's employment, shall be and remain the sole property of the Employer. The Employee agrees to return to the Employer all such materials and property as and when requested by the Employer. Upon termination of employment, the Employee shall return all such materials and property promptly without retaining any copies.\n\n`;
+      document += `7.14 Company Property. All documents, data, records, equipment, and other physical property, whether or not pertaining to Confidential Information, which are furnished to the Employee by the Employer or are produced by the Employee in connection with the Employee's employment, shall be and remain the sole property of the Employer. The Employee agrees to return to the Employer all such materials and property as and when requested by the Employer. Upon termination of employment, the Employee shall return all such materials and property promptly without retaining any copies.\n\n`;
+    }
+    
+    // Data Privacy
+    if (formData.dataPrivacy) {
+      document += `7.15 Data Privacy. The Employee shall comply with all Employer policies and applicable laws regarding data privacy and security, including but not limited to the California Consumer Privacy Act (CCPA), the California Privacy Rights Act (CPRA), and any other applicable data privacy laws or regulations. The Employee shall take all reasonable precautions to ensure the security and privacy of personal information accessed or processed in the course of employment.\n\n`;
+    }
+    
+    // Employee Privacy Protections
+    if (formData.employeePrivacyProtections) {
+      document += `7.16 Employee Privacy. The Employee has the right to privacy as provided under California law. The Employer may monitor the Employee's use of Employer-provided equipment, systems, and networks in accordance with applicable law and Employer policies. The Employer shall inform the Employee of any monitoring activities as required by law. The Employee's personal information will be handled in accordance with applicable privacy laws and Employer policies.\n\n`;
+    }
+    
+    // Company Policies Section
+    document += `## 8. COMPANY POLICIES AND COMPLIANCE\n\n`;
+    
+    // Employee Handbook
+    if (formData.employeeHandbook) {
+      document += `8.1 Employee Handbook. The Employee acknowledges receipt of the Employer's Employee Handbook and agrees to comply with all policies and procedures contained therein. The Employee understands that the Employee Handbook is not a contract of employment and does not alter the at-will nature of employment. The Employer reserves the right to modify, supplement, or rescind any policies or portions of the Employee Handbook from time to time as it deems necessary, with or without prior notice.\n\n`;
+    }
+    
+    // Anti-Harassment Policy
+    if (formData.antiHarassmentPolicy) {
+      document += `8.2 Anti-Harassment Policy. The Employer is committed to providing a workplace free from unlawful harassment, discrimination, and retaliation. The Employee agrees to comply with the Employer's anti-harassment policies and to participate in any required harassment prevention training. California law requires employers with 5 or more employees to provide at least 1 hour of sexual harassment prevention training to non-supervisory employees and at least 2 hours of such training to supervisors and managers within 6 months of hire or promotion, and every 2 years thereafter.\n\n`;
+    }
+    
+    // Non-Discrimination Policy
+    if (formData.nonDiscriminationPolicy) {
+      document += `8.3 Non-Discrimination Policy. The Employer is an equal opportunity employer and does not discriminate against any employee or applicant for employment on the basis of race, color, religion, sex, sexual orientation, gender identity, national origin, age, disability, genetic information, marital status, amnesty, or status as a covered veteran in accordance with applicable federal, state, and local laws, including the California Fair Employment and Housing Act (FEHA). The Employee agrees to comply with the Employer's non-discrimination policies.\n\n`;
+    }
+    
+    // Drug-Free Workplace
+    if (formData.drugFreeWorkplace) {
+      document += `8.4 Drug-Free Workplace Policy. The Employer maintains a drug-free workplace. The unlawful manufacture, distribution, dispensation, possession, or use of a controlled substance in the workplace is prohibited. The Employee agrees to comply with the Employer's drug-free workplace policy.\n\n`;
+    }
+    
+    // Workplace Violence
+    if (formData.workplaceViolencePolicy) {
+      document += `8.5 Workplace Violence Policy. The Employer is committed to maintaining a workplace free from threats and acts of violence. The Employee agrees to comply with the Employer's workplace violence prevention policy and to report any threatening or violent behavior immediately.\n\n`;
+    }
+    
+    // Ethics Policy
+    if (formData.ethicsPolicy) {
+      document += `8.6 Ethics Policy. The Employee agrees to comply with the Employer's ethics policy and to conduct business in accordance with the highest ethical standards, including avoiding conflicts of interest, maintaining accurate records, and reporting any suspected illegal or unethical conduct.\n\n`;
+    }
+    
+    // Social Media Policy
+    if (formData.socialMediaPolicy) {
+      document += `8.7 Social Media Policy. The Employee agrees to comply with the Employer's social media policy, which governs the Employee's use of social media in both professional and personal contexts. The Employee acknowledges that inappropriate use of social media may result in disciplinary action, up to and including termination of employment.\n\n`;
+    }
+    
+    // BYOD Policy
+    if (formData.byodPolicy) {
+      document += `8.8 Bring Your Own Device (BYOD) Policy. ${formData.byodPolicyDetails}\n\n`;
     }
     
     // Termination Section
-    document += `## 5. TERMINATION\n\n`;
+    document += `## 9. TERMINATION\n\n`;
     
     // If at-will employment
     if (formData.atWillEmployment) {
-      document += `5.1 At-Will Employment. As stated in Section 1.2, the Employee's employment is at-will and may be terminated by either party at any time, with or without cause, and with or without notice.\n\n`;
+      document += `9.1 At-Will Employment. As stated in Section 1.2, the Employee's employment is at-will and may be terminated by either party at any time, with or without cause, and with or without notice.\n\n`;
     }
     
     // Notice Period
     if (formData.noticePeriod !== "none") {
-      document += `5.2 Notice Period. `;
+      document += `9.2 Notice Period. `;
       
       if (formData.noticePeriod === "1-week") {
         document += `While employment remains at-will, the Employee is requested to provide at least one (1) week's written notice prior to voluntary resignation.`;
@@ -379,22 +850,57 @@ const App = () => {
     
     // Severance
     if (formData.severanceIncluded) {
-      document += `5.3 Severance. ${formData.severanceTerms}\n\n`;
+      document += `9.3 Severance. ${formData.severanceTerms}\n\n`;
+    }
+    
+    // Exit Interview
+    if (formData.exitInterview) {
+      document += `9.4 Exit Interview. Upon termination of employment, the Employee may be requested to participate in an exit interview conducted by the Employer or its representative.\n\n`;
+    }
+    
+    // Continuation of Benefits
+    if (formData.continuationOfBenefits) {
+      document += `9.5 Continuation of Benefits. Upon termination of employment, the Employee may be eligible to continue certain benefits in accordance with applicable law, including the Consolidated Omnibus Budget Reconciliation Act (COBRA) or Cal-COBRA. Information regarding continuation of benefits will be provided to the Employee at the time of termination.\n\n`;
     }
     
     // Return of Property
     if (formData.returnOfProperty) {
-      document += `5.4 Return of Property. Upon termination of employment for any reason, the Employee shall promptly return to the Employer all property belonging to the Employer, including but not limited to computers, phones, files, documents, keys, access cards, and any other Employer property in the Employee's possession or control.\n\n`;
+      document += `9.6 Return of Property. Upon termination of employment for any reason, the Employee shall promptly return to the Employer all property belonging to the Employer, including but not limited to computers, phones, files, documents, keys, access cards, and any other Employer property in the Employee's possession or control.\n\n`;
+    }
+    
+    // Final Pay Requirements
+    if (formData.finalPayRequirements) {
+      document += `9.7 Final Pay. In accordance with California law, if the Employee is terminated, the Employee's final wages, including accrued but unused vacation or PTO, shall be paid immediately upon termination. If the Employee resigns with at least 72 hours' notice, the final wages shall be paid on the last day of employment. If the Employee resigns without 72 hours' notice, the final wages shall be paid within 72 hours of the resignation.\n\n`;
+    }
+    
+    // Post-Employment Restrictions
+    if (formData.postEmploymentRestrictions) {
+      document += `9.8 Post-Employment Restrictions. ${formData.postEmploymentRestrictionsDetails}\n\n`;
+      
+      document += `9.9 California Non-Compete Law. The Employee acknowledges that California law generally prohibits post-employment non-compete agreements, with limited exceptions. Any post-employment restrictions in this Agreement shall be construed and enforced in accordance with California law, including California Business and Professions Code Section 16600.\n\n`;
     }
     
     // Dispute Resolution Section
-    document += `## 6. DISPUTE RESOLUTION\n\n`;
+    document += `## 10. DISPUTE RESOLUTION\n\n`;
+    
+    // Grievance Procedure
+    if (formData.grievanceProcedure) {
+      document += `10.1 Grievance Procedure. `;
+      
+      if (formData.grievanceProcedureDetails) {
+        document += `${formData.grievanceProcedureDetails}`;
+      } else {
+        document += `If the Employee has a complaint or concern related to employment, the Employee is encouraged to discuss the matter with their immediate supervisor. If the matter is not resolved, the Employee may escalate the concern to the next level of management or to Human Resources. The Employer is committed to addressing employee concerns in a fair and timely manner.`;
+      }
+      
+      document += `\n\n`;
+    }
     
     // Arbitration
     if (formData.arbitrationClause) {
-      document += `6.1 Arbitration. Any dispute, claim, or controversy arising out of or relating to this Agreement or the Employee's employment with the Employer shall be resolved through final and binding arbitration, rather than in court. This agreement to arbitrate is governed by the Federal Arbitration Act.\n\n`;
+      document += `10.2 Arbitration. Any dispute, claim, or controversy arising out of or relating to this Agreement or the Employee's employment with the Employer shall be resolved through final and binding arbitration, rather than in court. This agreement to arbitrate is governed by the Federal Arbitration Act.\n\n`;
       
-      document += `6.2 Arbitration Procedure. `;
+      document += `10.3 Arbitration Procedure. `;
       
       if (formData.arbitrationType === "jams") {
         document += `The arbitration shall be administered by JAMS pursuant to its Employment Arbitration Rules & Procedures in effect at the time of the arbitration. The arbitration shall take place in the county where the Employee worked, before a single arbitrator selected in accordance with the JAMS rules.`;
@@ -406,47 +912,112 @@ const App = () => {
       
       document += `\n\n`;
       
-      document += `6.3 Costs. The Employer shall pay all costs unique to arbitration, including the administrative fees and the arbitrator's fees. Each party shall bear its own attorneys' fees and costs, unless applicable law or the arbitrator provides otherwise.\n\n`;
+      document += `10.4 Costs. `;
       
-      document += `6.4 Remedies. The arbitrator shall have the authority to award any remedies that would be available in a court proceeding under applicable law.\n\n`;
+      if (formData.arbitrationFees === "employer-pays") {
+        document += `The Employer shall pay all costs unique to arbitration, including the administrative fees and the arbitrator's fees. Each party shall bear its own attorneys' fees and costs, unless applicable law or the arbitrator provides otherwise.`;
+      } else {
+        document += `The costs of arbitration shall be allocated as provided in the arbitration agreement or as determined by the arbitrator in accordance with applicable law.`;
+      }
       
-      document += `6.5 Class Action Waiver. The parties agree that any arbitration shall be conducted on an individual basis, and not as a class, collective, or representative action. There will be no right or authority for any dispute to be brought, heard, or arbitrated as a class, collective, or representative action.\n\n`;
+      document += `\n\n`;
       
-      document += `6.6 Exceptions. This arbitration agreement does not prevent the Employee from filing charges or claims with the National Labor Relations Board, the Equal Employment Opportunity Commission, or other federal, state, or local administrative agencies, or from filing a workers' compensation claim. Additionally, either party may seek injunctive relief in a court of law to protect their rights pending arbitration.\n\n`;
+      document += `10.5 Remedies. The arbitrator shall have the authority to award any remedies that would be available in a court proceeding under applicable law.\n\n`;
+      
+      if (formData.classActionWaiver) {
+        document += `10.6 Class Action Waiver. The parties agree that any arbitration shall be conducted on an individual basis, and not as a class, collective, or representative action. There will be no right or authority for any dispute to be brought, heard, or arbitrated as a class, collective, or representative action.\n\n`;
+      }
+      
+      document += `10.7 Exceptions. This arbitration agreement does not prevent the Employee from filing charges or claims with the National Labor Relations Board, the Equal Employment Opportunity Commission, or other federal, state, or local administrative agencies, or from filing a workers' compensation claim. Additionally, either party may seek injunctive relief in a court of law to protect their rights pending arbitration.\n\n`;
+      
+      if (formData.arbitrationOptOut) {
+        document += `10.8 Opt-Out Provision. The Employee may opt out of this arbitration agreement by providing written notice to the Employer within ${formData.arbitrationOptOutPeriod} days of signing this Agreement. If the Employee opts out, neither party will be required to arbitrate employment-related claims.\n\n`;
+      }
     } else {
-      document += `6.1 Resolution of Disputes. Any dispute, claim, or controversy arising out of or relating to this Agreement or the Employee's employment with the Employer shall be resolved in a court of competent jurisdiction in the State of California.\n\n`;
+      document += `10.2 Resolution of Disputes. Any dispute, claim, or controversy arising out of or relating to this Agreement or the Employee's employment with the Employer shall be resolved in a court of competent jurisdiction in the State of California.\n\n`;
     }
     
     // Governing Law
-    document += `6.7 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without giving effect to any choice of law or conflict of law provisions.\n\n`;
+    document += `10.9 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without giving effect to any choice of law or conflict of law provisions.\n\n`;
+    
+    // Venue
+    if (formData.venueCounty) {
+      document += `10.10 Venue. Any legal action relating to this Agreement or the Employee's employment shall be filed in ${formData.venueCounty} County, California, unless otherwise required by law.\n\n`;
+    }
     
     // Miscellaneous Section
-    document += `## 7. MISCELLANEOUS\n\n`;
+    document += `## 11. MISCELLANEOUS\n\n`;
     
     // Entire Agreement
     if (formData.entireAgreement) {
-      document += `7.1 Entire Agreement. This Agreement constitutes the entire understanding between the parties with respect to the subject matter hereof and supersedes all prior agreements, understandings, and negotiations, whether written or oral, relating to such subject matter.\n\n`;
+      document += `11.1 Entire Agreement. This Agreement constitutes the entire understanding between the parties with respect to the subject matter hereof and supersedes all prior agreements, understandings, and negotiations, whether written or oral, relating to such subject matter.\n\n`;
     }
     
     // Non-Modification
     if (formData.nonModification) {
-      document += `7.2 Modification. This Agreement may not be amended or modified except by a written instrument signed by both parties.\n\n`;
+      document += `11.2 Modification. This Agreement may not be amended or modified except by a written instrument signed by both parties.\n\n`;
     }
     
     // Severability
     if (formData.severability) {
-      document += `7.3 Severability. If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall not in any way be affected or impaired.\n\n`;
+      document += `11.3 Severability. If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall not in any way be affected or impaired.\n\n`;
     }
     
     // Non-Waiver
     if (formData.nonWaiver) {
-      document += `7.4 Non-Waiver. The failure of either party to enforce any provision of this Agreement shall not be construed as a waiver of that provision or the right of the party to enforce that provision or any other provision.\n\n`;
+      document += `11.4 Non-Waiver. The failure of either party to enforce any provision of this Agreement shall not be construed as a waiver of that provision or the right of the party to enforce that provision or any other provision.\n\n`;
     }
     
     // Electronic Signatures
     if (formData.electronicSignatures) {
-      document += `7.5 Electronic Signatures. The parties agree that electronic signatures shall be as valid and binding as handwritten signatures.\n\n`;
+      document += `11.5 Electronic Signatures. The parties agree that electronic signatures shall be as valid and binding as handwritten signatures.\n\n`;
     }
+    
+    // Counterparts
+    if (formData.counterparts) {
+      document += `11.6 Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.\n\n`;
+    }
+    
+    // Third Party Beneficiaries
+    if (formData.thirdPartyBeneficiaries) {
+      document += `11.7 No Third-Party Beneficiaries. This Agreement is for the sole benefit of the parties hereto and their respective successors and permitted assigns, and nothing herein, express or implied, is intended to or shall confer upon any other person or entity any legal or equitable right, benefit, or remedy of any nature whatsoever under or by reason of this Agreement.\n\n`;
+    }
+    
+    // Force Majeure
+    if (formData.forcesMajeure) {
+      document += `11.8 Force Majeure. Neither party shall be liable or responsible to the other party, nor be deemed to have defaulted under or breached this Agreement, for any failure or delay in fulfilling or performing any term of this Agreement, when and to the extent such failure or delay is caused by or results from acts beyond the affected party's reasonable control, including, without limitation: acts of God; flood, fire, earthquake, explosion, or other natural disaster; epidemic or pandemic; war, invasion, hostilities, terrorist threats or acts, riot or other civil unrest; government order, law, or action; embargoes or blockades; national or regional emergency; strikes, labor stoppages or slowdowns, or other industrial disturbances; or shortage of adequate power or transportation facilities.\n\n`;
+    }
+    
+    // Survival Clauses
+    if (formData.survivalClauses) {
+      document += `11.9 Survival. The provisions of this Agreement that by their nature extend beyond the termination of employment, including but not limited to Sections 4 (Confidentiality and Intellectual Property) and 6 (Dispute Resolution), shall survive termination of this Agreement.\n\n`;
+    }
+    
+    // Notices
+    document += `11.10 Notices. All notices required or permitted under this Agreement shall be in writing and shall be delivered `;
+    
+    if (formData.noticesMethod === "email") {
+      document += `via email to the respective email addresses of the parties as set forth in this Agreement or as otherwise designated in writing by the parties.`;
+    } else if (formData.noticesMethod === "mail") {
+      document += `via certified mail, return receipt requested, to the respective addresses of the parties as set forth in this Agreement or as otherwise designated in writing by the parties.`;
+    } else if (formData.noticesMethod === "both") {
+      document += `via email or certified mail, return receipt requested, to the respective addresses or email addresses of the parties as set forth in this Agreement or as otherwise designated in writing by the parties.`;
+    }
+    
+    document += `\n\n`;
+    
+    // Assignment
+    document += `11.11 Assignment. `;
+    
+    if (formData.assignmentOfRights === "non-assignable") {
+      document += `This Agreement may not be assigned by either party without the prior written consent of the other party.`;
+    } else if (formData.assignmentOfRights === "company-only") {
+      document += `This Agreement may not be assigned by the Employee. The Employer may assign this Agreement to any successor to all or substantially all of the business and/or assets of the Employer.`;
+    } else if (formData.assignmentOfRights === "both-parties") {
+      document += `This Agreement may be assigned by either party with the prior written consent of the other party, which consent shall not be unreasonably withheld.`;
+    }
+    
+    document += `\n\n`;
     
     // Signature Block
     document += `IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.\n\n`;
@@ -457,6 +1028,21 @@ const App = () => {
     document += `EMPLOYEE:\n\n`;
     document += `By: ________________________\n`;
     document += `${formData.employeeName}\n\n`;
+    
+    // California Labor Code Section 2870-2872 for IP Assignment
+    if (formData.ipAssignment && formData.ipAssignmentCaliforniaCompliance) {
+      document += `EXHIBIT A\n\n`;
+      document += `CALIFORNIA LABOR CODE SECTIONS 2870-2872\n\n`;
+      document += `SECTION 2870\n`;
+      document += `(a) Any provision in an employment agreement which provides that an employee shall assign, or offer to assign, any of his or her rights in an invention to his or her employer shall not apply to an invention that the employee developed entirely on his or her own time without using the employer's equipment, supplies, facilities, or trade secret information except for those inventions that either:\n`;
+      document += `(1) Relate at the time of conception or reduction to practice of the invention to the employer's business, or actual or demonstrably anticipated research or development of the employer; or\n`;
+      document += `(2) Result from any work performed by the employee for the employer.\n`;
+      document += `(b) To the extent a provision in an employment agreement purports to require an employee to assign an invention otherwise excluded from being required to be assigned under subdivision (a), the provision is against the public policy of this state and is unenforceable.\n\n`;
+      document += `SECTION 2871\n`;
+      document += `No employer shall require a provision made void and unenforceable by Section 2870 as a condition of employment or continued employment. Nothing in this article shall be construed to forbid or restrict the right of an employer to provide in contracts of employment for disclosure, provided that any such disclosures be received in confidence, of all of the employee's inventions made solely or jointly with others during the term of his or her employment, a review process by the employer to determine such issues as may arise, and for full title to certain patents and inventions to be in the United States, as required by contracts between the employer and the United States or any of its agencies.\n\n`;
+      document += `SECTION 2872\n`;
+      document += `If an employment agreement entered into after January 1, 1980, contains a provision requiring the employee to assign or offer to assign any of his or her rights in any invention to his or her employer, the employer must also, at the time the agreement is made, provide a written notification to the employee that the agreement does not apply to an invention which qualifies fully under the provisions of Section 2870. In any suit or action arising thereunder, the burden of proof shall be on the employee claiming the benefits of its provisions.\n`;
+    }
     
     return document;
   };
@@ -478,43 +1064,82 @@ const App = () => {
   // Function to determine which sections to highlight based on the last changed field
   const getSectionToHighlight = () => {
     const basicInfoFields = [
-      'employerName', 'employerAddress', 'employeeName', 'employeeAddress', 
-      'startDate', 'position', 'reportingTo', 'employmentType', 
-      'workLocation', 'customWorkLocation', 'atWillEmployment', 'probationPeriod'
+      'employerName', 'employerAddress', 'employerEIN', 'employeeName', 'employeeAddress', 
+      'employeeEmail', 'employeePhone', 'startDate', 'position', 'reportingTo', 
+      'employmentType', 'isExempt', 'workLocation', 'customWorkLocation', 
+      'atWillEmployment', 'probationPeriod', 'backgroundCheck', 'drugTest', 'employmentEligibility'
     ];
     
     const compensationFields = [
       'compensationType', 'salaryAmount', 'salaryPeriod', 'hourlyRate', 
-      'overtimeEligible', 'overtimeRate', 'commissionRate', 'commissionStructure', 
+      'overtimeEligible', 'overtimeRate', 'doubleTimeEligible', 'mealBreakPremium',
+      'restBreakPremium', 'commissionRate', 'commissionStructure', 
       'bonusEligible', 'bonusStructure', 'equityEligible', 'equityDetails',
-      'paymentFrequency', 'paymentMethod', 'expenseReimbursement'
+      'paymentFrequency', 'paymentMethod', 'expenseReimbursement', 'businessExpenses',
+      'travelExpenses', 'telecomExpenses', 'finalPayoutTerms', 'customFinalPayoutTerms'
     ];
     
     const benefitFields = [
-      'ptoPolicy', 'ptoAmount', 'sickLeavePolicy', 'sickLeaveAmount',
-      'healthInsurance', 'healthInsuranceDetails', 'retirementPlan',
-      'retirementPlanDetails', 'otherBenefits'
+      'ptoPolicy', 'ptoAmount', 'ptoCarryover', 'ptoCarryoverLimit', 'ptoAccrualRate',
+      'paidHolidays', 'sickLeavePolicy', 'sickLeaveAmount', 'sickLeaveAccrual', 
+      'sickLeaveAccrualRate', 'healthInsurance', 'healthInsuranceContribution',
+      'healthInsuranceWaitingPeriod', 'healthInsuranceDetails', 'retirementPlan',
+      'retirementPlanDetails', 'fmlaEligible', 'cfraEligible', 'pdlEligible', 
+      'paidFamilyLeave', 'workerComp', 'disabilityInsurance', 'otherBenefits'
+    ];
+    
+    const workScheduleFields = [
+      'hoursPerWeek', 'workSchedule', 'customSchedule', 'mealBreaks',
+      'mealBreakDuration', 'mealBreakPaid', 'mealBreaksWaiver', 'restBreaks',
+      'restBreakDuration', 'lactationAccommodation', 'reportingTimePay',
+      'splitShiftPremium', 'callbackPay', 'onCallPay'
+    ];
+    
+    const remoteWorkFields = [
+      'remoteWorkPolicy', 'remoteWorkEquipment', 'remoteWorkEquipmentDetails',
+      'remoteWorkExpenses', 'remoteWorkTimeRecording', 'customTimeRecordingMethod',
+      'remoteWorkSecurity', 'remoteWorkSecurityDetails'
+    ];
+    
+    const covidFields = [
+      'covidSafetyMeasures', 'covidSafetyDetails', 'covidVaccination',
+      'covidVaccinationDetails', 'covidTesting', 'covidTestingDetails',
+      'covidQuarantine', 'covidQuarantineDetails', 'covidLeave', 'covidLeaveDetails'
     ];
     
     const dutiesFields = [
-      'hoursPerWeek', 'workSchedule', 'customSchedule', 'mealBreaks',
-      'restBreaks', 'dutiesDescription', 'performanceReview', 'performanceReviewFrequency'
+      'dutiesDescription', 'performanceReview', 'performanceReviewFrequency',
+      'performanceMetrics', 'trainingRequirements', 'trainingDetails'
     ];
     
     const ipFields = [
-      'confidentialityAgreement', 'confidentialityScope', 'ipAssignment',
-      'ipAssignmentExceptions', 'tradeSecretsProtection', 'companyProperty'
+      'confidentialityAgreement', 'confidentialityScope', 'confidentialityExclusions',
+      'ipAssignment', 'ipAssignmentExceptions', 'ipAssignmentCaliforniaCompliance',
+      'tradeSecretsProtection', 'nonDisclosureTerm', 'companyProperty',
+      'dataPrivacy', 'employeePrivacyProtections'
+    ];
+    
+    const policiesFields = [
+      'employeeHandbook', 'antiHarassmentPolicy', 'nonDiscriminationPolicy',
+      'drugFreeWorkplace', 'workplaceViolencePolicy', 'ethicsPolicy', 
+      'socialMediaPolicy', 'byodPolicy', 'byodPolicyDetails'
     ];
     
     const terminationFields = [
       'noticePeriod', 'customNoticePeriod', 'severanceIncluded',
-      'severanceTerms', 'returnOfProperty'
+      'severanceTerms', 'exitInterview', 'continuationOfBenefits',
+      'returnOfProperty', 'finalPayRequirements', 'postEmploymentRestrictions',
+      'postEmploymentRestrictionsDetails'
     ];
     
     const disputeFields = [
-      'arbitrationClause', 'arbitrationType', 'arbitrationCustomDetails',
-      'governingLaw', 'entireAgreement', 'nonModification', 'severability',
-      'nonWaiver', 'electronicSignatures'
+      'grievanceProcedure', 'grievanceProcedureDetails', 'arbitrationClause', 
+      'arbitrationType', 'arbitrationCustomDetails', 'arbitrationOptOut',
+      'arbitrationOptOutPeriod', 'arbitrationFees', 'classActionWaiver',
+      'governingLaw', 'venueCounty', 'entireAgreement', 'nonModification', 
+      'severability', 'nonWaiver', 'electronicSignatures', 'counterparts',
+      'thirdPartyBeneficiaries', 'forcesMajeure', 'survivalClauses',
+      'noticesMethod', 'assignmentOfRights'
     ];
     
     if (basicInfoFields.includes(lastChanged)) {
@@ -523,10 +1148,18 @@ const App = () => {
       return 'compensation';
     } else if (benefitFields.includes(lastChanged)) {
       return 'benefits';
+    } else if (workScheduleFields.includes(lastChanged)) {
+      return 'work-schedule';
+    } else if (remoteWorkFields.includes(lastChanged)) {
+      return 'remote-work';
+    } else if (covidFields.includes(lastChanged)) {
+      return 'covid';
     } else if (dutiesFields.includes(lastChanged)) {
       return 'duties';
     } else if (ipFields.includes(lastChanged)) {
       return 'ip';
+    } else if (policiesFields.includes(lastChanged)) {
+      return 'policies';
     } else if (terminationFields.includes(lastChanged)) {
       return 'termination';
     } else if (disputeFields.includes(lastChanged)) {
@@ -539,12 +1172,16 @@ const App = () => {
   // Pattern matching for different sections
   const sectionPatterns = {
     'basic-info': /THIS EMPLOYMENT AGREEMENT.*?\n\n1\.4 Start Date[^\n]*\n\n/s,
-    'compensation': /## 2\. COMPENSATION AND BENEFITS\n\n.*?(?=## 3\. DUTIES AND RESPONSIBILITIES)/s,
-    'benefits': /2\.7 Benefits.*?(?=## 3\. DUTIES AND RESPONSIBILITIES)/s,
-    'duties': /## 3\. DUTIES AND RESPONSIBILITIES\n\n.*?(?=## 4\. CONFIDENTIALITY AND INTELLECTUAL PROPERTY)/s,
-    'ip': /## 4\. CONFIDENTIALITY AND INTELLECTUAL PROPERTY\n\n.*?(?=## 5\. TERMINATION)/s,
-    'termination': /## 5\. TERMINATION\n\n.*?(?=## 6\. DISPUTE RESOLUTION)/s,
-    'dispute': /## 6\. DISPUTE RESOLUTION\n\n.*?(?=## 7\. MISCELLANEOUS)/s
+    'compensation': /## 2\. COMPENSATION AND BENEFITS\n\n.*?(?=## 3\. WORK SCHEDULE AND BREAKS)/s,
+    'benefits': /2\.7 Benefits.*?(?=## 3\. WORK SCHEDULE AND BREAKS)/s,
+    'work-schedule': /## 3\. WORK SCHEDULE AND BREAKS\n\n.*?(?=## 4\. REMOTE WORK POLICY|## 5\. COVID-19 PROVISIONS|## 6\. DUTIES AND RESPONSIBILITIES)/s,
+    'remote-work': /## 4\. REMOTE WORK POLICY\n\n.*?(?=## 5\. COVID-19 PROVISIONS|## 6\. DUTIES AND RESPONSIBILITIES)/s,
+    'covid': /## 5\. COVID-19 PROVISIONS\n\n.*?(?=## 6\. DUTIES AND RESPONSIBILITIES)/s,
+    'duties': /## 6\. DUTIES AND RESPONSIBILITIES\n\n.*?(?=## 7\. CONFIDENTIALITY AND INTELLECTUAL PROPERTY)/s,
+    'ip': /## 7\. CONFIDENTIALITY AND INTELLECTUAL PROPERTY\n\n.*?(?=## 8\. COMPANY POLICIES AND COMPLIANCE)/s,
+    'policies': /## 8\. COMPANY POLICIES AND COMPLIANCE\n\n.*?(?=## 9\. TERMINATION)/s,
+    'termination': /## 9\. TERMINATION\n\n.*?(?=## 10\. DISPUTE RESOLUTION)/s,
+    'dispute': /## 10\. DISPUTE RESOLUTION\n\n.*?(?=## 11\. MISCELLANEOUS)/s
   };
 
   // Function to create a highlighted version of the text
