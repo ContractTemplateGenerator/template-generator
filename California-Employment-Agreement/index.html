@@ -6,19 +6,48 @@
     <meta name="description" content="Create a customized California employment agreement that complies with state law. Free generator for employers hiring in California.">
     <title>California Employment Agreement Generator | terms.law</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <!-- Use development versions for better error messages -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Error tracking to help debug issues -->
+    <script>
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('Error caught:', message, 'at', source, 'line:', lineno);
+            document.getElementById('error-display').innerHTML = 
+                '<div style="color: red; padding: 20px; border: 1px solid red; margin: 20px; background: #fff5f5;">' +
+                '<h3>Error Loading Generator</h3>' +
+                '<p>Message: ' + message + '</p>' +
+                '<p>Source: ' + source + '</p>' +
+                '<p>Line: ' + lineno + '</p>' +
+                '</div>';
+            return false;
+        };
+    </script>
 </head>
 <body>
     <div id="root"></div>
+    <div id="error-display"></div>
     
+    <!-- Fallback content in case JS doesn't load -->
+    <noscript>
+        <div style="padding: 20px; text-align: center;">
+            <h2>California Employment Agreement Generator</h2>
+            <p>This tool requires JavaScript to function. Please enable JavaScript in your browser settings.</p>
+        </div>
+    </noscript>
+    
+    <!-- Load scripts in proper order -->
     <script type="text/babel" src="docx-generator.js"></script>
     <script type="text/babel" src="california-employment-agreement.js"></script>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            feather.replace();
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
         });
     </script>
 
@@ -26,7 +55,7 @@
     <script type="text/babel">
         window.createCalendlyLink = function() {
             return (
-                <a href="" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">Schedule time with me</a>
+                <a href="" onClick={(e) => {e.preventDefault(); if (typeof Calendly !== 'undefined') Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'}); return false;}}>Schedule time with me</a>
             );
         }
     </script>
