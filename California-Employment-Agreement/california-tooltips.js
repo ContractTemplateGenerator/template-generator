@@ -41,6 +41,11 @@ const californiaTips = {
   arbitration: "California arbitration agreements must meet specific requirements, including employer payment of all arbitration fees and no limitation on available remedies.",
 };
 
+// Make components and tips globally available
+window.InfoTooltip = InfoTooltip;
+window.CaliforniaLawAlert = CaliforniaLawAlert;
+window.californiaTips = californiaTips;
+
 // Usage examples:
 // <InfoTooltip 
 //   title="Overtime Rules" 
