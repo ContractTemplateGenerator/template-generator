@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Affiliate Agreement Generator | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            font-size: 2.2rem;
+            text-align: center;
+            color: #4f46e5;
+            margin-bottom: 2rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #e5e7eb;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+        
+        input[type="text"]:focus {
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+        
+        .preview-container {
+            margin-top: 30px;
+        }
+        
+        .preview-title {
+            font-size: 1.5rem;
+            color: #333;
+            border-bottom: 2px solid #4f46e5;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .agreement-preview {
+            white-space: pre-line;
+            line-height: 1.6;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .copy-button {
+            background-color: #4f46e5;
+            color: white;
+        }
+        
+        .download-button {
+            background-color: #2563eb;
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        // Word document generation function
+        const generateWordDoc = function(documentText, formData) {
+          try {
+            // Create HTML content that can be rendered in Word
+            let htmlContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <meta charset="UTF-8">
+            <title>Affiliate Agreement</title>
+            <style>
+              body {
+                font-family: Calibri, Arial, sans-serif;
+                font-size: 12pt;
+                line-height: 1.5;
+                margin: 0;
+              }
+            </style>
+            </head>
+            <body>
+            `;
+
+            // Process text into paragraphs
+            const processedText = documentText
+              .split('\n')
+              .map(line => line.trim() ? `<p>${line}</p>` : '')
+              .join('');
+            
+            htmlContent += processedText;
+            htmlContent += '</body></html>';
+            
+            // Convert HTML to Blob
+            const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+            
+            // Create download link and trigger download
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Affiliate-Agreement.doc';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+          } catch (error) {
+            console.error("Error generating Word document:", error);
+            alert("Error generating Word document. Please try again or use the copy option.");
+          }
+        };
+
+        // Main component
+        const AffiliateAgreementGenerator = () => {
+          const [formData, setFormData] = useState({
+            companyName: '',
+            affiliateName: ''
+          });
+
+          const [agreementText, setAgreementText] = useState(
+            `AFFILIATE AGREEMENT
+This Affiliate Agreement is entered into by and between:
+[COMPANY NAME] ("Company"),
+and
+[AFFILIATE NAME] ("Affiliate").`
+          );
+
+          // Update agreement text when form data changes
+          useEffect(() => {
+            let updatedText = `AFFILIATE AGREEMENT
+This Affiliate Agreement is entered into by and between:
+${formData.companyName || '[COMPANY NAME]'} ("Company"),
+and
+${formData.affiliateName || '[AFFILIATE NAME]'} ("Affiliate").`;
+            
+            setAgreementText(updatedText);
+          }, [formData]);
+
+          const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData(prev => ({
+              ...prev,
+              [name]: value
+            }));
+          };
+
+          const copyToClipboard = () => {
+            try {
+              navigator.clipboard.writeText(agreementText);
+              alert('Agreement copied to clipboard!');
+            } catch (error) {
+              console.error('Error copying to clipboard:', error);
+              alert('Failed to copy to clipboard. Please try again.');
+            }
+          };
+          
+          const downloadAsWord = () => {
+            generateWordDoc(agreementText, formData);
+          };
+
+          return (
+            <div>
+              <h1>Affiliate Agreement Generator</h1>
+              
+              <div>
+                <label htmlFor="companyName">Company Name:</label>
+                <input
+                  type="text"
+                  id="companyName"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="affiliateName">Affiliate Name:</label>
+                <input
+                  type="text"
+                  id="affiliateName"
+                  name="affiliateName"
+                  value={formData.affiliateName}
+                  onChange={handleChange}
+                />
+              </div>
+              
+              <div className="preview-container">
+                <h2 className="preview-title">Preview:</h2>
+                <div className="agreement-preview">
+                  {agreementText}
+                </div>
+                
+                <div className="button-container">
+                  <button className="copy-button" onClick={copyToClipboard}>
+                    Copy to Clipboard
+                  </button>
+                  <button className="download-button" onClick={downloadAsWord}>
+                    Download as Word
+                  </button>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
+        ReactDOM.render(
+          <AffiliateAgreementGenerator />,
+          document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
