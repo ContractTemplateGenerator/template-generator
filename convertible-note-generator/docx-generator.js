@@ -1,4 +1,4 @@
-// docx-generator.js
+// Word document generator
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -9,10 +9,10 @@ window.generateWordDoc = function(documentText, formData) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${formData.companyName || "Convertible Note"}</title>
+<title>${formData.companyName || "Company"} Convertible Note</title>
 <style>
   body {
-    font-family: Calibri, Arial, sans-serif;
+    font-family: "Times New Roman", Times, serif;
     font-size: 12pt;
     line-height: 1.5;
   }
@@ -31,11 +31,6 @@ window.generateWordDoc = function(documentText, formData) {
   }
   .page-break {
     page-break-before: always;
-  }
-  .signature-line {
-    border-top: 1px solid black;
-    width: 80%;
-    margin-top: 30pt;
   }
 </style>
 </head>
@@ -85,7 +80,7 @@ window.generateWordDoc = function(documentText, formData) {
     // Create download link and trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${formData.companyName ? formData.companyName.replace(/\s+/g, '-') : 'Convertible-Note'}.doc`;
+    link.download = `${formData.companyName ? formData.companyName.replace(/\s+/g, '-') : 'Company'}-Convertible-Note.doc`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
