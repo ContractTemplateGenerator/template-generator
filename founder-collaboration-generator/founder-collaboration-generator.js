@@ -105,7 +105,8 @@ const App = () => {
     { id: 'exit', label: 'Exit Strategy' },
     { id: 'disputes', label: 'Dispute Resolution' },
     { id: 'term', label: 'Term & Termination' },
-    { id: 'misc', label: 'Miscellaneous' }
+    { id: 'misc', label: 'Miscellaneous' },
+    { id: 'evaluation', label: 'Risk Evaluation' }
   ];
   
   // Navigation functions
@@ -604,6 +605,188 @@ const App = () => {
     }
   };
   
+  // Function to evaluate risks in the agreement
+  const evaluateRisks = () => {
+    const risks = [];
+    
+    // 1. Check founder equity totals
+    const equityTotal = parseFloat(formData.founder1EquityPercentage || 0) + 
+                       parseFloat(formData.founder2EquityPercentage || 0) + 
+                       (formData.additionalFounders ? parseFloat(formData.founder3EquityPercentage || 0) : 0) + 
+                       (formData.additionalFounders ? parseFloat(formData.founder4EquityPercentage || 0) : 0);
+    
+    if (Math.abs(equityTotal - 100) > 0.01) {
+      risks.push({
+        category: "Equity Allocation",
+        issue: "Founder equity percentages do not add up to 100%",
+        impact: "High",
+        color: "#ef4444", // Red
+        recommendation: "Adjust equity percentages to total exactly 100%."
+      });
+    } else {
+      risks.push({
+        category: "Equity Allocation",
+        issue: "Founder equity percentages correctly total 100%",
+        impact: "None",
+        color: "#22c55e", // Green
+        recommendation: "No action needed."
+      });
+    }
+    
+    // 2. Check for missing founder details
+    const founderDetailsMissing = [
+      !formData.founder1Name || !formData.founder1Email || !formData.founder1Address,
+      !formData.founder2Name || !formData.founder2Email || !formData.founder2Address,
+      formData.additionalFounders && formData.founder3Name && (!formData.founder3Email || !formData.founder3Address),
+      formData.additionalFounders && formData.founder4Name && (!formData.founder4Email || !formData.founder4Address)
+    ].some(Boolean);
+    
+    if (founderDetailsMissing) {
+      risks.push({
+        category: "Founder Information",
+        issue: "One or more founders have missing contact details",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Complete all founder name, email, and address fields."
+      });
+    } else {
+      risks.push({
+        category: "Founder Information",
+        issue: "All founder contact details are complete",
+        impact: "None",
+        color: "#22c55e", // Green
+        recommendation: "No action needed."
+      });
+    }
+    
+    // 3. Check roles and responsibilities
+    const rolesMissing = [
+      !formData.founder1Responsibilities,
+      !formData.founder2Responsibilities,
+      formData.additionalFounders && formData.founder3Name && !formData.founder3Responsibilities,
+      formData.additionalFounders && formData.founder4Name && !formData.founder4Responsibilities
+    ].some(Boolean);
+    
+    if (rolesMissing) {
+      risks.push({
+        category: "Roles & Responsibilities",
+        issue: "One or more founders have undefined responsibilities",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Define specific responsibilities for each founder to avoid confusion and disputes."
+      });
+    } else {
+      risks.push({
+        category: "Roles & Responsibilities",
+        issue: "All founders have defined responsibilities",
+        impact: "None",
+        color: "#22c55e", // Green
+        recommendation: "No action needed."
+      });
+    }
+    
+    // 4. Vesting considerations
+    if (!formData.vestingSchedule) {
+      risks.push({
+        category: "Vesting",
+        issue: "No vesting schedule included",
+        impact: "High",
+        color: "#ef4444", // Red
+        recommendation: "Consider adding a vesting schedule to protect founders if someone leaves early."
+      });
+    } else if (formData.vestingCliff === "0") {
+      risks.push({
+        category: "Vesting",
+        issue: "Vesting schedule has no cliff period",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Consider adding a cliff period (typically 1 year) to ensure founders demonstrate commitment."
+      });
+    } else {
+      risks.push({
+        category: "Vesting",
+        issue: "Standard vesting schedule with cliff included",
+        impact: "None",
+        color: "#22c55e", // Green
+        recommendation: "No action needed."
+      });
+    }
+    
+    // 5. IP assignment
+    if (!formData.ipAssignment) {
+      risks.push({
+        category: "Intellectual Property",
+        issue: "IP is not assigned to the founder group",
+        impact: "High",
+        color: "#ef4444", // Red
+        recommendation: "Consider assigning all project-related IP to the founder group to prevent future disputes."
+      });
+    } else {
+      risks.push({
+        category: "Intellectual Property",
+        issue: "IP is appropriately assigned to the founder group",
+        impact: "None",
+        color: "#22c55e", // Green
+        recommendation: "No action needed."
+      });
+    }
+    
+    // 6. Check if prior IP is flagged but not described
+    if (formData.priorIP && !formData.priorIPDescription) {
+      risks.push({
+        category: "Prior IP",
+        issue: "Prior IP is indicated but not described",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Add detailed descriptions of any prior IP to clearly separate it from project IP."
+      });
+    }
+    
+    // 7. Decision making structure
+    if (formData.decisionMakingStructure === "specific" && !formData.specificDecisionMaking) {
+      risks.push({
+        category: "Decision Making",
+        issue: "Custom decision making structure selected but not defined",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Define your custom decision making structure in detail."
+      });
+    }
+    
+    // 8. Non-compete enforceability (California specific)
+    if (formData.nonCompete && formData.governingLaw === "California") {
+      risks.push({
+        category: "Non-Compete",
+        issue: "Non-compete provision with California governing law",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Non-compete provisions are generally unenforceable in California. Consider removing or modifying."
+      });
+    }
+    
+    // 9. Agreement term
+    if (formData.agreementTerm === "specific" && parseInt(formData.specificTerm) < parseInt(formData.incorporationTimeline || 6)) {
+      risks.push({
+        category: "Agreement Term",
+        issue: "Agreement term is shorter than incorporation timeline",
+        impact: "Medium",
+        color: "#f97316", // Orange
+        recommendation: "Extend agreement term to cover the full incorporation timeline."
+      });
+    }
+    
+    // 10. General legal advice
+    risks.push({
+      category: "Legal Review",
+      issue: "Generator provides a starting point but not legal advice",
+      impact: "Medium",
+      color: "#eab308", // Yellow
+      recommendation: "Have an attorney review the final agreement before signing."
+    });
+    
+    return risks;
+  };
+
   // Render the form based on current tab
   const renderTabContent = () => {
     switch (currentTab) {
@@ -1523,6 +1706,123 @@ const App = () => {
             
             <div className="alert alert-warning">
               <strong>Legal Note:</strong> Non-compete provisions may not be enforceable in some jurisdictions (e.g., California). Consider consulting with an attorney to ensure these provisions are appropriate and enforceable in your location.
+            </div>
+          </div>
+        );
+        
+      case 10: // Risk Evaluation
+        const risks = evaluateRisks();
+        return (
+          <div className="tab-content">
+            <h2>Risk Evaluation</h2>
+            
+            <div className="alert alert-info">
+              <strong>About This Evaluation:</strong> This automated assessment identifies potential risks or issues in your agreement. Each item is color-coded by potential impact level.
+            </div>
+            
+            <div className="risk-evaluation">
+              {risks.map((risk, index) => (
+                <div 
+                  key={index} 
+                  className="risk-item" 
+                  style={{
+                    borderLeft: `4px solid ${risk.color}`,
+                    backgroundColor: `${risk.color}10`,
+                    padding: "1rem",
+                    marginBottom: "1rem",
+                    borderRadius: "0.25rem"
+                  }}
+                >
+                  <h3 style={{ 
+                    color: risk.color, 
+                    marginBottom: "0.5rem", 
+                    display: "flex", 
+                    alignItems: "center",
+                    fontSize: "1rem",
+                    fontWeight: "600"
+                  }}>
+                    {risk.impact !== "None" ? (
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke={risk.color} 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        style={{ marginRight: "0.5rem" }}
+                      >
+                        {risk.impact === "High" ? (
+                          <><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></>
+                        ) : (
+                          <><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12.01" y2="16"></line><path d="M12 8v4"></path></>
+                        )}
+                      </svg>
+                    ) : (
+                      <svg 
+                        xmlns="http://www.w3.org/2000/svg" 
+                        width="16" 
+                        height="16" 
+                        viewBox="0 0 24 24" 
+                        fill="none" 
+                        stroke={risk.color} 
+                        strokeWidth="2" 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        style={{ marginRight: "0.5rem" }}
+                      >
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                      </svg>
+                    )}
+                    {risk.category}: {risk.impact} Risk
+                  </h3>
+                  <p style={{ marginBottom: "0.5rem" }}><strong>Issue:</strong> {risk.issue}</p>
+                  <p><strong>Recommendation:</strong> {risk.recommendation}</p>
+                </div>
+              ))}
+            </div>
+            
+            <div className="alert alert-warning">
+              <strong>Disclaimer:</strong> This evaluation is automated and does not constitute legal advice. It's strongly recommended that you have the final agreement reviewed by a qualified attorney before signing.
+            </div>
+            
+            <div style={{ 
+              display: "flex", 
+              alignItems: "center", 
+              marginTop: "2rem",
+              padding: "1rem",
+              backgroundColor: "#f0fdf4",
+              borderRadius: "0.5rem",
+              border: "1px solid #dcfce7"
+            }}>
+              <div style={{ marginRight: "1rem" }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#22c55e" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                  <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                  <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+              </div>
+              <div>
+                <h3 style={{ margin: 0, marginBottom: "0.5rem", fontSize: "1rem" }}>Need Professional Help?</h3>
+                <p style={{ margin: 0 }}>
+                  <a 
+                    href="https://terms.law/call/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#22c55e",
+                      textDecoration: "none",
+                      fontWeight: "500"
+                    }}
+                  >
+                    Schedule a consultation
+                  </a> with an experienced attorney to review your agreement and address any concerns.
+                </p>
+              </div>
             </div>
           </div>
         );
