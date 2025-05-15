@@ -1,4 +1,4 @@
-// Word document generator
+// Word document generation utility
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -9,10 +9,10 @@ window.generateWordDoc = function(documentText, formData) {
 <html>
 <head>
 <meta charset="UTF-8">
-<title>${formData.companyName || "Company"} Convertible Note</title>
+<title>${formData.documentTitle || "Convertible Promissory Note"}</title>
 <style>
   body {
-    font-family: "Times New Roman", Times, serif;
+    font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
   }
@@ -80,7 +80,7 @@ window.generateWordDoc = function(documentText, formData) {
     // Create download link and trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `${formData.companyName ? formData.companyName.replace(/\s+/g, '-') : 'Company'}-Convertible-Note.doc`;
+    link.download = `${formData.fileName || 'Convertible-Note'}.doc`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

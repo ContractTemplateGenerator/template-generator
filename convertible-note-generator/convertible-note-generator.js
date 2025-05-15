@@ -1,66 +1,98 @@
-// convertible-note-generator.js
+// Convertible Note Generator
 const { useState, useEffect, useRef } = React;
 
-const ConvertibleNoteGenerator = () => {
-  // Tabs configuration
-  const tabs = [
-    { id: 'company', label: 'Company & Investor' },
-    { id: 'terms', label: 'Note Terms' },
-    { id: 'additional', label: 'Additional Terms' },
-    { id: 'review', label: 'Review & Generate' }
-  ];
+// Helper function to format currency
+const formatCurrency = (value) => {
+  if (!value) return '';
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(value);
+};
 
-  // State for current tab
-  const [currentTab, setCurrentTab] = useState(0);
-  
+// Helper function to calculate future date
+const calculateFutureDate = (months) => {
+  const date = new Date();
+  date.setMonth(date.getMonth() + months);
+  return date.toISOString().split('T')[0];
+};
+
+// Main Component
+function ConvertibleNoteGenerator() {
   // State for form data
   const [formData, setFormData] = useState({
-    // Company Information
+    // Basic info
     companyName: '',
-    companyAddress: '',
-    stateOfIncorporation: 'Delaware',
-    companyRepName: '',
-    companyRepTitle: '',
-    
-    // Investor Information
+    companyState: 'Delaware',
     investorName: '',
-    investorAddress: '',
-    investorType: 'individual',
+    principalAmount: '100000',
+    date: new Date().toISOString().split('T')[0],
     
-    // Note Terms
-    principalAmount: '',
+    // Financial terms
     interestRate: '5',
-    maturityDate: '',
-    qualifiedFinancingThreshold: '1000000',
+    maturityMonths: '24',
+    maturityDate: calculateFutureDate(24),
+    
+    // Conversion terms
     valuationCap: '5000000',
     discountRate: '20',
-    conversionMechanism: 'automatic',
-    conversionPriceOption: 'lower',
+    qualifyingFinancingAmount: '1000000',
     
-    // Additional Terms
-    prepaymentRights: 'no',
-    amendmentProvisions: 'majority',
-    governingLaw: 'Delaware',
-    subordination: 'yes',
-    mfnClause: 'yes',
-    acceleration: 'yes',
+    // Advanced terms
+    hasMFN: true,
+    hasProRataRights: true,
+    hasInformationRights: true,
+    prepaymentOption: 'with_consent',
+    conversionMultiple: '2',
+    governingLawState: '',
     
-    // Signature
-    signatureDate: new Date().toISOString().split('T')[0]
+    // Document settings
+    documentTitle: 'Convertible Promissory Note',
+    fileName: 'Convertible-Note-Agreement'
   });
-
+  
+  // State for tabs
+  const [currentTab, setCurrentTab] = useState(0);
+  
+  // State for the document text
+  const [documentText, setDocumentText] = useState('');
+  
   // State to track what was last changed
   const [lastChanged, setLastChanged] = useState(null);
   
-  // State for document text
-  const [documentText, setDocumentText] = useState('');
-  
-  // Ref for preview content div
+  // Ref for preview content
   const previewRef = useRef(null);
-
-  // State to track highlighted text spans in the document
-  const [highlightedText, setHighlightedText] = useState('');
-
+  
+  // Tab configuration
+  const tabs = [
+    { id: 'basics', label: 'Company & Investor' },
+    { id: 'financials', label: 'Financial Terms' },
+    { id: 'conversion', label: 'Conversion Terms' },
+    { id: 'advanced', label: 'Advanced Terms' },
+    { id: 'finalize', label: 'Finalize & Review' }
+  ];
+  
+  // Generate document text whenever form data changes
+  useEffect(() => {
+    const newDocumentText = generateDocumentText(formData);
+    setDocumentText(newDocumentText);
+  }, [formData]);
+  
+  // Effect to scroll to highlighted text
+  useEffect(() => {
+    if (previewRef.current) {
+      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }
+  }, [documentText, lastChanged]);
+  
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -68,280 +100,373 @@ const ConvertibleNoteGenerator = () => {
     // Record what field was changed for highlighting
     setLastChanged(name);
     
-    // Update form data
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    // Special handling for maturity months to also update maturity date
+    if (name === 'maturityMonths') {
+      const newMaturityDate = calculateFutureDate(parseInt(value));
+      
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        maturityDate: newMaturityDate
+      }));
+    } 
+    // Handle maturity date direct changes
+    else if (name === 'maturityDate') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        // Don't update maturityMonths since it's a direct date change
+      }));
+    }
+    // Normal field handling
+    else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value,
+        // Set governingLawState to company state if empty
+        ...(name === 'companyState' && !prev.governingLawState ? { governingLawState: value } : {})
+      }));
+    }
   };
-
-  // Format currency values
-  const formatCurrency = (amount) => {
-    if (!amount) return '';
+  
+  // Document text generation function
+  const generateDocumentText = (data) => {
+    // Format values for display
+    const formattedPrincipal = formatCurrency(data.principalAmount);
     
-    // Remove any non-digit characters
-    const cleanAmount = amount.toString().replace(/[^0-9.]/g, '');
+    // Date formatting for display
+    const formatDate = (dateString) => {
+      if (!dateString) return '';
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+    };
     
-    // Format with commas
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(cleanAmount);
-  };
+    // Prepare document text
+    let text = `CONVERTIBLE PROMISSORY NOTE
 
-  // Format dates
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    });
-  };
+${formattedPrincipal}${' '.repeat(Math.max(70 - formattedPrincipal.length, 1))}${formatDate(data.date)}
 
-  // Generate the document text
-  useEffect(() => {
-    if (!formData.companyName) {
-      setDocumentText('Please fill out the company name to generate the document.');
-      return;
+FOR VALUE RECEIVED, ${data.companyName || '[COMPANY NAME]'}, a ${data.companyState || '[STATE]'} corporation (the "Company"), promises to pay to ${data.investorName || '[INVESTOR NAME]'} (the "Investor"), the principal sum of ${formattedPrincipal || '$[AMOUNT]'} together with accrued and unpaid interest thereon, each due and payable on the date and in the manner set forth below.
+
+1. Interest. The Note will bear interest at the rate of ${data.interestRate || '[RATE]'}% per annum, calculated on the basis of a year of 365 days for the actual number of days elapsed. Interest shall accrue daily and be payable upon the earlier of (i) conversion of this Note or (ii) the Maturity Date.
+
+2. Maturity Date. Unless this Note has been previously converted in accordance with the terms hereof, the entire outstanding principal balance and all unpaid accrued interest shall become fully due and payable on ${formatDate(data.maturityDate) || '[MATURITY DATE]'} (the "Maturity Date").
+
+3. Conversion.
+   (a) Qualified Financing Conversion. In the event the Company consummates, prior to the Maturity Date, a bona fide equity financing with total proceeds to the Company of not less than ${formatCurrency(data.qualifyingFinancingAmount) || '$[QUALIFYING AMOUNT]'} (excluding the conversion of this Note and other indebtedness) (a "Qualified Financing"), then the outstanding principal balance and unpaid accrued interest of this Note shall automatically convert into the equity securities issued in the Qualified Financing at a conversion price equal to ${data.discountRate || '[DISCOUNT]'}% of the price per share paid by the other purchasers of equity securities in the Qualified Financing; provided, however, that if the effective price per share calculated using the Valuation Cap would result in a lower effective price per share, the outstanding principal amount and accrued interest on this Note shall convert at such lower price. The "Valuation Cap" means ${formatCurrency(data.valuationCap) || '$[VALUATION CAP]'}.
+
+   (b) Maturity Conversion. If this Note remains outstanding on the Maturity Date, at the option of the Investor, the outstanding principal amount and unpaid accrued interest may be converted into shares of the Company's common stock at a conversion price determined by dividing the Valuation Cap by the fully-diluted capitalization of the Company as of immediately prior to such conversion (including all outstanding equity securities, all outstanding options and warrants, all notes convertible into equity securities and all unissued shares reserved for issuance under the Company's equity incentive plan).
+
+   (c) Change of Control. If the Company consummates a Change of Control prior to the Maturity Date and prior to the conversion of this Note, then at the Investor's option, either (i) the Company will pay the Investor an amount equal to ${data.conversionMultiple || '[2-3]'}x the outstanding principal and unpaid accrued interest on this Note, or (ii) this Note will be converted into that number of shares of the Company's common stock determined by dividing the outstanding principal and unpaid accrued interest by the price per share determined by dividing the Valuation Cap by the fully-diluted capitalization of the Company as of immediately prior to such Change of Control. "Change of Control" means (i) a merger or consolidation in which the Company is a constituent party, or a subsidiary of the Company is a constituent party and the Company issues shares of its capital stock pursuant to such merger or consolidation, except any such merger or consolidation involving the Company or a subsidiary in which the shares of capital stock of the Company outstanding immediately prior to such merger or consolidation continue to represent, or are converted into or exchanged for shares of capital stock that represent, immediately following such merger or consolidation, at least a majority, by voting power, of the capital stock of the surviving or resulting entity or the parent corporation, or (ii) the sale, lease, transfer, exclusive license or other disposition, in a single transaction or series of related transactions, by the Company of all or substantially all the assets of the Company (except where such sale, lease, transfer, exclusive license or other disposition is to a wholly owned subsidiary of the Company).
+
+4. Prepayment. This Note may not be prepaid ${data.prepaymentOption === 'with_consent' ? 'without the prior written consent of the Investor' : data.prepaymentOption === 'not_allowed' ? 'prior to the Maturity Date' : 'at any time upon 15 days\' prior written notice to the Investor'}.
+`;
+
+    // Conditional clauses based on form data
+    if (data.hasMFN) {
+      text += `
+5. Most Favored Nation. If, prior to the conversion of this Note, the Company issues any convertible notes or other debt securities ("Other Notes") to investors, and such Other Notes contain terms that are more favorable to such investors than the terms of this Note are to the Investor, the Company shall promptly notify the Investor of such terms and, at the Investor's option, this Note shall be amended to include such more favorable terms.
+`;
     }
 
-    const text = `
-CONVERTIBLE PROMISSORY NOTE
+    if (data.hasProRataRights) {
+      text += `
+${data.hasMFN ? '6' : '5'}. Pro-rata Rights. If, while this Note is outstanding, the Company issues equity securities in a transaction primarily for capital raising purposes, the Investor shall have the right to participate in such transaction on a pro-rata basis based on the percentage of the Company's fully-diluted capitalization that would be owned by the Investor upon conversion of this Note at the Valuation Cap.
+`;
+    }
 
-$${formData.principalAmount ? parseInt(formData.principalAmount).toLocaleString() : "[PRINCIPAL AMOUNT]"}
+    if (data.hasInformationRights) {
+      text += `
+${data.hasMFN && data.hasProRataRights ? '7' : data.hasMFN || data.hasProRataRights ? '6' : '5'}. Information Rights. For so long as this Note remains outstanding, the Company shall deliver to the Investor (a) annual unaudited financial statements within 90 days after the end of each fiscal year and (b) quarterly unaudited financial statements within 45 days after the end of each of the first three fiscal quarters, in each case prepared in accordance with generally accepted accounting principles.
+`;
+    }
 
-THIS CONVERTIBLE PROMISSORY NOTE (this "Note") is made as of ${formatDate(formData.signatureDate)} (the "Effective Date"), by ${formData.companyName} (the "Company"), a ${formData.stateOfIncorporation} corporation with its principal office at ${formData.companyAddress}, for the benefit of ${formData.investorName} (the "Investor").
+    // Add amendment and governing law clauses
+    const nextClauseNumber = [
+      data.hasMFN ? 1 : 0, 
+      data.hasProRataRights ? 1 : 0, 
+      data.hasInformationRights ? 1 : 0
+    ].reduce((a, b) => a + b, 5);
 
-FOR VALUE RECEIVED, the Company hereby promises to pay to the order of the Investor the principal sum of $${formData.principalAmount ? parseInt(formData.principalAmount).toLocaleString() : "[PRINCIPAL AMOUNT]"} together with accrued and unpaid interest thereon, each due and payable on the date and in the manner set forth below.
+    text += `
+${nextClauseNumber}. Amendment and Waiver. Any provision of this Note may be amended or waived with the written consent of the Company and the Investor.
 
-1. INTEREST RATE. Simple interest shall accrue on this Note at the rate of ${formData.interestRate}% per annum, calculated on the basis of a 365-day year, commencing on the date hereof and continuing until repayment of this Note in full.
-
-2. MATURITY DATE. The principal amount and all unpaid accrued interest shall be due and payable on ${formatDate(formData.maturityDate)} (the "Maturity Date"), unless this Note is converted prior to such date in accordance with Section 3 below.
-
-3. CONVERSION.
-
-   3.1 Qualified Financing Conversion. If the Company issues and sells shares of its equity securities (the "Equity Securities") to investors in a bona fide equity financing with total proceeds to the Company of not less than $${formData.qualifiedFinancingThreshold ? parseInt(formData.qualifiedFinancingThreshold).toLocaleString() : "[THRESHOLD AMOUNT]"} (excluding the conversion of this Note and other similar convertible securities) (a "Qualified Financing"), then ${formData.conversionMechanism === 'automatic' ? 'all principal and unpaid accrued interest then outstanding under this Note shall automatically convert' : 'the Investor shall have the option to convert all principal and unpaid accrued interest then outstanding under this Note'} into Equity Securities.
-
-   3.2 Conversion Price. The conversion price for the Equity Securities shall be equal to ${formData.conversionPriceOption === 'cap' ? `the Valuation Cap Price` : formData.conversionPriceOption === 'discount' ? `the Discount Price` : `the lower of (i) the Valuation Cap Price or (ii) the Discount Price`}. The "Valuation Cap Price" means the price per share equal to $${formData.valuationCap ? parseInt(formData.valuationCap).toLocaleString() : "[VALUATION CAP]"} divided by the Company's fully-diluted capitalization immediately prior to the Qualified Financing. The "Discount Price" means the price per share paid by other purchasers of Equity Securities in the Qualified Financing multiplied by ${(100 - parseInt(formData.discountRate || 0)) / 100} (representing a ${formData.discountRate}% discount to the Qualified Financing price).
-
-   3.3 Conversion Mechanics. The Investor shall become a party to the transaction documents for the Qualified Financing by execution of such documents normally required of investors in the Qualified Financing.
-
-4. PREPAYMENT. This Note ${formData.prepaymentRights === 'yes' ? 'may' : 'may not'} be prepaid at any time ${formData.prepaymentRights === 'yes' ? 'with the written consent of the Investor' : ''}.
-
-5. DEFAULT. The occurrence of any of the following shall constitute an "Event of Default" under this Note:
-
-   5.1 Failure to Pay. The Company shall fail to pay when due any principal or interest payment on the date due hereunder, and such payment shall not have been made within ten (10) days of the date due.
-
-   5.2 Voluntary Bankruptcy or Insolvency Proceedings. The Company shall (i) apply for or consent to the appointment of a receiver, trustee, liquidator or custodian of itself or of all or a substantial part of its property, (ii) make a general assignment for the benefit of its creditors, or (iii) commence a voluntary case or other proceeding seeking liquidation, reorganization or other relief with respect to itself or its debts.
-
-   5.3 Involuntary Bankruptcy or Insolvency Proceedings. A proceeding shall have been instituted in a court having jurisdiction seeking (i) an order for relief, reorganization, arrangement, liquidation, dissolution or similar relief with respect to the Company or its debts under any bankruptcy or insolvency law, or (ii) the appointment of a receiver, trustee, liquidator or custodian of the Company or all or a substantial part of its property, and either such proceeding shall remain undismissed or unstayed for a period of 60 days.
-
-6. REMEDIES. Upon the occurrence of an Event of Default, the Investor, at its option, may (i) upon written notice to the Company, accelerate and demand payment of all or any part of the unpaid principal amount of the Note, together with the unpaid interest accrued thereon and all other amounts owing hereunder, and upon the Company's receipt of such notice, such amounts shall be immediately due and payable, and/or (ii) pursue any other remedy available to the Investor at law or in equity.
-
-${formData.acceleration === 'yes' ? `7. ACCELERATION. If the Company consummates a Change of Control (as defined below) prior to the Maturity Date or a Qualified Financing, then all principal and unpaid interest under this Note shall automatically become immediately due and payable. A "Change of Control" means (i) a consolidation or merger of the Company with or into any other corporation or other entity or person, or any other corporate reorganization, other than any such consolidation, merger or reorganization in which the shares of capital stock of the Company immediately prior to such consolidation, merger or reorganization continue to represent a majority of the voting power of the surviving entity immediately after such consolidation, merger or reorganization; (ii) any transaction or series of related transactions to which the Company is a party in which in excess of 50% of the Company's voting power is transferred; or (iii) the sale, lease, transfer, exclusive license or other disposition by the Company of all or substantially all of the assets of the Company.` : ''}
-
-${formData.subordination === 'yes' ? `8. SUBORDINATION. The indebtedness evidenced by this Note is hereby expressly subordinated in right of payment to the prior payment in full of all of the Company's Senior Indebtedness. "Senior Indebtedness" shall mean, unless expressly subordinated to or made on a parity with the amounts due under this Note, all amounts due in connection with (i) indebtedness of the Company to banks or other lending institutions regularly engaged in the business of lending money, and (ii) any such indebtedness or any debentures, notes or other evidence of indebtedness issued in exchange for or to refinance such Senior Indebtedness.` : ''}
-
-${formData.mfnClause === 'yes' ? `9. MOST FAVORED NATION. If, at any time prior to the earlier of the Maturity Date and a Qualified Financing, the Company issues convertible notes to other investors (excluding the Investor) on terms and conditions which are more favorable to such investors than the terms and conditions provided to the Investor herein, the Company will promptly amend this Note to reflect such more favorable terms.` : ''}
-
-10. GENERAL PROVISIONS.
-
-    10.1 Successors and Assigns. This Note may be assigned by the Investor to any party with the prior written consent of the Company. The Company may not assign or delegate this Note without the prior written consent of the Investor.
-
-    10.2 Governing Law. This Note shall be governed by and construed under the laws of the State of ${formData.governingLaw} as applied to agreements among ${formData.governingLaw} residents, made and to be performed entirely within the State of ${formData.governingLaw}, without giving effect to conflicts of laws principles.
-
-    10.3 Notices. Any notice required or permitted by this Note shall be in writing and shall be deemed sufficient when delivered personally or by overnight courier or sent by email or fax, or 48 hours after being deposited in the U.S. mail as certified or registered mail with postage prepaid, addressed to the party to be notified at such party's address or fax number as set forth below or as subsequently modified by written notice.
-
-    10.4 Amendments and Waivers. Any term of this Note may be amended or waived only with the written consent of the Company and ${formData.amendmentProvisions === 'majority' ? 'the holders of a majority in interest of all convertible promissory notes of the same series as this Note' : 'the Investor'}. Any amendment or waiver effected in accordance with this Section shall be binding upon the Company, the Investor and each transferee of the Note.
-
-    10.5 Entire Agreement. This Note constitutes the entire agreement between the parties hereto pertaining to the subject matter hereof, and any and all other written or oral agreements existing between the parties hereto are expressly canceled.
+${nextClauseNumber + 1}. Governing Law. This Note shall be governed by and construed in accordance with the laws of the State of ${data.governingLawState || data.companyState || '[STATE]'}, without regard to its principles of conflicts of laws.
 
 IN WITNESS WHEREOF, the Company has executed this Convertible Promissory Note as of the date first written above.
 
-COMPANY:
-${formData.companyName.toUpperCase()}
+${data.companyName ? data.companyName.toUpperCase() : '[COMPANY NAME]'}
 
-By: _______________________________
-    ${formData.companyRepName}
-    ${formData.companyRepTitle}
-
-Address: ${formData.companyAddress}
+By: ______________________________
+Name: 
+Title: CEO
 
 ACKNOWLEDGED AND AGREED:
 
-INVESTOR:
-${formData.investorType === 'individual' ? formData.investorName.toUpperCase() : `${formData.investorName.toUpperCase()}\n\nBy: _______________________________\n    Name: \n    Title: `}
+${data.investorName || '[INVESTOR NAME]'}
 
-Address: ${formData.investorAddress}
+By: ______________________________
+Name:
+Title:
 `;
 
-    setDocumentText(text);
-  }, [formData]);
-
-  // Function to determine which section to highlight based on the last changed field
-  const getHighlightedText = () => {
-    if (!lastChanged || !documentText) return documentText;
-
-    let newText = documentText;
-    
-    // Define patterns to highlight based on which field was changed
-    const highlightPatterns = {
-      // Company Info
-      companyName: new RegExp(`${formData.companyName}`, 'g'),
-      companyAddress: new RegExp(`${formData.companyAddress}`, 'g'),
-      stateOfIncorporation: new RegExp(`${formData.stateOfIncorporation} corporation`, 'g'),
-      companyRepName: new RegExp(`${formData.companyRepName}`, 'g'),
-      companyRepTitle: new RegExp(`${formData.companyRepTitle}`, 'g'),
+    return text;
+  };
+  
+  // Function to determine which section to highlight
+  const getSectionToHighlight = () => {
+    // Define mappings between form fields and document sections
+    const fieldToSectionMap = {
+      // Company & Investor tab
+      companyName: 'company-info',
+      companyState: 'company-info',
+      investorName: 'investor-info',
+      principalAmount: 'principal-amount',
+      date: 'date',
       
-      // Investor Info
-      investorName: new RegExp(`${formData.investorName}`, 'g'),
-      investorAddress: new RegExp(`${formData.investorAddress}`, 'g'),
+      // Financial Terms tab
+      interestRate: 'interest-section',
+      maturityMonths: 'maturity-section',
+      maturityDate: 'maturity-section',
       
-      // Note Terms
-      principalAmount: new RegExp(`\\$${parseInt(formData.principalAmount || '0').toLocaleString()}`, 'g'),
-      interestRate: new RegExp(`${formData.interestRate}%`, 'g'),
-      maturityDate: new RegExp(`${formatDate(formData.maturityDate)}`, 'g'),
-      qualifiedFinancingThreshold: new RegExp(`\\$${parseInt(formData.qualifiedFinancingThreshold || '0').toLocaleString()}`, 'g'),
-      valuationCap: new RegExp(`\\$${parseInt(formData.valuationCap || '0').toLocaleString()}`, 'g'),
-      discountRate: new RegExp(`${formData.discountRate}%`, 'g'),
-      conversionMechanism: formData.conversionMechanism === 'automatic' 
-        ? /all principal and unpaid accrued interest then outstanding under this Note shall automatically convert/g
-        : /the Investor shall have the option to convert all principal and unpaid accrued interest then outstanding under this Note/g,
-      conversionPriceOption: formData.conversionPriceOption === 'cap'
-        ? /the Valuation Cap Price/g 
-        : formData.conversionPriceOption === 'discount'
-        ? /the Discount Price/g 
-        : /the lower of \(i\) the Valuation Cap Price or \(ii\) the Discount Price/g,
+      // Conversion Terms tab
+      valuationCap: 'conversion-section',
+      discountRate: 'conversion-section',
+      qualifyingFinancingAmount: 'qualified-financing',
+      conversionMultiple: 'change-of-control',
       
-      // Additional Terms
-      prepaymentRights: formData.prepaymentRights === 'yes' 
-        ? /may be prepaid at any time with the written consent of the Investor/g
-        : /may not be prepaid at any time/g,
-      amendmentProvisions: formData.amendmentProvisions === 'majority'
-        ? /the holders of a majority in interest of all convertible promissory notes of the same series as this Note/g
-        : /the Investor/g,
-      governingLaw: new RegExp(`the State of ${formData.governingLaw}`, 'g'),
-      
-      // Signature Date
-      signatureDate: new RegExp(`${formatDate(formData.signatureDate)}`, 'g')
+      // Advanced Terms tab
+      hasMFN: 'mfn-section',
+      hasProRataRights: 'prorata-section',
+      hasInformationRights: 'information-section',
+      prepaymentOption: 'prepayment-section',
+      governingLawState: 'governing-law'
     };
     
-    // Apply highlighting to the relevant pattern
-    if (highlightPatterns[lastChanged] && formData[lastChanged]) {
-      newText = documentText.replace(
-        highlightPatterns[lastChanged], 
-        match => `<span class="highlighted-text">${match}</span>`
+    return fieldToSectionMap[lastChanged] || null;
+  };
+  
+  // Create highlighted version of the text
+  const createHighlightedText = () => {
+    if (!lastChanged) return documentText;
+    
+    const sectionToHighlight = getSectionToHighlight();
+    if (!sectionToHighlight) return documentText;
+    
+    // Define regex patterns for different sections of the document
+    const sections = {
+      'company-info': new RegExp(`${formData.companyName || '\\[COMPANY NAME\\]'}, a ${formData.companyState || '\\[STATE\\]'} corporation`, 'g'),
+      'investor-info': new RegExp(`${formData.investorName || '\\[INVESTOR NAME\\]'}`, 'g'),
+      'principal-amount': new RegExp(`${formatCurrency(formData.principalAmount) || '\\$\\[AMOUNT\\]'}`, 'g'),
+      'date': new RegExp(`${new Date(formData.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) || '\\[DATE\\]'}`, 'g'),
+      'interest-section': /bear interest at the rate of .*?% per annum/,
+      'maturity-section': /fully due and payable on .*? \(the "Maturity Date"\)/,
+      'qualified-financing': new RegExp(`not less than ${formatCurrency(formData.qualifyingFinancingAmount) || '\\$\\[QUALIFYING AMOUNT\\]'}`, 'g'),
+      'conversion-section': new RegExp(`${formData.discountRate || '\\[DISCOUNT\\]'}% of the price per share|"Valuation Cap" means ${formatCurrency(formData.valuationCap) || '\\$\\[VALUATION CAP\\]'}`, 'g'),
+      'change-of-control': new RegExp(`pay the Investor an amount equal to ${formData.conversionMultiple || '\\[2-3\\]'}x the outstanding`, 'g'),
+      'prepayment-section': /Prepayment\. This Note may not be prepaid .*?\./,
+      'mfn-section': /Most Favored Nation\. If, prior to the conversion.*?more favorable terms\./s,
+      'prorata-section': /Pro-rata Rights\. If, while this Note is outstanding.*?at the Valuation Cap\./s,
+      'information-section': /Information Rights\. For so long as this Note.*?accounting principles\./s,
+      'governing-law': new RegExp(`laws of the State of ${formData.governingLawState || formData.companyState || '\\[STATE\\]'}`, 'g')
+    };
+    
+    // Find and highlight the section
+    if (sections[sectionToHighlight]) {
+      let highlightedText = documentText;
+      
+      // Apply highlighting based on the regex pattern
+      const pattern = sections[sectionToHighlight];
+      highlightedText = highlightedText.replace(pattern, match => 
+        `<span class="highlighted-text">${match}</span>`
       );
+      
+      return highlightedText;
     }
     
-    return newText;
+    return documentText;
   };
-
-  // Update highlighted text when document or lastChanged changes
-  useEffect(() => {
-    setHighlightedText(getHighlightedText());
-  }, [documentText, lastChanged]);
-
-  // Scroll to highlighted text
-  useEffect(() => {
-    if (previewRef.current) {
-      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
-      if (highlightedElement) {
-        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [highlightedText]);
-
+  
   // Navigation functions
   const nextTab = () => {
     if (currentTab < tabs.length - 1) {
       setCurrentTab(currentTab + 1);
     }
   };
-
+  
   const prevTab = () => {
     if (currentTab > 0) {
       setCurrentTab(currentTab - 1);
     }
   };
-
+  
   const goToTab = (index) => {
     setCurrentTab(index);
   };
-
-  // Copy document to clipboard
+  
+  // Function to copy text to clipboard
   const copyToClipboard = () => {
-    try {
-      navigator.clipboard.writeText(documentText);
-      alert('Document copied to clipboard');
-    } catch (error) {
-      console.error('Failed to copy: ', error);
-      alert('Failed to copy document. Please try again.');
-    }
-  };
-
-  // Download MS Word document
-  const downloadAsWord = () => {
-    try {
-      console.log("Download MS Word button clicked");
-      
-      // Call the document generation function
-      window.generateWordDoc(documentText, {
-        companyName: formData.companyName || "Convertible-Note"
+    navigator.clipboard.writeText(documentText)
+      .then(() => {
+        alert('Convertible Note copied to clipboard!');
+      })
+      .catch(err => {
+        console.error('Error copying text: ', err);
+        alert('Failed to copy text. Please try again.');
       });
-    } catch (error) {
-      console.error("Error in downloadAsWord:", error);
-      alert("Error generating Word document. Please try again or use the copy option.");
-    }
   };
-
-  // Render forms for each tab
+  
+  // Function to download as MS Word
+  const downloadAsWord = () => {
+    window.generateWordDoc(documentText, {
+      documentTitle: formData.documentTitle,
+      fileName: formData.fileName
+    });
+  };
+  
+  // Risk assessment function
+  const assessRisks = () => {
+    const risks = [];
+    
+    // Check for empty required fields
+    if (!formData.companyName) {
+      risks.push({
+        level: 'high',
+        message: 'Company name is missing. This is a critical element of the contract.',
+        solution: 'Enter the legal name of the company issuing the note.'
+      });
+    }
+    
+    if (!formData.investorName) {
+      risks.push({
+        level: 'high',
+        message: 'Investor name is missing. This is a critical element of the contract.',
+        solution: 'Enter the legal name of the investor.'
+      });
+    }
+    
+    // Valuation cap and discount rate checks
+    if (!formData.valuationCap || parseFloat(formData.valuationCap) <= 0) {
+      risks.push({
+        level: 'high',
+        message: 'Valuation cap is missing or invalid. This is a critical term for conversion.',
+        solution: 'Set a reasonable valuation cap based on your company\'s current and projected value.'
+      });
+    } else if (parseFloat(formData.valuationCap) < parseFloat(formData.principalAmount) * 5) {
+      risks.push({
+        level: 'medium',
+        message: 'Valuation cap appears unusually low compared to the investment amount.',
+        solution: 'Consider increasing the valuation cap or ensure it accurately reflects your company\'s value.'
+      });
+    }
+    
+    if (!formData.discountRate || parseFloat(formData.discountRate) <= 0) {
+      risks.push({
+        level: 'medium',
+        message: 'Discount rate is missing. This affects the investor\'s conversion price.',
+        solution: 'Set a discount rate (typically 15-25%) to compensate the investor for early risk.'
+      });
+    }
+    
+    // Interest rate check
+    if (!formData.interestRate || parseFloat(formData.interestRate) <= 0) {
+      risks.push({
+        level: 'medium',
+        message: 'Interest rate is missing or zero. Most convertible notes accrue interest.',
+        solution: 'Set a reasonable interest rate (typically 2-8% for convertible notes).'
+      });
+    } else if (parseFloat(formData.interestRate) > 10) {
+      risks.push({
+        level: 'medium',
+        message: 'Interest rate is unusually high for a convertible note.',
+        solution: 'Consider lowering the interest rate to be within market norms (typically 2-8%).'
+      });
+    }
+    
+    // Maturity date check
+    if (!formData.maturityDate) {
+      risks.push({
+        level: 'high',
+        message: 'Maturity date is missing. This is when the note becomes due if not converted.',
+        solution: 'Set a maturity date, typically 18-24 months from issuance.'
+      });
+    } else {
+      const maturityDate = new Date(formData.maturityDate);
+      const today = new Date();
+      const monthsDiff = (maturityDate.getFullYear() - today.getFullYear()) * 12 + 
+                        (maturityDate.getMonth() - today.getMonth());
+                        
+      if (monthsDiff < 12) {
+        risks.push({
+          level: 'medium',
+          message: 'Maturity date is less than 12 months from today, which is shorter than typical for convertible notes.',
+          solution: 'Consider extending the maturity date to 18-24 months to give your company adequate time to reach next financing round.'
+        });
+      } else if (monthsDiff > 36) {
+        risks.push({
+          level: 'low',
+          message: 'Maturity date is more than 36 months from today, which is longer than typical for convertible notes.',
+          solution: 'Consider shortening the maturity date to 18-24 months, which is more standard and may be more attractive to investors.'
+        });
+      }
+    }
+    
+    // Qualifying financing amount check
+    if (!formData.qualifyingFinancingAmount || parseFloat(formData.qualifyingFinancingAmount) <= 0) {
+      risks.push({
+        level: 'medium',
+        message: 'Qualifying financing amount is missing. This determines when the note automatically converts.',
+        solution: 'Set a qualifying financing threshold that aligns with your next planned funding round.'
+      });
+    } else if (parseFloat(formData.qualifyingFinancingAmount) < parseFloat(formData.principalAmount) * 2) {
+      risks.push({
+        level: 'low',
+        message: 'Qualifying financing threshold is set lower than twice the note amount, which might trigger conversion too early.',
+        solution: 'Consider setting a higher qualifying amount to ensure conversion happens at a substantial funding round.'
+      });
+    }
+    
+    // Add best practice suggestions even if not critical issues
+    if (risks.length === 0) {
+      risks.push({
+        level: 'low',
+        message: 'No critical issues detected, but always review with legal counsel before finalizing.',
+        solution: 'Have an attorney review the final document before signing.'
+      });
+    }
+    
+    return risks;
+  };
+  
+  // Render tab content based on current tab
   const renderTabContent = () => {
     switch (currentTab) {
       case 0:
         return (
-          <div className="tab-content">
+          <>
             <h2>Company & Investor Information</h2>
-            
-            <h3>Company Information</h3>
             <div className="form-group">
-              <label className="form-label" htmlFor="companyName">Company Name</label>
-              <input
-                type="text"
-                id="companyName"
-                name="companyName"
-                className="form-input"
-                value={formData.companyName}
-                onChange={handleChange}
-                placeholder="e.g., Acme Technologies, Inc."
+              <label htmlFor="companyName">Company Name:</label>
+              <input 
+                type="text" 
+                id="companyName" 
+                name="companyName" 
+                value={formData.companyName} 
+                onChange={handleChange} 
+                placeholder="Enter company name"
               />
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="companyAddress">Company Address</label>
-              <input
-                type="text"
-                id="companyAddress"
-                name="companyAddress"
-                className="form-input"
-                value={formData.companyAddress}
-                onChange={handleChange}
-                placeholder="e.g., 123 Main Street, Suite 200, San Francisco, CA 94107"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="stateOfIncorporation">State of Incorporation</label>
-              <select
-                id="stateOfIncorporation"
-                name="stateOfIncorporation"
-                className="form-select"
-                value={formData.stateOfIncorporation}
+              <label htmlFor="companyState">State of Incorporation:</label>
+              <select 
+                id="companyState" 
+                name="companyState" 
+                value={formData.companyState} 
                 onChange={handleChange}
               >
                 <option value="Alabama">Alabama</option>
@@ -398,633 +523,322 @@ Address: ${formData.investorAddress}
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="companyRepName">Company Representative Name</label>
-              <input
-                type="text"
-                id="companyRepName"
-                name="companyRepName"
-                className="form-input"
-                value={formData.companyRepName}
-                onChange={handleChange}
-                placeholder="e.g., John Smith"
+              <label htmlFor="investorName">Investor Name:</label>
+              <input 
+                type="text" 
+                id="investorName" 
+                name="investorName" 
+                value={formData.investorName} 
+                onChange={handleChange} 
+                placeholder="Enter investor name"
               />
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="companyRepTitle">Company Representative Title</label>
-              <input
-                type="text"
-                id="companyRepTitle"
-                name="companyRepTitle"
-                className="form-input"
-                value={formData.companyRepTitle}
-                onChange={handleChange}
-                placeholder="e.g., Chief Executive Officer"
-              />
-            </div>
-            
-            <h3>Investor Information</h3>
-            <div className="form-group">
-              <label className="form-label" htmlFor="investorName">Investor Name</label>
-              <input
-                type="text"
-                id="investorName"
-                name="investorName"
-                className="form-input"
-                value={formData.investorName}
-                onChange={handleChange}
-                placeholder="e.g., Jane Doe or XYZ Ventures, LLC"
+              <label htmlFor="principalAmount">Principal Amount ($):</label>
+              <input 
+                type="number" 
+                id="principalAmount" 
+                name="principalAmount" 
+                value={formData.principalAmount} 
+                onChange={handleChange} 
+                placeholder="Enter principal amount"
+                min="0"
+                step="1000"
               />
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="investorAddress">Investor Address</label>
-              <input
-                type="text"
-                id="investorAddress"
-                name="investorAddress"
-                className="form-input"
-                value={formData.investorAddress}
+              <label htmlFor="date">Note Date:</label>
+              <input 
+                type="date" 
+                id="date" 
+                name="date" 
+                value={formData.date} 
                 onChange={handleChange}
-                placeholder="e.g., 456 Venture Way, Menlo Park, CA 94025"
               />
             </div>
             
-            <div className="form-group">
-              <label className="form-label">Investor Type</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="investorTypeIndividual"
-                    name="investorType"
-                    className="form-radio"
-                    value="individual"
-                    checked={formData.investorType === 'individual'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="investorTypeIndividual">Individual</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="investorTypeEntity"
-                    name="investorType"
-                    className="form-radio"
-                    value="entity"
-                    checked={formData.investorType === 'entity'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="investorTypeEntity">Legal Entity</label>
-                </div>
-              </div>
+            <div className="tip-box">
+              <strong>Tip:</strong> The principal amount is the total investment being made by the investor. This will accrue interest at the specified rate until conversion or repayment.
             </div>
-          </div>
+          </>
         );
-      
+        
       case 1:
         return (
-          <div className="tab-content">
-            <h2>Note Terms</h2>
-            
+          <>
+            <h2>Financial Terms</h2>
             <div className="form-group">
-              <label className="form-label" htmlFor="principalAmount">Principal Amount</label>
-              <div className="currency-input">
-                <span className="currency-symbol">$</span>
-                <input
-                  type="text"
-                  id="principalAmount"
-                  name="principalAmount"
-                  className="form-input"
-                  value={formData.principalAmount}
-                  onChange={handleChange}
-                  placeholder="e.g., 100000"
-                />
-              </div>
-              <p className="helper-text">The amount being loaned through this convertible note.</p>
+              <label htmlFor="interestRate">Interest Rate (% per annum):</label>
+              <input 
+                type="number" 
+                id="interestRate" 
+                name="interestRate" 
+                value={formData.interestRate} 
+                onChange={handleChange} 
+                placeholder="Enter interest rate"
+                min="0"
+                max="20"
+                step="0.5"
+              />
+              <small>Typical range: 2-8%</small>
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="interestRate">Interest Rate</label>
-              <div className="percentage-input">
-                <input
-                  type="text"
-                  id="interestRate"
-                  name="interestRate"
-                  className="form-input"
-                  value={formData.interestRate}
-                  onChange={handleChange}
-                  placeholder="e.g., 5"
-                />
-                <span className="percentage-symbol">%</span>
-              </div>
-              <p className="helper-text">The annual interest rate applied to the principal amount.</p>
+              <label htmlFor="maturityMonths">Maturity Term (months):</label>
+              <input 
+                type="number" 
+                id="maturityMonths" 
+                name="maturityMonths" 
+                value={formData.maturityMonths} 
+                onChange={handleChange} 
+                placeholder="Enter months until maturity"
+                min="1"
+                max="60"
+                step="1"
+              />
+              <small>Typical range: 18-24 months</small>
             </div>
             
             <div className="form-group">
-              <label className="form-label" htmlFor="maturityDate">Maturity Date</label>
-              <input
-                type="date"
-                id="maturityDate"
-                name="maturityDate"
-                className="form-input"
-                value={formData.maturityDate}
+              <label htmlFor="maturityDate">Maturity Date:</label>
+              <input 
+                type="date" 
+                id="maturityDate" 
+                name="maturityDate" 
+                value={formData.maturityDate} 
                 onChange={handleChange}
               />
-              <p className="helper-text">The date when the note becomes due if not converted.</p>
+              <small>Date when the note becomes due if not converted</small>
             </div>
             
-            <div className="form-group">
-              <label className="form-label" htmlFor="qualifiedFinancingThreshold">Qualified Financing Threshold</label>
-              <div className="currency-input">
-                <span className="currency-symbol">$</span>
-                <input
-                  type="text"
-                  id="qualifiedFinancingThreshold"
-                  name="qualifiedFinancingThreshold"
-                  className="form-input"
-                  value={formData.qualifiedFinancingThreshold}
-                  onChange={handleChange}
-                  placeholder="e.g., 1000000"
-                />
-              </div>
-              <p className="helper-text">The minimum amount of new money raised in an equity financing that triggers conversion.</p>
+            <div className="tip-box">
+              <strong>Tip:</strong> The interest rate applies until the note converts or is repaid. Setting a maturity date that is too short may force repayment or conversion before your company is ready for its next financing round.
             </div>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="valuationCap">Valuation Cap</label>
-              <div className="currency-input">
-                <span className="currency-symbol">$</span>
-                <input
-                  type="text"
-                  id="valuationCap"
-                  name="valuationCap"
-                  className="form-input"
-                  value={formData.valuationCap}
-                  onChange={handleChange}
-                  placeholder="e.g., 5000000"
-                />
-              </div>
-              <p className="helper-text">The maximum company valuation used to determine conversion price, regardless of actual valuation.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="discountRate">Discount Rate</label>
-              <div className="percentage-input">
-                <input
-                  type="text"
-                  id="discountRate"
-                  name="discountRate"
-                  className="form-input"
-                  value={formData.discountRate}
-                  onChange={handleChange}
-                  placeholder="e.g., 20"
-                />
-                <span className="percentage-symbol">%</span>
-              </div>
-              <p className="helper-text">The percentage discount the investor receives on the price per share in a qualified financing.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Conversion Mechanism</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="conversionMechanismAuto"
-                    name="conversionMechanism"
-                    className="form-radio"
-                    value="automatic"
-                    checked={formData.conversionMechanism === 'automatic'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="conversionMechanismAuto">Automatic</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="conversionMechanismOption"
-                    name="conversionMechanism"
-                    className="form-radio"
-                    value="optional"
-                    checked={formData.conversionMechanism === 'optional'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="conversionMechanismOption">Optional</label>
-                </div>
-              </div>
-              <p className="helper-text">Determines whether conversion happens automatically or at the investor's option.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Conversion Price Option</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="conversionPriceOptionCap"
-                    name="conversionPriceOption"
-                    className="form-radio"
-                    value="cap"
-                    checked={formData.conversionPriceOption === 'cap'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="conversionPriceOptionCap">Valuation Cap Only</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="conversionPriceOptionDiscount"
-                    name="conversionPriceOption"
-                    className="form-radio"
-                    value="discount"
-                    checked={formData.conversionPriceOption === 'discount'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="conversionPriceOptionDiscount">Discount Only</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="conversionPriceOptionLower"
-                    name="conversionPriceOption"
-                    className="form-radio"
-                    value="lower"
-                    checked={formData.conversionPriceOption === 'lower'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="conversionPriceOptionLower">Lower of Both</label>
-                </div>
-              </div>
-              <p className="helper-text">Determines which method is used to calculate the conversion price.</p>
-            </div>
-          </div>
+          </>
         );
-      
+        
       case 2:
         return (
-          <div className="tab-content">
-            <h2>Additional Terms</h2>
-            
+          <>
+            <h2>Conversion Terms</h2>
             <div className="form-group">
-              <label className="form-label">Prepayment Rights</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="prepaymentRightsYes"
-                    name="prepaymentRights"
-                    className="form-radio"
-                    value="yes"
-                    checked={formData.prepaymentRights === 'yes'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="prepaymentRightsYes">Yes (with investor consent)</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="prepaymentRightsNo"
-                    name="prepaymentRights"
-                    className="form-radio"
-                    value="no"
-                    checked={formData.prepaymentRights === 'no'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="prepaymentRightsNo">No</label>
-                </div>
-              </div>
-              <p className="helper-text">Determines whether the company can pay back the note before maturity.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Amendment Provisions</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="amendmentProvisionsMajority"
-                    name="amendmentProvisions"
-                    className="form-radio"
-                    value="majority"
-                    checked={formData.amendmentProvisions === 'majority'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="amendmentProvisionsMajority">Majority Note Holders</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="amendmentProvisionsInvestor"
-                    name="amendmentProvisions"
-                    className="form-radio"
-                    value="investor"
-                    checked={formData.amendmentProvisions === 'investor'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="amendmentProvisionsInvestor">This Investor Only</label>
-                </div>
-              </div>
-              <p className="helper-text">Determines who needs to consent to amendments to the note.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="governingLaw">Governing Law</label>
-              <select
-                id="governingLaw"
-                name="governingLaw"
-                className="form-select"
-                value={formData.governingLaw}
-                onChange={handleChange}
-              >
-                <option value="Alabama">Alabama</option>
-                <option value="Alaska">Alaska</option>
-                <option value="Arizona">Arizona</option>
-                <option value="Arkansas">Arkansas</option>
-                <option value="California">California</option>
-                <option value="Colorado">Colorado</option>
-                <option value="Connecticut">Connecticut</option>
-                <option value="Delaware">Delaware</option>
-                <option value="Florida">Florida</option>
-                <option value="Georgia">Georgia</option>
-                <option value="Hawaii">Hawaii</option>
-                <option value="Idaho">Idaho</option>
-                <option value="Illinois">Illinois</option>
-                <option value="Indiana">Indiana</option>
-                <option value="Iowa">Iowa</option>
-                <option value="Kansas">Kansas</option>
-                <option value="Kentucky">Kentucky</option>
-                <option value="Louisiana">Louisiana</option>
-                <option value="Maine">Maine</option>
-                <option value="Maryland">Maryland</option>
-                <option value="Massachusetts">Massachusetts</option>
-                <option value="Michigan">Michigan</option>
-                <option value="Minnesota">Minnesota</option>
-                <option value="Mississippi">Mississippi</option>
-                <option value="Missouri">Missouri</option>
-                <option value="Montana">Montana</option>
-                <option value="Nebraska">Nebraska</option>
-                <option value="Nevada">Nevada</option>
-                <option value="New Hampshire">New Hampshire</option>
-                <option value="New Jersey">New Jersey</option>
-                <option value="New Mexico">New Mexico</option>
-                <option value="New York">New York</option>
-                <option value="North Carolina">North Carolina</option>
-                <option value="North Dakota">North Dakota</option>
-                <option value="Ohio">Ohio</option>
-                <option value="Oklahoma">Oklahoma</option>
-                <option value="Oregon">Oregon</option>
-                <option value="Pennsylvania">Pennsylvania</option>
-                <option value="Rhode Island">Rhode Island</option>
-                <option value="South Carolina">South Carolina</option>
-                <option value="South Dakota">South Dakota</option>
-                <option value="Tennessee">Tennessee</option>
-                <option value="Texas">Texas</option>
-                <option value="Utah">Utah</option>
-                <option value="Vermont">Vermont</option>
-                <option value="Virginia">Virginia</option>
-                <option value="Washington">Washington</option>
-                <option value="West Virginia">West Virginia</option>
-                <option value="Wisconsin">Wisconsin</option>
-                <option value="Wyoming">Wyoming</option>
-              </select>
-              <p className="helper-text">The state law that governs the interpretation of the note.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Subordination</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="subordinationYes"
-                    name="subordination"
-                    className="form-radio"
-                    value="yes"
-                    checked={formData.subordination === 'yes'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="subordinationYes">Yes</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="subordinationNo"
-                    name="subordination"
-                    className="form-radio"
-                    value="no"
-                    checked={formData.subordination === 'no'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="subordinationNo">No</label>
-                </div>
-              </div>
-              <p className="helper-text">Determines whether this note is subordinate to other company debt.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Most Favored Nation (MFN) Clause</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="mfnClauseYes"
-                    name="mfnClause"
-                    className="form-radio"
-                    value="yes"
-                    checked={formData.mfnClause === 'yes'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="mfnClauseYes">Yes</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="mfnClauseNo"
-                    name="mfnClause"
-                    className="form-radio"
-                    value="no"
-                    checked={formData.mfnClause === 'no'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="mfnClauseNo">No</label>
-                </div>
-              </div>
-              <p className="helper-text">If included, ensures the investor gets the best terms offered to any other note holder.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label">Acceleration on Change of Control</label>
-              <div className="form-radio-group">
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="accelerationYes"
-                    name="acceleration"
-                    className="form-radio"
-                    value="yes"
-                    checked={formData.acceleration === 'yes'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="accelerationYes">Yes</label>
-                </div>
-                <div className="radio-option">
-                  <input
-                    type="radio"
-                    id="accelerationNo"
-                    name="acceleration"
-                    className="form-radio"
-                    value="no"
-                    checked={formData.acceleration === 'no'}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="accelerationNo">No</label>
-                </div>
-              </div>
-              <p className="helper-text">If included, the note immediately becomes due if the company is acquired.</p>
-            </div>
-            
-            <div className="form-group">
-              <label className="form-label" htmlFor="signatureDate">Signature Date</label>
-              <input
-                type="date"
-                id="signatureDate"
-                name="signatureDate"
-                className="form-input"
-                value={formData.signatureDate}
-                onChange={handleChange}
+              <label htmlFor="valuationCap">Valuation Cap ($):</label>
+              <input 
+                type="number" 
+                id="valuationCap" 
+                name="valuationCap" 
+                value={formData.valuationCap} 
+                onChange={handleChange} 
+                placeholder="Enter valuation cap"
+                min="0"
+                step="500000"
               />
-              <p className="helper-text">The date when this convertible note is signed.</p>
+              <small>Maximum company valuation for conversion purposes</small>
             </div>
-          </div>
+            
+            <div className="form-group">
+              <label htmlFor="discountRate">Discount Rate (%):</label>
+              <input 
+                type="number" 
+                id="discountRate" 
+                name="discountRate" 
+                value={formData.discountRate} 
+                onChange={handleChange} 
+                placeholder="Enter discount rate"
+                min="0"
+                max="50"
+                step="1"
+              />
+              <small>Typical range: 15-25%</small>
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="qualifyingFinancingAmount">Qualifying Financing Amount ($):</label>
+              <input 
+                type="number" 
+                id="qualifyingFinancingAmount" 
+                name="qualifyingFinancingAmount" 
+                value={formData.qualifyingFinancingAmount} 
+                onChange={handleChange} 
+                placeholder="Enter qualifying amount"
+                min="0"
+                step="100000"
+              />
+              <small>Minimum funding round size to trigger automatic conversion</small>
+            </div>
+            
+            <div className="tip-box">
+              <strong>Tip:</strong> The investor gets the better of either (1) the valuation cap or (2) the discount rate when converting in a qualifying financing. The qualifying financing amount should be set to ensure conversion happens at a substantial funding round.
+            </div>
+          </>
         );
-      
+        
       case 3:
         return (
-          <div className="tab-content">
-            <h2>Review & Generate</h2>
-            <p>Review the information below and make any necessary changes before generating your convertible note.</p>
-            
-            <h3>Company & Investor Information</h3>
+          <>
+            <h2>Advanced Terms</h2>
             <div className="form-group">
-              <label className="form-label">Company Name:</label>
-              <p>{formData.companyName || "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Company Address:</label>
-              <p>{formData.companyAddress || "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">State of Incorporation:</label>
-              <p>{formData.stateOfIncorporation}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Company Representative:</label>
-              <p>{formData.companyRepName || "[Not provided]"}, {formData.companyRepTitle || "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Investor:</label>
-              <p>{formData.investorName || "[Not provided]"} ({formData.investorType === 'individual' ? 'Individual' : 'Entity'})</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Investor Address:</label>
-              <p>{formData.investorAddress || "[Not provided]"}</p>
+              <div className="checkbox-group">
+                <input 
+                  type="checkbox" 
+                  id="hasMFN" 
+                  name="hasMFN" 
+                  checked={formData.hasMFN} 
+                  onChange={handleChange}
+                />
+                <label htmlFor="hasMFN">Include Most Favored Nation (MFN) Clause</label>
+              </div>
+              <small>Ensures this investor gets the best terms offered to other investors</small>
             </div>
             
-            <h3>Note Terms</h3>
             <div className="form-group">
-              <label className="form-label">Principal Amount:</label>
-              <p>{formData.principalAmount ? formatCurrency(formData.principalAmount) : "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Interest Rate:</label>
-              <p>{formData.interestRate}%</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Maturity Date:</label>
-              <p>{formData.maturityDate ? formatDate(formData.maturityDate) : "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Qualified Financing Threshold:</label>
-              <p>{formData.qualifiedFinancingThreshold ? formatCurrency(formData.qualifiedFinancingThreshold) : "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Valuation Cap:</label>
-              <p>{formData.valuationCap ? formatCurrency(formData.valuationCap) : "[Not provided]"}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Discount Rate:</label>
-              <p>{formData.discountRate}%</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Conversion Mechanism:</label>
-              <p>{formData.conversionMechanism === 'automatic' ? 'Automatic' : 'Optional'}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Conversion Price Option:</label>
-              <p>
-                {formData.conversionPriceOption === 'cap' 
-                  ? 'Valuation Cap Only' 
-                  : formData.conversionPriceOption === 'discount' 
-                    ? 'Discount Only' 
-                    : 'Lower of Both'}
-              </p>
+              <div className="checkbox-group">
+                <input 
+                  type="checkbox" 
+                  id="hasProRataRights" 
+                  name="hasProRataRights" 
+                  checked={formData.hasProRataRights} 
+                  onChange={handleChange}
+                />
+                <label htmlFor="hasProRataRights">Include Pro-rata Rights</label>
+              </div>
+              <small>Allows investor to maintain ownership percentage in future rounds</small>
             </div>
             
-            <h3>Additional Terms</h3>
             <div className="form-group">
-              <label className="form-label">Prepayment Rights:</label>
-              <p>{formData.prepaymentRights === 'yes' ? 'Yes (with investor consent)' : 'No'}</p>
+              <div className="checkbox-group">
+                <input 
+                  type="checkbox" 
+                  id="hasInformationRights" 
+                  name="hasInformationRights" 
+                  checked={formData.hasInformationRights} 
+                  onChange={handleChange}
+                />
+                <label htmlFor="hasInformationRights">Include Information Rights</label>
+              </div>
+              <small>Entitles investor to receive financial statements and updates</small>
             </div>
+            
             <div className="form-group">
-              <label className="form-label">Amendment Provisions:</label>
-              <p>{formData.amendmentProvisions === 'majority' ? 'Majority Note Holders' : 'This Investor Only'}</p>
+              <label htmlFor="prepaymentOption">Prepayment Terms:</label>
+              <select 
+                id="prepaymentOption" 
+                name="prepaymentOption" 
+                value={formData.prepaymentOption} 
+                onChange={handleChange}
+              >
+                <option value="with_consent">No prepayment without investor consent</option>
+                <option value="not_allowed">No prepayment allowed</option>
+                <option value="with_notice">Prepayment allowed with notice</option>
+              </select>
             </div>
+            
             <div className="form-group">
-              <label className="form-label">Governing Law:</label>
-              <p>{formData.governingLaw}</p>
+              <label htmlFor="conversionMultiple">Change of Control Multiple:</label>
+              <select 
+                id="conversionMultiple" 
+                name="conversionMultiple" 
+                value={formData.conversionMultiple} 
+                onChange={handleChange}
+              >
+                <option value="1">1x (No premium)</option>
+                <option value="1.5">1.5x</option>
+                <option value="2">2x</option>
+                <option value="2.5">2.5x</option>
+                <option value="3">3x</option>
+              </select>
+              <small>Multiple applied to principal + interest if company is acquired</small>
             </div>
+            
             <div className="form-group">
-              <label className="form-label">Subordination:</label>
-              <p>{formData.subordination === 'yes' ? 'Yes' : 'No'}</p>
+              <label htmlFor="governingLawState">Governing Law State:</label>
+              <select 
+                id="governingLawState" 
+                name="governingLawState" 
+                value={formData.governingLawState || formData.companyState} 
+                onChange={handleChange}
+              >
+                <option value="">Same as Company State</option>
+                <option value="California">California</option>
+                <option value="Delaware">Delaware</option>
+                <option value="New York">New York</option>
+                <option value="Texas">Texas</option>
+                <option value="Florida">Florida</option>
+                <option value="Illinois">Illinois</option>
+                <option value="Massachusetts">Massachusetts</option>
+              </select>
             </div>
-            <div className="form-group">
-              <label className="form-label">Most Favored Nation (MFN) Clause:</label>
-              <p>{formData.mfnClause === 'yes' ? 'Yes' : 'No'}</p>
+            
+            <div className="tip-box">
+              <strong>Tip:</strong> MFN clauses protect early investors by ensuring they get the best terms offered to later investors. Pro-rata rights are valuable for investors who want to maintain their ownership percentage in future rounds.
             </div>
-            <div className="form-group">
-              <label className="form-label">Acceleration on Change of Control:</label>
-              <p>{formData.acceleration === 'yes' ? 'Yes' : 'No'}</p>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Signature Date:</label>
-              <p>{formData.signatureDate ? formatDate(formData.signatureDate) : "[Not provided]"}</p>
-            </div>
-          </div>
+          </>
         );
-      
+        
+      case 4:
+        const risks = assessRisks();
+        return (
+          <>
+            <h2>Finalize & Review</h2>
+            
+            <h3>Document Settings</h3>
+            <div className="form-group">
+              <label htmlFor="documentTitle">Document Title:</label>
+              <input 
+                type="text" 
+                id="documentTitle" 
+                name="documentTitle" 
+                value={formData.documentTitle} 
+                onChange={handleChange}
+              />
+            </div>
+            
+            <div className="form-group">
+              <label htmlFor="fileName">File Name (for download):</label>
+              <input 
+                type="text" 
+                id="fileName" 
+                name="fileName" 
+                value={formData.fileName} 
+                onChange={handleChange}
+              />
+            </div>
+            
+            <h3>Risk Assessment</h3>
+            {risks.map((risk, index) => (
+              <div key={index} className={`risk-assessment risk-${risk.level}`}>
+                <h4>{risk.level === 'high' ? '⚠️ High Risk' : risk.level === 'medium' ? '⚠️ Medium Risk' : '⚠️ Low Risk'}</h4>
+                <p><strong>Issue:</strong> {risk.message}</p>
+                <p><strong>Solution:</strong> {risk.solution}</p>
+              </div>
+            ))}
+            
+            <div className="tip-box">
+              <h4>Convertible Note Key Points:</h4>
+              <p>• A convertible note is a form of short-term debt that converts into equity upon specific triggering events.</p>
+              <p>• The valuation cap and discount rate are the two primary mechanisms that provide the investor with upside.</p>
+              <p>• The maturity date serves as a deadline for either conversion or repayment.</p>
+              <p>• Always consult with a lawyer before finalizing any investment agreement.</p>
+            </div>
+          </>
+        );
+        
       default:
         return null;
     }
   };
-
-  const Icon = ({ name, ...props }) => {
-    useEffect(() => {
-      if (window.feather) {
-        window.feather.replace();
-      }
-    }, []);
-    
-    return <i data-feather={name} {...props}></i>;
-  };
-
+  
+  // Main render
   return (
-    <div className="container">
-      <div className="header">
+    <div className="generator-container">
+      <div className="generator-header">
         <h1>Convertible Note Generator</h1>
-        <p>Create a customized convertible promissory note with flexible terms for your startup or investment needs.</p>
+        <p>Create a customized convertible promissory note for early-stage startup funding.</p>
       </div>
       
+      {/* Tab Navigation */}
       <div className="tab-navigation">
         {tabs.map((tab, index) => (
           <button
@@ -1037,84 +851,86 @@ Address: ${formData.investorAddress}
         ))}
       </div>
       
-      <div className="generator-layout">
+      <div className="generator-content">
+        {/* Left Panel - Form Fields */}
         <div className="form-panel">
           {renderTabContent()}
-          
-          <div className="navigation-buttons">
-            <button
-              onClick={prevTab}
-              className={`nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`}
-              disabled={currentTab === 0}
-            >
-              <Icon name="chevron-left" style={{marginRight: "0.25rem"}} />
-              Previous
-            </button>
-            
-            <button
-              onClick={copyToClipboard}
-              className="nav-button"
-              style={{
-                backgroundColor: "#4f46e5", 
-                color: "white",
-                border: "none"
-              }}
-            >
-              <Icon name="copy" style={{marginRight: "0.25rem"}} />
-              Copy to Clipboard
-            </button>
-            
-            <button
-              onClick={downloadAsWord}
-              className="nav-button"
-              style={{
-                backgroundColor: "#2563eb", 
-                color: "white",
-                border: "none"
-              }}
-            >
-              <Icon name="file-text" style={{marginRight: "0.25rem"}} />
-              Download MS Word
-            </button>
-            
-            <button
-              onClick={nextTab}
-              className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
-              disabled={currentTab === tabs.length - 1}
-            >
-              Next
-              <Icon name="chevron-right" style={{marginLeft: "0.25rem"}} />
-            </button>
-          </div>
         </div>
         
-        <div className="preview-panel">
-          <div className="preview-content" ref={previewRef}>
+        {/* Right Panel - Live Preview */}
+        <div className="preview-panel" ref={previewRef}>
+          <div className="preview-content">
             <h2>Live Preview</h2>
             <pre 
               className="document-preview"
-              dangerouslySetInnerHTML={{ __html: highlightedText }}
+              dangerouslySetInnerHTML={{ __html: createHighlightedText() }}
             />
           </div>
         </div>
       </div>
       
-      <div style={{ marginTop: "2rem", textAlign: "center" }}>
-        <p>Need legal assistance with your convertible note or funding strategy?</p>
-        <a href="" onClick={() => Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;} style={{
-          display: "inline-block", 
-          margin: "1rem auto",
-          padding: "0.75rem 1.5rem",
-          backgroundColor: "#4f46e5",
-          color: "white",
-          borderRadius: "0.375rem",
-          textDecoration: "none",
-          fontWeight: "500"
-        }}>Schedule time with me</a>
+      {/* Navigation Buttons */}
+      <div className="navigation-buttons">
+        <button
+          onClick={prevTab}
+          className={`nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`}
+          disabled={currentTab === 0}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Previous
+        </button>
+        
+        <button
+          onClick={copyToClipboard}
+          className="nav-button"
+          style={{
+            backgroundColor: "#4f46e5", 
+            color: "white",
+            border: "none"
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          Copy to Clipboard
+        </button>
+        
+        <button
+          onClick={downloadAsWord}
+          className="nav-button"
+          style={{
+            backgroundColor: "#2563eb", 
+            color: "white",
+            border: "none"
+          }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+          </svg>
+          Download MS Word
+        </button>
+        
+        <button
+          onClick={nextTab}
+          className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
+          disabled={currentTab === tabs.length - 1}
+        >
+          Next
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="icon">
+            <polyline points="9 18 15 12 9 6"></polyline>
+          </svg>
+        </button>
       </div>
     </div>
   );
-};
+}
 
-// Render the App component to the DOM
+// Render the app
 ReactDOM.render(<ConvertibleNoteGenerator />, document.getElementById('root'));
