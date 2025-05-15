@@ -274,96 +274,98 @@ const App = () => {
     
     const documentationRequirementsText = documentationReqs.join(" and ");
     
-    // Generate the document text
-    return `TARIFF REIMBURSEMENT SIDE LETTER
-
-Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
-
-BETWEEN:
-
-${supplierName || "[Supplier Name]"} (the "Supplier")
-${supplierAddress ? supplierAddress + ", " : ""}${supplierState ? supplierState + ", " : ""}${supplierCountry || ""}
-Contact: ${supplierContact || "[Contact Person]"}
-Email: ${supplierEmail || "[Email]"}
-
-AND:
-
-${distributorName || "[Distributor Name]"} (the "Distributor")
-${distributorAddress ? distributorAddress + ", " : ""}${distributorState ? distributorState + ", " : ""}${distributorCountry || ""}
-Contact: ${distributorContact || "[Contact Person]"}
-Email: ${distributorEmail || "[Email]"}
-
-(each a "Party" and together the "Parties")
-
-RECITALS:
-
-WHEREAS, the Parties have entered into a ${agreementName || "Distribution Agreement"} dated ${formattedAgreementDate} (the "Agreement");
-
-WHEREAS, the Agreement provides for the distribution of certain products as defined therein;
-
-WHEREAS, since the execution of the Agreement, there have been, or may be, increases in import tariffs applicable to the products distributed under the Agreement; and
-
-WHEREAS, the Parties wish to establish a mechanism to address the allocation of the costs associated with such tariff increases;
-
-NOW, THEREFORE, the Parties agree as follows:
-
-1. DEFINITIONS
-
-1.1. "Effective Date" means ${formattedEffectiveDate}.
-
-1.2. "Excess Tariffs" means any import tariffs, duties, levies, or similar governmental charges imposed on the Products that exceed by more than ${tariffThreshold || "10"}% the tariffs in effect as of the date of the Agreement.
-
-1.3. "Products" means ${appliedProducts || "the products distributed under the Agreement"}${productList ? ", specifically: " + productList : ""}.
-
-2. TARIFF REIMBURSEMENT
-
-2.1. Responsibility for Excess Tariffs. The ${responsibleParty === "supplier" ? "Supplier" : "Distributor"} shall be responsible for ${reimbursementPercentage || "100"}% of any Excess Tariffs incurred in connection with the importation of the Products.
-
-2.2. Reimbursement Mechanism. The ${responsibleParty === "supplier" ? "Supplier shall reimburse the Distributor" : "Distributor shall reimburse the Supplier"} for ${reimbursementPercentage || "100"}% of any Excess Tariffs incurred${includeCapAmount && capAmount ? ", up to a maximum amount of " + capAmount + " per calendar year" : ""}.
-
-2.3. Reporting. The Party incurring the Excess Tariffs shall report such Excess Tariffs to the other Party ${reportingFrequencyText}.
-
-3. PROCEDURE FOR REIMBURSEMENT
-
-3.1. Reimbursement Request. To obtain reimbursement for Excess Tariffs, the Party seeking reimbursement shall submit a written request to the other Party, accompanied by ${documentationRequirementsText} evidencing the amount of the Excess Tariffs incurred.
-
-3.2. Payment Timeline. The Party responsible for reimbursement shall pay any properly documented Excess Tariffs within ${reimbursementTimeline || "30"} days of receiving a reimbursement request that complies with Section 3.1.
-
-3.3. Dispute Resolution. ${disputeResolutionText}
-
-4. TERM AND TERMINATION
-
-4.1. Term. This Side Letter shall commence on the Effective Date and shall continue until ${formattedExpirationDate}, unless earlier terminated in accordance with this Section 4.
-
-4.2. Termination. Either Party may terminate this Side Letter upon ${terminationNoticePeriod || "30"} days' prior written notice to the other Party.
-
-4.3. Effect of Termination. Termination of this Side Letter shall not affect the validity of the Agreement, which shall continue in full force and effect in accordance with its terms.
-
-5. MISCELLANEOUS
-
-5.1. Integration with Agreement. This Side Letter supplements the Agreement. Except as expressly modified by this Side Letter, all terms and conditions of the Agreement shall remain in full force and effect.
-
-5.2. Governing Law. This Side Letter shall be governed by and construed in accordance with the laws of ${governingLaw || "the State of California"}, ${governingCountry || "United States"}, without giving effect to any choice of law or conflict of law provisions.
-
-5.3. Counterparts. This Side Letter may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
-
-5.4. Entire Agreement. This Side Letter, together with the Agreement, constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior negotiations, understandings, and agreements.
-
-IN WITNESS WHEREOF, the Parties have executed this Side Letter as of the date first written above.
-
-SUPPLIER:
-${supplierName || "[SUPPLIER NAME]"}
-
-By: ____________________________
-Name: ${supplierContact || "[NAME]"}
-Title: ____________________________
-
-DISTRIBUTOR:
-${distributorName || "[DISTRIBUTOR NAME]"}
-
-By: ____________________________
-Name: ${distributorContact || "[NAME]"}
-Title: ____________________________`;
+    // Generate the document text with proper line breaks for formatting
+    return [
+      "TARIFF REIMBURSEMENT SIDE LETTER",
+      "",
+      `Date: ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`,
+      "",
+      "BETWEEN:",
+      "",
+      `${supplierName || "[Supplier Name]"} (the "Supplier")`,
+      `${supplierAddress ? supplierAddress + ", " : ""}${supplierState ? supplierState + ", " : ""}${supplierCountry || ""}`,
+      `Contact: ${supplierContact || "[Contact Person]"}`,
+      `Email: ${supplierEmail || "[Email]"}`,
+      "",
+      "AND:",
+      "",
+      `${distributorName || "[Distributor Name]"} (the "Distributor")`,
+      `${distributorAddress ? distributorAddress + ", " : ""}${distributorState ? distributorState + ", " : ""}${distributorCountry || ""}`,
+      `Contact: ${distributorContact || "[Contact Person]"}`,
+      `Email: ${distributorEmail || "[Email]"}`,
+      "",
+      `(each a "Party" and together the "Parties")`,
+      "",
+      "RECITALS:",
+      "",
+      `WHEREAS, the Parties have entered into a ${agreementName || "Distribution Agreement"} dated ${formattedAgreementDate} (the "Agreement");`,
+      "",
+      "WHEREAS, the Agreement provides for the distribution of certain products as defined therein;",
+      "",
+      "WHEREAS, since the execution of the Agreement, there have been, or may be, increases in import tariffs applicable to the products distributed under the Agreement; and",
+      "",
+      "WHEREAS, the Parties wish to establish a mechanism to address the allocation of the costs associated with such tariff increases;",
+      "",
+      "NOW, THEREFORE, the Parties agree as follows:",
+      "",
+      "1. DEFINITIONS",
+      "",
+      `1.1. "Effective Date" means ${formattedEffectiveDate}.`,
+      "",
+      `1.2. "Excess Tariffs" means any import tariffs, duties, levies, or similar governmental charges imposed on the Products that exceed by more than ${tariffThreshold || "10"}% the tariffs in effect as of the date of the Agreement.`,
+      "",
+      `1.3. "Products" means ${appliedProducts || "the products distributed under the Agreement"}${productList ? ", specifically: " + productList : ""}.`,
+      "",
+      "2. TARIFF REIMBURSEMENT",
+      "",
+      `2.1. Responsibility for Excess Tariffs. The ${responsibleParty === "supplier" ? "Supplier" : "Distributor"} shall be responsible for ${reimbursementPercentage || "100"}% of any Excess Tariffs incurred in connection with the importation of the Products.`,
+      "",
+      `2.2. Reimbursement Mechanism. The ${responsibleParty === "supplier" ? "Supplier shall reimburse the Distributor" : "Distributor shall reimburse the Supplier"} for ${reimbursementPercentage || "100"}% of any Excess Tariffs incurred${includeCapAmount && capAmount ? ", up to a maximum amount of " + capAmount + " per calendar year" : ""}.`,
+      "",
+      `2.3. Reporting. The Party incurring the Excess Tariffs shall report such Excess Tariffs to the other Party ${reportingFrequencyText}.`,
+      "",
+      "3. PROCEDURE FOR REIMBURSEMENT",
+      "",
+      `3.1. Reimbursement Request. To obtain reimbursement for Excess Tariffs, the Party seeking reimbursement shall submit a written request to the other Party, accompanied by ${documentationRequirementsText} evidencing the amount of the Excess Tariffs incurred.`,
+      "",
+      `3.2. Payment Timeline. The Party responsible for reimbursement shall pay any properly documented Excess Tariffs within ${reimbursementTimeline || "30"} days of receiving a reimbursement request that complies with Section 3.1.`,
+      "",
+      `3.3. Dispute Resolution. ${disputeResolutionText}`,
+      "",
+      "4. TERM AND TERMINATION",
+      "",
+      `4.1. Term. This Side Letter shall commence on the Effective Date and shall continue until ${formattedExpirationDate}, unless earlier terminated in accordance with this Section 4.`,
+      "",
+      `4.2. Termination. Either Party may terminate this Side Letter upon ${terminationNoticePeriod || "30"} days' prior written notice to the other Party.`,
+      "",
+      "4.3. Effect of Termination. Termination of this Side Letter shall not affect the validity of the Agreement, which shall continue in full force and effect in accordance with its terms.",
+      "",
+      "5. MISCELLANEOUS",
+      "",
+      "5.1. Integration with Agreement. This Side Letter supplements the Agreement. Except as expressly modified by this Side Letter, all terms and conditions of the Agreement shall remain in full force and effect.",
+      "",
+      `5.2. Governing Law. This Side Letter shall be governed by and construed in accordance with the laws of ${governingLaw || "the State of California"}, ${governingCountry || "United States"}, without giving effect to any choice of law or conflict of law provisions.`,
+      "",
+      "5.3. Counterparts. This Side Letter may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.",
+      "",
+      "5.4. Entire Agreement. This Side Letter, together with the Agreement, constitutes the entire agreement between the Parties with respect to the subject matter hereof and supersedes all prior negotiations, understandings, and agreements.",
+      "",
+      "IN WITNESS WHEREOF, the Parties have executed this Side Letter as of the date first written above.",
+      "",
+      "SUPPLIER:",
+      `${supplierName || "[SUPPLIER NAME]"}`,
+      "",
+      "By: ____________________________",
+      `Name: ${supplierContact || "[NAME]"}`,
+      "Title: ____________________________",
+      "",
+      "DISTRIBUTOR:",
+      `${distributorName || "[DISTRIBUTOR NAME]"}`,
+      "",
+      "By: ____________________________",
+      `Name: ${distributorContact || "[NAME]"}`,
+      "Title: ____________________________"
+    ].join("\n");
   };
 
   // Generate document text
@@ -408,6 +410,17 @@ Title: ____________________________`;
 
   // Create highlightable content
   const highlightedText = createHighlightedText();
+
+  // Process document text for display
+  const formatTextForPreview = (text) => {
+    // Apply highlighting if present
+    return text.replace(/<span class="highlighted-text">(.*?)<\/span>/g, (match) => {
+      // Preserve highlighting while ensuring proper spacing
+      return match;
+    });
+  };
+
+  const formattedPreviewText = formatTextForPreview(highlightedText);
 
   // Effect to scroll to highlighted text
   React.useEffect(() => {
@@ -1073,7 +1086,7 @@ Title: ____________________________`;
             <h2>Live Preview</h2>
             <pre 
               className="document-preview"
-              dangerouslySetInnerHTML={{ __html: highlightedText }}
+              dangerouslySetInnerHTML={{ __html: formattedPreviewText }}
             />
           </div>
         </div>
