@@ -27,24 +27,24 @@ const TokenDistributionGenerator = () => {
   // State for form data
   const [formData, setFormData] = useState({
     // Parties & Token Details
-    companyName: '',
+    companyName: 'ABC Blockchain Inc.',
     companyType: 'Delaware Corporation',
-    companyAddress: '',
-    recipientName: '',
+    companyAddress: '123 Crypto Street, San Francisco, CA 94107',
+    recipientName: 'John Smith',
     recipientType: 'Individual',
-    recipientAddress: '',
-    tokenName: '',
-    tokenSymbol: '',
+    recipientAddress: '456 Blockchain Avenue, New York, NY 10001',
+    tokenName: 'Acme Token',
+    tokenSymbol: 'ACM',
     tokenBlockchain: 'Ethereum',
     tokenType: 'ERC-20',
     tokenStandard: 'Utility Token',
     
     // Distribution Terms
-    tokenAmount: '',
-    tokenPrice: '',
+    tokenAmount: '100000',
+    tokenPrice: '0.10',
     totalConsideration: '',
     paymentMethod: 'USD',
-    distributionDate: '',
+    distributionDate: new Date().toISOString().split('T')[0],
     distributionMethod: 'Direct Transfer',
     
     // Vesting Schedule
@@ -122,9 +122,29 @@ const TokenDistributionGenerator = () => {
   // Copy to clipboard function
   const copyToClipboard = () => {
     try {
-      navigator.clipboard.writeText(generateDocumentText()).then(() => {
-        alert("Agreement text copied to clipboard!");
-      });
+      const text = generateDocumentText();
+      
+      if (!text || text.trim() === '') {
+        alert("Cannot copy - document text is empty. Please complete the required fields.");
+        return;
+      }
+      
+      // Create a temporary textarea element
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.setAttribute('readonly', '');
+      textarea.style.position = 'absolute';
+      textarea.style.left = '-9999px';
+      document.body.appendChild(textarea);
+      
+      // Select and copy the text
+      textarea.select();
+      document.execCommand('copy');
+      
+      // Remove the textarea
+      document.body.removeChild(textarea);
+      
+      alert("Agreement text copied to clipboard!");
     } catch (error) {
       console.error("Error copying to clipboard:", error);
       alert("Failed to copy to clipboard. Please try again.");
@@ -140,7 +160,7 @@ const TokenDistributionGenerator = () => {
       const documentText = generateDocumentText();
       
       // Make sure document text is available
-      if (!documentText) {
+      if (!documentText || documentText.trim() === '') {
         console.error("Document text is empty");
         alert("Cannot generate document - text is empty. Please check the form data.");
         return;
@@ -220,10 +240,13 @@ const TokenDistributionGenerator = () => {
   
   // Generate document text based on form data
   const generateDocumentText = () => {
-    // Return empty string if essential fields are missing
-    if (!formData.companyName || !formData.recipientName || !formData.tokenName) {
-      return '';
-    }
+    // Make sure we have the essential fields
+    const companyName = formData.companyName || '[COMPANY NAME]';
+    const recipientName = formData.recipientName || '[RECIPIENT NAME]';
+    const tokenName = formData.tokenName || '[TOKEN NAME]';
+    const tokenSymbol = formData.tokenSymbol || '[TOKEN SYMBOL]';
+    const tokenAmount = formData.tokenAmount || '[NUMBER OF TOKENS]';
+    const tokenPrice = formData.tokenPrice || '[PRICE PER TOKEN]';
     
     // Build document sections
     const sections = {
@@ -1279,6 +1302,24 @@ Title: _____________________________` :
             <div className="info-text">
               <p><strong>Jurisdiction Selection:</strong> The choice of governing law can significantly impact the interpretation and enforcement of the agreement. Delaware is often chosen for its well-developed business law, but consider the jurisdiction where your company is incorporated or where most of your operations are based.</p>
             </div>
+            
+            {/* Add Calendly widget loader */}
+            <script 
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.onload = function() { 
+                    if (window.Calendly) {
+                      Calendly.initBadgeWidget({ 
+                        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', 
+                        text: 'Schedule consultation', 
+                        color: '#0069ff', 
+                        textColor: '#ffffff' 
+                      });
+                    }
+                  }
+                `
+              }}
+            ></script>
           </div>
         );
         
@@ -1398,7 +1439,21 @@ Title: _____________________________` :
                 </ol>
                 <p style={{ marginTop: '10px' }}>This generated agreement is a starting point and may require customization based on your specific situation.</p>
                 <div style={{ marginTop: '15px' }}>
-                  <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" target="_blank" style={{ color: '#4f46e5', textDecoration: 'underline', fontWeight: 'bold' }}>Schedule a consultation with a blockchain attorney</a>
+                  <a 
+                    href="#" 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (window.Calendly) {
+                        window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});
+                        return false;
+                      } else {
+                        alert("Calendly widget not available. Please try again later.");
+                      }
+                    }}
+                    style={{ color: '#4f46e5', textDecoration: 'underline', fontWeight: 'bold' }}
+                  >
+                    Schedule a consultation with a blockchain attorney
+                  </a>
                 </div>
               </div>
             </div>
