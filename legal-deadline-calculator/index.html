@@ -3,39 +3,413 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Legal Deadline Calculator | terms.law</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/2.30.0/date-fns.min.js"></script>
+    <title>Simple Legal Deadline Calculator</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            color: #0069ff;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        @media (min-width: 768px) {
+            .container {
+                flex-direction: row;
+            }
+            
+            .form-panel {
+                width: 50%;
+            }
+            
+            .result-panel {
+                width: 50%;
+            }
+        }
+        
+        .form-panel, .result-panel {
+            padding: 20px;
+            background-color: #f9fafb;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        select, input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .checkbox-group input {
+            margin-right: 10px;
+        }
+        
+        button {
+            background-color: #0069ff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        button:hover {
+            background-color: #0050c5;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .result-box {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        
+        .deadline-date {
+            font-weight: bold;
+            font-size: 18px;
+            color: #0069ff;
+            margin: 10px 0;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel" src="docx-generator.js"></script>
-    <script type="text/babel" src="deadline-calculator.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            feather.replace();
-        });
-    </script>
+    <h1>Legal Deadline Calculator</h1>
+    <div class="container">
+        <div class="form-panel">
+            <div class="form-group">
+                <label for="jurisdiction">Jurisdiction</label>
+                <select id="jurisdiction">
+                    <option value="federal">Federal</option>
+                    <option value="california">California</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="filingDate">Filing Date</label>
+                <input type="date" id="filingDate">
+            </div>
+            
+            <div class="form-group">
+                <label for="deadlineType">Deadline Type</label>
+                <select id="deadlineType">
+                    <option value="response">Response to Complaint</option>
+                    <option value="appeal">Appeal</option>
+                    <option value="discovery">Discovery Response</option>
+                    <option value="motion">Motion Response</option>
+                </select>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="includeFilingDate">
+                <label for="includeFilingDate">Include Filing Date in Calculation</label>
+            </div>
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="extendWeekend" checked>
+                <label for="extendWeekend">Extend Deadline if Falls on Weekend/Holiday</label>
+            </div>
+            
+            <div class="button-group">
+                <button id="calculateBtn">Calculate Deadline</button>
+            </div>
+        </div>
+        
+        <div class="result-panel">
+            <h2>Results</h2>
+            <div id="results" class="hidden">
+                <div class="result-box">
+                    <p><strong>Jurisdiction:</strong> <span id="resultJurisdiction"></span></p>
+                    <p><strong>Filing Date:</strong> <span id="resultFilingDate"></span></p>
+                    <p><strong>Deadline Type:</strong> <span id="resultDeadlineType"></span></p>
+                    <p><strong>Rule Reference:</strong> <span id="resultRule"></span></p>
+                    <div class="deadline-date">Deadline: <span id="resultDeadline"></span></div>
+                    <p id="adjustmentNote" class="hidden"></p>
+                </div>
+                
+                <div class="disclaimer">
+                    <p style="font-size: 12px; color: #666; margin-top: 20px;">
+                        Disclaimer: This deadline calculation is provided for informational purposes only and should not be considered legal advice. Legal deadlines can be complex and may vary based on specific court rules, local rules, and case circumstances. Always verify deadlines with applicable rules and consult with a licensed attorney for legal advice.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- Calendly link widget -->
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
-    
-    <!-- Calendly badge widget -->
-    <script type="text/javascript">
-        window.onload = function() { 
-            Calendly.initBadgeWidget({ 
-                url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', 
-                text: 'Schedule time with me', 
-                color: '#0069ff', 
-                textColor: '#ffffff' 
-            }); 
-            feather.replace();
+    <script>
+        // Simple date formatter
+        function formatDateLong(date) {
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            return date.toLocaleDateString('en-US', options);
+        }
+        
+        // Federal holidays 2024-2025
+        const HOLIDAYS = {
+            "federal": {
+                "2024-01-01": "New Year's Day",
+                "2024-01-15": "Martin Luther King Jr. Day",
+                "2024-02-19": "Presidents' Day",
+                "2024-05-27": "Memorial Day",
+                "2024-06-19": "Juneteenth",
+                "2024-07-04": "Independence Day",
+                "2024-09-02": "Labor Day",
+                "2024-10-14": "Columbus Day",
+                "2024-11-11": "Veterans Day",
+                "2024-11-28": "Thanksgiving Day",
+                "2024-12-25": "Christmas Day",
+                "2025-01-01": "New Year's Day",
+                "2025-01-20": "Martin Luther King Jr. Day",
+                "2025-02-17": "Presidents' Day",
+                "2025-05-26": "Memorial Day",
+                "2025-06-19": "Juneteenth",
+                "2025-07-04": "Independence Day",
+                "2025-09-01": "Labor Day",
+                "2025-10-13": "Columbus Day",
+                "2025-11-11": "Veterans Day",
+                "2025-11-27": "Thanksgiving Day",
+                "2025-12-25": "Christmas Day"
+            },
+            "california": {
+                "2024-01-01": "New Year's Day",
+                "2024-01-15": "Martin Luther King Jr. Day",
+                "2024-02-12": "Lincoln's Birthday",
+                "2024-02-19": "Presidents' Day",
+                "2024-03-31": "César Chávez Day",
+                "2024-05-27": "Memorial Day",
+                "2024-06-19": "Juneteenth",
+                "2024-07-04": "Independence Day",
+                "2024-09-02": "Labor Day",
+                "2024-10-14": "Columbus Day",
+                "2024-11-11": "Veterans Day",
+                "2024-11-28": "Thanksgiving Day",
+                "2024-12-25": "Christmas Day",
+                "2025-01-01": "New Year's Day",
+                "2025-01-20": "Martin Luther King Jr. Day",
+                "2025-02-12": "Lincoln's Birthday",
+                "2025-02-17": "Presidents' Day",
+                "2025-03-31": "César Chávez Day",
+                "2025-05-26": "Memorial Day",
+                "2025-06-19": "Juneteenth",
+                "2025-07-04": "Independence Day",
+                "2025-09-01": "Labor Day",
+                "2025-10-13": "Columbus Day",
+                "2025-11-11": "Veterans Day",
+                "2025-11-27": "Thanksgiving Day",
+                "2025-12-25": "Christmas Day"
+            }
+        };
+        
+        // Check if a date is a weekend
+        function isWeekend(date) {
+            const day = date.getDay();
+            return day === 0 || day === 6; // 0 = Sunday, 6 = Saturday
+        }
+        
+        // Check if a date is a holiday
+        function isHoliday(date, jurisdiction) {
+            const dateString = date.toISOString().split('T')[0];
+            return HOLIDAYS[jurisdiction] && HOLIDAYS[jurisdiction][dateString];
+        }
+        
+        // Add days to a date, skipping weekends and holidays
+        function addBusinessDays(date, days, jurisdiction) {
+            let result = new Date(date);
+            let daysAdded = 0;
+            
+            while (daysAdded < days) {
+                result.setDate(result.getDate() + 1);
+                if (!isWeekend(result) && !isHoliday(result, jurisdiction)) {
+                    daysAdded++;
+                }
+            }
+            
+            return result;
+        }
+        
+        // Adjust date if it falls on a weekend or holiday
+        function adjustDeadlineDate(date, jurisdiction) {
+            let result = new Date(date);
+            let adjusted = false;
+            let reason = null;
+            
+            while (isWeekend(result) || isHoliday(result, jurisdiction)) {
+                if (!adjusted) {
+                    adjusted = true;
+                    
+                    if (isWeekend(result)) {
+                        reason = "weekend";
+                    } else {
+                        reason = HOLIDAYS[jurisdiction][result.toISOString().split('T')[0]];
+                    }
+                }
+                
+                result.setDate(result.getDate() + 1);
+            }
+            
+            return { date: result, wasAdjusted: adjusted, reason: reason };
+        }
+        
+        // Initialize the calculator
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default date to today
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('filingDate').value = today;
+            
+            // Add event listener to calculate button
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                calculateDeadline();
+            });
+            
+            // Initial calculation
+            calculateDeadline();
+        });
+        
+        // Main calculation function
+        function calculateDeadline() {
+            // Get form values
+            const jurisdiction = document.getElementById('jurisdiction').value;
+            const filingDateStr = document.getElementById('filingDate').value;
+            const deadlineType = document.getElementById('deadlineType').value;
+            const includeFilingDate = document.getElementById('includeFilingDate').checked;
+            const extendWeekend = document.getElementById('extendWeekend').checked;
+            
+            // Validate filing date
+            if (!filingDateStr) {
+                alert('Please enter a filing date');
+                return;
+            }
+            
+            // Parse filing date
+            const filingDate = new Date(filingDateStr);
+            
+            // Start date (filing date or day after)
+            let startDate = new Date(filingDate);
+            if (!includeFilingDate) {
+                startDate.setDate(startDate.getDate() + 1);
+            }
+            
+            // Determine deadline period and rule reference
+            let days, ruleReference;
+            
+            switch (deadlineType) {
+                case 'response':
+                    if (jurisdiction === 'california') {
+                        days = 30;
+                        ruleReference = "California Code of Civil Procedure 412.20(a)(3)";
+                    } else {
+                        days = 21;
+                        ruleReference = "Federal Rule of Civil Procedure 12(a)(1)(A)";
+                    }
+                    break;
+                case 'appeal':
+                    if (jurisdiction === 'california') {
+                        days = 60;
+                        ruleReference = "California Rules of Court, rule 8.104";
+                    } else {
+                        days = 30;
+                        ruleReference = "Federal Rules of Appellate Procedure 4(a)(1)(A)";
+                    }
+                    break;
+                case 'discovery':
+                    days = 30;
+                    ruleReference = jurisdiction === 'california' ? 
+                        "California Code of Civil Procedure 2030.260" : 
+                        "Federal Rules of Civil Procedure 33, 34, 36";
+                    break;
+                case 'motion':
+                    if (jurisdiction === 'california') {
+                        days = 16;
+                        ruleReference = "California Rules of Court 3.1300(a)";
+                    } else {
+                        days = 14;
+                        ruleReference = "Federal Rules of Civil Procedure 27(a)(4)";
+                    }
+                    break;
+                default:
+                    days = 30;
+                    ruleReference = "Default rule";
+            }
+            
+            // Calculate deadline date
+            let deadlineDate = addBusinessDays(startDate, days - (includeFilingDate ? 1 : 0), jurisdiction);
+            
+            // Adjust if falls on weekend or holiday
+            let adjustment = { wasAdjusted: false };
+            if (extendWeekend) {
+                adjustment = adjustDeadlineDate(deadlineDate, jurisdiction);
+                deadlineDate = adjustment.date;
+            }
+            
+            // Display results
+            document.getElementById('resultJurisdiction').textContent = jurisdiction === 'federal' ? 'Federal' : 'California';
+            document.getElementById('resultFilingDate').textContent = formatDateLong(filingDate);
+            
+            const deadlineTypeText = {
+                'response': 'Response to Complaint',
+                'appeal': 'Appeal',
+                'discovery': 'Discovery Response',
+                'motion': 'Motion Response'
+            }[deadlineType];
+            
+            document.getElementById('resultDeadlineType').textContent = deadlineTypeText;
+            document.getElementById('resultRule').textContent = ruleReference;
+            document.getElementById('resultDeadline').textContent = formatDateLong(deadlineDate);
+            
+            // Show adjustment note if needed
+            const adjustmentNote = document.getElementById('adjustmentNote');
+            if (adjustment.wasAdjusted) {
+                const originalDate = new Date(deadlineDate);
+                originalDate.setDate(originalDate.getDate() - 1); // Simple approximation
+                
+                adjustmentNote.textContent = `Note: The deadline was extended because it fell on a ${adjustment.reason}.`;
+                adjustmentNote.classList.remove('hidden');
+            } else {
+                adjustmentNote.classList.add('hidden');
+            }
+            
+            // Show results section
+            document.getElementById('results').classList.remove('hidden');
         }
     </script>
 </body>
