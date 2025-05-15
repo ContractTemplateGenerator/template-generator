@@ -1184,22 +1184,7 @@ Investing in startups involves substantial risk, including illiquidity, lack of 
                   <Icon name="alert-circle" style={{ color: '#0ea5e9', marginRight: '0.5rem' }} />
                   Need Legal Help?
                 </h3>
-                <p style={{ marginTop: '0.5rem' }}>For professional assistance with your equity crowdfunding offering, including SEC compliance and investor documentation, schedule a consultation with a securities attorney.</p>
-                <div style={{ marginTop: '1rem' }}>
-                  <a href="https://terms.law/call/" target="_blank" style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    padding: '0.5rem 1rem',
-                    backgroundColor: '#0ea5e9',
-                    color: 'white',
-                    borderRadius: '0.25rem',
-                    textDecoration: 'none',
-                    fontWeight: 500
-                  }}>
-                    <Icon name="calendar" style={{ marginRight: '0.5rem' }} />
-                    Schedule Consultation
-                  </a>
-                </div>
+                <p style={{ marginTop: '0.5rem' }}>For professional assistance with your equity crowdfunding offering, including SEC compliance and investor documentation, consider consulting with a securities attorney who specializes in crowdfunding regulations.</p>
               </div>
             </div>
           </>
