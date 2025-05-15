@@ -44,7 +44,7 @@ const App = () => {
     documentationRequired: true,
     invoiceRequired: true,
     customsDocumentsRequired: true,
-    disputeResolutionMechanism: "amicable", // amicable, arbitration, litigation
+    disputeResolutionMechanism: "arbitration", // arbitration, litigation
     governingLaw: "California",
     governingCountry: "United States",
     
@@ -256,9 +256,6 @@ const App = () => {
     // Format dispute resolution mechanism
     let disputeResolutionText = "";
     switch (disputeResolutionMechanism) {
-      case "amicable":
-        disputeResolutionText = "The Parties shall attempt in good faith to resolve any dispute arising out of or relating to this Side Letter amicably through negotiation between executives who have authority to settle the controversy.";
-        break;
       case "arbitration":
         disputeResolutionText = `Any dispute arising out of or in connection with this Side Letter shall be referred to and finally resolved by arbitration under the rules of the American Arbitration Association, which rules are deemed to be incorporated by reference into this clause. The seat of arbitration shall be ${governingLaw}, ${governingCountry}. The language of the arbitration shall be English. The number of arbitrators shall be one.`;
         break;
@@ -266,7 +263,7 @@ const App = () => {
         disputeResolutionText = `Any dispute arising out of or in connection with this Side Letter shall be subject to the exclusive jurisdiction of the courts of ${governingLaw}, ${governingCountry}.`;
         break;
       default:
-        disputeResolutionText = "The Parties shall attempt in good faith to resolve any dispute arising out of or relating to this Side Letter amicably through negotiation between executives who have authority to settle the controversy.";
+        disputeResolutionText = `Any dispute arising out of or in connection with this Side Letter shall be referred to and finally resolved by arbitration under the rules of the American Arbitration Association, which rules are deemed to be incorporated by reference into this clause. The seat of arbitration shall be ${governingLaw}, ${governingCountry}. The language of the arbitration shall be English. The number of arbitrators shall be one.`;
     }
     
     // Documentation requirements
@@ -955,7 +952,6 @@ Title: ____________________________`;
                 value={formData.disputeResolutionMechanism}
                 onChange={handleChange}
               >
-                <option value="amicable">Amicable Negotiation</option>
                 <option value="arbitration">Arbitration</option>
                 <option value="litigation">Litigation</option>
               </select>
@@ -1065,7 +1061,6 @@ Title: ____________________________`;
           </button>
         ))}
       </div>
-      
       <div className="main-content">
         {/* Form Panel */}
         <div className="form-panel">
