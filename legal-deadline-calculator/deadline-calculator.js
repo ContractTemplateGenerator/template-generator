@@ -1,7 +1,7 @@
 // Legal Deadline Calculator - Simplified Version
 const { useState, useRef, useEffect } = React;
 
-// Basic holiday data for Federal and California
+// Basic holiday data for jurisdictions
 const HOLIDAYS = {
   "federal": {
     "2024-01-01": "New Year's Day",
@@ -53,6 +53,54 @@ const HOLIDAYS = {
     "2025-07-04": "Independence Day",
     "2025-09-01": "Labor Day",
     "2025-10-13": "Columbus Day",
+    "2025-11-11": "Veterans Day",
+    "2025-11-27": "Thanksgiving Day",
+    "2025-12-25": "Christmas Day"
+  },
+  "new_york": {
+    "2024-01-01": "New Year's Day",
+    "2024-01-15": "Martin Luther King Jr. Day",
+    "2024-02-19": "Presidents' Day",
+    "2024-05-27": "Memorial Day",
+    "2024-06-19": "Juneteenth",
+    "2024-07-04": "Independence Day",
+    "2024-09-02": "Labor Day",
+    "2024-10-14": "Columbus Day",
+    "2024-11-11": "Veterans Day",
+    "2024-11-28": "Thanksgiving Day",
+    "2024-12-25": "Christmas Day",
+    
+    "2025-01-01": "New Year's Day",
+    "2025-01-20": "Martin Luther King Jr. Day",
+    "2025-02-17": "Presidents' Day",
+    "2025-05-26": "Memorial Day",
+    "2025-06-19": "Juneteenth",
+    "2025-07-04": "Independence Day",
+    "2025-09-01": "Labor Day",
+    "2025-10-13": "Columbus Day",
+    "2025-11-11": "Veterans Day",
+    "2025-11-27": "Thanksgiving Day",
+    "2025-12-25": "Christmas Day"
+  },
+  "texas": {
+    "2024-01-01": "New Year's Day",
+    "2024-01-15": "Martin Luther King Jr. Day",
+    "2024-02-19": "Presidents' Day",
+    "2024-05-27": "Memorial Day",
+    "2024-06-19": "Juneteenth",
+    "2024-07-04": "Independence Day",
+    "2024-09-02": "Labor Day",
+    "2024-11-11": "Veterans Day",
+    "2024-11-28": "Thanksgiving Day",
+    "2024-12-25": "Christmas Day",
+    
+    "2025-01-01": "New Year's Day",
+    "2025-01-20": "Martin Luther King Jr. Day",
+    "2025-02-17": "Presidents' Day",
+    "2025-05-26": "Memorial Day",
+    "2025-06-19": "Juneteenth",
+    "2025-07-04": "Independence Day",
+    "2025-09-01": "Labor Day",
     "2025-11-11": "Veterans Day",
     "2025-11-27": "Thanksgiving Day",
     "2025-12-25": "Christmas Day"
@@ -128,6 +176,8 @@ const App = () => {
     customPeriodType: 'calendar',
     includeFilingDate: false,
     extendIfWeekendHoliday: true,
+    serviceMethod: 'electronic',
+    additionalDays: 0
   });
   
   // State for calculated deadline
@@ -204,28 +254,64 @@ const App = () => {
       // Predefined periods
       switch (formData.deadlineType) {
         case 'response':
-          deadlineDays = formData.jurisdiction === 'california' ? 30 : 21;
-          ruleReference = formData.jurisdiction === 'california' ? 
-            "California Code of Civil Procedure 412.20(a)(3)" : 
-            "Federal Rule of Civil Procedure 12(a)(1)(A)";
+          if (formData.jurisdiction === 'california') {
+            deadlineDays = 30;
+            ruleReference = "California Code of Civil Procedure 412.20(a)(3)";
+          } else if (formData.jurisdiction === 'new_york') {
+            deadlineDays = 20;
+            ruleReference = "New York CPLR 3012(a)";
+          } else if (formData.jurisdiction === 'texas') {
+            deadlineDays = 20;
+            ruleReference = "Texas Rules of Civil Procedure 99(b)";
+          } else {
+            deadlineDays = 21;
+            ruleReference = "Federal Rule of Civil Procedure 12(a)(1)(A)";
+          }
           break;
         case 'appeal':
-          deadlineDays = formData.jurisdiction === 'california' ? 60 : 30;
-          ruleReference = formData.jurisdiction === 'california' ? 
-            "California Rules of Court, rule 8.104" : 
-            "Federal Rules of Appellate Procedure 4(a)(1)(A)";
+          if (formData.jurisdiction === 'california') {
+            deadlineDays = 60;
+            ruleReference = "California Rules of Court, rule 8.104";
+          } else if (formData.jurisdiction === 'new_york') {
+            deadlineDays = 30;
+            ruleReference = "New York CPLR 5513";
+          } else if (formData.jurisdiction === 'texas') {
+            deadlineDays = 30;
+            ruleReference = "Texas Rules of Appellate Procedure 26.1";
+          } else {
+            deadlineDays = 30;
+            ruleReference = "Federal Rules of Appellate Procedure 4(a)(1)(A)";
+          }
           break;
         case 'discovery':
-          deadlineDays = 30;
-          ruleReference = formData.jurisdiction === 'california' ? 
-            "California Code of Civil Procedure 2030.260" : 
-            "Federal Rules of Civil Procedure 33, 34, 36";
+          if (formData.jurisdiction === 'california') {
+            deadlineDays = 30;
+            ruleReference = "California Code of Civil Procedure 2030.260";
+          } else if (formData.jurisdiction === 'new_york') {
+            deadlineDays = 20;
+            ruleReference = "New York CPLR 3133";
+          } else if (formData.jurisdiction === 'texas') {
+            deadlineDays = 30;
+            ruleReference = "Texas Rules of Civil Procedure 196.2";
+          } else {
+            deadlineDays = 30;
+            ruleReference = "Federal Rules of Civil Procedure 33, 34, 36";
+          }
           break;
         case 'motion':
-          deadlineDays = formData.jurisdiction === 'california' ? 16 : 14;
-          ruleReference = formData.jurisdiction === 'california' ? 
-            "California Rules of Court 3.1300(a)" : 
-            "Federal Rules of Civil Procedure 27(a)(4)";
+          if (formData.jurisdiction === 'california') {
+            deadlineDays = 16;
+            ruleReference = "California Rules of Court 3.1300(a)";
+          } else if (formData.jurisdiction === 'new_york') {
+            deadlineDays = 8;
+            ruleReference = "New York CPLR 2214(b)";
+          } else if (formData.jurisdiction === 'texas') {
+            deadlineDays = 7;
+            ruleReference = "Texas Rules of Civil Procedure 21";
+          } else {
+            deadlineDays = 14;
+            ruleReference = "Federal Rules of Civil Procedure 27(a)(4)";
+          }
           break;
         default:
           deadlineDays = 30;
@@ -239,6 +325,15 @@ const App = () => {
       deadlineDate = addCalendarDays(startDate, deadlineDays - (formData.includeFilingDate ? 1 : 0));
     } else {
       deadlineDate = addBusinessDays(startDate, deadlineDays - (formData.includeFilingDate ? 1 : 0), formData.jurisdiction);
+    }
+    
+    // Add additional days for service method
+    if (formData.additionalDays > 0) {
+      if (formData.deadlineType === 'custom' && formData.customPeriodType === 'calendar') {
+        deadlineDate = addCalendarDays(deadlineDate, parseInt(formData.additionalDays, 10));
+      } else {
+        deadlineDate = addBusinessDays(deadlineDate, parseInt(formData.additionalDays, 10), formData.jurisdiction);
+      }
     }
     
     // Adjust the deadline if it falls on a weekend or holiday
@@ -284,6 +379,120 @@ const App = () => {
     }
   };
   
+  // Print document
+  const printDocument = () => {
+    try {
+      const printWindow = window.open('', '_blank');
+      
+      const printContent = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <title>Legal Deadline Calculation</title>
+          <style>
+            body {
+              font-family: 'Segoe UI', Arial, sans-serif;
+              line-height: 1.6;
+              padding: 20px;
+            }
+            h1 {
+              color: #0069ff;
+              text-align: center;
+            }
+            .header {
+              text-align: center;
+              margin-bottom: 30px;
+            }
+            .calculation {
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+              border: 1px solid #ddd;
+              border-radius: 5px;
+            }
+            .deadline {
+              font-weight: bold;
+              font-size: 18px;
+              color: #0069ff;
+              padding: 10px;
+              border: 1px solid #0069ff;
+              border-radius: 5px;
+              display: inline-block;
+              margin: 15px 0;
+            }
+            .disclaimer {
+              font-size: 12px;
+              color: #666;
+              margin-top: 30px;
+              border-top: 1px solid #ddd;
+              padding-top: 10px;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="header">
+            <h1>Legal Deadline Calculation</h1>
+          </div>
+          
+          <div class="calculation">
+            <p><strong>Jurisdiction:</strong> ${formData.jurisdiction === 'federal' ? 'Federal' : 
+                                              formData.jurisdiction === 'california' ? 'California' : 
+                                              formData.jurisdiction === 'new_york' ? 'New York' : 
+                                              formData.jurisdiction === 'texas' ? 'Texas' : 
+                                              formData.jurisdiction}</p>
+            
+            <p><strong>Deadline Type:</strong> ${formData.deadlineType === 'response' ? 'Response to Complaint/Petition' :
+                                               formData.deadlineType === 'appeal' ? 'Appeal' :
+                                               formData.deadlineType === 'discovery' ? 'Discovery Response' :
+                                               formData.deadlineType === 'motion' ? 'Motion Response' :
+                                               'Custom Deadline'}</p>
+            
+            <p><strong>Filing Date:</strong> ${calculatedDeadline.formattedStartDate}</p>
+            
+            <p><strong>Calculation Start Date:</strong> ${calculatedDeadline.formattedStartDate} 
+              (${formData.includeFilingDate ? 'including' : 'excluding'} filing date)</p>
+            
+            <p><strong>Period:</strong> ${calculatedDeadline.days} 
+              ${calculatedDeadline.periodType === 'business' ? 'business' : 'calendar'} days</p>
+            
+            ${formData.serviceMethod !== 'electronic' || formData.additionalDays > 0 ? 
+              `<p><strong>Service Method:</strong> ${formData.serviceMethod.charAt(0).toUpperCase() + formData.serviceMethod.slice(1)}</p>` : ''}
+            
+            ${formData.additionalDays > 0 ? 
+              `<p><strong>Additional Days for Service:</strong> ${formData.additionalDays}</p>` : ''}
+            
+            <p><strong>Legal Authority:</strong> ${calculatedDeadline.ruleReference}</p>
+            
+            <div class="deadline">
+              DEADLINE DATE: ${calculatedDeadline.formattedDate}
+            </div>
+            
+            ${calculatedDeadline.adjustment && calculatedDeadline.adjustment.wasAdjusted ? 
+              `<p><strong>Note:</strong> The original calculated date (${formatDate(calculatedDeadline.adjustment.originalDate)}) was adjusted because it fell on a weekend or holiday.</p>` : ''}
+            
+            <div class="disclaimer">
+              <p>Disclaimer: This deadline calculation is provided for informational purposes only and should not be considered legal advice. Legal deadlines can be complex and may vary based on specific court rules, local rules, and case circumstances. Always verify deadlines with applicable rules and consult with a licensed attorney for legal advice.</p>
+              <p>Generated on: ${formatDate(new Date())}</p>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+      
+      printWindow.document.write(printContent);
+      printWindow.document.close();
+      
+      printWindow.onload = function() {
+        printWindow.print();
+      };
+      
+    } catch (error) {
+      console.error("Error in printDocument:", error);
+      alert("Error generating print view. Please try again.");
+    }
+  };
+  
   // Download MS Word document
   const downloadAsWord = () => {
     try {
@@ -297,17 +506,6 @@ const App = () => {
       alert("Error generating Word document. Please try again or use the copy option.");
     }
   };
-  
-  // Generate document text for preview and export
-  const generateDocumentText = () => {
-    if (!calculatedDeadline) {
-      return "Please enter a valid filing date to calculate the deadline.";
-    }
-    
-    let text = "";
-    
-    // Title
-    text += "LEGAL DEADLINE CALCULATION\n\n";
     
     // Jurisdiction
     text += `Jurisdiction: ${formData.jurisdiction === 'federal' ? 'Federal' : 'California'}\n\n`;
@@ -341,6 +539,15 @@ const App = () => {
     const periodType = calculatedDeadline.periodType === 'business' ? 'business days' : 'calendar days';
     text += `Period: ${calculatedDeadline.days} ${periodType}\n\n`;
     
+    // Service method
+    if (formData.serviceMethod !== 'electronic' || formData.additionalDays > 0) {
+      text += `Service Method: ${formData.serviceMethod.charAt(0).toUpperCase() + formData.serviceMethod.slice(1)}\n`;
+      if (formData.additionalDays > 0) {
+        text += `Additional Days for Service: ${formData.additionalDays}\n`;
+      }
+      text += '\n';
+    }
+    
     // Rule reference if available
     if (calculatedDeadline.ruleReference) {
       text += `Legal Authority: ${calculatedDeadline.ruleReference}\n\n`;
@@ -363,24 +570,16 @@ const App = () => {
     return text;
   };
   
-  // Function to determine which section to highlight
-  const getSectionToHighlight = () => {
-    switch (lastChanged) {
-      case 'jurisdiction':
-        return 'jurisdiction';
-      case 'filingDate':
-        return 'filingDate';
-      case 'deadlineType':
-        return 'deadlineType';
-      case 'customPeriod':
-      case 'customPeriodType':
-        return 'period';
-      case 'includeFilingDate':
-        return 'calculationStart';
-      default:
-        return null;
+  // Generate document text for preview and export
+  const generateDocumentText = () => {
+    if (!calculatedDeadline) {
+      return "Please enter a valid filing date to calculate the deadline.";
     }
-  };
+    
+    let text = "";
+    
+    // Title
+    text += "LEGAL DEADLINE CALCULATION\n\n";
   
   // Function to create a highlighted version of the text
   const createHighlightedText = () => {
@@ -391,11 +590,12 @@ const App = () => {
     
     // Define regex patterns to find different sections
     const sections = {
-      jurisdiction: /Jurisdiction: (Federal|California)/,
+      jurisdiction: /Jurisdiction: (Federal|California|New York|Texas)/,
       filingDate: /Filing Date: [^\n]+/,
       deadlineType: /Deadline Type: [^\n]+/,
       period: /Period: \d+ (business|calendar) days/,
       calculationStart: /Calculation Start Date: [^\n]+(including filing date|excludes filing date)/,
+      service: /(Service Method|Additional Days for Service):[^\n]+/,
       deadline: /DEADLINE DATE: [^\n]+/
     };
     
@@ -438,6 +638,8 @@ const App = () => {
             >
               <option value="federal">Federal</option>
               <option value="california">California</option>
+              <option value="new_york">New York</option>
+              <option value="texas">Texas</option>
             </select>
           </div>
           
@@ -538,6 +740,39 @@ const App = () => {
             />
             <label htmlFor="extendIfWeekendHoliday">Extend Deadline if Falls on Weekend/Holiday</label>
           </div>
+          
+          <div className="form-group">
+            <label htmlFor="serviceMethod">Service Method</label>
+            <select 
+              id="serviceMethod" 
+              name="serviceMethod"
+              className="form-control"
+              value={formData.serviceMethod}
+              onChange={handleChange}
+            >
+              <option value="electronic">Electronic Filing/Service</option>
+              <option value="personal">Personal Service</option>
+              <option value="mail">Mail Service</option>
+              <option value="fax">Fax Service</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="additionalDays">Additional Days for Service</label>
+            <select 
+              id="additionalDays"
+              name="additionalDays"
+              className="form-control"
+              value={formData.additionalDays}
+              onChange={handleChange}
+            >
+              <option value="0">None</option>
+              <option value="1">1 Day</option>
+              <option value="2">2 Days</option>
+              <option value="3">3 Days (Federal Mail Service)</option>
+              <option value="5">5 Days (CA Mail Service)</option>
+            </select>
+          </div>
         </div>
         
         {/* Action buttons */}
@@ -551,6 +786,17 @@ const App = () => {
             }}
           >
             Copy to Clipboard
+          </button>
+          
+          <button
+            onClick={printDocument}
+            className="action-button"
+            style={{
+              backgroundColor: "#0069ff", 
+              color: "white"
+            }}
+          >
+            Print
           </button>
           
           <button
