@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal Deadline Calculator | terms.law</title>
+    <style>
+        /* Base Styles */
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #4f46e5;
+            --light-gray: #f3f4f6;
+            --mid-gray: #d1d5db;
+            --dark-gray: #4b5563;
+            --success-color: #10b981;
+            --highlight-color: #fde68a;
+            --border-radius: 6px;
+            --box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9fafb;
+            padding: 20px;
+        }
+
+        /* Container */
+        .calculator-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .calculator-header {
+            padding: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+        }
+
+        .calculator-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+        }
+
+        .calculator-header p {
+            margin-top: 5px;
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+
+        /* Form Section */
+        .calculator-content {
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .calculator-content {
+                flex-direction: row;
+            }
+        }
+
+        .calculator-form {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-gray);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--mid-gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+
+        select.form-control {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%234b5563' viewBox='0 0 16 16'%3E%3Cpath d='M8 10.5a.5.5 0 0 1-.354-.146l-4-4a.5.5 0 1 1 .708-.708L8 9.293l3.646-3.647a.5.5 0 0 1 .708.708l-4 4A.5.5 0 0 1 8 10.5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            padding-right: 30px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1d4ed8;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4338ca;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--mid-gray);
+            color: var(--dark-gray);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light-gray);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Results Section */
+        .calculator-results {
+            flex: 1;
+            padding: 20px;
+            background-color: var(--light-gray);
+            border-left: 1px solid var(--mid-gray);
+        }
+
+        @media (max-width: 767px) {
+            .calculator-results {
+                border-left: none;
+                border-top: 1px solid var(--mid-gray);
+                margin-top: 20px;
+            }
+        }
+
+        .result-container {
+            background-color: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+
+        .result-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--mid-gray);
+        }
+
+        .result-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+
+        .result-explanation {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: var(--border-radius);
+            border-left: 3px solid var(--secondary-color);
+        }
+
+        .result-details {
+            margin-top: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding-bottom: 8px;
+            border-bottom: 1px dashed var(--mid-gray);
+        }
+
+        .detail-label {
+            font-weight: 600;
+        }
+
+        .detail-value {
+            color: var(--dark-gray);
+        }
+
+        .highlight {
+            background-color: var(--highlight-color);
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+
+        /* Hidden elements */
+        .hidden {
+            display: none;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                background-color: white;
+                padding: 0;
+            }
+
+            .calculator-container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+
+            .calculator-form,
+            .btn-group {
+                display: none;
+            }
+
+            .calculator-results {
+                flex: 1;
+                width: 100%;
+                border: none;
+                padding: 0;
+                background-color: white;
+            }
+
+            .result-container {
+                box-shadow: none;
+                padding: 0;
+            }
+        }
+
+        /* Success Message */
+        .success-message {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            background-color: #ecfdf5;
+            border: 1px solid #10b981;
+            border-radius: var(--border-radius);
+            color: #065f46;
+            margin-bottom: 20px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .success-message.visible {
+            opacity: 1;
+        }
+
+        .success-message span {
+            margin-left: 8px;
+        }
+
+        /* Error Message */
+        .error-message {
+            padding: 10px 15px;
+            background-color: #fee2e2;
+            border: 1px solid #ef4444;
+            border-radius: var(--border-radius);
+            color: #b91c1c;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error-message.visible {
+            display: block;
+        }
+
+        /* Spinner for loading */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-left-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Additional Custom Styling */
+        .custom-date-input {
+            position: relative;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .credits {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 1px solid var(--mid-gray);
+            color: var(--dark-gray);
+            font-size: 0.875rem;
+        }
+
+        .calendly-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .calendly-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator-container">
+        <div class="calculator-header">
+            <h1>Legal Deadline Calculator</h1>
+            <p>Calculate legal deadlines with jurisdiction-specific rules and court holidays</p>
+        </div>
+
+        <div class="calculator-content">
+            <div class="calculator-form">
+                <div id="error-message" class="error-message">
+                    Please fix the errors before continuing.
+                </div>
+
+                <div id="copy-success" class="success-message">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <span>Results copied to clipboard!</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="jurisdiction">Jurisdiction</label>
+                    <select id="jurisdiction" class="form-control">
+                        <option value="federal">Federal Court</option>
+                        <option value="california">California State Court</option>
+                        <option value="new-york">New York State Court</option>
+                        <option value="texas">Texas State Court</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="deadline-type">Deadline Type</label>
+                    <select id="deadline-type" class="form-control">
+                        <option value="response">Response to Complaint/Petition</option>
+                        <option value="appeal">Appeal Filing</option>
+                        <option value="discovery">Discovery Response</option>
+                        <option value="motion">Response to Motion</option>
+                        <option value="custom">Custom Deadline (Days)</option>
+                    </select>
+                </div>
+
+                <div id="custom-days-container" class="form-group hidden">
+                    <label for="custom-days">Number of Days</label>
+                    <input type="number" id="custom-days" class="form-control" min="1" max="365" value="30">
+                </div>
+
+                <div class="form-group">
+                    <label for="service-method">Service Method</label>
+                    <select id="service-method" class="form-control">
+                        <option value="electronic">Electronic Service</option>
+                        <option value="personal">Personal Service</option>
+                        <option value="mail">Mail Service</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="start-date">Start Date</label>
+                    <div class="custom-date-input">
+                        <input type="date" id="start-date" class="form-control">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Count Start Date as</label>
+                    <select id="count-method" class="form-control">
+                        <option value="exclude">Day after trigger event (exclude start date)</option>
+                        <option value="include">Date of trigger event (include start date)</option>
+                    </select>
+                </div>
+
+                <div class="btn-group">
+                    <button id="calculate-btn" class="btn btn-primary">Calculate Deadline</button>
+                    <button id="copy-btn" class="btn btn-secondary">Copy to Clipboard</button>
+                    <button id="print-btn" class="btn btn-outline">Print Results</button>
+                </div>
+            </div>
+
+            <div class="calculator-results">
+                <div class="result-container">
+                    <div class="result-header">
+                        <h2>Deadline Results</h2>
+                    </div>
+                    <div id="result-content">
+                        <p>Complete the form and click "Calculate Deadline" to see results.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="credits">
+            <p>© 2025 terms.law - Created by Attorney Sergei Tokmakov (CA Bar #279869)</p>
+            <p>
+                <a href="" class="calendly-link" onclick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;">
+                    Schedule a consultation
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Calendly widget script -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const jurisdictionSelect = document.getElementById('jurisdiction');
+            const deadlineTypeSelect = document.getElementById('deadline-type');
+            const customDaysContainer = document.getElementById('custom-days-container');
+            const customDaysInput = document.getElementById('custom-days');
+            const serviceMethodSelect = document.getElementById('service-method');
+            const startDateInput = document.getElementById('start-date');
+            const countMethodSelect = document.getElementById('count-method');
+            const calculateBtn = document.getElementById('calculate-btn');
+            const copyBtn = document.getElementById('copy-btn');
+            const printBtn = document.getElementById('print-btn');
+            const resultContent = document.getElementById('result-content');
+            const errorMessage = document.getElementById('error-message');
+            const copySuccess = document.getElementById('copy-success');
+
+            // Set default date to today
+            const today = new Date();
+            startDateInput.valueAsDate = today;
+
+            // Court Holidays by Jurisdiction
+            const courtHolidays = {
+                federal: getHolidaysForYears('federal'),
+                california: getHolidaysForYears('california'),
+                'new-york': getHolidaysForYears('new-york'),
+                texas: getHolidaysForYears('texas')
+            };
+
+            // Default deadlines by jurisdiction and type (in days)
+            const defaultDeadlines = {
+                federal: {
+                    response: 21,  // Fed. R. Civ. P. 12(a)(1)(A)
+                    appeal: 30,    // Fed. R. App. P. 4(a)(1)(A)
+                    discovery: 30, // Fed. R. Civ. P. 33, 34, 36
+                    motion: 14     // Local rules often specify (this is common)
+                },
+                california: {
+                    response: 30,  // CCP § 412.20(a)(3)
+                    appeal: 60,    // CRC 8.104
+                    discovery: 30, // CCP § 2030.260 (Interrogatories)
+                    motion: 16     // CCP § 1005
+                },
+                'new-york': {
+                    response: 20,  // CPLR § 3012
+                    appeal: 30,    // CPLR § 5513
+                    discovery: 20, // CPLR § 3133 (Interrogatories)
+                    motion: 8      // Varies by court, commonly 8 days
+                },
+                texas: {
+                    response: 20,  // TRCP 99
+                    appeal: 30,    // TRAP 26.1
+                    discovery: 30, // TRCP 196.2 (RFP), 197.2 (Interrogatories)
+                    motion: 21     // Local rules vary
+                }
+            };
+
+            // Extra days for service methods
+            const serviceMethodExtensions = {
+                federal: {
+                    electronic: 0,
+                    personal: 0,
+                    mail: 3       // Fed. R. Civ. P. 6(d)
+                },
+                california: {
+                    electronic: 2, // CCP § 1010.6
+                    personal: 0,
+                    mail: 5        // CCP § 1013
+                },
+                'new-york': {
+                    electronic: 1, // CPLR § 2103(b)(7)
+                    personal: 0,
+                    mail: 5        // CPLR § 2103(b)(2)
+                },
+                texas: {
+                    electronic: 0,
+                    personal: 0,
+                    mail: 3        // TRCP 21a
+                }
+            };
+
+            // Event handlers
+            deadlineTypeSelect.addEventListener('change', function() {
+                if (this.value === 'custom') {
+                    customDaysContainer.classList.remove('hidden');
+                } else {
+                    customDaysContainer.classList.add('hidden');
+                }
+            });
+
+            calculateBtn.addEventListener('click', calculateDeadline);
+            copyBtn.addEventListener('click', copyToClipboard);
+            printBtn.addEventListener('click', printResults);
+
+            // Main calculation function
+            function calculateDeadline() {
+                try {
+                    // Reset error state
+                    errorMessage.classList.remove('visible');
+                    
+                    // Get form values
+                    const jurisdiction = jurisdictionSelect.value;
+                    const deadlineType = deadlineTypeSelect.value;
+                    const serviceMethod = serviceMethodSelect.value;
+                    const startDateStr = startDateInput.value;
+                    const countMethod = countMethodSelect.value;
+                    
+                    // Validate inputs
+                    if (!startDateStr) {
+                        showError('Please select a start date.');
+                        return;
+                    }
+
+                    // Parse the start date
+                    const startDate = new Date(startDateStr);
+                    
+                    // Determine the number of days for the deadline
+                    let deadlineDays;
+                    
+                    if (deadlineType === 'custom') {
+                        deadlineDays = parseInt(customDaysInput.value);
+                        if (isNaN(deadlineDays) || deadlineDays < 1) {
+                            showError('Please enter a valid number of days for the custom deadline.');
+                            return;
+                        }
+                    } else {
+                        deadlineDays = defaultDeadlines[jurisdiction][deadlineType];
+                    }
+                    
+                    // Add extra days for service method
+                    const extraDays = serviceMethodExtensions[jurisdiction][serviceMethod];
+                    const totalDays = deadlineDays + extraDays;
+                    
+                    // Calculate the raw deadline (before weekend/holiday adjustments)
+                    let calculationStartDate = new Date(startDate);
+                    
+                    // Adjust start date based on count method
+                    if (countMethod === 'exclude') {
+                        calculationStartDate.setDate(calculationStartDate.getDate() + 1);
+                    }
+                    
+                    let rawDeadline = new Date(calculationStartDate);
+                    rawDeadline.setDate(rawDeadline.getDate() + (totalDays - 1)); // -1 because we're including the start day in the count
+                    
+                    // Adjust for weekends and holidays
+                    const finalDeadline = adjustForWeekendAndHolidays(rawDeadline, jurisdiction);
+                    
+                    // Generate explanation
+                    const explanation = generateExplanation(
+                        startDate,
+                        calculationStartDate,
+                        rawDeadline,
+                        finalDeadline,
+                        deadlineDays,
+                        extraDays,
+                        jurisdiction,
+                        deadlineType,
+                        serviceMethod,
+                        countMethod
+                    );
+                    
+                    // Display the results
+                    displayResults(finalDeadline, explanation, jurisdiction, deadlineType, serviceMethod);
+                } catch (error) {
+                    console.error('Calculation error:', error);
+                    showError('An error occurred during calculation. Please check your inputs and try again.');
+                }
+            }
+
+            // Function to adjust date for weekends and holidays
+            function adjustForWeekendAndHolidays(date, jurisdiction) {
+                let adjustedDate = new Date(date);
+                let dayOfWeek = adjustedDate.getDay();
+                let dateStr = formatDateForComparison(adjustedDate);
+                let holidaysList = courtHolidays[jurisdiction];
+                
+                // Keep adjusting the date until it's not a weekend or holiday
+                while (
+                    dayOfWeek === 0 || // Sunday
+                    dayOfWeek === 6 || // Saturday
+                    holidaysList.includes(dateStr)
+                ) {
+                    // Move to the next day
+                    adjustedDate.setDate(adjustedDate.getDate() + 1);
+                    dayOfWeek = adjustedDate.getDay();
+                    dateStr = formatDateForComparison(adjustedDate);
+                }
+                
+                return adjustedDate;
+            }
+
+            // Helper function to generate holiday lists for multiple years
+            function getHolidaysForYears(jurisdiction, yearSpan = 3) {
+                const currentYear = new Date().getFullYear();
+                let allHolidays = [];
+                
+                for (let year = currentYear - 1; year <= currentYear + yearSpan; year++) {
+                    allHolidays = allHolidays.concat(getHolidaysForYear(jurisdiction, year));
+                }
+                
+                return allHolidays;
+            }
+
+            // Function to generate jurisdiction-specific holidays for a given year
+            function getHolidaysForYear(jurisdiction, year) {
+                const holidays = [];
+                
+                // Common Federal Holidays
+                const newYearsDay = formatDateForComparison(new Date(year, 0, 1));
+                holidays.push(newYearsDay);
+                
+                // MLK Day (3rd Monday in January)
+                const mlkDay = getNthDayOfMonth(year, 0, 1, 3); // January (0), Monday (1), 3rd occurrence
+                holidays.push(formatDateForComparison(mlkDay));
+                
+                // Presidents Day (3rd Monday in February)
+                const presidentsDay = getNthDayOfMonth(year, 1, 1, 3); // February (1), Monday (1), 3rd occurrence
+                holidays.push(formatDateForComparison(presidentsDay));
+                
+                // Memorial Day (Last Monday in May)
+                const memorialDay = getLastDayOfMonth(year, 4, 1); // May (4), Monday (1)
+                holidays.push(formatDateForComparison(memorialDay));
+                
+                // Juneteenth (June 19)
+                const juneteenth = formatDateForComparison(new Date(year, 5, 19));
+                holidays.push(juneteenth);
+                
+                // Independence Day (July 4)
+                const independenceDay = formatDateForComparison(new Date(year, 6, 4));
+                holidays.push(independenceDay);
+                
+                // Labor Day (1st Monday in September)
+                const laborDay = getNthDayOfMonth(year, 8, 1, 1); // September (8), Monday (1), 1st occurrence
+                holidays.push(formatDateForComparison(laborDay));
+                
+                // Columbus Day / Indigenous Peoples' Day (2nd Monday in October)
+                const columbusDay = getNthDayOfMonth(year, 9, 1, 2); // October (9), Monday (1), 2nd occurrence
+                holidays.push(formatDateForComparison(columbusDay));
+                
+                // Veterans Day (November 11)
+                const veteransDay = formatDateForComparison(new Date(year, 10, 11));
+                holidays.push(veteransDay);
+                
+                // Thanksgiving Day (4th Thursday in November)
+                const thanksgivingDay = getNthDayOfMonth(year, 10, 4, 4); // November (10), Thursday (4), 4th occurrence
+                holidays.push(formatDateForComparison(thanksgivingDay));
+                
+                // Christmas Day (December 25)
+                const christmasDay = formatDateForComparison(new Date(year, 11, 25));
+                holidays.push(christmasDay);
+
+                // Add jurisdiction-specific holidays
+                switch(jurisdiction) {
+                    case 'california':
+                        // Add California specific holidays
+                        const cesarChavezDay = formatDateForComparison(new Date(year, 2, 31)); // March 31
+                        holidays.push(cesarChavezDay);
+                        
+                        // Friday after Thanksgiving
+                        const dayAfterThanksgiving = new Date(thanksgivingDay);
+                        dayAfterThanksgiving.setDate(dayAfterThanksgiving.getDate() + 1);
+                        holidays.push(formatDateForComparison(dayAfterThanksgiving));
+                        break;
+                        
+                    case 'new-york':
+                        // Add New York specific holidays
+                        const electionDay = getNthDayOfMonth(year, 10, 2, 1); // November (10), Tuesday (2), 1st occurrence
+                        electionDay.setDate(electionDay.getDate() + 1); // First Tuesday after first Monday
+                        holidays.push(formatDateForComparison(electionDay));
+                        break;
+                        
+                    case 'texas':
+                        // Add Texas specific holidays
+                        const confederateHeroesDay = formatDateForComparison(new Date(year, 0, 19)); // January 19
+                        holidays.push(confederateHeroesDay);
+                        
+                        const texasIndependenceDay = formatDateForComparison(new Date(year, 2, 2)); // March 2
+                        holidays.push(texasIndependenceDay);
+                        
+                        const sanJacintoDay = formatDateForComparison(new Date(year, 3, 21)); // April 21
+                        holidays.push(sanJacintoDay);
+                        
+                        const lyndonBJohnsonDay = formatDateForComparison(new Date(year, 7, 27)); // August 27
+                        holidays.push(lyndonBJohnsonDay);
+                        break;
+                }
+                
+                // Adjust for weekend holidays
+                const adjustedHolidays = [...holidays];
+                
+                for (const holiday of holidays) {
+                    const holidayDate = new Date(parseInt(holiday.substring(0, 4)), 
+                                               parseInt(holiday.substring(5, 7)) - 1, 
+                                               parseInt(holiday.substring(8, 10)));
+                    
+                    const dayOfWeek = holidayDate.getDay();
+                    
+                    // If the holiday falls on a Saturday, observe it on Friday
+                    if (dayOfWeek === 6) {
+                        const fridayObservance = new Date(holidayDate);
+                        fridayObservance.setDate(fridayObservance.getDate() - 1);
+                        adjustedHolidays.push(formatDateForComparison(fridayObservance));
+                    }
+                    
+                    // If the holiday falls on a Sunday, observe it on Monday
+                    if (dayOfWeek === 0) {
+                        const mondayObservance = new Date(holidayDate);
+                        mondayObservance.setDate(mondayObservance.getDate() + 1);
+                        adjustedHolidays.push(formatDateForComparison(mondayObservance));
+                    }
+                }
+                
+                return adjustedHolidays;
+            }
+
+            // Helper function to get the nth occurrence of a day in a month
+            function getNthDayOfMonth(year, month, dayOfWeek, occurrence) {
+                const date = new Date(year, month, 1);
+                let count = 0;
+                
+                // Find the first occurrence of the day
+                while (date.getDay() !== dayOfWeek) {
+                    date.setDate(date.getDate() + 1);
+                }
+                
+                // Move to the nth occurrence
+                date.setDate(date.getDate() + (occurrence - 1) * 7);
+                
+                return date;
+            }
+
+            // Helper function to get the last occurrence of a day in a month
+            function getLastDayOfMonth(year, month, dayOfWeek) {
+                const date = new Date(year, month + 1, 0); // Last day of the month
+                
+                // Go backwards until we find the specified day of the week
+                while (date.getDay() !== dayOfWeek) {
+                    date.setDate(date.getDate() - 1);
+                }
+                
+                return date;
+            }
+
+            // Helper function to format a date as YYYY-MM-DD for comparison
+            function formatDateForComparison(date) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                
+                return `${year}-${month}-${day}`;
+            }
+
+            // Function to generate explanation of the calculation
+            function generateExplanation(
+                originalStartDate,
+                calculationStartDate,
+                rawDeadline,
+                finalDeadline,
+                baseDays,
+                extraDays,
+                jurisdiction,
+                deadlineType,
+                serviceMethod,
+                countMethod
+            ) {
+                // Format dates for display
+                const startDateFormatted = formatDateForDisplay(originalStartDate);
+                const calcStartDateFormatted = formatDateForDisplay(calculationStartDate);
+                const rawDeadlineFormatted = formatDateForDisplay(rawDeadline);
+                const finalDeadlineFormatted = formatDateForDisplay(finalDeadline);
+                
+                // Initialize explanation parts
+                let explanation = '';
+                let details = [];
+                
+                // Starting point explanation
+                explanation += `<p>Starting from <strong>${startDateFormatted}</strong>`;
+                
+                if (countMethod === 'exclude') {
+                    explanation += `, the calculation begins on the next day (<strong>${calcStartDateFormatted}</strong>)`;
+                    details.push({
+                        label: 'Count Method',
+                        value: 'Excluding start date (begins day after)'
+                    });
+                } else {
+                    explanation += `, the calculation includes this date`;
+                    details.push({
+                        label: 'Count Method',
+                        value: 'Including start date'
+                    });
+                }
+                
+                explanation += '.</p>';
+                
+                // Deadline type and base days
+                details.push({
+                    label: 'Deadline Type',
+                    value: getDeadlineTypeDesc(deadlineType)
+                });
+                
+                details.push({
+                    label: 'Base Days',
+                    value: `${baseDays} days`
+                });
+                
+                // Service method explanation
+                if (extraDays > 0) {
+                    explanation += `<p>Adding <strong>${baseDays} days</strong> for the base deadline`;
+                    explanation += ` and <strong>${extraDays} extra days</strong> for ${serviceMethod} service`;
+                    explanation += ` under ${getJurisdictionDesc(jurisdiction)} rules.</p>`;
+                    
+                    details.push({
+                        label: 'Service Method',
+                        value: `${capitalizeFirstLetter(serviceMethod)} (+${extraDays} days)`
+                    });
+                } else {
+                    explanation += `<p>Adding <strong>${baseDays} days</strong> for the base deadline under ${getJurisdictionDesc(jurisdiction)} rules.</p>`;
+                    
+                    details.push({
+                        label: 'Service Method',
+                        value: capitalizeFirstLetter(serviceMethod)
+                    });
+                }
+                
+                // Total days
+                details.push({
+                    label: 'Total Days',
+                    value: `${baseDays + extraDays} days`
+                });
+                
+                // Initial deadline calculation
+                explanation += `<p>This initially results in a deadline of <strong>${rawDeadlineFormatted}</strong>.</p>`;
+                
+                // Weekend/holiday adjustment explanation
+                if (formatDateForComparison(rawDeadline) !== formatDateForComparison(finalDeadline)) {
+                    const rawDay = getDayOfWeek(rawDeadline);
+                    const isHoliday = isDateHoliday(rawDeadline, jurisdiction);
+                    
+                    explanation += `<p>Since ${rawDeadlineFormatted} is a <strong>${rawDay}${isHoliday ? ' and a court holiday' : ''}</strong>, `;
+                    explanation += `the deadline adjusts to the next business day: <strong>${finalDeadlineFormatted}</strong>.</p>`;
+                    
+                    details.push({
+                        label: 'Weekend/Holiday Adjustment',
+                        value: `${rawDeadlineFormatted} → ${finalDeadlineFormatted}`
+                    });
+                } else {
+                    explanation += `<p>${rawDeadlineFormatted} is a business day, so no weekend or holiday adjustment is needed.</p>`;
+                    
+                    details.push({
+                        label: 'Weekend/Holiday Adjustment',
+                        value: 'None required'
+                    });
+                }
+                
+                return {
+                    explanation: explanation,
+                    details: details
+                };
+            }
+
+            // Helper function to check if a date is a holiday in the specified jurisdiction
+            function isDateHoliday(date, jurisdiction) {
+                const dateStr = formatDateForComparison(date);
+                return courtHolidays[jurisdiction].includes(dateStr);
+            }
+
+            // Helper function to get the day of week
+            function getDayOfWeek(date) {
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                return days[date.getDay()];
+            }
+
+            // Helper function to format date for display
+            function formatDateForDisplay(date) {
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                return date.toLocaleDateString('en-US', options);
+            }
+
+            // Helper functions to get descriptive text
+            function getJurisdictionDesc(jurisdiction) {
+                const descriptions = {
+                    federal: 'Federal Court',
+                    california: 'California State Court',
+                    'new-york': 'New York State Court',
+                    texas: 'Texas State Court'
+                };
+                
+                return descriptions[jurisdiction] || jurisdiction;
+            }
+
+            function getDeadlineTypeDesc(deadlineType) {
+                const descriptions = {
+                    response: 'Response to Complaint/Petition',
+                    appeal: 'Appeal Filing',
+                    discovery: 'Discovery Response',
+                    motion: 'Response to Motion',
+                    custom: 'Custom Deadline'
+                };
+                
+                return descriptions[deadlineType] || deadlineType;
+            }
+
+            // Function to capitalize first letter of a string
+            function capitalizeFirstLetter(string) {
+                return string.charAt(0).toUpperCase() + string.slice(1);
+            }
+
+            // Function to display results
+            function displayResults(finalDeadline, explanation, jurisdiction, deadlineType, serviceMethod) {
+                const finalDeadlineFormatted = formatDateForDisplay(finalDeadline);
+                
+                let resultHtml = `
+                    <div class="result-value">${finalDeadlineFormatted}</div>
+                    <div class="result-explanation">
+                        ${explanation.explanation}
+                    </div>
+                    <div class="result-details">
+                        <h3>Calculation Details</h3>
+                `;
+                
+                // Add jurisdiction and other details
+                resultHtml += `
+                    <div class="detail-item">
+                        <div class="detail-label">Jurisdiction</div>
+                        <div class="detail-value">${getJurisdictionDesc(jurisdiction)}</div>
+                    </div>
+                `;
+                
+                // Add all other details
+                explanation.details.forEach(detail => {
+                    resultHtml += `
+                        <div class="detail-item">
+                            <div class="detail-label">${detail.label}</div>
+                            <div class="detail-value">${detail.value}</div>
+                        </div>
+                    `;
+                });
+                
+                // Disclaimer
+                resultHtml += `
+                    <div style="margin-top: 20px; font-size: 0.85rem; color: #64748b;">
+                        <strong>Disclaimer:</strong> This calculator is provided for informational purposes only and should not be relied upon as legal advice. 
+                        Court rules and procedures can vary. Always verify deadlines with the relevant court and consult with an attorney.
+                    </div>
+                `;
+                
+                resultHtml += '</div>';
+                resultContent.innerHTML = resultHtml;
+            }
+
+            // Copy to clipboard function
+            function copyToClipboard() {
+                try {
+                    if (resultContent.textContent.trim() === 'Complete the form and click "Calculate Deadline" to see results.') {
+                        showError('Please calculate a deadline first before copying.');
+                        return;
+                    }
+                    
+                    // Create a plain text version of the results
+                    let plainText = '';
+                    
+                    // Extract and format the deadline value
+                    const resultValue = resultContent.querySelector('.result-value');
+                    if (resultValue) {
+                        plainText += 'DEADLINE: ' + resultValue.textContent.trim() + '\n\n';
+                    }
+                    
+                    // Extract explanation, removing HTML tags
+                    const resultExplanation = resultContent.querySelector('.result-explanation');
+                    if (resultExplanation) {
+                        const explanationText = resultExplanation.textContent.trim()
+                            .replace(/\s+/g, ' ') // Normalize whitespace
+                            .replace(/\.(?=\S)/g, '. '); // Ensure periods have space after them
+                        
+                        plainText += 'EXPLANATION:\n' + explanationText + '\n\n';
+                    }
+                    
+                    // Extract calculation details
+                    const detailItems = resultContent.querySelectorAll('.detail-item');
+                    if (detailItems.length > 0) {
+                        plainText += 'CALCULATION DETAILS:\n';
+                        
+                        detailItems.forEach(item => {
+                            const label = item.querySelector('.detail-label');
+                            const value = item.querySelector('.detail-value');
+                            
+                            if (label && value) {
+                                plainText += label.textContent.trim() + ': ' + value.textContent.trim() + '\n';
+                            }
+                        });
+                    }
+                    
+                    // Add disclaimer
+                    plainText += '\nDISCLAIMER: This calculator is provided for informational purposes only and should not be relied upon as legal advice. Court rules and procedures can vary. Always verify deadlines with the relevant court and consult with an attorney.';
+                    
+                    // Copy to clipboard using the Clipboard API
+                    navigator.clipboard.writeText(plainText).then(() => {
+                        showCopySuccess();
+                    }).catch(error => {
+                        console.error('Clipboard API error:', error);
+                        
+                        // Fallback for older browsers
+                        const textarea = document.createElement('textarea');
+                        textarea.value = plainText;
+                        textarea.style.position = 'fixed';
+                        document.body.appendChild(textarea);
+                        textarea.select();
+                        
+                        try {
+                            document.execCommand('copy');
+                            showCopySuccess();
+                        } catch (err) {
+                            console.error('Fallback clipboard error:', err);
+                            showError('Failed to copy results. Please try again.');
+                        } finally {
+                            document.body.removeChild(textarea);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Copy error:', error);
+                    showError('Failed to copy results. Please try again.');
+                }
+            }
+
+            // Print results function
+            function printResults() {
+                if (resultContent.textContent.trim() === 'Complete the form and click "Calculate Deadline" to see results.') {
+                    showError('Please calculate a deadline first before printing.');
+                    return;
+                }
+                
+                window.print();
+            }
+
+            // Show error message
+            function showError(message) {
+                errorMessage.textContent = message;
+                errorMessage.classList.add('visible');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    errorMessage.classList.remove('visible');
+                }, 5000);
+            }
+
+            // Show copy success message
+            function showCopySuccess() {
+                copySuccess.classList.add('visible');
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    copySuccess.classList.remove('visible');
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>
