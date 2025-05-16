@@ -1127,6 +1127,9 @@ Title: ________________________`;
     <div className="app-container">
       <div className="generator-heading">
         <h1>Membership Pledge & Security Agreement Generator</h1>
+        <p style={{ fontSize: '0.95rem', color: '#4b5563', marginTop: '0.5rem', maxWidth: '90%' }}>
+          Create a customized security agreement that uses LLC membership units as collateral for loans or performance obligations. This legally-binding document establishes a security interest that the company can enforce if a member defaults, protecting the company's interests while clearly defining rights and remedies.
+        </p>
       </div>
       
       <div className="tabs-container">
