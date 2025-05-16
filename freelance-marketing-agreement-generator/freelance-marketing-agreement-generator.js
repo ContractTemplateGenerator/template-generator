@@ -957,7 +957,7 @@ const App = () => {
             </div>
             
             <div className="form-group">
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "8px" }}>
                 <div>
                   <label htmlFor="clientCity">City</label>
                   <input 
@@ -1025,7 +1025,7 @@ const App = () => {
             </div>
             
             <div className="form-group">
-              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "10px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gap: "8px" }}>
                 <div>
                   <label htmlFor="freelancerCity">City</label>
                   <input 
