@@ -1902,24 +1902,6 @@ const App = () => {
             </div>
             
             <div style={{ marginTop: '1rem' }}>
-              <h3>Need Legal Assistance?</h3>
-              <p>If you have questions or need personalized guidance, schedule a consultation:</p>
-              
-              <button
-                onClick={() => window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
-                className="action-button"
-                style={{
-                  backgroundColor: "#059669",
-                  color: "white",
-                  border: "none",
-                  margin: "0.5rem 0"
-                }}
-              >
-                <Icon name="calendar" /> Schedule Consultation
-              </button>
-            </div>
-            
-            <div style={{ marginTop: '1rem' }}>
               <h3>Legal Disclaimer</h3>
               <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
                 This document generator provides a template for an LLC Interest Purchase Agreement. It is not a substitute for legal advice. 
@@ -1977,29 +1959,43 @@ const App = () => {
             <Icon name="chevron-left" /> Previous
           </button>
           
-          <button
-            onClick={copyToClipboard}
-            className="nav-button"
-            style={{
-              backgroundColor: "#4f46e5", 
-              color: "white",
-              border: "none"
-            }}
-          >
-            <Icon name="copy" /> Copy
-          </button>
-          
-          <button
-            onClick={downloadAsWord}
-            className="nav-button"
-            style={{
-              backgroundColor: "#2563eb", 
-              color: "white",
-              border: "none"
-            }}
-          >
-            <Icon name="file-text" /> Download Word
-          </button>
+          <div className="action-group" style={{ display: 'flex', gap: '8px', margin: '0 auto' }}>
+            <button
+              onClick={copyToClipboard}
+              className="nav-button"
+              style={{
+                backgroundColor: "#4f46e5", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <Icon name="copy" /> Copy
+            </button>
+            
+            <button
+              onClick={downloadAsWord}
+              className="nav-button"
+              style={{
+                backgroundColor: "#2563eb", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <Icon name="file-text" /> Download Word
+            </button>
+            
+            <button
+              onClick={() => window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+              className="nav-button"
+              style={{
+                backgroundColor: "#059669", 
+                color: "white",
+                border: "none"
+              }}
+            >
+              <Icon name="calendar" /> Consult
+            </button>
+          </div>
           
           <button
             onClick={nextTab}
