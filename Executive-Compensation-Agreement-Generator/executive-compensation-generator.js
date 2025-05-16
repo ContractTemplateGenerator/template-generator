@@ -141,9 +141,20 @@ const App = () => {
   
   // Open Calendly for consultation
   const openCalendly = () => {
-    Calendly.initPopupWidget({
-      url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-    });
+    try {
+      console.log("Opening Calendly consultation popup");
+      if (typeof Calendly !== 'undefined') {
+        Calendly.initPopupWidget({
+          url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
+        });
+      } else {
+        console.error("Calendly is not defined. The Calendly script may not have loaded properly.");
+        window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
+      }
+    } catch (error) {
+      console.error("Error opening Calendly:", error);
+      window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
+    }
   };
   
   // Generate document text based on form data
