@@ -41,9 +41,9 @@ const App = () => {
     needVirtualOffice: false,
     
     // Agreement Details
-    consultantName: 'Serge Makov',
+    consultantName: 'Attorney',
     consultantTitle: 'Attorney at Law',
-    consultantEmail: 'serge@terms.law',
+    consultantEmail: 'attorney@example.com',
     agreementDate: new Date().toISOString().split('T')[0],
   });
   
