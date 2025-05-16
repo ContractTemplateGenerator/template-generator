@@ -136,9 +136,14 @@ const EmployeeIPAssignmentGenerator = () => {
 
   // Schedule consultation
   const scheduleConsultation = () => {
-    Calendly.initPopupWidget({
-      url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-    });
+    if (typeof Calendly !== 'undefined') {
+      Calendly.initPopupWidget({
+        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
+      });
+    } else {
+      // Fallback if Calendly isn't loaded yet
+      window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
+    }
     return false;
   };
 
@@ -443,7 +448,23 @@ const EmployeeIPAssignmentGenerator = () => {
     if (previewRef.current) {
       const highlightedElement = previewRef.current.querySelector('.highlighted-text');
       if (highlightedElement) {
-        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        // Save current scroll position before scrolling
+        const prevScrollTop = previewRef.current.scrollTop;
+        
+        // Scroll to the highlighted element with smooth behavior
+        highlightedElement.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center',
+          inline: 'nearest'
+        });
+        
+        // Store original position to allow scrolling back
+        setTimeout(() => {
+          // This gives the UI time to update before allowing scroll again
+          if (previewRef.current) {
+            previewRef.current.dataset.prevScrollTop = prevScrollTop;
+          }
+        }, 100);
       }
     }
   }, [highlightedText]);
