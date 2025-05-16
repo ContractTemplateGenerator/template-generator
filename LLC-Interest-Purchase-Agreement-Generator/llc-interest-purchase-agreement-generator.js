@@ -1901,7 +1901,7 @@ const App = () => {
               </div>
             </div>
             
-            <div style={{ marginTop: '2rem' }}>
+            <div style={{ marginTop: '1rem' }}>
               <h3>Need Legal Assistance?</h3>
               <p>If you have questions or need personalized guidance, schedule a consultation:</p>
               
@@ -1919,7 +1919,7 @@ const App = () => {
               </button>
             </div>
             
-            <div style={{ marginTop: '2rem' }}>
+            <div style={{ marginTop: '1rem' }}>
               <h3>Legal Disclaimer</h3>
               <p style={{ fontSize: '0.875rem', color: '#64748b' }}>
                 This document generator provides a template for an LLC Interest Purchase Agreement. It is not a substitute for legal advice. 
