@@ -938,28 +938,30 @@ const App = () => {
               />
             </div>
             
-            <div className="form-group">
-              <label>Seller's State</label>
-              <input
-                type="text"
-                name="sellerState"
-                value={formData.sellerState}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="NY"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Seller's ZIP Code</label>
-              <input
-                type="text"
-                name="sellerZip"
-                value={formData.sellerZip}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="10001"
-              />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Seller's State</label>
+                <input
+                  type="text"
+                  name="sellerState"
+                  value={formData.sellerState}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="NY"
+                />
+              </div>
+              
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Seller's ZIP Code</label>
+                <input
+                  type="text"
+                  name="sellerZip"
+                  value={formData.sellerZip}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="10001"
+                />
+              </div>
             </div>
             
             <h3>Buyer Information</h3>
@@ -999,28 +1001,30 @@ const App = () => {
               />
             </div>
             
-            <div className="form-group">
-              <label>Buyer's State</label>
-              <input
-                type="text"
-                name="buyerState"
-                value={formData.buyerState}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="CA"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Buyer's ZIP Code</label>
-              <input
-                type="text"
-                name="buyerZip"
-                value={formData.buyerZip}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="90001"
-              />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Buyer's State</label>
+                <input
+                  type="text"
+                  name="buyerState"
+                  value={formData.buyerState}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="CA"
+                />
+              </div>
+              
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Buyer's ZIP Code</label>
+                <input
+                  type="text"
+                  name="buyerZip"
+                  value={formData.buyerZip}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="90001"
+                />
+              </div>
             </div>
             
             <h3>Company Information</h3>
@@ -1073,28 +1077,30 @@ const App = () => {
               />
             </div>
             
-            <div className="form-group">
-              <label>Company's State</label>
-              <input
-                type="text"
-                name="companyState"
-                value={formData.companyState}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="IL"
-              />
-            </div>
-            
-            <div className="form-group">
-              <label>Company's ZIP Code</label>
-              <input
-                type="text"
-                name="companyZip"
-                value={formData.companyZip}
-                onChange={handleChange}
-                className="form-control"
-                placeholder="60601"
-              />
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Company's State</label>
+                <input
+                  type="text"
+                  name="companyState"
+                  value={formData.companyState}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="IL"
+                />
+              </div>
+              
+              <div className="form-group" style={{ flex: '1' }}>
+                <label>Company's ZIP Code</label>
+                <input
+                  type="text"
+                  name="companyZip"
+                  value={formData.companyZip}
+                  onChange={handleChange}
+                  className="form-control"
+                  placeholder="60601"
+                />
+              </div>
             </div>
           </div>
         );
@@ -1132,9 +1138,9 @@ const App = () => {
                 <div className="form-help">Enter the percentage of membership interest being sold (e.g., 25 for 25%).</div>
               </div>
             ) : (
-              <>
-                <div className="form-group">
-                  <label>Number of Membership Units Being Sold</label>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <div className="form-group" style={{ flex: '1' }}>
+                  <label>Number of Units Being Sold</label>
                   <input
                     type="text"
                     name="membershipUnits"
@@ -1145,8 +1151,8 @@ const App = () => {
                   />
                 </div>
                 
-                <div className="form-group">
-                  <label>Total Units in the Company</label>
+                <div className="form-group" style={{ flex: '1' }}>
+                  <label>Total Units in Company</label>
                   <input
                     type="text"
                     name="totalUnits"
@@ -1155,9 +1161,8 @@ const App = () => {
                     className="form-control"
                     placeholder="1000"
                   />
-                  <div className="form-help">The total number of membership units in the company.</div>
                 </div>
-              </>
+              </div>
             )}
             
             <div className="form-group">
@@ -1894,6 +1899,24 @@ const App = () => {
                   <Icon name="file-text" /> Download MS Word
                 </button>
               </div>
+            </div>
+            
+            <div style={{ marginTop: '2rem' }}>
+              <h3>Need Legal Assistance?</h3>
+              <p>If you have questions or need personalized guidance, schedule a consultation:</p>
+              
+              <button
+                onClick={() => window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                className="action-button"
+                style={{
+                  backgroundColor: "#059669",
+                  color: "white",
+                  border: "none",
+                  margin: "0.5rem 0"
+                }}
+              >
+                <Icon name="calendar" /> Schedule Consultation
+              </button>
             </div>
             
             <div style={{ marginTop: '2rem' }}>
