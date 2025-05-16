@@ -140,21 +140,10 @@ const App = () => {
   };
   
   // Open Calendly for consultation
-  const openCalendly = () => {
-    try {
-      console.log("Opening Calendly consultation popup");
-      if (typeof Calendly !== 'undefined') {
-        Calendly.initPopupWidget({
-          url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-        });
-      } else {
-        console.error("Calendly is not defined. The Calendly script may not have loaded properly.");
-        window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
-      }
-    } catch (error) {
-      console.error("Error opening Calendly:", error);
-      window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
-    }
+  const openCalendly = (e) => {
+    e.preventDefault();
+    Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});
+    return false;
   };
   
   // Generate document text based on form data
@@ -1382,18 +1371,27 @@ ${formData.executiveName || "[EXECUTIVE NAME]"}`;
           Previous
         </button>
         
-        <button
-          onClick={openCalendly}
+        <a 
+          href="https://terms.law/call/"
+          target="_blank"
           className="nav-button"
           style={{
             backgroundColor: "#6366f1", 
             color: "white",
-            border: "none"
+            border: "none",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            textDecoration: "none",
+            fontWeight: 500,
+            fontSize: "14px",
+            padding: "8px 16px",
+            cursor: "pointer"
           }}
         >
           <i data-feather="calendar" style={{marginRight: "0.25rem"}} />
           Consultation
-        </button>
+        </a>
         
         <button
           onClick={copyToClipboard}
