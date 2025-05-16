@@ -51,16 +51,16 @@ window.generateWordDoc = function(documentText, formData) {
     let mainText = documentText;
     let appendixText = '';
     
-    if (documentText.includes('\\f')) {
-      const parts = documentText.split(/\\f/);
+    if (documentText.includes('\f')) {
+      const parts = documentText.split(/\f/);
       mainText = parts[0];
       appendixText = parts.length > 1 ? parts[1] : '';
     }
     
     // Process main text - convert newlines to HTML paragraphs
     const mainTextHtml = mainText
-      .split('\\n\\n')
-      .map(para => para.trim() ? `<p>${para.replace(/\\n/g, '<br>')}</p>` : '')
+      .split('\n\n')
+      .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
       .join('');
     
     // Add main text to HTML content
@@ -73,8 +73,8 @@ window.generateWordDoc = function(documentText, formData) {
       
       // Process appendix text
       const appendixHtml = appendixText
-        .split('\\n\\n')
-        .map(para => para.trim() ? `<p>${para.replace(/\\n/g, '<br>')}</p>` : '')
+        .split('\n\n')
+        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
         .join('');
       
       // Add appendix to HTML content

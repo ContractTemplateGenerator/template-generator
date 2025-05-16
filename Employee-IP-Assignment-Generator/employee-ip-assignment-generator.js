@@ -126,7 +126,7 @@ const EmployeeIPAssignmentGenerator = () => {
     try {
       window.generateWordDoc(documentText, {
         documentTitle: "Employee IP Assignment Agreement",
-        fileName: \`\${formData.companyName.replace(/\\s+/g, '-')}-\${formData.employeeName.replace(/\\s+/g, '-')}-IP-Assignment\`
+        fileName: `${formData.companyName.replace(/\s+/g, '-')}-${formData.employeeName.replace(/\s+/g, '-')}-IP-Assignment`
       });
     } catch (error) {
       console.error("Error generating Word document:", error);
