@@ -37,39 +37,14 @@ window.generateWordDoc = function(documentText, formData) {
 <body>
 `;
 
-    // Split document text if there's a form feed character (for separate pages)
-    let mainText = documentText;
-    let appendixText = '';
-    
-    if (documentText.includes('\f')) {
-      const parts = documentText.split(/\f/);
-      mainText = parts[0];
-      appendixText = parts.length > 1 ? parts[1] : '';
-    }
-    
-    // Process main text - convert newlines to HTML paragraphs
-    const mainTextHtml = mainText
+    // Process text and convert newlines to HTML paragraphs
+    const textHtml = documentText
       .split('\n\n')
       .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
       .join('');
     
-    // Add main text to HTML content
-    htmlContent += mainTextHtml;
-    
-    // Add appendix on a new page if applicable
-    if (appendixText) {
-      // Add page break
-      htmlContent += '<div class="page-break"></div>';
-      
-      // Process appendix text
-      const appendixHtml = appendixText
-        .split('\n\n')
-        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
-        .join('');
-      
-      // Add appendix to HTML content
-      htmlContent += appendixHtml;
-    }
+    // Add text to HTML content
+    htmlContent += textHtml;
     
     // Close HTML document
     htmlContent += '</body></html>';

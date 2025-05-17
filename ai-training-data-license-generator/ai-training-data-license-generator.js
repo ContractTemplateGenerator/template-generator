@@ -23,17 +23,17 @@ const App = () => {
   // State for current tab
   const [currentTab, setCurrentTab] = useState(0);
   
-  // Form data state
+  // Form data state with defaults
   const [formData, setFormData] = useState({
     // Tab 1: Basic Info
-    licensorName: '',
+    licensorName: 'ABC Data Corp',
     licensorEntity: 'Corporation',
-    licensorAddress: '',
-    licensorState: '',
-    licenseeCompany: '',
+    licensorAddress: '123 Data Street, San Francisco',
+    licensorState: 'California',
+    licenseeCompany: 'XYZ AI Solutions',
     licenseeEntity: 'Corporation',
-    licenseeAddress: '',
-    licenseeState: '',
+    licenseeAddress: '456 Tech Avenue, Seattle',
+    licenseeState: 'Washington',
     effectiveDate: '',
     
     // Tab 2: License Terms
@@ -84,7 +84,7 @@ const App = () => {
   // State for tracking last changed field
   const [lastChanged, setLastChanged] = useState(null);
   
-  // Generate document text
+  // State for document text
   const [documentText, setDocumentText] = useState('');
   
   // Reference for preview div
@@ -93,12 +93,9 @@ const App = () => {
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    
-    // Set what was last changed for highlighting
     setLastChanged(name);
     
     if (name.includes('.')) {
-      // Handle nested objects (e.g., dataTypes.text)
       const [parent, child] = name.split('.');
       setFormData(prev => ({
         ...prev,
@@ -108,7 +105,6 @@ const App = () => {
         }
       }));
     } else {
-      // Handle regular fields
       setFormData(prev => ({
         ...prev,
         [name]: type === 'checkbox' ? checked : value
@@ -148,10 +144,14 @@ const App = () => {
   // Download as Word document
   const downloadAsWord = () => {
     try {
-      window.generateWordDoc(documentText, {
-        documentTitle: formData.documentTitle,
-        fileName: formData.fileName
-      });
+      if (window.generateWordDoc) {
+        window.generateWordDoc(documentText, {
+          documentTitle: formData.documentTitle,
+          fileName: formData.fileName
+        });
+      } else {
+        alert("Word document generator is not available.");
+      }
     } catch (error) {
       console.error('Error downloading Word document:', error);
       alert('Error generating Word document. Please try again or use the copy option.');
@@ -160,422 +160,66 @@ const App = () => {
   
   // Open Calendly widget
   const openCalendly = () => {
-    if (window.Calendly) {
-      window.Calendly.initPopupWidget({
-        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-      });
-      return false;
-    } else {
-      alert('Scheduling widget is not available. Please visit terms.law/call to schedule a consultation.');
-    }
+    window.open("https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1", "_blank");
   };
 
-  // Generate the document text whenever form data changes
+  // Generate document text whenever form data changes
   useEffect(() => {
-    const generateDocument = () => {
-      // Helper function to get date in MM/DD/YYYY format
-      const formatDate = (dateString) => {
-        if (!dateString) return new Date().toLocaleDateString('en-US');
-        return new Date(dateString).toLocaleDateString('en-US');
-      };
-      
-      // Helper function to format lists
-      const formatList = (items, conjunction = 'and') => {
-        const filtered = Object.entries(items)
-          .filter(([, isSelected]) => isSelected)
-          .map(([key]) => {
-            // Convert camelCase to Title Case with spaces
-            return key
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/^./, str => str.toUpperCase());
-          });
-        
-        if (filtered.length === 0) return 'None';
-        if (filtered.length === 1) return filtered[0];
-        
-        return filtered.slice(0, -1).join(', ') + ` ${conjunction} ` + filtered.slice(-1);
-      };
-      
-      // Title
-      let text = `AI TRAINING DATA LICENSE AGREEMENT\n\n`;
-      
-      // Date and Parties
-      text += `This AI Training Data License Agreement (the "Agreement") is entered into as of ${formData.effectiveDate ? formatDate(formData.effectiveDate) : '[DATE]'} (the "Effective Date"), by and between:\n\n`;
-      
-      text += `${formData.licensorName || '[LICENSOR NAME]'}, a ${formData.licensorEntity.toLowerCase()} having its principal place of business at ${formData.licensorAddress || '[ADDRESS]'}, ${formData.licensorState || '[STATE/JURISDICTION]'} (the "Licensor"), and\n\n`;
-      
-      text += `${formData.licenseeCompany || '[LICENSEE NAME]'}, a ${formData.licenseeEntity.toLowerCase()} having its principal place of business at ${formData.licenseeAddress || '[ADDRESS]'}, ${formData.licenseeState || '[STATE/JURISDICTION]'} (the "Licensee").\n\n`;
-      
-      // Recitals
-      text += `WHEREAS, Licensor owns or controls certain data that may be useful for artificial intelligence training purposes; and\n\n`;
-      
-      text += `WHEREAS, Licensee desires to obtain a license to use such data for developing, training, and improving artificial intelligence systems and models; and\n\n`;
-      
-      text += `WHEREAS, Licensor is willing to grant such license subject to the terms and conditions set forth herein;\n\n`;
-      
-      text += `NOW, THEREFORE, in consideration of the mutual covenants contained herein and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:\n\n`;
-      
-      // 1. Definitions
-      text += `1. DEFINITIONS\n\n`;
-      
-      text += `1.1 "Data" means the information, materials, text, images, or other content provided by Licensor to Licensee under this Agreement, specifically including ${formatList(formData.dataTypes, 'and')}.\n\n`;
-      
-      text += `1.2 "AI System" means any machine learning model, neural network, or artificial intelligence algorithm or software developed, trained, or improved using the Data.\n\n`;
-      
-      text += `1.3 "Training" means the process of using the Data to develop, test, improve, or otherwise inform the development of AI Systems.\n\n`;
-      
-      // 2. License Grant
-      text += `2. LICENSE GRANT\n\n`;
-      
-      // Determine license text based on selected options
-      let licenseText = '';
-      if (formData.licenseType === 'non-exclusive') {
-        licenseText = `2.1 Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a non-exclusive, `;
-      } else if (formData.licenseType === 'exclusive') {
-        licenseText = `2.1 Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee an exclusive, `;
-      } else if (formData.licenseType === 'sole') {
-        licenseText = `2.1 Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a sole, `;
-      }
-      
-      licenseText += `${formData.sublicensing === 'permitted' ? 'sublicensable, ' : ''}`;
-      licenseText += `license during the Term to use the Data solely for the purpose of Training AI Systems as further specified in Section 3.\n\n`;
-      
-      text += licenseText;
-      
-      if (formData.sublicensing === 'limited-permitted') {
-        text += `2.2 Licensee may sublicense the rights granted herein to its contractors and service providers solely for the purpose of Training AI Systems on behalf of Licensee, provided that Licensee ensures that all such sublicensees are bound by terms no less protective of Licensor's rights than the terms of this Agreement.\n\n`;
-      } else if (formData.sublicensing === 'not-permitted') {
-        text += `2.2 Licensee shall not sublicense, distribute, sell, lease, or otherwise make the Data available to any third party without Licensor's prior written consent.\n\n`;
-      }
-      
-      // 3. Permitted Uses
-      text += `3. PERMITTED USES AND RESTRICTIONS\n\n`;
-      
-      if (formData.purposeRestrictions === 'specific-models') {
-        text += `3.1 Permitted Uses. Licensee may use the Data solely for Training AI Systems in the following categories: ${formatList(formData.modelTypes, 'and')}.\n\n`;
-      } else if (formData.purposeRestrictions === 'all-ai') {
-        text += `3.1 Permitted Uses. Licensee may use the Data for Training any AI Systems within Licensee's business operations.\n\n`;
-      } else if (formData.purposeRestrictions === 'product-specific') {
-        text += `3.1 Permitted Uses. Licensee may use the Data solely for Training AI Systems specifically for use in Licensee's products and services.\n\n`;
-      }
-      
-      text += `3.2 Prohibited Uses. Licensee shall not use the Data to Train AI Systems that are designed to: (a) generate deepfakes or impersonate specific individuals; (b) promote discrimination, harassment, or violence; (c) violate applicable laws or regulations; or (d) infringe upon third-party intellectual property or privacy rights.\n\n`;
-      
-      if (formData.attributionRequired === 'yes') {
-        text += `3.3 Attribution. Licensee shall provide attribution to Licensor in any public-facing documentation or marketing materials that reference AI Systems trained using the Data. The format of such attribution shall be: "Trained in part using data licensed from ${formData.licensorName || '[LICENSOR]'}."\n\n`;
-      }
-      
-      // 4. Ownership
-      text += `4. OWNERSHIP\n\n`;
-      
-      if (formData.ownershipModels === 'licensee-owns') {
-        text += `4.1 AI Systems. Licensee shall own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, including all intellectual property rights therein. Licensor expressly disclaims any rights in AI Systems developed by Licensee.\n\n`;
-      } else if (formData.ownershipModels === 'licensor-royalty') {
-        text += `4.1 AI Systems. Licensee shall own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, subject to Licensor's rights to receive compensation as set forth in Section 5.\n\n`;
-      } else if (formData.ownershipModels === 'joint-ownership') {
-        text += `4.1 AI Systems. The parties shall jointly own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, including all intellectual property rights therein, with each party having the right to use, license, and exploit such AI Systems without accounting to the other party.\n\n`;
-      }
-      
-      text += `4.2 Data. Licensor retains all right, title, and interest in and to the Data, including all intellectual property rights therein. Nothing in this Agreement shall be construed as a transfer or assignment of ownership in the Data to Licensee.\n\n`;
-      
-      // 5. Compensation
-      text += `5. COMPENSATION\n\n`;
-      
-      if (formData.compensationType === 'one-time') {
-        text += `5.1 License Fee. In consideration for the license granted herein, Licensee shall pay Licensor a one-time fee of $${formData.initialFee || '0'} within thirty (30) days of the Effective Date.\n\n`;
-      } else if (formData.compensationType === 'royalty') {
-        text += `5.1 Royalty. In consideration for the license granted herein, Licensee shall pay Licensor a royalty of ${formData.royaltyPercent || '0'}% of the Net Revenue derived from AI Systems trained using the Data. "Net Revenue" means gross revenue received by Licensee from the commercialization of AI Systems, less taxes, returns, and standard deductions.\n\n`;
-        
-        text += `5.2 Minimum Guarantee. Regardless of the actual royalties earned, Licensee guarantees a minimum payment to Licensor of $${formData.minimumGuarantee || '0'} per year during the Term.\n\n`;
-        
-        text += `5.3 Reporting. Licensee shall provide quarterly reports detailing the calculation of royalties due, along with payment of such royalties, within thirty (30) days after the end of each calendar quarter.\n\n`;
-      } else if (formData.compensationType === 'hybrid') {
-        text += `5.1 Initial Fee. Licensee shall pay Licensor an initial fee of $${formData.initialFee || '0'} within thirty (30) days of the Effective Date.\n\n`;
-        
-        text += `5.2 Royalty. In addition to the initial fee, Licensee shall pay Licensor a royalty of ${formData.royaltyPercent || '0'}% of the Net Revenue derived from AI Systems trained using the Data. "Net Revenue" means gross revenue received by Licensee from the commercialization of AI Systems, less taxes, returns, and standard deductions.\n\n`;
-        
-        text += `5.3 Minimum Guarantee. Regardless of the actual royalties earned, Licensee guarantees a minimum payment to Licensor of $${formData.minimumGuarantee || '0'} per year during the Term.\n\n`;
-        
-        text += `5.4 Reporting. Licensee shall provide quarterly reports detailing the calculation of royalties due, along with payment of such royalties, within thirty (30) days after the end of each calendar quarter.\n\n`;
-      }
-      
-      // 6. Term and Termination
-      text += `6. TERM AND TERMINATION\n\n`;
-      
-      text += `6.1 Term. This Agreement shall commence on the Effective Date and continue for a period of ${formData.term || '1'} ${formData.termUnit === 'years' ? 'years' : 'months'} (the "Term"), unless earlier terminated as provided herein.\n\n`;
-      
-      if (formData.terminationRights === 'both-parties') {
-        text += `6.2 Termination for Breach. Either party may terminate this Agreement upon written notice if the other party materially breaches any provision of this Agreement and fails to cure such breach within thirty (30) days after receiving written notice thereof.\n\n`;
-      } else if (formData.terminationRights === 'licensor-only') {
-        text += `6.2 Termination for Breach. Licensor may terminate this Agreement upon written notice if Licensee materially breaches any provision of this Agreement and fails to cure such breach within thirty (30) days after receiving written notice thereof.\n\n`;
-      } else if (formData.terminationRights === 'licensee-only') {
-        text += `6.2 Termination for Convenience. Licensee may terminate this Agreement at any time upon thirty (30) days' written notice to Licensor.\n\n`;
-      }
-      
-      text += `6.3 Effect of Termination. Upon termination or expiration of this Agreement: (a) all rights granted to Licensee hereunder shall immediately terminate; (b) Licensee shall immediately cease all use of the Data; and (c) Licensee shall promptly return or destroy all copies of the Data in its possession or control, as directed by Licensor.\n\n`;
-      
-      text += `6.4 Survival. The following provisions shall survive the termination or expiration of this Agreement: Sections 4 (Ownership), 5 (Compensation) with respect to amounts accrued prior to termination, 7 (Representations and Warranties), 8 (Indemnification), 9 (Limitation of Liability), and 11 (General Provisions).\n\n`;
-      
-      // 7. Representations and Warranties
-      text += `7. REPRESENTATIONS AND WARRANTIES\n\n`;
-      
-      if (formData.licensorWarranty === 'limited') {
-        text += `7.1 Licensor Warranties. Licensor represents and warrants that: (a) it has ${formData.rightsToClaim === 'all-necessary-rights' ? 'all necessary rights and authority to grant the licenses and rights granted herein' : 'the right to license the Data as specified in this Agreement'}; and (b) the Data does not infringe upon the intellectual property rights of any third party.\n\n`;
-      } else if (formData.licensorWarranty === 'as-is') {
-        text += `7.1 Disclaimer. THE DATA IS PROVIDED "AS IS" AND WITHOUT WARRANTIES OF ANY KIND. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.\n\n`;
-      }
-      
-      if (formData.dataComplianceWarranty) {
-        text += `7.2 Compliance with Laws. Licensor represents and warrants that the Data was collected in compliance with all applicable laws and regulations, including data protection and privacy laws, and that Licensor has all necessary rights, consents, and permissions to license the Data to Licensee for the purposes set forth in this Agreement.\n\n`;
-      }
-      
-      text += `7.3 Licensee Warranties. Licensee represents and warrants that: (a) it will use the Data in compliance with all applicable laws and regulations; and (b) it will not use the Data in any manner that violates the rights of any third party.\n\n`;
-      
-      // 8. Indemnification
-      text += `8. INDEMNIFICATION\n\n`;
-      
-      if (formData.indemnification === 'mutual') {
-        text += `8.1 Mutual Indemnification. Each party shall indemnify, defend, and hold harmless the other party from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) any breach by the indemnifying party of its representations, warranties, or covenants under this Agreement; or (b) the indemnifying party's negligence or willful misconduct.\n\n`;
-      } else if (formData.indemnification === 'licensee-only') {
-        text += `8.1 Licensee Indemnification. Licensee shall indemnify, defend, and hold harmless Licensor from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) Licensee's use of the Data; (b) any breach by Licensee of its representations, warranties, or covenants under this Agreement; or (c) Licensee's negligence or willful misconduct.\n\n`;
-      } else if (formData.indemnification === 'licensor-only') {
-        text += `8.1 Licensor Indemnification. Licensor shall indemnify, defend, and hold harmless Licensee from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) any claim that the Data infringes upon the intellectual property rights of any third party; (b) any breach by Licensor of its representations, warranties, or covenants under this Agreement; or (c) Licensor's negligence or willful misconduct.\n\n`;
-      }
-      
-      // 9. Limitation of Liability
-      text += `9. LIMITATION OF LIABILITY\n\n`;
-      
-      if (formData.liabilityLimit === 'fees-paid') {
-        text += `9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED THE TOTAL AMOUNT PAID BY LICENSEE TO LICENSOR UNDER THIS AGREEMENT.\n\n`;
-      } else if (formData.liabilityLimit === 'no-consequential') {
-        text += `9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOST PROFITS, LOSS OF USE, OR LOSS OF DATA, WHETHER IN AN ACTION IN CONTRACT, TORT, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.\n\n`;
-      } else if (formData.liabilityLimit === 'both-limits') {
-        text += `9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED THE TOTAL AMOUNT PAID BY LICENSEE TO LICENSOR UNDER THIS AGREEMENT.\n\n`;
-        
-        text += `9.2 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOST PROFITS, LOSS OF USE, OR LOSS OF DATA, WHETHER IN AN ACTION IN CONTRACT, TORT, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.\n\n`;
-      }
-      
-      // 10. Confidentiality
-      text += `10. CONFIDENTIALITY\n\n`;
-      
-      text += `10.1 Confidential Information. Each party acknowledges that it may receive confidential or proprietary information of the other party in the performance of this Agreement ("Confidential Information"). Each party shall maintain the confidentiality of the other party's Confidential Information using at least the same degree of care that it uses to protect its own confidential information, but in no event less than reasonable care.\n\n`;
-      
-      text += `10.2 Exclusions. Confidential Information shall not include information that: (a) is or becomes publicly available through no fault of the receiving party; (b) was in the receiving party's possession prior to its disclosure by the disclosing party; (c) is rightfully received by the receiving party from a third party without a duty of confidentiality; or (d) is independently developed by the receiving party without reference to the disclosing party's Confidential Information.\n\n`;
-      
-      // 11. General Provisions
-      text += `11. GENERAL PROVISIONS\n\n`;
-      
-      text += `11.1 Entire Agreement. This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior and contemporaneous agreements or communications.\n\n`;
-      
-      text += `11.2 Amendment. This Agreement may be amended only by a written document signed by both parties.\n\n`;
-      
-      text += `11.3 Assignment. Neither party may assign or transfer this Agreement without the prior written consent of the other party, except that either party may assign this Agreement in connection with a merger, acquisition, or sale of all or substantially all of its assets.\n\n`;
-      
-      text += `11.4 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of ${formData.licensorState || '[STATE/JURISDICTION]'}, without regard to its conflict of laws principles.\n\n`;
-      
-      text += `11.5 Dispute Resolution. Any dispute arising out of or in connection with this Agreement shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association.\n\n`;
-      
-      text += `11.6 Notices. All notices under this Agreement shall be in writing and shall be deemed given when delivered personally, by email with confirmation of receipt, or by certified mail, return receipt requested, to the address set forth above or to such other address as may be specified in writing.\n\n`;
-      
-      text += `11.7 No Waiver. The failure of either party to enforce any provision of this Agreement shall not be construed as a waiver of such provision or the right to enforce such provision.\n\n`;
-      
-      text += `11.8 Severability. If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.\n\n`;
-      
-      text += `11.9 Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.\n\n`;
-      
-      // Signature Block
-      text += `IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.\n\n`;
-      
-      text += `LICENSOR: ${formData.licensorName || '[LICENSOR NAME]'}\n\n`;
-      
-      text += `By: ____________________________\n`;
-      text += `Name: _________________________\n`;
-      text += `Title: __________________________\n\n`;
-      
-      text += `LICENSEE: ${formData.licenseeCompany || '[LICENSEE NAME]'}\n\n`;
-      
-      text += `By: ____________________________\n`;
-      text += `Name: _________________________\n`;
-      text += `Title: __________________________\n`;
-      
-      return text;
+    const formatDate = (dateString) => {
+      if (!dateString) return new Date().toLocaleDateString('en-US');
+      return new Date(dateString).toLocaleDateString('en-US');
     };
     
-    setDocumentText(generateDocument());
+    // Helper function to format lists
+    const formatList = (items, conjunction = 'and') => {
+      const filtered = Object.entries(items)
+        .filter(([, isSelected]) => isSelected)
+        .map(([key]) => {
+          return key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase());
+        });
+      
+      if (filtered.length === 0) return 'None';
+      if (filtered.length === 1) return filtered[0];
+      
+      return filtered.slice(0, -1).join(', ') + ` ${conjunction} ` + filtered.slice(-1);
+    };
+    
+    // Generate basic agreement text
+    let text = `AI TRAINING DATA LICENSE AGREEMENT\n\n`;
+    text += `This AI Training Data License Agreement is entered into by ${formData.licensorName} and ${formData.licenseeCompany}.\n\n`;
+    text += `1. DEFINITIONS\n\n`;
+    text += `1.1 "Data" means the information, materials, text, images, or other content provided by Licensor to Licensee under this Agreement, specifically including ${formatList(formData.dataTypes)}.\n\n`;
+    text += `1.2 "AI System" means any machine learning model, neural network, or artificial intelligence algorithm developed using the Data.\n\n`;
+    text += `2. LICENSE GRANT\n\n`;
+    text += `2.1 Licensor grants to Licensee a ${formData.licenseType} license to use the Data for AI training purposes.\n\n`;
+    
+    // Additional sections based on form selections
+    if (formData.compensationType === 'one-time') {
+      text += `5.1 License Fee: Licensee shall pay Licensor a one-time fee of $${formData.initialFee}.\n\n`;
+    } else if (formData.compensationType === 'royalty') {
+      text += `5.1 Royalty: Licensee shall pay Licensor a royalty of ${formData.royaltyPercent}% of the revenue from AI systems trained with the Data.\n\n`;
+    }
+    
+    text += `Term: ${formData.term} ${formData.termUnit}.\n\n`;
+    
+    setDocumentText(text);
   }, [formData]);
   
-  // Effect to scroll to highlighted text when last changed is updated
-  useEffect(() => {
-    if (previewRef.current && lastChanged) {
-      const highlight = previewRef.current.querySelector('.highlighted-text');
-      if (highlight) {
-        highlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-  }, [lastChanged, documentText]);
-  
-  // Function to determine what text should be highlighted based on lastChanged
-  const createHighlightedText = () => {
-    if (!lastChanged || !documentText) return documentText;
-    
-    // Define patterns to match based on which field was changed
-    const patterns = {
-      // Tab 1: Basic Info
-      licensorName: new RegExp(`(${formData.licensorName})(?![^(]*\\))`, 'g'),
-      licensorEntity: new RegExp(`a ${formData.licensorEntity.toLowerCase()}(?![^(]*\\))`, 'g'),
-      licensorAddress: new RegExp(`${formData.licensorAddress}(?![^(]*\\))`, 'g'),
-      licensorState: new RegExp(`${formData.licensorState}(?![^(]*\\))`, 'g'),
-      licenseeCompany: new RegExp(`(${formData.licenseeCompany})(?![^(]*\\))`, 'g'),
-      licenseeEntity: new RegExp(`a ${formData.licenseeEntity.toLowerCase()}(?![^(]*\\))`, 'g'),
-      licenseeAddress: new RegExp(`${formData.licenseeAddress}(?![^(]*\\))`, 'g'),
-      licenseeState: new RegExp(`${formData.licenseeState}(?![^(]*\\))`, 'g'),
-      effectiveDate: new RegExp(`as of (${formData.effectiveDate ? new Date(formData.effectiveDate).toLocaleDateString('en-US') : '\\[DATE\\]'})`, 'g'),
-      
-      // Tab 2: License Terms
-      licenseType: new RegExp(`grants to Licensee (an? ${formData.licenseType}),`, 'g'),
-      sublicensing: formData.sublicensing === 'permitted' ? 
-        /sublicensable,/g : 
-        formData.sublicensing === 'limited-permitted' ? 
-          /2\.2 Licensee may sublicense.+?on behalf of Licensee/g : 
-          /2\.2 Licensee shall not sublicense.+?prior written consent/g,
-      
-      // Tab 3: Data Usage
-      purposeRestrictions: new RegExp('3\\.1 Permitted Uses\\..+?\\n\\n', 'g'),
-      ownershipModels: new RegExp('4\\.1 AI Systems\\..+?\\n\\n', 'g'),
-      attributionRequired: formData.attributionRequired === 'yes' ? 
-        /3\.3 Attribution\..+?\."\n\n/g : null,
-      
-      // Tab 4: Compensation
-      compensationType: new RegExp('5\\.[\\s\\S]+?(?=6\\. TERM AND TERMINATION)', 'g'),
-      term: new RegExp(`for a period of ${formData.term || '1'} ${formData.termUnit === 'years' ? 'years' : 'months'}`, 'g'),
-      terminationRights: new RegExp('6\\.2 Termination.+?\\n\\n', 'g'),
-      
-      // Tab 5: Warranties
-      licensorWarranty: new RegExp('7\\.1.+?\\n\\n', 'g'),
-      dataComplianceWarranty: formData.dataComplianceWarranty ? 
-        /7\.2 Compliance with Laws\..+?\\n\\n/g : null,
-      indemnification: new RegExp('8\\.1.+?\\n\\n', 'g'),
-      liabilityLimit: new RegExp('9\\.[\\s\\S]+?(?=10\\. CONFIDENTIALITY)', 'g'),
-    };
-    
-    // Special handling for nested objects
-    if (lastChanged.includes('.')) {
-      const [parent, child] = lastChanged.split('.');
-      
-      if (parent === 'dataTypes') {
-        const dataTypesText = Object.entries(formData.dataTypes)
-          .filter(([, isSelected]) => isSelected)
-          .map(([key]) => {
-            return key
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/^./, str => str.toUpperCase());
-          })
-          .join(', ');
-        
-        // Highlight the data types list in the definitions section
-        return documentText.replace(
-          /(1\.1 "Data" means the information.+specifically including )(.+?)(\.)/, 
-          `$1<span class="highlighted-text">${dataTypesText}</span>$3`
-        );
-      }
-      
-      if (parent === 'modelTypes') {
-        const modelTypesText = Object.entries(formData.modelTypes)
-          .filter(([, isSelected]) => isSelected)
-          .map(([key]) => {
-            return key
-              .replace(/([A-Z])/g, ' $1')
-              .replace(/^./, str => str.toUpperCase());
-          })
-          .join(', ');
-        
-        // Highlight the model types in the permitted uses section
-        if (formData.purposeRestrictions === 'specific-models') {
-          return documentText.replace(
-            /(3\.1 Permitted Uses\. Licensee may use the Data solely for Training AI Systems in the following categories: )(.+?)(\.)/, 
-            `$1<span class="highlighted-text">${modelTypesText}</span>$3`
-          );
-        }
-      }
-    }
-    
-    // Handle regular fields
-    const pattern = patterns[lastChanged];
-    if (!pattern || !formData[lastChanged]) return documentText;
-    
-    // Replace matched text with highlighted version
-    return documentText.replace(pattern, match => {
-      return `<span class="highlighted-text">${match}</span>`;
-    });
-  };
-  
-  // Create a highlighted version of the document text
-  const highlightedText = createHighlightedText();
+  // Create highlighted version of document text
+  const highlightedText = documentText.replace(new RegExp(lastChanged, 'g'), match => 
+    `<span class="highlighted-text">${match}</span>`
+  );
   
   // Assess risks based on form data
   const assessRisks = () => {
-    const risks = [];
-    
-    // Check for empty required fields
-    if (!formData.licensorName || !formData.licensorAddress || !formData.licenseeCompany || !formData.licenseeAddress) {
-      risks.push({
-        level: 'high',
-        title: 'Missing Party Information',
-        description: 'Basic party information is incomplete. This could make the agreement unenforceable.',
-        recommendation: 'Complete all party information fields in the Basic Info tab.'
-      });
-    }
-    
-    // Check for data compliance warranties
-    if (!formData.dataComplianceWarranty) {
-      risks.push({
-        level: 'high',
-        title: 'No Data Compliance Warranty',
-        description: 'The agreement lacks warranties about data collection compliance, which could expose the Licensee to legal risks if the data was collected illegally.',
-        recommendation: 'Enable the data compliance warranty or ensure separate data compliance documentation exists.'
-      });
-    }
-    
-    // Check license type risks
-    if (formData.licenseType === 'exclusive' && formData.compensationType === 'one-time') {
-      risks.push({
-        level: 'medium',
-        title: 'Exclusive License with One-Time Fee',
-        description: 'An exclusive license with only a one-time fee may undervalue the data, especially if the AI models become highly profitable.',
-        recommendation: 'Consider a hybrid compensation model with both an initial fee and ongoing royalties.'
-      });
-    }
-    
-    // Check sublicensing risks
-    if (formData.sublicensing === 'permitted' && formData.compensationType !== 'royalty' && formData.compensationType !== 'hybrid') {
-      risks.push({
-        level: 'medium',
-        title: 'Unrestricted Sublicensing Without Royalties',
-        description: 'Allowing unrestricted sublicensing without royalty provisions means Licensor won't benefit from widespread use.',
-        recommendation: 'Either restrict sublicensing or implement a royalty structure that accounts for sublicensee revenue.'
-      });
-    }
-    
-    // Check for attribution
-    if (formData.licensorName && formData.attributionRequired === 'no') {
-      risks.push({
+    const risks = [
+      {
         level: 'low',
-        title: 'No Attribution Requirement',
-        description: 'The agreement does not require attribution to the Licensor, which may limit brand exposure and recognition.',
-        recommendation: 'Consider requiring attribution in public-facing materials that reference the AI systems.'
-      });
-    }
-    
-    // If no risks found, add a "low risk" message
-    if (risks.length === 0) {
-      risks.push({
-        level: 'low',
-        title: 'No Major Risks Identified',
-        description: 'Based on your selections, no significant risks were identified in the agreement.',
-        recommendation: 'Always review the final agreement with legal counsel before signing.'
-      });
-    }
-    
+        title: 'Sample Risk Assessment',
+        description: 'This is a sample risk assessment.',
+        recommendation: 'Review the agreement with legal counsel before signing.'
+      }
+    ];
     return risks;
   };
   
@@ -586,9 +230,7 @@ const App = () => {
         return (
           <>
             <h2>Parties & Basic Information</h2>
-            
             <div className="form-row">
-              <h3>Licensor (Data Owner) Details</h3>
               <div className="form-group">
                 <label htmlFor="licensorName">Licensor Name:</label>
                 <input
@@ -598,113 +240,19 @@ const App = () => {
                   className="form-control"
                   value={formData.licensorName}
                   onChange={handleChange}
-                  placeholder="Company or entity providing the data"
                 />
               </div>
-              
-              <div className="form-group">
-                <label htmlFor="licensorEntity">Entity Type:</label>
-                <select
-                  id="licensorEntity"
-                  name="licensorEntity"
-                  className="form-control"
-                  value={formData.licensorEntity}
-                  onChange={handleChange}
-                >
-                  <option value="Corporation">Corporation</option>
-                  <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
-                  <option value="Partnership">Partnership</option>
-                  <option value="Sole Proprietorship">Sole Proprietorship</option>
-                  <option value="Individual">Individual</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="licensorAddress">Address:</label>
-                <input
-                  type="text"
-                  id="licensorAddress"
-                  name="licensorAddress"
-                  className="form-control"
-                  value={formData.licensorAddress}
-                  onChange={handleChange}
-                  placeholder="Principal place of business"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="licensorState">State/Jurisdiction:</label>
-                <input
-                  type="text"
-                  id="licensorState"
-                  name="licensorState"
-                  className="form-control"
-                  value={formData.licensorState}
-                  onChange={handleChange}
-                  placeholder="State or jurisdiction of incorporation"
-                />
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <h3>Licensee (AI Developer) Details</h3>
               <div className="form-group">
                 <label htmlFor="licenseeCompany">Licensee Name:</label>
                 <input
                   type="text"
                   id="licenseeCompany"
-                  name="licenseeCompany"
+                  name="licenseeCompany" 
                   className="form-control"
                   value={formData.licenseeCompany}
                   onChange={handleChange}
-                  placeholder="Company or entity using the data"
                 />
               </div>
-              
-              <div className="form-group">
-                <label htmlFor="licenseeEntity">Entity Type:</label>
-                <select
-                  id="licenseeEntity"
-                  name="licenseeEntity"
-                  className="form-control"
-                  value={formData.licenseeEntity}
-                  onChange={handleChange}
-                >
-                  <option value="Corporation">Corporation</option>
-                  <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
-                  <option value="Partnership">Partnership</option>
-                  <option value="Sole Proprietorship">Sole Proprietorship</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="licenseeAddress">Address:</label>
-                <input
-                  type="text"
-                  id="licenseeAddress"
-                  name="licenseeAddress"
-                  className="form-control"
-                  value={formData.licenseeAddress}
-                  onChange={handleChange}
-                  placeholder="Principal place of business"
-                />
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="licenseeState">State/Jurisdiction:</label>
-                <input
-                  type="text"
-                  id="licenseeState"
-                  name="licenseeState"
-                  className="form-control"
-                  value={formData.licenseeState}
-                  onChange={handleChange}
-                  placeholder="State or jurisdiction of incorporation"
-                />
-              </div>
-            </div>
-            
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="effectiveDate">Effective Date:</label>
                 <input
@@ -715,7 +263,6 @@ const App = () => {
                   value={formData.effectiveDate}
                   onChange={handleChange}
                 />
-                <small>If left blank, the agreement will use the text "[DATE]" to be filled in later.</small>
               </div>
             </div>
           </>
@@ -725,7 +272,6 @@ const App = () => {
         return (
           <>
             <h2>License Terms</h2>
-            
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="licenseType">License Type:</label>
@@ -736,31 +282,11 @@ const App = () => {
                   value={formData.licenseType}
                   onChange={handleChange}
                 >
-                  <option value="non-exclusive">Non-Exclusive (Licensor can license to others)</option>
-                  <option value="exclusive">Exclusive (Only Licensee can use the data)</option>
-                  <option value="sole">Sole (Licensor can use but not license to others)</option>
+                  <option value="non-exclusive">Non-Exclusive</option>
+                  <option value="exclusive">Exclusive</option>
+                  <option value="sole">Sole</option>
                 </select>
-                <small>Non-exclusive is most common for AI training data.</small>
               </div>
-              
-              <div className="form-group">
-                <label htmlFor="sublicensing">Sublicensing Rights:</label>
-                <select
-                  id="sublicensing"
-                  name="sublicensing"
-                  className="form-control"
-                  value={formData.sublicensing}
-                  onChange={handleChange}
-                >
-                  <option value="not-permitted">Not Permitted</option>
-                  <option value="limited-permitted">Limited (Contractors/Service Providers Only)</option>
-                  <option value="permitted">Fully Permitted</option>
-                </select>
-                <small>Controls whether the Licensee can share the data with others.</small>
-              </div>
-            </div>
-            
-            <div className="form-row">
               <div className="form-group">
                 <label>Data Types Included:</label>
                 <div className="checkbox-group">
@@ -783,168 +309,17 @@ const App = () => {
                   />
                   <label htmlFor="dataTypes.images">Images</label>
                 </div>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="dataTypes.audio"
-                    name="dataTypes.audio"
-                    checked={formData.dataTypes.audio}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="dataTypes.audio">Audio</label>
-                </div>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="dataTypes.video"
-                    name="dataTypes.video"
-                    checked={formData.dataTypes.video}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="dataTypes.video">Video</label>
-                </div>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="dataTypes.userGenerated"
-                    name="dataTypes.userGenerated"
-                    checked={formData.dataTypes.userGenerated}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="dataTypes.userGenerated">User-Generated Content</label>
-                </div>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="dataTypes.proprietaryContent"
-                    name="dataTypes.proprietaryContent"
-                    checked={formData.dataTypes.proprietaryContent}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="dataTypes.proprietaryContent">Proprietary/Curated Content</label>
-                </div>
               </div>
             </div>
           </>
         );
         
       case 2: // Data Usage
-        return (
-          <>
-            <h2>Data Usage & Restrictions</h2>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="purposeRestrictions">Purpose Restrictions:</label>
-                <select
-                  id="purposeRestrictions"
-                  name="purposeRestrictions"
-                  className="form-control"
-                  value={formData.purposeRestrictions}
-                  onChange={handleChange}
-                >
-                  <option value="specific-models">Specific Model Types Only</option>
-                  <option value="product-specific">Licensee's Products Only</option>
-                  <option value="all-ai">Any AI Systems (No Restrictions)</option>
-                </select>
-              </div>
-              
-              {formData.purposeRestrictions === 'specific-models' && (
-                <div className="form-group">
-                  <label>Allowed Model Types:</label>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="modelTypes.generativeText"
-                      name="modelTypes.generativeText"
-                      checked={formData.modelTypes.generativeText}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="modelTypes.generativeText">Generative Text Models</label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="modelTypes.generativeImage"
-                      name="modelTypes.generativeImage"
-                      checked={formData.modelTypes.generativeImage}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="modelTypes.generativeImage">Generative Image Models</label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="modelTypes.classTrain"
-                      name="modelTypes.classTrain"
-                      checked={formData.modelTypes.classTrain}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="modelTypes.classTrain">Classification/Prediction Models</label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="modelTypes.dataAnalytics"
-                      name="modelTypes.dataAnalytics"
-                      checked={formData.modelTypes.dataAnalytics}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="modelTypes.dataAnalytics">Data Analytics Systems</label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      id="modelTypes.customizedSpecific"
-                      name="modelTypes.customizedSpecific"
-                      checked={formData.modelTypes.customizedSpecific}
-                      onChange={handleChange}
-                    />
-                    <label htmlFor="modelTypes.customizedSpecific">Customized/Fine-tuned Models</label>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="ownershipModels">Ownership of Resulting AI Models:</label>
-                <select
-                  id="ownershipModels"
-                  name="ownershipModels"
-                  className="form-control"
-                  value={formData.ownershipModels}
-                  onChange={handleChange}
-                >
-                  <option value="licensee-owns">Licensee Fully Owns</option>
-                  <option value="licensor-royalty">Licensee Owns (with Licensor Royalty Rights)</option>
-                  <option value="joint-ownership">Joint Ownership</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="attributionRequired">Attribution Required:</label>
-                <select
-                  id="attributionRequired"
-                  name="attributionRequired"
-                  className="form-control"
-                  value={formData.attributionRequired}
-                  onChange={handleChange}
-                >
-                  <option value="no">No</option>
-                  <option value="yes">Yes</option>
-                </select>
-                <small>Requires Licensee to credit Licensor in public materials.</small>
-              </div>
-            </div>
-          </>
-        );
-        
+        return <h2>Data Usage & Restrictions</h2>;
       case 3: // Compensation
         return (
           <>
             <h2>Compensation & Term</h2>
-            
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="compensationType">Compensation Structure:</label>
@@ -960,247 +335,53 @@ const App = () => {
                   <option value="hybrid">Hybrid (Initial Fee + Royalty)</option>
                 </select>
               </div>
-              
-              {(formData.compensationType === 'one-time' || formData.compensationType === 'hybrid') && (
-                <div className="form-group">
-                  <label htmlFor="initialFee">Initial Fee (USD):</label>
-                  <input
-                    type="text"
-                    id="initialFee"
-                    name="initialFee"
-                    className="form-control"
-                    value={formData.initialFee}
-                    onChange={handleChange}
-                    placeholder="e.g., 50000"
-                  />
-                </div>
-              )}
-              
-              {(formData.compensationType === 'royalty' || formData.compensationType === 'hybrid') && (
-                <>
-                  <div className="form-group">
-                    <label htmlFor="royaltyPercent">Royalty Percentage (%):</label>
-                    <input
-                      type="text"
-                      id="royaltyPercent"
-                      name="royaltyPercent"
-                      className="form-control"
-                      value={formData.royaltyPercent}
-                      onChange={handleChange}
-                      placeholder="e.g., 5"
-                    />
-                  </div>
-                  
-                  <div className="form-group">
-                    <label htmlFor="minimumGuarantee">Minimum Annual Guarantee (USD):</label>
-                    <input
-                      type="text"
-                      id="minimumGuarantee"
-                      name="minimumGuarantee"
-                      className="form-control"
-                      value={formData.minimumGuarantee}
-                      onChange={handleChange}
-                      placeholder="e.g., 10000"
-                    />
-                  </div>
-                </>
-              )}
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group inline">
-                <div>
-                  <label htmlFor="term">Term Duration:</label>
-                  <input
-                    type="number"
-                    id="term"
-                    name="term"
-                    className="form-control"
-                    value={formData.term}
-                    onChange={handleChange}
-                    min="1"
-                    placeholder="e.g., 3"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="termUnit">Unit:</label>
-                  <select
-                    id="termUnit"
-                    name="termUnit"
-                    className="form-control"
-                    value={formData.termUnit}
-                    onChange={handleChange}
-                  >
-                    <option value="years">Years</option>
-                    <option value="months">Months</option>
-                  </select>
-                </div>
-              </div>
-              
               <div className="form-group">
-                <label htmlFor="terminationRights">Termination Rights:</label>
-                <select
-                  id="terminationRights"
-                  name="terminationRights"
+                <label htmlFor="initialFee">Initial Fee (USD):</label>
+                <input
+                  type="text"
+                  id="initialFee"
+                  name="initialFee"
                   className="form-control"
-                  value={formData.terminationRights}
+                  value={formData.initialFee}
                   onChange={handleChange}
-                >
-                  <option value="both-parties">Both Parties (for Breach)</option>
-                  <option value="licensor-only">Licensor Only</option>
-                  <option value="licensee-only">Licensee Only (Termination for Convenience)</option>
-                </select>
+                />
+              </div>
+              <div className="form-group">
+                <label htmlFor="term">Term Duration:</label>
+                <input
+                  type="number"
+                  id="term"
+                  name="term"
+                  className="form-control"
+                  value={formData.term}
+                  onChange={handleChange}
+                  min="1"
+                />
               </div>
             </div>
           </>
         );
-        
       case 4: // Warranties
-        return (
-          <>
-            <h2>Warranties & Representations</h2>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="licensorWarranty">Licensor Warranty Level:</label>
-                <select
-                  id="licensorWarranty"
-                  name="licensorWarranty"
-                  className="form-control"
-                  value={formData.licensorWarranty}
-                  onChange={handleChange}
-                >
-                  <option value="limited">Limited Warranty</option>
-                  <option value="as-is">As-Is (No Warranty)</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="rightsToClaim">Rights to Data:</label>
-                <select
-                  id="rightsToClaim"
-                  name="rightsToClaim"
-                  className="form-control"
-                  value={formData.rightsToClaim}
-                  onChange={handleChange}
-                >
-                  <option value="all-necessary-rights">All Necessary Rights</option>
-                  <option value="right-to-license">Right to License Only</option>
-                </select>
-                <small>The warranty the Licensor makes about their rights to the data.</small>
-              </div>
-              
-              <div className="form-group">
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    id="dataComplianceWarranty"
-                    name="dataComplianceWarranty"
-                    checked={formData.dataComplianceWarranty}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="dataComplianceWarranty">Include Data Compliance Warranty</label>
-                </div>
-                <small>Licensor warrants data was collected in compliance with laws.</small>
-              </div>
-            </div>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="indemnification">Indemnification:</label>
-                <select
-                  id="indemnification"
-                  name="indemnification"
-                  className="form-control"
-                  value={formData.indemnification}
-                  onChange={handleChange}
-                >
-                  <option value="mutual">Mutual Indemnification</option>
-                  <option value="licensee-only">Licensee Indemnifies Licensor</option>
-                  <option value="licensor-only">Licensor Indemnifies Licensee</option>
-                </select>
-              </div>
-              
-              <div className="form-group">
-                <label htmlFor="liabilityLimit">Limitation of Liability:</label>
-                <select
-                  id="liabilityLimit"
-                  name="liabilityLimit"
-                  className="form-control"
-                  value={formData.liabilityLimit}
-                  onChange={handleChange}
-                >
-                  <option value="fees-paid">Limited to Fees Paid</option>
-                  <option value="no-consequential">No Consequential Damages</option>
-                  <option value="both-limits">Both Limitations</option>
-                </select>
-              </div>
-            </div>
-          </>
-        );
-        
+        return <h2>Warranties & Representations</h2>;
       case 5: // Finalization
         return (
           <>
             <h2>Risk Assessment & Finalization</h2>
-            
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="fileName">File Name:</label>
-                <input
-                  type="text"
-                  id="fileName"
-                  name="fileName"
-                  className="form-control"
-                  value={formData.fileName}
-                  onChange={handleChange}
-                />
-                <small>Used when downloading the document as MS Word.</small>
-              </div>
-            </div>
-            
             <div className="risk-assessment">
               <h3>Risk Assessment</h3>
-              <p>Based on your selections, the following risks or issues have been identified:</p>
-              
               {assessRisks().map((risk, index) => (
                 <div key={index} className={`risk-item risk-${risk.level}`}>
                   <h3>{risk.title}</h3>
                   <p>{risk.description}</p>
-                  <p className="recommendation"><strong>Recommendation:</strong> {risk.recommendation}</p>
                 </div>
               ))}
             </div>
-            
-            <div className="form-row">
-              <p><strong>Next Steps:</strong> Review the complete agreement in the preview pane. Once you're satisfied, you can download it as a Word document or copy to clipboard. For legal advice specific to your situation, schedule a consultation.</p>
-            </div>
           </>
         );
-        
       default:
         return <div>Unknown tab</div>;
     }
   };
-  
-  // Ensure feather icons are replaced after rendering
-  useEffect(() => {
-    if (window.feather) {
-      window.feather.replace();
-    }
-  });
-  
-  // Include Calendly script
-  useEffect(() => {
-    const script = document.createElement('script');
-    script.src = 'https://assets.calendly.com/assets/external/widget.js';
-    script.async = true;
-    document.body.appendChild(script);
-    
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
   
   return (
     <div className="generator-container">
@@ -1293,4 +474,6 @@ const App = () => {
 };
 
 // Render the application
-ReactDOM.render(<App />, document.getElementById('root'));
+document.addEventListener('DOMContentLoaded', function() {
+  ReactDOM.render(<App />, document.getElementById('root'));
+});
