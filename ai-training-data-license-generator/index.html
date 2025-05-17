@@ -3,23 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Training Data License Agreement Generator | terms.law</title>
-    <link rel="stylesheet" href="styles.css">
-    <!-- Load React from CDN -->
-    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <title>AI Training Data License Generator</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; line-height: 1.5; padding: 20px; }
+        #app { max-width: 1200px; margin: 0 auto; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; overflow: hidden; }
+        .header { padding: 20px; background: #f8f9fa; border-bottom: 1px solid #e2e8f0; }
+        .header h1 { margin-bottom: 5px; color: #333; }
+        .content { display: flex; min-height: 400px; }
+        .form-panel, .preview-panel { flex: 1; padding: 20px; height: 500px; overflow-y: auto; }
+        .preview-panel { background: #f8f9fa; border-left: 1px solid #e2e8f0; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-weight: 500; }
+        .form-control { width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+        .footer { padding: 15px; background: #f8f9fa; border-top: 1px solid #e2e8f0; display: flex; justify-content: space-between; }
+        .button { padding: 8px 16px; background: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { background: #4338ca; }
+        .preview-content { background: white; padding: 20px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Times New Roman', serif; }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel" src="docx-generator.js"></script>
-    <script type="text/babel" src="ai-training-data-license-generator.js"></script>
+    <div id="app">
+        <div class="header">
+            <h1>AI Training Data License Agreement Generator</h1>
+            <p>Create a customized agreement for licensing data for AI training</p>
+        </div>
+        
+        <div class="content">
+            <div class="form-panel">
+                <h2>Basic Information</h2>
+                <div class="form-group">
+                    <label for="licensorName">Licensor Name:</label>
+                    <input type="text" id="licensorName" class="form-control" value="ABC Data Corp">
+                </div>
+                <div class="form-group">
+                    <label for="licenseeCompany">Licensee Name:</label>
+                    <input type="text" id="licenseeCompany" class="form-control" value="XYZ AI Solutions">
+                </div>
+                <div class="form-group">
+                    <label for="licenseType">License Type:</label>
+                    <select id="licenseType" class="form-control">
+                        <option value="non-exclusive">Non-Exclusive</option>
+                        <option value="exclusive">Exclusive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="initialFee">License Fee (USD):</label>
+                    <input type="text" id="initialFee" class="form-control" value="50000">
+                </div>
+                <div class="form-group">
+                    <label for="term">Term (years):</label>
+                    <input type="number" id="term" class="form-control" value="3" min="1">
+                </div>
+            </div>
+            
+            <div class="preview-panel">
+                <h2>Preview</h2>
+                <div class="preview-content" id="preview">
+                    <h3>AI TRAINING DATA LICENSE AGREEMENT</h3>
+                    <p>This AI Training Data License Agreement is made and entered into by and between <strong>ABC Data Corp</strong> ("Licensor") and <strong>XYZ AI Solutions</strong> ("Licensee").</p>
+                    <p>1. License Grant: Licensor grants to Licensee a non-exclusive license to use the Data for AI training purposes.</p>
+                    <p>2. Fee: Licensee shall pay Licensor a fee of $50,000.</p>
+                    <p>3. Term: This Agreement shall be in effect for 3 years.</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <button class="button" id="copyBtn">Copy to Clipboard</button>
+            <button class="button" id="downloadBtn">Download as Word</button>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            if (typeof feather !== 'undefined') {
-                feather.replace();
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Generator loaded');
+            
+            // Update preview when inputs change
+            const inputs = document.querySelectorAll('input, select');
+            inputs.forEach(input => {
+                input.addEventListener('input', updatePreview);
+            });
+            
+            // Copy to clipboard functionality
+            document.getElementById('copyBtn').addEventListener('click', function() {
+                const previewText = document.getElementById('preview').innerText;
+                navigator.clipboard.writeText(previewText)
+                    .then(() => alert('Copied to clipboard'))
+                    .catch(err => console.error('Copy failed', err));
+            });
+            
+            // Download as Word functionality
+            document.getElementById('downloadBtn').addEventListener('click', function() {
+                const licensorName = document.getElementById('licensorName').value;
+                const licenseeCompany = document.getElementById('licenseeCompany').value;
+                const licenseType = document.getElementById('licenseType').value;
+                const initialFee = document.getElementById('initialFee').value;
+                const term = document.getElementById('term').value;
+                
+                const htmlContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <title>AI Training Data License Agreement</title>
+                        <style>
+                            body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; }
+                            h1 { text-align: center; font-size: 14pt; margin-bottom: 20pt; }
+                            p { margin-bottom: 10pt; }
+                        </style>
+                    </head>
+                    <body>
+                        <h1>AI TRAINING DATA LICENSE AGREEMENT</h1>
+                        <p>This AI Training Data License Agreement is made and entered into by and between <strong>${licensorName}</strong> ("Licensor") and <strong>${licenseeCompany}</strong> ("Licensee").</p>
+                        <p>1. License Grant: Licensor grants to Licensee a ${licenseType} license to use the Data for AI training purposes.</p>
+                        <p>2. Fee: Licensee shall pay Licensor a fee of $${initialFee}.</p>
+                        <p>3. Term: This Agreement shall be in effect for ${term} years.</p>
+                    </body>
+                    </html>
+                `;
+                
+                const blob = new Blob([htmlContent], { type: 'application/msword' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'AI-Training-Data-License-Agreement.doc';
+                link.click();
+            });
+            
+            function updatePreview() {
+                const licensorName = document.getElementById('licensorName').value || 'ABC Data Corp';
+                const licenseeCompany = document.getElementById('licenseeCompany').value || 'XYZ AI Solutions';
+                const licenseType = document.getElementById('licenseType').value;
+                const initialFee = document.getElementById('initialFee').value || '50000';
+                const term = document.getElementById('term').value || '3';
+                
+                document.getElementById('preview').innerHTML = `
+                    <h3>AI TRAINING DATA LICENSE AGREEMENT</h3>
+                    <p>This AI Training Data License Agreement is made and entered into by and between <strong>${licensorName}</strong> ("Licensor") and <strong>${licenseeCompany}</strong> ("Licensee").</p>
+                    <p>1. License Grant: Licensor grants to Licensee a ${licenseType} license to use the Data for AI training purposes.</p>
+                    <p>2. Fee: Licensee shall pay Licensor a fee of $${initialFee}.</p>
+                    <p>3. Term: This Agreement shall be in effect for ${term} years.</p>
+                `;
             }
         });
     </script>
