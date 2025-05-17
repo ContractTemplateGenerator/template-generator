@@ -1,508 +1,1 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-
-\f0\fs24 \cf0 // AI Training Data License Agreement Generator\
-(function() \{\
-  // This console log helps confirm the script itself is parsed.\
-  console.log("ai-training-data-license-generator.js: Script loaded, attaching DOMContentLoaded listener.");\
-\
-  document.addEventListener('DOMContentLoaded', function() \{\
-    // All React-dependent logic is now inside DOMContentLoaded.\
-    try \{\
-      // Make sure React and ReactDOM are available\
-      if (typeof React === "undefined") \{\
-        console.error("React not loaded even after DOMContentLoaded. Application cannot start.");\
-        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Error: React library not found. Please check your internet connection and browser console.</div>';\
-        return;\
-      \}\
-      if (typeof ReactDOM === "undefined") \{\
-        console.error("ReactDOM not loaded even after DOMContentLoaded. Application cannot start.");\
-        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Error: ReactDOM library not found. Please check your internet connection and browser console.</div>';\
-        return;\
-      \}\
-      \
-      console.log("AI Training Data License Generator: DOMContentLoaded fired. Initializing React application...");\
-      const \{ useState, useEffect, useRef \} = React;\
-\
-      // Icon component\
-      const Icon = (\{ name, ...props \}) => \{\
-        // Consider calling feather.replace() in a useEffect hook in App component\
-        // if icons don't render correctly after initial load or dynamic changes.\
-        return (\
-          <i data-feather=\{name\} \{...props\} className=\{`icon $\{props.className || ''\}`\}></i>\
-        );\
-      \};\
-\
-      // Main Application Component\
-      const App = () => \{\
-        // Tab configuration\
-        const tabs = [\
-          \{ id: 'basic-info', label: 'Basic Info' \},\
-          \{ id: 'data-description', label: 'Data Description' \},\
-          \{ id: 'license-terms', label: 'License Terms' \},\
-          \{ id: 'data-usage', label: 'Data Usage' \},\
-          \{ id: 'compensation', label: 'Compensation' \},\
-          \{ id: 'warranties', label: 'Warranties' \},\
-          \{ id: 'finalization', label: 'Finalization' \}\
-        ];\
-\
-        // Default form data\
-        const defaultData = \{\
-          // Tab 1: Basic Info\
-          licensorName: 'ABC Data Corp',\
-          licensorEntity: 'Corporation',\
-          licensorAddress: '123 Data Street, San Francisco',\
-          licensorState: 'California',\
-          licenseeCompany: 'XYZ AI Solutions',\
-          licenseeEntity: 'Corporation',\
-          licenseeAddress: '456 Tech Avenue, Seattle',\
-          licenseeState: 'Washington',\
-          effectiveDate: '',\
-          \
-          // Tab 2: Data Description\
-          datasetName: 'Alpha Dataset',\
-          datasetDescription: 'Comprehensive collection of training data for AI models',\
-          dataOrigin: 'proprietary',\
-          dataAccessMethod: 'api',\
-          dataFormat: 'json',\
-          dataSizeGB: '50',\
-          dataUpdateFrequency: 'none',\
-          dataQualityWarranty: true,\
-          \
-          // Tab 3: License Terms\
-          licenseType: 'non-exclusive',\
-          sublicensing: 'not-permitted',\
-          geographicScope: 'worldwide',\
-          industryRestrictions: 'none',\
-          dataTypes: \{\
-            text: true,\
-            images: true,\
-            audio: false,\
-            video: false,\
-            userGenerated: true,\
-            proprietaryContent: false,\
-            personalData: false,\
-            anonymizedData: true,\
-            structuredData: true,\
-            unstructuredData: false\
-          \},\
-          \
-          // Tab 4: Data Usage\
-          purposeRestrictions: 'specific-models',\
-          modelTypes: \{\
-            generativeText: true,\
-            generativeImage: false,\
-            generativeAudio: false,\
-            generativeVideo: false,\
-            classTrain: false,\
-            dataAnalytics: false,\
-            predictiveModels: false,\
-            customizedSpecific: false,\
-            languageModels: true,\
-            computerVision: false,\
-            sentimentAnalysis: false,\
-            recommendationSystems: false,\
-            naturalLanguageProcessing: true\
-          \},\
-          usagePurposes: \{\
-            research: true,\
-            commercial: true,\
-            internalUse: true,\
-            publicServices: false,\
-            militaryApplications: false,\
-            governmentSurveillance: false\
-          \},\
-          ownershipModels: 'licensee-owns',\
-          attributionRequired: 'no',\
-          dataRetention: 'unlimited',\
-          \
-          // Tab 5: Compensation\
-          compensationType: 'one-time',\
-          initialFee: '50000',\
-          royaltyPercent: '5',\
-          minimumGuarantee: '10000',\
-          term: '3',\
-          termUnit: 'years',\
-          terminationRights: 'both-parties',\
-          renewalTerms: 'automatic',\
-          \
-          // Tab 6: Warranties\
-          licensorWarranty: 'limited',\
-          rightsToClaim: 'all-necessary-rights',\
-          dataComplianceWarranty: true,\
-          indemnification: 'mutual',\
-          liabilityLimit: 'fees-paid',\
-          disputeResolution: 'arbitration',\
-          governingLaw: '',\
-          \
-          // Document options\
-          fileName: 'AI-Training-Data-License-Agreement',\
-          documentTitle: 'AI Training Data License Agreement'\
-        \};\
-\
-        // Try to load saved state from localStorage\
-        const loadSavedData = () => \{\
-          try \{\
-            const saved = localStorage.getItem('aiDataLicenseForm');\
-            return saved ? JSON.parse(saved) : null;\
-          \} catch (e) \{\
-            console.error("Error loading saved data:", e);\
-            return null;\
-          \}\
-        \};\
-\
-        // State for current tab\
-        const [currentTab, setCurrentTab] = useState(0);\
-        \
-        // Form data state\
-        const [formData, setFormData] = useState(() => \{\
-          const savedData = loadSavedData();\
-          return savedData || defaultData;\
-        \});\
-        \
-        // State for document text\
-        const [documentText, setDocumentText] = useState('Loading document preview...');\
-        \
-        // State for tracking last changed field\
-        const [lastChanged, setLastChanged] = useState(null);\
-        \
-        // Reference for preview div\
-        const previewRef = useRef(null);\
-        \
-        // Save form data to localStorage when it changes\
-        useEffect(() => \{\
-          try \{\
-            localStorage.setItem('aiDataLicenseForm', JSON.stringify(formData));\
-          \} catch (e) \{\
-            console.error("Error saving form data:", e);\
-          \}\
-        \}, [formData]);\
-\
-        // Initialize Feather Icons after React has rendered the app.\
-        // This ensures icons within React components are processed.\
-        useEffect(() => \{\
-            if (typeof feather !== 'undefined') \{\
-                feather.replace();\
-            \} else \{\
-                console.warn("Feather icons library not found when trying to replace icons in App.");\
-            \}\
-        \}); // Runs after every render. For performance, you might add dependencies if icons only change with certain state.\
-        \
-        // Handle input changes\
-        const handleChange = (e) => \{\
-          const \{ name, value, type, checked \} = e.target;\
-          setLastChanged(name);\
-          \
-          if (name.includes('.')) \{\
-            const [parent, child] = name.split('.');\
-            setFormData(prev => (\{\
-              ...prev,\
-              [parent]: \{\
-                ...prev[parent],\
-                [child]: type === 'checkbox' ? checked : value\
-              \}\
-            \}));\
-          \} else \{\
-            setFormData(prev => (\{\
-              ...prev,\
-              [name]: type === 'checkbox' ? checked : value\
-            \}));\
-          \}\
-        \};\
-        \
-        // Reset form to defaults\
-        const resetForm = () => \{\
-          if (confirm('This will reset all form fields to default values. Continue?')) \{\
-            setFormData(defaultData);\
-            try \{\
-              localStorage.removeItem('aiDataLicenseForm');\
-            \} catch (e) \{\
-              console.error("Error removing form data from localStorage:", e);\
-            \}\
-          \}\
-        \};\
-        \
-        // Navigation functions\
-        const nextTab = () => \{\
-          if (currentTab < tabs.length - 1) \{\
-            setCurrentTab(currentTab + 1);\
-            window.scrollTo(0, 0);\
-          \}\
-        \};\
-        \
-        const prevTab = () => \{\
-          if (currentTab > 0) \{\
-            setCurrentTab(currentTab - 1);\
-            window.scrollTo(0, 0);\
-          \}\
-        \};\
-        \
-        const goToTab = (index) => \{\
-          setCurrentTab(index);\
-          window.scrollTo(0, 0);\
-        \};\
-        \
-        // Copy document text to clipboard\
-        const copyToClipboard = () => \{\
-          navigator.clipboard.writeText(documentText)\
-            .then(() => \{\
-              alert('Document copied to clipboard successfully!');\
-            \})\
-            .catch(err => \{\
-              console.error('Error copying to clipboard:', err);\
-              alert('Failed to copy to clipboard. Please try again or use the download option.');\
-            \});\
-        \};\
-        \
-        // Download as Word document\
-        const downloadAsWord = () => \{\
-          try \{\
-            if (window.generateWordDoc) \{\
-              window.generateWordDoc(documentText, \{\
-                documentTitle: formData.documentTitle,\
-                fileName: formData.fileName\
-              \});\
-            \} else \{\
-              alert("Word document generator is not available.");\
-            \}\
-          \} catch (error) \{\
-            console.error('Error downloading Word document:', error);\
-            alert('Error generating Word document. Please try again or use the copy option.');\
-          \}\
-        \};\
-        \
-        // Open Calendly widget\
-        const openCalendly = () => \{\
-          window.open("https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1", "_blank");\
-        \};\
-\
-        // Generate document text whenever form data changes\
-        useEffect(() => \{\
-          try \{\
-            // Simple document generation for testing\
-            let text = `AI TRAINING DATA LICENSE AGREEMENT\\n\\n`;\
-            text += `This agreement is between $\{formData.licensorName\} (Licensor) and $\{formData.licenseeCompany\} (Licensee).\\n\\n`;\
-            text += `The Licensor grants a $\{formData.licenseType\} license to the Licensee.\\n\\n`;\
-            text += `This is a simplified preview. The full agreement will be generated based on your selections.`;\
-            \
-            setDocumentText(text);\
-          \} catch (e) \{\
-            console.error("Error generating document:", e);\
-            setDocumentText("Error generating document preview.");\
-          \}\
-        \}, [formData]);\
-        \
-        // Render tab content based on current tab\
-        const renderTabContent = () => \{\
-          try \{\
-            switch (currentTab) \{\
-              case 0: // Basic Info\
-                return (\
-                  <>\
-                    <h2>Parties & Basic Information</h2>\
-                    \
-                    <div className="form-row">\
-                      <h3>Licensor (Data Owner) Details</h3>\
-                      <div className="form-group">\
-                        <label htmlFor="licensorName">Licensor Name:</label>\
-                        <input\
-                          type="text"\
-                          id="licensorName"\
-                          name="licensorName"\
-                          className="form-control"\
-                          value=\{formData.licensorName\}\
-                          onChange=\{handleChange\}\
-                          placeholder="Company or entity providing the data"\
-                        />\
-                      </div>\
-                      \
-                      <div className="form-group">\
-                        <label htmlFor="licensorEntity">Entity Type:</label>\
-                        <select\
-                          id="licensorEntity"\
-                          name="licensorEntity"\
-                          className="form-control"\
-                          value=\{formData.licensorEntity\}\
-                          onChange=\{handleChange\}\
-                        >\
-                          <option value="Corporation">Corporation</option>\
-                          <option value="Limited Liability Company">Limited Liability Company (LLC)</option>\
-                          <option value="Partnership">Partnership</option>\
-                          <option value="Sole Proprietorship">Sole Proprietorship</option>\
-                          <option value="Individual">Individual</option>\
-                        </select>\
-                      </div>\
-                    </div>\
-                    \
-                    <div className="form-row">\
-                      <h3>Licensee (AI Developer) Details</h3>\
-                      <div className="form-group">\
-                        <label htmlFor="licenseeCompany">Licensee Name:</label>\
-                        <input\
-                          type="text"\
-                          id="licenseeCompany"\
-                          name="licenseeCompany"\
-                          className="form-control"\
-                          value=\{formData.licenseeCompany\}\
-                          onChange=\{handleChange\}\
-                          placeholder="Company or entity using the data"\
-                        />\
-                      </div>\
-                    </div>\
-                    \{/* Example of Icon usage, if you had an icon for a section */\}\
-                    \{/* <Icon name="info" /> */\}\
-                  </>\
-                );\
-                \
-              case 1: // Data Description\
-                return <h2>Data Description Tab</h2>;\
-                \
-              case 2: // License Terms\
-                return (\
-                  <>\
-                    <h2>License Terms</h2>\
-                    \
-                    <div className="form-row">\
-                      <div className="form-group">\
-                        <label htmlFor="licenseType">License Type:</label>\
-                        <select\
-                          id="licenseType"\
-                          name="licenseType"\
-                          className="form-control"\
-                          value=\{formData.licenseType\}\
-                          onChange=\{handleChange\}\
-                        >\
-                          <option value="non-exclusive">Non-Exclusive</option>\
-                          <option value="exclusive">Exclusive</option>\
-                          <option value="sole">Sole</option>\
-                        </select>\
-                      </div>\
-                    </div>\
-                  </>\
-                );\
-                \
-              case 3: // Data Usage\
-                return <h2>Data Usage Tab</h2>;\
-                \
-              case 4: // Compensation\
-                return <h2>Compensation Tab</h2>;\
-                \
-              case 5: // Warranties\
-                return <h2>Warranties Tab</h2>;\
-                \
-              case 6: // Finalization\
-                return (\
-                  <>\
-                    <h2>Finalization</h2>\
-                    <button onClick=\{resetForm\}>Reset Form</button>\
-                  </>\
-                );\
-                \
-              default:\
-                return <div>Unknown tab</div>;\
-            \}\
-          \} catch (e) \{\
-            console.error("Error rendering tab content:", e);\
-            return <div>Error rendering content. Please see console for details.</div>;\
-          \}\
-        \};\
-        \
-        return (\
-          <div className="generator-container">\
-            <div className="generator-header">\
-              <h1>AI Training Data License Agreement Generator</h1>\
-              <p>Create a customized agreement for licensing data for AI model training purposes.</p>\
-            </div>\
-            \
-            <div className="tab-navigation">\
-              \{tabs.map((tab, index) => (\
-                <button\
-                  key=\{tab.id\}\
-                  className=\{`tab-button $\{currentTab === index ? 'active' : ''\}`\}\
-                  onClick=\{() => goToTab(index)\}\
-                >\
-                  \{index + 1\}. \{tab.label\}\
-                </button>\
-              ))\}\
-            </div>\
-            \
-            <div className="main-content">\
-              <div className="form-panel">\
-                \{renderTabContent()\}\
-              </div>\
-              \
-              <div className="preview-panel" ref=\{previewRef\}>\
-                <h2>Live Preview</h2>\
-                <pre className="document-preview">\
-                  \{documentText\}\
-                </pre>\
-              </div>\
-            </div>\
-            \
-            <div className="navigation-buttons">\
-              <button\
-                onClick=\{prevTab\}\
-                className=\{`nav-button prev-button $\{currentTab === 0 ? 'disabled' : ''\}`\}\
-                disabled=\{currentTab === 0\}\
-              >\
-                Previous\
-              </button>\
-              \
-              <button\
-                onClick=\{copyToClipboard\}\
-                className="nav-button"\
-              >\
-                Copy\
-              </button>\
-              \
-              <button\
-                onClick=\{downloadAsWord\}\
-                className="nav-button"\
-              >\
-                Download\
-              </button>\
-              \
-              <button\
-                onClick=\{openCalendly\}\
-                className="nav-button"\
-              >\
-                Consult\
-              </button>\
-              \
-              <button\
-                onClick=\{nextTab\}\
-                className=\{`nav-button next-button $\{currentTab === tabs.length - 1 ? 'disabled' : ''\}`\}\
-                disabled=\{currentTab === tabs.length - 1\}\
-              >\
-                Next\
-              </button>\
-            </div>\
-          </div>\
-        );\
-      \}; // End of App component\
-\
-      // Render the App component\
-      console.log("DOM loaded and React app initialized, attempting to render...");\
-      ReactDOM.render(React.createElement(App), document.getElementById('root'));\
-      console.log("React app rendered successfully.");\
-\
-    \} catch (e) \{\
-      console.error("Error during React app initialization or rendering:", e);\
-      // Show a helpful error message in the UI\
-      const rootEl = document.getElementById('root');\
-      if (rootEl) \{\
-        rootEl.innerHTML = `\
-          <div style="text-align: center; padding: 40px; font-family: sans-serif; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">\
-            <h3>Error Loading Generator</h3>\
-            <p>The AI Training Data License Agreement Generator failed to load. Please check your browser console for detailed error messages.</p>\
-            <p>Error: $\{e.message\}</p>\
-          </div>\
-        `;\
-      \}\
-    \}\
-  \}); // End of DOMContentLoaded listener\
-\})(); // End of IIFE}
+// AI Training Data License Agreement Generator(function() {  // This console log helps confirm the script itself is parsed.  console.log("ai-training-data-license-generator.js: Script loaded, attaching DOMContentLoaded listener.");  document.addEventListener('DOMContentLoaded', function() {    // All React-dependent logic is now inside DOMContentLoaded.    try {      // Make sure React and ReactDOM are available      if (typeof React === "undefined") {        console.error("React not loaded even after DOMContentLoaded. Application cannot start.");        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Error: React library not found. Please check your internet connection and browser console.</div>';        return;      }      if (typeof ReactDOM === "undefined") {        console.error("ReactDOM not loaded even after DOMContentLoaded. Application cannot start.");        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Error: ReactDOM library not found. Please check your internet connection and browser console.</div>';        return;      }            console.log("AI Training Data License Generator: DOMContentLoaded fired. Initializing React application...");      const { useState, useEffect, useRef } = React;      // Icon component      const Icon = ({ name, ...props }) => {        // Consider calling feather.replace() in a useEffect hook in App component        // if icons don't render correctly after initial load or dynamic changes.        return (          <i data-feather={name} {...props} className={`icon ${props.className || ''}`}></i>        );      };      // Main Application Component      const App = () => {        // Tab configuration        const tabs = [          { id: 'basic-info', label: 'Basic Info' },          { id: 'data-description', label: 'Data Description' },          { id: 'license-terms', label: 'License Terms' },          { id: 'data-usage', label: 'Data Usage' },          { id: 'compensation', label: 'Compensation' },          { id: 'warranties', label: 'Warranties' },          { id: 'finalization', label: 'Finalization' }        ];        // Default form data        const defaultData = {          // Tab 1: Basic Info          licensorName: 'ABC Data Corp',          licensorEntity: 'Corporation',          licensorAddress: '123 Data Street, San Francisco',          licensorState: 'California',          licenseeCompany: 'XYZ AI Solutions',          licenseeEntity: 'Corporation',          licenseeAddress: '456 Tech Avenue, Seattle',          licenseeState: 'Washington',          effectiveDate: '',                    // Tab 2: Data Description          datasetName: 'Alpha Dataset',          datasetDescription: 'Comprehensive collection of training data for AI models',          dataOrigin: 'proprietary',          dataAccessMethod: 'api',          dataFormat: 'json',          dataSizeGB: '50',          dataUpdateFrequency: 'none',          dataQualityWarranty: true,                    // Tab 3: License Terms          licenseType: 'non-exclusive',          sublicensing: 'not-permitted',          geographicScope: 'worldwide',          industryRestrictions: 'none',          dataTypes: {            text: true,            images: true,            audio: false,            video: false,            userGenerated: true,            proprietaryContent: false,            personalData: false,            anonymizedData: true,            structuredData: true,            unstructuredData: false          },                    // Tab 4: Data Usage          purposeRestrictions: 'specific-models',          modelTypes: {            generativeText: true,            generativeImage: false,            generativeAudio: false,            generativeVideo: false,            classTrain: false,            dataAnalytics: false,            predictiveModels: false,            customizedSpecific: false,            languageModels: true,            computerVision: false,            sentimentAnalysis: false,            recommendationSystems: false,            naturalLanguageProcessing: true          },          usagePurposes: {            research: true,            commercial: true,            internalUse: true,            publicServices: false,            militaryApplications: false,            governmentSurveillance: false          },          ownershipModels: 'licensee-owns',          attributionRequired: 'no',          dataRetention: 'unlimited',                    // Tab 5: Compensation          compensationType: 'one-time',          initialFee: '50000',          royaltyPercent: '5',          minimumGuarantee: '10000',          term: '3',          termUnit: 'years',          terminationRights: 'both-parties',          renewalTerms: 'automatic',                    // Tab 6: Warranties          licensorWarranty: 'limited',          rightsToClaim: 'all-necessary-rights',          dataComplianceWarranty: true,          indemnification: 'mutual',          liabilityLimit: 'fees-paid',          disputeResolution: 'arbitration',          governingLaw: '',                    // Document options          fileName: 'AI-Training-Data-License-Agreement',          documentTitle: 'AI Training Data License Agreement'        };        // Try to load saved state from localStorage        const loadSavedData = () => {          try {            const saved = localStorage.getItem('aiDataLicenseForm');            return saved ? JSON.parse(saved) : null;          } catch (e) {            console.error("Error loading saved data:", e);            return null;          }        };        // State for current tab        const [currentTab, setCurrentTab] = useState(0);                // Form data state        const [formData, setFormData] = useState(() => {          const savedData = loadSavedData();          return savedData || defaultData;        });                // State for document text        const [documentText, setDocumentText] = useState('Loading document preview...');                // State for tracking last changed field        const [lastChanged, setLastChanged] = useState(null);                // Reference for preview div        const previewRef = useRef(null);                // Save form data to localStorage when it changes        useEffect(() => {          try {            localStorage.setItem('aiDataLicenseForm', JSON.stringify(formData));          } catch (e) {            console.error("Error saving form data:", e);          }        }, [formData]);        // Initialize Feather Icons after React has rendered the app.        // This ensures icons within React components are processed.        useEffect(() => {            if (typeof feather !== 'undefined') {                feather.replace();            } else {                console.warn("Feather icons library not found when trying to replace icons in App.");            }        }); // Runs after every render. For performance, you might add dependencies if icons only change with certain state.                // Handle input changes        const handleChange = (e) => {          const { name, value, type, checked } = e.target;          setLastChanged(name);                    if (name.includes('.')) {            const [parent, child] = name.split('.');            setFormData(prev => ({              ...prev,              [parent]: {                ...prev[parent],                [child]: type === 'checkbox' ? checked : value              }            }));          } else {            setFormData(prev => ({              ...prev,              [name]: type === 'checkbox' ? checked : value            }));          }        };                // Reset form to defaults        const resetForm = () => {          if (confirm('This will reset all form fields to default values. Continue?')) {            setFormData(defaultData);            try {              localStorage.removeItem('aiDataLicenseForm');            } catch (e) {              console.error("Error removing form data from localStorage:", e);            }          }        };                // Navigation functions        const nextTab = () => {          if (currentTab < tabs.length - 1) {            setCurrentTab(currentTab + 1);            window.scrollTo(0, 0);          }        };                const prevTab = () => {          if (currentTab > 0) {            setCurrentTab(currentTab - 1);            window.scrollTo(0, 0);          }        };                const goToTab = (index) => {          setCurrentTab(index);          window.scrollTo(0, 0);        };                // Copy document text to clipboard        const copyToClipboard = () => {          navigator.clipboard.writeText(documentText)            .then(() => {              alert('Document copied to clipboard successfully!');            })            .catch(err => {              console.error('Error copying to clipboard:', err);              alert('Failed to copy to clipboard. Please try again or use the download option.');            });        };                // Download as Word document        const downloadAsWord = () => {          try {            if (window.generateWordDoc) {              window.generateWordDoc(documentText, {                documentTitle: formData.documentTitle,                fileName: formData.fileName              });            } else {              alert("Word document generator is not available.");            }          } catch (error) {            console.error('Error downloading Word document:', error);            alert('Error generating Word document. Please try again or use the copy option.');          }        };                // Open Calendly widget        const openCalendly = () => {          window.open("https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1", "_blank");        };        // Generate document text whenever form data changes        useEffect(() => {          try {            // Simple document generation for testing            let text = `AI TRAINING DATA LICENSE AGREEMENT\n\n`;            text += `This agreement is between ${formData.licensorName} (Licensor) and ${formData.licenseeCompany} (Licensee).\n\n`;            text += `The Licensor grants a ${formData.licenseType} license to the Licensee.\n\n`;            text += `This is a simplified preview. The full agreement will be generated based on your selections.`;                        setDocumentText(text);          } catch (e) {            console.error("Error generating document:", e);            setDocumentText("Error generating document preview.");          }        }, [formData]);                // Render tab content based on current tab        const renderTabContent = () => {          try {            switch (currentTab) {              case 0: // Basic Info                return (                  <>                    <h2>Parties & Basic Information</h2>                                        <div className="form-row">                      <h3>Licensor (Data Owner) Details</h3>                      <div className="form-group">                        <label htmlFor="licensorName">Licensor Name:</label>                        <input                          type="text"                          id="licensorName"                          name="licensorName"                          className="form-control"                          value={formData.licensorName}                          onChange={handleChange}                          placeholder="Company or entity providing the data"                        />                      </div>                                            <div className="form-group">                        <label htmlFor="licensorEntity">Entity Type:</label>                        <select                          id="licensorEntity"                          name="licensorEntity"                          className="form-control"                          value={formData.licensorEntity}                          onChange={handleChange}                        >                          <option value="Corporation">Corporation</option>                          <option value="Limited Liability Company">Limited Liability Company (LLC)</option>                          <option value="Partnership">Partnership</option>                          <option value="Sole Proprietorship">Sole Proprietorship</option>                          <option value="Individual">Individual</option>                        </select>                      </div>                    </div>                                        <div className="form-row">                      <h3>Licensee (AI Developer) Details</h3>                      <div className="form-group">                        <label htmlFor="licenseeCompany">Licensee Name:</label>                        <input                          type="text"                          id="licenseeCompany"                          name="licenseeCompany"                          className="form-control"                          value={formData.licenseeCompany}                          onChange={handleChange}                          placeholder="Company or entity using the data"                        />                      </div>                    </div>                    {/* Example of Icon usage, if you had an icon for a section */}                    {/* <Icon name="info" /> */}                  </>                );                              case 1: // Data Description                return <h2>Data Description Tab</h2>;                              case 2: // License Terms                return (                  <>                    <h2>License Terms</h2>                                        <div className="form-row">                      <div className="form-group">                        <label htmlFor="licenseType">License Type:</label>                        <select                          id="licenseType"                          name="licenseType"                          className="form-control"                          value={formData.licenseType}                          onChange={handleChange}                        >                          <option value="non-exclusive">Non-Exclusive</option>                          <option value="exclusive">Exclusive</option>                          <option value="sole">Sole</option>                        </select>                      </div>                    </div>                  </>                );                              case 3: // Data Usage                return <h2>Data Usage Tab</h2>;                              case 4: // Compensation                return <h2>Compensation Tab</h2>;                              case 5: // Warranties                return <h2>Warranties Tab</h2>;                              case 6: // Finalization                return (                  <>                    <h2>Finalization</h2>                    <button onClick={resetForm}>Reset Form</button>                  </>                );                              default:                return <div>Unknown tab</div>;            }          } catch (e) {            console.error("Error rendering tab content:", e);            return <div>Error rendering content. Please see console for details.</div>;          }        };                return (          <div className="generator-container">            <div className="generator-header">              <h1>AI Training Data License Agreement Generator</h1>              <p>Create a customized agreement for licensing data for AI model training purposes.</p>            </div>                        <div className="tab-navigation">              {tabs.map((tab, index) => (                <button                  key={tab.id}                  className={`tab-button ${currentTab === index ? 'active' : ''}`}                  onClick={() => goToTab(index)}                >                  {index + 1}. {tab.label}                </button>              ))}            </div>                        <div className="main-content">              <div className="form-panel">                {renderTabContent()}              </div>                            <div className="preview-panel" ref={previewRef}>                <h2>Live Preview</h2>                <pre className="document-preview">                  {documentText}                </pre>              </div>            </div>                        <div className="navigation-buttons">              <button                onClick={prevTab}                className={`nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`}                disabled={currentTab === 0}              >                Previous              </button>                            <button                onClick={copyToClipboard}                className="nav-button"              >                Copy              </button>                            <button                onClick={downloadAsWord}                className="nav-button"              >                Download              </button>                            <button                onClick={openCalendly}                className="nav-button"              >                Consult              </button>                            <button                onClick={nextTab}                className={`nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}                disabled={currentTab === tabs.length - 1}              >                Next              </button>            </div>          </div>        );      }; // End of App component      // Render the App component      console.log("DOM loaded and React app initialized, attempting to render...");      ReactDOM.render(React.createElement(App), document.getElementById('root'));      console.log("React app rendered successfully.");    } catch (e) {      console.error("Error during React app initialization or rendering:", e);      // Show a helpful error message in the UI      const rootEl = document.getElementById('root');      if (rootEl) {        rootEl.innerHTML = `          <div style="text-align: center; padding: 40px; font-family: sans-serif; color: #721c24; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px;">            <h3>Error Loading Generator</h3>            <p>The AI Training Data License Agreement Generator failed to load. Please check your browser console for detailed error messages.</p>            <p>Error: ${e.message}</p>          </div>        `;      }    }  }); // End of DOMContentLoaded listener})(); // End of IIFE
