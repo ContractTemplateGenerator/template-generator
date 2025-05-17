@@ -1,6 +1,21 @@
 // AI Training Data License Agreement Generator
 const { useState, useEffect, useRef } = React;
 
+// Simplified persistence implementation
+// Store form data in a global variable that persists across tab changes
+let savedFormData = null;
+
+// Try to load from localStorage on initial script execution (outside of component)
+try {
+  const storedData = localStorage.getItem('aiTrainingDataLicenseFormData');
+  if (storedData) {
+    savedFormData = JSON.parse(storedData);
+    console.log("Loaded form data from localStorage");
+  }
+} catch (error) {
+  console.error("Failed to load form data from localStorage:", error);
+}
+
 // Icon component
 const Icon = ({ name, ...props }) => {
   return (
@@ -115,25 +130,13 @@ const App = () => {
     documentTitle: 'AI Training Data License Agreement'
   };
 
-  // Load form data from localStorage if available
-  const getSavedFormData = () => {
-    try {
-      const savedData = localStorage.getItem('aiTrainingDataLicenseFormData');
-      if (savedData) {
-        return JSON.parse(savedData);
-      }
-    } catch (error) {
-      console.error('Error loading saved form data:', error);
-    }
-    return defaultFormData;
-  };
-
   // State for current tab
   const [currentTab, setCurrentTab] = useState(0);
   
-  // Form data state with initial data from localStorage or defaults
-  // Using useState with a function to ensure the localStorage read happens only once
-  const [formData, setFormData] = useState(getSavedFormData);
+  // Use the global savedFormData or defaultFormData if none exists
+  const [formData, setFormData] = useState(() => {
+    return savedFormData || defaultFormData;
+  });
   
   // State for tracking last changed field
   const [lastChanged, setLastChanged] = useState(null);
@@ -144,42 +147,61 @@ const App = () => {
   // Reference for preview div
   const previewRef = useRef(null);
   
-  // Save form data to localStorage whenever it changes
-  useEffect(() => {
+  // Function to save form data both in memory and localStorage
+  const saveFormData = (data) => {
+    // Update the global variable
+    savedFormData = data;
+    
+    // Save to localStorage
     try {
-      localStorage.setItem('aiTrainingDataLicenseFormData', JSON.stringify(formData));
+      localStorage.setItem('aiTrainingDataLicenseFormData', JSON.stringify(data));
+      console.log("Form data saved to localStorage");
     } catch (error) {
-      console.error('Error saving form data:', error);
+      console.error("Failed to save form data to localStorage:", error);
     }
-  }, [formData]);
+  };
   
   // Handle input changes
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setLastChanged(name);
     
+    let updatedFormData;
+    
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
+      updatedFormData = {
+        ...formData,
         [parent]: {
-          ...prev[parent],
+          ...formData[parent],
           [child]: type === 'checkbox' ? checked : value
         }
-      }));
+      };
     } else {
-      setFormData(prev => ({
-        ...prev,
+      updatedFormData = {
+        ...formData,
         [name]: type === 'checkbox' ? checked : value
-      }));
+      };
     }
+    
+    // Update state
+    setFormData(updatedFormData);
+    
+    // Save updated data
+    saveFormData(updatedFormData);
   };
   
   // Reset form to defaults
   const resetForm = () => {
     if (confirm('This will reset all form fields to default values. Continue?')) {
       setFormData(defaultFormData);
-      localStorage.removeItem('aiTrainingDataLicenseFormData');
+      saveFormData(defaultFormData);
+      try {
+        localStorage.removeItem('aiTrainingDataLicenseFormData');
+        console.log("Form data reset and removed from localStorage");
+      } catch (error) {
+        console.error("Failed to remove form data from localStorage:", error);
+      }
     }
   };
   
@@ -228,7 +250,7 @@ const App = () => {
       }
     } catch (error) {
       console.error('Error downloading Word document:', error);
-      alert('Error generating Word document. Please try again or use the copy option.');
+      alert('Error generating Word document. Please try again or use the download option.');
     }
   };
   
