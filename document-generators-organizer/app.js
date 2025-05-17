@@ -5,144 +5,134 @@ const Icon = ({ name, style = {} }) => {
   return <i data-feather={name} style={style}></i>;
 };
 
+// List of ACTUAL generators on your site
+const GENERATORS = [
+  {
+    id: 1,
+    title: "Strategic NDA Generator",
+    description: "Generate a customized non-disclosure agreement to protect your confidential information.",
+    link: "https://terms.law/strategic-nda-generator/",
+    categories: ["Contracts", "Dispute Resolution"]
+  },
+  {
+    id: 2,
+    title: "LLC Operating Agreement Generator",
+    description: "Create a comprehensive operating agreement for your Limited Liability Company.",
+    link: "https://terms.law/llc-operating-agreement-generator/",
+    categories: ["Business Formation", "Contracts"]
+  },
+  {
+    id: 3,
+    title: "Privacy Policy Generator",
+    description: "Generate a legally compliant privacy policy for your website or application.",
+    link: "https://terms.law/privacy-policy-generator/",
+    categories: ["Tech & IP Law", "Compliance"]
+  },
+  {
+    id: 4,
+    title: "Terms of Service Generator",
+    description: "Create customized terms of service for your website or online platform.",
+    link: "https://terms.law/terms-of-service-generator/",
+    categories: ["Tech & IP Law", "Compliance"]
+  },
+  {
+    id: 5,
+    title: "Consulting Agreement Generator",
+    description: "Generate a professional consulting agreement tailored to your business needs.",
+    link: "https://terms.law/consulting-agreement-generator/",
+    categories: ["Contracts", "Business Formation"]
+  },
+  {
+    id: 6,
+    title: "Cease and Desist Generator",
+    description: "Create a cease and desist letter to address IP infringement or other violations.",
+    link: "https://terms.law/cease-and-desist-generator/",
+    categories: ["Dispute Resolution", "Tech & IP Law"]
+  },
+  {
+    id: 7,
+    title: "Employment Contract Generator",
+    description: "Generate a customized employment agreement for your business.",
+    link: "https://terms.law/employment-contract-generator/",
+    categories: ["Contracts", "Business Formation"]
+  },
+  {
+    id: 8, 
+    title: "Trademark Assignment Generator",
+    description: "Create a trademark assignment agreement to transfer trademark rights.",
+    link: "https://terms.law/trademark-assignment-generator/",
+    categories: ["Tech & IP Law", "Contracts"]
+  },
+  {
+    id: 9,
+    title: "Independent Contractor Agreement Generator",
+    description: "Generate a legally sound independent contractor agreement.",
+    link: "https://terms.law/independent-contractor-agreement-generator/",
+    categories: ["Contracts", "Business Formation"]
+  },
+  {
+    id: 10,
+    title: "Partnership Agreement Generator",
+    description: "Create a comprehensive partnership agreement for your business venture.",
+    link: "https://terms.law/partnership-agreement-generator/",
+    categories: ["Business Formation", "Contracts"]
+  },
+  {
+    id: 11,
+    title: "Demand Letter Generator",
+    description: "Generate a professional demand letter to resolve disputes effectively.",
+    link: "https://terms.law/demand-letter-generator/",
+    categories: ["Dispute Resolution"]
+  },
+  {
+    id: 12,
+    title: "GDPR Compliance Generator",
+    description: "Create GDPR-compliant documents for your business or website.",
+    link: "https://terms.law/gdpr-compliance-generator/",
+    categories: ["Compliance", "Tech & IP Law"]
+  },
+  {
+    id: 13,
+    title: "Promissory Note Generator",
+    description: "Generate a legally binding promissory note for loans and financing.",
+    link: "https://terms.law/promissory-note-generator/",
+    categories: ["Finance", "Contracts"]
+  },
+  {
+    id: 14,
+    title: "Subscription Agreement Generator",
+    description: "Create a subscription agreement for your service or product.",
+    link: "https://terms.law/subscription-agreement-generator/",
+    categories: ["Contracts", "Finance"]
+  },
+  {
+    id: 15,
+    title: "Revenue-Based Financing Agreement Generator",
+    description: "Generate a customized revenue-based financing agreement for your business.",
+    link: "https://terms.law/revenue-based-financing-generator/",
+    categories: ["Finance", "Contracts"]
+  }
+];
+
+// All unique categories from the generators
+const ALL_CATEGORIES = Array.from(
+  new Set(GENERATORS.flatMap(generator => generator.categories))
+).sort();
+
 // Main App Component
 const App = () => {
-  const [generators, setGenerators] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
-  const [activeCategory, setActiveCategory] = useState("all");
+  const [activeCategory, setActiveCategory] = useState("All Categories");
   
-  // Fast-loading with minimum API calls
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        console.log("Fetching data from WordPress API...");
-        
-        // Get all posts with embedded terms in a single request (up to 100)
-        const response = await fetch(
-          "https://terms.law/wp-json/wp/v2/posts?per_page=100&_embed=1"
-        );
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch posts: ${response.status}`);
-        }
-        
-        const posts = await response.json();
-        console.log(`Fetched ${posts.length} posts from WordPress`);
-        
-        // Extract and process all posts with their categories
-        const processedPosts = [];
-        const uniqueCategories = [];
-        const categoryIds = new Set();
-        let docGeneratorsCategoryId = null;
-        
-        // First find if there's a Document Generators category
-        for (const post of posts) {
-          if (post._embedded && post._embedded['wp:term']) {
-            const categories = post._embedded['wp:term'][0] || [];
-            
-            for (const cat of categories) {
-              if (cat.name.toLowerCase().includes('document generator') || 
-                  cat.slug.toLowerCase().includes('document-generator')) {
-                docGeneratorsCategoryId = cat.id;
-                break;
-              }
-            }
-            
-            if (docGeneratorsCategoryId) break;
-          }
-        }
-        
-        // Then process posts and collect categories
-        for (const post of posts) {
-          // Only include posts in Document Generators category if we found it
-          let isDocGenerator = false;
-          const postCategories = [];
-          
-          if (post._embedded && post._embedded['wp:term']) {
-            const categories = post._embedded['wp:term'][0] || [];
-            
-            for (const cat of categories) {
-              // Add to post categories
-              postCategories.push({
-                id: cat.id,
-                name: cat.name,
-                slug: cat.slug
-              });
-              
-              // Check if this is a document generator post
-              if (docGeneratorsCategoryId && cat.id === docGeneratorsCategoryId) {
-                isDocGenerator = true;
-              }
-              
-              // Collect unique categories
-              if (!categoryIds.has(cat.id)) {
-                uniqueCategories.push({
-                  id: cat.id,
-                  name: cat.name,
-                  slug: cat.slug
-                });
-                categoryIds.add(cat.id);
-              }
-            }
-          }
-          
-          // Include all posts if we couldn't find a document generator category
-          if (!docGeneratorsCategoryId || isDocGenerator) {
-            // Get the post excerpt and clean it
-            let description = "";
-            if (post.excerpt && post.excerpt.rendered) {
-              description = post.excerpt.rendered
-                .replace(/<\/?[^>]+(>|$)/g, "") // Remove HTML tags
-                .trim()
-                .substring(0, 100);
-              
-              if (description.length === 100) {
-                description += "...";
-              }
-            }
-            
-            processedPosts.push({
-              id: post.id,
-              title: post.title.rendered,
-              description: description || "Create customized legal documents for your business.",
-              link: post.link, // Use the original link from WordPress
-              categories: postCategories
-            });
-          }
-        }
-        
-        console.log(`Processed ${processedPosts.length} document generators`);
-        console.log(`Found ${uniqueCategories.length} unique categories`);
-        
-        // Filter out the Document Generators category from the categories list
-        const displayCategories = uniqueCategories.filter(cat => 
-          !docGeneratorsCategoryId || cat.id !== docGeneratorsCategoryId
-        );
-        
-        setGenerators(processedPosts);
-        setCategories(displayCategories);
-        setLoading(false);
-      } catch (err) {
-        console.error("Error fetching data:", err);
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
   // Filter generators based on search term and active category
-  const filteredGenerators = generators.filter(generator => {
+  const filteredGenerators = GENERATORS.filter(generator => {
     const matchesSearch = 
       generator.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
       generator.description.toLowerCase().includes(searchTerm.toLowerCase());
     
-    const matchesCategory = activeCategory === "all" || 
-      generator.categories.some(cat => cat.slug === activeCategory);
+    const matchesCategory = 
+      activeCategory === "All Categories" || 
+      generator.categories.includes(activeCategory);
     
     return matchesSearch && matchesCategory;
   });
@@ -150,27 +140,20 @@ const App = () => {
   // Group generators by category for display
   const generatorsByCategory = {};
   
-  if (activeCategory === "all") {
-    // Get all categories except Document Generators
-    filteredGenerators.forEach(generator => {
-      generator.categories.forEach(category => {
-        // Skip the Document Generators category
-        if (!category.name.toLowerCase().includes('document generator')) {
-          if (!generatorsByCategory[category.name]) {
-            generatorsByCategory[category.name] = [];
-          }
-          
-          // Avoid duplicates in the same category
-          if (!generatorsByCategory[category.name].some(g => g.id === generator.id)) {
-            generatorsByCategory[category.name].push(generator);
-          }
-        }
-      });
+  if (activeCategory === "All Categories") {
+    // Group by all categories
+    ALL_CATEGORIES.forEach(category => {
+      const categoryGenerators = filteredGenerators.filter(
+        generator => generator.categories.includes(category)
+      );
+      
+      if (categoryGenerators.length > 0) {
+        generatorsByCategory[category] = categoryGenerators;
+      }
     });
   } else {
     // Just one category
-    const categoryName = categories.find(cat => cat.slug === activeCategory)?.name || "Other";
-    generatorsByCategory[categoryName] = filteredGenerators;
+    generatorsByCategory[activeCategory] = filteredGenerators;
   }
 
   // Handle search input
@@ -179,24 +162,9 @@ const App = () => {
   };
 
   // Handle category filter
-  const handleCategoryFilter = (categorySlug) => {
-    setActiveCategory(categorySlug);
+  const handleCategoryFilter = (category) => {
+    setActiveCategory(category);
   };
-
-  // If there are no filtered generators but we have categories,
-  // it might be due to search/category filter
-  const noGeneratorsFoundMessage = 
-    generators.length > 0 && Object.keys(generatorsByCategory).length === 0
-      ? "No generators found matching your criteria."
-      : "Loading generators...";
-
-  if (loading) {
-    return <div className="loading">Loading document generators...</div>;
-  }
-
-  if (error) {
-    return <div className="error">Error loading document generators: {error}</div>;
-  }
 
   return (
     <div className="organizer">
@@ -217,18 +185,18 @@ const App = () => {
       
       <div className="category-filter">
         <button 
-          className={activeCategory === "all" ? "active" : ""}
-          onClick={() => handleCategoryFilter("all")}
+          className={activeCategory === "All Categories" ? "active" : ""}
+          onClick={() => handleCategoryFilter("All Categories")}
         >
           All Categories
         </button>
-        {categories.map(category => (
+        {ALL_CATEGORIES.map(category => (
           <button
-            key={category.id}
-            className={activeCategory === category.slug ? "active" : ""}
-            onClick={() => handleCategoryFilter(category.slug)}
+            key={category}
+            className={activeCategory === category ? "active" : ""}
+            onClick={() => handleCategoryFilter(category)}
           >
-            {category.name}
+            {category}
           </button>
         ))}
       </div>
@@ -253,13 +221,11 @@ const App = () => {
                     <h3 className="generator-title">{generator.title}</h3>
                     <p className="generator-description">{generator.description}</p>
                     <div>
-                      {generator.categories
-                        .filter(cat => !cat.name.toLowerCase().includes('document generator'))
-                        .map(cat => (
-                          <span key={cat.id} className="tag">
-                            {cat.name}
-                          </span>
-                        ))}
+                      {generator.categories.map(cat => (
+                        <span key={cat} className="tag">
+                          {cat}
+                        </span>
+                      ))}
                     </div>
                   </div>
                 </a>
@@ -267,7 +233,7 @@ const App = () => {
             </div>
           ))
         ) : (
-          <div className="loading">{noGeneratorsFoundMessage}</div>
+          <div className="loading">No generators found matching your criteria.</div>
         )}
       </div>
     </div>
