@@ -48,6 +48,7 @@
             font-weight: 500;
             color: #666;
             position: relative;
+            white-space: nowrap;
         }
         .tab.active {
             color: #4361ee;
@@ -71,12 +72,14 @@
             padding: 1.5rem;
             border-right: 1px solid #e2e8f0;
             overflow-y: auto;
+            max-height: 600px;
         }
         .preview-panel {
             flex: 1;
             padding: 1.5rem;
             background-color: #f8f9fa;
             overflow-y: auto;
+            max-height: 600px;
         }
         .form-panel h2, .preview-panel h2 {
             margin-top: 0;
@@ -85,9 +88,27 @@
         }
         .form-section {
             margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        .form-section h3 {
+            margin: 1rem 0 0.75rem;
+            font-size: 1.1rem;
+            color: #555;
+        }
+        .form-section:last-child {
+            border-bottom: none;
         }
         .form-group {
             margin-bottom: 1rem;
+        }
+        .form-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .form-row .form-group {
+            flex: 1;
         }
         .form-group label {
             display: block;
@@ -101,15 +122,30 @@
             border-radius: 4px;
             font-size: 0.95rem;
         }
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        .form-check input[type="checkbox"] {
+            margin-right: 0.5rem;
+        }
+        .form-text {
+            display: block;
+            margin-top: 0.25rem;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
         .preview-content {
             background-color: #fff;
             padding: 1.5rem;
             border: 1px solid #e2e8f0;
             border-radius: 4px;
             font-family: 'Times New Roman', Times, serif;
-            height: 400px;
+            height: 500px;
             overflow-y: auto;
             white-space: pre-wrap;
+            line-height: 1.5;
         }
         .footer {
             display: flex;
@@ -125,26 +161,80 @@
             border-radius: 4px;
             font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         .btn-primary {
             background-color: #4361ee;
             color: white;
         }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #3a56d4;
+        }
         .btn-secondary {
             background-color: #3a0ca3;
             color: white;
         }
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #2d0a7a;
+        }
         .btn-accent {
             background-color: #e63946;
             color: white;
+        }
+        .btn-accent:hover:not(:disabled) {
+            background-color: #d32535;
         }
         .btn-outline {
             background-color: transparent;
             border: 1px solid #ddd;
             color: #666;
         }
+        .btn-outline:hover:not(:disabled) {
+            background-color: #f8f9fa;
+        }
         .highlighted {
             background-color: #fff9c4;
+        }
+        .risk-assessment {
+            margin-top: 1rem;
+        }
+        .risk-item {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        .risk-high {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .risk-medium {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        .risk-low {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        .risk-item h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+        .risk-item p {
+            margin: 0 0 0.5rem 0;
+            font-size: 0.95rem;
+        }
+        .recommendation {
+            font-style: italic;
+            margin-top: 0.5rem;
+        }
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
         }
     </style>
 </head>
@@ -171,38 +261,83 @@
                     <h2>Parties & Basic Information</h2>
                     
                     <div class="form-section">
-                        <div class="form-group">
-                            <label for="licensorName">Licensor Name:</label>
-                            <input type="text" id="licensorName" class="form-control" value="ABC Data Corp" onchange="updateForm(this)">
+                        <h3>Licensor (Data Owner) Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="licensorName">Licensor Name:</label>
+                                <input type="text" id="licensorName" class="form-control" value="ABC Data Corp" onchange="updateForm(this)">
+                                <small class="form-text">The company or entity providing the data.</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="licensorEntity">Entity Type:</label>
+                                <select id="licensorEntity" class="form-control" onchange="updateForm(this)">
+                                    <option value="Corporation" selected>Corporation</option>
+                                    <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
+                                    <option value="Partnership">Partnership</option>
+                                    <option value="Sole Proprietorship">Sole Proprietorship</option>
+                                    <option value="Individual">Individual</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="licensorEntity">Entity Type:</label>
-                            <select id="licensorEntity" class="form-control" onchange="updateForm(this)">
-                                <option value="Corporation" selected>Corporation</option>
-                                <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
-                                <option value="Partnership">Partnership</option>
-                                <option value="Individual">Individual</option>
-                            </select>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="licensorAddress">Address:</label>
+                                <input type="text" id="licensorAddress" class="form-control" value="123 Data Street, San Francisco" onchange="updateForm(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="licensorState">State/Jurisdiction:</label>
+                                <input type="text" id="licensorState" class="form-control" value="California" onchange="updateForm(this)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Licensee (AI Developer) Details</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="licenseeCompany">Licensee Name:</label>
+                                <input type="text" id="licenseeCompany" class="form-control" value="XYZ AI Solutions" onchange="updateForm(this)">
+                                <small class="form-text">The company or entity using the data.</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="licenseeEntity">Entity Type:</label>
+                                <select id="licenseeEntity" class="form-control" onchange="updateForm(this)">
+                                    <option value="Corporation" selected>Corporation</option>
+                                    <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
+                                    <option value="Partnership">Partnership</option>
+                                    <option value="Sole Proprietorship">Sole Proprietorship</option>
+                                </select>
+                            </div>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="licenseeCompany">Licensee Name:</label>
-                            <input type="text" id="licenseeCompany" class="form-control" value="XYZ AI Solutions" onchange="updateForm(this)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="licenseeAddress">Address:</label>
+                                <input type="text" id="licenseeAddress" class="form-control" value="456 Tech Avenue, Seattle" onchange="updateForm(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="licenseeState">State/Jurisdiction:</label>
+                                <input type="text" id="licenseeState" class="form-control" value="Washington" onchange="updateForm(this)">
+                            </div>
                         </div>
-                        
-                        <div class="form-group">
-                            <label for="licenseeEntity">Entity Type:</label>
-                            <select id="licenseeEntity" class="form-control" onchange="updateForm(this)">
-                                <option value="Corporation" selected>Corporation</option>
-                                <option value="Limited Liability Company">Limited Liability Company (LLC)</option>
-                                <option value="Partnership">Partnership</option>
-                            </select>
-                        </div>
-                        
+                    </div>
+                    
+                    <div class="form-section">
                         <div class="form-group">
                             <label for="effectiveDate">Effective Date:</label>
                             <input type="date" id="effectiveDate" class="form-control" onchange="updateForm(this)">
+                            <small class="form-text">If left blank, the agreement will use the current date.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="governingLaw">Governing Law:</label>
+                            <input type="text" id="governingLaw" class="form-control" value="California" onchange="updateForm(this)">
+                            <small class="form-text">The state or jurisdiction whose laws govern this agreement.</small>
                         </div>
                     </div>
                 </div>
@@ -212,6 +347,7 @@
                     <h2>License Terms</h2>
                     
                     <div class="form-section">
+                        <h3>License Grant</h3>
                         <div class="form-group">
                             <label for="licenseType">License Type:</label>
                             <select id="licenseType" class="form-control" onchange="updateForm(this)">
@@ -219,6 +355,7 @@
                                 <option value="exclusive">Exclusive (Only Licensee can use the data)</option>
                                 <option value="sole">Sole (Licensor can use but not license to others)</option>
                             </select>
+                            <small class="form-text">Non-exclusive is most common for AI training data licenses.</small>
                         </div>
                         
                         <div class="form-group">
@@ -228,57 +365,339 @@
                                 <option value="limited-permitted">Limited (Contractors/Service Providers Only)</option>
                                 <option value="permitted">Fully Permitted</option>
                             </select>
+                            <small class="form-text">Controls whether the Licensee can share the data with others.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Data Types Included</h3>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeText" checked onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeText">Text Data</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeImages" checked onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeImages">Image Data</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeAudio" onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeAudio">Audio Data</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeVideo" onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeVideo">Video Data</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeUserGenerated" checked onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeUserGenerated">User-Generated Content</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="dataTypeProprietary" onchange="updateFormCheckbox(this)">
+                            <label for="dataTypeProprietary">Proprietary/Curated Content</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Delivery & Access</h3>
+                        <div class="form-group">
+                            <label for="dataDeliveryMethod">Data Delivery Method:</label>
+                            <select id="dataDeliveryMethod" class="form-control" onchange="updateForm(this)">
+                                <option value="one-time" selected>One-Time Transfer</option>
+                                <option value="api-access">API Access</option>
+                                <option value="continuous">Continuous Updates</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dataStorage">Data Storage Requirements:</label>
+                            <select id="dataStorage" class="form-control" onchange="updateForm(this)">
+                                <option value="standard" selected>Standard Security Measures</option>
+                                <option value="enhanced">Enhanced Security Measures</option>
+                                <option value="specialized">Specialized Security Protocol</option>
+                            </select>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Additional tabs will be hidden by default -->
+                <!-- Tab 2: Data Usage -->
                 <div id="tab-2" style="display: none;">
                     <h2>Data Usage & Restrictions</h2>
-                    <div class="form-group">
-                        <label for="purposeRestrictions">Purpose Restrictions:</label>
-                        <select id="purposeRestrictions" class="form-control" onchange="updateForm(this)">
-                            <option value="specific-models" selected>Specific Model Types Only</option>
-                            <option value="all-ai">Any AI Systems (No Restrictions)</option>
-                        </select>
+                    
+                    <div class="form-section">
+                        <h3>Purpose Limitations</h3>
+                        <div class="form-group">
+                            <label for="purposeRestrictions">Purpose Restrictions:</label>
+                            <select id="purposeRestrictions" class="form-control" onchange="updateForm(this)">
+                                <option value="specific-models" selected>Specific Model Types Only</option>
+                                <option value="product-specific">Licensee's Products Only</option>
+                                <option value="all-ai">Any AI Systems (No Restrictions)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="modelTypesSection">
+                            <h4>Allowed Model Types</h4>
+                            <div class="form-check">
+                                <input type="checkbox" id="modelTypeText" checked onchange="updateFormCheckbox(this)">
+                                <label for="modelTypeText">Generative Text Models</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="modelTypeImage" onchange="updateFormCheckbox(this)">
+                                <label for="modelTypeImage">Generative Image Models</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="modelTypeClassification" onchange="updateFormCheckbox(this)">
+                                <label for="modelTypeClassification">Classification/Prediction Models</label>
+                            </div>
+                            <div class="form-check">
+                                <input type="checkbox" id="modelTypeAnalytics" onchange="updateFormCheckbox(this)">
+                                <label for="modelTypeAnalytics">Data Analytics Systems</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Usage Rights & Attribution</h3>
+                        <div class="form-group">
+                            <label for="ownershipModels">Ownership of Resulting AI Models:</label>
+                            <select id="ownershipModels" class="form-control" onchange="updateForm(this)">
+                                <option value="licensee-owns" selected>Licensee Fully Owns</option>
+                                <option value="licensor-royalty">Licensee Owns (with Licensor Royalty Rights)</option>
+                                <option value="joint-ownership">Joint Ownership</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="attributionRequired">Attribution Required:</label>
+                            <select id="attributionRequired" class="form-control" onchange="updateForm(this)">
+                                <option value="no" selected>No</option>
+                                <option value="yes">Yes</option>
+                            </select>
+                            <small class="form-text">Requires Licensee to credit Licensor in public materials.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Prohibited Uses</h3>
+                        <div class="form-check">
+                            <input type="checkbox" id="prohibitDeepfakes" checked onchange="updateFormCheckbox(this)">
+                            <label for="prohibitDeepfakes">Prohibit Deepfakes/Impersonation</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="prohibitHarmful" checked onchange="updateFormCheckbox(this)">
+                            <label for="prohibitHarmful">Prohibit Harmful/Discriminatory Content</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="prohibitIllegal" checked onchange="updateFormCheckbox(this)">
+                            <label for="prohibitIllegal">Prohibit Illegal Activities</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" id="prohibitMilitary" onchange="updateFormCheckbox(this)">
+                            <label for="prohibitMilitary">Prohibit Military/Defense Applications</label>
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Tab 3: Compensation -->
                 <div id="tab-3" style="display: none;">
                     <h2>Compensation & Term</h2>
-                    <div class="form-group">
-                        <label for="compensationType">Compensation Structure:</label>
-                        <select id="compensationType" class="form-control" onchange="updateForm(this)">
-                            <option value="one-time" selected>One-Time Fee</option>
-                            <option value="royalty">Royalty-Based</option>
-                            <option value="hybrid">Hybrid (Initial Fee + Royalty)</option>
-                        </select>
+                    
+                    <div class="form-section">
+                        <h3>Fee Structure</h3>
+                        <div class="form-group">
+                            <label for="compensationType">Compensation Structure:</label>
+                            <select id="compensationType" class="form-control" onchange="updateForm(this)">
+                                <option value="one-time" selected>One-Time Fee</option>
+                                <option value="royalty">Royalty-Based</option>
+                                <option value="hybrid">Hybrid (Initial Fee + Royalty)</option>
+                            </select>
+                        </div>
+                        
+                        <div id="initialFeeSection">
+                            <div class="form-group">
+                                <label for="initialFee">Initial Fee (USD):</label>
+                                <input type="text" id="initialFee" class="form-control" value="50000" onchange="updateForm(this)">
+                            </div>
+                        </div>
+                        
+                        <div id="royaltySection" style="display: none;">
+                            <div class="form-group">
+                                <label for="royaltyPercent">Royalty Percentage (%):</label>
+                                <input type="text" id="royaltyPercent" class="form-control" value="5" onchange="updateForm(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="minimumGuarantee">Minimum Annual Guarantee (USD):</label>
+                                <input type="text" id="minimumGuarantee" class="form-control" value="10000" onchange="updateForm(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="royaltyReporting">Royalty Reporting Frequency:</label>
+                                <select id="royaltyReporting" class="form-control" onchange="updateForm(this)">
+                                    <option value="quarterly" selected>Quarterly</option>
+                                    <option value="monthly">Monthly</option>
+                                    <option value="annually">Annually</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label for="initialFee">Initial Fee (USD):</label>
-                        <input type="text" id="initialFee" class="form-control" value="50000" onchange="updateForm(this)">
+                    
+                    <div class="form-section">
+                        <h3>Term & Renewal</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="term">Term Duration:</label>
+                                <input type="number" id="term" class="form-control" value="3" min="1" onchange="updateForm(this)">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="termUnit">Unit:</label>
+                                <select id="termUnit" class="form-control" onchange="updateForm(this)">
+                                    <option value="years" selected>Years</option>
+                                    <option value="months">Months</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="autoRenewal">Auto-Renewal:</label>
+                            <select id="autoRenewal" class="form-control" onchange="updateForm(this)">
+                                <option value="no" selected>No Auto-Renewal</option>
+                                <option value="yes-notice">Yes, with Prior Notice Required</option>
+                                <option value="yes-automatic">Yes, Automatic Renewal</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Termination Rights</h3>
+                        <div class="form-group">
+                            <label for="terminationRights">Termination Rights:</label>
+                            <select id="terminationRights" class="form-control" onchange="updateForm(this)">
+                                <option value="both-parties" selected>Both Parties (for Breach)</option>
+                                <option value="licensor-only">Licensor Only</option>
+                                <option value="licensee-only">Licensee Only (Termination for Convenience)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="dataRetention">Post-Termination Data Retention:</label>
+                            <select id="dataRetention" class="form-control" onchange="updateForm(this)">
+                                <option value="destroy" selected>Data Must Be Destroyed</option>
+                                <option value="limited-retention">Limited Retention Allowed</option>
+                                <option value="perpetual">Perpetual License to Trained Models</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Tab 4: Legal Terms -->
                 <div id="tab-4" style="display: none;">
-                    <h2>Legal Terms</h2>
-                    <div class="form-group">
-                        <label for="indemnification">Indemnification:</label>
-                        <select id="indemnification" class="form-control" onchange="updateForm(this)">
-                            <option value="mutual" selected>Mutual Indemnification</option>
-                            <option value="licensee-only">Licensee Indemnifies Licensor</option>
-                            <option value="licensor-only">Licensor Indemnifies Licensee</option>
-                        </select>
+                    <h2>Legal Terms & Protections</h2>
+                    
+                    <div class="form-section">
+                        <h3>Warranties</h3>
+                        <div class="form-group">
+                            <label for="licensorWarranty">Licensor Warranty Level:</label>
+                            <select id="licensorWarranty" class="form-control" onchange="updateForm(this)">
+                                <option value="limited" selected>Limited Warranty</option>
+                                <option value="as-is">As-Is (No Warranty)</option>
+                                <option value="expanded">Expanded Warranty</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="rightsToClaim">Rights to Data:</label>
+                            <select id="rightsToClaim" class="form-control" onchange="updateForm(this)">
+                                <option value="all-necessary-rights" selected>All Necessary Rights</option>
+                                <option value="right-to-license">Right to License Only</option>
+                            </select>
+                            <small class="form-text">The warranty the Licensor makes about their rights to the data.</small>
+                        </div>
+                        
+                        <div class="form-check">
+                            <input type="checkbox" id="dataComplianceWarranty" checked onchange="updateFormCheckbox(this)">
+                            <label for="dataComplianceWarranty">Include Data Compliance Warranty</label>
+                            <small class="form-text">Licensor warrants data was collected in compliance with laws.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Indemnification & Liability</h3>
+                        <div class="form-group">
+                            <label for="indemnification">Indemnification:</label>
+                            <select id="indemnification" class="form-control" onchange="updateForm(this)">
+                                <option value="mutual" selected>Mutual Indemnification</option>
+                                <option value="licensee-only">Licensee Indemnifies Licensor</option>
+                                <option value="licensor-only">Licensor Indemnifies Licensee</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="liabilityLimit">Limitation of Liability:</label>
+                            <select id="liabilityLimit" class="form-control" onchange="updateForm(this)">
+                                <option value="fees-paid" selected>Limited to Fees Paid</option>
+                                <option value="no-consequential">No Consequential Damages</option>
+                                <option value="both-limits">Both Limitations</option>
+                                <option value="no-limit">No Liability Limitation</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Dispute Resolution</h3>
+                        <div class="form-group">
+                            <label for="disputeResolution">Dispute Resolution Method:</label>
+                            <select id="disputeResolution" class="form-control" onchange="updateForm(this)">
+                                <option value="arbitration" selected>Binding Arbitration</option>
+                                <option value="mediation-first">Mediation Then Arbitration</option>
+                                <option value="litigation">Litigation (Courts)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="disputeLocation">Dispute Resolution Location:</label>
+                            <input type="text" id="disputeLocation" class="form-control" value="San Francisco, California" onchange="updateForm(this)">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Confidentiality</h3>
+                        <div class="form-group">
+                            <label for="confidentialityTerm">Confidentiality Term:</label>
+                            <select id="confidentialityTerm" class="form-control" onchange="updateForm(this)">
+                                <option value="agreement-term" selected>Term of Agreement</option>
+                                <option value="perpetual">Perpetual</option>
+                                <option value="years-3">3 Years</option>
+                                <option value="years-5">5 Years</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Tab 5: Finalization -->
                 <div id="tab-5" style="display: none;">
-                    <h2>Finalization</h2>
-                    <div class="form-group">
-                        <label for="fileName">File Name:</label>
-                        <input type="text" id="fileName" class="form-control" value="AI-Training-Data-License-Agreement" onchange="updateForm(this)">
+                    <h2>Risk Assessment & Finalization</h2>
+                    
+                    <div class="form-section">
+                        <h3>Document Options</h3>
+                        <div class="form-group">
+                            <label for="fileName">File Name:</label>
+                            <input type="text" id="fileName" class="form-control" value="AI-Training-Data-License-Agreement" onchange="updateForm(this)">
+                            <small class="form-text">Used when downloading the document as MS Word.</small>
+                        </div>
                     </div>
-                    <p>Review your agreement in the preview pane, then use the buttons below to copy or download.</p>
+                    
+                    <div class="form-section">
+                        <h3>Risk Assessment</h3>
+                        <div id="risk-assessment">
+                            <!-- Risk assessment will be dynamically inserted here -->
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3>Next Steps</h3>
+                        <p>Review the complete agreement in the preview pane. Once you're satisfied, you can download it as a Word document or copy to clipboard. For legal advice specific to your situation, click the "Consult" button to schedule a consultation with an attorney.</p>
+                    </div>
                 </div>
             </div>
             
@@ -290,7 +709,7 @@
         
         <div class="footer">
             <button class="btn btn-outline" onclick="prevTab()" id="prev-btn">Previous</button>
-            <div>
+            <div class="button-group">
                 <button class="btn btn-secondary" onclick="copyAgreement()">Copy</button>
                 <button class="btn btn-primary" onclick="downloadWord()">Download</button>
                 <button class="btn btn-accent" onclick="openConsultation()">Consult</button>
@@ -303,26 +722,88 @@
         // Basic state management
         const state = {
             currentTab: 0,
+            lastChanged: null,
             formData: {
+                // Tab 0: Basic Info
                 licensorName: 'ABC Data Corp',
                 licensorEntity: 'Corporation',
+                licensorAddress: '123 Data Street, San Francisco',
+                licensorState: 'California',
                 licenseeCompany: 'XYZ AI Solutions',
                 licenseeEntity: 'Corporation',
+                licenseeAddress: '456 Tech Avenue, Seattle',
+                licenseeState: 'Washington',
                 effectiveDate: '',
+                governingLaw: 'California',
+                
+                // Tab 1: License Terms
                 licenseType: 'non-exclusive',
                 sublicensing: 'not-permitted',
+                dataDeliveryMethod: 'one-time',
+                dataStorage: 'standard',
+                dataTypes: {
+                    text: true,
+                    images: true,
+                    audio: false,
+                    video: false,
+                    userGenerated: true,
+                    proprietary: false
+                },
+                
+                // Tab 2: Data Usage
                 purposeRestrictions: 'specific-models',
+                modelTypes: {
+                    text: true,
+                    image: false,
+                    classification: false,
+                    analytics: false
+                },
+                ownershipModels: 'licensee-owns',
+                attributionRequired: 'no',
+                prohibited: {
+                    deepfakes: true,
+                    harmful: true,
+                    illegal: true,
+                    military: false
+                },
+                
+                // Tab 3: Compensation
                 compensationType: 'one-time',
                 initialFee: '50000',
+                royaltyPercent: '5',
+                minimumGuarantee: '10000',
+                royaltyReporting: 'quarterly',
+                term: '3',
+                termUnit: 'years',
+                autoRenewal: 'no',
+                terminationRights: 'both-parties',
+                dataRetention: 'destroy',
+                
+                // Tab 4: Legal Terms
+                licensorWarranty: 'limited',
+                rightsToClaim: 'all-necessary-rights',
+                dataComplianceWarranty: true,
                 indemnification: 'mutual',
+                liabilityLimit: 'fees-paid',
+                disputeResolution: 'arbitration',
+                disputeLocation: 'San Francisco, California',
+                confidentialityTerm: 'agreement-term',
+                
+                // Document options
                 fileName: 'AI-Training-Data-License-Agreement'
             }
         };
         
         // Initialize
         window.onload = function() {
+            // Handle initial compensation type display
+            updateCompensationFields();
+            
             // Generate initial preview
             updatePreview();
+            
+            // Generate risk assessment
+            updateRiskAssessment();
         };
         
         // Tab navigation
@@ -342,7 +823,11 @@
             
             // Update navigation buttons
             document.getElementById('prev-btn').disabled = (tabIndex === 0);
-            document.getElementById('next-btn').disabled = (tabIndex === 5);
+            
+            // If we're now on the finalization tab, update the risk assessment
+            if (tabIndex === 5) {
+                updateRiskAssessment();
+            }
         }
         
         function nextTab() {
@@ -360,55 +845,391 @@
         // Update form data when inputs change
         function updateForm(element) {
             state.formData[element.id] = element.value;
+            
+            // Special handling for compensationType
+            if (element.id === 'compensationType') {
+                updateCompensationFields();
+            }
+            
+            // Special handling for purposeRestrictions
+            if (element.id === 'purposeRestrictions') {
+                const modelTypesSection = document.getElementById('modelTypesSection');
+                if (element.value === 'specific-models') {
+                    modelTypesSection.style.display = 'block';
+                } else {
+                    modelTypesSection.style.display = 'none';
+                }
+            }
+            
             updatePreview();
+        }
+        
+        // Update checkboxes (for nested objects)
+        function updateFormCheckbox(element) {
+            const id = element.id;
+            
+            // Determine which object this checkbox belongs to
+            if (id.startsWith('dataType')) {
+                const key = id.replace('dataType', '').toLowerCase();
+                state.formData.dataTypes[key] = element.checked;
+            } else if (id.startsWith('modelType')) {
+                const key = id.replace('modelType', '').toLowerCase();
+                state.formData.modelTypes[key] = element.checked;
+            } else if (id.startsWith('prohibit')) {
+                const key = id.replace('prohibit', '').toLowerCase();
+                state.formData.prohibited[key] = element.checked;
+            } else if (id === 'dataComplianceWarranty') {
+                state.formData.dataComplianceWarranty = element.checked;
+            }
+            
+            updatePreview();
+        }
+        
+        // Update compensation fields based on selected type
+        function updateCompensationFields() {
+            const compensationType = state.formData.compensationType;
+            const initialFeeSection = document.getElementById('initialFeeSection');
+            const royaltySection = document.getElementById('royaltySection');
+            
+            if (compensationType === 'one-time') {
+                initialFeeSection.style.display = 'block';
+                royaltySection.style.display = 'none';
+            } else if (compensationType === 'royalty') {
+                initialFeeSection.style.display = 'none';
+                royaltySection.style.display = 'block';
+            } else if (compensationType === 'hybrid') {
+                initialFeeSection.style.display = 'block';
+                royaltySection.style.display = 'block';
+            }
+        }
+        
+        // Format data types list
+        function formatDataTypesList() {
+            const dataTypes = state.formData.dataTypes;
+            const enabledTypes = [];
+            
+            if (dataTypes.text) enabledTypes.push('text data');
+            if (dataTypes.images) enabledTypes.push('image data');
+            if (dataTypes.audio) enabledTypes.push('audio data');
+            if (dataTypes.video) enabledTypes.push('video data');
+            if (dataTypes.userGenerated) enabledTypes.push('user-generated content');
+            if (dataTypes.proprietary) enabledTypes.push('proprietary content');
+            
+            if (enabledTypes.length === 0) return 'data';
+            if (enabledTypes.length === 1) return enabledTypes[0];
+            
+            return enabledTypes.slice(0, -1).join(', ') + ', and ' + enabledTypes[enabledTypes.length - 1];
+        }
+        
+        // Format model types list
+        function formatModelTypesList() {
+            const modelTypes = state.formData.modelTypes;
+            const enabledTypes = [];
+            
+            if (modelTypes.text) enabledTypes.push('generative text models');
+            if (modelTypes.image) enabledTypes.push('generative image models');
+            if (modelTypes.classification) enabledTypes.push('classification and prediction models');
+            if (modelTypes.analytics) enabledTypes.push('data analytics systems');
+            
+            if (enabledTypes.length === 0) return 'AI models';
+            if (enabledTypes.length === 1) return enabledTypes[0];
+            
+            return enabledTypes.slice(0, -1).join(', ') + ', and ' + enabledTypes[enabledTypes.length - 1];
+        }
+        
+        // Format date
+        function formatDate() {
+            if (state.formData.effectiveDate) {
+                return new Date(state.formData.effectiveDate).toLocaleDateString('en-US');
+            }
+            return new Date().toLocaleDateString('en-US');
         }
         
         // Generate agreement text
         function generateAgreementText() {
-            const formatDate = () => {
-                if (state.formData.effectiveDate) {
-                    return new Date(state.formData.effectiveDate).toLocaleDateString('en-US');
-                }
-                return new Date().toLocaleDateString('en-US');
-            };
-            
             return `AI TRAINING DATA LICENSE AGREEMENT
 
 This AI Training Data License Agreement (the "Agreement") is entered into as of ${formatDate()} (the "Effective Date"), by and between:
 
-${state.formData.licensorName}, a ${state.formData.licensorEntity.toLowerCase()} (the "Licensor"), and
+${state.formData.licensorName}, a ${state.formData.licensorEntity.toLowerCase()} having its principal place of business at ${state.formData.licensorAddress}, ${state.formData.licensorState} (the "Licensor"), and
 
-${state.formData.licenseeCompany}, a ${state.formData.licenseeEntity.toLowerCase()} (the "Licensee").
+${state.formData.licenseeCompany}, a ${state.formData.licenseeEntity.toLowerCase()} having its principal place of business at ${state.formData.licenseeAddress}, ${state.formData.licenseeState} (the "Licensee").
 
-1. LICENSE GRANT
+WHEREAS, Licensor owns or controls certain data that may be useful for artificial intelligence training purposes; and
 
-1.1 Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a${state.formData.licenseType === 'exclusive' ? 'n' : ''} ${state.formData.licenseType} license to use the Data for training AI systems.
+WHEREAS, Licensee desires to obtain a license to use such data for developing, training, and improving artificial intelligence systems and models; and
 
-2. COMPENSATION
+WHEREAS, Licensor is willing to grant such license subject to the terms and conditions set forth herein;
 
-2.1 ${state.formData.compensationType === 'one-time' ? 
-      `Licensee shall pay Licensor a one-time fee of $${state.formData.initialFee}.` : 
-      state.formData.compensationType === 'royalty' ? 
-      'Licensee shall pay Licensor a royalty based on revenue generated from AI systems trained with the Data.' : 
-      `Licensee shall pay Licensor an initial fee of $${state.formData.initialFee} and royalties based on revenue generated.`}
+NOW, THEREFORE, in consideration of the mutual covenants contained herein and for other good and valuable consideration, the receipt and sufficiency of which are hereby acknowledged, the parties agree as follows:
 
-3. TERM AND TERMINATION
+1. DEFINITIONS
 
-3.1 This Agreement shall remain in effect for a period of 3 years from the Effective Date.
+1.1 "Data" means the information, materials, text, images, or other content provided by Licensor to Licensee under this Agreement, specifically including ${formatDataTypesList()}.
 
-4. REPRESENTATIONS AND WARRANTIES
+1.2 "AI System" means any machine learning model, neural network, or artificial intelligence algorithm or software developed, trained, or improved using the Data.
 
-4.1 Licensor represents and warrants that it has all necessary rights to license the Data.
+1.3 "Training" means the process of using the Data to develop, test, improve, or otherwise inform the development of AI Systems.
 
-5. INDEMNIFICATION
+2. LICENSE GRANT
 
-5.1 ${state.formData.indemnification === 'mutual' ? 
-      'Each party shall indemnify the other party from claims arising from their breach of this Agreement.' : 
-      state.formData.indemnification === 'licensee-only' ? 
-      'Licensee shall indemnify Licensor from claims arising from Licensee\'s use of the Data.' : 
-      'Licensor shall indemnify Licensee from claims arising from any infringement of third-party rights by the Data.'}
+2.1 Subject to the terms and conditions of this Agreement, Licensor hereby grants to Licensee a${state.formData.licenseType === 'exclusive' ? 'n' : ''} ${state.formData.licenseType}, ${state.formData.sublicensing === 'permitted' ? 'sublicensable, ' : ''}license during the Term to use the Data solely for the purpose of Training AI Systems as further specified in Section 3.
 
-IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.`;
+${state.formData.sublicensing === 'limited-permitted' ? 
+`2.2 Licensee may sublicense the rights granted herein to its contractors and service providers solely for the purpose of Training AI Systems on behalf of Licensee, provided that Licensee ensures that all such sublicensees are bound by terms no less protective of Licensor's rights than the terms of this Agreement.` : 
+state.formData.sublicensing === 'not-permitted' ? 
+`2.2 Licensee shall not sublicense, distribute, sell, lease, or otherwise make the Data available to any third party without Licensor's prior written consent.` : ''}
+
+2.3 The Data shall be provided to Licensee via ${state.formData.dataDeliveryMethod === 'one-time' ? 'a one-time transfer' : state.formData.dataDeliveryMethod === 'api-access' ? 'API access' : 'continuous updates'}.
+
+2.4 Licensee shall implement ${state.formData.dataStorage === 'standard' ? 'standard' : state.formData.dataStorage === 'enhanced' ? 'enhanced' : 'specialized'} security measures to protect the Data from unauthorized access, use, or disclosure.
+
+3. PERMITTED USES AND RESTRICTIONS
+
+${state.formData.purposeRestrictions === 'specific-models' ? 
+`3.1 Permitted Uses. Licensee may use the Data solely for Training ${formatModelTypesList()}.` : 
+state.formData.purposeRestrictions === 'all-ai' ? 
+`3.1 Permitted Uses. Licensee may use the Data for Training any AI Systems within Licensee's business operations.` : 
+`3.1 Permitted Uses. Licensee may use the Data solely for Training AI Systems specifically for use in Licensee's products and services.`}
+
+3.2 Prohibited Uses. Licensee shall not use the Data to Train AI Systems that are designed to:
+${state.formData.prohibited.deepfakes ? '   (a) generate deepfakes or impersonate specific individuals;' : ''}
+${state.formData.prohibited.harmful ? '   (b) promote discrimination, harassment, or violence;' : ''}
+${state.formData.prohibited.illegal ? '   (c) violate applicable laws or regulations;' : ''}
+${state.formData.prohibited.military ? '   (d) develop military or defense applications; or' : ''}
+   (e) infringe upon third-party intellectual property or privacy rights.
+
+${state.formData.attributionRequired === 'yes' ? 
+`3.3 Attribution. Licensee shall provide attribution to Licensor in any public-facing documentation or marketing materials that reference AI Systems trained using the Data. The format of such attribution shall be: "Trained in part using data licensed from ${state.formData.licensorName}."` : ''}
+
+4. OWNERSHIP
+
+${state.formData.ownershipModels === 'licensee-owns' ? 
+`4.1 AI Systems. Licensee shall own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, including all intellectual property rights therein. Licensor expressly disclaims any rights in AI Systems developed by Licensee.` : 
+state.formData.ownershipModels === 'licensor-royalty' ? 
+`4.1 AI Systems. Licensee shall own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, subject to Licensor's rights to receive compensation as set forth in Section 5.` : 
+`4.1 AI Systems. The parties shall jointly own all right, title, and interest in and to any AI Systems developed, trained, or improved using the Data, including all intellectual property rights therein, with each party having the right to use, license, and exploit such AI Systems without accounting to the other party.`}
+
+4.2 Data. Licensor retains all right, title, and interest in and to the Data, including all intellectual property rights therein. Nothing in this Agreement shall be construed as a transfer or assignment of ownership in the Data to Licensee.
+
+5. COMPENSATION
+
+${state.formData.compensationType === 'one-time' ? 
+`5.1 License Fee. In consideration for the license granted herein, Licensee shall pay Licensor a one-time fee of $${state.formData.initialFee} within thirty (30) days of the Effective Date.` : 
+state.formData.compensationType === 'royalty' ? 
+`5.1 Royalty. In consideration for the license granted herein, Licensee shall pay Licensor a royalty of ${state.formData.royaltyPercent}% of the Net Revenue derived from AI Systems trained using the Data. "Net Revenue" means gross revenue received by Licensee from the commercialization of AI Systems, less taxes, returns, and standard deductions.
+
+5.2 Minimum Guarantee. Regardless of the actual royalties earned, Licensee guarantees a minimum payment to Licensor of $${state.formData.minimumGuarantee} per year during the Term.
+
+5.3 Reporting. Licensee shall provide ${state.formData.royaltyReporting} reports detailing the calculation of royalties due, along with payment of such royalties, within thirty (30) days after the end of each ${state.formData.royaltyReporting} period.` : 
+`5.1 Initial Fee. Licensee shall pay Licensor an initial fee of $${state.formData.initialFee} within thirty (30) days of the Effective Date.
+
+5.2 Royalty. In addition to the initial fee, Licensee shall pay Licensor a royalty of ${state.formData.royaltyPercent}% of the Net Revenue derived from AI Systems trained using the Data. "Net Revenue" means gross revenue received by Licensee from the commercialization of AI Systems, less taxes, returns, and standard deductions.
+
+5.3 Minimum Guarantee. Regardless of the actual royalties earned, Licensee guarantees a minimum payment to Licensor of $${state.formData.minimumGuarantee} per year during the Term.
+
+5.4 Reporting. Licensee shall provide ${state.formData.royaltyReporting} reports detailing the calculation of royalties due, along with payment of such royalties, within thirty (30) days after the end of each ${state.formData.royaltyReporting} period.`}
+
+6. TERM AND TERMINATION
+
+6.1 Term. This Agreement shall commence on the Effective Date and continue for a period of ${state.formData.term} ${state.formData.termUnit} (the "Term"), unless earlier terminated as provided herein.
+
+${state.formData.autoRenewal === 'no' ? 
+`6.2 Renewal. This Agreement shall not automatically renew upon expiration of the Term.` :
+state.formData.autoRenewal === 'yes-notice' ?
+`6.2 Renewal. This Agreement shall automatically renew for successive one (1) year periods unless either party provides written notice of non-renewal at least sixty (60) days prior to the end of the then-current term.` :
+`6.2 Renewal. This Agreement shall automatically renew for successive one (1) year periods unless terminated pursuant to this Agreement.`}
+
+${state.formData.terminationRights === 'both-parties' ? 
+`6.3 Termination for Breach. Either party may terminate this Agreement upon written notice if the other party materially breaches any provision of this Agreement and fails to cure such breach within thirty (30) days after receiving written notice thereof.` : 
+state.formData.terminationRights === 'licensor-only' ? 
+`6.3 Termination for Breach. Licensor may terminate this Agreement upon written notice if Licensee materially breaches any provision of this Agreement and fails to cure such breach within thirty (30) days after receiving written notice thereof.` : 
+`6.3 Termination for Convenience. Licensee may terminate this Agreement at any time upon thirty (30) days' written notice to Licensor.`}
+
+6.4 Effect of Termination. Upon termination or expiration of this Agreement: (a) all rights granted to Licensee hereunder shall immediately terminate; (b) Licensee shall immediately cease all use of the Data; and (c) Licensee shall ${state.formData.dataRetention === 'destroy' ? 
+`promptly destroy all copies of the Data in its possession or control.` : 
+state.formData.dataRetention === 'limited-retention' ? 
+`return or destroy all copies of the Data in its possession or control, except that Licensee may retain a limited amount of Data as reasonably necessary to maintain the functionality of AI Systems developed prior to termination.` : 
+`return all copies of the Data in its possession or control, but may continue to use and exploit any AI Systems developed prior to termination.`}
+
+6.5 Survival. The following provisions shall survive the termination or expiration of this Agreement: Sections 4 (Ownership), 5 (Compensation) with respect to amounts accrued prior to termination, 7 (Representations and Warranties), 8 (Indemnification), 9 (Limitation of Liability), and 11 (General Provisions).
+
+7. REPRESENTATIONS AND WARRANTIES
+
+${state.formData.licensorWarranty === 'limited' ? 
+`7.1 Licensor Warranties. Licensor represents and warrants that: (a) it has ${state.formData.rightsToClaim === 'all-necessary-rights' ? 'all necessary rights and authority to grant the licenses and rights granted herein' : 'the right to license the Data as specified in this Agreement'}; and (b) the Data does not infringe upon the intellectual property rights of any third party.` : 
+state.formData.licensorWarranty === 'as-is' ? 
+`7.1 Disclaimer. THE DATA IS PROVIDED "AS IS" AND WITHOUT WARRANTIES OF ANY KIND. LICENSOR HEREBY DISCLAIMS ALL WARRANTIES, WHETHER EXPRESS, IMPLIED, STATUTORY, OR OTHERWISE, INCLUDING WITHOUT LIMITATION ANY WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT.` :
+`7.1 Licensor Warranties. Licensor represents and warrants that: (a) it has ${state.formData.rightsToClaim === 'all-necessary-rights' ? 'all necessary rights and authority to grant the licenses and rights granted herein' : 'the right to license the Data as specified in this Agreement'}; (b) the Data does not infringe upon the intellectual property rights of any third party; (c) the Data does not contain any viruses, malware, or other harmful code; and (d) the Data is of professional quality and suitable for the purposes described in this Agreement.`}
+
+${state.formData.dataComplianceWarranty ? 
+`7.2 Compliance with Laws. Licensor represents and warrants that the Data was collected in compliance with all applicable laws and regulations, including data protection and privacy laws, and that Licensor has all necessary rights, consents, and permissions to license the Data to Licensee for the purposes set forth in this Agreement.` : ''}
+
+7.3 Licensee Warranties. Licensee represents and warrants that: (a) it will use the Data in compliance with all applicable laws and regulations; and (b) it will not use the Data in any manner that violates the rights of any third party.
+
+8. INDEMNIFICATION
+
+${state.formData.indemnification === 'mutual' ? 
+`8.1 Mutual Indemnification. Each party shall indemnify, defend, and hold harmless the other party from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) any breach by the indemnifying party of its representations, warranties, or covenants under this Agreement; or (b) the indemnifying party's negligence or willful misconduct.` : 
+state.formData.indemnification === 'licensee-only' ? 
+`8.1 Licensee Indemnification. Licensee shall indemnify, defend, and hold harmless Licensor from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) Licensee's use of the Data; (b) any breach by Licensee of its representations, warranties, or covenants under this Agreement; or (c) Licensee's negligence or willful misconduct.` : 
+`8.1 Licensor Indemnification. Licensor shall indemnify, defend, and hold harmless Licensee from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to: (a) any claim that the Data infringes upon the intellectual property rights of any third party; (b) any breach by Licensor of its representations, warranties, or covenants under this Agreement; or (c) Licensor's negligence or willful misconduct.`}
+
+9. LIMITATION OF LIABILITY
+
+${state.formData.liabilityLimit === 'fees-paid' ? 
+`9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED THE TOTAL AMOUNT PAID BY LICENSEE TO LICENSOR UNDER THIS AGREEMENT.` : 
+state.formData.liabilityLimit === 'no-consequential' ? 
+`9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOST PROFITS, LOSS OF USE, OR LOSS OF DATA, WHETHER IN AN ACTION IN CONTRACT, TORT, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.` : 
+state.formData.liabilityLimit === 'both-limits' ? 
+`9.1 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY'S AGGREGATE LIABILITY ARISING OUT OF OR RELATED TO THIS AGREEMENT EXCEED THE TOTAL AMOUNT PAID BY LICENSEE TO LICENSOR UNDER THIS AGREEMENT.
+
+9.2 EXCEPT FOR OBLIGATIONS UNDER SECTION 8 (INDEMNIFICATION), IN NO EVENT SHALL EITHER PARTY BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING WITHOUT LIMITATION DAMAGES FOR LOST PROFITS, LOSS OF USE, OR LOSS OF DATA, WHETHER IN AN ACTION IN CONTRACT, TORT, OR OTHERWISE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.` :
+`9.1 Each party shall be liable to the other for all damages arising out of or related to this Agreement as provided by applicable law.`}
+
+10. CONFIDENTIALITY
+
+10.1 Confidential Information. Each party acknowledges that it may receive confidential or proprietary information of the other party in the performance of this Agreement ("Confidential Information"). Each party shall maintain the confidentiality of the other party's Confidential Information using at least the same degree of care that it uses to protect its own confidential information, but in no event less than reasonable care.
+
+10.2 Confidentiality Term. The obligations of confidentiality under this Section shall continue for ${state.formData.confidentialityTerm === 'agreement-term' ? 'the Term of this Agreement' : state.formData.confidentialityTerm === 'perpetual' ? 'perpetuity' : state.formData.confidentialityTerm === 'years-3' ? 'three (3) years following the termination or expiration of this Agreement' : 'five (5) years following the termination or expiration of this Agreement'}.
+
+10.3 Exclusions. Confidential Information shall not include information that: (a) is or becomes publicly available through no fault of the receiving party; (b) was in the receiving party's possession prior to its disclosure by the disclosing party; (c) is rightfully received by the receiving party from a third party without a duty of confidentiality; or (d) is independently developed by the receiving party without reference to the disclosing party's Confidential Information.
+
+11. GENERAL PROVISIONS
+
+11.1 Entire Agreement. This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior and contemporaneous agreements or communications.
+
+11.2 Amendment. This Agreement may be amended only by a written document signed by both parties.
+
+11.3 Assignment. Neither party may assign or transfer this Agreement without the prior written consent of the other party, except that either party may assign this Agreement in connection with a merger, acquisition, or sale of all or substantially all of its assets.
+
+11.4 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of ${state.formData.governingLaw}, without regard to its conflict of laws principles.
+
+11.5 Dispute Resolution. Any dispute arising out of or in connection with this Agreement shall be resolved through ${state.formData.disputeResolution === 'arbitration' ? `binding arbitration in ${state.formData.disputeLocation} in accordance with the rules of the American Arbitration Association` : state.formData.disputeResolution === 'mediation-first' ? `mediation, and if mediation is unsuccessful, through binding arbitration in ${state.formData.disputeLocation}` : `litigation in the courts located in ${state.formData.disputeLocation}`}.
+
+11.6 Notices. All notices under this Agreement shall be in writing and shall be deemed given when delivered personally, by email with confirmation of receipt, or by certified mail, return receipt requested, to the address set forth above or to such other address as may be specified in writing.
+
+11.7 No Waiver. The failure of either party to enforce any provision of this Agreement shall not be construed as a waiver of such provision or the right to enforce such provision.
+
+11.8 Severability. If any provision of this Agreement is found to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+
+11.9 Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective Date.
+
+LICENSOR: ${state.formData.licensorName}
+
+By: ____________________________
+Name: _________________________
+Title: __________________________
+
+LICENSEE: ${state.formData.licenseeCompany}
+
+By: ____________________________
+Name: _________________________
+Title: __________________________`;
+        }
+        
+        // Generate risk assessment
+        function updateRiskAssessment() {
+            // Define risk items
+            const risks = [];
+            
+            // Check for missing party information
+            if (!state.formData.licensorName || !state.formData.licensorAddress || !state.formData.licenseeCompany || !state.formData.licenseeAddress) {
+                risks.push({
+                    level: 'high',
+                    title: 'Missing Party Information',
+                    description: 'Basic party information is incomplete. This could make the agreement unenforceable.',
+                    recommendation: 'Complete all party information fields in the Parties tab.'
+                });
+            }
+            
+            // Check for data compliance warranty
+            if (!state.formData.dataComplianceWarranty) {
+                risks.push({
+                    level: 'high',
+                    title: 'No Data Compliance Warranty',
+                    description: 'The agreement lacks warranties about data collection compliance, which could expose the Licensee to legal risks if the data was collected illegally.',
+                    recommendation: 'Enable the data compliance warranty or ensure separate data compliance documentation exists.'
+                });
+            }
+            
+            // Check license type vs compensation
+            if (state.formData.licenseType === 'exclusive' && state.formData.compensationType === 'one-time') {
+                risks.push({
+                    level: 'medium',
+                    title: 'Exclusive License with One-Time Fee',
+                    description: 'An exclusive license with only a one-time fee may undervalue the data, especially if the AI models become highly profitable.',
+                    recommendation: 'Consider a hybrid compensation model with both an initial fee and ongoing royalties for exclusive licenses.'
+                });
+            }
+            
+            // Check sublicensing rights vs compensation
+            if (state.formData.sublicensing === 'permitted' && state.formData.compensationType !== 'royalty' && state.formData.compensationType !== 'hybrid') {
+                risks.push({
+                    level: 'medium',
+                    title: 'Unrestricted Sublicensing Without Royalties',
+                    description: 'Allowing unrestricted sublicensing without royalty provisions means Licensor won't benefit from widespread use.',
+                    recommendation: 'Either restrict sublicensing or implement a royalty structure that accounts for sublicensee revenue.'
+                });
+            }
+            
+            // Check for attribution
+            if (state.formData.licensorName && state.formData.attributionRequired === 'no') {
+                risks.push({
+                    level: 'low',
+                    title: 'No Attribution Requirement',
+                    description: 'The agreement does not require attribution to the Licensor, which may limit brand exposure and recognition.',
+                    recommendation: 'Consider requiring attribution in public-facing materials that reference the AI systems.'
+                });
+            }
+            
+            // Check for warranty level vs liability
+            if (state.formData.licensorWarranty === 'as-is' && state.formData.liabilityLimit === 'no-limit') {
+                risks.push({
+                    level: 'high',
+                    title: 'As-Is Warranty with No Liability Limitation',
+                    description: 'Providing data "as-is" while having no liability limitation creates significant legal exposure for the Licensor.',
+                    recommendation: 'Either improve the warranty or add a liability limitation.'
+                });
+            }
+            
+            // Check for perpetual rights after termination
+            if (state.formData.dataRetention === 'perpetual') {
+                risks.push({
+                    level: 'medium',
+                    title: 'Perpetual Rights to AI Models',
+                    description: 'Allowing perpetual rights to AI models trained on the data effectively creates a permanent license, even after termination.',
+                    recommendation: 'Consider limiting post-termination rights or ensure compensation reflects this perpetual value.'
+                });
+            }
+            
+            // If no risks found, add a "low risk" message
+            if (risks.length === 0) {
+                risks.push({
+                    level: 'low',
+                    title: 'No Major Risks Identified',
+                    description: 'Based on your selections, no significant risks were identified in the agreement.',
+                    recommendation: 'Always review the final agreement with legal counsel before signing.'
+                });
+            }
+            
+            // Generate HTML
+            let html = '';
+            
+            risks.forEach(risk => {
+                html += `
+                <div class="risk-item risk-${risk.level}">
+                    <h4>${risk.title}</h4>
+                    <p>${risk.description}</p>
+                    <p class="recommendation"><strong>Recommendation:</strong> ${risk.recommendation}</p>
+                </div>
+                `;
+            });
+            
+            // Set HTML
+            document.getElementById('risk-assessment').innerHTML = html;
         }
         
         // Update preview
@@ -443,10 +1264,24 @@ IN WITNESS WHEREOF, the parties have executed this Agreement as of the Effective
     <title>${fileName}</title>
     <style>
         body { font-family: 'Times New Roman', Times, serif; font-size: 12pt; line-height: 1.5; }
+        h1, h2, h3 { font-weight: bold; }
+        h1 { text-align: center; font-size: 14pt; margin-bottom: 20pt; }
+        h2 { font-size: 12pt; text-transform: uppercase; }
     </style>
 </head>
 <body>
-    ${text.split('\n\n').map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('')}
+    ${text.split('\n\n').map(para => {
+        // Format section headers (all caps lines)
+        if (/^\d+\.\s[A-Z\s]+$/.test(para)) {
+            return `<h2>${para}</h2>`;
+        }
+        // Format the title
+        if (para === 'AI TRAINING DATA LICENSE AGREEMENT') {
+            return `<h1>${para}</h1>`;
+        }
+        // Regular paragraphs
+        return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+    }).join('')}
 </body>
 </html>`;
             
