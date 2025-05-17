@@ -115,11 +115,8 @@ const App = () => {
     documentTitle: 'AI Training Data License Agreement'
   };
 
-  // State for current tab
-  const [currentTab, setCurrentTab] = useState(0);
-  
   // Load form data from localStorage if available
-  const loadSavedFormData = () => {
+  const getSavedFormData = () => {
     try {
       const savedData = localStorage.getItem('aiTrainingDataLicenseFormData');
       if (savedData) {
@@ -130,9 +127,13 @@ const App = () => {
     }
     return defaultFormData;
   };
+
+  // State for current tab
+  const [currentTab, setCurrentTab] = useState(0);
   
-  // Form data state with defaults or saved data
-  const [formData, setFormData] = useState(loadSavedFormData());
+  // Form data state with initial data from localStorage or defaults
+  // Using useState with a function to ensure the localStorage read happens only once
+  const [formData, setFormData] = useState(getSavedFormData);
   
   // State for tracking last changed field
   const [lastChanged, setLastChanged] = useState(null);
@@ -186,17 +187,20 @@ const App = () => {
   const nextTab = () => {
     if (currentTab < tabs.length - 1) {
       setCurrentTab(currentTab + 1);
+      window.scrollTo(0, 0);
     }
   };
   
   const prevTab = () => {
     if (currentTab > 0) {
       setCurrentTab(currentTab - 1);
+      window.scrollTo(0, 0);
     }
   };
   
   const goToTab = (index) => {
     setCurrentTab(index);
+    window.scrollTo(0, 0);
   };
   
   // Copy document text to clipboard
