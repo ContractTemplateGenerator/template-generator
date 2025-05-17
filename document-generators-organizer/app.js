@@ -46,7 +46,8 @@ const FALLBACK_CATEGORIES = [
   { id: 3, name: "Contracts", slug: "contracts" },
   { id: 4, name: "Tech & IP Law", slug: "tech-ip-law" },
   { id: 5, name: "Dispute Resolution", slug: "dispute-resolution" },
-  { id: 6, name: "Compliance", slug: "compliance" }
+  { id: 6, name: "Compliance", slug: "compliance" },
+  { id: 7, name: "Russian", slug: "russian" }
 ];
 
 // Main App Component
@@ -65,9 +66,30 @@ const App = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       try {
+        console.log("Fetching posts...");
+        
+        // First, let's get all categories
+        const catResponse = await fetch("https://terms.law/wp-json/wp/v2/categories?per_page=100");
+        
+        if (!catResponse.ok) {
+          throw new Error("Failed to fetch categories");
+        }
+        
+        const allCategories = await catResponse.json();
+        console.log(`Fetched ${allCategories.length} categories`);
+        
+        // Find Document Generators category ID
+        const docGenCategory = allCategories.find(cat => 
+          cat.slug === "document-generators" || 
+          cat.name.toLowerCase().includes("document generator")
+        );
+        
+        const docGeneratorsCategoryId = docGenCategory ? docGenCategory.id : DOC_GENERATORS_CATEGORY_ID;
+        console.log(`Using Document Generators category ID: ${docGeneratorsCategoryId}`);
+        
         // Single API call with _embed to get all related data at once
         const response = await fetch(
-          `https://terms.law/wp-json/wp/v2/posts?categories=${DOC_GENERATORS_CATEGORY_ID}&per_page=100&_embed`
+          `https://terms.law/wp-json/wp/v2/posts?categories=${docGeneratorsCategoryId}&per_page=100&_embed`
         );
         
         if (!response.ok) {
@@ -75,6 +97,7 @@ const App = () => {
         }
         
         const posts = await response.json();
+        console.log(`Fetched ${posts.length} posts`);
         
         // Process posts - with _embed we get categories in the same request
         const processedPosts = posts.map(post => {
@@ -84,11 +107,27 @@ const App = () => {
             post._embedded["wp:term"][0] ? 
             post._embedded["wp:term"][0] : [];
           
+          // Make sure link is correctly formatted
+          let postLink = post.link;
+          
+          // Check for relative URLs and convert to absolute
+          if (postLink && !postLink.startsWith('http')) {
+            postLink = `https://terms.law${postLink.startsWith('/') ? '' : '/'}${postLink}`;
+          }
+          
+          // Check if the link format looks like a generator URL
+          const isGenerator = postLink && (
+            postLink.includes('-generator') || 
+            postLink.includes('generator-') ||
+            post.title.rendered.toLowerCase().includes('generator')
+          );
+          
           return {
             id: post.id,
             title: post.title.rendered,
             description: post.excerpt.rendered.replace(/<\/?[^>]+(>|$)/g, "").substring(0, 100) + "...",
-            link: post.link,
+            link: postLink,
+            isGenerator: isGenerator,
             categories: postCategories.map(cat => ({
               id: cat.id,
               name: cat.name,
@@ -97,22 +136,45 @@ const App = () => {
           };
         });
         
-        setGenerators(processedPosts);
+        // Filter out only posts that look like generators
+        const generatorPosts = processedPosts.filter(post => post.isGenerator);
         
-        // Extract all unique categories from the posts
-        const allCategories = [];
+        if (generatorPosts.length === 0) {
+          console.warn("No generator posts found, falling back to all posts");
+          setGenerators(processedPosts);
+        } else {
+          setGenerators(generatorPosts);
+        }
+        
+        // Extract unique categories including Russian
+        const uniqueCategories = [];
         const categoryIds = new Set();
         
         processedPosts.forEach(post => {
           post.categories.forEach(cat => {
-            if (cat.id !== DOC_GENERATORS_CATEGORY_ID && !categoryIds.has(cat.id)) {
-              allCategories.push(cat);
+            if (cat.id !== docGeneratorsCategoryId && !categoryIds.has(cat.id)) {
+              uniqueCategories.push(cat);
               categoryIds.add(cat.id);
             }
           });
         });
         
-        setCategories(allCategories);
+        // Ensure Russian category is included
+        const russianCat = allCategories.find(cat => 
+          cat.name === "Russian" || 
+          cat.slug === "russian" ||
+          cat.name.toLowerCase().includes("russian")
+        );
+        
+        if (russianCat && !categoryIds.has(russianCat.id)) {
+          uniqueCategories.push({
+            id: russianCat.id,
+            name: russianCat.name,
+            slug: russianCat.slug
+          });
+        }
+        
+        setCategories(uniqueCategories.length > 0 ? uniqueCategories : FALLBACK_CATEGORIES);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching data:", err);
