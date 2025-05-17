@@ -1,43 +1,60 @@
 // Simple Word Document Generator
 (function() {
   // Make the function available globally
-  window.generateWordDoc = function(documentText, formData) {
+  window.generateWordDoc = function(documentText, options) {
     try {
-      console.log("Generating Word document...");
+      if (!documentText || !options) {
+        console.error("Document text or options missing for Word generation.");
+        alert("Error: Could not generate Word document due to missing data.");
+        return;
+      }
+      console.log("Generating Word document with title:", options.documentTitle);
       
-      // Create HTML content for Word
+      // Basic HTML structure for the .doc file
+      // Replace newlines with <br> for single newlines and <p> for double newlines (paragraphs)
+      const paragraphs = documentText.split('\n\n').map(para => {
+          // Escape HTML characters within each paragraph to prevent XSS or rendering issues
+          const escapedPara = para.replace(/&/g, '&')
+                                  .replace(/</g, '<')
+                                  .replace(/>/g, '>')
+                                  .replace(/"/g, '"')
+                                  .replace(/'/g, ''');
+          return `<p>${escapedPara.replace(/\n/g, '<br>')}</p>`;
+      }).join('');
+
       let htmlContent = `
 <!DOCTYPE html>
-<html>
+<html xmlns:w="urn:schemas-microsoft-com:office:word">
 <head>
 <meta charset="UTF-8">
-<title>${formData.documentTitle || "AI Training Data License Agreement"}</title>
+<title>${options.documentTitle || "AI Training Data License Agreement"}</title>
 <style>
-  body { font-family: Calibri, Arial, sans-serif; font-size: 12pt; line-height: 1.5; }
-  h1 { text-align: center; font-size: 16pt; margin-bottom: 20pt; }
-  p { margin-bottom: 10pt; }
+  body { font-family: 'Times New Roman', Times, serif; font-size: 11pt; line-height: 1.5; margin: 1in; }
+  h1, h2, h3 { font-family: 'Arial', sans-serif; } /* You might want more specific styles */
+  p { margin-bottom: 10pt; text-align: justify; }
+  /* Add more specific styles for headings, lists, etc. if needed */
 </style>
 </head>
 <body>
-${documentText.split('\n\n').map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('')}
+  <h1>${options.documentTitle || "AI Training Data License Agreement"}</h1>
+  ${paragraphs}
 </body>
 </html>`;
       
-      // Create and trigger download
       const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = `${formData.fileName || 'AI-Training-Data-License-Agreement'}.doc`;
+      link.download = `${options.fileName || 'AI-Training-Data-License-Agreement'}.doc`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       
-      console.log("Word document generated successfully");
+      console.log("Word document generation initiated.");
     } catch (error) {
       console.error("Error generating Word document:", error);
-      alert("Error generating Word document. Please try again or use the copy option.");
+      alert("Error generating Word document. Please check the console or try copying the text.");
     }
   };
   
-  console.log("Word document generator initialized");
+  console.log("Word document generator (docx-generator.js) initialized.");
 })();
