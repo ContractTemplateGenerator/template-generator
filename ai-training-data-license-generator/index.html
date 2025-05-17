@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Training Data License Agreement Generator</title>
+    <!-- Calendly widget script -->
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
     <style>
         * { box-sizing: border-box; }
         body { 
@@ -195,6 +197,67 @@
             display: flex;
             gap: 0.5rem;
         }
+        .highlighted {
+            background-color: #ffff9c;
+            padding: 0 2px;
+            transition: background-color 0.5s;
+            animation: flash 1s;
+        }
+        
+        @keyframes flash {
+            from { background-color: #ffeb3b; }
+            to { background-color: #ffff9c; }
+        }
+        
+        .completion-status {
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            border-radius: 4px;
+        }
+        
+        .completion-perfect {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        
+        .completion-good {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .completion-needs-work {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .completion-incomplete {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        
+        .completion-status h3 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-list {
+            margin-top: 0.5rem;
+            padding-left: 1.5rem;
+        }
+        
+        .action-item {
+            margin-bottom: 0.5rem;
+        }
+        
+        .action-item a {
+            color: #4361ee;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        
+        .action-item a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -230,7 +293,7 @@
             <div class="button-group">
                 <button class="btn btn-secondary" onclick="copyAgreement()">Copy</button>
                 <button class="btn btn-primary" onclick="downloadAgreement()">Download</button>
-                <button class="btn btn-accent" onclick="openConsultation()">Consult</button>
+                <button class="btn btn-accent" onclick="openCalendly()">Consult</button>
                 <button class="btn btn-primary" id="next-btn" onclick="nextTab()">Next</button>
             </div>
         </div>
@@ -240,6 +303,7 @@
         // Simple global state
         const state = {
             currentTab: 0,
+            lastChanged: null,
             formData: {
                 // Parties
                 licensorName: "ABC Data Corp",
@@ -291,14 +355,14 @@
             <h3>Licensor (Data Owner) Details</h3>
             <div class="form-group">
                 <label for="licensorName">Licensor Name:</label>
-                <input type="text" id="licensorName" class="form-control" value="${state.formData.licensorName}" onchange="updateField(this)">
+                <input type="text" id="licensorName" class="form-control" value="${state.formData.licensorName}" oninput="updateFieldLive(this)">
                 <small>The company or entity providing the data.</small>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="licensorEntity">Entity Type:</label>
-                    <select id="licensorEntity" class="form-control" onchange="updateField(this)">
+                    <select id="licensorEntity" class="form-control" onchange="updateFieldLive(this)">
                         <option value="Corporation" ${state.formData.licensorEntity === 'Corporation' ? 'selected' : ''}>Corporation</option>
                         <option value="Limited Liability Company" ${state.formData.licensorEntity === 'Limited Liability Company' ? 'selected' : ''}>Limited Liability Company</option>
                         <option value="Partnership" ${state.formData.licensorEntity === 'Partnership' ? 'selected' : ''}>Partnership</option>
@@ -308,26 +372,26 @@
                 
                 <div class="form-group">
                     <label for="licensorState">State/Jurisdiction:</label>
-                    <input type="text" id="licensorState" class="form-control" value="${state.formData.licensorState}" onchange="updateField(this)">
+                    <input type="text" id="licensorState" class="form-control" value="${state.formData.licensorState}" oninput="updateFieldLive(this)">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="licensorAddress">Address:</label>
-                <input type="text" id="licensorAddress" class="form-control" value="${state.formData.licensorAddress}" onchange="updateField(this)">
+                <input type="text" id="licensorAddress" class="form-control" value="${state.formData.licensorAddress}" oninput="updateFieldLive(this)">
             </div>
             
             <h3>Licensee (AI Developer) Details</h3>
             <div class="form-group">
                 <label for="licenseeCompany">Licensee Name:</label>
-                <input type="text" id="licenseeCompany" class="form-control" value="${state.formData.licenseeCompany}" onchange="updateField(this)">
+                <input type="text" id="licenseeCompany" class="form-control" value="${state.formData.licenseeCompany}" oninput="updateFieldLive(this)">
                 <small>The company or entity using the data.</small>
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="licenseeEntity">Entity Type:</label>
-                    <select id="licenseeEntity" class="form-control" onchange="updateField(this)">
+                    <select id="licenseeEntity" class="form-control" onchange="updateFieldLive(this)">
                         <option value="Corporation" ${state.formData.licenseeEntity === 'Corporation' ? 'selected' : ''}>Corporation</option>
                         <option value="Limited Liability Company" ${state.formData.licenseeEntity === 'Limited Liability Company' ? 'selected' : ''}>Limited Liability Company</option>
                         <option value="Partnership" ${state.formData.licenseeEntity === 'Partnership' ? 'selected' : ''}>Partnership</option>
@@ -336,13 +400,13 @@
                 
                 <div class="form-group">
                     <label for="licenseeState">State/Jurisdiction:</label>
-                    <input type="text" id="licenseeState" class="form-control" value="${state.formData.licenseeState}" onchange="updateField(this)">
+                    <input type="text" id="licenseeState" class="form-control" value="${state.formData.licenseeState}" oninput="updateFieldLive(this)">
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="licenseeAddress">Address:</label>
-                <input type="text" id="licenseeAddress" class="form-control" value="${state.formData.licenseeAddress}" onchange="updateField(this)">
+                <input type="text" id="licenseeAddress" class="form-control" value="${state.formData.licenseeAddress}" oninput="updateFieldLive(this)">
             </div>`,
             
             // Tab 1: License Terms
@@ -350,7 +414,7 @@
             
             <div class="form-group">
                 <label for="licenseType">License Type:</label>
-                <select id="licenseType" class="form-control" onchange="updateField(this)">
+                <select id="licenseType" class="form-control" onchange="updateFieldLive(this)">
                     <option value="non-exclusive" ${state.formData.licenseType === 'non-exclusive' ? 'selected' : ''}>Non-Exclusive (Licensor can license to others)</option>
                     <option value="exclusive" ${state.formData.licenseType === 'exclusive' ? 'selected' : ''}>Exclusive (Only Licensee can use the data)</option>
                     <option value="sole" ${state.formData.licenseType === 'sole' ? 'selected' : ''}>Sole (Licensor can use but not license to others)</option>
@@ -360,7 +424,7 @@
             
             <div class="form-group">
                 <label for="sublicensing">Sublicensing Rights:</label>
-                <select id="sublicensing" class="form-control" onchange="updateField(this)">
+                <select id="sublicensing" class="form-control" onchange="updateFieldLive(this)">
                     <option value="not-permitted" ${state.formData.sublicensing === 'not-permitted' ? 'selected' : ''}>Not Permitted</option>
                     <option value="limited-permitted" ${state.formData.sublicensing === 'limited-permitted' ? 'selected' : ''}>Limited (Contractors/Service Providers Only)</option>
                     <option value="permitted" ${state.formData.sublicensing === 'permitted' ? 'selected' : ''}>Fully Permitted</option>
@@ -370,15 +434,15 @@
             
             <h3>Data Types Included</h3>
             <div class="form-check">
-                <input type="checkbox" id="dataTypesText" ${state.formData.dataTypesText ? 'checked' : ''} onchange="updateCheckbox(this)">
+                <input type="checkbox" id="dataTypesText" ${state.formData.dataTypesText ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                 <label for="dataTypesText">Text Data</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" id="dataTypesImages" ${state.formData.dataTypesImages ? 'checked' : ''} onchange="updateCheckbox(this)">
+                <input type="checkbox" id="dataTypesImages" ${state.formData.dataTypesImages ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                 <label for="dataTypesImages">Image Data</label>
             </div>
             <div class="form-check">
-                <input type="checkbox" id="dataTypesAudio" ${state.formData.dataTypesAudio ? 'checked' : ''} onchange="updateCheckbox(this)">
+                <input type="checkbox" id="dataTypesAudio" ${state.formData.dataTypesAudio ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                 <label for="dataTypesAudio">Audio Data</label>
             </div>`,
             
@@ -387,7 +451,7 @@
             
             <div class="form-group">
                 <label for="purposeRestrictions">Purpose Restrictions:</label>
-                <select id="purposeRestrictions" class="form-control" onchange="updateField(this)">
+                <select id="purposeRestrictions" class="form-control" onchange="updateFieldLive(this)">
                     <option value="specific-models" ${state.formData.purposeRestrictions === 'specific-models' ? 'selected' : ''}>Specific Model Types Only</option>
                     <option value="product-specific" ${state.formData.purposeRestrictions === 'product-specific' ? 'selected' : ''}>Licensee's Products Only</option>
                     <option value="all-ai" ${state.formData.purposeRestrictions === 'all-ai' ? 'selected' : ''}>Any AI Systems (No Restrictions)</option>
@@ -397,18 +461,18 @@
             <div id="modelTypesSection">
                 <h3>Allowed Model Types</h3>
                 <div class="form-check">
-                    <input type="checkbox" id="modelTypesText" ${state.formData.modelTypesText ? 'checked' : ''} onchange="updateCheckbox(this)">
+                    <input type="checkbox" id="modelTypesText" ${state.formData.modelTypesText ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                     <label for="modelTypesText">Generative Text Models</label>
                 </div>
                 <div class="form-check">
-                    <input type="checkbox" id="modelTypesImage" ${state.formData.modelTypesImage ? 'checked' : ''} onchange="updateCheckbox(this)">
+                    <input type="checkbox" id="modelTypesImage" ${state.formData.modelTypesImage ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                     <label for="modelTypesImage">Generative Image Models</label>
                 </div>
             </div>
             
             <div class="form-group">
                 <label for="ownershipModels">Ownership of Resulting AI Models:</label>
-                <select id="ownershipModels" class="form-control" onchange="updateField(this)">
+                <select id="ownershipModels" class="form-control" onchange="updateFieldLive(this)">
                     <option value="licensee-owns" ${state.formData.ownershipModels === 'licensee-owns' ? 'selected' : ''}>Licensee Fully Owns</option>
                     <option value="licensor-royalty" ${state.formData.ownershipModels === 'licensor-royalty' ? 'selected' : ''}>Licensee Owns (with Licensor Royalty Rights)</option>
                     <option value="joint-ownership" ${state.formData.ownershipModels === 'joint-ownership' ? 'selected' : ''}>Joint Ownership</option>
@@ -417,7 +481,7 @@
             
             <div class="form-group">
                 <label for="attributionRequired">Attribution Required:</label>
-                <select id="attributionRequired" class="form-control" onchange="updateField(this)">
+                <select id="attributionRequired" class="form-control" onchange="updateFieldLive(this)">
                     <option value="no" ${state.formData.attributionRequired === 'no' ? 'selected' : ''}>No</option>
                     <option value="yes" ${state.formData.attributionRequired === 'yes' ? 'selected' : ''}>Yes</option>
                 </select>
@@ -429,7 +493,7 @@
             
             <div class="form-group">
                 <label for="compensationType">Compensation Structure:</label>
-                <select id="compensationType" class="form-control" onchange="updateField(this)">
+                <select id="compensationType" class="form-control" onchange="updateFieldLive(this)">
                     <option value="one-time" ${state.formData.compensationType === 'one-time' ? 'selected' : ''}>One-Time Fee</option>
                     <option value="royalty" ${state.formData.compensationType === 'royalty' ? 'selected' : ''}>Royalty-Based</option>
                     <option value="hybrid" ${state.formData.compensationType === 'hybrid' ? 'selected' : ''}>Hybrid (Initial Fee + Royalty)</option>
@@ -438,23 +502,23 @@
             
             <div class="form-group">
                 <label for="initialFee">Initial Fee (USD):</label>
-                <input type="text" id="initialFee" class="form-control" value="${state.formData.initialFee}" onchange="updateField(this)">
+                <input type="text" id="initialFee" class="form-control" value="${state.formData.initialFee}" oninput="updateFieldLive(this)">
             </div>
             
             <div class="form-group" id="royaltySection" style="${state.formData.compensationType === 'one-time' ? 'display:none' : ''}">
                 <label for="royaltyPercent">Royalty Percentage (%):</label>
-                <input type="text" id="royaltyPercent" class="form-control" value="${state.formData.royaltyPercent}" onchange="updateField(this)">
+                <input type="text" id="royaltyPercent" class="form-control" value="${state.formData.royaltyPercent}" oninput="updateFieldLive(this)">
             </div>
             
             <div class="form-row">
                 <div class="form-group">
                     <label for="term">Term Duration:</label>
-                    <input type="number" id="term" class="form-control" value="${state.formData.term}" min="1" onchange="updateField(this)">
+                    <input type="number" id="term" class="form-control" value="${state.formData.term}" min="1" oninput="updateFieldLive(this)">
                 </div>
                 
                 <div class="form-group">
                     <label for="termUnit">Unit:</label>
-                    <select id="termUnit" class="form-control" onchange="updateField(this)">
+                    <select id="termUnit" class="form-control" onchange="updateFieldLive(this)">
                         <option value="years" ${state.formData.termUnit === 'years' ? 'selected' : ''}>Years</option>
                         <option value="months" ${state.formData.termUnit === 'months' ? 'selected' : ''}>Months</option>
                     </select>
@@ -466,21 +530,21 @@
             
             <div class="form-group">
                 <label for="licensorWarranty">Licensor Warranty Level:</label>
-                <select id="licensorWarranty" class="form-control" onchange="updateField(this)">
+                <select id="licensorWarranty" class="form-control" onchange="updateFieldLive(this)">
                     <option value="limited" ${state.formData.licensorWarranty === 'limited' ? 'selected' : ''}>Limited Warranty</option>
                     <option value="as-is" ${state.formData.licensorWarranty === 'as-is' ? 'selected' : ''}>As-Is (No Warranty)</option>
                 </select>
             </div>
             
             <div class="form-check">
-                <input type="checkbox" id="dataComplianceWarranty" ${state.formData.dataComplianceWarranty ? 'checked' : ''} onchange="updateCheckbox(this)">
+                <input type="checkbox" id="dataComplianceWarranty" ${state.formData.dataComplianceWarranty ? 'checked' : ''} onchange="updateCheckboxLive(this)">
                 <label for="dataComplianceWarranty">Include Data Compliance Warranty</label>
                 <small>Licensor warrants data was collected in compliance with laws.</small>
             </div>
             
             <div class="form-group">
                 <label for="indemnification">Indemnification:</label>
-                <select id="indemnification" class="form-control" onchange="updateField(this)">
+                <select id="indemnification" class="form-control" onchange="updateFieldLive(this)">
                     <option value="mutual" ${state.formData.indemnification === 'mutual' ? 'selected' : ''}>Mutual Indemnification</option>
                     <option value="licensee-only" ${state.formData.indemnification === 'licensee-only' ? 'selected' : ''}>Licensee Indemnifies Licensor</option>
                     <option value="licensor-only" ${state.formData.indemnification === 'licensor-only' ? 'selected' : ''}>Licensor Indemnifies Licensee</option>
@@ -489,7 +553,7 @@
             
             <div class="form-group">
                 <label for="liabilityLimit">Limitation of Liability:</label>
-                <select id="liabilityLimit" class="form-control" onchange="updateField(this)">
+                <select id="liabilityLimit" class="form-control" onchange="updateFieldLive(this)">
                     <option value="fees-paid" ${state.formData.liabilityLimit === 'fees-paid' ? 'selected' : ''}>Limited to Fees Paid</option>
                     <option value="no-consequential" ${state.formData.liabilityLimit === 'no-consequential' ? 'selected' : ''}>No Consequential Damages</option>
                     <option value="both-limits" ${state.formData.liabilityLimit === 'both-limits' ? 'selected' : ''}>Both Limitations</option>
@@ -501,14 +565,18 @@
             
             <div class="form-group">
                 <label for="fileName">File Name:</label>
-                <input type="text" id="fileName" class="form-control" value="${state.formData.fileName}" onchange="updateField(this)">
+                <input type="text" id="fileName" class="form-control" value="${state.formData.fileName}" oninput="updateFieldLive(this)">
+            </div>
+            
+            <div id="completion-status">
+                <!-- Completion status will be inserted here -->
             </div>
             
             <div id="risk-assessment">
                 <!-- Risk assessment will be inserted here -->
             </div>
             
-            <p>Review the complete agreement in the preview pane. Once you're satisfied, you can download it as a Word document or copy to clipboard. For legal advice specific to your situation, click the "Consult" button to schedule a consultation with an attorney.</p>`
+            <p>To finalize this agreement, you can download it as a Word document or copy it to your clipboard. For legal advice specific to your situation, click the "Consult" button to schedule a consultation with an attorney.</p>`
         ];
         
         // Initialize when page loads
@@ -543,6 +611,7 @@
             
             if (tabIndex === 5) { // Finalization tab
                 updateRiskAssessment();
+                updateCompletionStatus();
             }
             
             // Update navigation buttons
@@ -563,8 +632,9 @@
             }
         }
         
-        // Update form data when fields change
-        function updateField(element) {
+        // Update form data when fields change in real-time
+        function updateFieldLive(element) {
+            state.lastChanged = element.id;
             state.formData[element.id] = element.value;
             
             // Special handling for compensation type
@@ -572,13 +642,14 @@
                 updateCompensationFields();
             }
             
-            updatePreview();
+            updatePreviewLive();
         }
         
-        // Update checkbox values
-        function updateCheckbox(element) {
+        // Update checkbox values in real-time
+        function updateCheckboxLive(element) {
+            state.lastChanged = element.id;
             state.formData[element.id] = element.checked;
-            updatePreview();
+            updatePreviewLive();
         }
         
         // Update compensation fields visibility
@@ -616,76 +687,6 @@
             if (types.length === 1) return types[0];
             
             return types.slice(0, -1).join(', ') + ' and ' + types[types.length - 1];
-        }
-        
-        // Update preview
-        function updatePreview() {
-            const preview = document.getElementById('preview-content');
-            preview.textContent = generateAgreementText();
-        }
-        
-        // Update risk assessment
-        function updateRiskAssessment() {
-            const riskAssessment = document.getElementById('risk-assessment');
-            if (!riskAssessment) return;
-            
-            const risks = [];
-            
-            // Check for missing party information
-            if (!state.formData.licensorName || !state.formData.licensorAddress) {
-                risks.push({
-                    level: 'high',
-                    title: 'Missing Licensor Information',
-                    description: 'Basic licensor information is incomplete.'
-                });
-            }
-            
-            if (!state.formData.licenseeCompany || !state.formData.licenseeAddress) {
-                risks.push({
-                    level: 'high',
-                    title: 'Missing Licensee Information',
-                    description: 'Basic licensee information is incomplete.'
-                });
-            }
-            
-            // Check for data compliance warranty
-            if (!state.formData.dataComplianceWarranty) {
-                risks.push({
-                    level: 'medium',
-                    title: 'No Data Compliance Warranty',
-                    description: 'Consider including a warranty that data was collected legally.'
-                });
-            }
-            
-            // Check exclusive license with one-time fee
-            if (state.formData.licenseType === 'exclusive' && state.formData.compensationType === 'one-time') {
-                risks.push({
-                    level: 'medium',
-                    title: 'Exclusive License with One-Time Fee',
-                    description: 'Consider a royalty component for exclusive licenses.'
-                });
-            }
-            
-            // Generate HTML
-            let html = '<h3>Risk Assessment</h3>';
-            
-            if (risks.length === 0) {
-                html += `
-                <div class="risk-item risk-low">
-                    <h4>No Major Risks Identified</h4>
-                    <p>Based on your selections, no significant risks were identified.</p>
-                </div>`;
-            } else {
-                risks.forEach(risk => {
-                    html += `
-                    <div class="risk-item risk-${risk.level}">
-                        <h4>${risk.title}</h4>
-                        <p>${risk.description}</p>
-                    </div>`;
-                });
-            }
-            
-            riskAssessment.innerHTML = html;
         }
         
         // Generate agreement text
@@ -818,6 +819,403 @@ Name: _________________________
 Title: __________________________`;
         }
         
+        // Define mapping for highlight positions based on fields
+        const highlightPositions = {
+            // Parties
+            licensorName: [
+                { startPattern: 'by and between:', endPattern: ', a', includeStart: true },
+                { startPattern: 'LICENSOR: ', endPattern: '\n\nBy:', includeStart: true }
+            ],
+            licensorEntity: [
+                { startPattern: `${state.formData.licensorName || '[LICENSOR NAME]'}, a `, endPattern: ' having its', includeStart: true }
+            ],
+            licensorAddress: [
+                { startPattern: 'principal place of business at ', endPattern: `, ${state.formData.licensorState || '[STATE]'}`, includeStart: true }
+            ],
+            licensorState: [
+                { startPattern: `${state.formData.licensorAddress || '[ADDRESS]'}, `, endPattern: ' (the "Licensor")', includeStart: true },
+                { startPattern: 'laws of ', endPattern: ', without regard', includeStart: true }
+            ],
+            licenseeCompany: [
+                { startPattern: '(the "Licensor"), and\n\n', endPattern: ', a', includeStart: true },
+                { startPattern: 'LICENSEE: ', endPattern: '\n\nBy:', includeStart: true }
+            ],
+            licenseeEntity: [
+                { startPattern: `${state.formData.licenseeCompany || '[LICENSEE NAME]'}, a `, endPattern: ' having its', includeStart: true }
+            ],
+            licenseeAddress: [
+                { startPattern: 'principal place of business at ', endPattern: `, ${state.formData.licenseeState || '[STATE]'} (the "Licensee")`, includeStart: true }
+            ],
+            licenseeState: [
+                { startPattern: `${state.formData.licenseeAddress || '[ADDRESS]'}, `, endPattern: ' (the "Licensee")', includeStart: true }
+            ],
+            
+            // License terms
+            licenseType: [
+                { startPattern: 'grants to Licensee a', endPattern: ', license', includeStart: true }
+            ],
+            sublicensing: [
+                { startPattern: '2.2 Licensee', endPattern: 'prior written consent.', includeStart: true }
+            ],
+            dataTypesText: [
+                { startPattern: 'specifically including ', endPattern: '.', includeStart: true }
+            ],
+            dataTypesImages: [
+                { startPattern: 'specifically including ', endPattern: '.', includeStart: true }
+            ],
+            dataTypesAudio: [
+                { startPattern: 'specifically including ', endPattern: '.', includeStart: true }
+            ],
+            
+            // Data Usage
+            purposeRestrictions: [
+                { startPattern: '3.1 Permitted Uses.', endPattern: '.', includeStart: true }
+            ],
+            modelTypesText: [
+                { startPattern: 'solely for Training ', endPattern: '.', includeStart: true }
+            ],
+            modelTypesImage: [
+                { startPattern: 'solely for Training ', endPattern: '.', includeStart: true }
+            ],
+            ownershipModels: [
+                { startPattern: '4.1 AI Systems.', endPattern: '.', includeStart: false }
+            ],
+            attributionRequired: [
+                { startPattern: '3.3 Attribution.', endPattern: '."}', includeStart: true }
+            ],
+            
+            // Compensation
+            compensationType: [
+                { startPattern: '5. COMPENSATION', endPattern: '6. TERM AND TERMINATION', includeStart: false, includeEnd: false, multiline: true }
+            ],
+            initialFee: [
+                { startPattern: 'fee of $', endPattern: ' within thirty', includeStart: true }
+            ],
+            royaltyPercent: [
+                { startPattern: 'a royalty of ', endPattern: '% of the Net', includeStart: true }
+            ],
+            term: [
+                { startPattern: 'for a period of ', endPattern: ` ${state.formData.termUnit}`, includeStart: true }
+            ],
+            termUnit: [
+                { startPattern: `${state.formData.term} `, endPattern: ' (the "Term")', includeStart: true }
+            ],
+            
+            // Legal terms
+            licensorWarranty: [
+                { startPattern: '7.1', endPattern: 'third party.', includeStart: true, multiline: true }
+            ],
+            dataComplianceWarranty: [
+                { startPattern: '7.2 Compliance with Laws.', endPattern: 'Agreement.', includeStart: true, multiline: true }
+            ],
+            indemnification: [
+                { startPattern: '8.1', endPattern: 'misconduct.', includeStart: true, multiline: true }
+            ],
+            liabilityLimit: [
+                { startPattern: '9.', endPattern: '10. GENERAL PROVISIONS', includeStart: true, includeEnd: false, multiline: true }
+            ]
+        };
+
+        // Find text to highlight based on field
+        function findTextToHighlight(field) {
+            const fullText = generateAgreementText();
+            const positions = highlightPositions[field];
+            
+            if (!positions) return null;
+            
+            for (const position of positions) {
+                let startIndex, endIndex;
+                
+                if (position.multiline) {
+                    // For multiline matches
+                    startIndex = fullText.indexOf(position.startPattern);
+                    endIndex = position.endPattern ? fullText.indexOf(position.endPattern, startIndex + position.startPattern.length) : fullText.length;
+                } else {
+                    // For single-line matches
+                    const lines = fullText.split('\n');
+                    for (let i = 0; i < lines.length; i++) {
+                        if (lines[i].includes(position.startPattern)) {
+                            startIndex = fullText.indexOf(lines[i]);
+                            endIndex = startIndex + lines[i].length;
+                            break;
+                        }
+                    }
+                }
+                
+                if (startIndex >= 0 && endIndex >= 0) {
+                    if (!position.includeStart) startIndex += position.startPattern.length;
+                    if (position.includeEnd) endIndex += position.endPattern.length;
+                    
+                    return {
+                        text: fullText.substring(startIndex, endIndex),
+                        start: startIndex,
+                        end: endIndex
+                    };
+                }
+            }
+            
+            return null;
+        }
+        
+        // Update preview with live highlighting and scrolling
+        function updatePreviewLive() {
+            const preview = document.getElementById('preview-content');
+            const originalText = generateAgreementText();
+            
+            // If no field has changed, just set the text
+            if (!state.lastChanged) {
+                preview.textContent = originalText;
+                return;
+            }
+            
+            // Find the text to highlight
+            const highlightInfo = findTextToHighlight(state.lastChanged);
+            
+            if (!highlightInfo) {
+                // If we couldn't find specific text to highlight, just update the preview
+                preview.textContent = originalText;
+                return;
+            }
+            
+            // Create the highlighted text
+            const beforeText = originalText.substring(0, highlightInfo.start);
+            const highlightedText = originalText.substring(highlightInfo.start, highlightInfo.end);
+            const afterText = originalText.substring(highlightInfo.end);
+            
+            // Update the preview with highlighted text
+            preview.innerHTML = beforeText + '<span class="highlighted">' + highlightedText + '</span>' + afterText;
+            
+            // Scroll to the highlighted text
+            const highlightedSpan = preview.querySelector('.highlighted');
+            if (highlightedSpan) {
+                highlightedSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
+        
+        // Update preview without highlighting (used for initialization)
+        function updatePreview() {
+            const preview = document.getElementById('preview-content');
+            preview.textContent = generateAgreementText();
+        }
+        
+        // Update risk assessment
+        function updateRiskAssessment() {
+            const riskAssessment = document.getElementById('risk-assessment');
+            if (!riskAssessment) return;
+            
+            const risks = [];
+            
+            // Check for missing party information
+            if (!state.formData.licensorName || !state.formData.licensorName.trim()) {
+                risks.push({
+                    level: 'high',
+                    title: 'Missing Licensor Name',
+                    description: 'The licensor\'s name is required to identify the party providing the data.',
+                    action: 'Add the licensor\'s name in the Parties tab.',
+                    tab: 0
+                });
+            }
+            
+            if (!state.formData.licensorAddress || !state.formData.licensorAddress.trim()) {
+                risks.push({
+                    level: 'high',
+                    title: 'Missing Licensor Address',
+                    description: 'The licensor\'s address is required for proper notice and legal identification.',
+                    action: 'Add the licensor\'s address in the Parties tab.',
+                    tab: 0
+                });
+            }
+            
+            if (!state.formData.licenseeCompany || !state.formData.licenseeCompany.trim()) {
+                risks.push({
+                    level: 'high',
+                    title: 'Missing Licensee Name',
+                    description: 'The licensee\'s name is required to identify the party using the data.',
+                    action: 'Add the licensee\'s name in the Parties tab.',
+                    tab: 0
+                });
+            }
+            
+            if (!state.formData.licenseeAddress || !state.formData.licenseeAddress.trim()) {
+                risks.push({
+                    level: 'high',
+                    title: 'Missing Licensee Address',
+                    description: 'The licensee\'s address is required for proper notice and legal identification.',
+                    action: 'Add the licensee\'s address in the Parties tab.',
+                    tab: 0
+                });
+            }
+            
+            // Check for data compliance warranty
+            if (!state.formData.dataComplianceWarranty) {
+                risks.push({
+                    level: 'medium',
+                    title: 'No Data Compliance Warranty',
+                    description: 'Without this warranty, the licensee has no assurance that the data was collected legally, which could expose them to liability if used in AI systems.',
+                    action: 'Consider enabling the data compliance warranty in the Legal Terms tab.',
+                    tab: 4
+                });
+            }
+            
+            // Check exclusive license with one-time fee
+            if (state.formData.licenseType === 'exclusive' && state.formData.compensationType === 'one-time') {
+                risks.push({
+                    level: 'medium',
+                    title: 'Exclusive License with One-Time Fee',
+                    description: 'An exclusive license with only a one-time fee may undervalue the data, especially if the AI models become highly profitable over time.',
+                    action: 'Consider adding a royalty component by changing the compensation type in the Compensation tab.',
+                    tab: 3
+                });
+            }
+            
+            // Check for "as-is" warranty with no attribution
+            if (state.formData.licensorWarranty === 'as-is' && state.formData.attributionRequired === 'no') {
+                risks.push({
+                    level: 'low',
+                    title: 'No Warranty and No Attribution',
+                    description: 'Providing data "as-is" with no attribution requirement may limit the licensor\'s recognition and potential marketing benefits.',
+                    action: 'Consider requiring attribution in the Data Usage tab if providing data without warranties.',
+                    tab: 2
+                });
+            }
+            
+            // Check if no data types are selected
+            if (!state.formData.dataTypesText && !state.formData.dataTypesImages && !state.formData.dataTypesAudio) {
+                risks.push({
+                    level: 'medium',
+                    title: 'No Data Types Selected',
+                    description: 'No specific data types have been selected, which may create ambiguity about what is covered under the agreement.',
+                    action: 'Select at least one data type in the License Terms tab.',
+                    tab: 1
+                });
+            }
+            
+            // Check if specific models required but none selected
+            if (state.formData.purposeRestrictions === 'specific-models' && 
+                !state.formData.modelTypesText && !state.formData.modelTypesImage) {
+                risks.push({
+                    level: 'medium',
+                    title: 'No Model Types Selected',
+                    description: 'Purpose restrictions are set to specific model types, but no models have been selected.',
+                    action: 'Select at least one model type or change purpose restrictions in the Data Usage tab.',
+                    tab: 2
+                });
+            }
+            
+            // Generate HTML
+            let html = '<h3>Risk Assessment</h3>';
+            
+            if (risks.length === 0) {
+                html += `
+                <div class="risk-item risk-low">
+                    <h4>No Significant Risks Identified</h4>
+                    <p>Based on your selections, no significant risks were identified in the agreement.</p>
+                </div>`;
+            } else {
+                risks.forEach(risk => {
+                    html += `
+                    <div class="risk-item risk-${risk.level}">
+                        <h4>${risk.title}</h4>
+                        <p>${risk.description}</p>
+                        <p><strong>Recommended Action:</strong> <a href="#" onclick="showTab(${risk.tab}); return false;">${risk.action}</a></p>
+                    </div>`;
+                });
+            }
+            
+            riskAssessment.innerHTML = html;
+        }
+        
+        // Update completion status
+        function updateCompletionStatus() {
+            const completionStatus = document.getElementById('completion-status');
+            if (!completionStatus) return;
+            
+            // Check for missing required fields
+            const missingFields = [];
+            
+            if (!state.formData.licensorName || !state.formData.licensorName.trim()) {
+                missingFields.push('Licensor Name');
+            }
+            
+            if (!state.formData.licensorAddress || !state.formData.licensorAddress.trim()) {
+                missingFields.push('Licensor Address');
+            }
+            
+            if (!state.formData.licenseeCompany || !state.formData.licenseeCompany.trim()) {
+                missingFields.push('Licensee Name');
+            }
+            
+            if (!state.formData.licenseeAddress || !state.formData.licenseeAddress.trim()) {
+                missingFields.push('Licensee Address');
+            }
+            
+            // Check for other potential issues
+            const warnings = [];
+            
+            if (state.formData.licenseType === 'exclusive' && state.formData.compensationType === 'one-time') {
+                warnings.push('Exclusive license with one-time fee may undervalue the data');
+            }
+            
+            if (!state.formData.dataComplianceWarranty) {
+                warnings.push('No data compliance warranty included');
+            }
+            
+            if (state.formData.purposeRestrictions === 'specific-models' && 
+                !state.formData.modelTypesText && !state.formData.modelTypesImage) {
+                warnings.push('No model types selected for specific model restrictions');
+            }
+            
+            // Determine completion status
+            let statusClass, statusTitle, statusMessage;
+            let actionList = '';
+            
+            if (missingFields.length > 0) {
+                statusClass = 'completion-incomplete';
+                statusTitle = 'Agreement Incomplete';
+                statusMessage = 'Your agreement is missing critical information that should be completed before finalizing.';
+                
+                actionList = '<ul class="action-list">';
+                missingFields.forEach(field => {
+                    actionList += `<li class="action-item">Add <a href="#" onclick="showTab(0); return false;">${field}</a></li>`;
+                });
+                actionList += '</ul>';
+            } else if (warnings.length > 2) {
+                statusClass = 'completion-needs-work';
+                statusTitle = 'Agreement Needs Attention';
+                statusMessage = 'Your agreement has several potential issues that should be addressed.';
+                
+                actionList = '<ul class="action-list">';
+                warnings.slice(0, 3).forEach(warning => {
+                    actionList += `<li class="action-item">${warning}</li>`;
+                });
+                actionList += '</ul>';
+            } else if (warnings.length > 0) {
+                statusClass = 'completion-good';
+                statusTitle = 'Agreement Nearly Complete';
+                statusMessage = 'Your agreement has the essential information but could be improved in a few areas.';
+                
+                actionList = '<ul class="action-list">';
+                warnings.forEach(warning => {
+                    actionList += `<li class="action-item">${warning}</li>`;
+                });
+                actionList += '</ul>';
+            } else {
+                statusClass = 'completion-perfect';
+                statusTitle = 'Agreement Ready to Finalize';
+                statusMessage = 'Your agreement looks complete and well-balanced. You may download or copy it now.';
+            }
+            
+            // Generate HTML
+            let html = `
+            <div class="completion-status ${statusClass}">
+                <h3>${statusTitle}</h3>
+                <p>${statusMessage}</p>
+                ${actionList}
+            </div>`;
+            
+            completionStatus.innerHTML = html;
+        }
+        
         // Copy agreement to clipboard
         function copyAgreement() {
             navigator.clipboard.writeText(generateAgreementText())
@@ -862,9 +1260,10 @@ Title: __________________________`;
             document.body.removeChild(link);
         }
         
-        // Open consultation calendar
-        function openConsultation() {
-            window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1', '_blank');
+        // Open Calendly popup
+        function openCalendly() {
+            Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});
+            return false;
         }
     </script>
 </body>
