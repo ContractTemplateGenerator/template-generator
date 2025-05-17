@@ -1,4 +1,4 @@
-// Word document generator
+// Word Document Generator Function
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -12,7 +12,7 @@ window.generateWordDoc = function(documentText, formData) {
 <title>${formData.documentTitle || "AI Training Data License Agreement"}</title>
 <style>
   body {
-    font-family: 'Times New Roman', Times, serif;
+    font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
   }
@@ -37,14 +37,39 @@ window.generateWordDoc = function(documentText, formData) {
 <body>
 `;
 
-    // Process the document text - convert newlines to HTML paragraphs
-    const processedText = documentText
+    // Split document text if there's a form feed character (for separate pages)
+    let mainText = documentText;
+    let appendixText = '';
+    
+    if (documentText.includes('\f')) {
+      const parts = documentText.split(/\f/);
+      mainText = parts[0];
+      appendixText = parts.length > 1 ? parts[1] : '';
+    }
+    
+    // Process main text - convert newlines to HTML paragraphs
+    const mainTextHtml = mainText
       .split('\n\n')
       .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
       .join('');
     
-    // Add processed text to HTML content
-    htmlContent += processedText;
+    // Add main text to HTML content
+    htmlContent += mainTextHtml;
+    
+    // Add appendix on a new page if applicable
+    if (appendixText) {
+      // Add page break
+      htmlContent += '<div class="page-break"></div>';
+      
+      // Process appendix text
+      const appendixHtml = appendixText
+        .split('\n\n')
+        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
+        .join('');
+      
+      // Add appendix to HTML content
+      htmlContent += appendixHtml;
+    }
     
     // Close HTML document
     htmlContent += '</body></html>';
