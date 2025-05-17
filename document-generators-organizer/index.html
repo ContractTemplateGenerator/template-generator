@@ -4,20 +4,466 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document Generators Organizer | terms.law</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <style>
+        :root {
+          --primary-color: #0069ff;
+          --secondary-color: #f6f8fa;
+          --border-color: #e1e4e8;
+          --text-color: #24292e;
+          --heading-color: #1b1f23;
+          --link-color: #0366d6;
+          --hover-color: #f1f5f9;
+          --active-color: #e3f2fd;
+          --shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+        }
+        
+        * {
+          box-sizing: border-box;
+          margin: 0;
+          padding: 0;
+        }
+        
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+          color: var(--text-color);
+          background-color: #fff;
+          line-height: 1.5;
+        }
+        
+        .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          padding: 20px;
+        }
+        
+        .organizer {
+          display: flex;
+          flex-direction: column;
+          border: 1px solid var(--border-color);
+          border-radius: 6px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+        }
+        
+        .header {
+          padding: 16px;
+          background-color: var(--secondary-color);
+          border-bottom: 1px solid var(--border-color);
+        }
+        
+        .header h1 {
+          font-size: 18px;
+          font-weight: 600;
+          color: var(--heading-color);
+          margin-bottom: 8px;
+        }
+        
+        .header p {
+          font-size: 14px;
+          color: #586069;
+        }
+        
+        .search-bar {
+          padding: 12px 16px;
+          border-bottom: 1px solid var(--border-color);
+        }
+        
+        .search-input {
+          width: 100%;
+          padding: 8px 12px;
+          border: 1px solid var(--border-color);
+          border-radius: 4px;
+          font-size: 14px;
+        }
+        
+        .category-filter {
+          display: flex;
+          padding: 8px 16px;
+          border-bottom: 1px solid var(--border-color);
+          background-color: var(--secondary-color);
+          overflow-x: auto;
+          white-space: nowrap;
+        }
+        
+        .category-filter button {
+          background: none;
+          border: none;
+          padding: 6px 12px;
+          margin-right: 8px;
+          font-size: 14px;
+          cursor: pointer;
+          border-radius: 4px;
+          color: var(--text-color);
+        }
+        
+        .category-filter button:hover {
+          background-color: var(--hover-color);
+        }
+        
+        .category-filter button.active {
+          background-color: var(--active-color);
+          color: var(--primary-color);
+          font-weight: 500;
+        }
+        
+        .generators-list {
+          padding: 0;
+          max-height: 600px;
+          overflow-y: auto;
+        }
+        
+        .category-section {
+          margin-bottom: 16px;
+        }
+        
+        .category-title {
+          padding: 12px 16px;
+          font-size: 16px;
+          font-weight: 600;
+          background-color: var(--secondary-color);
+          border-bottom: 1px solid var(--border-color);
+          position: sticky;
+          top: 0;
+        }
+        
+        .generator-card {
+          display: flex;
+          padding: 16px;
+          border-bottom: 1px solid var(--border-color);
+          transition: background-color 0.2s;
+          text-decoration: none;
+          color: var(--text-color);
+        }
+        
+        .generator-card:hover {
+          background-color: var(--hover-color);
+        }
+        
+        .generator-icon {
+          width: 32px;
+          height: 32px;
+          margin-right: 12px;
+          color: var(--primary-color);
+        }
+        
+        .generator-info {
+          flex: 1;
+        }
+        
+        .generator-title {
+          font-size: 16px;
+          font-weight: 500;
+          color: var(--link-color);
+          margin-bottom: 4px;
+        }
+        
+        .generator-description {
+          font-size: 13px;
+          color: #586069;
+        }
+        
+        .tag {
+          display: inline-block;
+          padding: 2px 8px;
+          margin-right: 4px;
+          margin-top: 6px;
+          background-color: var(--secondary-color);
+          border-radius: 12px;
+          font-size: 12px;
+          color: #586069;
+        }
+        
+        .loading {
+          padding: 20px;
+          text-align: center;
+          color: #586069;
+        }
+        
+        .error {
+          padding: 20px;
+          text-align: center;
+          color: #cb2431;
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel" src="app.js"></script>
+    <div class="organizer">
+        <div class="header">
+            <h1>Document Generators</h1>
+            <p>Customizable legal document generators for your business needs</p>
+        </div>
+        
+        <div class="search-bar">
+            <input id="search-input" type="text" class="search-input" placeholder="Search generators...">
+        </div>
+        
+        <div class="category-filter" id="category-filter">
+            <button class="active" data-category="all">All Categories</button>
+            <button data-category="business-formation">Business Formation</button>
+            <button data-category="contracts">Contracts</button>
+            <button data-category="tech-ip-law">Tech & IP Law</button>
+            <button data-category="finance">Finance</button>
+            <button data-category="dispute-resolution">Dispute Resolution</button>
+            <button data-category="compliance">Compliance</button>
+        </div>
+        
+        <div class="generators-list" id="generators-list">
+            <!-- Data will be loaded here by JavaScript -->
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            feather.replace();
+    // Generator data
+    const GENERATORS = [
+      {
+        id: 1,
+        title: "Revenue-Based Financing Agreement Generator",
+        description: "Create a custom revenue-based financing agreement tailored to your business needs.",
+        link: "https://terms.law/revenue-based-financing-generator/",
+        categories: [
+          { id: 1, name: "Business Formation", slug: "business-formation" },
+          { id: 2, name: "Finance", slug: "finance" }
+        ]
+      },
+      {
+        id: 2,
+        title: "LLC Operating Agreement Generator",
+        description: "Generate a comprehensive LLC operating agreement customized for your business structure.",
+        link: "https://terms.law/llc-operating-agreement-generator/",
+        categories: [
+          { id: 1, name: "Business Formation", slug: "business-formation" },
+          { id: 3, name: "Contracts", slug: "contracts" }
+        ]
+      },
+      {
+        id: 3,
+        title: "SaaS Terms of Service Generator",
+        description: "Create legally compliant terms of service for your software as a service business.",
+        link: "https://terms.law/saas-terms-generator/",
+        categories: [
+          { id: 4, name: "Tech & IP Law", slug: "tech-ip-law" },
+          { id: 3, name: "Contracts", slug: "contracts" }
+        ]
+      },
+      {
+        id: 4,
+        title: "Strategic NDA Generator",
+        description: "Generate a customized non-disclosure agreement to protect your confidential information.",
+        link: "https://terms.law/strategic-nda-generator/",
+        categories: [
+          { id: 3, name: "Contracts", slug: "contracts" },
+          { id: 5, name: "Dispute Resolution", slug: "dispute-resolution" }
+        ]
+      },
+      {
+        id: 5,
+        title: "Share Transfer Agreement Generator",
+        description: "Create a legally sound share transfer agreement for company ownership changes.",
+        link: "https://terms.law/share-transfer-agreement-generator/",
+        categories: [
+          { id: 1, name: "Business Formation", slug: "business-formation" },
+          { id: 3, name: "Contracts", slug: "contracts" }
+        ]
+      },
+      {
+        id: 6,
+        title: "Privacy Policy Generator",
+        description: "Generate a comprehensive privacy policy compliant with GDPR, CCPA and other regulations.",
+        link: "https://terms.law/privacy-policy-generator/",
+        categories: [
+          { id: 4, name: "Tech & IP Law", slug: "tech-ip-law" },
+          { id: 6, name: "Compliance", slug: "compliance" }
+        ]
+      },
+      {
+        id: 7,
+        title: "Independent Contractor Agreement Generator",
+        description: "Create an independent contractor agreement that protects your business interests.",
+        link: "https://terms.law/independent-contractor-agreement-generator/",
+        categories: [
+          { id: 3, name: "Contracts", slug: "contracts" },
+          { id: 7, name: "Employment", slug: "employment" }
+        ]
+      },
+      {
+        id: 8,
+        title: "Website Terms of Use Generator",
+        description: "Generate comprehensive terms of use for your business website.",
+        link: "https://terms.law/website-terms-generator/",
+        categories: [
+          { id: 4, name: "Tech & IP Law", slug: "tech-ip-law" },
+          { id: 6, name: "Compliance", slug: "compliance" }
+        ]
+      },
+      {
+        id: 9,
+        title: "Trademark Licensing Agreement Generator",
+        description: "Create a custom trademark licensing agreement to protect your intellectual property.",
+        link: "https://terms.law/trademark-licensing-generator/",
+        categories: [
+          { id: 4, name: "Tech & IP Law", slug: "tech-ip-law" },
+          { id: 3, name: "Contracts", slug: "contracts" }
+        ]
+      },
+      {
+        id: 10,
+        title: "Executive Compensation Agreement Generator",
+        description: "Generate a tailored compensation agreement for corporate executives.",
+        link: "https://terms.law/executive-compensation-generator/",
+        categories: [
+          { id: 7, name: "Employment", slug: "employment" },
+          { id: 3, name: "Contracts", slug: "contracts" }
+        ]
+      }
+    ];
+
+    // Initialize the app
+    document.addEventListener('DOMContentLoaded', function() {
+      // State
+      let activeCategory = 'all';
+      let searchTerm = '';
+
+      // DOM elements
+      const generatorsList = document.getElementById('generators-list');
+      const searchInput = document.getElementById('search-input');
+      const categoryFilter = document.getElementById('category-filter');
+      
+      // Filter generators based on search term and active category
+      function getFilteredGenerators() {
+        return GENERATORS.filter(generator => {
+          const matchesSearch = 
+            generator.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+            generator.description.toLowerCase().includes(searchTerm.toLowerCase());
+          
+          const matchesCategory = 
+            activeCategory === 'all' || 
+            generator.categories.some(cat => cat.slug === activeCategory);
+          
+          return matchesSearch && matchesCategory;
         });
+      }
+
+      // Group generators by category
+      function getGeneratorsByCategory() {
+        const filteredGenerators = getFilteredGenerators();
+        const generatorsByCategory = {};
+        
+        if (activeCategory === 'all') {
+          // Group by all categories
+          filteredGenerators.forEach(generator => {
+            generator.categories.forEach(category => {
+              if (!generatorsByCategory[category.name]) {
+                generatorsByCategory[category.name] = [];
+              }
+              
+              // Check if this generator is already in this category (avoid duplicates)
+              const isDuplicate = generatorsByCategory[category.name].some(g => g.id === generator.id);
+              if (!isDuplicate) {
+                generatorsByCategory[category.name].push(generator);
+              }
+            });
+          });
+        } else {
+          // Just one category
+          const categoryName = GENERATORS.flatMap(g => g.categories)
+            .find(cat => cat.slug === activeCategory)?.name || "Other";
+          generatorsByCategory[categoryName] = filteredGenerators;
+        }
+        
+        return generatorsByCategory;
+      }
+
+      // Render generators
+      function renderGenerators() {
+        const generatorsByCategory = getGeneratorsByCategory();
+        generatorsList.innerHTML = '';
+        
+        if (Object.keys(generatorsByCategory).length === 0) {
+          generatorsList.innerHTML = '<div class="loading">No generators found matching your criteria.</div>';
+          return;
+        }
+        
+        // Create DOM elements for each category and its generators
+        Object.entries(generatorsByCategory).forEach(([category, categoryGenerators]) => {
+          const categorySection = document.createElement('div');
+          categorySection.className = 'category-section';
+          
+          const categoryTitle = document.createElement('h3');
+          categoryTitle.className = 'category-title';
+          categoryTitle.textContent = category;
+          categorySection.appendChild(categoryTitle);
+          
+          // Add generators for this category
+          categoryGenerators.forEach(generator => {
+            const generatorCard = document.createElement('a');
+            generatorCard.className = 'generator-card';
+            generatorCard.href = generator.link;
+            generatorCard.target = '_blank';
+            generatorCard.rel = 'noopener noreferrer';
+            
+            // Create generator icon
+            const generatorIcon = document.createElement('div');
+            generatorIcon.className = 'generator-icon';
+            generatorIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>';
+            
+            // Create generator info
+            const generatorInfo = document.createElement('div');
+            generatorInfo.className = 'generator-info';
+            
+            const generatorTitle = document.createElement('h3');
+            generatorTitle.className = 'generator-title';
+            generatorTitle.textContent = generator.title;
+            
+            const generatorDescription = document.createElement('p');
+            generatorDescription.className = 'generator-description';
+            generatorDescription.textContent = generator.description;
+            
+            const tagsContainer = document.createElement('div');
+            generator.categories.forEach(cat => {
+              const tag = document.createElement('span');
+              tag.className = 'tag';
+              tag.textContent = cat.name;
+              tagsContainer.appendChild(tag);
+            });
+            
+            // Assemble the card
+            generatorInfo.appendChild(generatorTitle);
+            generatorInfo.appendChild(generatorDescription);
+            generatorInfo.appendChild(tagsContainer);
+            
+            generatorCard.appendChild(generatorIcon);
+            generatorCard.appendChild(generatorInfo);
+            
+            categorySection.appendChild(generatorCard);
+          });
+          
+          generatorsList.appendChild(categorySection);
+        });
+      }
+
+      // Event listeners
+      searchInput.addEventListener('input', function(e) {
+        searchTerm = e.target.value;
+        renderGenerators();
+      });
+      
+      categoryFilter.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') {
+          // Update active button styling
+          document.querySelectorAll('#category-filter button').forEach(btn => {
+            btn.classList.remove('active');
+          });
+          e.target.classList.add('active');
+          
+          // Update active category
+          activeCategory = e.target.dataset.category;
+          renderGenerators();
+        }
+      });
+
+      // Initial render
+      renderGenerators();
+    });
     </script>
 </body>
 </html>
