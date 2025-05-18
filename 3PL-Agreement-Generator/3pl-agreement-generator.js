@@ -442,7 +442,7 @@ Exhibit E - Penalties and Incentives
     switch (currentTab) {
       case 0: // Parties
         return (
-          <div className="form-panel">
+          <>
             <h2>Parties Information</h2>
             <div className="form-group">
               <label htmlFor="effectiveDate">Effective Date</label>
@@ -565,12 +565,12 @@ Exhibit E - Penalties and Incentives
                 />
               </div>
             </div>
-          </div>
+          </>
         );
         
       case 1: // Services
         return (
-          <div className="form-panel">
+          <>
             <h2>Services</h2>
             <p>Select the services that will be provided under this agreement:</p>
             
@@ -638,12 +638,12 @@ Exhibit E - Penalties and Incentives
                 rows="3"
               />
             </div>
-          </div>
+          </>
         );
         
       case 2: // Term & Termination
         return (
-          <div className="form-panel">
+          <>
             <h2>Term and Termination</h2>
             
             <div className="form-group">
@@ -710,12 +710,12 @@ Exhibit E - Penalties and Incentives
                 Include Termination for Cause Provisions
               </label>
             </div>
-          </div>
+          </>
         );
         
       case 3: // Pricing & Payment
         return (
-          <div className="form-panel">
+          <>
             <h2>Pricing and Payment</h2>
             
             <div className="form-group">
@@ -785,12 +785,12 @@ Exhibit E - Penalties and Incentives
                 min="1"
               />
             </div>
-          </div>
+          </>
         );
         
       case 4: // Warehousing
         return (
-          <div className="form-panel">
+          <>
             <h2>Warehousing</h2>
             
             <div className="form-group">
@@ -847,12 +847,12 @@ Exhibit E - Penalties and Incentives
                 rows="3"
               />
             </div>
-          </div>
+          </>
         );
         
       case 5: // Transportation
         return (
-          <div className="form-panel">
+          <>
             <h2>Transportation</h2>
             
             <div className="form-group">
@@ -908,12 +908,12 @@ Exhibit E - Penalties and Incentives
                 rows="3"
               />
             </div>
-          </div>
+          </>
         );
         
       case 6: // Inventory
         return (
-          <div className="form-panel">
+          <>
             <h2>Inventory Management</h2>
             
             <div className="form-group">
@@ -973,12 +973,12 @@ Exhibit E - Penalties and Incentives
                 Include Penalties for Stockouts
               </label>
             </div>
-          </div>
+          </>
         );
         
       case 7: // Liability & Insurance
         return (
-          <div className="form-panel">
+          <>
             <h2>Liability and Insurance</h2>
             
             <div className="form-group">
@@ -1048,12 +1048,12 @@ Exhibit E - Penalties and Incentives
                 Include Force Majeure Clause
               </label>
             </div>
-          </div>
+          </>
         );
         
       case 8: // Confidentiality
         return (
-          <div className="form-panel">
+          <>
             <h2>Confidentiality and Data Protection</h2>
             
             <div className="form-group">
@@ -1094,12 +1094,12 @@ Exhibit E - Penalties and Incentives
                 min="1"
               />
             </div>
-          </div>
+          </>
         );
         
       case 9: // General
         return (
-          <div className="form-panel">
+          <>
             <h2>General Provisions</h2>
             
             <div className="form-group">
@@ -1172,12 +1172,12 @@ Exhibit E - Penalties and Incentives
                 />
               </div>
             )}
-          </div>
+          </>
         );
         
       case 10: // Review & Finalize
         return (
-          <div className="form-panel">
+          <>
             <h2>Review and Finalize</h2>
             
             <p>Review your 3PL Agreement settings and check for any potential issues or risks:</p>
@@ -1325,7 +1325,7 @@ Exhibit E - Penalties and Incentives
                 Schedule Consultation
               </button>
             </div>
-          </div>
+          </>
         );
         
       default:
@@ -1357,12 +1357,18 @@ Exhibit E - Penalties and Incentives
       
       {/* Main Content */}
       <div className="main-content">
-        <div className="tab-content">
+        <div className="tab-content" style={{ display: 'flex', height: '450px' }}>
           {/* Form Panel */}
-          {renderTabContent()}
+          <div style={{ width: '50%', height: '100%', overflowY: 'auto' }}>
+            {renderTabContent()}
+          </div>
           
           {/* Preview Panel */}
-          <div className="preview-panel" ref={previewRef}>
+          <div 
+            className="preview-panel" 
+            ref={previewRef}
+            style={{ width: '50%', height: '100%', overflowY: 'auto' }}
+          >
             <div className="preview-content">
               <h2>Live Preview</h2>
               <pre 
