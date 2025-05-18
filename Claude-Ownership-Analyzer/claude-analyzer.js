@@ -176,7 +176,8 @@ const ClaudeOwnershipAnalyzer = () => {
     };
 
     // Open Calendly popup
-    const openCalendlyPopup = () => {
+    const openCalendlyPopup = (e) => {
+        e.preventDefault();
         if (window.Calendly) {
             window.Calendly.initPopupWidget({
                 url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
@@ -185,6 +186,7 @@ const ClaudeOwnershipAnalyzer = () => {
             // Fallback if Calendly is not loaded
             window.open('https://terms.law/call/', '_blank');
         }
+        return false;
     };
 
     const renderTabContent = () => {
@@ -399,53 +401,70 @@ const ClaudeOwnershipAnalyzer = () => {
                 return (
                     <div>
                         {detailedAnalysis ? (
-                            <div className="results-grid">
-                                <div className={`result-card ${detailedAnalysis.ownership.status === 'allowed' ? 'low' : detailedAnalysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                    <h4>
-                                        <Icon name="award" size={14} style={{ marginRight: '0.5rem' }} />
-                                        Ownership Rights
-                                    </h4>
-                                    <p><strong>{detailedAnalysis.ownership.title}</strong></p>
-                                    <p>{detailedAnalysis.ownership.description}</p>
-                                    <span className={`status-indicator ${getStatusClass(detailedAnalysis.ownership.status)}`}>
-                                        {detailedAnalysis.ownership.status.replace('-', ' ')}
-                                    </span>
+                            <div>
+                                <div className="results-grid">
+                                    <div className={`result-card ${detailedAnalysis.ownership.status === 'allowed' ? 'low' : detailedAnalysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
+                                        <h4>
+                                            <Icon name="award" size={14} style={{ marginRight: '0.5rem' }} />
+                                            Ownership Rights
+                                        </h4>
+                                        <p><strong>{detailedAnalysis.ownership.title}</strong></p>
+                                        <p>{detailedAnalysis.ownership.description}</p>
+                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.ownership.status)}`}>
+                                            {detailedAnalysis.ownership.status.replace('-', ' ')}
+                                        </span>
+                                    </div>
+
+                                    <div className={`result-card ${detailedAnalysis.usage.status === 'allowed' ? 'low' : detailedAnalysis.usage.status === 'requires-review' ? 'medium' : 'high'}`}>
+                                        <h4>
+                                            <Icon name="check-circle" size={14} style={{ marginRight: '0.5rem' }} />
+                                            Usage Compliance
+                                        </h4>
+                                        <p><strong>{detailedAnalysis.usage.title}</strong></p>
+                                        <p>{detailedAnalysis.usage.description}</p>
+                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.usage.status)}`}>
+                                            {detailedAnalysis.usage.status.replace('-', ' ')}
+                                        </span>
+                                    </div>
+
+                                    <div className={`result-card ${detailedAnalysis.disclosure.status === 'allowed' ? 'low' : detailedAnalysis.disclosure.status === 'requires-review' ? 'medium' : 'high'}`}>
+                                        <h4>
+                                            <Icon name="info" size={14} style={{ marginRight: '0.5rem' }} />
+                                            Disclosure Requirements
+                                        </h4>
+                                        <p><strong>{detailedAnalysis.disclosure.title}</strong></p>
+                                        <p>{detailedAnalysis.disclosure.description}</p>
+                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
+                                            {detailedAnalysis.disclosure.status.replace('-', ' ')}
+                                        </span>
+                                    </div>
+
+                                    <div className={`result-card ${detailedAnalysis.copyright.status === 'allowed' ? 'low' : detailedAnalysis.copyright.status === 'requires-review' ? 'medium' : 'high'}`}>
+                                        <h4>
+                                            <Icon name="shield" size={14} style={{ marginRight: '0.5rem' }} />
+                                            Copyright Protection
+                                        </h4>
+                                        <p><strong>{detailedAnalysis.copyright.title}</strong></p>
+                                        <p>{detailedAnalysis.copyright.description}</p>
+                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.copyright.status)}`}>
+                                            {detailedAnalysis.copyright.status.replace('-', ' ')}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className={`result-card ${detailedAnalysis.usage.status === 'allowed' ? 'low' : detailedAnalysis.usage.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                    <h4>
-                                        <Icon name="check-circle" size={14} style={{ marginRight: '0.5rem' }} />
-                                        Usage Compliance
-                                    </h4>
-                                    <p><strong>{detailedAnalysis.usage.title}</strong></p>
-                                    <p>{detailedAnalysis.usage.description}</p>
-                                    <span className={`status-indicator ${getStatusClass(detailedAnalysis.usage.status)}`}>
-                                        {detailedAnalysis.usage.status.replace('-', ' ')}
-                                    </span>
-                                </div>
-
-                                <div className={`result-card ${detailedAnalysis.disclosure.status === 'allowed' ? 'low' : detailedAnalysis.disclosure.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                    <h4>
-                                        <Icon name="info" size={14} style={{ marginRight: '0.5rem' }} />
-                                        Disclosure Requirements
-                                    </h4>
-                                    <p><strong>{detailedAnalysis.disclosure.title}</strong></p>
-                                    <p>{detailedAnalysis.disclosure.description}</p>
-                                    <span className={`status-indicator ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
-                                        {detailedAnalysis.disclosure.status.replace('-', ' ')}
-                                    </span>
-                                </div>
-
-                                <div className={`result-card ${detailedAnalysis.copyright.status === 'allowed' ? 'low' : detailedAnalysis.copyright.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                    <h4>
-                                        <Icon name="shield" size={14} style={{ marginRight: '0.5rem' }} />
-                                        Copyright Protection
-                                    </h4>
-                                    <p><strong>{detailedAnalysis.copyright.title}</strong></p>
-                                    <p>{detailedAnalysis.copyright.description}</p>
-                                    <span className={`status-indicator ${getStatusClass(detailedAnalysis.copyright.status)}`}>
-                                        {detailedAnalysis.copyright.status.replace('-', ' ')}
-                                    </span>
+                                {/* Consultation Section - Only in Results Tab */}
+                                <div className="consultation-section">
+                                    <p style={{ marginBottom: '1rem', color: '#8892a6', fontSize: '0.85rem' }}>
+                                        Need personalized legal guidance for your specific use case?
+                                    </p>
+                                    <a 
+                                        href="" 
+                                        onClick={openCalendlyPopup}
+                                        className="consultation-btn"
+                                    >
+                                        <Icon name="calendar" size={16} />
+                                        Schedule Legal Consultation
+                                    </a>
                                 </div>
                             </div>
                         ) : (
@@ -494,17 +513,6 @@ const ClaudeOwnershipAnalyzer = () => {
                 <div className="gauge-pane">
                     <AdvancedRiskGauge score={riskAnalysis.score} level={riskAnalysis.level} />
                 </div>
-            </div>
-
-            {/* Floating Consultation Button */}
-            <div className="consultation-section">
-                <button 
-                    className="consultation-btn"
-                    onClick={openCalendlyPopup}
-                >
-                    <Icon name="calendar" size={16} />
-                    Legal Consultation
-                </button>
             </div>
         </div>
     );
