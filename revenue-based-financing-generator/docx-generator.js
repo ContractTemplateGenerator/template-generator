@@ -1,4 +1,4 @@
-// MS Word document generation utility
+// Word document generator function
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -15,7 +15,6 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: Calibri, Arial, sans-serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 0;
   }
   h1 {
     text-align: center;
