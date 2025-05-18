@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef, useMemo } = React;
+const { useState, useEffect, useRef } = React;
 
 // Sophisticated card data with enhanced content
 const takeawayData = [
@@ -297,65 +297,35 @@ const TakeawayCard = ({ data, index, onCardHover }) => {
 // Main component
 const TakeawayCards = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'masonry'
 
   const handleCardHover = (cardId) => {
     setHoveredCard(cardId);
   };
 
-  const gridClasses = useMemo(() => {
-    if (viewMode === 'masonry') {
-      return 'columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6';
-    }
-    return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
-  }, [viewMode]);
-
   return (
     <div className="w-full max-w-7xl mx-auto p-6 bg-gray-50/50">
-      {/* Optional header with view mode toggle */}
-      <div className="flex items-center justify-between mb-8">
-        <div className="flex items-center space-x-4">
-          <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
-          <div>
-            <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-              Legal Analysis
-            </h2>
-            <p className="text-gray-600 text-sm">
-              Click any card for detailed analysis
-            </p>
-          </div>
-        </div>
-        
-        {/* View mode toggle */}
-        <div className="hidden md:flex items-center space-x-2 bg-white rounded-lg p-1 shadow-sm border">
-          {['grid', 'masonry'].map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setViewMode(mode)}
-              className={`
-                px-3 py-1.5 text-sm font-medium rounded-md transition-all duration-200
-                ${viewMode === mode 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                }
-              `}
-            >
-              {mode.charAt(0).toUpperCase() + mode.slice(1)}
-            </button>
-          ))}
+      {/* Header */}
+      <div className="flex items-center mb-8">
+        <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+        <div className="ml-4">
+          <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
+            Legal Analysis
+          </h2>
+          <p className="text-gray-600 text-sm">
+            Click any card for detailed analysis
+          </p>
         </div>
       </div>
 
       {/* Cards container */}
-      <div className={gridClasses}>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {takeawayData.map((data, index) => (
-          <div key={data.id} className={viewMode === 'masonry' ? 'break-inside-avoid' : ''}>
-            <TakeawayCard
-              data={data}
-              index={index}
-              onCardHover={handleCardHover}
-            />
-          </div>
+          <TakeawayCard
+            key={data.id}
+            data={data}
+            index={index}
+            onCardHover={handleCardHover}
+          />
         ))}
       </div>
 
