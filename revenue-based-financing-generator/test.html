@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Test</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f7f9fc;
+        }
+        .test-container {
+            max-width: 600px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #2d3748;
+        }
+        p {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background-color: #3182ce;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #c6f6d5;
+            color: #2f855a;
+        }
+        .error {
+            background-color: #fed7d7;
+            color: #c53030;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Generator Test Page</h1>
+        <p>This page tests if the basic React and JavaScript infrastructure is working correctly.</p>
+        <button id="testBtn">Run Test</button>
+        <div id="status" style="display: none;" class="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('testBtn').addEventListener('click', function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.style.display = 'block';
+            
+            try {
+                // Test if we can access window object
+                if (window) {
+                    statusDiv.textContent = "✅ Window object accessible";
+                    statusDiv.className = 'status success';
+                    
+                    // More detailed info
+                    const details = document.createElement('div');
+                    details.innerHTML = `
+                        <p><strong>Browser:</strong> ${navigator.userAgent}</p>
+                        <p><strong>Screen Size:</strong> ${window.innerWidth}×${window.innerHeight}</p>
+                        <p><strong>URL:</strong> ${window.location.href}</p>
+                    `;
+                    statusDiv.appendChild(details);
+                    
+                    // Check if scripts can load
+                    const script = document.createElement('script');
+                    script.src = "https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js";
+                    script.onload = function() {
+                        const reactStatus = document.createElement('p');
+                        reactStatus.textContent = "✅ React loaded successfully";
+                        reactStatus.style.color = "#2f855a";
+                        statusDiv.appendChild(reactStatus);
+                    };
+                    script.onerror = function() {
+                        const reactStatus = document.createElement('p');
+                        reactStatus.textContent = "❌ Failed to load React";
+                        reactStatus.style.color = "#c53030";
+                        statusDiv.appendChild(reactStatus);
+                    };
+                    document.head.appendChild(script);
+                }
+            } catch (error) {
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                statusDiv.className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html>
