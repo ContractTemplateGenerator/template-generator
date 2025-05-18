@@ -103,16 +103,40 @@ const ClaudeOwnershipAnalyzer = () => {
         }
     };
 
-    const nextTab = () => {
-        if (currentTab < tabs.length - 1) {
-            setCurrentTab(currentTab + 1);
-        }
-    };
+    // Animated Gauge Component
+    const RiskGauge = ({ score, level }) => {
+        const circumference = 2 * Math.PI * 45; // radius = 45
+        const strokeDasharray = circumference;
+        const strokeDashoffset = circumference - (score / 100) * circumference;
+        const color = getRiskColor(level);
 
-    const prevTab = () => {
-        if (currentTab > 0) {
-            setCurrentTab(currentTab - 1);
-        }
+        return (
+            <div className="risk-gauge">
+                <svg className="gauge-svg" viewBox="0 0 100 100">
+                    <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        className="gauge-track"
+                    />
+                    <circle
+                        cx="50"
+                        cy="50"
+                        r="45"
+                        className="gauge-fill"
+                        style={{
+                            stroke: color,
+                            strokeDasharray: strokeDasharray,
+                            strokeDashoffset: strokeDashoffset,
+                        }}
+                    />
+                </svg>
+                <div className="gauge-center">
+                    <div className="gauge-score">{score}%</div>
+                    <div className="gauge-label">Risk Level</div>
+                </div>
+            </div>
+        );
     };
 
     const renderTabContent = () => {
@@ -277,9 +301,6 @@ const ClaudeOwnershipAnalyzer = () => {
                     <div>
                         <div className="form-section">
                             <h3><Icon name="alert-triangle" className="form-section-icon" />Prohibited Content Check</h3>
-                            <p className="form-section-description">
-                                Select any activities that might apply to your use case. These are prohibited under Claude's Usage Policy:
-                            </p>
                             <div className="checkbox-group">
                                 {[
                                     { value: 'child-safety', label: 'Content affecting children\'s safety' },
@@ -312,9 +333,6 @@ const ClaudeOwnershipAnalyzer = () => {
 
                         <div className="form-section">
                             <h3><Icon name="cpu" className="form-section-icon" />AI Development Restrictions</h3>
-                            <p className="form-section-description">
-                                Select any AI-related development activities that apply:
-                            </p>
                             <div className="checkbox-group">
                                 {[
                                     { value: 'competing-ai', label: 'Developing competing AI services' },
@@ -347,19 +365,17 @@ const ClaudeOwnershipAnalyzer = () => {
                                 <div className="loading-spinner"></div>
                             </div>
                         ) : analysis ? (
-                            <div className="pulse">
-                                {/* Risk Score Section */}
-                                <div className="risk-score-section" style={{ background: `linear-gradient(135deg, ${getRiskColor(analysis.riskScore.level)} 0%, ${getRiskColor(analysis.riskScore.level)}80 100%)` }}>
-                                    <div className="risk-score">{analysis.riskScore.score}%</div>
-                                    <div className="risk-level">
-                                        {analysis.riskScore.level.toUpperCase()} RISK
-                                    </div>
-                                    <div className="risk-description">
-                                        Based on your inputs, here's your compliance risk assessment and legal analysis.
+                            <div>
+                                {/* Risk Gauge Section */}
+                                <div className="risk-gauge-container">
+                                    <RiskGauge score={analysis.riskScore.score} level={analysis.riskScore.level} />
+                                    <div className="gauge-description">
+                                        <h3>{analysis.riskScore.level.toUpperCase()} RISK</h3>
+                                        <p>Compliance assessment based on Claude's Terms of Service and Usage Policy</p>
                                     </div>
                                 </div>
 
-                                {/* Analysis Cards Grid */}
+                                {/* Compact Analysis Cards */}
                                 <div className="analysis-grid">
                                     {/* Ownership Rights Card */}
                                     <div className={`analysis-card risk-${analysis.ownership.status === 'allowed' ? 'low' : analysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
@@ -375,13 +391,8 @@ const ClaudeOwnershipAnalyzer = () => {
                                         <div className="card-content">
                                             <p><strong>{analysis.ownership.title}</strong></p>
                                             <p>{analysis.ownership.description}</p>
-                                            <ul style={{ marginTop: '1rem', paddingLeft: '1.5rem' }}>
-                                                {analysis.ownership.details.map((detail, index) => (
-                                                    <li key={index}>{detail}</li>
-                                                ))}
-                                            </ul>
                                             <div className="terms-reference">
-                                                <strong>Terms Reference:</strong> {analysis.ownership.termsRef}
+                                                <strong>Terms:</strong> {analysis.ownership.termsRef}
                                             </div>
                                         </div>
                                     </div>
@@ -400,25 +411,21 @@ const ClaudeOwnershipAnalyzer = () => {
                                         <div className="card-content">
                                             <p><strong>{analysis.usage.title}</strong></p>
                                             <p>{analysis.usage.description}</p>
-                                            {analysis.usage.details.length > 0 && (
-                                                <ul style={{ marginTop: '1rem', paddingLeft: '1.5rem' }}>
-                                                    {analysis.usage.details.map((detail, index) => (
-                                                        <li key={index}>{detail}</li>
-                                                    ))}
-                                                </ul>
-                                            )}
                                             {analysis.usage.violations && analysis.usage.violations.length > 0 && (
-                                                <div style={{ marginTop: '1rem' }}>
-                                                    <strong style={{ color: '#ef4444' }}>Violations Detected:</strong>
-                                                    <ul style={{ marginTop: '0.5rem', paddingLeft: '1.5rem' }}>
-                                                        {analysis.usage.violations.map((violation, index) => (
-                                                            <li key={index} style={{ color: '#dc2626' }}>{violation}</li>
+                                                <div style={{ marginTop: '0.5rem' }}>
+                                                    <strong style={{ color: '#ef4444', fontSize: '0.8rem' }}>Violations:</strong>
+                                                    <ul style={{ fontSize: '0.75rem', color: '#dc2626' }}>
+                                                        {analysis.usage.violations.slice(0, 2).map((violation, index) => (
+                                                            <li key={index}>{violation}</li>
                                                         ))}
+                                                        {analysis.usage.violations.length > 2 && (
+                                                            <li>+{analysis.usage.violations.length - 2} more</li>
+                                                        )}
                                                     </ul>
                                                 </div>
                                             )}
                                             <div className="terms-reference">
-                                                <strong>Terms Reference:</strong> {analysis.usage.termsRef}
+                                                <strong>Terms:</strong> {analysis.usage.termsRef}
                                             </div>
                                         </div>
                                     </div>
@@ -437,15 +444,8 @@ const ClaudeOwnershipAnalyzer = () => {
                                         <div className="card-content">
                                             <p><strong>{analysis.disclosure.title}</strong></p>
                                             <p>{analysis.disclosure.description}</p>
-                                            {analysis.disclosure.details.length > 0 && (
-                                                <ul style={{ marginTop: '1rem', paddingLeft: '1.5rem' }}>
-                                                    {analysis.disclosure.details.map((detail, index) => (
-                                                        <li key={index}>{detail}</li>
-                                                    ))}
-                                                </ul>
-                                            )}
                                             <div className="terms-reference">
-                                                <strong>Terms Reference:</strong> {analysis.disclosure.termsRef}
+                                                <strong>Terms:</strong> {analysis.disclosure.termsRef}
                                             </div>
                                         </div>
                                     </div>
@@ -464,57 +464,38 @@ const ClaudeOwnershipAnalyzer = () => {
                                         <div className="card-content">
                                             <p><strong>{analysis.copyright.title}</strong></p>
                                             <p>{analysis.copyright.description}</p>
-                                            <ul style={{ marginTop: '1rem', paddingLeft: '1.5rem' }}>
-                                                {analysis.copyright.details.map((detail, index) => (
-                                                    <li key={index}>{detail}</li>
-                                                ))}
-                                            </ul>
                                             <div className="terms-reference">
-                                                <strong>Terms Reference:</strong> {analysis.copyright.termsRef}
+                                                <strong>Terms:</strong> {analysis.copyright.termsRef}
                                             </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Risk Factors */}
-                                {analysis.riskScore.factors.length > 0 && (
-                                    <div className="analysis-card" style={{ marginBottom: '2rem' }}>
-                                        <div className="card-header">
-                                            <div className="card-title">
-                                                <Icon name="alert-triangle" className="card-icon" />
-                                                Risk Factors Identified
-                                            </div>
-                                        </div>
-                                        <div className="card-content">
-                                            <ul style={{ paddingLeft: '1.5rem' }}>
-                                                {analysis.riskScore.factors.map((factor, index) => (
-                                                    <li key={index} style={{ marginBottom: '0.5rem' }}>{factor}</li>
-                                                ))}
-                                            </ul>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Suggestions Section */}
+                                {/* Compact Suggestions */}
                                 {analysis.suggestions.length > 0 && (
                                     <div className="suggestions-section">
                                         <h3 className="suggestions-title">
                                             <Icon name="lightbulb" />
-                                            Personalized Recommendations
+                                            Key Recommendations
                                         </h3>
-                                        {analysis.suggestions.map((suggestion, index) => (
+                                        {analysis.suggestions.slice(0, 3).map((suggestion, index) => (
                                             <div key={index} className="suggestion-item" style={{ borderLeftColor: suggestion.priority === 'high' ? '#ef4444' : suggestion.priority === 'medium' ? '#f59e0b' : '#3b82f6' }}>
                                                 <div className="suggestion-title">{suggestion.title}</div>
                                                 <div className="suggestion-description">{suggestion.description}</div>
                                             </div>
                                         ))}
+                                        {analysis.suggestions.length > 3 && (
+                                            <div style={{ fontSize: '0.8rem', color: '#64748b', textAlign: 'center', marginTop: '0.5rem' }}>
+                                                +{analysis.suggestions.length - 3} more recommendations
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
                                 {/* Consultation CTA */}
                                 <div className="consultation-cta">
-                                    <h3>Need Personalized Legal Guidance?</h3>
-                                    <p>Get expert advice tailored to your specific Claude usage scenario.</p>
+                                    <h3>Need Legal Guidance?</h3>
+                                    <p>Get expert advice on your Claude usage scenario</p>
                                     <a 
                                         href="https://terms.law/call/" 
                                         target="_blank" 
@@ -538,31 +519,18 @@ const ClaudeOwnershipAnalyzer = () => {
         <div className="analyzer-container">
             <div className="header">
                 <h1>Claude Ownership Rights Analyzer</h1>
-                <p>Analyze your Claude usage scenario against Terms of Service requirements and get personalized compliance recommendations.</p>
+                <p>Analyze your Claude usage scenario against Terms of Service requirements.</p>
             </div>
 
-            {/* Progress Indicator */}
-            <div className="progress-indicator">
-                <Icon name="activity" size={16} />
-                <span>Step {currentTab + 1} of {tabs.length}</span>
-                <div className="progress-bar">
-                    <div 
-                        className="progress-fill" 
-                        style={{ width: `${((currentTab + 1) / tabs.length) * 100}%` }}
-                    ></div>
-                </div>
-            </div>
-
-            {/* Tab Navigation */}
+            {/* Tab Navigation - All tabs are clickable */}
             <div className="tab-navigation">
                 {tabs.map((tab, index) => (
                     <button
                         key={tab.id}
                         className={`tab-button ${currentTab === index ? 'active' : ''}`}
                         onClick={() => setCurrentTab(index)}
-                        disabled={index > currentTab && currentTab < 3}
                     >
-                        <Icon name={tab.icon} size={18} style={{ marginRight: '0.5rem' }} />
+                        <Icon name={tab.icon} size={16} style={{ marginRight: '0.5rem' }} />
                         {tab.label}
                     </button>
                 ))}
@@ -571,48 +539,6 @@ const ClaudeOwnershipAnalyzer = () => {
             {/* Tab Content */}
             <div className="tab-content">
                 {renderTabContent()}
-                
-                {/* Navigation Buttons */}
-                {currentTab < 3 && (
-                    <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-                        <button
-                            onClick={prevTab}
-                            disabled={currentTab === 0}
-                            style={{
-                                padding: '0.75rem 1.5rem',
-                                border: '1px solid #d1d5db',
-                                borderRadius: '8px',
-                                background: currentTab === 0 ? '#f9fafb' : 'white',
-                                cursor: currentTab === 0 ? 'not-allowed' : 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem'
-                            }}
-                        >
-                            <Icon name="chevron-left" size={16} />
-                            Previous
-                        </button>
-                        
-                        <button
-                            onClick={nextTab}
-                            style={{
-                                padding: '0.75rem 1.5rem',
-                                border: 'none',
-                                borderRadius: '8px',
-                                background: '#3b82f6',
-                                color: 'white',
-                                cursor: 'pointer',
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '0.5rem',
-                                fontWeight: '600'
-                            }}
-                        >
-                            {currentTab === 2 ? 'Analyze' : 'Next'}
-                            <Icon name={currentTab === 2 ? 'zap' : 'chevron-right'} size={16} />
-                        </button>
-                    </div>
-                )}
             </div>
         </div>
     );
