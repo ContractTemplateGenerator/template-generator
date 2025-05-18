@@ -30,8 +30,7 @@ const ClaudeOwnershipAnalyzer = () => {
     const tabs = [
         { id: 'setup', label: 'Account Setup', icon: 'settings' },
         { id: 'usage', label: 'Usage Type', icon: 'file-text' },
-        { id: 'compliance', label: 'Risk Factors', icon: 'shield' },
-        { id: 'results', label: 'Analysis', icon: 'check-circle' }
+        { id: 'compliance', label: 'Risk Factors', icon: 'shield' }
     ];
 
     // Real-time risk calculation
@@ -40,26 +39,25 @@ const ClaudeOwnershipAnalyzer = () => {
         setRiskAnalysis(newRiskAnalysis);
     }, [formData]);
 
-    // Generate detailed analysis for results tab
+    // Generate detailed analysis for live gauge pane
     useEffect(() => {
-        if (currentTab === 3) {
-            const ownershipAnalysis = window.RiskAnalyzer.analyzeOwnership(formData);
-            const usageAnalysis = window.RiskAnalyzer.analyzeUsage(formData);
-            const disclosureAnalysis = window.RiskAnalyzer.analyzeDisclosure(formData);
-            const copyrightAnalysis = window.RiskAnalyzer.analyzeCopyright(formData);
-            const suggestions = window.RiskAnalyzer.generateSuggestions(formData, riskAnalysis);
+        const ownershipAnalysis = window.RiskAnalyzer.analyzeOwnership(formData);
+        const usageAnalysis = window.RiskAnalyzer.analyzeUsage(formData);
+        const disclosureAnalysis = window.RiskAnalyzer.analyzeDisclosure(formData);
+        const copyrightAnalysis = window.RiskAnalyzer.analyzeCopyright(formData);
+        const suggestions = window.RiskAnalyzer.generateSuggestions(formData, riskAnalysis);
 
-            setDetailedAnalysis({
-                ownership: ownershipAnalysis,
-                usage: usageAnalysis,
-                disclosure: disclosureAnalysis,
-                copyright: copyrightAnalysis,
-                suggestions
-            });
-        }
+        setDetailedAnalysis({
+            ownership: ownershipAnalysis,
+            usage: usageAnalysis,
+            disclosure: disclosureAnalysis,
+            copyright: copyrightAnalysis,
+            suggestions
+        });
+        
         // Replace feather icons after each render
         setTimeout(() => feather.replace(), 0);
-    }, [currentTab, formData, riskAnalysis]);
+    }, [formData, riskAnalysis]);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -104,25 +102,29 @@ const ClaudeOwnershipAnalyzer = () => {
         }
     };
 
-    // Advanced Risk Gauge Component
-    const AdvancedRiskGauge = ({ score, level }) => {
-        const circumference = 2 * Math.PI * 70; // radius = 70
+    // Compact Risk Gauge Component
+    const CompactRiskGauge = ({ score, level }) => {
+        const circumference = 2 * Math.PI * 50; // smaller radius = 50
         const strokeDasharray = circumference;
         const strokeDashoffset = circumference - (score / 100) * circumference;
         const color = getRiskColor(level);
 
         return (
-            <div className="risk-gauge-container">
-                <div className="risk-gauge">
-                    <div className="gauge-background"></div>
-                    <svg className="gauge-svg" viewBox="0 0 160 160">
+            <div style={{ width: '140px', height: '140px', margin: '0 auto 1rem auto' }}>
+                <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+                    <svg style={{ 
+                        width: '100%', 
+                        height: '100%', 
+                        transform: 'rotate(-135deg)',
+                        filter: 'drop-shadow(0 0 10px rgba(0, 212, 255, 0.3))'
+                    }} viewBox="0 0 120 120">
                         <defs>
-                            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <linearGradient id="compactGaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
                                 <stop offset="0%" stopColor={color} stopOpacity="0.8" />
                                 <stop offset="100%" stopColor={color} stopOpacity="1" />
                             </linearGradient>
-                            <filter id="glow">
-                                <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <filter id="compactGlow">
+                                <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
                                 <feMerge> 
                                     <feMergeNode in="coloredBlur"/>
                                     <feMergeNode in="SourceGraphic"/>
@@ -130,47 +132,68 @@ const ClaudeOwnershipAnalyzer = () => {
                             </filter>
                         </defs>
                         <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            className="gauge-track"
+                            cx="60"
+                            cy="60"
+                            r="50"
+                            fill="none"
+                            stroke="#2a3441"
+                            strokeWidth="6"
+                            strokeLinecap="round"
                         />
                         <circle
-                            cx="80"
-                            cy="80"
-                            r="70"
-                            className="gauge-fill"
+                            cx="60"
+                            cy="60"
+                            r="50"
+                            fill="none"
+                            stroke={`url(#compactGaugeGradient)`}
+                            strokeWidth="6"
+                            strokeLinecap="round"
                             style={{
-                                stroke: `url(#gaugeGradient)`,
                                 strokeDasharray: strokeDasharray,
                                 strokeDashoffset: strokeDashoffset,
+                                transition: 'stroke-dasharray 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
+                                filter: 'url(#compactGlow)'
                             }}
                         />
                     </svg>
-                    <div className="gauge-center">
-                        <div className="gauge-score" style={{ color }}>{score}%</div>
-                        <div className="gauge-label">Risk Level</div>
+                    <div style={{ 
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        textAlign: 'center'
+                    }}>
+                        <div style={{
+                            fontFamily: 'Orbitron, monospace',
+                            fontSize: '1.5rem',
+                            fontWeight: 900,
+                            color: color,
+                            lineHeight: 1,
+                            textShadow: `0 0 10px ${color}`
+                        }}>{score}%</div>
+                        <div style={{
+                            fontFamily: 'Orbitron, monospace',
+                            fontSize: '0.6rem',
+                            color: '#8892a6',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px',
+                            marginTop: '0.25rem'
+                        }}>Risk Level</div>
                     </div>
                 </div>
-                <div className="risk-level-display">
-                    <div className={`risk-level-label ${level}`}>
-                        {level === 'neutral' ? 'Analyzing...' : `${level.toUpperCase()} RISK`}
+                <div style={{ textAlign: 'center', marginTop: '0.5rem' }}>
+                    <div style={{
+                        fontFamily: 'Orbitron, monospace',
+                        fontSize: '1rem',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '1px',
+                        color: color,
+                        textShadow: `0 0 10px ${color}`
+                    }}>
+                        {level === 'neutral' ? 'Analyzing...' : `${level} RISK`}
                     </div>
                 </div>
-                
-                {riskAnalysis.factors.length > 0 && (
-                    <div className="risk-factors-list">
-                        <h4>Risk Factors</h4>
-                        <ul>
-                            {riskAnalysis.factors.slice(0, 3).map((factor, index) => (
-                                <li key={index}>{factor}</li>
-                            ))}
-                            {riskAnalysis.factors.length > 3 && (
-                                <li>+{riskAnalysis.factors.length - 3} more factors</li>
-                            )}
-                        </ul>
-                    </div>
-                )}
             </div>
         );
     };
@@ -397,95 +420,167 @@ const ClaudeOwnershipAnalyzer = () => {
                     </div>
                 );
 
-            case 3:
-                return (
-                    <div>
-                        {detailedAnalysis ? (
-                            <div>
-                                <div className="results-grid">
-                                    <div className={`result-card ${detailedAnalysis.ownership.status === 'allowed' ? 'low' : detailedAnalysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                        <h4>
-                                            <Icon name="award" size={14} style={{ marginRight: '0.5rem' }} />
-                                            Ownership Rights
-                                        </h4>
-                                        <p><strong>{detailedAnalysis.ownership.title}</strong></p>
-                                        <p>{detailedAnalysis.ownership.description}</p>
-                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.ownership.status)}`}>
-                                            {detailedAnalysis.ownership.status.replace('-', ' ')}
-                                        </span>
-                                    </div>
-
-                                    <div className={`result-card ${detailedAnalysis.usage.status === 'allowed' ? 'low' : detailedAnalysis.usage.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                        <h4>
-                                            <Icon name="check-circle" size={14} style={{ marginRight: '0.5rem' }} />
-                                            Usage Compliance
-                                        </h4>
-                                        <p><strong>{detailedAnalysis.usage.title}</strong></p>
-                                        <p>{detailedAnalysis.usage.description}</p>
-                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.usage.status)}`}>
-                                            {detailedAnalysis.usage.status.replace('-', ' ')}
-                                        </span>
-                                    </div>
-
-                                    <div className={`result-card ${detailedAnalysis.disclosure.status === 'allowed' ? 'low' : detailedAnalysis.disclosure.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                        <h4>
-                                            <Icon name="info" size={14} style={{ marginRight: '0.5rem' }} />
-                                            Disclosure Requirements
-                                        </h4>
-                                        <p><strong>{detailedAnalysis.disclosure.title}</strong></p>
-                                        <p>{detailedAnalysis.disclosure.description}</p>
-                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
-                                            {detailedAnalysis.disclosure.status.replace('-', ' ')}
-                                        </span>
-                                    </div>
-
-                                    <div className={`result-card ${detailedAnalysis.copyright.status === 'allowed' ? 'low' : detailedAnalysis.copyright.status === 'requires-review' ? 'medium' : 'high'}`}>
-                                        <h4>
-                                            <Icon name="shield" size={14} style={{ marginRight: '0.5rem' }} />
-                                            Copyright Protection
-                                        </h4>
-                                        <p><strong>{detailedAnalysis.copyright.title}</strong></p>
-                                        <p>{detailedAnalysis.copyright.description}</p>
-                                        <span className={`status-indicator ${getStatusClass(detailedAnalysis.copyright.status)}`}>
-                                            {detailedAnalysis.copyright.status.replace('-', ' ')}
-                                        </span>
-                                    </div>
-                                </div>
-
-                                {/* Consultation Section - Only in Results Tab */}
-                                <div className="consultation-section">
-                                    <p style={{ marginBottom: '1rem', color: '#8892a6', fontSize: '0.85rem' }}>
-                                        Need personalized legal guidance for your specific use case?
-                                    </p>
-                                    <a 
-                                        href="" 
-                                        onClick={openCalendlyPopup}
-                                        className="consultation-btn"
-                                    >
-                                        <Icon name="calendar" size={16} />
-                                        Schedule Legal Consultation
-                                    </a>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="loading">
-                                <div className="loading-spinner"></div>
-                                <div className="loading-text">Analyzing compliance...</div>
-                            </div>
-                        )}
-                    </div>
-                );
-
             default:
                 return null;
         }
+    };
+
+    // Render comprehensive gauge pane with analysis
+    const renderGaugePane = () => {
+        return (
+            <div style={{ padding: '1rem', overflow: 'auto', height: '100%' }}>
+                {/* Compact Gauge */}
+                <CompactRiskGauge score={riskAnalysis.score} level={riskAnalysis.level} />
+                
+                {/* Risk Factors */}
+                {riskAnalysis.factors.length > 0 && (
+                    <div style={{
+                        background: 'rgba(26, 31, 46, 0.5)',
+                        borderRadius: '8px',
+                        padding: '0.75rem',
+                        marginBottom: '1rem',
+                        border: '1px solid #2a3441'
+                    }}>
+                        <h4 style={{
+                            fontFamily: 'Orbitron, monospace',
+                            fontSize: '0.8rem',
+                            color: '#00d4ff',
+                            marginBottom: '0.5rem',
+                            textTransform: 'uppercase',
+                            letterSpacing: '0.5px'
+                        }}>Risk Factors</h4>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
+                            {riskAnalysis.factors.slice(0, 3).map((factor, index) => (
+                                <li key={index} style={{
+                                    fontSize: '0.75rem',
+                                    color: '#b4c1d3',
+                                    marginBottom: '0.25rem',
+                                    paddingLeft: '0.5rem',
+                                    position: 'relative'
+                                }}>
+                                    <span style={{
+                                        position: 'absolute',
+                                        left: 0,
+                                        color: '#39ff14'
+                                    }}>▸</span>
+                                    {factor}
+                                </li>
+                            ))}
+                            {riskAnalysis.factors.length > 3 && (
+                                <li style={{
+                                    fontSize: '0.75rem',
+                                    color: '#8892a6',
+                                    paddingLeft: '0.5rem'
+                                }}>
+                                    +{riskAnalysis.factors.length - 3} more factors
+                                </li>
+                            )}
+                        </ul>
+                    </div>
+                )}
+
+                {/* Analysis Cards */}
+                {detailedAnalysis && (
+                    <div style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr',
+                        gap: '0.5rem'
+                    }}>
+                        {/* Ownership Rights */}
+                        <div className={`result-card ${detailedAnalysis.ownership.status === 'allowed' ? 'low' : detailedAnalysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
+                            <h4>
+                                <Icon name="award" size={12} style={{ marginRight: '0.5rem' }} />
+                                Ownership
+                            </h4>
+                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
+                                <strong>{detailedAnalysis.ownership.title}</strong>
+                            </p>
+                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.ownership.status)}`}>
+                                {detailedAnalysis.ownership.status.replace('-', ' ')}
+                            </span>
+                        </div>
+
+                        {/* Usage Compliance */}
+                        <div className={`result-card ${detailedAnalysis.usage.status === 'allowed' ? 'low' : detailedAnalysis.usage.status === 'requires-review' ? 'medium' : 'high'}`}>
+                            <h4>
+                                <Icon name="check-circle" size={12} style={{ marginRight: '0.5rem' }} />
+                                Compliance
+                            </h4>
+                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
+                                <strong>{detailedAnalysis.usage.title}</strong>
+                            </p>
+                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.usage.status)}`}>
+                                {detailedAnalysis.usage.status.replace('-', ' ')}
+                            </span>
+                        </div>
+
+                        {/* Disclosure Requirements */}
+                        <div className={`result-card ${detailedAnalysis.disclosure.status === 'allowed' ? 'low' : detailedAnalysis.disclosure.status === 'requires-review' ? 'medium' : 'high'}`}>
+                            <h4>
+                                <Icon name="info" size={12} style={{ marginRight: '0.5rem' }} />
+                                Disclosure
+                            </h4>
+                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
+                                <strong>{detailedAnalysis.disclosure.title}</strong>
+                            </p>
+                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
+                                {detailedAnalysis.disclosure.status.replace('-', ' ')}
+                            </span>
+                        </div>
+
+                        {/* Copyright Protection */}
+                        <div className={`result-card ${detailedAnalysis.copyright.status === 'allowed' ? 'low' : detailedAnalysis.copyright.status === 'requires-review' ? 'medium' : 'high'}`}>
+                            <h4>
+                                <Icon name="shield" size={12} style={{ marginRight: '0.5rem' }} />
+                                Copyright
+                            </h4>
+                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
+                                <strong>{detailedAnalysis.copyright.title}</strong>
+                            </p>
+                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.copyright.status)}`}>
+                                {detailedAnalysis.copyright.status.replace('-', ' ')}
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+                {/* Consultation Button - Only when high risk or violations */}
+                {(riskAnalysis.level === 'high' || riskAnalysis.score > 60) && (
+                    <div style={{
+                        marginTop: '1rem',
+                        padding: '0.75rem',
+                        textAlign: 'center',
+                        background: 'rgba(26, 31, 46, 0.3)',
+                        borderRadius: '8px',
+                        border: '1px solid #2a3441'
+                    }}>
+                        <p style={{ 
+                            marginBottom: '0.75rem', 
+                            color: '#8892a6', 
+                            fontSize: '0.8rem' 
+                        }}>
+                            Consider legal consultation for high-risk scenarios
+                        </p>
+                        <a 
+                            href="" 
+                            onClick={openCalendlyPopup}
+                            className="consultation-btn"
+                            style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+                        >
+                            <Icon name="calendar" size={14} />
+                            Legal Consultation
+                        </a>
+                    </div>
+                )}
+            </div>
+        );
     };
 
     return (
         <div className="analyzer-container">
             <div className="header">
                 <h1>Claude Risk Analyzer</h1>
-                <p>Real-time compliance monitoring for Claude usage scenarios</p>
+                <p>Test your Claude usage scenario to discover real-time risk factors and compliance levels</p>
             </div>
 
             {/* Tab Navigation */}
@@ -509,9 +604,9 @@ const ClaudeOwnershipAnalyzer = () => {
                     {renderTabContent()}
                 </div>
 
-                {/* Live Risk Gauge Pane */}
+                {/* Live Analysis Pane */}
                 <div className="gauge-pane">
-                    <AdvancedRiskGauge score={riskAnalysis.score} level={riskAnalysis.level} />
+                    {renderGaugePane()}
                 </div>
             </div>
         </div>
