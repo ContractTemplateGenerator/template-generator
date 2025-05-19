@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-container {
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #4338ca;
+        }
+        .response {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+        }
+        .success {
+            background: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            color: #166534;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>API Test Page</h1>
+    <p>Test your Claude chatbox API deployment</p>
+
+    <div class="test-container">
+        <h2>Quick Test</h2>
+        <button onclick="testAPI()">Test API with Sample Question</button>
+        <div id="quick-response" class="response" style="display: none;"></div>
+    </div>
+
+    <div class="test-container">
+        <h2>Custom Test</h2>
+        <label for="custom-message">Your question:</label>
+        <textarea id="custom-message" placeholder="Enter your question about contracts here...">What should I include in a privacy policy for my website?</textarea>
+        
+        <label for="contract-type">Contract Type:</label>
+        <select id="contract-type">
+            <option value="NDA">Non-Disclosure Agreement</option>
+            <option value="Employment Agreement">Employment Agreement</option>
+            <option value="Operating Agreement">LLC Operating Agreement</option>
+            <option value="Privacy Policy">Privacy Policy</option>
+            <option value="Terms of Service">Terms of Service</option>
+        </select>
+        
+        <button onclick="testCustomAPI()">Send Custom Message</button>
+        <div id="custom-response" class="response" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_URL = 'https://template-generator-red.vercel.app/api/chat';
+
+        async function testAPI() {
+            const responseDiv = document.getElementById('quick-response');
+            responseDiv.style.display = 'block';
+            responseDiv.textContent = 'Testing API...';
+            responseDiv.className = 'response';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'What is a non-disclosure agreement and when should I use one?',
+                        contractType: 'NDA',
+                        formData: { 
+                            companyName: 'Test Company',
+                            disclosingParty: 'Test Corp'
+                        },
+                        documentText: 'This Non-Disclosure Agreement (NDA) is entered into between Test Corp and the receiving party...'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                responseDiv.textContent = `✅ SUCCESS!\n\nClaude's Response:\n${data.response}`;
+                responseDiv.className = 'response success';
+            } catch (error) {
+                responseDiv.textContent = `❌ ERROR!\n\nError details:\n${error.message}`;
+                responseDiv.className = 'response error';
+                console.error('Test failed:', error);
+            }
+        }
+
+        async function testCustomAPI() {
+            const message = document.getElementById('custom-message').value;
+            const contractType = document.getElementById('contract-type').value;
+            const responseDiv = document.getElementById('custom-response');
+            
+            if (!message.trim()) {
+                alert('Please enter a message');
+                return;
+            }
+
+            responseDiv.style.display = 'block';
+            responseDiv.textContent = 'Sending message to Claude...';
+            responseDiv.className = 'response';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        contractType: contractType,
+                        formData: { testMode: true },
+                        documentText: `This is a sample ${contractType} document being generated...`
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP ${response.status}: ${errorText}`);
+                }
+
+                const data = await response.json();
+                responseDiv.textContent = `✅ SUCCESS!\n\nClaude's Response:\n${data.response}`;
+                responseDiv.className = 'response success';
+            } catch (error) {
+                responseDiv.textContent = `❌ ERROR!\n\nError details:\n${error.message}`;
+                responseDiv.className = 'response error';
+                console.error('Test failed:', error);
+            }
+        }
+
+        // Test on page load
+        window.addEventListener('load', function() {
+            console.log('API Test Page loaded. API URL:', API_URL);
+        });
+    </script>
+</body>
+</html>

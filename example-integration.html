@@ -1,0 +1,60 @@
+<!-- Example: How to integrate the chatbox into your existing generators -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Example Generator with Chatbox</title>
+    
+    <!-- Your existing styles -->
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- ADD: Chatbox styles -->
+    <link rel="stylesheet" href="./components/chatbox.css">
+    
+    <!-- Your existing scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- ADD: Chatbox component script -->
+    <script type="text/babel" src="./components/chatbox.js"></script>
+    
+    <!-- Your existing generator script -->
+    <script type="text/babel">
+        // Example of integrating chatbox into your existing generator
+        const YourGenerator = () => {
+            const [formData, setFormData] = React.useState({
+                // your form data
+            });
+            
+            const [documentText, setDocumentText] = React.useState('');
+            
+            // UPDATE: Configure chatbox with your generator's data
+            React.useEffect(() => {
+                window.chatboxConfig = {
+                    contractType: 'NDA Agreement', // Change this to your contract type
+                    formData: formData,
+                    documentText: documentText,
+                    apiUrl: 'https://your-vercel-deployment.vercel.app/api/chat' // Change to your Vercel URL
+                };
+            }, [formData, documentText]);
+
+            return React.createElement('div', {},
+                // Your existing generator components
+                React.createElement('div', { className: 'generator-content' },
+                    'Your existing generator UI goes here'
+                ),
+                
+                // ADD: Chatbox component
+                React.createElement(window.LegalChatbox)
+            );
+        };
+
+        ReactDOM.render(React.createElement(YourGenerator), document.getElementById('root'));
+    </script>
+</body>
+</html>
