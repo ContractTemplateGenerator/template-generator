@@ -1,8 +1,9 @@
+// Fixed API endpoint for Vercel
 export default async function handler(req, res) {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
@@ -10,41 +11,43 @@ export default async function handler(req, res) {
     return;
   }
 
+  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { message, contractType, formData, documentText } = req.body;
+    const { message, contractType = 'Legal Document', formData = {}, documentText = '' } = req.body;
+
+    console.log('Received request:', { message, contractType });
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });
     }
 
-    // Prepare the context for Claude
-    const context = {
-      contractType: contractType || 'Unknown',
-      formData: formData || {},
-      documentText: documentText || ''
-    };
+    // Check for API key
+    if (!process.env.ANTHROPIC_API_KEY) {
+      console.error('No API key found');
+      return res.status(500).json({ error: 'Server configuration error' });
+    }
 
-    // Create the system prompt
-    const systemPrompt = `You are a legal assistant helping users understand contract generators on terms.law. 
+    // Prepare the system prompt
+    const systemPrompt = `You are a legal assistant helping users understand contract generators. 
 
-Contract type: ${context.contractType}
-Current form data: ${JSON.stringify(context.formData, null, 2)}
-Generated document preview: ${context.documentText.substring(0, 1000)}...
+Current context:
+- Contract type: ${contractType}
+- User form data: ${JSON.stringify(formData, null, 2)}
+- Document preview: ${documentText.substring(0, 500)}...
 
 Guidelines:
 - Provide clear, practical legal explanations in plain English
 - Explain legal concepts and clauses without giving specific legal advice
-- Suggest improvements or alternatives when appropriate
+- Suggest improvements when appropriate
 - Always remind users to have contracts reviewed by a lawyer
-- Keep responses concise but helpful
-- Focus on educational content about the specific contract type`;
+- Keep responses concise but helpful`;
 
-    // Prepare the API request to Anthropic
-    const anthropicResponse = await fetch('https://api.anthropic.com/v1/messages', {
+    // Make request to Anthropic API
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -63,26 +66,28 @@ Guidelines:
       })
     });
 
-    if (!anthropicResponse.ok) {
-      const errorData = await anthropicResponse.text();
-      console.error('Anthropic API error:', errorData);
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Anthropic API error:', response.status, errorText);
       return res.status(500).json({ 
         error: 'Failed to get response from AI assistant',
-        details: errorData
+        details: errorText
       });
     }
 
-    const data = await anthropicResponse.json();
+    const data = await response.json();
     const assistantMessage = data.content[0].text;
 
-    res.status(200).json({ 
+    console.log('Successful response generated');
+
+    return res.status(200).json({ 
       response: assistantMessage,
       timestamp: new Date().toISOString()
     });
 
   } catch (error) {
     console.error('Error in chat API:', error);
-    res.status(500).json({ 
+    return res.status(500).json({ 
       error: 'Internal server error',
       message: error.message
     });

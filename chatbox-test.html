@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chatbox Test - Legal Assistant</title>
+    <link rel="stylesheet" href="./components/chatbox.css">
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            margin: 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #4f46e5;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .demo-content {
+            background: #f8fafc;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+        .status {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .status.success {
+            background: #ecfdf5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+        .status.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+        .test-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            margin: 10px 10px 10px 0;
+            transition: all 0.2s;
+        }
+        .test-button:hover {
+            background: #4338ca;
+            transform: translateY(-1px);
+        }
+        .instructions {
+            background: #fffbeb;
+            border: 1px solid #f59e0b;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .config-example {
+            background: #1f2937;
+            color: #e5e7eb;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Legal Assistant Chatbox Test</h1>
+        
+        <div class="instructions">
+            <h3>🤖 How to Test the Chatbox</h3>
+            <p>
+                <strong>Look for the purple chat button in the bottom-right corner!</strong><br>
+                Click it to open the legal assistant chatbox and start asking questions about contracts.
+            </p>
+        </div>
+
+        <div class="demo-content">
+            <h2>Sample Legal Document Generator</h2>
+            <p>This is a simulated legal document generator. The chatbox will help answer questions about this type of contract.</p>
+            
+            <div id="api-status" class="status">
+                🔄 Checking API status...
+            </div>
+
+            <div>
+                <button class="test-button" onclick="testAPI()">Test API Connection</button>
+                <button class="test-button" onclick="updateConfig('NDA')">Set Contract: NDA</button>
+                <button class="test-button" onclick="updateConfig('Employment')">Set Contract: Employment</button>
+                <button class="test-button" onclick="updateConfig('Operating Agreement')">Set Contract: LLC Agreement</button>
+            </div>
+
+            <h3>Integration Example Code:</h3>
+            <div class="config-example">
+// To integrate the chatbox into your generator:
+
+// 1. Include the CSS and JS files:
+&lt;link rel="stylesheet" href="./components/chatbox.css"&gt;
+&lt;script src="./components/chatbox.js"&gt;&lt;/script&gt;
+
+// 2. Configure the chatbox:
+window.chatboxConfig = {
+    contractType: 'Non-Disclosure Agreement',
+    formData: { 
+        companyName: 'Your Company',
+        disclosingParty: 'Party Name' 
+    },
+    documentText: 'Your generated document text...',
+    apiUrl: 'https://your-domain.vercel.app/api/chat'
+};
+
+// 3. Add the component to your React app:
+React.createElement(window.LegalChatbox)
+            </div>
+        </div>
+    </div>
+
+    <!-- The chatbox component will be rendered here -->
+    <div id="chatbox-root"></div>
+
+    <script type="text/babel" src="./components/chatbox.js"></script>
+    <script type="text/babel">
+        // Configuration for the chatbox
+        window.chatboxConfig = {
+            contractType: 'Sample Legal Document',
+            formData: { 
+                companyName: 'Test Company',
+                documentType: 'Sample Agreement'
+            },
+            documentText: 'This is a sample legal document for testing purposes. It contains various clauses and legal terms that users might have questions about.',
+            apiUrl: window.location.origin + '/api/chat'
+        };
+
+        // Test API function
+        async function testAPI() {
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.className = 'status';
+            statusDiv.innerHTML = '🔄 Testing API connection...';
+
+            try {
+                const response = await fetch(window.location.origin + '/api/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Hello, can you help me understand this test?',
+                        contractType: 'Test Document',
+                        formData: { test: true },
+                        documentText: 'Test document content'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    statusDiv.className = 'status success';
+                    statusDiv.innerHTML = '✅ API is working! Response: ' + data.response.substring(0, 100) + '...';
+                } else {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.innerHTML = '❌ API Error: ' + error.message;
+            }
+        }
+
+        // Update configuration function
+        function updateConfig(contractType) {
+            window.chatboxConfig.contractType = contractType + ' Agreement';
+            window.chatboxConfig.documentText = `This is a sample ${contractType} agreement for testing the chatbox functionality.`;
+            
+            // Show confirmation
+            const statusDiv = document.getElementById('api-status');
+            statusDiv.className = 'status success';
+            statusDiv.innerHTML = `✅ Configuration updated! Contract type set to: ${contractType} Agreement`;
+            
+            // Auto-hide after 3 seconds
+            setTimeout(() => {
+                statusDiv.className = 'status';
+                statusDiv.innerHTML = '💬 Ready to chat! Click the purple button in the bottom-right corner.';
+            }, 3000);
+        }
+
+        // Render the chatbox component
+        function renderChatbox() {
+            ReactDOM.render(
+                React.createElement(window.LegalChatbox),
+                document.getElementById('chatbox-root')
+            );
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            renderChatbox();
+            testAPI(); // Auto-test API on load
+        });
+    </script>
+</body>
+</html>
