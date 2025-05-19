@@ -59,58 +59,75 @@ Guidelines:
 
 If asked about non-NDA topics, politely redirect to NDA-related questions.`;
 
-    // Make request to Groq API
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: 'llama3-8b-8192', // Currently supported Llama 3 model
-        messages: [
-          {
-            role: 'system',
-            content: systemPrompt
+    // Try different models in order of preference
+    const models = [
+      'llama3-8b-8192',
+      'llama3-70b-8192', 
+      'gemma-7b-it',
+      'llama-3.1-8b-instant'
+    ];
+    
+    let assistantMessage = null;
+    let modelUsed = null;
+    
+    for (const model of models) {
+      try {
+        console.log(`Trying model: ${model}`);
+        
+        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
           },
-          {
-            role: 'user',
-            content: message
-          }
-        ],
-        max_tokens: 1000,
-        temperature: 0.3 // Lower temperature for more consistent legal advice
-      })
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Groq API error:', response.status, errorText);
-      
-      if (response.status === 401) {
-        console.error('Groq authentication failed - check API key');
-        return res.status(500).json({ 
-          error: 'authentication_error',
-          type: 'error',
-          message: 'Groq API authentication failed'
+          body: JSON.stringify({
+            model: model,
+            messages: [
+              {
+                role: 'system',
+                content: systemPrompt
+              },
+              {
+                role: 'user',
+                content: message
+              }
+            ],
+            max_tokens: 1000,
+            temperature: 0.3
+          })
         });
+
+        if (response.ok) {
+          const data = await response.json();
+          assistantMessage = data.choices[0].message.content;
+          modelUsed = model;
+          console.log(`Success with model: ${model}`);
+          break;
+        } else {
+          const errorText = await response.text();
+          console.log(`Model ${model} failed:`, errorText);
+          continue;
+        }
+      } catch (error) {
+        console.log(`Model ${model} error:`, error.message);
+        continue;
       }
-      
+    }
+    
+    if (!assistantMessage) {
+      console.error('All models failed');
       return res.status(500).json({ 
-        error: 'Failed to get response from legal assistant',
-        details: errorText
+        error: 'All available models failed',
+        details: 'Please try again later'
       });
     }
-
-    const data = await response.json();
-    const assistantMessage = data.choices[0].message.content;
 
     console.log('Successful Groq response generated');
 
     return res.status(200).json({ 
       response: assistantMessage,
       timestamp: new Date().toISOString(),
-      model: 'llama3-8b-8192'
+      model: modelUsed
     });
 
   } catch (error) {
