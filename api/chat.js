@@ -31,6 +31,11 @@ const handler = async (req, res) => {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
+    // Log API key info for debugging (first 10 chars only)
+    const keyPrefix = process.env.ANTHROPIC_API_KEY.substring(0, 10);
+    console.log('API key prefix:', keyPrefix);
+    console.log('API key length:', process.env.ANTHROPIC_API_KEY.length);
+
     // Prepare the system prompt
     const systemPrompt = `You are a legal assistant helping users understand contract generators. 
 
@@ -69,6 +74,17 @@ Guidelines:
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Anthropic API error:', response.status, errorText);
+      
+      // Specific handling for authentication errors
+      if (response.status === 401) {
+        console.error('Authentication failed - check API key');
+        return res.status(500).json({ 
+          error: 'authentication_error',
+          type: 'error',
+          message: 'API authentication failed'
+        });
+      }
+      
       return res.status(500).json({ 
         error: 'Failed to get response from AI assistant',
         details: errorText
