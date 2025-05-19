@@ -259,7 +259,7 @@ const BlogCards = () => {
       {/* View All Button */}
       <div className="margin-top-30px text-align-center mt-8 text-center">
         <a 
-          href="https://template.terms.law/posts-clean/"
+          href="https://terms.law/posts/"
           className="display-inline-block border-1px-solid-#1e293b color-#1e293b padding-12px-24px font-size-14px font-weight-500 text-decoration-none border-radius-4px transition-all-0.2s-ease background-color-#f8fafc box-shadow-0-2px-4px-rgba-0-0-0-0.05 inline-block border border-gray-800 text-gray-800 px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-200"
         >
           View All Articles
