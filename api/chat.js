@@ -1,5 +1,5 @@
-// Fixed API endpoint for Vercel
-export default async function handler(req, res) {
+// API endpoint for Claude chatbox
+const handler = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -92,4 +92,6 @@ Guidelines:
       message: error.message
     });
   }
-}
+};
+
+export default handler;
