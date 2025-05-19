@@ -25,7 +25,7 @@ const Tooltip = ({ text, children }) => {
 };
 
 // Main NDA Generator component
-const StrategicNDAGenerator = () => {
+const StrategicNDAGenerator = ({ onFormDataChange, onNdaTextChange }) => {
   // State for form values
   const [formData, setFormData] = React.useState({
     // Parties
@@ -440,6 +440,15 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
 
   // Generate the NDA text
   const ndaText = generateNDA();
+  
+  // Notify parent component of data changes
+  React.useEffect(() => {
+    if (onFormDataChange) onFormDataChange(formData);
+  }, [formData, onFormDataChange]);
+  
+  React.useEffect(() => {
+    if (onNdaTextChange) onNdaTextChange(ndaText);
+  }, [ndaText, onNdaTextChange]);
   
   // Get section that should be highlighted based on current tab
   const getSectionToHighlight = () => {
@@ -1654,7 +1663,46 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
   );
 };
 
+// Configure the chatbox
+const configureChatbox = () => {
+  window.chatboxConfig = {
+    contractType: 'Strategic Non-Disclosure Agreement',
+    formData: {},
+    documentText: '',
+    apiUrl: 'https://template-generator-red.vercel.app/api/chat'
+  };
+};
+
+// Main app component that includes the NDA generator and chatbox
+const App = () => {
+  const [formData, setFormData] = React.useState({});
+  const [ndaText, setNdaText] = React.useState('');
+  
+  // Initialize chatbox configuration
+  React.useEffect(() => {
+    configureChatbox();
+  }, []);
+  
+  // Update chatbox configuration when form data or document changes
+  React.useEffect(() => {
+    if (window.chatboxConfig) {
+      window.chatboxConfig.formData = formData;
+      window.chatboxConfig.documentText = ndaText;
+    }
+  }, [formData, ndaText]);
+  
+  return (
+    <div>
+      <StrategicNDAGenerator 
+        onFormDataChange={setFormData}
+        onNdaTextChange={setNdaText}
+      />
+      {window.LegalChatbox && React.createElement(window.LegalChatbox)}
+    </div>
+  );
+};
+
 // Render the app
 const root = document.getElementById('root');
 const reactRoot = ReactDOM.createRoot(root);
-reactRoot.render(<StrategicNDAGenerator />);
+reactRoot.render(<App />);
