@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Chatbox Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 10px;
+            font-size: 16px;
+        }
+        .test-button:hover {
+            background: #4338ca;
+        }
+        .response {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            background: #dcfce7;
+            border: 1px solid #16a34a;
+            color: #15803d;
+        }
+        .error {
+            background: #fef2f2;
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+        
+        /* Chatbox styles */
+        .chatbox-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 24px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+        .chatbox-toggle:hover {
+            background: #4338ca;
+        }
+        .chatbox-window {
+            position: fixed;
+            bottom: 90px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+        .chatbox-header {
+            background: #4f46e5;
+            color: white;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chatbox-close {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+        }
+        .chatbox-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        .message.user {
+            background: #4f46e5;
+            color: white;
+            align-self: flex-end;
+        }
+        .message.assistant {
+            background: #f3f4f6;
+            color: #374151;
+            align-self: flex-start;
+        }
+        .chatbox-input-container {
+            padding: 16px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 8px;
+        }
+        .chatbox-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            outline: none;
+        }
+        .chatbox-send {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .chatbox-send:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Simple Chatbox Test</h1>
+        <p>This is a standalone test to see if the chatbox API is working.</p>
+        
+        <button class="test-button" onclick="testAPI()">Test API Connection</button>
+        <button class="test-button" onclick="toggleChatbox()">Toggle Chatbox</button>
+        
+        <div id="response-area"></div>
+    </div>
+
+    <!-- Simple Chatbox -->
+    <button class="chatbox-toggle" onclick="toggleChatbox()">💬</button>
+    <div class="chatbox-window" id="chatbox">
+        <div class="chatbox-header">
+            <span>Legal Assistant</span>
+            <button class="chatbox-close" onclick="toggleChatbox()">×</button>
+        </div>
+        <div class="chatbox-messages" id="messages">
+            <div class="message assistant">
+                Hello! I'm here to help answer questions about your legal documents. Try asking me something!
+            </div>
+        </div>
+        <div class="chatbox-input-container">
+            <input type="text" class="chatbox-input" id="chatInput" placeholder="Ask about contracts..." onkeypress="handleKeyPress(event)">
+            <button class="chatbox-send" id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'https://template-generator-red.vercel.app/api/chat';
+        let isLoading = false;
+
+        async function testAPI() {
+            const responseArea = document.getElementById('response-area');
+            responseArea.innerHTML = '<div class="response">Testing API...</div>';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Hello, can you help me with a simple test?',
+                        contractType: 'Test Document',
+                        formData: {},
+                        documentText: 'This is a test document.'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    responseArea.innerHTML = `<div class="response success">✅ API Working!\n\nResponse: ${data.response}</div>`;
+                } else {
+                    const errorText = await response.text();
+                    responseArea.innerHTML = `<div class="response error">❌ API Error: ${response.status}\n\n${errorText}</div>`;
+                }
+            } catch (error) {
+                responseArea.innerHTML = `<div class="response error">❌ Connection Error: ${error.message}</div>`;
+            }
+        }
+
+        function toggleChatbox() {
+            const chatbox = document.getElementById('chatbox');
+            if (chatbox.style.display === 'none' || chatbox.style.display === '') {
+                chatbox.style.display = 'flex';
+            } else {
+                chatbox.style.display = 'none';
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            if (isLoading) return;
+
+            const input = document.getElementById('chatInput');
+            const messages = document.getElementById('messages');
+            const sendBtn = document.getElementById('sendBtn');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Add user message
+            const userDiv = document.createElement('div');
+            userDiv.className = 'message user';
+            userDiv.textContent = message;
+            messages.appendChild(userDiv);
+
+            // Clear input and disable send
+            input.value = '';
+            isLoading = true;
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        contractType: 'Legal Document',
+                        formData: {},
+                        documentText: 'This is a test legal document for demonstration purposes.'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Add assistant message
+                    const assistantDiv = document.createElement('div');
+                    assistantDiv.className = 'message assistant';
+                    assistantDiv.textContent = data.response;
+                    messages.appendChild(assistantDiv);
+                } else {
+                    const assistantDiv = document.createElement('div');
+                    assistantDiv.className = 'message assistant';
+                    assistantDiv.textContent = `Sorry, I encountered an error: ${response.status}. Please try again.`;
+                    messages.appendChild(assistantDiv);
+                }
+            } catch (error) {
+                const assistantDiv = document.createElement('div');
+                assistantDiv.className = 'message assistant';
+                assistantDiv.textContent = `Sorry, I couldn't connect: ${error.message}. Please try again.`;
+                messages.appendChild(assistantDiv);
+            } finally {
+                isLoading = false;
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send';
+                messages.scrollTop = messages.scrollHeight;
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', function() {
+            console.log('Testing API on load...');
+            testAPI();
+        });
+    </script>
+</body>
+</html>
