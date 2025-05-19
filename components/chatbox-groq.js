@@ -32,6 +32,12 @@ window.LegalChatboxGroq = function(props) {
     try {
       console.log('Sending message to Groq:', apiUrl);
       
+      // Get the most current form data and document text from the window
+      const currentFormData = window.chatboxConfig ? window.chatboxConfig.formData : formData;
+      const currentDocumentText = window.chatboxConfig ? window.chatboxConfig.documentText : documentText;
+      
+      console.log('Current form data being sent:', currentFormData);
+      
       const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -40,8 +46,8 @@ window.LegalChatboxGroq = function(props) {
         body: JSON.stringify({
           message: userMessage,
           contractType: contractType,
-          formData: formData,
-          documentText: documentText
+          formData: currentFormData,
+          documentText: currentDocumentText
         }),
       });
 

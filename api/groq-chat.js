@@ -19,7 +19,16 @@ const handler = async (req, res) => {
   try {
     const { message, contractType = 'Strategic NDA', formData = {}, documentText = '' } = req.body;
 
-    console.log('Received Groq request:', { message, contractType });
+    console.log('Received Groq request:', { 
+      message, 
+      contractType,
+      formDataKeys: Object.keys(formData),
+      term: formData.term,
+      termUnit: formData.termUnit,
+      state: formData.state,
+      purpose: formData.purpose,
+      docLength: documentText.length 
+    });
 
     if (!message) {
       return res.status(400).json({ error: 'Message is required' });

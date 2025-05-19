@@ -1688,6 +1688,12 @@ const App = () => {
     if (window.chatboxConfig) {
       window.chatboxConfig.formData = formData;
       window.chatboxConfig.documentText = ndaText;
+      console.log('Updated chatbox config with:', { 
+        formDataKeys: Object.keys(formData),
+        docLength: ndaText.length,
+        term: formData.term,
+        termUnit: formData.termUnit 
+      });
     }
   }, [formData, ndaText]);
   
