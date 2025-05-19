@@ -67,7 +67,7 @@ If asked about non-NDA topics, politely redirect to NDA-related questions.`;
         'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant', // Updated to current supported model
+        model: 'mixtral-8x7b-32768', // Reliable and currently supported model
         messages: [
           {
             role: 'system',
@@ -110,7 +110,7 @@ If asked about non-NDA topics, politely redirect to NDA-related questions.`;
     return res.status(200).json({ 
       response: assistantMessage,
       timestamp: new Date().toISOString(),
-      model: 'llama-3.1-8b-instant'
+      model: 'mixtral-8x7b-32768'
     });
 
   } catch (error) {
