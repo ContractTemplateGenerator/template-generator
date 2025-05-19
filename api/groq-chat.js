@@ -31,7 +31,7 @@ const handler = async (req, res) => {
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // Strategic NDA-specific system prompt
+    // Strategic NDA-specific system prompt with enhanced context awareness
     const systemPrompt = `You are a specialized legal assistant for Strategic Non-Disclosure Agreements (NDAs). 
 
 Your expertise includes:
@@ -43,12 +43,21 @@ Your expertise includes:
 - Duration and termination provisions
 - Remedies for breach
 
-Current context:
+Current NDA Context (IMPORTANT - refer to these specific details when answering):
 - Contract type: ${contractType}
-- User form data: ${JSON.stringify(formData, null, 2)}
-- Document preview: ${documentText.substring(0, 500)}...
+- Duration: ${formData.term || 'Not specified'} ${formData.termUnit || ''}
+- Governing State: ${formData.state || 'Not specified'}
+- Purpose: ${formData.purpose || 'Not specified'}
+- Parties: ${formData.disclosingPartyName || 'Disclosing Party'} and ${formData.receivingPartyName || 'Receiving Party'}
+- Use Pseudonyms: ${formData.usePseudonyms ? 'Yes' : 'No'}
+- Monetary Consideration: ${formData.monetaryConsideration ? `Yes ($${formData.considerationAmount})` : 'No'}
+- Full form data: ${JSON.stringify(formData, null, 2)}
+
+Current document preview (first 1000 chars): ${documentText.substring(0, 1000)}...
 
 Guidelines:
+- ALWAYS check the current context first when answering questions
+- Reference specific details from the form when relevant (e.g., "Based on your 2-year term..." or "Since you selected California as governing state...")
 - Provide clear, practical legal explanations
 - Focus specifically on NDA-related concepts
 - Suggest specific improvements when appropriate
