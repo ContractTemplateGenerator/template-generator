@@ -1697,7 +1697,7 @@ const App = () => {
         onFormDataChange={setFormData}
         onNdaTextChange={setNdaText}
       />
-      {window.LegalChatbox && React.createElement(window.LegalChatbox)}
+      {window.LegalChatboxGroq && React.createElement(window.LegalChatboxGroq)}
     </div>
   );
 };
