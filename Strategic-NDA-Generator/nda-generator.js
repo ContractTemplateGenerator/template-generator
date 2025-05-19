@@ -1669,7 +1669,7 @@ const configureChatbox = () => {
     contractType: 'Strategic Non-Disclosure Agreement',
     formData: {},
     documentText: '',
-    apiUrl: 'https://template-generator-red.vercel.app/api/chat'
+    apiUrl: window.location.origin + '/api/groq-chat'
   };
 };
 
