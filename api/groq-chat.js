@@ -59,12 +59,13 @@ Guidelines:
 
 If asked about non-NDA topics, politely redirect to NDA-related questions.`;
 
-    // Try different models in order of preference (based on current Groq availability)
+    // Try different models in order of preference (llama-3.3-70b-versatile as primary)
     const models = [
-      'llama-3.1-8b-instant',  // Best balance of speed and capability
-      'llama3-70b-8192',       // Most powerful for complex legal reasoning
-      'llama3-8b-8192',        // Backup option
-      'gemma2-9b-it'           // Alternative if Llama models fail
+      'llama-3.3-70b-versatile', // Your preferred primary model
+      'llama3-70b-8192',         // Backup powerful model
+      'llama-3.1-8b-instant',    // Fast and capable
+      'llama3-8b-8192',          // Reliable backup
+      'gemma2-9b-it'             // Final fallback
     ];
     
     let assistantMessage = null;
