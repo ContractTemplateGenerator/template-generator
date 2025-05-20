@@ -1,4 +1,4 @@
-// Document generation utility for Word download - SIMPLIFIED NO MARGINS NO BOLD
+// Document generation utility for Word download - FIXED FORMATTING WITH SELECTIVE BOLD
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -18,20 +18,25 @@ window.generateWordDoc = function(documentText, formData) {
     margin: 0;
     padding: 0;
   }
-  h1, h2, h3, p {
+  h1 {
+    text-align: center;
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 6pt;
+    margin-top: 0pt;
+  }
+  h2 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+  }
+  h3, p {
     font-size: 12pt;
     font-weight: normal;
     margin-top: 0pt;
     margin-bottom: 0pt;
     text-align: left;
-  }
-  h1 {
-    text-align: center;
-    margin-bottom: 6pt;
-  }
-  h2 {
-    margin-top: 12pt;
-    margin-bottom: 6pt;
   }
   h3 {
     margin-top: 6pt;
@@ -54,18 +59,26 @@ window.generateWordDoc = function(documentText, formData) {
   }
   .signature-table td {
     border: none;
-    padding: 6pt;
+    padding: 3pt;
     vertical-align: top;
     width: 50%;
   }
   .signature-line {
     border-bottom: 1px solid black;
     width: 200px;
-    margin-bottom: 3pt;
+    margin-bottom: 2pt;
+    margin-top: 2pt;
   }
   .signature-text {
     font-size: 12pt;
-    margin-bottom: 3pt;
+    margin-bottom: 2pt;
+    margin-top: 2pt;
+  }
+  .signature-header {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-bottom: 2pt;
+    margin-top: 2pt;
   }
 </style>
 </head>
@@ -82,7 +95,7 @@ window.generateWordDoc = function(documentText, formData) {
       
       if (!line) continue;
       
-      // Handle title
+      // Handle title - MAKE BOLD
       if (line === 'ANGEL INVESTOR AGREEMENT') {
         htmlContent += `<h1>${line}</h1>`;
         continue;
@@ -106,7 +119,7 @@ window.generateWordDoc = function(documentText, formData) {
         continue;
       }
       
-      // Handle numbered sections
+      // Handle numbered sections - MAKE BOLD
       if (line.match(/^\d+\.\s+[A-Z\s]+$/)) {
         htmlContent += `<h2>${line}</h2>`;
         continue;
@@ -132,19 +145,19 @@ window.generateWordDoc = function(documentText, formData) {
 <table class="signature-table">
   <tr>
     <td>
-      <div class="signature-text">COMPANY:</div><br>
-      <div class="signature-text">${formData.startupName || 'Company Name'}</div><br>
-      <div class="signature-line"></div><br>
-      <div class="signature-text">${formData.founderName || 'CEO Name'}</div><br>
-      <div class="signature-text">Chief Executive Officer</div><br>
+      <div class="signature-header">COMPANY:</div>
+      <div class="signature-text">${formData.startupName || 'Company Name'}</div>
+      <div class="signature-line"></div>
+      <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
+      <div class="signature-text">Chief Executive Officer</div>
       <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
     </td>
     <td>
-      <div class="signature-text">INVESTOR:</div><br>
-      <div class="signature-text">${formData.investorName || 'Investor Name'}</div><br>
-      <div class="signature-line"></div><br>
-      <div class="signature-text">${formData.investorName || 'Investor Name'}</div><br>
-      <div class="signature-text">Investor</div><br>
+      <div class="signature-header">INVESTOR:</div>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
+      <div class="signature-line"></div>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
+      <div class="signature-text">Investor</div>
       <div class="signature-text">Date: _________________</div>
     </td>
   </tr>
