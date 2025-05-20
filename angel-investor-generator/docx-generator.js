@@ -1,4 +1,4 @@
-// Document generation utility for Word download - FIXED SIGNATURE HEIGHT & BOLD FORMATTING
+// Document generation utility for Word download - FIXED DATE FORMAT, SIGNATURE HEIGHT, BOLD FORMATTING
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -150,7 +150,7 @@ window.generateWordDoc = function(documentText, formData) {
       <div class="signature-line"></div>
       <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
       <div class="signature-text">Chief Executive Officer</div>
-      <div class="signature-text">Date: ${formData.signatureDate ? new Date(formData.signatureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '_________________'}</div>
+      <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
     </td>
     <td>
       <div class="signature-header">INVESTOR:</div>
