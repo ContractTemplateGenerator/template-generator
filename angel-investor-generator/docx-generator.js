@@ -1,4 +1,4 @@
-// Document generation utility for Word download - FIXED FORMATTING
+// Document generation utility for Word download - SIMPLIFIED NO MARGINS NO BOLD
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -14,54 +14,58 @@ window.generateWordDoc = function(documentText, formData) {
   body {
     font-family: "Times New Roman", serif;
     font-size: 12pt;
-    line-height: 1.5;
-    margin: 1in;
+    line-height: 1.4;
+    margin: 0;
     padding: 0;
+  }
+  h1, h2, h3, p {
+    font-size: 12pt;
+    font-weight: normal;
+    margin-top: 0pt;
+    margin-bottom: 0pt;
+    text-align: left;
   }
   h1 {
     text-align: center;
-    font-size: 12pt;
-    font-weight: bold;
-    margin-bottom: 12pt;
+    margin-bottom: 6pt;
   }
   h2 {
-    font-size: 12pt;
-    font-weight: bold;
     margin-top: 12pt;
     margin-bottom: 6pt;
   }
   h3 {
-    font-size: 12pt;
-    font-weight: bold;
     margin-top: 6pt;
     margin-bottom: 6pt;
   }
   p {
-    margin-bottom: 0pt;
-    margin-top: 0pt;
     text-align: justify;
-    font-weight: normal;
-    font-size: 12pt;
+  }
+  .recitals {
+    margin-top: 12pt;
+    margin-bottom: 12pt;
+  }
+  .section-break {
+    margin-top: 12pt;
   }
   .signature-table {
     width: 100%;
-    margin-top: 24pt;
+    margin-top: 18pt;
     border-collapse: collapse;
   }
   .signature-table td {
     border: none;
-    padding: 12pt;
+    padding: 6pt;
     vertical-align: top;
     width: 50%;
   }
   .signature-line {
     border-bottom: 1px solid black;
     width: 200px;
-    margin-bottom: 6pt;
+    margin-bottom: 3pt;
   }
   .signature-text {
     font-size: 12pt;
-    margin-bottom: 6pt;
+    margin-bottom: 3pt;
   }
 </style>
 </head>
@@ -84,6 +88,24 @@ window.generateWordDoc = function(documentText, formData) {
         continue;
       }
       
+      // Handle RECITALS
+      if (line === 'RECITALS') {
+        htmlContent += `<p class="recitals">${line}</p>`;
+        continue;
+      }
+      
+      // Handle WHEREAS clauses - add more space after
+      if (line.startsWith('WHEREAS,')) {
+        htmlContent += `<p style="margin-bottom: 6pt;">${line}</p>`;
+        continue;
+      }
+      
+      // Handle NOW THEREFORE
+      if (line.startsWith('NOW, THEREFORE,')) {
+        htmlContent += `<p class="section-break" style="margin-bottom: 6pt;">${line}</p>`;
+        continue;
+      }
+      
       // Handle numbered sections
       if (line.match(/^\d+\.\s+[A-Z\s]+$/)) {
         htmlContent += `<h2>${line}</h2>`;
@@ -100,7 +122,7 @@ window.generateWordDoc = function(documentText, formData) {
       if (line.includes('IN WITNESS WHEREOF') || inSignatureSection) {
         if (line.includes('IN WITNESS WHEREOF')) {
           inSignatureSection = true;
-          htmlContent += `<p style="margin-top: 24pt;">${line}</p>`;
+          htmlContent += `<p class="section-break">${line}</p>`;
           continue;
         }
         
@@ -110,19 +132,19 @@ window.generateWordDoc = function(documentText, formData) {
 <table class="signature-table">
   <tr>
     <td>
-      <div class="signature-text">COMPANY:</div>
-      <div class="signature-text">${formData.startupName || 'Company Name'}</div>
-      <div class="signature-line"></div>
-      <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
-      <div class="signature-text">Chief Executive Officer</div>
+      <div class="signature-text">COMPANY:</div><br>
+      <div class="signature-text">${formData.startupName || 'Company Name'}</div><br>
+      <div class="signature-line"></div><br>
+      <div class="signature-text">${formData.founderName || 'CEO Name'}</div><br>
+      <div class="signature-text">Chief Executive Officer</div><br>
       <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
     </td>
     <td>
-      <div class="signature-text">INVESTOR:</div>
-      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
-      <div class="signature-line"></div>
-      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
-      <div class="signature-text">Investor</div>
+      <div class="signature-text">INVESTOR:</div><br>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div><br>
+      <div class="signature-line"></div><br>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div><br>
+      <div class="signature-text">Investor</div><br>
       <div class="signature-text">Date: _________________</div>
     </td>
   </tr>

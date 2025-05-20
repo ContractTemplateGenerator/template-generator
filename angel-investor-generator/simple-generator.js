@@ -1,4 +1,4 @@
-// Angel Investor Generator - Complete Fixed Version
+// Angel Investor Generator - Fixed Version with Better Highlighting
 const { useState, useEffect, useRef } = React;
 const { createElement: h } = React;
 
@@ -23,6 +23,7 @@ const AngelInvestorGenerator = () => {
     tagAlong: true,
     dragAlong: true,
     rightOfFirstRefusal: true,
+    includeConfidentiality: true,
     confidentialityPeriod: '5',
     governingLaw: 'California',
     disputeResolution: 'arbitration',
@@ -132,6 +133,7 @@ const AngelInvestorGenerator = () => {
       tagAlong: true,
       dragAlong: true,
       rightOfFirstRefusal: true,
+      includeConfidentiality: true,
       confidentialityPeriod: '5',
       governingLaw: 'California',
       disputeResolution: 'arbitration',
@@ -139,11 +141,16 @@ const AngelInvestorGenerator = () => {
     });
     localStorage.removeItem(FORM_DATA_KEY);
   };
-  // Comprehensive document generation with 8 sections - NO SCHEDULES
+  // Comprehensive document generation with conditional confidentiality
   const generateDocumentText = () => {
     const postmoneyValuation = formData.premoneyValuation ? 
       parseInt(formData.premoneyValuation) + parseInt(formData.investmentAmount || 0) : 
       'TBD';
+
+    // Build the confidentiality section conditionally
+    const confidentialitySection = formData.includeConfidentiality ? 
+      `d) Proprietary Information. The Investor acknowledges that any information provided by the Company pursuant to this Agreement may contain proprietary and confidential information. The Investor agrees to maintain the confidentiality of such information for a period of ${formData.confidentialityPeriod} years following the termination of this Agreement or the Investor's relationship with the Company.`
+      : '';
 
     return `ANGEL INVESTOR AGREEMENT
 
@@ -199,7 +206,7 @@ b) Operational Updates. The Company shall provide monthly operational updates to
 
 c) Inspection Rights. Upon reasonable advance notice and during normal business hours, the Investor shall have the right to inspect the Company's books and records, properties, and facilities. Such inspection rights shall be exercised in a manner that does not unduly interfere with the Company's operations and subject to reasonable confidentiality protections.
 
-d) Proprietary Information. The Investor acknowledges that any information provided by the Company pursuant to this Agreement may contain proprietary and confidential information. The Investor agrees to maintain the confidentiality of such information for a period of ${formData.confidentialityPeriod} years following the termination of this Agreement or the Investor's relationship with the Company.
+${confidentialitySection}
 
 4. TRANSFER RESTRICTIONS AND RIGHTS
 
@@ -280,49 +287,95 @@ By: _________________________________       _________________________________
 Date: ${formData.signatureDate}            Date: _________________`;
   };
 
-  // Function to get highlighted preview with scroll functionality
+  // PRECISE highlighting for specific subsections
   const getHighlightedPreview = () => {
     const documentText = generateDocumentText();
     
-    // Define sections that should be highlighted based on the current tab and last changed field
-    let sectionToHighlight = null;
-    
-    switch (currentTab) {
-      case 0: // Basic Information
-        if (['startupName', 'investorName', 'startupAddress', 'investorAddress', 'founderName'].includes(lastChanged)) {
-          sectionToHighlight = 'header';
-        }
-        break;
-      case 1: // Investment Terms
-        if (['investmentAmount', 'equityPercentage', 'premoneyValuation', 'securitiesType'].includes(lastChanged)) {
-          sectionToHighlight = 'investment';
-        }
-        break;
-      case 2: // Equity & Control
-        if (['antiDilution', 'liquidationPreference', 'boardRepresentation', 'informationRights', 'tagAlong', 'dragAlong', 'rightOfFirstRefusal'].includes(lastChanged)) {
-          sectionToHighlight = 'equity';
-        }
-        break;
-      case 3: // Legal Terms
-        if (['governingLaw', 'disputeResolution', 'confidentialityPeriod'].includes(lastChanged)) {
-          sectionToHighlight = 'legal';
-        }
-        break;
-    }
-
-    if (sectionToHighlight && lastChanged) {
-      // Create highlighted version based on section
-      const sections = {
-        header: /This Angel Investor Agreement.*?NOW, THEREFORE/s,
-        investment: /1\. INVESTMENT TERMS.*?(?=2\.)/s,
-        equity: /2\. EQUITY AND GOVERNANCE RIGHTS.*?(?=5\.)/s,
-        legal: /7\. GOVERNING LAW AND DISPUTE RESOLUTION.*?(?=8\.)/s
-      };
-
-      if (sections[sectionToHighlight]) {
-        return documentText.replace(sections[sectionToHighlight], match => 
-          `<span class="highlighted-text">${match}</span>`
-        );
+    // More precise highlighting based on specific fields
+    if (lastChanged) {
+      switch (lastChanged) {
+        case 'startupName':
+        case 'investorName':
+        case 'startupAddress':
+        case 'investorAddress':
+        case 'founderName':
+          return documentText.replace(
+            /This Angel Investor Agreement[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'investmentAmount':
+        case 'equityPercentage':
+        case 'premoneyValuation':
+          return documentText.replace(
+            /a\) Investment Amount and Consideration[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'securitiesType':
+          return documentText.replace(
+            /b\) Securities to be Issued[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'boardRepresentation':
+          return documentText.replace(
+            /b\) Board of Directors\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'antiDilution':
+          return documentText.replace(
+            /c\) Anti-Dilution Protection\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'liquidationPreference':
+          return documentText.replace(
+            /d\) Liquidation Preferences\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'rightOfFirstRefusal':
+          return documentText.replace(
+            /a\) Right of First Refusal\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'tagAlong':
+          return documentText.replace(
+            /b\) Tag-Along Rights\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'dragAlong':
+          return documentText.replace(
+            /c\) Drag-Along Rights\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'confidentialityPeriod':
+        case 'includeConfidentiality':
+          // Only highlight if confidentiality section exists
+          if (formData.includeConfidentiality) {
+            return documentText.replace(
+              /d\) Proprietary Information\.[^.]*\./,
+              match => `<span class="highlighted-text">${match}</span>`
+            );
+          }
+          break;
+        
+        case 'governingLaw':
+          return documentText.replace(
+            /a\) Governing Law\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
+        
+        case 'disputeResolution':
+          return documentText.replace(
+            /b\) Dispute Resolution\.[^.]*\./,
+            match => `<span class="highlighted-text">${match}</span>`
+          );
       }
     }
 
@@ -337,7 +390,7 @@ Date: ${formData.signatureDate}            Date: _________________`;
         highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-  }, [lastChanged, currentTab]);
+  }, [lastChanged]);
   return h('div', { className: 'generator-container' },
     // Header
     h('div', { className: 'generator-header' },
@@ -655,6 +708,26 @@ Date: ${formData.signatureDate}            Date: _________________`;
                 'Method for resolving disputes under this agreement')
             ),
             h('div', { className: 'form-group' },
+              h('label', { 
+                style: { 
+                  display: 'flex', 
+                  alignItems: 'center',
+                  marginBottom: '1rem'
+                } 
+              },
+                h('input', {
+                  type: 'checkbox',
+                  name: 'includeConfidentiality',
+                  checked: formData.includeConfidentiality,
+                  onChange: handleInputChange,
+                  style: { marginRight: '0.75rem' }
+                }),
+                h('span', null, 'Include Confidentiality Clause')
+              ),
+              h('small', { style: { color: '#7f8c8d', marginBottom: '1rem', display: 'block' } }, 
+                'Check to include investor confidentiality requirements in the agreement')
+            ),
+            formData.includeConfidentiality && h('div', { className: 'form-group' },
               h('label', null, 'Confidentiality Period (years)'),
               h('input', {
                 type: 'number',
@@ -740,7 +813,7 @@ Date: ${formData.signatureDate}            Date: _________________`;
         }, '📞 Schedule Legal Consultation')
       ),
       
-      // Preview Panel - FULLY SCROLLABLE WITH HIGHLIGHTING
+      // Preview Panel - EQUAL HEIGHT
       h('div', { className: 'preview-panel' },
         h('div', { className: 'preview-header' },
           h('h3', null, 'Live Preview'),
@@ -748,51 +821,20 @@ Date: ${formData.signatureDate}            Date: _________________`;
         ),
         h('div', { 
           className: `preview-content ${!isPaid ? 'locked' : ''}`, 
-          ref: previewRef,
-          style: { position: 'relative', height: '600px' }
+          ref: previewRef
         },
           h('pre', {
             className: 'document-preview',
             style: { 
-              height: '100%', 
-              overflowY: 'auto',
-              userSelect: isPaid ? 'text' : 'none',
-              padding: '2rem',
-              margin: 0,
-              whiteSpace: 'pre-wrap',
-              fontFamily: 'Times New Roman, serif',
-              fontSize: '12pt',
-              lineHeight: '1.6'
+              userSelect: isPaid ? 'text' : 'none'
             },
             dangerouslySetInnerHTML: { __html: getHighlightedPreview() }
           }),
           
           !isPaid && h('div', null,
+            h('div', { className: 'preview-overlay' }),
             h('div', { 
-              className: 'preview-overlay',
-              style: {
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'linear-gradient(to bottom, rgba(255,255,255,0) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0.8) 70%, rgba(255,255,255,0.95) 100%)',
-                pointerEvents: 'none'
-              }
-            }),
-            h('div', { 
-              className: 'paywall-modal',
-              style: {
-                position: 'absolute',
-                bottom: '2rem',
-                left: '2rem',
-                right: '2rem',
-                backgroundColor: 'white',
-                borderRadius: '8px',
-                boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
-                border: '2px solid #3498db',
-                zIndex: 10
-              }
+              className: 'paywall-modal'
             },
               h('div', { className: 'paywall-content' },
                 h('h4', null, '🔒 Unlock Full Agreement'),
