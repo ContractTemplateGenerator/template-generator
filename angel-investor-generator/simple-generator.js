@@ -391,6 +391,15 @@ Date: ${readableDate}              Date: _________________
     }
   }, [lastChanged, currentTab]);
 
+  // Create tooltip component
+  const Tooltip = ({ text }) => (
+    <div className="tooltip-container">
+      <span className="tooltip-icon">ⓘ</span>
+      <div className="tooltip-text">{text}</div>
+    </div>
+  );
+
+  // Tab content rendering with enhanced tooltips
   const renderTabContent = () => {
     switch (currentTab) {
       case 0: // Basic Information
@@ -399,7 +408,10 @@ Date: ${readableDate}              Date: _________________
             <h3>Company and Investor Details</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="startupName">Company Name *</label>
+                <label htmlFor="startupName">
+                  Company Name *
+                  <Tooltip text="Enter the full legal name of the company exactly as it appears on official incorporation documents." />
+                </label>
                 <input
                   type="text"
                   id="startupName"
@@ -411,7 +423,10 @@ Date: ${readableDate}              Date: _________________
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="startupState">State of Incorporation *</label>
+                <label htmlFor="startupState">
+                  State of Incorporation *
+                  <Tooltip text="The state where the company is legally incorporated. This determines which state's corporate laws apply to the company's internal affairs." />
+                </label>
                 <select
                   id="startupState"
                   name="startupState"
@@ -419,16 +434,17 @@ Date: ${readableDate}              Date: _________________
                   onChange={handleInputChange}
                   required
                 >
-                  <option value="Delaware">Delaware</option>
-                  <option value="California">California</option>
-                  <option value="New York">New York</option>
-                  <option value="Texas">Texas</option>
-                  <option value="Nevada">Nevada</option>
+                  {states.map(state => 
+                    <option key={state} value={state}>{state}</option>
+                  )}
                 </select>
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="startupAddress">Company Address *</label>
+              <label htmlFor="startupAddress">
+                Company Address *
+                <Tooltip text="Official registered address of the company. This may affect jurisdiction for legal disputes." />
+              </label>
               <input
                 type="text"
                 id="startupAddress"
@@ -440,7 +456,10 @@ Date: ${readableDate}              Date: _________________
               />
             </div>
             <div className="form-group">
-              <label htmlFor="founderName">CEO/Founder Name *</label>
+              <label htmlFor="founderName">
+                CEO/Founder Name *
+                <Tooltip text="Name of the individual who will sign the agreement on behalf of the company. Typically the CEO or authorized officer." />
+              </label>
               <input
                 type="text"
                 id="founderName"
@@ -453,7 +472,10 @@ Date: ${readableDate}              Date: _________________
             </div>
             <hr className="section-divider" />
             <div className="form-group">
-              <label htmlFor="investorName">Investor Name *</label>
+              <label htmlFor="investorName">
+                Investor Name *
+                <Tooltip text="Full legal name of the investor who will sign the agreement. For individual investors, use their complete name." />
+              </label>
               <input
                 type="text"
                 id="investorName"
@@ -465,7 +487,10 @@ Date: ${readableDate}              Date: _________________
               />
             </div>
             <div className="form-group">
-              <label htmlFor="investorAddress">Investor Address *</label>
+              <label htmlFor="investorAddress">
+                Investor Address *
+                <Tooltip text="Current residential or business address of the investor. Used for legal notices and communication." />
+              </label>
               <input
                 type="text"
                 id="investorAddress"
@@ -484,7 +509,10 @@ Date: ${readableDate}              Date: _________________
             <h3>Investment Structure</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="investmentAmount">Investment Amount ($) *</label>
+                <label htmlFor="investmentAmount">
+                  Investment Amount ($) *
+                  <Tooltip text="The total dollar amount the investor will contribute to the company in exchange for equity." />
+                </label>
                 <input
                   type="number"
                   id="investmentAmount"
@@ -497,7 +525,10 @@ Date: ${readableDate}              Date: _________________
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="equityPercentage">Equity Percentage (%) *</label>
+                <label htmlFor="equityPercentage">
+                  Equity Percentage (%) *
+                  <Tooltip text="The percentage of ownership in the company that the investor will receive in exchange for their investment. This is calculated on a fully-diluted basis." />
+                </label>
                 <input
                   type="number"
                   id="equityPercentage"
@@ -513,7 +544,10 @@ Date: ${readableDate}              Date: _________________
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="premoneyValuation">Pre-Money Valuation ($) *</label>
+              <label htmlFor="premoneyValuation">
+                Pre-Money Valuation ($) *
+                <Tooltip text="The valuation of the company before the investment is made. The post-money valuation equals pre-money valuation plus the investment amount." />
+              </label>
               <input
                 type="number"
                 id="premoneyValuation"
@@ -528,7 +562,10 @@ Date: ${readableDate}              Date: _________________
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="securitiesType">Type of Securities</label>
+                <label htmlFor="securitiesType">
+                  Type of Securities
+                  <Tooltip text="The type of equity the investor will receive. Common stock offers basic ownership rights, while preferred stock typically includes liquidation preferences and special rights." />
+                </label>
                 <select
                   id="securitiesType"
                   name="securitiesType"
@@ -542,7 +579,10 @@ Date: ${readableDate}              Date: _________________
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="signatureDate">Agreement Date</label>
+                <label htmlFor="signatureDate">
+                  Agreement Date
+                  <Tooltip text="The date when the agreement will be signed by both parties. This is the effective date of the contract." />
+                </label>
                 <input
                   type="date"
                   id="signatureDate"
@@ -559,7 +599,10 @@ Date: ${readableDate}              Date: _________________
           <div className="tab-content">
             <h3>Governance and Control Rights</h3>
             <div className="form-group">
-              <label htmlFor="boardRepresentation">Board Representation</label>
+              <label htmlFor="boardRepresentation">
+                Board Representation
+                <Tooltip text="Determines the investor's role in company governance. A board seat gives voting power, while observer rights allow attendance without voting privileges." />
+              </label>
               <select
                 id="boardRepresentation"
                 name="boardRepresentation"
@@ -573,7 +616,10 @@ Date: ${readableDate}              Date: _________________
               <small>Observer rights allow attendance at board meetings without voting</small>
             </div>
             <div className="form-group">
-              <label htmlFor="antiDilution">Anti-Dilution Protection</label>
+              <label htmlFor="antiDilution">
+                Anti-Dilution Protection
+                <Tooltip text="Protects the investor from dilution in future down-rounds (when the company raises money at a lower valuation). Weighted average is standard and moderate, while full ratchet offers strongest protection for investors but can be harsh for founders." />
+              </label>
               <select
                 id="antiDilution"
                 name="antiDilution"
@@ -587,7 +633,10 @@ Date: ${readableDate}              Date: _________________
               <small>Protection against future down-rounds</small>
             </div>
             <div className="form-group">
-              <label htmlFor="liquidationPreference">Liquidation Preference</label>
+              <label htmlFor="liquidationPreference">
+                Liquidation Preference
+                <Tooltip text="Determines how proceeds are distributed in a sale or liquidation. Participating preferences can result in investors receiving more than their proportional share, while non-participating limits returns to the greater of their investment or pro-rata share." />
+              </label>
               <select
                 id="liquidationPreference"
                 name="liquidationPreference"
@@ -617,6 +666,7 @@ Date: ${readableDate}              Date: _________________
                 />
                 <label htmlFor="rightOfFirstRefusal">
                   <strong>Right of First Refusal</strong>
+                  <Tooltip text="Gives the company and other shareholders the right to purchase shares before they can be sold to an outside party, helping control who becomes a shareholder." />
                   <small>Company and other shareholders can purchase shares before outside sales</small>
                 </label>
               </div>
@@ -630,6 +680,7 @@ Date: ${readableDate}              Date: _________________
                 />
                 <label htmlFor="tagAlong">
                   <strong>Tag-Along Rights</strong>
+                  <Tooltip text="Protects minority shareholders by allowing them to join or 'tag along' when a majority shareholder sells their shares to a third party. This ensures minority investors aren't left behind." />
                   <small>Minority shareholders can participate in sale to third parties</small>
                 </label>
               </div>
@@ -643,12 +694,16 @@ Date: ${readableDate}              Date: _________________
                 />
                 <label htmlFor="dragAlong">
                   <strong>Drag-Along Rights</strong>
+                  <Tooltip text="Allows majority shareholders to force minority shareholders to join in the sale of the company. This prevents minority shareholders from blocking a beneficial exit opportunity." />
                   <small>Majority can force all shareholders to sell in approved transactions</small>
                 </label>
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="confidentialityPeriod">Confidentiality Period (years)</label>
+              <label htmlFor="confidentialityPeriod">
+                Confidentiality Period (years)
+                <Tooltip text="Number of years the investor must keep company information confidential after the termination of the agreement. Longer periods provide more protection for the company's sensitive information." />
+              </label>
               <input
                 type="number"
                 id="confidentialityPeriod"
@@ -667,24 +722,27 @@ Date: ${readableDate}              Date: _________________
           <div className="tab-content">
             <h3>Legal and Dispute Resolution</h3>
             <div className="form-group">
-              <label htmlFor="governingLaw">Governing Law</label>
+              <label htmlFor="governingLaw">
+                Governing Law
+                <Tooltip text="The state whose laws will be used to interpret the agreement. This is separate from the state of incorporation and may impact how disputes are resolved. Often matches either the company's or investor's primary location." />
+              </label>
               <select
                 id="governingLaw"
                 name="governingLaw"
                 value={formData.governingLaw}
                 onChange={handleInputChange}
               >
-                <option value="California">California</option>
-                <option value="Delaware">Delaware</option>
-                <option value="New York">New York</option>
-                <option value="Texas">Texas</option>
-                <option value="Florida">Florida</option>
-                <option value="Nevada">Nevada</option>
+                {states.map(state => 
+                  <option key={state} value={state}>{state}</option>
+                )}
               </select>
               <small>State laws that will govern this agreement</small>
             </div>
             <div className="form-group">
-              <label htmlFor="disputeResolution">Dispute Resolution</label>
+              <label htmlFor="disputeResolution">
+                Dispute Resolution
+                <Tooltip text="The method for resolving any legal disputes that arise under the agreement. Arbitration is typically faster and more private than court litigation, but may limit appeal options." />
+              </label>
               <select
                 id="disputeResolution"
                 name="disputeResolution"
@@ -732,17 +790,32 @@ Date: ${readableDate}              Date: _________________
                 </div>
                 {formData.antiDilution === 'none' && (
                   <div className="risk-item yellow">
-                    <strong>⚠ No Anti-Dilution:</strong> Consider adding anti-dilution protection
+                    <strong>⚠ No Anti-Dilution:</strong> Consider adding anti-dilution protection to safeguard your investment in case of future down-rounds
                   </div>
                 )}
                 {parseInt(formData.equityPercentage) > 25 && (
                   <div className="risk-item red">
-                    <strong>✗ High Equity:</strong> {formData.equityPercentage}% may be excessive for angel round
+                    <strong>✗ High Equity Percentage:</strong> {formData.equityPercentage}% equity is unusually high for an angel investment and may deter future investors
                   </div>
                 )}
                 {formData.boardRepresentation === 'none' && (
                   <div className="risk-item yellow">
-                    <strong>⚠ No Board Rights:</strong> Consider requesting observer rights
+                    <strong>⚠ No Board Rights:</strong> Consider requesting at least observer rights to stay informed about company operations
+                  </div>
+                )}
+                {formData.liquidationPreference === 'participating' && parseInt(formData.equityPercentage) > 15 && (
+                  <div className="risk-item yellow">
+                    <strong>⚠ Participating Preferred:</strong> With high equity percentage, this combination may be viewed as overly investor-favorable by future VCs
+                  </div>
+                )}
+                {formData.dragAlong && !formData.tagAlong && (
+                  <div className="risk-item yellow">
+                    <strong>⚠ Unbalanced Exit Rights:</strong> Drag-along without tag-along may disadvantage minority shareholders
+                  </div>
+                )}
+                {!formData.rightOfFirstRefusal && (
+                  <div className="risk-item yellow">
+                    <strong>⚠ No ROFR:</strong> Without right of first refusal, you may lose control over who becomes a co-investor
                   </div>
                 )}
               </div>
