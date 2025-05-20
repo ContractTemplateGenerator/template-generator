@@ -188,7 +188,7 @@ const AngelInvestorGenerator = () => {
 
     return `ANGEL INVESTOR AGREEMENT
 
-This Angel Investor Agreement (this "Agreement") is made and entered into as of ${readableDate}, by and between ${formData.startupName}, a ${formData.startupState} corporation (the "Company"), and ${formData.investorName}, an individual (the "Investor").
+This Angel Investor Agreement (this "Agreement") is made and entered into as of ${readableDate}, by and between ${formData.startupName}, a ${formData.startupState} corporation (the "Company"), located at ${formData.startupAddress}, and ${formData.investorName}, an individual (the "Investor"), located at ${formData.investorAddress}.
 
 RECITALS
 
@@ -204,85 +204,107 @@ NOW, THEREFORE, in consideration of the mutual covenants and agreements containe
 
 a) Investment Amount and Consideration. The Investor agrees to purchase ${formData.equityPercentage}% of the outstanding shares of ${formData.securitiesType} stock of the Company for a total investment of $${parseInt(formData.investmentAmount || 0).toLocaleString()}. This investment values the Company at a pre-money valuation of $${parseInt(formData.premoneyValuation || 0).toLocaleString()} and a post-money valuation of $${postmoneyValuation.toLocaleString ? postmoneyValuation.toLocaleString() : postmoneyValuation}.
 
-b) Securities to be Issued. In exchange for the investment amount, the Company shall issue to the Investor shares of ${formData.securitiesType} stock, representing ${formData.equityPercentage}% of the fully diluted shares of the Company on a post-closing basis.
+b) Securities to be Issued. In exchange for the investment amount, the Company shall issue to the Investor shares of ${formData.securitiesType} stock, representing ${formData.equityPercentage}% of the fully diluted shares of the Company on a post-closing basis. The shares shall be subject to the terms and conditions of this Agreement and any applicable stockholders' agreement.
 
-c) Use of Investment Proceeds. The Company shall use the investment proceeds for general corporate purposes, including but not limited to product development, marketing, and working capital needs.
+c) Use of Investment Proceeds. The Company shall use the investment proceeds for general corporate purposes, including but not limited to product development, marketing initiatives, hiring key personnel, and working capital needs. The Company agrees to provide quarterly updates to the Investor regarding the use of funds and the Company's operational progress.
 
-d) Additional Investment Rights. The Investor shall have the right to participate in future financing rounds of the Company on a pro rata basis.
+d) Additional Investment Rights. The Investor shall have the right to participate in future financing rounds of the Company on a pro rata basis, based on the Investor's percentage ownership at the time of such future financing. This participation right shall be subject to standard exceptions for certain types of financing arrangements such as employee option plans and strategic partnerships.
 
 2. EQUITY AND GOVERNANCE RIGHTS
 
-a) Voting Rights. The Investor shall have voting rights commensurate with their ownership percentage in the Company.
+a) Voting Rights. The Investor shall have voting rights commensurate with their ownership percentage in the Company. All major corporate decisions, including changes to the Company's charter documents, issuance of additional securities exceeding 10% of outstanding shares, and significant asset sales or acquisitions, shall require the approval of a majority of stockholders, including the Investor if their ownership exceeds 5% of the outstanding shares.
 
 b) Board of Directors. ${formData.boardRepresentation === 'board_seat' ? 
-  `The Investor shall be entitled to designate one member to the Company's Board of Directors.` : 
+  `The Investor shall be entitled to designate one member to the Company's Board of Directors. The Board shall consist of no more than five members, and the Investor's designated board member shall serve until such time as the Investor's ownership falls below 5% of the outstanding shares.` : 
   formData.boardRepresentation === 'observer' ?
-  `The Investor shall have the right to designate a board observer who may attend all board meetings and receive all board materials.` :
+  `The Investor shall have the right to designate a board observer who may attend all board meetings and receive all board materials, but shall not have voting rights. The observer rights shall continue until the Investor's ownership falls below 2% of the outstanding shares on a fully diluted basis.` :
   `The Investor shall not have board representation or observer rights under this Agreement.`}
 
 c) Anti-Dilution Protection. ${formData.antiDilution === 'weighted_average' ? 
-  `The Investor shall be protected against dilution through weighted average anti-dilution provisions.` :
+  `The Investor shall be protected against dilution through weighted average anti-dilution provisions. In the event the Company issues additional shares at a price per share lower than the price paid by the Investor, the Investor's conversion ratio shall be adjusted using a standard weighted average formula to account for the dilutive issuance.` :
   formData.antiDilution === 'full_ratchet' ?
-  `The Investor shall be protected against dilution through full ratchet anti-dilution provisions.` :
+  `The Investor shall be protected against dilution through full ratchet anti-dilution provisions. In the event the Company issues additional shares at a price per share lower than the price paid by the Investor, the Investor's conversion ratio shall be adjusted to the lower price.` :
   `The Investor shall not receive anti-dilution protection under this Agreement.`}
 
 d) Liquidation Preferences. ${formData.liquidationPreference === 'participating' ?
-  `Upon any liquidation event, the Investor shall be entitled to receive the greater of (i) the return of their original investment amount, or (ii) their pro rata share of the liquidation proceeds based on their ownership percentage, plus an additional participating amount.` :
+  `Upon any liquidation event, including a sale of the Company, merger, or winding up, the Investor shall be entitled to receive the greater of (i) the return of their original investment amount, or (ii) their pro rata share of the liquidation proceeds based on their ownership percentage, plus an additional participating amount equal to their pro rata share of any remaining proceeds.` :
   formData.liquidationPreference === 'non_participating' ?
-  `Upon any liquidation event, the Investor shall be entitled to receive the greater of (i) the return of their original investment amount, or (ii) their pro rata share of the liquidation proceeds based on their ownership percentage.` :
-  `The Investor shall receive liquidation proceeds solely based on their pro rata ownership percentage.`}
+  `Upon any liquidation event, including a sale of the Company, merger, or winding up, the Investor shall be entitled to receive the greater of (i) the return of their original investment amount, or (ii) their pro rata share of the liquidation proceeds based on their ownership percentage.` :
+  `The Investor shall receive liquidation proceeds solely based on their pro rata ownership percentage in a liquidation event.`}
 
 3. INFORMATION AND INSPECTION RIGHTS
 
-a) Financial Reporting. The Company shall provide the Investor with quarterly financial statements within thirty (30) days after the end of each quarter.
+a) Financial Reporting. The Company shall provide the Investor with quarterly financial statements, including income statements, balance sheets, cash flow statements, and a statement of stockholder equity, within thirty (30) days after the end of each quarter. Annual audited financial statements prepared by an independent certified public accountant shall be provided within ninety (90) days after the end of each fiscal year.
 
-b) Operational Updates. The Company shall provide monthly operational updates to the Investor.
+b) Operational Updates. The Company shall provide monthly operational updates to the Investor, including key performance metrics, significant business developments, customer acquisition data, and any material changes to the Company's business plan or strategy. These updates may be provided in written form or through regular investor calls at the Company's discretion.
 
-c) Inspection Rights. Upon reasonable notice, the Investor shall have the right to inspect the Company's books and records.
+c) Inspection Rights. Upon reasonable advance notice and during normal business hours, the Investor shall have the right to inspect the Company's books and records, properties, and facilities. Such inspection rights shall be exercised in a manner that does not unduly interfere with the Company's operations and subject to reasonable confidentiality protections.
 
-d) Proprietary Information. The Investor agrees to maintain the confidentiality of information for a period of ${formData.confidentialityPeriod} years.
+d) Proprietary Information. The Investor acknowledges that any information provided by the Company pursuant to this Agreement may contain proprietary and confidential information. The Investor agrees to maintain the confidentiality of such information for a period of ${formData.confidentialityPeriod} years following the termination of this Agreement or the Investor's relationship with the Company.
 
 4. TRANSFER RESTRICTIONS AND RIGHTS
 
 a) Right of First Refusal. ${formData.rightOfFirstRefusal ? 
-  `Prior to transferring any shares to a third party, the selling stockholder must first offer such shares to the Company and other stockholders.` :
-  `No rights of first refusal shall apply.`}
+  `Prior to transferring any shares to a third party, the selling stockholder must first offer such shares to the Company and then to the other stockholders on a pro rata basis at the same price and terms. This right of first refusal shall apply to all transfers except for certain permitted transfers to family members, trusts, and affiliates.` :
+  `The Company and stockholders shall not have rights of first refusal with respect to transfers of shares under this Agreement.`}
 
 b) Tag-Along Rights. ${formData.tagAlong ?
-  `If any stockholder proposes to transfer their shares to a third party, the other stockholders shall have the right to participate in such transfer.` :
-  `No tag-along rights shall apply.`}
+  `If any stockholder proposes to transfer their shares to a third party purchaser, the other stockholders shall have the right to participate in such transfer on the same terms and conditions, subject to their pro rata ownership percentages. The selling stockholder must use reasonable efforts to include the other stockholders in the proposed transaction.` :
+  `Stockholders shall not have tag-along rights under this Agreement.`}
 
 c) Drag-Along Rights. ${formData.dragAlong ?
-  `In the event that stockholders holding a majority approve a sale of the Company, all stockholders shall be required to participate.` :
-  `No drag-along rights shall apply.`}
+  `In the event that stockholders holding a majority of the outstanding shares approve a sale of the Company to a third party, all stockholders shall be required to participate in such sale on the same terms and conditions. The majority stockholders may initiate drag-along procedures by providing at least thirty (30) days written notice to all stockholders.` :
+  `No drag-along rights shall apply under this Agreement.`}
+
+d) Transfer Restrictions. Except as otherwise provided herein, no stockholder may transfer their shares without the prior written consent of the Company's Board of Directors, which consent shall not be unreasonably withheld. Any attempted transfer in violation of this provision shall be void and of no effect.
 
 5. REPRESENTATIONS AND WARRANTIES
 
-a) Company Representations. The Company represents and warrants that it is duly organized under the laws of ${formData.startupState}.
+a) Company Representations. The Company represents and warrants that it is duly organized and validly existing under the laws of ${formData.startupState}, has full corporate power and authority to enter into this Agreement, and that the execution and delivery of this Agreement has been duly authorized by all necessary corporate action. The Company further represents that it has no material pending litigation or regulatory proceedings.
 
-b) Investor Representations. The Investor represents that they are an accredited investor.
+b) Investor Representations. The Investor represents and warrants that they have full power and authority to enter into this Agreement, that they are an accredited investor as defined under applicable securities laws, and that they are acquiring the shares for investment purposes and not with a view to distribution. The Investor acknowledges the speculative nature of this investment.
+
+c) No Conflicts. Each party represents that the execution and performance of this Agreement will not violate any agreement, instrument, or obligation to which they are bound or by which they are affected, and that no consent or approval of any third party is required for the execution and performance of this Agreement.
+
+d) Due Diligence. The Investor acknowledges that they have conducted their own due diligence investigation of the Company and its business, finances, and prospects, and are not relying on any representations or warranties not expressly set forth in this Agreement.
 
 6. COVENANTS AND RESTRICTIONS
 
-a) Use of Funds. The Company shall use the investment proceeds for the purposes set forth in this Agreement.
+a) Use of Funds. The Company covenants to use the investment proceeds solely for the purposes set forth in this Agreement and in a manner consistent with sound business practices. The Company shall not use the funds for any unlawful purpose or for the personal benefit of its founders or employees outside of ordinary compensation arrangements and approved expense reimbursements.
 
-b) Compliance with Laws. The Company shall conduct its business in compliance with all applicable laws.
+b) Compliance with Laws. The Company shall conduct its business in compliance with all applicable federal, state, and local laws and regulations. The Company shall maintain all necessary licenses and permits required for the operation of its business and shall promptly notify the Investor of any material compliance issues or regulatory actions.
+
+c) Insurance and Protection. The Company shall maintain appropriate insurance coverage for its business operations, including general liability, professional liability, cyber liability, and directors and officers insurance as may be reasonably required by the Investor or as customary for businesses of similar size and nature.
+
+d) Intellectual Property Protection. The Company shall take all reasonable steps to protect its intellectual property rights, including filing for appropriate patent, trademark, and copyright protections where applicable, and ensuring that all employees and contractors execute appropriate intellectual property assignment agreements.
 
 7. GOVERNING LAW AND DISPUTE RESOLUTION
 
-a) Governing Law. This Agreement shall be governed by the laws of the State of ${formData.governingLaw}.
+a) Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of laws principles. All parties consent to the jurisdiction of the courts of ${formData.governingLaw} for any legal proceedings arising under this Agreement.
 
 b) Dispute Resolution. ${formData.disputeResolution === 'arbitration' ?
-  `Any disputes shall be resolved through binding arbitration.` :
-  `Any disputes shall be resolved through litigation in the appropriate courts.`}
+  `Any disputes arising under this Agreement shall first be subject to good faith mediation. If mediation fails to resolve the dispute within sixty (60) days, the parties may pursue binding arbitration or litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.` :
+  formData.disputeResolution === 'mediation' ?
+  `Any disputes arising under this Agreement shall first be subject to good faith mediation. If mediation fails to resolve the dispute within sixty (60) days, the parties may pursue binding arbitration in accordance with the rules of the American Arbitration Association. The arbitration shall take place in ${formData.governingLaw}, and the decision of the arbitrator(s) shall be final and binding upon all parties.` :
+  `Any disputes arising under this Agreement shall be resolved through litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.`}
+
+c) Attorney's Fees. In the event of any legal proceeding arising under this Agreement, the prevailing party shall be entitled to recover its reasonable attorney's fees and costs from the non-prevailing party, provided that such award shall not exceed the amount in controversy.
+
+d) Equitable Relief. The parties acknowledge that a breach of certain provisions of this Agreement may cause irreparable harm for which monetary damages may be inadequate. Therefore, the parties agree that equitable relief, including injunctive relief and specific performance, may be appropriate in addition to any other legal remedies available at law or equity.
 
 8. GENERAL PROVISIONS
 
-a) Entire Agreement. This Agreement constitutes the entire agreement between the parties.
+a) Entire Agreement. This Agreement constitutes the entire agreement between the parties with respect to the subject matter hereof and supersedes all prior agreements, understandings, and negotiations, whether written or oral, relating to such subject matter. This Agreement may be supplemented by separate documents such as a stockholders' agreement or investor rights agreement.
 
-b) Amendment. This Agreement may only be amended in writing.
+b) Amendment and Modification. This Agreement may only be amended or modified by a written instrument signed by all parties hereto. No waiver of any provision of this Agreement shall be effective unless made in writing and signed by the party making such waiver. Any waiver shall be limited to the specific instance and shall not constitute a general waiver.
 
-c) Severability. If any provision is invalid, the remaining provisions shall remain in effect.
+c) Severability. If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall not be affected or impaired thereby. The parties agree to negotiate in good faith to replace any invalid provision with a valid provision that achieves the same economic effect.
+
+d) Counterparts and Electronic Signatures. This Agreement may be executed in counterparts, each of which shall be deemed an original and all of which together shall constitute one and the same instrument. Electronic signatures and facsimile signatures shall be deemed equivalent to original signatures for all purposes.
+
+e) Notices. All notices required or permitted hereunder shall be in writing and shall be deemed given when delivered personally, sent by certified mail (return receipt requested), or sent by overnight courier service to the addresses set forth above or such other address as a party may designate by written notice to the other party.
+
+f) Survival of Representations. The representations and warranties contained herein shall survive the closing of the investment for a period of two (2) years, except for those relating to organization, authority, and capitalization, which shall survive indefinitely.
 
 IN WITNESS WHEREOF, the parties have executed this Angel Investor Agreement as of the date first written above.
 
@@ -294,7 +316,8 @@ By: _________________________      _________________________
     ${formData.founderName}         ${formData.investorName}
     Chief Executive Officer        Investor
 
-Date: ${readableDate}              Date: _________________`;
+Date: ${readableDate}              Date: _________________
+`;
   };
 
   const downloadWord = () => {
