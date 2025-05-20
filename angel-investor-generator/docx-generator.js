@@ -1,4 +1,4 @@
-// Document generation utility for Word download - FIXED FORMATTING WITH SELECTIVE BOLD
+// Document generation utility for Word download - FIXED SIGNATURE HEIGHT & BOLD FORMATTING
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -54,31 +54,31 @@ window.generateWordDoc = function(documentText, formData) {
   }
   .signature-table {
     width: 100%;
-    margin-top: 18pt;
+    margin-top: 12pt;
     border-collapse: collapse;
   }
   .signature-table td {
     border: none;
-    padding: 3pt;
+    padding: 1pt;
     vertical-align: top;
     width: 50%;
   }
   .signature-line {
     border-bottom: 1px solid black;
-    width: 200px;
-    margin-bottom: 2pt;
-    margin-top: 2pt;
+    width: 180px;
+    margin-bottom: 1pt;
+    margin-top: 1pt;
   }
   .signature-text {
     font-size: 12pt;
-    margin-bottom: 2pt;
-    margin-top: 2pt;
+    margin-bottom: 1pt;
+    margin-top: 1pt;
   }
   .signature-header {
     font-size: 12pt;
     font-weight: bold;
-    margin-bottom: 2pt;
-    margin-top: 2pt;
+    margin-bottom: 1pt;
+    margin-top: 1pt;
   }
 </style>
 </head>
@@ -150,7 +150,7 @@ window.generateWordDoc = function(documentText, formData) {
       <div class="signature-line"></div>
       <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
       <div class="signature-text">Chief Executive Officer</div>
-      <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
+      <div class="signature-text">Date: ${formData.signatureDate ? new Date(formData.signatureDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '_________________'}</div>
     </td>
     <td>
       <div class="signature-header">INVESTOR:</div>
