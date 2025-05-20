@@ -1,7 +1,17 @@
-// Document generation utility for Word download - FIXED DATE FORMAT, SIGNATURE HEIGHT, BOLD FORMATTING
+// Document generation utility for Word download - FIXED DATE FORMAT AND SIGNATURE HEIGHT
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
+    
+    // Format date to readable format
+    const formatReadableDate = (dateString) => {
+      if (!dateString) return '_________________';
+      const date = new Date(dateString);
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return date.toLocaleDateString('en-US', options);
+    };
+    
+    const readableDate = formatReadableDate(formData.signatureDate);
     
     // Create HTML content that can be rendered in Word
     let htmlContent = `
@@ -150,7 +160,7 @@ window.generateWordDoc = function(documentText, formData) {
       <div class="signature-line"></div>
       <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
       <div class="signature-text">Chief Executive Officer</div>
-      <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
+      <div class="signature-text">Date: ${readableDate}</div>
     </td>
     <td>
       <div class="signature-header">INVESTOR:</div>
