@@ -1,4 +1,4 @@
-// Angel Investor Generator - Complete Version
+// Angel Investor Generator - Complete Fixed Version
 const { useState, useEffect, useRef } = React;
 const { createElement: h } = React;
 
@@ -36,6 +36,17 @@ const AngelInvestorGenerator = () => {
 
   const FORM_DATA_KEY = "angel_investor_form_data";
   const PAID_STATUS_KEY = "angel_investor_paid";
+
+  // All 50 US states
+  const states = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+    'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+    'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+    'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+    'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+    'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  ];
 
   // Check payment status on load
   useEffect(() => {
@@ -128,7 +139,7 @@ const AngelInvestorGenerator = () => {
     });
     localStorage.removeItem(FORM_DATA_KEY);
   };
-  // Comprehensive document generation with 8 sections
+  // Comprehensive document generation with 8 sections - NO SCHEDULES
   const generateDocumentText = () => {
     const postmoneyValuation = formData.premoneyValuation ? 
       parseInt(formData.premoneyValuation) + parseInt(formData.investmentAmount || 0) : 
@@ -136,7 +147,7 @@ const AngelInvestorGenerator = () => {
 
     return `ANGEL INVESTOR AGREEMENT
 
-This Angel Investor Agreement (this "Agreement") is made and entered into as of ${formData.signatureDate}, by and between ${formData.startupName}, a ${formData.startupState} corporation (the "Company"), and ${formData.investorName}, an individual (the "Investor").
+This Angel Investor Agreement (this "Agreement") is made and entered into as of ${formData.signatureDate}, by and between ${formData.startupName}, a ${formData.startupState} corporation (the "Company"), located at ${formData.startupAddress}, and ${formData.investorName}, an individual (the "Investor"), located at ${formData.investorAddress}.
 
 RECITALS
 
@@ -231,10 +242,10 @@ d) Intellectual Property Protection. The Company shall take all reasonable steps
 a) Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of laws principles. All parties consent to the jurisdiction of the courts of ${formData.governingLaw} for any legal proceedings arising under this Agreement.
 
 b) Dispute Resolution. ${formData.disputeResolution === 'arbitration' ?
-  'Any dispute, controversy, or claim arising out of or relating to this Agreement shall be resolved through binding arbitration in accordance with the Commercial Arbitration Rules of the American Arbitration Association. The arbitration shall take place in ${formData.governingLaw}, and the decision of the arbitrator(s) shall be final and binding upon all parties. Each party shall bear their own costs and expenses, and the fees of the arbitrator shall be shared equally.' :
+  `Any dispute, controversy, or claim arising out of or relating to this Agreement shall be resolved through binding arbitration in accordance with the Commercial Arbitration Rules of the American Arbitration Association. The arbitration shall take place in ${formData.governingLaw}, and the decision of the arbitrator(s) shall be final and binding upon all parties. Each party shall bear their own costs and expenses, and the fees of the arbitrator shall be shared equally.` :
   formData.disputeResolution === 'mediation' ?
-  'Any disputes arising under this Agreement shall first be subject to good faith mediation. If mediation fails to resolve the dispute within sixty (60) days, the parties may pursue binding arbitration or litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.' :
-  'Any disputes arising under this Agreement shall be resolved through litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.'}
+  `Any disputes arising under this Agreement shall first be subject to good faith mediation. If mediation fails to resolve the dispute within sixty (60) days, the parties may pursue binding arbitration or litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.` :
+  `Any disputes arising under this Agreement shall be resolved through litigation in the appropriate courts of ${formData.governingLaw}. Each party waives any right to a jury trial in connection with any litigation arising under this Agreement.`}
 
 c) Attorney's Fees. In the event of any legal proceeding arising under this Agreement, the prevailing party shall be entitled to recover its reasonable attorney's fees and costs from the non-prevailing party, provided that such award shall not exceed the amount in controversy.
 
@@ -266,19 +277,67 @@ By: _________________________________       _________________________________
     ${formData.founderName}                 ${formData.investorName}
     Chief Executive Officer                 Investor
 
-Date: ${formData.signatureDate}            Date: _________________
-
-
-
-SCHEDULE A - CAPITALIZATION TABLE
-[To be attached showing pre-investment and post-investment capitalization]
-
-SCHEDULE B - INVESTOR RIGHTS AGREEMENT  
-[If applicable, detailed investor rights agreement to be attached]
-
-SCHEDULE C - KEY EMPLOYEE AGREEMENTS
-[If applicable, employment and equity agreements for key personnel]`;
+Date: ${formData.signatureDate}            Date: _________________`;
   };
+
+  // Function to get highlighted preview with scroll functionality
+  const getHighlightedPreview = () => {
+    const documentText = generateDocumentText();
+    
+    // Define sections that should be highlighted based on the current tab and last changed field
+    let sectionToHighlight = null;
+    
+    switch (currentTab) {
+      case 0: // Basic Information
+        if (['startupName', 'investorName', 'startupAddress', 'investorAddress', 'founderName'].includes(lastChanged)) {
+          sectionToHighlight = 'header';
+        }
+        break;
+      case 1: // Investment Terms
+        if (['investmentAmount', 'equityPercentage', 'premoneyValuation', 'securitiesType'].includes(lastChanged)) {
+          sectionToHighlight = 'investment';
+        }
+        break;
+      case 2: // Equity & Control
+        if (['antiDilution', 'liquidationPreference', 'boardRepresentation', 'informationRights', 'tagAlong', 'dragAlong', 'rightOfFirstRefusal'].includes(lastChanged)) {
+          sectionToHighlight = 'equity';
+        }
+        break;
+      case 3: // Legal Terms
+        if (['governingLaw', 'disputeResolution', 'confidentialityPeriod'].includes(lastChanged)) {
+          sectionToHighlight = 'legal';
+        }
+        break;
+    }
+
+    if (sectionToHighlight && lastChanged) {
+      // Create highlighted version based on section
+      const sections = {
+        header: /This Angel Investor Agreement.*?NOW, THEREFORE/s,
+        investment: /1\. INVESTMENT TERMS.*?(?=2\.)/s,
+        equity: /2\. EQUITY AND GOVERNANCE RIGHTS.*?(?=5\.)/s,
+        legal: /7\. GOVERNING LAW AND DISPUTE RESOLUTION.*?(?=8\.)/s
+      };
+
+      if (sections[sectionToHighlight]) {
+        return documentText.replace(sections[sectionToHighlight], match => 
+          `<span class="highlighted-text">${match}</span>`
+        );
+      }
+    }
+
+    return documentText;
+  };
+
+  // Scroll to highlighted section when it changes
+  useEffect(() => {
+    if (previewRef.current && lastChanged) {
+      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+      if (highlightedElement) {
+        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+  }, [lastChanged, currentTab]);
   return h('div', { className: 'generator-container' },
     // Header
     h('div', { className: 'generator-header' },
@@ -322,13 +381,9 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 name: 'startupState',
                 value: formData.startupState,
                 onChange: handleInputChange
-              },
-                h('option', { value: 'Delaware' }, 'Delaware'),
-                h('option', { value: 'California' }, 'California'),
-                h('option', { value: 'New York' }, 'New York'),
-                h('option', { value: 'Texas' }, 'Texas'),
-                h('option', { value: 'Nevada' }, 'Nevada')
-              )
+              }, states.map(state =>
+                h('option', { key: state, value: state }, state)
+              ))
             ),
             h('div', { className: 'form-group' },
               h('label', null, 'Company Address *'),
@@ -384,7 +439,8 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 value: formData.investmentAmount,
                 onChange: handleInputChange,
                 placeholder: '100000',
-                min: '1000'
+                min: '1000',
+                step: '5000'
               })
             ),
             h('div', { className: 'form-group' },
@@ -397,7 +453,7 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 placeholder: '10',
                 min: '0.1',
                 max: '100',
-                step: '0.1'
+                step: '0.5'
               })
             ),
             h('div', { className: 'form-group' },
@@ -408,7 +464,8 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 value: formData.premoneyValuation,
                 onChange: handleInputChange,
                 placeholder: '900000',
-                min: '1'
+                min: '10000',
+                step: '50000'
               }),
               h('small', { style: { color: '#7f8c8d', marginTop: '0.25rem', display: 'block' } }, 
                 'Post-money valuation will be calculated automatically')
@@ -498,36 +555,71 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
             ),
             h('div', { className: 'form-group', style: { marginTop: '2rem' } },
               h('label', null, 'Transfer Rights'),
-              h('div', { style: { marginTop: '1rem' } },
-                h('label', { style: { display: 'flex', alignItems: 'center', marginBottom: '1rem', fontWeight: 'normal' } },
+              h('div', { style: { 
+                marginTop: '1rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.75rem'
+              } },
+                h('label', { 
+                  style: { 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    fontWeight: 'normal',
+                    padding: '0.5rem',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e6ed'
+                  } 
+                },
                   h('input', {
                     type: 'checkbox',
                     name: 'rightOfFirstRefusal',
                     checked: formData.rightOfFirstRefusal,
                     onChange: handleInputChange,
-                    style: { marginRight: '0.5rem' }
+                    style: { marginRight: '0.75rem' }
                   }),
-                  'Right of First Refusal'
+                  h('span', null, 'Right of First Refusal')
                 ),
-                h('label', { style: { display: 'flex', alignItems: 'center', marginBottom: '1rem', fontWeight: 'normal' } },
+                h('label', { 
+                  style: { 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    fontWeight: 'normal',
+                    padding: '0.5rem',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e6ed'
+                  } 
+                },
                   h('input', {
                     type: 'checkbox',
                     name: 'tagAlong',
                     checked: formData.tagAlong,
                     onChange: handleInputChange,
-                    style: { marginRight: '0.5rem' }
+                    style: { marginRight: '0.75rem' }
                   }),
-                  'Tag-Along Rights'
+                  h('span', null, 'Tag-Along Rights')
                 ),
-                h('label', { style: { display: 'flex', alignItems: 'center', fontWeight: 'normal' } },
+                h('label', { 
+                  style: { 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    fontWeight: 'normal',
+                    padding: '0.5rem',
+                    backgroundColor: '#f8f9fa',
+                    borderRadius: '6px',
+                    border: '1px solid #e0e6ed'
+                  } 
+                },
                   h('input', {
                     type: 'checkbox',
                     name: 'dragAlong',
                     checked: formData.dragAlong,
                     onChange: handleInputChange,
-                    style: { marginRight: '0.5rem' }
+                    style: { marginRight: '0.75rem' }
                   }),
-                  'Drag-Along Rights'
+                  h('span', null, 'Drag-Along Rights')
                 )
               )
             )
@@ -542,14 +634,9 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 name: 'governingLaw',
                 value: formData.governingLaw,
                 onChange: handleInputChange
-              },
-                h('option', { value: 'California' }, 'California'),
-                h('option', { value: 'Delaware' }, 'Delaware'),
-                h('option', { value: 'New York' }, 'New York'),
-                h('option', { value: 'Texas' }, 'Texas'),
-                h('option', { value: 'Florida' }, 'Florida'),
-                h('option', { value: 'Nevada' }, 'Nevada')
-              ),
+              }, states.map(state =>
+                h('option', { key: state, value: state }, state)
+              )),
               h('small', { style: { color: '#7f8c8d', marginTop: '0.25rem', display: 'block' } }, 
                 'State laws that will govern this agreement')
             ),
@@ -575,10 +662,10 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
                 value: formData.confidentialityPeriod,
                 onChange: handleInputChange,
                 min: '1',
-                max: '10'
+                max: '25'
               }),
               h('small', { style: { color: '#7f8c8d', marginTop: '0.25rem', display: 'block' } }, 
-                'How long investor must keep company information confidential')
+                'How long investor must keep company information confidential (max 25 years)')
             )
           )
         ),
@@ -615,7 +702,11 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
               if (window.generateWordDoc) {
                 window.generateWordDoc(generateDocumentText(), {
                   documentTitle: 'Angel Investor Agreement',
-                  fileName: 'Angel_Investor_Agreement'
+                  fileName: 'Angel_Investor_Agreement',
+                  startupName: formData.startupName,
+                  founderName: formData.founderName,
+                  investorName: formData.investorName,
+                  signatureDate: formData.signatureDate
                 });
               }
             },
@@ -649,7 +740,7 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
         }, '📞 Schedule Legal Consultation')
       ),
       
-      // Preview Panel - NOW FULLY SCROLLABLE
+      // Preview Panel - FULLY SCROLLABLE WITH HIGHLIGHTING
       h('div', { className: 'preview-panel' },
         h('div', { className: 'preview-header' },
           h('h3', null, 'Live Preview'),
@@ -658,12 +749,12 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
         h('div', { 
           className: `preview-content ${!isPaid ? 'locked' : ''}`, 
           ref: previewRef,
-          style: { position: 'relative', height: '100%' }
+          style: { position: 'relative', height: '600px' }
         },
           h('pre', {
             className: 'document-preview',
             style: { 
-              height: '600px', 
+              height: '100%', 
               overflowY: 'auto',
               userSelect: isPaid ? 'text' : 'none',
               padding: '2rem',
@@ -671,9 +762,10 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
               whiteSpace: 'pre-wrap',
               fontFamily: 'Times New Roman, serif',
               fontSize: '12pt',
-              lineHeight: '1.8'
-            }
-          }, generateDocumentText()),
+              lineHeight: '1.6'
+            },
+            dangerouslySetInnerHTML: { __html: getHighlightedPreview() }
+          }),
           
           !isPaid && h('div', null,
             h('div', { 
@@ -704,13 +796,14 @@ SCHEDULE C - KEY EMPLOYEE AGREEMENTS
             },
               h('div', { className: 'paywall-content' },
                 h('h4', null, '🔒 Unlock Full Agreement'),
-                h('p', null, 'Purchase to download, copy, and customize this agreement'),
+                h('p', null, 'Purchase to download, copy, and customize this comprehensive agreement'),
                 h('div', { id: 'paypal-button-container-angel' }),
                 h('div', { className: 'features-list' },
                   h('div', { className: 'feature' }, '✓ Complete 8-section legal agreement'),
                   h('div', { className: 'feature' }, '✓ Professional MS Word download'),
                   h('div', { className: 'feature' }, '✓ Fully customizable for your needs'),
-                  h('div', { className: 'feature' }, '✓ Created by licensed California attorney')
+                  h('div', { className: 'feature' }, '✓ Created by licensed California attorney'),
+                  h('div', { className: 'feature' }, '✓ Includes all addresses and signature blocks')
                 ),
                 h('div', { className: 'unlock-section' },
                   h('p', null, 'Already purchased? Enter your PayPal transaction ID:'),
@@ -776,7 +869,6 @@ setTimeout(() => {
 
 // Listen for PayPal success events
 window.addEventListener('paypal-unlock', () => {
-  // This will trigger the unlock in the component
   localStorage.setItem('angel_investor_paid', 'true');
   window.location.reload();
 });

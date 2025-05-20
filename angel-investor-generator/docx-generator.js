@@ -1,4 +1,4 @@
-// Document generation utility for Word download
+// Document generation utility for Word download - FIXED FORMATTING
 window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
@@ -14,101 +14,132 @@ window.generateWordDoc = function(documentText, formData) {
   body {
     font-family: "Times New Roman", serif;
     font-size: 12pt;
-    line-height: 1.8;
-    margin: 0;
+    line-height: 1.5;
+    margin: 1in;
     padding: 0;
   }
   h1 {
     text-align: center;
-    font-size: 18pt;
+    font-size: 12pt;
     font-weight: bold;
-    margin-bottom: 24pt;
-    page-break-after: avoid;
+    margin-bottom: 12pt;
   }
   h2 {
-    font-size: 14pt;
-    font-weight: bold;
-    margin-top: 18pt;
-    margin-bottom: 12pt;
-    page-break-after: avoid;
-  }
-  h3 {
     font-size: 12pt;
     font-weight: bold;
     margin-top: 12pt;
     margin-bottom: 6pt;
-    page-break-after: avoid;
+  }
+  h3 {
+    font-size: 12pt;
+    font-weight: bold;
+    margin-top: 6pt;
+    margin-bottom: 6pt;
   }
   p {
-    margin-bottom: 12pt;
+    margin-bottom: 0pt;
+    margin-top: 0pt;
     text-align: justify;
-    orphans: 2;
-    widows: 2;
+    font-weight: normal;
+    font-size: 12pt;
   }
-  .signature-section {
-    margin-top: 36pt;
-    page-break-inside: avoid;
+  .signature-table {
+    width: 100%;
+    margin-top: 24pt;
+    border-collapse: collapse;
+  }
+  .signature-table td {
+    border: none;
+    padding: 12pt;
+    vertical-align: top;
+    width: 50%;
   }
   .signature-line {
     border-bottom: 1px solid black;
     width: 200px;
-    display: inline-block;
-    margin-right: 50px;
+    margin-bottom: 6pt;
   }
-  .page-break {
-    page-break-before: always;
-  }
-  .section-break {
-    margin-top: 24pt;
-    margin-bottom: 18pt;
+  .signature-text {
+    font-size: 12pt;
+    margin-bottom: 6pt;
   }
 </style>
 </head>
 <body>
 `;
 
-    // Convert the document text to HTML paragraphs
+    // Split content into lines and process
     const lines = documentText.split('\n');
     let inSignatureSection = false;
+    let signatureHtml = '';
     
-    lines.forEach(line => {
-      const trimmedLine = line.trim();
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
       
-      if (!trimmedLine) {
-        htmlContent += '<p>&nbsp;</p>';
-        return;
+      if (!line) continue;
+      
+      // Handle title
+      if (line === 'ANGEL INVESTOR AGREEMENT') {
+        htmlContent += `<h1>${line}</h1>`;
+        continue;
       }
       
-      // Handle titles
-      if (trimmedLine === 'ANGEL INVESTOR AGREEMENT') {
-        htmlContent += `<h1>${trimmedLine}</h1>`;
-      }
       // Handle numbered sections
-      else if (trimmedLine.match(/^\d+\.\s+[A-Z\s]+$/)) {
-        htmlContent += `<h2>${trimmedLine}</h2>`;
+      if (line.match(/^\d+\.\s+[A-Z\s]+$/)) {
+        htmlContent += `<h2>${line}</h2>`;
+        continue;
       }
+      
       // Handle lettered subsections
-      else if (trimmedLine.match(/^[a-d]\)\s+/)) {
-        htmlContent += `<h3>${trimmedLine}</h3>`;
+      if (line.match(/^[a-z]\)\s+/)) {
+        htmlContent += `<h3>${line}</h3>`;
+        continue;
       }
+      
       // Handle signature section
-      else if (trimmedLine.includes('IN WITNESS WHEREOF') || inSignatureSection) {
-        if (trimmedLine.includes('IN WITNESS WHEREOF')) {
+      if (line.includes('IN WITNESS WHEREOF') || inSignatureSection) {
+        if (line.includes('IN WITNESS WHEREOF')) {
           inSignatureSection = true;
-          htmlContent += '<div class="section-break"></div>';
+          htmlContent += `<p style="margin-top: 24pt;">${line}</p>`;
+          continue;
         }
         
-        if (trimmedLine.includes('_________________________')) {
-          htmlContent += '<p><span class="signature-line">&nbsp;</span></p>';
-        } else {
-          htmlContent += `<p>${trimmedLine}</p>`;
+        // Collect signature lines
+        if (line.includes('COMPANY:') && line.includes('INVESTOR:')) {
+          signatureHtml += `
+<table class="signature-table">
+  <tr>
+    <td>
+      <div class="signature-text">COMPANY:</div>
+      <div class="signature-text">${formData.startupName || 'Company Name'}</div>
+      <div class="signature-line"></div>
+      <div class="signature-text">${formData.founderName || 'CEO Name'}</div>
+      <div class="signature-text">Chief Executive Officer</div>
+      <div class="signature-text">Date: ${formData.signatureDate || '_________________'}</div>
+    </td>
+    <td>
+      <div class="signature-text">INVESTOR:</div>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
+      <div class="signature-line"></div>
+      <div class="signature-text">${formData.investorName || 'Investor Name'}</div>
+      <div class="signature-text">Investor</div>
+      <div class="signature-text">Date: _________________</div>
+    </td>
+  </tr>
+</table>`;
+          break; // Stop processing after signature table
         }
+        
+        // Skip other signature-related lines as they're handled in the table
+        continue;
       }
+      
       // Handle regular paragraphs
-      else {
-        htmlContent += `<p>${trimmedLine}</p>`;
-      }
-    });
+      htmlContent += `<p>${line}</p>`;
+    }
+    
+    // Add signature table if we have it
+    htmlContent += signatureHtml;
     
     // Close HTML document
     htmlContent += '</body></html>';
