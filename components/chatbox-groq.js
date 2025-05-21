@@ -13,6 +13,22 @@ window.LegalChatboxGroq = function(props) {
   const documentText = config.documentText || '';
   const apiUrl = config.apiUrl || window.location.origin + '/api/groq-chat';
 
+  // Track previous form data to calculate deltas for token optimization
+  const [prevFormData, setPrevFormData] = React.useState({});
+  const [conversationStarted, setConversationStarted] = React.useState(false);
+  
+  // Track conversation history
+  const [conversationHistory, setConversationHistory] = React.useState([]);
+  
+  // Side letter tracked separately for important context
+  const [sideLetterContext, setSideLetterContext] = React.useState({
+    enabled: false,
+    disclosingParty: '',
+    receivingParty: '',
+    disclosingPartyPseudonym: '',
+    receivingPartyPseudonym: ''
+  });
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -36,7 +52,128 @@ window.LegalChatboxGroq = function(props) {
       const currentFormData = window.chatboxConfig ? window.chatboxConfig.formData : formData;
       const currentDocumentText = window.chatboxConfig ? window.chatboxConfig.documentText : documentText;
       
-      console.log('Current form data being sent:', currentFormData);
+      // Calculate form data changes (delta) if not first message
+      let formDataToSend = {};
+      let documentTextToSend = '';
+      let sideLetterInfo = {}; // Special handling for side letter text
+      
+      if (!conversationStarted) {
+        // First message - send full context but only essential fields
+        formDataToSend = {
+          // Core agreement details
+          term: currentFormData.term,
+          termUnit: currentFormData.termUnit,
+          state: currentFormData.state,
+          purpose: currentFormData.purpose,
+          
+          // Party information
+          disclosingPartyType: currentFormData.disclosingPartyType,
+          disclosingPartyName: currentFormData.disclosingPartyName,
+          receivingPartyType: currentFormData.receivingPartyType,
+          receivingPartyName: currentFormData.receivingPartyName,
+          
+          // Critical flags
+          usePseudonyms: currentFormData.usePseudonyms,
+          
+          // If pseudonyms are used, include pseudonym data
+          ...(currentFormData.usePseudonyms ? {
+            disclosingPartyPseudonym: currentFormData.disclosingPartyPseudonym,
+            receivingPartyPseudonym: currentFormData.receivingPartyPseudonym
+          } : {})
+        };
+        
+        // Send full document text only for the first message
+        documentTextToSend = currentDocumentText;
+        
+        // Track side letter context
+        if (currentFormData.usePseudonyms) {
+          setSideLetterContext({
+            enabled: true,
+            disclosingParty: currentFormData.disclosingPartyName,
+            receivingParty: currentFormData.receivingPartyName,
+            disclosingPartyPseudonym: currentFormData.disclosingPartyPseudonym,
+            receivingPartyPseudonym: currentFormData.receivingPartyPseudonym
+          });
+        }
+        
+        setConversationStarted(true);
+        console.log('First message, sending full document and optimized context');
+      } else {
+        // Follow-up message - only send changes, NO document text
+        const changedFields = {};
+        
+        // Determine which fields have changed
+        Object.keys(currentFormData).forEach(key => {
+          // Check if field has changed from previous version
+          if (JSON.stringify(currentFormData[key]) !== JSON.stringify(prevFormData[key])) {
+            changedFields[key] = currentFormData[key];
+            
+            // Special case for pseudonyms
+            if (key === 'usePseudonyms') {
+              if (currentFormData[key]) {
+                setSideLetterContext({
+                  enabled: true,
+                  disclosingParty: currentFormData.disclosingPartyName,
+                  receivingParty: currentFormData.receivingPartyName,
+                  disclosingPartyPseudonym: currentFormData.disclosingPartyPseudonym || '',
+                  receivingPartyPseudonym: currentFormData.receivingPartyPseudonym || ''
+                });
+              } else {
+                setSideLetterContext({
+                  enabled: false,
+                  disclosingParty: '',
+                  receivingParty: '',
+                  disclosingPartyPseudonym: '',
+                  receivingPartyPseudonym: ''
+                });
+              }
+            }
+            
+            // If pseudonym fields change, update side letter context
+            if (key === 'disclosingPartyPseudonym' || key === 'receivingPartyPseudonym' || 
+                key === 'disclosingPartyName' || key === 'receivingPartyName') {
+              if (currentFormData.usePseudonyms) {
+                setSideLetterContext(prev => ({
+                  ...prev,
+                  [key]: currentFormData[key]
+                }));
+              }
+            }
+          }
+        });
+        
+        // Only send minimal data for follow-up messages
+        formDataToSend = {
+          // Only include changed fields
+          ...changedFields
+        };
+        
+        // No document text for follow-up messages
+        documentTextToSend = '';
+        
+        console.log('Follow-up message, sending only changes:', formDataToSend);
+      }
+      
+      // Update previous form data for next comparison
+      setPrevFormData(currentFormData);
+      
+      // Add current exchange to conversation history
+      const newHistoryItem = { role: "user", content: userMessage };
+      const updatedHistory = [...conversationHistory, newHistoryItem];
+      setConversationHistory(updatedHistory);
+      
+      // Create special field for side letter content if pseudonyms are enabled
+      if (sideLetterContext.enabled) {
+        sideLetterInfo = { 
+          sideLetterEnabled: true,
+          sideLetterParties: {
+            disclosingParty: sideLetterContext.disclosingParty,
+            receivingParty: sideLetterContext.receivingParty,
+            disclosingPartyPseudonym: sideLetterContext.disclosingPartyPseudonym,
+            receivingPartyPseudonym: sideLetterContext.receivingPartyPseudonym
+          }
+        };
+      }
       
       const response = await fetch(apiUrl, {
         method: 'POST',
@@ -46,8 +183,12 @@ window.LegalChatboxGroq = function(props) {
         body: JSON.stringify({
           message: userMessage,
           contractType: contractType,
-          formData: currentFormData,
-          documentText: currentDocumentText
+          formData: formDataToSend,
+          // Only send document text for the first message
+          documentText: documentTextToSend,
+          sideLetterInfo: sideLetterInfo,
+          conversationHistory: updatedHistory.slice(-4), // Send last 4 exchanges only
+          isFollowUpQuestion: conversationStarted
         }),
       });
 
@@ -58,6 +199,11 @@ window.LegalChatboxGroq = function(props) {
       }
 
       const data = await response.json();
+      
+      // Add response to conversation history
+      setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
+      
+      // Add to messages for display
       setMessages(prev => [...prev, { 
         type: 'assistant', 
         content: data.response,

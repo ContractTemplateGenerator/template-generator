@@ -441,6 +441,14 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
   // Generate the NDA text
   const ndaText = generateNDA();
   
+  // Extract side letter text for chatbox context if pseudonyms are used
+  const extractSideLetterText = () => {
+    if (formData.usePseudonyms && ndaText.includes('EXHIBIT A')) {
+      return ndaText.substring(ndaText.indexOf('EXHIBIT A'));
+    }
+    return '';
+  };
+  
   // Notify parent component of data changes
   React.useEffect(() => {
     if (onFormDataChange) onFormDataChange(formData);
@@ -448,7 +456,12 @@ ${formData.usePseudonyms ? '\n\n' + ndaSections.sideLetter : ''}`;
   
   React.useEffect(() => {
     if (onNdaTextChange) onNdaTextChange(ndaText);
-  }, [ndaText, onNdaTextChange]);
+    
+    // If window.chatboxConfig exists, update side letter text
+    if (window.chatboxConfig && formData.usePseudonyms) {
+      window.chatboxConfig.sideLetterText = extractSideLetterText();
+    }
+  }, [ndaText, onNdaTextChange, formData.usePseudonyms]);
   
   // Get section that should be highlighted based on current tab
   const getSectionToHighlight = () => {
@@ -1686,13 +1699,36 @@ const App = () => {
   // Update chatbox configuration when form data or document changes
   React.useEffect(() => {
     if (window.chatboxConfig) {
+      // Store complete form data for the chatbox
       window.chatboxConfig.formData = formData;
       window.chatboxConfig.documentText = ndaText;
+      
+      // Pay special attention to side letter components
+      if (formData.usePseudonyms) {
+        // Make sure side letter text is included in context
+        window.chatboxConfig.sideLetterText = ndaText.includes('EXHIBIT A') 
+          ? ndaText.substring(ndaText.indexOf('EXHIBIT A')) 
+          : '';
+        
+        // Ensure pseudonym information is properly tracked
+        window.chatboxConfig.sideLetterInfo = {
+          enabled: true,
+          disclosingParty: formData.disclosingPartyName,
+          receivingParty: formData.receivingPartyName,
+          disclosingPartyPseudonym: formData.disclosingPartyPseudonym || '',
+          receivingPartyPseudonym: formData.receivingPartyPseudonym || ''
+        };
+      } else {
+        window.chatboxConfig.sideLetterText = '';
+        window.chatboxConfig.sideLetterInfo = { enabled: false };
+      }
+      
       console.log('Updated chatbox config with:', { 
-        formDataKeys: Object.keys(formData),
+        formDataKeys: Object.keys(formData).length,
         docLength: ndaText.length,
-        term: formData.term,
-        termUnit: formData.termUnit 
+        sideLetterEnabled: formData.usePseudonyms,
+        pseudonymsProvided: formData.usePseudonyms && 
+          (formData.disclosingPartyPseudonym || formData.receivingPartyPseudonym)
       });
     }
   }, [formData, ndaText]);
