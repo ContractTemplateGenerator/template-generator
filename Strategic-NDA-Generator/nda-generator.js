@@ -1682,7 +1682,7 @@ const configureChatbox = () => {
     contractType: 'Strategic Non-Disclosure Agreement',
     formData: {},
     documentText: '',
-    apiUrl: window.location.origin + '/api/groq-chat'
+    apiUrl: window.location.origin + '/Strategic-NDA-Generator/api/groq-chat'
   };
 };
 
