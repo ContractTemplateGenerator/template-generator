@@ -6,6 +6,36 @@ window.LegalChatboxGroq = function(props) {
   const [isLoading, setIsLoading] = React.useState(false);
   const messagesEndRef = React.useRef(null);
   
+  // Simple markdown parser for message formatting
+  const parseMarkdown = (text) => {
+    if (!text) return '';
+    
+    // Parse paragraphs - this is critical for readability
+    text = text.replace(/\n\n/g, '</p><p>');
+    
+    // Parse headers
+    text = text.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+    text = text.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^# (.*?)$/gm, '<h1>$1</h1>');
+    
+    // Parse bold and italic text
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+    
+    // Parse bullet lists
+    text = text.replace(/^\- (.*?)$/gm, '<li>$1</li>');
+    text = text.replace(/<li>(.*?)<\/li>\n<li>/g, '<li>$1</li><li>');
+    text = text.replace(/<li>(.*?)<\/li>(?!\n<li>)/g, '<ul><li>$1</li></ul>');
+    text = text.replace(/<\/ul>\n<ul>/g, '');
+    
+    // Wrap in paragraph tags if not already wrapped
+    if (!text.startsWith('<')) {
+      text = `<p>${text}</p>`;
+    }
+    
+    return text;
+  };
+  
   // Configuration from props or global config
   const config = props || window.chatboxConfig || {};
   const contractType = config.contractType || 'Strategic NDA';
@@ -310,8 +340,11 @@ window.LegalChatboxGroq = function(props) {
           React.createElement('div', {
             key: index,
             className: `message ${message.type}`,
-            style: message.error ? { borderLeft: '3px solid #ef4444' } : {}
-          }, message.content)
+            style: message.error ? { borderLeft: '3px solid #ef4444' } : {},
+            dangerouslySetInnerHTML: { 
+              __html: message.type === 'assistant' ? parseMarkdown(message.content) : message.content 
+            }
+          })
         ),
         isLoading && React.createElement(TypingIndicator),
         React.createElement('div', { ref: messagesEndRef })
