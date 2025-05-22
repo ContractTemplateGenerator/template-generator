@@ -41,7 +41,7 @@ window.LegalChatboxGroq = function(props) {
   const contractType = config.contractType || 'Strategic NDA';
   const formData = config.formData || {};
   const documentText = config.documentText || '';
-  const apiUrl = config.apiUrl || window.location.origin + '/Strategic-NDA-Generator/api/groq-chat';
+  const apiUrl = config.apiUrl || window.location.origin + '/api/nda-groq-chat';
 
   // Track previous form data to calculate deltas for token optimization
   const [prevFormData, setPrevFormData] = React.useState({});
