@@ -13,7 +13,7 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: Times, 'Times New Roman', serif;
-    font-size: 12pt;
+    font-size: 11pt;
     line-height: 1.6;
     margin: 0;
     text-align: left;
@@ -34,10 +34,10 @@ window.generateWordDoc = function(documentText, formData) {
   p {
     margin-bottom: 12pt;
     text-align: left;
-    font-size: 12pt;
+    font-size: 11pt;
   }
   .signature-section {
-    margin-top: 30pt;
+    margin-top: 15pt;
     width: 100%;
   }
   .signature-table {
