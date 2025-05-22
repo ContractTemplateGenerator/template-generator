@@ -897,3 +897,101 @@ Client: ${formData.clientPhone} | ${formData.clientEmail}`;
                 return <div>Tab content not found</div>;
         }
     };
+
+    // Render main component
+    return (
+        <div className="appraisal-generator">
+            <div className="container">
+                <div className="generator-content">
+                    {/* Left Panel - Form */}
+                    <div className="form-panel">
+                        <div className="header">
+                            <h1>Appraisal Services Agreement Generator</h1>
+                            <p>Generate professional appraisal service agreements for jewelry, antiques, artwork, and luxury goods.</p>
+                        </div>
+
+                        {/* Tab Navigation */}
+                        <div className="tab-navigation">
+                            {tabs.map((tab, index) => (
+                                <button
+                                    key={tab.id}
+                                    className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                    onClick={() => goToTab(index)}
+                                >
+                                    <i data-feather={tab.icon}></i>
+                                    <span>{index + 1}. {tab.label}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Tab Content */}
+                        <div className="tab-content">
+                            {renderTabContent()}
+                        </div>
+
+                        {/* Navigation Buttons */}
+                        <div className="navigation-buttons">
+                            <button
+                                onClick={prevTab}
+                                className={`nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`}
+                                disabled={currentTab === 0}
+                            >
+                                <i data-feather="chevron-left"></i>
+                                Previous
+                            </button>
+                            
+                            <button
+                                onClick={copyToClipboard}
+                                className="nav-button copy-button"
+                            >
+                                <i data-feather="copy"></i>
+                                Copy
+                            </button>
+                            
+                            <button
+                                onClick={downloadAsWord}
+                                className="nav-button download-button"
+                            >
+                                <i data-feather="file-text"></i>
+                                Download MS Word
+                            </button>
+                            
+                            <button
+                                onClick={openConsultation}
+                                className="nav-button consult-button"
+                            >
+                                <i data-feather="calendar"></i>
+                                Consult
+                            </button>
+                            
+                            <button
+                                onClick={nextTab}
+                                className="nav-button next-button"
+                            >
+                                Next
+                                <i data-feather="chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* Right Panel - Live Preview */}
+                    <div className="preview-panel" ref={previewRef}>
+                        <div className="preview-header">
+                            <h2>Live Preview</h2>
+                            <p>See your agreement update in real-time</p>
+                        </div>
+                        <div className="preview-content">
+                            <pre 
+                                className="document-preview"
+                                dangerouslySetInnerHTML={{ __html: highlightedText }}
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Render the component
+ReactDOM.render(<AppraisalGenerator />, document.getElementById('root'));
