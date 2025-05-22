@@ -52,7 +52,12 @@ const AppraisalGenerator = () => {
         validityPeriod: '12',
         cancellationPolicy: 'standard',
         recordRetention: '7',
-        insuranceRequired: false
+        insuranceRequired: false,
+        
+        // New sections
+        clientIndemnification: true,
+        servicesNotIncluded: true,
+        expertWitnessConsent: true
     });
 
     const previewRef = useRef(null);
@@ -382,26 +387,61 @@ ${formData.clientConfidentiality ? '10.1' : '9.1'} Dispute Resolution. Any dispu
 
 10.3 Attorney's Fees. In the event of any legal proceeding arising from this Agreement, the prevailing party shall be entitled to recover reasonable attorney's fees and costs.
 
-11. GENERAL PROVISIONS
+11. SERVICES NOT PROVIDED
 
-11.1 Entire Agreement. This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter hereof.
+${formData.servicesNotIncluded ? `11.1 Excluded Services. The fees set forth in this Agreement apply solely to the appraisal services described herein. Unless otherwise specified in writing, Appraiser's services do not include:
+    (a) Meetings with persons other than Client or Client's designated representatives;
+    (b) Depositions, testimony, or appearances before judicial, arbitration, or administrative tribunals;
+    (c) Preparation time associated with depositions, testimony, or legal proceedings;
+    (d) Expert witness services or litigation support beyond the scope of the basic appraisal report.
 
-11.2 Severability. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.
+11.2 Additional Service Fees. Any services not included in the base fee will be performed only upon separate written agreement and will be billed at Appraiser's prevailing hourly rates.` : '11.1 Additional Services. Any services beyond the scope described herein will be subject to separate agreement and additional compensation.'}
 
-11.3 Assignment. This Agreement may not be assigned by either party without the prior written consent of the other party.
+12. CLIENT INDEMNIFICATION AND REPRESENTATIONS
 
-11.4 Notices. All notices required under this Agreement shall be in writing and delivered by email, certified mail, or personal delivery to the addresses specified herein.
+${formData.clientIndemnification ? `12.1 Client's Duty to Indemnify. Client agrees to defend, indemnify, and hold harmless Appraiser from any damages, claims, demands, causes of action, liabilities, losses, or expenses (including reasonable attorneys' fees and litigation costs) arising from or relating to:
+    (a) Any breach by Client of Client's obligations, representations, or warranties under this Agreement;
+    (b) Any violation by Client of federal, state, or local laws, ordinances, regulations, or common law;
+    (c) Client's use of the appraisal report in a manner inconsistent with its stated purpose or professional standards;
+    (d) Any false or misleading information provided by Client to Appraiser.
+
+12.2 Client Representations and Warranties. Client represents and warrants that:
+    (a) Client has full authority to enter into this Agreement;
+    (b) Client's obligations under this Agreement do not conflict with any other agreements or duties;
+    (c) Client will not use the appraisal report for any illegal purposes or in violation of applicable laws;
+    (d) All information provided to Appraiser will be accurate and complete to the best of Client's knowledge.` : '12.1 Standard Representations. Client represents that they have authority to enter into this Agreement and will use the appraisal report in accordance with applicable laws and professional standards.'}
+
+13. EXPERT WITNESS AND TESTIMONY LIMITATIONS
+
+${formData.expertWitnessConsent ? `13.1 Expert Witness Designation. Client agrees not to designate or disclose Appraiser as an expert witness in any court, arbitration, or administrative proceeding without Appraiser's prior written consent.
+
+13.2 Testimony Limitations. Unless otherwise agreed in writing, this engagement does not include Appraiser's participation in depositions, testimony, or legal proceedings. Such services, if requested and agreed upon, will be subject to separate compensation at Appraiser's prevailing rates.
+
+13.3 Legal Proceeding Cooperation. If Appraiser is subpoenaed or required to provide testimony, Client agrees to reimburse Appraiser for all time, expenses, and legal fees associated with such proceedings.` : '13.1 Testimony. Any testimony or expert witness services will be subject to separate agreement and compensation.'}
+
+14. GENERAL PROVISIONS
+
+14.1 Entire Agreement. This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter hereof.
+
+14.2 Severability. If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall continue in full force and effect.
+
+14.3 Assignment. This Agreement may not be assigned by either party without the prior written consent of the other party.
+
+14.4 Notices. All notices required under this Agreement shall be in writing and delivered by email, certified mail, or personal delivery to the addresses specified herein.
 
 IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
 
-APPRAISER:                           CLIENT:
 
-_________________________________    _________________________________
-${formData.appraiserName}                     ${formData.clientName}
+APPRAISER:                                    CLIENT:
+
+
+_________________________________            _________________________________
+${formData.appraiserName}                              ${formData.clientName}
 ${formData.businessName}
 ${formData.licenseNumber ? `License #${formData.licenseNumber}` : ''}
 
-Date: ___________________________    Date: ___________________________
+Date: ___________________________            Date: ___________________________
+
 
 Contact Information:
 Appraiser: ${formData.phone || '[Phone]'} | ${formData.email || '[Email]'}
@@ -596,12 +636,36 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
             });
         }
         
-        // Add positive assessments
-        if (formData.limitationOfLiability && formData.clientConfidentiality && formData.licenseNumber && formData.itemDescription) {
+        if (!formData.clientIndemnification) {
+            risks.push({
+                level: 'medium',
+                title: 'Missing Client Indemnification',
+                description: 'Client indemnification protects you from liability arising from client misuse of your appraisal or client misconduct.'
+            });
+        }
+        
+        if (!formData.servicesNotIncluded) {
             risks.push({
                 level: 'low',
-                title: 'Well-Protected Agreement',
-                description: 'Excellent liability protection, professional credentials disclosed, and clear scope definition provide strong legal foundation.'
+                title: 'Scope Creep Risk',
+                description: 'Clearly defining what services are NOT included helps prevent clients from expecting additional work at the base fee.'
+            });
+        }
+        
+        if (!formData.expertWitnessConsent) {
+            risks.push({
+                level: 'low',
+                title: 'Testimony Risk',
+                description: 'Requiring consent before being designated as an expert witness gives you control over litigation involvement.'
+            });
+        }
+        
+        // Add positive assessments
+        if (formData.limitationOfLiability && formData.clientConfidentiality && formData.clientIndemnification && formData.licenseNumber && formData.itemDescription) {
+            risks.push({
+                level: 'low',
+                title: 'Comprehensive Legal Protection',
+                description: 'Excellent liability protection, client indemnification, professional credentials, and clear scope provide strong legal foundation.'
             });
         }
         
@@ -1095,6 +1159,36 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
                             </div>
                         </div>
                         
+                        <div className="checkbox-group">
+                            <input
+                                type="checkbox"
+                                name="clientIndemnification"
+                                checked={formData.clientIndemnification}
+                                onChange={handleChange}
+                            />
+                            <label>Include Client Indemnification Clause (Recommended)</label>
+                        </div>
+                        
+                        <div className="checkbox-group">
+                            <input
+                                type="checkbox"
+                                name="servicesNotIncluded"
+                                checked={formData.servicesNotIncluded}
+                                onChange={handleChange}
+                            />
+                            <label>Include "Services Not Provided" Section (Prevents Scope Creep)</label>
+                        </div>
+                        
+                        <div className="checkbox-group">
+                            <input
+                                type="checkbox"
+                                name="expertWitnessConsent"
+                                checked={formData.expertWitnessConsent}
+                                onChange={handleChange}
+                            />
+                            <label>Require Consent for Expert Witness Designation</label>
+                        </div>
+                        
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Record Retention (Years) *</label>
@@ -1150,7 +1244,10 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
                                 <p><strong>Base Fee:</strong> ${formData.baseFee || '0'} {formData.hourlyRate ? `+ $${formData.hourlyRate}/hr for complex items` : ''}</p>
                                 <p><strong>Payment Terms:</strong> {formData.paymentTerms?.replace('_', ' ').replace('upfront', 'Full upfront payment').replace('completion', 'Payment on completion').replace('net30', 'Net 30 days')}</p>
                                 <p><strong>Liability Protection:</strong> <span style={{color: formData.limitationOfLiability ? '#16a34a' : '#dc2626'}}>{formData.limitationOfLiability ? '✓ Included' : '✗ Not included'}</span></p>
+                                <p><strong>Client Indemnification:</strong> <span style={{color: formData.clientIndemnification ? '#16a34a' : '#64748b'}}>{formData.clientIndemnification ? '✓ Included' : '○ Standard only'}</span></p>
                                 <p><strong>Confidentiality:</strong> <span style={{color: formData.clientConfidentiality ? '#16a34a' : '#64748b'}}>{formData.clientConfidentiality ? '✓ Included' : '○ Standard only'}</span></p>
+                                <p><strong>Scope Protection:</strong> <span style={{color: formData.servicesNotIncluded ? '#16a34a' : '#64748b'}}>{formData.servicesNotIncluded ? '✓ Services exclusions defined' : '○ Basic scope only'}</span></p>
+                                <p><strong>Expert Witness Control:</strong> <span style={{color: formData.expertWitnessConsent ? '#16a34a' : '#64748b'}}>{formData.expertWitnessConsent ? '✓ Consent required' : '○ Not specified'}</span></p>
                                 <p><strong>Record Retention:</strong> {formData.recordRetention} years</p>
                             </div>
                         </div>
