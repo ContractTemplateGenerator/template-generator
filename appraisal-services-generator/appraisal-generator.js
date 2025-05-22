@@ -4,6 +4,8 @@ const AppraisalGenerator = () => {
     // State management
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
+    const [isPaid, setIsPaid] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
     const [formData, setFormData] = useState({
         // Business Information
         appraiserName: '',
@@ -61,6 +63,34 @@ const AppraisalGenerator = () => {
     });
 
     const previewRef = useRef(null);
+
+    // Check for payment status on load
+    useEffect(() => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentSuccess = urlParams.get('payment') === 'success';
+        const savedPaymentStatus = localStorage.getItem('appraisal_paid') === 'true';
+        
+        if (paymentSuccess || savedPaymentStatus) {
+            setIsPaid(true);
+            localStorage.setItem('appraisal_paid', 'true');
+        }
+        
+        // Load saved form data
+        const savedData = localStorage.getItem('appraisal_form_data');
+        if (savedData) {
+            try {
+                const parsedData = JSON.parse(savedData);
+                setFormData(prev => ({ ...prev, ...parsedData }));
+            } catch (e) {
+                console.error('Error loading saved data:', e);
+            }
+        }
+    }, []);
+
+    // Save form data to localStorage whenever it changes
+    useEffect(() => {
+        localStorage.setItem('appraisal_form_data', JSON.stringify(formData));
+    }, [formData]);
 
     // All 50 US States
     const states = [
@@ -551,6 +581,11 @@ Date: ___________________________            Date: ___________________________`;
 
     // Utility functions
     const copyToClipboard = async () => {
+        if (!isPaid) {
+            setShowPaymentModal(true);
+            return;
+        }
+        
         try {
             await navigator.clipboard.writeText(documentText);
             alert('Agreement copied to clipboard!');
@@ -561,6 +596,11 @@ Date: ___________________________            Date: ___________________________`;
     };
 
     const downloadAsWord = () => {
+        if (!isPaid) {
+            setShowPaymentModal(true);
+            return;
+        }
+        
         try {
             console.log("Download MS Word button clicked");
             
@@ -577,6 +617,58 @@ Date: ___________________________            Date: ___________________________`;
         } catch (error) {
             console.error("Error in downloadAsWord:", error);
             alert("Error generating Word document. Please try again or use the copy option.");
+        }
+    };
+
+    // 17-digit backup code verification
+    const verifyBackupCode = (code) => {
+        // Must be exactly 17 characters, mix of CAPS letters and numbers, at least one of each
+        if (code.length !== 17) return false;
+        
+        const hasLetter = /[A-Z]/.test(code);
+        const hasNumber = /[0-9]/.test(code);
+        const isValidFormat = /^[A-Z0-9]+$/.test(code);
+        
+        return hasLetter && hasNumber && isValidFormat;
+    };
+
+    const handleBackupCode = () => {
+        const code = prompt('Enter your 17-character backup code:');
+        if (code && verifyBackupCode(code)) {
+            setIsPaid(true);
+            localStorage.setItem('appraisal_paid', 'true');
+            alert('Access granted! You can now copy and download your agreement.');
+        } else if (code) {
+            alert('Invalid backup code. Code must be exactly 17 characters with a mix of CAPITAL letters and numbers.');
+        }
+    };
+
+    const handlePayPalPayment = () => {
+        if (window.paypal) {
+            window.paypal.Buttons({
+                createOrder: (data, actions) => {
+                    return actions.order.create({
+                        purchase_units: [{
+                            amount: {
+                                value: '14.99'
+                            },
+                            description: 'Professional Appraisal Services Agreement Generator - Lifetime Access'
+                        }]
+                    });
+                },
+                onApprove: (data, actions) => {
+                    return actions.order.capture().then((details) => {
+                        setIsPaid(true);
+                        localStorage.setItem('appraisal_paid', 'true');
+                        setShowPaymentModal(false);
+                        alert('Payment successful! You now have full access to copy and download your agreement.');
+                    });
+                },
+                onError: (err) => {
+                    console.error('PayPal error:', err);
+                    alert('Payment failed. Please try again or use a backup code if you have one.');
+                }
+            }).render('#paypal-button-container');
         }
     };
 
@@ -692,6 +784,18 @@ Date: ___________________________            Date: ___________________________`;
             }
         }
     }, [highlightedText]);
+
+    // Initialize PayPal when modal opens
+    useEffect(() => {
+        if (showPaymentModal && window.paypal) {
+            // Clear any existing PayPal buttons
+            const container = document.getElementById('paypal-button-container');
+            if (container) {
+                container.innerHTML = '';
+                handlePayPalPayment();
+            }
+        }
+    }, [showPaymentModal]);
 
     // Render tab content
     const renderTabContent = () => {
@@ -1361,15 +1465,83 @@ Date: ___________________________            Date: ___________________________`;
                             <h2>Live Agreement Preview</h2>
                             <p>Watch your professional agreement update in real-time</p>
                         </div>
-                        <div className="preview-content">
+                        <div className="preview-content" style={{ position: 'relative' }}>
                             <pre 
                                 className="document-preview"
                                 dangerouslySetInnerHTML={{ __html: highlightedText }}
+                                style={{ 
+                                    userSelect: isPaid ? 'text' : 'none',
+                                    WebkitUserSelect: isPaid ? 'text' : 'none',
+                                    MozUserSelect: isPaid ? 'text' : 'none'
+                                }}
                             />
+                            {!isPaid && (
+                                <div className="paywall-overlay">
+                                    <div className="paywall-content">
+                                        <h3>🔒 Unlock Full Access</h3>
+                                        <p>Get unlimited access to copy, download, and use your professional agreement</p>
+                                        <button 
+                                            className="unlock-button"
+                                            onClick={() => setShowPaymentModal(true)}
+                                        >
+                                            Unlock for $14.99
+                                        </button>
+                                        <button 
+                                            className="backup-code-button"
+                                            onClick={handleBackupCode}
+                                        >
+                                            Have a backup code?
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
+            
+            {/* Payment Modal */}
+            {showPaymentModal && (
+                <div className="payment-modal-overlay">
+                    <div className="payment-modal">
+                        <div className="payment-header">
+                            <h2>🔓 Unlock Professional Agreement Generator</h2>
+                            <p>Get lifetime access to copy, download, and customize your professional appraisal service agreements</p>
+                        </div>
+                        
+                        <div className="payment-features">
+                            <div className="feature">✅ Copy agreement text instantly</div>
+                            <div className="feature">✅ Download as MS Word document</div>
+                            <div className="feature">✅ All 8 specialized presets included</div>
+                            <div className="feature">✅ Professional legal language</div>
+                            <div className="feature">✅ Lifetime access - no subscription</div>
+                        </div>
+                        
+                        <div className="payment-price">
+                            <span className="price">$14.99</span>
+                            <span className="price-note">One-time payment</span>
+                        </div>
+                        
+                        <div id="paypal-button-container"></div>
+                        
+                        <div className="payment-options">
+                            <button 
+                                className="backup-code-link"
+                                onClick={handleBackupCode}
+                            >
+                                Already paid? Enter backup code
+                            </button>
+                        </div>
+                        
+                        <button 
+                            className="close-modal"
+                            onClick={() => setShowPaymentModal(false)}
+                        >
+                            ×
+                        </button>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
