@@ -124,19 +124,6 @@ const AppraisalGenerator = () => {
 
     // Enhanced quick presets for different appraisal types
     const appraisalPresets = {
-        jewelry: {
-            name: 'Fine Jewelry & Watches',
-            appraisalType: 'jewelry',
-            baseFee: '250',
-            hourlyRate: '150',
-            itemDescription: 'Fine jewelry including rings, necklaces, bracelets, earrings, watches, and precious gemstones',
-            purposeOfAppraisal: 'insurance',
-            inspectionLocation: 'office',
-            rushFee: '100',
-            travelFee: '75',
-            icon: '💎',
-            description: 'Comprehensive appraisals for fine jewelry, luxury watches, and precious stones for insurance, estate, or resale purposes.'
-        },
         antiques: {
             name: 'Antiques & Collectibles',
             appraisalType: 'antiques',
@@ -149,6 +136,32 @@ const AppraisalGenerator = () => {
             travelFee: '100',
             icon: '🏺',
             description: 'Professional evaluation of antiques, collectibles, and vintage items with historical research and market analysis.'
+        },
+        coins: {
+            name: 'Coins & Currency',
+            appraisalType: 'coins',
+            baseFee: '200',
+            hourlyRate: '125',
+            itemDescription: 'Rare coins, currency, numismatic collections, and precious metal bullion',
+            purposeOfAppraisal: 'insurance',
+            inspectionLocation: 'office',
+            rushFee: '75',
+            travelFee: '50',
+            icon: '🪙',
+            description: 'Numismatic appraisals for coin collections, rare currency, and precious metal investments.'
+        },
+        jewelry: {
+            name: 'Fine Jewelry & Watches',
+            appraisalType: 'jewelry',
+            baseFee: '250',
+            hourlyRate: '150',
+            itemDescription: 'Fine jewelry including rings, necklaces, bracelets, earrings, watches, and precious gemstones',
+            purposeOfAppraisal: 'insurance',
+            inspectionLocation: 'office',
+            rushFee: '100',
+            travelFee: '75',
+            icon: '💎',
+            description: 'Comprehensive appraisals for fine jewelry, luxury watches, and precious stones for insurance, estate, or resale purposes.'
         },
         artwork: {
             name: 'Fine Art & Paintings',
@@ -176,32 +189,6 @@ const AppraisalGenerator = () => {
             icon: '👜',
             description: 'Specialized appraisals for luxury fashion items, handbags, and designer accessories.'
         },
-        coins: {
-            name: 'Coins & Currency',
-            appraisalType: 'coins',
-            baseFee: '200',
-            hourlyRate: '125',
-            itemDescription: 'Rare coins, currency, numismatic collections, and precious metal bullion',
-            purposeOfAppraisal: 'insurance',
-            inspectionLocation: 'office',
-            rushFee: '75',
-            travelFee: '50',
-            icon: '🪙',
-            description: 'Numismatic appraisals for coin collections, rare currency, and precious metal investments.'
-        },
-        firearms: {
-            name: 'Firearms & Militaria',
-            appraisalType: 'firearms',
-            baseFee: '225',
-            hourlyRate: '140',
-            itemDescription: 'Firearms, ammunition, military collectibles, and historical weapons',
-            purposeOfAppraisal: 'insurance',
-            inspectionLocation: 'mutual',
-            rushFee: '100',
-            travelFee: '75',
-            icon: '🔫',
-            description: 'Professional firearm appraisals including historical research and compliance verification.'
-        },
         instruments: {
             name: 'Musical Instruments',
             appraisalType: 'instruments',
@@ -227,6 +214,19 @@ const AppraisalGenerator = () => {
             travelFee: '125',
             icon: '🚗',
             description: 'Comprehensive vehicle appraisals including mechanical condition and market analysis.'
+        },
+        firearms: {
+            name: 'Firearms & Militaria',
+            appraisalType: 'firearms',
+            baseFee: '225',
+            hourlyRate: '140',
+            itemDescription: 'Firearms, ammunition, military collectibles, and historical weapons',
+            purposeOfAppraisal: 'insurance',
+            inspectionLocation: 'mutual',
+            rushFee: '100',
+            travelFee: '75',
+            icon: '🔫',
+            description: 'Professional firearm appraisals including historical research and compliance verification.'
         }
     };
 
@@ -360,23 +360,23 @@ ${formData.limitationOfLiability ? `7.1 Limitation of Liability. APPRAISER'S TOT
 
 7.3 Market Conditions. Appraiser makes no warranty regarding future market conditions, economic trends, or the continued accuracy of the valuation beyond the stated validity period.` : '7.1 Standard Liability. Appraiser shall be liable for damages only to the extent such damages are directly caused by Appraiser\'s gross negligence or willful misconduct in the performance of services under this Agreement.'}
 
-8. CONFIDENTIALITY AND PRIVACY
+${formData.clientConfidentiality ? `8. CONFIDENTIALITY AND PRIVACY
 
-${formData.clientConfidentiality ? `8.1 Confidentiality Obligation. Appraiser agrees to maintain strict confidentiality regarding Client's identity, the specific property appraised, the appraised values, and any other proprietary or personal information obtained during the course of the engagement.
+8.1 Confidentiality Obligation. Appraiser agrees to maintain strict confidentiality regarding Client's identity, the specific property appraised, the appraised values, and any other proprietary or personal information obtained during the course of the engagement.
 
 8.2 Non-Disclosure. Appraiser shall not disclose any confidential information to third parties without Client's prior written consent, except as required by law, court order, or applicable professional standards and regulations.
 
-8.3 Marketing and Testimonials. Appraiser shall not use Client's name, the appraised property, or any details of the appraisal engagement for marketing, promotional, or testimonial purposes without Client's express written permission.` : '8.1 Standard Confidentiality. Appraiser shall maintain confidentiality in accordance with standard professional appraisal practices and applicable laws and regulations.'}
+8.3 Marketing and Testimonials. Appraiser shall not use Client's name, the appraised property, or any details of the appraisal engagement for marketing, promotional, or testimonial purposes without Client's express written permission.
 
-9. CANCELLATION AND MODIFICATION
+9. CANCELLATION AND MODIFICATION` : `8. CANCELLATION AND MODIFICATION`}
 
-9.1 Cancellation Policy. ${formData.cancellationPolicy === 'standard' ? 'Either party may cancel this Agreement with twenty-four (24) hours written notice. If canceled after the inspection has commenced, Client shall be responsible for payment of all services rendered and expenses incurred up to the point of cancellation.' : formData.cancellationPolicy === 'strict' ? 'Client may cancel this Agreement with forty-eight (48) hours written notice. Cancellations with less than forty-eight (48) hours notice may result in a cancellation fee equal to fifty percent (50%) of the base appraisal fee.' : 'Cancellation terms shall be determined on a case-by-case basis, taking into consideration work completed and expenses incurred.'}
+${formData.clientConfidentiality ? '9.1' : '8.1'} Cancellation Policy. ${formData.cancellationPolicy === 'standard' ? 'Either party may cancel this Agreement with twenty-four (24) hours written notice. If canceled after the inspection has commenced, Client shall be responsible for payment of all services rendered and expenses incurred up to the point of cancellation.' : formData.cancellationPolicy === 'strict' ? 'Client may cancel this Agreement with forty-eight (48) hours written notice. Cancellations with less than forty-eight (48) hours notice may result in a cancellation fee equal to fifty percent (50%) of the base appraisal fee.' : 'Cancellation terms shall be determined on a case-by-case basis, taking into consideration work completed and expenses incurred.'}
 
-9.2 Modification. This Agreement may only be modified by written consent of both parties.
+${formData.clientConfidentiality ? '9.2' : '8.2'} Modification. This Agreement may only be modified by written consent of both parties.
 
-10. DISPUTE RESOLUTION AND GOVERNING LAW
+${formData.clientConfidentiality ? '10' : '9'}. DISPUTE RESOLUTION AND GOVERNING LAW
 
-10.1 Dispute Resolution. Any disputes arising under this Agreement shall be resolved through ${formData.disputeResolution === 'mediation' ? 'binding mediation conducted under the rules of the American Arbitration Association' : formData.disputeResolution === 'arbitration' ? 'binding arbitration conducted under the rules of the American Arbitration Association' : 'appropriate legal proceedings in the courts'} in ${formData.governingLaw}.
+${formData.clientConfidentiality ? '10.1' : '9.1'} Dispute Resolution. Any disputes arising under this Agreement shall be resolved through ${formData.disputeResolution === 'mediation' ? 'binding mediation conducted under the rules of the American Arbitration Association' : formData.disputeResolution === 'arbitration' ? 'binding arbitration conducted under the rules of the American Arbitration Association' : 'appropriate legal proceedings in the courts'} in ${formData.governingLaw}.
 
 10.2 Governing Law. This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to conflict of law principles.
 
@@ -441,8 +441,14 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
                 }
                 break;
             case 5: // Legal Terms
-                if (['limitationOfLiability', 'clientConfidentiality', 'disputeResolution'].includes(lastChanged)) {
-                    return 'legal-terms';
+                if (lastChanged === 'limitationOfLiability') {
+                    return 'liability-section';
+                }
+                if (lastChanged === 'clientConfidentiality') {
+                    return 'confidentiality-section';
+                }
+                if (lastChanged === 'disputeResolution') {
+                    return 'dispute-section';
                 }
                 break;
         }
@@ -459,7 +465,9 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
             'scope-section': /(1\. SCOPE OF APPRAISAL SERVICES.*?(?=2\. COMPENSATION))/s,
             'service-details': /(1\.1 Property Description.*?(?=1\.5|2\.))/s,
             'pricing-section': /(2\. COMPENSATION AND PAYMENT TERMS.*?(?=3\. DELIVERY))/s,
-            'legal-terms': /(7\. LIMITATION OF LIABILITY.*?(?=8\. CONFIDENTIALITY))/s
+            'liability-section': /(7\. LIMITATION OF LIABILITY.*?(?=8\. CONFIDENTIALITY|9\. CANCELLATION))/s,
+            'confidentiality-section': /(8\. CONFIDENTIALITY AND PRIVACY.*?(?=9\. CANCELLATION))/s,
+            'dispute-section': /(10\. DISPUTE RESOLUTION.*?(?=11\. GENERAL))/s
         };
         
         if (sections[sectionToHighlight]) {
