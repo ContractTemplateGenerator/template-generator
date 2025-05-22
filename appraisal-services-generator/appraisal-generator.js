@@ -440,12 +440,7 @@ ${formData.appraiserName}                              ${formData.clientName}
 ${formData.businessName}
 ${formData.licenseNumber ? `License #${formData.licenseNumber}` : ''}
 
-Date: ___________________________            Date: ___________________________
-
-
-Contact Information:
-Appraiser: ${formData.phone || '[Phone]'} | ${formData.email || '[Email]'}
-Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email]'}`;
+Date: ___________________________            Date: ___________________________`;
     };
 
     const documentText = generateDocument();
@@ -487,8 +482,20 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
                 if (lastChanged === 'clientConfidentiality') {
                     return 'confidentiality-section';
                 }
-                if (lastChanged === 'disputeResolution') {
+                if (['disputeResolution', 'governingLaw'].includes(lastChanged)) {
                     return 'dispute-section';
+                }
+                if (['deliveryMethod', 'validityPeriod', 'recordRetention', 'cancellationPolicy'].includes(lastChanged)) {
+                    return 'delivery-section';
+                }
+                if (lastChanged === 'clientIndemnification') {
+                    return 'indemnification-section';
+                }
+                if (lastChanged === 'servicesNotIncluded') {
+                    return 'services-section';
+                }
+                if (lastChanged === 'expertWitnessConsent') {
+                    return 'expert-section';
                 }
                 break;
         }
@@ -507,7 +514,11 @@ Client: ${formData.clientPhone || '[Phone]'} | ${formData.clientEmail || '[Email
             'pricing-section': /(2\. COMPENSATION AND PAYMENT TERMS.*?(?=3\. DELIVERY))/s,
             'liability-section': /(7\. LIMITATION OF LIABILITY.*?(?=8\. CONFIDENTIALITY|9\. CANCELLATION))/s,
             'confidentiality-section': /(8\. CONFIDENTIALITY AND PRIVACY.*?(?=9\. CANCELLATION))/s,
-            'dispute-section': /(10\. DISPUTE RESOLUTION.*?(?=11\. GENERAL))/s
+            'dispute-section': /(10\. DISPUTE RESOLUTION.*?(?=11\. SERVICES))/s,
+            'delivery-section': /(3\. DELIVERY AND COMPLETION.*?(?=4\. PROFESSIONAL)|6\. APPRAISAL VALIDITY.*?(?=7\. LIMITATION)|9\. CANCELLATION.*?(?=10\. DISPUTE))/s,
+            'indemnification-section': /(12\. CLIENT INDEMNIFICATION.*?(?=13\. EXPERT))/s,
+            'services-section': /(11\. SERVICES NOT PROVIDED.*?(?=12\. CLIENT))/s,
+            'expert-section': /(13\. EXPERT WITNESS.*?(?=14\. GENERAL))/s
         };
         
         if (sections[sectionToHighlight]) {

@@ -16,6 +16,7 @@ window.generateWordDoc = function(documentText, formData) {
     font-size: 12pt;
     line-height: 1.6;
     margin: 0;
+    text-align: left;
   }
   h1 {
     text-align: center;
@@ -23,15 +24,17 @@ window.generateWordDoc = function(documentText, formData) {
     margin-bottom: 20pt;
     font-weight: bold;
   }
-  h2 {
+  .section-heading {
     font-size: 12pt;
     margin-top: 14pt;
     margin-bottom: 10pt;
     font-weight: bold;
+    text-align: left;
   }
   p {
     margin-bottom: 12pt;
-    text-align: justify;
+    text-align: left;
+    font-size: 12pt;
   }
   .signature-section {
     margin-top: 30pt;
@@ -40,61 +43,57 @@ window.generateWordDoc = function(documentText, formData) {
   .signature-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20pt;
+    margin-top: 15pt;
   }
   .signature-table td {
     border: none;
-    padding: 8pt;
+    padding: 5pt;
     vertical-align: top;
     width: 50%;
   }
   .signature-labels {
     font-weight: bold;
-    margin-bottom: 15pt;
+    margin-bottom: 10pt;
   }
   .signature-line {
     border-bottom: 1pt solid black;
-    width: 250pt;
-    height: 15pt;
-    margin-bottom: 8pt;
+    width: 200pt;
+    height: 12pt;
+    margin-bottom: 5pt;
   }
   .signature-name {
-    margin-bottom: 5pt;
+    margin-bottom: 3pt;
     font-size: 11pt;
   }
   .date-line {
-    margin-top: 15pt;
+    margin-top: 10pt;
     font-size: 11pt;
-  }
-  .contact-info {
-    margin-top: 20pt;
-    font-size: 11pt;
-    text-align: left;
   }
 </style>
 </head>
 <body>
 `;
 
-    // Split document text if there's a form feed character (for separate pages)
-    let mainText = documentText;
-    let appendixText = '';
+    // Process text and add proper formatting
+    let processedText = documentText;
     
-    if (documentText.includes('\f')) {
-      const parts = documentText.split(/\f/);
-      mainText = parts[0];
-      appendixText = parts.length > 1 ? parts[1] : '';
-    }
+    // Make title bold and centered
+    processedText = processedText.replace(/^PROFESSIONAL APPRAISAL SERVICES AGREEMENT/, '<h1>PROFESSIONAL APPRAISAL SERVICES AGREEMENT</h1>');
+    
+    // Make section headings bold
+    processedText = processedText.replace(/^(\d+\.\s+[A-Z][A-Z\s&]+)$/gm, '<p class="section-heading">$1</p>');
+    processedText = processedText.replace(/^(RECITALS)$/gm, '<p class="section-heading">$1</p>');
+    processedText = processedText.replace(/^(NOW, THEREFORE.*)$/gm, '<p class="section-heading">$1</p>');
+    processedText = processedText.replace(/^(IN WITNESS WHEREOF.*)$/gm, '<p class="section-heading">$1</p>');
     
     // Find signature section and replace with proper table formatting
-    const signatureRegex = /APPRAISER:\s+CLIENT:\s+_+\s+_+\s*(.*?)\s+(.*?)\s+Date:\s+_+\s+Date:\s+_+\s+Contact Information:\s+(.*)/s;
+    const signatureRegex = /APPRAISER:\s+CLIENT:\s+_+\s+_+\s*(.*?)\s+(.*?)\s+Date:\s+_+\s+Date:\s+_+/s;
     
-    if (signatureRegex.test(mainText)) {
-      const match = mainText.match(signatureRegex);
-      const beforeSignature = mainText.substring(0, match.index);
+    if (signatureRegex.test(processedText)) {
+      const match = processedText.match(signatureRegex);
+      const beforeSignature = processedText.substring(0, match.index);
       const appraiserInfo = match[1] || '';
       const clientInfo = match[2] || '';
-      const contactInfo = match[3] || '';
       
       // Create properly formatted signature section
       const signatureSection = `
@@ -117,39 +116,26 @@ window.generateWordDoc = function(documentText, formData) {
       </td>
     </tr>
   </table>
-  <div class="contact-info">
-    Contact Information:<br>
-    ${contactInfo}
-  </div>
 </div>
 `;
       
-      mainText = beforeSignature + signatureSection;
+      processedText = beforeSignature + signatureSection;
     }
     
     // Process main text - convert newlines to HTML paragraphs
-    const mainTextHtml = mainText
+    const mainTextHtml = processedText
       .split('\n\n')
-      .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
+      .map(para => {
+        if (para.trim() === '') return '';
+        if (para.includes('<h1>') || para.includes('<p class="section-heading">') || para.includes('<div class="signature-section">')) {
+          return para;
+        }
+        return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+      })
       .join('');
     
-    // Add main text to HTML content
+    // Add processed text to HTML content
     htmlContent += mainTextHtml;
-    
-    // Add appendix on a new page if applicable
-    if (appendixText) {
-      // Add page break
-      htmlContent += '<div style="page-break-before: always;"></div>';
-      
-      // Process appendix text
-      const appendixHtml = appendixText
-        .split('\n\n')
-        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
-        .join('');
-      
-      // Add appendix to HTML content
-      htmlContent += appendixHtml;
-    }
     
     // Close HTML document
     htmlContent += '</body></html>';
