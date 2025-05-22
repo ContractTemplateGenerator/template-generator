@@ -633,13 +633,13 @@ Date: ___________________________            Date: ___________________________`;
     };
 
     const handleBackupCode = () => {
-        const code = prompt('Enter your 17-character backup code:');
+        const code = prompt('Enter your 17-character PayPal transaction ID:');
         if (code && verifyBackupCode(code)) {
             setIsPaid(true);
             localStorage.setItem('appraisal_paid', 'true');
             alert('Access granted! You can now copy and download your agreement.');
         } else if (code) {
-            alert('Invalid backup code. Code must be exactly 17 characters with a mix of CAPITAL letters and numbers.');
+            alert('Invalid PayPal ID format. Please enter the exact 17-character transaction ID from your PayPal receipt.');
         }
     };
 
@@ -1490,7 +1490,7 @@ Date: ___________________________            Date: ___________________________`;
                                             className="backup-code-button"
                                             onClick={handleBackupCode}
                                         >
-                                            Have a backup code?
+                                            Already purchased? Enter PayPal ID
                                         </button>
                                     </div>
                                 </div>
@@ -1514,7 +1514,7 @@ Date: ___________________________            Date: ___________________________`;
                             <div className="feature">✅ Download as MS Word document</div>
                             <div className="feature">✅ All 8 specialized presets included</div>
                             <div className="feature">✅ Professional legal language</div>
-                            <div className="feature">✅ Lifetime access - no subscription</div>
+                            <div className="feature">✅ Unlimited access and modifications</div>
                         </div>
                         
                         <div className="payment-price">
@@ -1529,7 +1529,7 @@ Date: ___________________________            Date: ___________________________`;
                                 className="backup-code-link"
                                 onClick={handleBackupCode}
                             >
-                                Already paid? Enter backup code
+                                Already purchased? Enter your PayPal ID here
                             </button>
                         </div>
                         
