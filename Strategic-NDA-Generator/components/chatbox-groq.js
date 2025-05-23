@@ -347,15 +347,54 @@ window.LegalChatboxGroq = function(props) {
     }
   };
 
-  // Strategic NDA specific quick actions
-  const quickActions = [
-    "What does Section 2 cover? (Confidential Information)",
-    "How long does Section 6 make this last? (Term)",
-    "What are my Section 4 obligations? (Receiving Party)",
-    "When does Section 5 allow disclosure? (Legal Carveouts)",
-    "What remedies are in Section 7? (Breach remedies)"
-  ];
-
+  // Strategic NDA specific quick actions - dynamically adjust based on pseudonym usage
+  const getQuickActions = () => {
+    // Get the most current form data to check pseudonym status
+    const currentFormData = window.chatboxConfig && window.chatboxConfig.formData ? window.chatboxConfig.formData : formData;
+    const usePseudonyms = currentFormData.usePseudonyms || false;
+    
+    // Adjust section numbers based on whether pseudonyms are used
+    // Default to false if not specified to match standard NDA numbering
+    const offset = usePseudonyms ? 1 : 0;
+    
+    // Popular questions people actually ask about NDAs
+    const popularQuestions = [
+      // Scope questions
+      `What exactly counts as confidential? (Section ${1 + offset} scope)`,
+      `Do emails and texts count? (Section ${1 + offset} definition)`,
+      `What if I already knew this? (Section ${2 + offset} exclusions)`,
+      
+      // Duration questions
+      `Is ${currentFormData.term || '2'} ${currentFormData.termUnit || 'years'} too long? (Section ${5 + offset} duration)`,
+      `When does this expire? (Section ${5 + offset} term)`,
+      
+      // Disclosure questions
+      `Can I tell my lawyer/accountant? (Section ${4 + offset} exceptions)`,
+      `What if the government asks? (Section ${4 + offset} carveouts)`,
+      `Can I share with my team? (Section ${3 + offset} restrictions)`,
+      
+      // Practical concerns
+      `What happens if someone breaches? (Section ${6 + offset} remedies)`,
+      `When can I destroy their info? (Section ${3 + offset} obligations)`,
+      `Can they sue me personally? (Section ${6 + offset} liability)`,
+      
+      // Strategic questions
+      `Is this mutual or one-way? (Review full agreement)`,
+      `What's the worst-case scenario? (Section ${6 + offset} damages)`,
+      usePseudonyms ? `Is the side letter enforceable? (Exhibit A concerns)` : `Should I use pseudonyms? (Privacy options)`
+    ];
+    
+    // Return 5 questions, prioritizing different aspects
+    // Mix of most common concerns and section-specific questions
+    return [
+      `What exactly is "confidential"? (Section ${1 + offset})`,
+      `Is ${currentFormData.term || '2'} ${currentFormData.termUnit || 'years'} standard? (Section ${5 + offset})`,
+      `Can I tell my lawyer? (Section ${4 + offset})`,
+      `What if they breach? (Section ${6 + offset})`,
+      usePseudonyms ? `Why use a side letter? (Exhibit A)` : `Should I get an attorney? (General advice)`
+    ];
+  };
+  
   const sendQuickAction = (action) => {
     setInputValue(action);
     setTimeout(() => sendMessage(), 100);
@@ -416,7 +455,7 @@ window.LegalChatboxGroq = function(props) {
             React.createElement('p', { style: { fontSize: '12px', color: '#6b7280', marginBottom: '8px' } }, 
               'Quick section questions:'
             ),
-            ...quickActions.map((action, index) =>
+            ...getQuickActions().map((action, index) =>
               React.createElement('button', {
                 key: index,
                 className: 'quick-action-btn',
