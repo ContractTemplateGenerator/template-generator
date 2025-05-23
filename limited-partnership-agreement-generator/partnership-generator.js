@@ -111,15 +111,15 @@ This Partnership Agreement (the "Agreement") is made and entered into as of ${cu
 
 Article I: Formation
 
-The Partnership is formed as a Limited Partnership under the laws of the State of ${formData.stateOfFormation}.
+a) The Partnership is formed as a Limited Partnership under the laws of the State of ${formData.stateOfFormation}.
 
-The Partnership's principal place of business shall be ${formData.principalPlaceOfBusiness || 'within the United States of America'}.
+b) The Partnership's principal place of business shall be ${formData.principalPlaceOfBusiness || 'within the United States of America'}.
 
 Article II: Partnership EIN and Partners
 
-The Employer Identification Number (EIN) of the Partnership is ${formData.ein || '[TO BE DETERMINED]'}.
+a) The Employer Identification Number (EIN) of the Partnership is ${formData.ein || '[TO BE DETERMINED]'}.
 
-The Partners of the Partnership are as follows, each with their respective percentage interests:
+b) The Partners of the Partnership are as follows, each with their respective percentage interests:
 
 - General Partner: ${formData.generalPartnerName || '[GENERAL PARTNER NAME]'} - ${formData.generalPartnerPercentage}%
 
@@ -149,19 +149,19 @@ This Agreement may be amended only with a majority vote according to the percent
 
 Article VIII: Miscellaneous
 
-Severability. Should any part of this Agreement be rendered or declared invalid by a court of competent jurisdiction, such invalidation of such part or portion of this Agreement shall not invalidate the remaining portions, and they shall remain in full force and effect.
+a) Severability. Should any part of this Agreement be rendered or declared invalid by a court of competent jurisdiction, such invalidation of such part or portion of this Agreement shall not invalidate the remaining portions, and they shall remain in full force and effect.
 
-Waiver. The waiver by any Partner of a breach of any provision of this Agreement shall not operate or be construed as a waiver of any subsequent breach.
+b) Waiver. The waiver by any Partner of a breach of any provision of this Agreement shall not operate or be construed as a waiver of any subsequent breach.
 
-Governing Law. This Agreement and the rights of the Partners hereunder shall be governed by and interpreted according to the laws of the State of ${formData.stateOfFormation}.
+c) Governing Law. This Agreement and the rights of the Partners hereunder shall be governed by and interpreted according to the laws of the State of ${formData.stateOfFormation}.
 
-Binding Effect. The provisions of this Agreement shall be binding upon and inure to the benefit of the heirs, personal representatives, successors, and assigns of the Partners.
+d) Binding Effect. The provisions of this Agreement shall be binding upon and inure to the benefit of the heirs, personal representatives, successors, and assigns of the Partners.
 
-Amendments. This Agreement may be amended only by a written agreement signed by all Partners.
+e) Amendments. This Agreement may be amended only by a written agreement signed by all Partners.
 
-Assignment. No Partner may assign any rights or obligations under this Agreement without the prior written consent of the other Partners.
+f) Assignment. No Partner may assign any rights or obligations under this Agreement without the prior written consent of the other Partners.
 
-Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
+g) Counterparts. This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
 
 ${formData.additionalProvisions ? `Additional Provisions\n\n${formData.additionalProvisions}\n\n` : ''}IN WITNESS WHEREOF, the undersigned have executed this Partnership Agreement as of the date first above written.
 
@@ -220,15 +220,15 @@ This Partnership Agreement (the "Agreement") is made and entered into as of ${cu
 
 <div style="font-weight: bold; margin: 15px 0 10px 0;">Article I: Formation</div>
 
-The Partnership is formed as a Limited Partnership under the laws of the State of ${formData.stateOfFormation}.
+a) The Partnership is formed as a Limited Partnership under the laws of the State of ${formData.stateOfFormation}.
 
-The Partnership's principal place of business shall be ${formData.principalPlaceOfBusiness || 'within the United States of America'}.
+b) The Partnership's principal place of business shall be ${formData.principalPlaceOfBusiness || 'within the United States of America'}.
 
 <div style="font-weight: bold; margin: 15px 0 10px 0;">Article II: Partnership EIN and Partners</div>
 
-The Employer Identification Number (EIN) of the Partnership is ${formData.ein || '[TO BE DETERMINED]'}.
+a) The Employer Identification Number (EIN) of the Partnership is ${formData.ein || '[TO BE DETERMINED]'}.
 
-The Partners of the Partnership are as follows, each with their respective percentage interests:
+b) The Partners of the Partnership are as follows, each with their respective percentage interests:
 
 - General Partner: ${formData.generalPartnerName || '[GENERAL PARTNER NAME]'} - ${formData.generalPartnerPercentage}%
 
@@ -258,19 +258,19 @@ This Agreement may be amended only with a majority vote according to the percent
 
 <div style="font-weight: bold; margin: 15px 0 10px 0;">Article VIII: Miscellaneous</div>
 
-<span style="font-weight: bold;">Severability.</span> Should any part of this Agreement be rendered or declared invalid by a court of competent jurisdiction, such invalidation of such part or portion of this Agreement shall not invalidate the remaining portions, and they shall remain in full force and effect.
+a) <span style="font-weight: bold;">Severability.</span> Should any part of this Agreement be rendered or declared invalid by a court of competent jurisdiction, such invalidation of such part or portion of this Agreement shall not invalidate the remaining portions, and they shall remain in full force and effect.
 
-<span style="font-weight: bold;">Waiver.</span> The waiver by any Partner of a breach of any provision of this Agreement shall not operate or be construed as a waiver of any subsequent breach.
+b) <span style="font-weight: bold;">Waiver.</span> The waiver by any Partner of a breach of any provision of this Agreement shall not operate or be construed as a waiver of any subsequent breach.
 
-<span style="font-weight: bold;">Governing Law.</span> This Agreement and the rights of the Partners hereunder shall be governed by and interpreted according to the laws of the State of ${formData.stateOfFormation}.
+c) <span style="font-weight: bold;">Governing Law.</span> This Agreement and the rights of the Partners hereunder shall be governed by and interpreted according to the laws of the State of ${formData.stateOfFormation}.
 
-<span style="font-weight: bold;">Binding Effect.</span> The provisions of this Agreement shall be binding upon and inure to the benefit of the heirs, personal representatives, successors, and assigns of the Partners.
+d) <span style="font-weight: bold;">Binding Effect.</span> The provisions of this Agreement shall be binding upon and inure to the benefit of the heirs, personal representatives, successors, and assigns of the Partners.
 
-<span style="font-weight: bold;">Amendments.</span> This Agreement may be amended only by a written agreement signed by all Partners.
+e) <span style="font-weight: bold;">Amendments.</span> This Agreement may be amended only by a written agreement signed by all Partners.
 
-<span style="font-weight: bold;">Assignment.</span> No Partner may assign any rights or obligations under this Agreement without the prior written consent of the other Partners.
+f) <span style="font-weight: bold;">Assignment.</span> No Partner may assign any rights or obligations under this Agreement without the prior written consent of the other Partners.
 
-<span style="font-weight: bold;">Counterparts.</span> This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
+g) <span style="font-weight: bold;">Counterparts.</span> This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
 
 ${formData.additionalProvisions ? `<div style="font-weight: bold; margin: 15px 0 10px 0;">Additional Provisions</div>\n\n${formData.additionalProvisions}\n\n` : ''}IN WITNESS WHEREOF, the undersigned have executed this Partnership Agreement as of the date first above written.
 
