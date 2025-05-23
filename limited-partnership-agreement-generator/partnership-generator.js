@@ -165,8 +165,6 @@ Counterparts. This Agreement may be executed in counterparts, each of which shal
 
 ${formData.additionalProvisions ? `Additional Provisions\n\n${formData.additionalProvisions}\n\n` : ''}IN WITNESS WHEREOF, the undersigned have executed this Partnership Agreement as of the date first above written.
 
-[Signatures of All Partners]
-
 ${createWordSignatureSection()}`;
   };
 
@@ -275,9 +273,6 @@ This Agreement may be amended only with a majority vote according to the percent
 <span style="font-weight: bold;">Counterparts.</span> This Agreement may be executed in counterparts, each of which shall be deemed an original, but all of which together shall constitute one and the same instrument.
 
 ${formData.additionalProvisions ? `<div style="font-weight: bold; margin: 15px 0 10px 0;">Additional Provisions</div>\n\n${formData.additionalProvisions}\n\n` : ''}IN WITNESS WHEREOF, the undersigned have executed this Partnership Agreement as of the date first above written.
-
-[Signatures of All Partners]
-
 
 ${createPreviewSignatureSection()}`;
   };

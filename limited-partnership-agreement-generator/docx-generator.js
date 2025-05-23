@@ -52,7 +52,7 @@ window.generateWordDoc = function(documentText, formData) {
   .signature-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20pt;
+    margin-top: 15pt;
     border: none;
   }
   .signature-table td {
@@ -83,7 +83,7 @@ window.generateWordDoc = function(documentText, formData) {
       // Make subsection headings bold
       .replace(/^(Severability|Waiver|Governing Law|Binding Effect|Amendments|Assignment|Counterparts)\./gm, '<span class="subsection-heading">$1.</span>')
       // Handle signatures section
-      .replace(/\[Signatures of All Partners\]/, '<div class="signature-section">[Signatures of All Partners]</div>')
+      .replace(/\[Signatures of All Partners\]/, '')  // Remove this line to save space
       // Convert newlines to paragraphs
       .split('\n\n')
       .map(para => {
