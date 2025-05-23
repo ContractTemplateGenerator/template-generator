@@ -52,14 +52,21 @@ window.generateWordDoc = function(documentText, formData) {
   .signature-table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 30pt;
+    margin-top: 20pt;
+    border: none;
   }
   .signature-table td {
     width: 50%;
-    padding: 20pt 10pt 5pt 10pt;
+    padding: 10pt 20pt 0pt 0pt;
+    border: none;
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.2;
+  }
+  .signature-line {
     border-bottom: 1px solid black;
-    text-align: center;
-    vertical-align: bottom;
+    min-height: 20pt;
+    margin-bottom: 5pt;
   }
 </style>
 </head>
@@ -85,19 +92,35 @@ window.generateWordDoc = function(documentText, formData) {
           if (para.includes('<div class=')) {
             return para;
           }
-          // Handle signature lines specially
-          if (para.includes('[GENERAL PARTNER NAME]') && para.includes('[LIMITED PARTNER')) {
-            const partners = para.split(/\s{2,}/); // Split on multiple spaces
-            const generalPartner = partners.find(p => p.includes('[GENERAL PARTNER NAME]')) || '[GENERAL PARTNER NAME]';
-            const limitedPartners = partners.filter(p => p.includes('[LIMITED PARTNER') && !p.includes('[GENERAL PARTNER'));
+          // Handle signature table specially
+          if (para.includes('SIGNATURE_TABLE_START')) {
+            const lines = para.split('\n').filter(line => line.trim() && 
+                                                   !line.includes('SIGNATURE_TABLE_START') && 
+                                                   !line.includes('SIGNATURE_TABLE_END'));
             
-            return `<table class="signature-table">
-              <tr>
-                <td>${generalPartner}</td>
-                <td>${limitedPartners[0] || '[LIMITED PARTNER NAME]'}</td>
-              </tr>
-              ${limitedPartners.length > 1 ? `<tr><td></td><td>${limitedPartners[1]}</td></tr>` : ''}
-            </table>`;
+            const generalPartner = lines[0] ? lines[0].trim() : '[GENERAL PARTNER NAME]';
+            const limitedPartners = lines.slice(1).filter(line => line.trim());
+            
+            let tableRows = '';
+            
+            // First row: General Partner and first Limited Partner
+            const firstLimitedPartner = limitedPartners[0] ? limitedPartners[0].trim() : '[LIMITED PARTNER NAME]';
+            tableRows += `<tr>
+              <td><div class="signature-line"></div>${generalPartner}</td>
+              <td><div class="signature-line"></div>${firstLimitedPartner}</td>
+            </tr>`;
+            
+            // Additional rows for remaining Limited Partners
+            for (let i = 1; i < limitedPartners.length; i++) {
+              if (limitedPartners[i].trim()) {
+                tableRows += `<tr>
+                  <td></td>
+                  <td><div class="signature-line"></div>${limitedPartners[i].trim()}</td>
+                </tr>`;
+              }
+            }
+            
+            return `<table class="signature-table">${tableRows}</table>`;
           }
           return `<p>${para.replace(/\n/g, '<br>')}</p>`;
         }

@@ -93,6 +93,18 @@ const PartnershipGenerator = () => {
       .map(partner => `- Limited Partner: ${partner.name} - ${partner.percentage}%`)
       .join('\n\n');
     
+    // Create signature section for Word document
+    const createWordSignatureSection = () => {
+      const signatures = [`${formData.generalPartnerName || '[GENERAL PARTNER NAME]'}`];
+      formData.limitedPartners.forEach(partner => {
+        if (partner.name || signatures.length <= 3) { // Always show at least 2 limited partners
+          signatures.push(partner.name || '[LIMITED PARTNER NAME]');
+        }
+      });
+      
+      return `SIGNATURE_TABLE_START\n${signatures.join('\n')}\nSIGNATURE_TABLE_END`;
+    };
+    
     return `PARTNERSHIP AGREEMENT OF ${formData.partnershipName.toUpperCase()}
 
 This Partnership Agreement (the "Agreement") is made and entered into as of ${currentDate}, by and among the undersigned partners of ${formData.partnershipName.toUpperCase()}, a ${formData.stateOfFormation} Limited Partnership (the "Partnership").
@@ -155,11 +167,7 @@ ${formData.additionalProvisions ? `Additional Provisions\n\n${formData.additiona
 
 [Signatures of All Partners]
 
-
-${formData.generalPartnerName || '[GENERAL PARTNER NAME]'}          ${formData.limitedPartners[0]?.name || '[LIMITED PARTNER NAME]'}
-
-
-${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
+${createWordSignatureSection()}`;
   };
 
   // Create formatted preview text
@@ -180,6 +188,31 @@ ${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
       .filter(partner => partner.name)
       .map(partner => `- Limited Partner: ${partner.name} - ${partner.percentage}%`)
       .join('\n\n');
+    
+    // Create signature section for preview
+    const createPreviewSignatureSection = () => {
+      const signatures = [];
+      signatures.push(`${formData.generalPartnerName || '[GENERAL PARTNER NAME]'}`);
+      
+      // Add limited partners, showing at least 2
+      const limitedPartnerNames = formData.limitedPartners.map(partner => partner.name || '[LIMITED PARTNER NAME]');
+      if (limitedPartnerNames.length === 0) {
+        limitedPartnerNames.push('[LIMITED PARTNER NAME]', '[LIMITED PARTNER NAME]');
+      } else if (limitedPartnerNames.length === 1) {
+        limitedPartnerNames.push('[LIMITED PARTNER NAME]');
+      }
+      
+      let signatureDisplay = `${signatures[0]}`;
+      limitedPartnerNames.forEach((name, index) => {
+        if (index === 0) {
+          signatureDisplay += `          ${name}`;
+        } else {
+          signatureDisplay += `\n\n${name}`;
+        }
+      });
+      
+      return signatureDisplay;
+    };
     
     return `<div style="text-align: center; text-decoration: underline; font-weight: bold; margin-bottom: 20px; font-size: 14pt;">
 PARTNERSHIP AGREEMENT OF ${formData.partnershipName.toUpperCase()}
@@ -246,10 +279,7 @@ ${formData.additionalProvisions ? `<div style="font-weight: bold; margin: 15px 0
 [Signatures of All Partners]
 
 
-${formData.generalPartnerName || '[GENERAL PARTNER NAME]'}          ${formData.limitedPartners[0]?.name || '[LIMITED PARTNER NAME]'}
-
-
-${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
+${createPreviewSignatureSection()}`;
   };
 
   const documentText = generateDocumentText();
@@ -261,18 +291,34 @@ ${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
     
     switch (currentTab) {
       case 0: // Basic Information
-        if (['partnershipName', 'stateOfFormation', 'agreementDate'].includes(lastChanged)) {
-          return 'header';
+        if (lastChanged === 'partnershipName') {
+          return 'title';
+        }
+        if (lastChanged === 'stateOfFormation') {
+          return 'stateOfFormation';
+        }
+        if (lastChanged === 'agreementDate') {
+          return 'agreementDate';
         }
         break;
       case 1: // Partnership Details
-        if (['ein', 'principalPlaceOfBusiness'].includes(lastChanged)) {
-          return 'article2';
+        if (lastChanged === 'ein') {
+          return 'ein';
+        }
+        if (lastChanged === 'principalPlaceOfBusiness') {
+          return 'principalPlace';
         }
         break;
       case 2: // Partners
-        if (lastChanged.includes('Partner')) {
-          return 'partners';
+        if (lastChanged === 'generalPartnerName' || lastChanged === 'generalPartnerPercentage') {
+          return 'generalPartner';
+        }
+        if (lastChanged.includes('limitedPartner')) {
+          // Extract the index from the field name to highlight specific partner
+          const match = lastChanged.match(/limitedPartner(\d+)/);
+          if (match) {
+            return `limitedPartner${match[1]}`;
+          }
         }
         break;
       case 3: // Additional Provisions
@@ -290,11 +336,25 @@ ${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
     if (!sectionToHighlight) return formattedPreview;
     
     const sections = {
-      header: /(PARTNERSHIP AGREEMENT OF .*?<\/div>.*?(?=<div style="font-weight: bold))/s,
-      article2: /(<div style="font-weight: bold[^>]*>Article II: Partnership EIN and Partners<\/div>.*?(?=<div style="font-weight: bold))/s,
-      partners: /(- General Partner:.*?(?=<div style="font-weight: bold))/s,
+      title: /(PARTNERSHIP AGREEMENT OF [^<]*)/,
+      stateOfFormation: /(The Partnership is formed as a Limited Partnership under the laws of the State of [^.]*\.)/,
+      agreementDate: /(This Partnership Agreement[^,]*, is made and entered into as of [^,]*,)/,
+      ein: /(The Employer Identification Number \(EIN\) of the Partnership is [^.]*\.)/,
+      principalPlace: /(The Partnership's principal place of business shall be [^.]*\.)/,
+      generalPartner: new RegExp(`(- General Partner: ${(formData.generalPartnerName || '[GENERAL PARTNER NAME]').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} - ${formData.generalPartnerPercentage}%)`),
       additional: /(<div style="font-weight: bold[^>]*>Additional Provisions<\/div>.*?(?=IN WITNESS WHEREOF))/s
     };
+    
+    // Handle specific limited partners
+    if (sectionToHighlight.startsWith('limitedPartner')) {
+      const partnerIndex = parseInt(sectionToHighlight.replace('limitedPartner', ''));
+      const partnerName = formData.limitedPartners[partnerIndex]?.name || '[LIMITED PARTNER NAME]';
+      const partnerPercentage = formData.limitedPartners[partnerIndex]?.percentage || '[PERCENTAGE]';
+      
+      // Create pattern to match this specific limited partner line
+      const escapedName = partnerName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      sections[sectionToHighlight] = new RegExp(`(- Limited Partner: ${escapedName} - ${partnerPercentage}%)`);
+    }
     
     if (sections[sectionToHighlight]) {
       return formattedPreview.replace(sections[sectionToHighlight], match => 
