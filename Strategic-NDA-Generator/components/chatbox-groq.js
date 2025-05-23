@@ -79,8 +79,13 @@ window.LegalChatboxGroq = function(props) {
       console.log('Sending message to Groq:', apiUrl);
       
       // Get the most current form data and document text from the window
-      const currentFormData = window.chatboxConfig ? window.chatboxConfig.formData : formData;
-      const currentDocumentText = window.chatboxConfig ? window.chatboxConfig.documentText : documentText;
+      const currentFormData = window.chatboxConfig && window.chatboxConfig.formData ? window.chatboxConfig.formData : formData;
+      const currentDocumentText = window.chatboxConfig && window.chatboxConfig.documentText ? window.chatboxConfig.documentText : documentText;
+      
+      // Validate essential fields are present
+      if (!currentFormData.term && userMessage.toLowerCase().includes('term') || userMessage.toLowerCase().includes('duration') || userMessage.toLowerCase().includes('long')) {
+        console.warn('User asking about term but term not specified in form data');
+      }
       
       // Calculate form data changes (delta) if not first message
       let formDataToSend = {};
@@ -130,7 +135,9 @@ window.LegalChatboxGroq = function(props) {
             liquidatedDamagesAmount: currentFormData.liquidatedDamagesAmount
           }, // Section 6/7
           disputeResolution: currentFormData.disputeResolution, // Section 7/8
-          arbitrationProvider: currentFormData.arbitrationProvider
+          arbitrationProvider: currentFormData.arbitrationProvider,
+          monetaryConsideration: currentFormData.monetaryConsideration,
+          considerationAmount: currentFormData.considerationAmount
         };
         
         // Send full document text only for the first message
@@ -236,10 +243,23 @@ window.LegalChatboxGroq = function(props) {
           }
         });
         
-        // Only send minimal data for follow-up messages
+        // For follow-up messages, always include essential fields plus changes
         formDataToSend = {
-          // Only include changed fields
+          // Always include essential context fields
+          term: currentFormData.term,
+          termUnit: currentFormData.termUnit,
+          state: currentFormData.state,
+          purpose: currentFormData.purpose,
+          usePseudonyms: currentFormData.usePseudonyms,
+          disclosingPartyName: currentFormData.disclosingPartyName,
+          receivingPartyName: currentFormData.receivingPartyName,
+          monetaryConsideration: currentFormData.monetaryConsideration,
+          considerationAmount: currentFormData.considerationAmount,
+          disputeResolution: currentFormData.disputeResolution,
+          
+          // Include changed fields
           ...changedFields,
+          
           // Include which sections were affected by the changes
           affectedSections: Array.from(affectedSections).join(', ')
         };
@@ -247,7 +267,10 @@ window.LegalChatboxGroq = function(props) {
         // No document text for follow-up messages
         documentTextToSend = '';
         
-        console.log('Follow-up message, sending only changes:', formDataToSend);
+        console.log('Follow-up message, sending essential context plus changes');
+        console.log('Current term value:', currentFormData.term, currentFormData.termUnit);
+        console.log('Changed fields:', Object.keys(changedFields));
+        console.log('Affected sections:', Array.from(affectedSections));
       }
       
       // Update previous form data for next comparison

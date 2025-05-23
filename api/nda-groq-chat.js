@@ -34,7 +34,11 @@ const handler = async (req, res) => {
       hasDocumentText: documentText.length > 0,
       hasSideLetterInfo: Object.keys(sideLetterInfo).length > 0,
       historyLength: conversationHistory.length,
-      isFollowUp: isFollowUpQuestion
+      isFollowUp: isFollowUpQuestion,
+      // Log essential fields to debug
+      term: formData.term,
+      termUnit: formData.termUnit,
+      state: formData.state
     });
 
     if (!message) {
@@ -147,9 +151,11 @@ Current NDA Context (IMPORTANT - refer to these specific details when answering)
 - Purpose: ${formData.purpose || 'Not specified'} (referenced in the recitals)
 - Parties: ${formData.disclosingPartyName || 'Disclosing Party'} and ${formData.receivingPartyName || 'Receiving Party'} ${formData.usePseudonyms ? '(Section 1 and Exhibit A)' : '(preamble)'}
 - Use Pseudonyms: ${formData.usePseudonyms || (sideLetterInfo && sideLetterInfo.sideLetterEnabled) ? 'Yes' : 'No'}
-- Monetary Consideration: ${formData.monetaryConsideration ? `Yes ($${formData.considerationAmount})` : 'No'} (recitals)
+- Monetary Consideration: ${formData.monetaryConsideration ? `Yes ($${formData.considerationAmount || 'amount not specified'})` : 'No'} (recitals)
 ${formData.affectedSections ? `- Recently Modified Sections: ${formData.affectedSections}` : ''}
 ${isFollowUpQuestion ? '- This is a follow-up question from an ongoing conversation' : ''}
+
+IMPORTANT: If the term is marked as "Not specified" above but the user is asking about duration, explain that you need the current form data to provide an accurate answer about the specific term length.
 
 FORM FIELD TO SECTION MAPPING:
 - Confidential Info Types (business/personal/custom): Section ${formData.usePseudonyms ? '2' : '1'}
