@@ -109,7 +109,28 @@ window.LegalChatboxGroq = function(props) {
           ...(currentFormData.usePseudonyms ? {
             disclosingPartyPseudonym: currentFormData.disclosingPartyPseudonym,
             receivingPartyPseudonym: currentFormData.receivingPartyPseudonym
-          } : {})
+          } : {}),
+          
+          // Section-specific configurations for context
+          confidentialInfoType: currentFormData.confidentialInfoType, // Section 1/2
+          exclusions: {
+            publicDomain: currentFormData.publicDomainExclusion,
+            independentDevelopment: currentFormData.independentDevelopmentExclusion,
+            rightfulPossession: currentFormData.rightfulPossessionExclusion
+          }, // Section 2/3
+          obligations: {
+            nonDisclosure: currentFormData.nonDisclosure,
+            nonUse: currentFormData.nonUse,
+            returnDocuments: currentFormData.returnDocuments
+          }, // Section 3/4
+          remedies: {
+            injunctiveRelief: currentFormData.injunctiveRelief,
+            monetaryDamages: currentFormData.monetaryDamages,
+            liquidatedDamages: currentFormData.liquidatedDamages,
+            liquidatedDamagesAmount: currentFormData.liquidatedDamagesAmount
+          }, // Section 6/7
+          disputeResolution: currentFormData.disputeResolution, // Section 7/8
+          arbitrationProvider: currentFormData.arbitrationProvider
         };
         
         // Send full document text only for the first message
@@ -131,12 +152,55 @@ window.LegalChatboxGroq = function(props) {
       } else {
         // Follow-up message - only send changes, NO document text
         const changedFields = {};
+        const affectedSections = new Set();
         
-        // Determine which fields have changed
+        // Determine which fields have changed and which sections are affected
         Object.keys(currentFormData).forEach(key => {
           // Check if field has changed from previous version
           if (JSON.stringify(currentFormData[key]) !== JSON.stringify(prevFormData[key])) {
             changedFields[key] = currentFormData[key];
+            
+            // Map field changes to affected sections
+            const sectionOffset = currentFormData.usePseudonyms ? 1 : 0;
+            
+            if (['disclosingPartyName', 'receivingPartyName', 'disclosingPartyPseudonym', 'receivingPartyPseudonym', 'usePseudonyms'].includes(key)) {
+              if (currentFormData.usePseudonyms) {
+                affectedSections.add('Section 1 (Identity of Parties)');
+                affectedSections.add('Exhibit A (Side Letter)');
+              }
+            }
+            
+            if (key.includes('confidentialInfo') || key.includes('Info')) {
+              affectedSections.add(`Section ${1 + sectionOffset} (Definition of Confidential Information)`);
+            }
+            
+            if (key.includes('Exclusion')) {
+              affectedSections.add(`Section ${2 + sectionOffset} (Exclusions)`);
+            }
+            
+            if (['nonDisclosure', 'nonUse', 'returnDocuments'].includes(key)) {
+              affectedSections.add(`Section ${3 + sectionOffset} (Obligations)`);
+            }
+            
+            if (key.includes('Carveout')) {
+              affectedSections.add(`Section ${4 + sectionOffset} (Permitted Disclosures)`);
+            }
+            
+            if (['term', 'termUnit'].includes(key)) {
+              affectedSections.add(`Section ${5 + sectionOffset} (Term)`);
+            }
+            
+            if (key.includes('Relief') || key.includes('Damages')) {
+              affectedSections.add(`Section ${6 + sectionOffset} (Remedies)`);
+            }
+            
+            if (key.includes('dispute') || key.includes('arbitration')) {
+              affectedSections.add(`Section ${7 + sectionOffset} (Dispute Resolution)`);
+            }
+            
+            if (['state', 'attorneyFees', 'severability', 'entireAgreement'].includes(key)) {
+              affectedSections.add(`Section ${8 + sectionOffset} (Miscellaneous)`);
+            }
             
             // Special case for pseudonyms
             if (key === 'usePseudonyms') {
@@ -175,7 +239,9 @@ window.LegalChatboxGroq = function(props) {
         // Only send minimal data for follow-up messages
         formDataToSend = {
           // Only include changed fields
-          ...changedFields
+          ...changedFields,
+          // Include which sections were affected by the changes
+          affectedSections: Array.from(affectedSections).join(', ')
         };
         
         // No document text for follow-up messages
@@ -260,11 +326,11 @@ window.LegalChatboxGroq = function(props) {
 
   // Strategic NDA specific quick actions
   const quickActions = [
-    "What is the purpose of this NDA?",
-    "How long does this NDA last?",
-    "What happens if someone breaches this?",
-    "Can I modify this template?",
-    "What are my disclosure obligations?"
+    "What does Section 2 cover? (Confidential Information)",
+    "How long does Section 6 make this last? (Term)",
+    "What are my Section 4 obligations? (Receiving Party)",
+    "When does Section 5 allow disclosure? (Legal Carveouts)",
+    "What remedies are in Section 7? (Breach remedies)"
   ];
 
   const sendQuickAction = (action) => {
@@ -321,11 +387,11 @@ window.LegalChatboxGroq = function(props) {
       React.createElement('div', { className: 'chatbox-messages' },
         messages.length === 0 && React.createElement('div', { className: 'chatbox-welcome' },
           React.createElement('div', { style: { marginBottom: '15px' } },
-            `Hello! I'm your Strategic NDA legal assistant. I can help explain clauses, suggest improvements, and answer questions about non-disclosure agreements. Ask me anything about your ${contractType}!`
+            `Hello! I'm your Strategic NDA legal assistant. I can help explain specific sections, clauses, and provisions of your ${contractType}. Each section has been carefully crafted based on legal best practices and lessons from cases like the Stormy Daniels NDA. Ask me anything about your agreement!`
           ),
           React.createElement('div', { className: 'quick-actions' },
             React.createElement('p', { style: { fontSize: '12px', color: '#6b7280', marginBottom: '8px' } }, 
-              'Common NDA questions:'
+              'Quick section questions:'
             ),
             ...quickActions.map((action, index) =>
               React.createElement('button', {
