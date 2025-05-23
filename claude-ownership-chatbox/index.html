@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Ownership Legal Assistant</title>
+    <link rel="stylesheet" href="chatbox-styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body>
+    <!-- Chatbox will mount here -->
+    <div id="claude-ownership-chatbox"></div>
+    
+    <script type="text/babel">
+        // Claude AI Ownership Chatbox Component
+        const ClaudeOwnershipChatbox = () => {
+            const [isOpen, setIsOpen] = React.useState(false);
+            const [messages, setMessages] = React.useState([]);
+            const [inputValue, setInputValue] = React.useState('');
+            const [isLoading, setIsLoading] = React.useState(false);
+            const [conversationHistory, setConversationHistory] = React.useState([]);
+            const [conversationStarted, setConversationStarted] = React.useState(false);
+            const messagesEndRef = React.useRef(null);
+            
+            // API URL - update this to your actual API endpoint
+            const apiUrl = 'https://template.terms.law/api/claude-ownership-groq-chat';
+            
+            // Parse markdown for formatting
+            const parseMarkdown = (text) => {
+                if (!text) return '';
+                
+                text = text.replace(/\n\n/g, '</p><p>');
+                text = text.replace(/^### (.*?)$/gm, '<h3>$1</h3>');
+                text = text.replace(/^## (.*?)$/gm, '<h2>$1</h2>');
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+                text = text.replace(/^\- (.*?)$/gm, '<li>$1</li>');
+                text = text.replace(/<li>(.*?)<\/li>\n<li>/g, '<li>$1</li><li>');
+                text = text.replace(/<li>(.*?)<\/li>(?!\n<li>)/g, '<ul><li>$1</li></ul>');
+                
+                if (!text.startsWith('<')) {
+                    text = `<p>${text}</p>`;
+                }
+                
+                return text;
+            };
+            
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+
+            React.useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const sendMessage = async () => {
+                if (!inputValue.trim() || isLoading) return;
+
+                const userMessage = inputValue.trim();
+                setInputValue('');
+                setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
+                setIsLoading(true);
+
+                try {
+                    // Add to conversation history
+                    const newHistoryItem = { role: "user", content: userMessage };
+                    const updatedHistory = [...conversationHistory, newHistoryItem];
+                    setConversationHistory(updatedHistory);
+                    
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            message: userMessage,
+                            articleContext: !conversationStarted ? getArticleContext() : '',
+                            conversationHistory: updatedHistory.slice(-4),
+                            isFollowUpQuestion: conversationStarted
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    // Add response to history
+                    setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
+                    setConversationStarted(true);
+                    
+                    setMessages(prev => [...prev, { 
+                        type: 'assistant', 
+                        content: data.response
+                    }]);
+                } catch (error) {
+                    console.error('Error:', error);
+                    setMessages(prev => [...prev, { 
+                        type: 'assistant', 
+                        content: `Sorry, I encountered an error. Please try again.`,
+                        error: true 
+                    }]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            const handleKeyPress = (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            };
+            
+            // Get article context from the page
+            const getArticleContext = () => {
+                // This could extract key points from the article
+                return `Article discusses Claude AI output ownership, user rights, copyright implications, and commercial use guidelines.`;
+            };
+
+            // Quick actions for common questions
+            const quickActions = [
+                "Do I own what Claude creates for me?",
+                "Can I use Claude's output commercially?",
+                "Do I need to give attribution?",
+                "What about copyright infringement?",
+                "Can I claim copyright on AI output?"
+            ];
+
+            const sendQuickAction = (action) => {
+                setInputValue(action);
+                setTimeout(() => sendMessage(), 100);
+            };
+
+            const TypingIndicator = () => (
+                <div className="message typing">
+                    <span>AI Legal Assistant is thinking...</span>
+                    <div className="typing-indicator">
+                        <div className="typing-dot"></div>
+                        <div className="typing-dot"></div>
+                        <div className="typing-dot"></div>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="chatbox-container claude-ownership">
+                    {/* Toggle Button */}
+                    <button
+                        className="chatbox-toggle"
+                        onClick={() => setIsOpen(!isOpen)}
+                        title="Ask about AI Output Ownership"
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                        </svg>
+                    </button>
+
+                    {/* Chat Window */}
+                    {isOpen && (
+                        <div className="chatbox-window">
+                            {/* Header */}
+                            <div className="chatbox-header">
+                                <div className="chatbox-title">
+                                    AI Output Ownership Assistant
+                                </div>
+                                <button className="chatbox-close" onClick={() => setIsOpen(false)}>
+                                    ×
+                                </button>
+                            </div>
+
+                            {/* Messages */}
+                            <div className="chatbox-messages">
+                                {messages.length === 0 && (
+                                    <div className="chatbox-welcome">
+                                        <div style={{ marginBottom: '15px' }}>
+                                            Hello! I'm your AI legal assistant specializing in Claude AI output ownership. 
+                                            I can help explain who owns AI-generated content, how it can be used commercially, 
+                                            copyright implications, and more. Ask me anything!
+                                        </div>
+                                        <div className="quick-actions">
+                                            <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '8px' }}>
+                                                Common questions:
+                                            </p>
+                                            {quickActions.map((action, index) => (
+                                                <button
+                                                    key={index}
+                                                    className="quick-action-btn"
+                                                    onClick={() => sendQuickAction(action)}
+                                                >
+                                                    {action}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                                {messages.map((message, index) => (
+                                    <div
+                                        key={index}
+                                        className={`message ${message.type}`}
+                                        dangerouslySetInnerHTML={{ 
+                                            __html: message.type === 'assistant' 
+                                                ? parseMarkdown(message.content) 
+                                                : message.content 
+                                        }}
+                                    />
+                                ))}
+                                {isLoading && <TypingIndicator />}
+                                <div ref={messagesEndRef} />
+                            </div>
+
+                            {/* Input */}
+                            <div className="chatbox-input-container">
+                                <textarea
+                                    className="chatbox-input"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    onKeyPress={handleKeyPress}
+                                    placeholder="Ask about AI output ownership..."
+                                    disabled={isLoading}
+                                    rows={1}
+                                />
+                                <button
+                                    className="chatbox-send"
+                                    onClick={sendMessage}
+                                    disabled={isLoading || !inputValue.trim()}
+                                >
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <line x1="22" y1="2" x2="11" y2="13" />
+                                        <polygon points="22,2 15,22 11,13 2,9" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        // Mount the chatbox
+        const root = ReactDOM.createRoot(document.getElementById('claude-ownership-chatbox'));
+        root.render(<ClaudeOwnershipChatbox />);
+    </script>
+</body>
+</html>

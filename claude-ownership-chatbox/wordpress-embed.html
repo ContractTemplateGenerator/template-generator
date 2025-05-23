@@ -1,0 +1,109 @@
+<!-- Claude AI Ownership Chatbox - WordPress Embed Version -->
+<!-- Add this code to a Custom HTML block in your WordPress post -->
+
+<style>
+.ai-ownership-chat-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #5E3AE2;
+  color: white;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(94, 58, 226, 0.3);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.ai-ownership-chat-btn:hover {
+  background: #4B2FBF;
+  transform: scale(1.05);
+}
+
+.ai-ownership-chat-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.chat-tooltip {
+  position: absolute;
+  bottom: 70px;
+  right: 0;
+  background: #1F2937;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.ai-ownership-chat-btn:hover .chat-tooltip {
+  opacity: 1;
+}
+</style>
+
+<button class="ai-ownership-chat-btn" onclick="openAIOwnershipChat()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+  </svg>
+  <span class="chat-tooltip">Ask about AI Output Ownership</span>
+</button>
+
+<script>
+function openAIOwnershipChat() {
+  // Get article title and excerpt for context
+  const articleTitle = document.querySelector('h1')?.textContent || 'AI Output Ownership Article';
+  const articleExcerpt = document.querySelector('.entry-content p')?.textContent?.substring(0, 200) || '';
+  
+  // Create popup window
+  const width = 440;
+  const height = 600;
+  const left = (window.screen.width - width) / 2;
+  const top = (window.screen.height - height) / 2;
+  
+  const chatWindow = window.open(
+    'https://template.terms.law/claude-ownership-chatbox/',
+    'AIOwnershipChat',
+    `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no`
+  );
+  
+  // Send article context to the chatbox when it loads
+  if (chatWindow) {
+    chatWindow.addEventListener('load', () => {
+      chatWindow.postMessage({
+        type: 'articleContext',
+        title: articleTitle,
+        excerpt: articleExcerpt,
+        url: window.location.href
+      }, '*');
+    });
+  }
+}
+
+// Alternative: Inline chatbox (requires more setup)
+function embedInlineChatbox() {
+  const chatContainer = document.createElement('div');
+  chatContainer.innerHTML = `
+    <iframe 
+      src="https://template.terms.law/claude-ownership-chatbox/" 
+      style="position: fixed; bottom: 20px; right: 20px; width: 400px; height: 560px; 
+             border: none; z-index: 9999; border-radius: 12px; 
+             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);"
+      title="AI Output Ownership Legal Assistant">
+    </iframe>
+  `;
+  document.body.appendChild(chatContainer);
+}
+
+// Uncomment the line below if you want the chatbox to appear inline instead of in a popup
+// embedInlineChatbox();
+</script>
