@@ -76,7 +76,17 @@ const PartnershipGenerator = () => {
   };
   // Generate document text
   const generateDocumentText = () => {
-    const currentDate = formData.agreementDate || new Date().toLocaleDateString();
+    // Format date properly - convert from YYYY-MM-DD to "Month DD, YYYY"
+    let currentDate;
+    if (formData.agreementDate) {
+      const date = new Date(formData.agreementDate + 'T00:00:00'); // Add time to avoid timezone issues
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      currentDate = date.toLocaleDateString('en-US', options);
+    } else {
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      currentDate = today.toLocaleDateString('en-US', options);
+    }
     
     const limitedPartnersText = formData.limitedPartners
       .filter(partner => partner.name)
@@ -154,7 +164,17 @@ ${formData.limitedPartners[1]?.name || '[LIMITED PARTNER NAME]'}`;
 
   // Create formatted preview text
   const createFormattedPreview = () => {
-    const currentDate = formData.agreementDate || new Date().toLocaleDateString();
+    // Format date properly - convert from YYYY-MM-DD to "Month DD, YYYY"
+    let currentDate;
+    if (formData.agreementDate) {
+      const date = new Date(formData.agreementDate + 'T00:00:00'); // Add time to avoid timezone issues
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      currentDate = date.toLocaleDateString('en-US', options);
+    } else {
+      const today = new Date();
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      currentDate = today.toLocaleDateString('en-US', options);
+    }
     
     const limitedPartnersText = formData.limitedPartners
       .filter(partner => partner.name)
