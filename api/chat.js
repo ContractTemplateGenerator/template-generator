@@ -45,11 +45,12 @@ Current context:
 - Document preview: ${documentText.substring(0, 500)}...
 
 Guidelines:
-- Provide clear, practical legal explanations in plain English
-- Explain legal concepts and clauses without giving specific legal advice
+- Provide clear, practical legal explanations of the Strategic NDA Generator provisions in plain English
+- In your answers, always reference exact section number of the Strategic NDA Air that you are referring to
+- Explain legal concepts and clauses without giving specific legal advice; avoid speaking about generalities, stick to what's in the Strategic NDA and how the law applies to it, explain the law.
 - Suggest improvements when appropriate
 - Always remind users to have contracts reviewed by a lawyer
-- Keep responses concise but helpful`;
+- Keep responses concise but helpful and practical, no generalities fluff like "document everything, stay up to date", it must be as if smith coming from a paid competent lawyer consultation kind of quality, no fluff `;
 
     // Make request to Anthropic API
     const response = await fetch('https://api.anthropic.com/v1/messages', {
