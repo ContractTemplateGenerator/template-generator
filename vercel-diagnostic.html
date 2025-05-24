@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vercel API Diagnostic</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background: #d4edda; }
+        .error { background: #f8d7da; }
+        button { background: #007bff; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; margin: 5px; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>Vercel API Endpoint Diagnostic</h1>
+    
+    <div class="test">
+        <h3>Test 1: Simple Test API (New)</h3>
+        <button onclick="testSimple()">Test /api/simple-test</button>
+        <div id="simple-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 2: Claude Ownership API</h3>
+        <button onclick="testClaude()">Test /api/claude-ownership-groq-chat</button>
+        <div id="claude-result"></div>
+    </div>
+    
+    <div class="test">
+        <h3>Test 3: Direct URL Check</h3>
+        <p>Try these URLs directly in your browser:</p>
+        <ul>
+            <li><a href="https://template.terms.law/api/simple-test" target="_blank">https://template.terms.law/api/simple-test</a></li>
+            <li><a href="https://template.terms.law/api/claude-ownership-groq-chat" target="_blank">https://template.terms.law/api/claude-ownership-groq-chat</a></li>
+        </ul>
+    </div>
+
+    <script>
+        async function testEndpoint(url, resultId, description) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = `<p>Testing ${description}...</p>`;
+            
+            try {
+                console.log(`Testing: ${url}`);
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                console.log(`Response status: ${response.status}`);
+                console.log(`Response headers:`, Object.fromEntries(response.headers.entries()));
+                
+                const responseText = await response.text();
+                console.log(`Response text:`, responseText);
+                
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    // Not JSON, probably HTML
+                    data = { rawResponse: responseText };
+                }
+                
+                if (response.ok && responseText.startsWith('{')) {
+                    resultDiv.className = 'success';
+                    resultDiv.innerHTML = `
+                        <h4>✅ ${description}: SUCCESS</h4>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                } else {
+                    resultDiv.className = 'error';
+                    resultDiv.innerHTML = `
+                        <h4>❌ ${description}: FAILED</h4>
+                        <p><strong>Status:</strong> ${response.status}</p>
+                        <p><strong>Content-Type:</strong> ${response.headers.get('content-type')}</p>
+                        <pre>${responseText.substring(0, 500)}${responseText.length > 500 ? '...' : ''}</pre>
+                    `;
+                }
+            } catch (error) {
+                console.error(`Error testing ${url}:`, error);
+                resultDiv.className = 'error';
+                resultDiv.innerHTML = `
+                    <h4>❌ ${description}: NETWORK ERROR</h4>
+                    <p>${error.message}</p>
+                `;
+            }
+        }
+        
+        function testSimple() {
+            testEndpoint('https://template.terms.law/api/simple-test', 'simple-result', 'Simple Test API');
+        }
+        
+        function testClaude() {
+            testEndpoint('https://template.terms.law/api/claude-ownership-groq-chat', 'claude-result', 'Claude Ownership API');
+        }
+        
+        // Auto-run simple test on page load
+        window.onload = testSimple;
+    </script>
+</body>
+</html>
