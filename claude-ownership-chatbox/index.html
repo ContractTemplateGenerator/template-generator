@@ -579,27 +579,125 @@
                 }
             };
             
-            const sendQuickQuestion = (question) => {
-                // Prevent page scroll
+            const sendQuickQuestion = async (question) => {
+                // Prevent page scroll and multiple clicks
                 event?.preventDefault();
                 event?.stopPropagation();
                 
                 // Don't proceed if already loading
                 if (isLoading) return;
                 
-                // Mark this question as used
+                // Mark this question as used immediately
                 setUsedQuestions(prev => new Set([...prev, question]));
                 
-                // Set the input value and trigger send
-                setInputValue(question);
+                // Add user message directly to chat
+                setMessages(prev => [...prev, { type: 'user', content: question }]);
+                setIsLoading(true);
                 setShouldAutoScroll(true);
                 
-                // Use a small delay to ensure state updates
-                setTimeout(() => {
-                    if (!isLoading) {
-                        sendMessage();
+                // Clear any text in input box
+                setInputValue('');
+                
+                let preventScrollTimeout;
+
+                try {
+                    const newHistoryItem = { role: "user", content: question };
+                    const updatedHistory = [...conversationHistory, newHistoryItem];
+                    setConversationHistory(updatedHistory);
+                    
+                    const apiUrls = [
+                        'https://template.terms.law/api/claude-ownership-groq-chat',
+                        'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat',
+                        '/api/claude-ownership-groq-chat'
+                    ];
+                    
+                    let response = null;
+                    let lastError = null;
+                    
+                    // Prevent page scrolling by maintaining parent frame position
+                    if (window.parent && window.parent !== window) {
+                        const maintainScroll = () => {
+                            if (window.parent.originalScrollPosition !== undefined) {
+                                window.parent.scrollTo(0, window.parent.originalScrollPosition);
+                            }
+                        };
+                        preventScrollTimeout = setInterval(maintainScroll, 50);
                     }
-                }, 50);
+                    
+                    for (const url of apiUrls) {
+                        try {
+                            response = await fetch(url, {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: question,
+                                    articleContext: 'Comprehensive AI ownership guide covering user rights, commercial use, copyright implications',
+                                    conversationHistory: updatedHistory.slice(-4),
+                                    isFollowUpQuestion: conversationHistory.length > 0
+                                }),
+                            });
+
+                            if (response.ok) {
+                                break;
+                            } else {
+                                const errorText = await response.text();
+                                lastError = new Error(`HTTP ${response.status}: ${errorText}`);
+                                response = null;
+                            }
+                        } catch (error) {
+                            lastError = error;
+                            response = null;
+                        }
+                    }
+                    
+                    if (!response) {
+                        throw lastError || new Error('All endpoints failed');
+                    }
+
+                    const data = await response.json();
+                    
+                    // Format the response
+                    let formattedResponse = data.response;
+                    formattedResponse = formattedResponse
+                        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                        .replace(/\n\n/g, '</p><p>')
+                        .replace(/\n/g, '<br>')
+                        .replace(/^(.*)$/gm, function(match) {
+                            if (match.startsWith('<h') || match.startsWith('<p>') || match.trim() === '') {
+                                return match;
+                            }
+                            return '<p>' + match + '</p>';
+                        });
+                    
+                    formattedResponse = formattedResponse
+                        .replace(/<p><\/p>/g, '')
+                        .replace(/<p>(<h[1-6]>.*?<\/h[1-6]>)<\/p>/g, '$1')
+                        .replace(/^<p>/, '')
+                        .replace(/<\/p>$/, '')
+                        .trim();
+                    
+                    setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
+                    setMessages(prev => [...prev, { type: 'assistant', content: formattedResponse, isFormatted: true }]);
+                } catch (error) {
+                    console.error('Quick question error:', error);
+                    setMessages(prev => [...prev, { 
+                        type: 'assistant', 
+                        content: 'Sorry, I encountered an error processing your question. Please try again.',
+                        error: true 
+                    }]);
+                } finally {
+                    setIsLoading(false);
+                    if (preventScrollTimeout) {
+                        clearInterval(preventScrollTimeout);
+                    }
+                }
             };
             
             const forceScrollToBottom = () => {
