@@ -165,11 +165,37 @@
             position: relative;
         }
         
+        .scroll-to-bottom {
+            position: absolute;
+            bottom: 60px;
+            right: 16px;
+            background: #5e3ae2;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+            z-index: 10;
+        }
+        
+        .scroll-to-bottom:hover {
+            opacity: 1;
+        }
+        
         .chat-messages {
             flex: 1;
             padding: 16px;
             overflow-y: auto;
             font-size: 13px;
+            max-height: 300px;
+            min-height: 200px;
         }
         
         .chat-input-area {
@@ -306,7 +332,9 @@
             const [inputValue, setInputValue] = React.useState('');
             const [isLoading, setIsLoading] = React.useState(false);
             const [conversationHistory, setConversationHistory] = React.useState([]);
+            const [shouldAutoScroll, setShouldAutoScroll] = React.useState(true);
             const messagesEndRef = React.useRef(null);
+            const messagesContainerRef = React.useRef(null);
             
             const quickAnswers = [
                 {
@@ -347,12 +375,22 @@
             };
             
             const scrollToBottom = () => {
-                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+                if (shouldAutoScroll && messagesEndRef.current) {
+                    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+                }
+            };
+
+            const handleScroll = (e) => {
+                const { scrollTop, scrollHeight, clientHeight } = e.target;
+                const isAtBottom = scrollTop + clientHeight >= scrollHeight - 10;
+                setShouldAutoScroll(isAtBottom);
             };
 
             React.useEffect(() => {
-                scrollToBottom();
-            }, [messages]);
+                if (shouldAutoScroll) {
+                    scrollToBottom();
+                }
+            }, [messages, shouldAutoScroll]);
             
             const sendMessage = async () => {
                 if (!inputValue.trim() || isLoading) return;
@@ -361,6 +399,7 @@
                 setInputValue('');
                 setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
                 setIsLoading(true);
+                setShouldAutoScroll(true); // Auto-scroll when user sends message
 
                 try {
                     const newHistoryItem = { role: "user", content: userMessage };
@@ -422,7 +461,15 @@
             
             const sendQuickQuestion = (question) => {
                 setInputValue(question);
+                setShouldAutoScroll(true);
                 setTimeout(() => sendMessage(), 100);
+            };
+            
+            const forceScrollToBottom = () => {
+                setShouldAutoScroll(true);
+                if (messagesEndRef.current) {
+                    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+                }
             };
             
             return (
@@ -477,7 +524,11 @@
                         </div>
                         
                         <div className="chat-area">
-                            <div className="chat-messages">
+                            <div 
+                                className="chat-messages"
+                                ref={messagesContainerRef}
+                                onScroll={handleScroll}
+                            >
                                 {messages.length === 0 && (
                                     <div style={{ textAlign: 'center', color: '#64748b', fontSize: '12px', marginTop: '20px' }}>
                                         Ask me anything about AI output ownership, copyright, or commercial use!
@@ -511,6 +562,16 @@
                                 )}
                                 <div ref={messagesEndRef} />
                             </div>
+                            
+                            {!shouldAutoScroll && (
+                                <button 
+                                    className="scroll-to-bottom"
+                                    onClick={forceScrollToBottom}
+                                    title="Scroll to bottom"
+                                >
+                                    ↓
+                                </button>
+                            )}
                             
                             <div className="chat-input-area">
                                 <textarea
