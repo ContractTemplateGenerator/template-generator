@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Ownership Chatbox Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .result {
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 3px;
+            margin-top: 10px;
+            white-space: pre-wrap;
+        }
+        .error {
+            background: #ffe6e6;
+            color: #d00;
+        }
+        .success {
+            background: #e6ffe6;
+            color: #080;
+        }
+        button {
+            background: #5E3AE2;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #4B2FBF;
+        }
+    </style>
+</head>
+<body>
+    <h1>Claude Ownership Chatbox Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Test API Endpoint URLs</h2>
+        <button onclick="testURL('https://template.terms.law/api/claude-ownership-groq-chat')">Test template.terms.law</button>
+        <button onclick="testURL('https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat')">Test vercel.app</button>
+        <div id="url-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Test with Sample Message</h2>
+        <button onclick="testMessage()">Send Test Message</button>
+        <div id="message-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. Check CORS</h2>
+        <button onclick="testCORS()">Test CORS</button>
+        <div id="cors-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Test Different Models</h2>
+        <button onclick="testModels()">Test Available Models</button>
+        <div id="models-result" class="result"></div>
+    </div>
+
+    <script>
+        let currentApiUrl = 'https://template.terms.law/api/claude-ownership-groq-chat';
+        
+        async function testURL(url) {
+            const resultDiv = document.getElementById('url-result');
+            resultDiv.textContent = `Testing ${url}...`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'OPTIONS'
+                });
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✓ ${url} is accessible (Status: ${response.status})`;
+                    currentApiUrl = url;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `✗ ${url} returned status ${response.status}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `✗ ${url} failed: ${error.message}`;
+            }
+        }
+        
+        async function testMessage() {
+            const resultDiv = document.getElementById('message-result');
+            resultDiv.textContent = 'Testing message...';
+            
+            try {
+                const response = await fetch(currentApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Do I own what Claude creates for me?',
+                        articleContext: 'Test article context',
+                        conversationHistory: [],
+                        isFollowUpQuestion: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✓ Message sent successfully!\n\nResponse: ${data.response}\n\nModel used: ${data.model}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `✗ Error ${response.status}: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `✗ Request failed: ${error.message}`;
+            }
+        }
+        
+        async function testCORS() {
+            const resultDiv = document.getElementById('cors-result');
+            resultDiv.textContent = 'Testing CORS...';
+            
+            try {
+                const response = await fetch(currentApiUrl, {
+                    method: 'OPTIONS',
+                    headers: {
+                        'Access-Control-Request-Method': 'POST',
+                        'Access-Control-Request-Headers': 'Content-Type'
+                    }
+                });
+                
+                const corsHeaders = {
+                    'Access-Control-Allow-Origin': response.headers.get('Access-Control-Allow-Origin'),
+                    'Access-Control-Allow-Methods': response.headers.get('Access-Control-Allow-Methods'),
+                    'Access-Control-Allow-Headers': response.headers.get('Access-Control-Allow-Headers')
+                };
+                
+                resultDiv.className = 'result success';
+                resultDiv.textContent = `✓ CORS Headers:\n${JSON.stringify(corsHeaders, null, 2)}`;
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `✗ CORS test failed: ${error.message}`;
+            }
+        }
+        
+        async function testModels() {
+            const resultDiv = document.getElementById('models-result');
+            resultDiv.textContent = 'Testing models...';
+            
+            // Test with a simple message to see which model responds
+            try {
+                const response = await fetch(currentApiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        message: 'Hello, which model are you?',
+                        articleContext: '',
+                        conversationHistory: [],
+                        isFollowUpQuestion: false
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `✓ Model working: ${data.model}\n\nResponse: ${data.response}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `✗ Model test failed: ${JSON.stringify(data, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `✗ Model test failed: ${error.message}`;
+            }
+        }
+        
+        // Run initial URL test
+        window.onload = () => {
+            testURL('https://template.terms.law/api/claude-ownership-groq-chat');
+        };
+    </script>
+</body>
+</html>

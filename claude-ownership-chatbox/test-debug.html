@@ -3,20 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude AI Ownership Legal Assistant</title>
+    <title>Claude AI Ownership Chatbox - Standalone Test</title>
     <link rel="stylesheet" href="chatbox-styles.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+        }
+        .test-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .test-btn {
+            background: #5E3AE2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .test-btn:hover {
+            background: #4B2FBF;
+        }
+        .debug-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: monospace;
+            font-size: 12px;
+            overflow-x: auto;
+        }
+    </style>
 </head>
 <body>
+    <div class="test-header">
+        <h1>Claude AI Ownership Chatbox - Test Mode</h1>
+        <p>This is a standalone test version of the chatbox. The chatbox will appear in the bottom right corner.</p>
+        
+        <div class="test-buttons">
+            <button class="test-btn" onclick="testAPI()">Test API Connection</button>
+            <button class="test-btn" onclick="sendTestMessage()">Send Test Message</button>
+            <button class="test-btn" onclick="clearDebugInfo()">Clear Debug Info</button>
+        </div>
+        
+        <div id="debug-info" class="debug-info" style="display: none;"></div>
+    </div>
+    
     <!-- Chatbox will mount here -->
     <div id="claude-ownership-chatbox"></div>
     
     <script type="text/babel">
-        // Claude AI Ownership Chatbox Component
+        // Debug logging function
+        window.debugLog = (message, data = null) => {
+            const debugDiv = document.getElementById('debug-info');
+            debugDiv.style.display = 'block';
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}${data ? '\n' + JSON.stringify(data, null, 2) : ''}`;
+            debugDiv.textContent += logEntry + '\n\n';
+            debugDiv.scrollTop = debugDiv.scrollHeight;
+            console.log(message, data);
+        };
+        
+        // Test functions
+        window.testAPI = async () => {
+            window.debugLog('Starting API connectivity test...');
+            
+            const apiUrls = [
+                'https://template.terms.law/api/claude-ownership-groq-chat',
+                'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat'
+            ];
+            
+            for (const url of apiUrls) {
+                try {
+                    window.debugLog(`Testing ${url}...`);
+                    const response = await fetch(url, { method: 'OPTIONS' });
+                    window.debugLog(`${url} - Status: ${response.status}`, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        headers: Object.fromEntries(response.headers.entries())
+                    });
+                } catch (error) {
+                    window.debugLog(`${url} - Error:`, error.message);
+                }
+            }
+        };
+        
+        window.sendTestMessage = () => {
+            window.debugLog('Sending test message via chatbox...');
+            // This will be used by the chatbox component
+            window.testMessagePending = "Do I own what Claude creates for me?";
+        };
+        
+        window.clearDebugInfo = () => {
+            document.getElementById('debug-info').textContent = '';
+            document.getElementById('debug-info').style.display = 'none';
+        };
+        
+        // Copy the chatbox component from index.html but with debug logging
         const ClaudeOwnershipChatbox = () => {
-            const [isOpen, setIsOpen] = React.useState(false);
+            const [isOpen, setIsOpen] = React.useState(true); // Start open in test mode
             const [messages, setMessages] = React.useState([]);
             const [inputValue, setInputValue] = React.useState('');
             const [isLoading, setIsLoading] = React.useState(false);
@@ -30,6 +131,17 @@
                 'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat',
                 '/api/claude-ownership-groq-chat'
             ];
+            
+            // Check for pending test message
+            React.useEffect(() => {
+                if (window.testMessagePending) {
+                    setInputValue(window.testMessagePending);
+                    window.testMessagePending = null;
+                    setTimeout(() => {
+                        sendMessage();
+                    }, 500);
+                }
+            }, []);
             
             // Parse markdown for formatting
             const parseMarkdown = (text) => {
@@ -66,6 +178,8 @@
                 setInputValue('');
                 setMessages(prev => [...prev, { type: 'user', content: userMessage }]);
                 setIsLoading(true);
+                
+                window.debugLog('Sending message:', { message: userMessage });
 
                 try {
                     // Add to conversation history
@@ -79,7 +193,7 @@
                     
                     for (const url of apiUrls) {
                         try {
-                            console.log(`Trying API URL: ${url}`);
+                            window.debugLog(`Trying API URL: ${url}`);
                             response = await fetch(url, {
                                 method: 'POST',
                                 headers: {
@@ -94,15 +208,20 @@
                             });
 
                             if (response.ok) {
-                                console.log(`Success with API URL: ${url}`);
+                                window.debugLog(`Success with API URL: ${url}`);
                                 break;
                             } else {
-                                console.log(`Failed with ${url}: ${response.status} ${response.statusText}`);
+                                const errorText = await response.text();
+                                window.debugLog(`Failed with ${url}:`, { 
+                                    status: response.status, 
+                                    statusText: response.statusText,
+                                    responseText: errorText
+                                });
                                 lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
                                 response = null;
                             }
                         } catch (error) {
-                            console.log(`Error with ${url}:`, error.message);
+                            window.debugLog(`Error with ${url}:`, error.message);
                             lastError = error;
                             response = null;
                         }
@@ -113,6 +232,7 @@
                     }
 
                     const data = await response.json();
+                    window.debugLog('Received response:', data);
                     
                     // Add response to history
                     setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
@@ -123,7 +243,7 @@
                         content: data.response
                     }]);
                 } catch (error) {
-                    console.error('Chatbox Error Details:', {
+                    window.debugLog('Chatbox Error Details:', {
                         message: error.message,
                         stack: error.stack,
                         timestamp: new Date().toISOString()
@@ -160,7 +280,6 @@
             
             // Get article context from the page
             const getArticleContext = () => {
-                // This could extract key points from the article
                 return `Article discusses Claude AI output ownership, user rights, copyright implications, and commercial use guidelines.`;
             };
 
