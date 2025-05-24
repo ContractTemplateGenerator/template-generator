@@ -19,6 +19,7 @@
             background: #f8fafc;
             height: 600px;
             overflow: hidden;
+            position: relative;
         }
         
         .guide-container {
@@ -408,17 +409,25 @@
                     
                     const apiUrls = [
                         'https://template.terms.law/api/claude-ownership-groq-chat',
-                        'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat'
+                        'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat',
+                        '/api/claude-ownership-groq-chat'
                     ];
                     
                     let response = null;
                     let lastError = null;
                     
+                    // Prevent page scroll during API calls
+                    document.body.style.overflow = 'hidden';
+                    
                     for (const url of apiUrls) {
                         try {
+                            console.log(`Trying API URL: ${url}`);
                             response = await fetch(url, {
                                 method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
                                 body: JSON.stringify({
                                     message: userMessage,
                                     articleContext: 'Comprehensive AI ownership guide covering user rights, commercial use, copyright implications',
@@ -427,28 +436,57 @@
                                 }),
                             });
 
-                            if (response.ok) break;
-                            lastError = new Error(`HTTP ${response.status}`);
-                            response = null;
+                            console.log(`Response status: ${response.status}`);
+                            
+                            if (response.ok) {
+                                console.log(`Success with API URL: ${url}`);
+                                break;
+                            } else {
+                                const errorText = await response.text();
+                                console.log(`Failed with ${url}: ${response.status} - ${errorText}`);
+                                lastError = new Error(`HTTP ${response.status}: ${errorText}`);
+                                response = null;
+                            }
                         } catch (error) {
+                            console.log(`Error with ${url}:`, error.message);
                             lastError = error;
                             response = null;
                         }
                     }
                     
-                    if (!response) throw lastError || new Error('All endpoints failed');
+                    if (!response) {
+                        console.error('All API endpoints failed. Last error:', lastError);
+                        throw lastError || new Error('All endpoints failed');
+                    }
 
                     const data = await response.json();
+                    console.log('Received response data:', data);
+                    
                     setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
                     setMessages(prev => [...prev, { type: 'assistant', content: data.response }]);
                 } catch (error) {
+                    console.error('Detailed error:', error);
+                    let errorMessage = 'Sorry, I encountered an error. ';
+                    
+                    if (error.message.includes('Failed to fetch')) {
+                        errorMessage += 'Network connection issue. Please check your internet connection.';
+                    } else if (error.message.includes('500')) {
+                        errorMessage += 'Server configuration error. The API key may not be properly set.';
+                    } else if (error.message.includes('404')) {
+                        errorMessage += 'API endpoint not found. Please try again later.';
+                    } else {
+                        errorMessage += `Error details: ${error.message}`;
+                    }
+                    
                     setMessages(prev => [...prev, { 
                         type: 'assistant', 
-                        content: `Sorry, I encountered an error. Please try again.`,
+                        content: errorMessage,
                         error: true 
                     }]);
                 } finally {
                     setIsLoading(false);
+                    // Restore page scroll
+                    document.body.style.overflow = '';
                 }
             };
             
@@ -460,6 +498,10 @@
             };
             
             const sendQuickQuestion = (question) => {
+                // Prevent page scroll
+                event?.preventDefault();
+                event?.stopPropagation();
+                
                 setInputValue(question);
                 setShouldAutoScroll(true);
                 setTimeout(() => sendMessage(), 100);
@@ -470,6 +512,12 @@
                 if (messagesEndRef.current) {
                     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
                 }
+            };
+            
+            const handleSendClick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                sendMessage();
             };
             
             return (
@@ -537,7 +585,12 @@
                                                 <button
                                                     key={i}
                                                     className="quick-question-btn"
-                                                    onClick={() => sendQuickQuestion(q)}
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        sendQuickQuestion(q);
+                                                    }}
+                                                    type="button"
                                                 >
                                                     {q}
                                                 </button>
@@ -585,8 +638,9 @@
                                 />
                                 <button
                                     className="chat-send"
-                                    onClick={sendMessage}
+                                    onClick={handleSendClick}
                                     disabled={isLoading || !inputValue.trim()}
+                                    type="button"
                                 >
                                     Send
                                 </button>
