@@ -39,7 +39,7 @@ const handler = async (req, res) => {
 
 ABOUT SERGEI TOKMAKOV:
 - California-licensed attorney (Bar #279869) 
-- Top Rated Plus on Upwork with 4.9/5 rating from 692+ reviews
+- Top Rated Plus on Upwork with 4.9/5 rating from 694+ reviews
 - 1,750+ completed legal projects
 - Specializes in: Contract drafting, AI/tech law, business formation, IP law
 - Author of comprehensive guides on AI ownership at terms.law
