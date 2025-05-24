@@ -257,6 +257,16 @@
             background: #f1f5f9;
             color: #334155;
             margin-right: 20%;
+            line-height: 1.6;
+        }
+        
+        .message.assistant strong {
+            color: #1e293b;
+            font-weight: 600;
+        }
+        
+        .message.assistant p {
+            margin-bottom: 8px;
         }
         
         .typing-indicator {
@@ -416,8 +426,16 @@
                     let response = null;
                     let lastError = null;
                     
-                    // Prevent page scroll during API calls
-                    document.body.style.overflow = 'hidden';
+                    // Prevent page scrolling by stopping event propagation and setting position
+                    const originalPosition = window.pageYOffset || document.documentElement.scrollTop;
+                    const preventScroll = () => {
+                        window.scrollTo(0, originalPosition);
+                    };
+                    const preventTouch = (e) => e.preventDefault();
+                    
+                    // Add event listeners to prevent scrolling
+                    window.addEventListener('scroll', preventScroll, { passive: false });
+                    document.addEventListener('touchmove', preventTouch, { passive: false });
                     
                     for (const url of apiUrls) {
                         try {
@@ -462,8 +480,24 @@
                     const data = await response.json();
                     console.log('Received response data:', data);
                     
+                    // Format the response with better paragraph breaks and structure
+                    let formattedResponse = data.response;
+                    
+                    // Add paragraph breaks for better readability
+                    formattedResponse = formattedResponse
+                        .replace(/\n\n/g, '\n')  // Remove double newlines first
+                        .replace(/\n/g, '\n\n')  // Then add proper paragraph spacing
+                        .replace(/(\d+\.\s)/g, '\n$1')  // Add breaks before numbered lists
+                        .replace(/(Key Points?:)/gi, '\n\n**$1**\n')  // Format key points
+                        .replace(/(Important:)/gi, '\n\n**$1**')  // Format important notes
+                        .replace(/(Note:)/gi, '\n\n**$1**')  // Format notes
+                        .replace(/(Summary:)/gi, '\n\n**$1**\n')  // Format summaries
+                        .replace(/(Recommendation:)/gi, '\n\n**$1**')  // Format recommendations
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Convert markdown bold to HTML
+                        .trim();
+                    
                     setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
-                    setMessages(prev => [...prev, { type: 'assistant', content: data.response }]);
+                    setMessages(prev => [...prev, { type: 'assistant', content: formattedResponse, isFormatted: true }]);
                 } catch (error) {
                     console.error('Detailed error:', error);
                     let errorMessage = 'Sorry, I encountered an error. ';
@@ -485,7 +519,10 @@
                     }]);
                 } finally {
                     setIsLoading(false);
-                    // Restore page scroll
+                    // Remove scroll prevention
+                    window.removeEventListener('scroll', preventScroll);
+                    document.removeEventListener('touchmove', preventTouch);
+                    // Allow normal scrolling again
                     document.body.style.overflow = '';
                 }
             };
@@ -600,7 +637,11 @@
                                 )}
                                 {messages.map((message, index) => (
                                     <div key={index} className={`message ${message.type}`}>
-                                        {message.content}
+                                        {message.isFormatted ? (
+                                            <div dangerouslySetInnerHTML={{ __html: message.content.replace(/\n/g, '<br>') }} />
+                                        ) : (
+                                            message.content
+                                        )}
                                     </div>
                                 ))}
                                 {isLoading && (
