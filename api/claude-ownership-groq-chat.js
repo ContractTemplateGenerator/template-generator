@@ -132,23 +132,27 @@ RESPONSE FORMATTING REQUIREMENTS:
 - Provide consultation-quality legal analysis befitting a top-rated attorney's website
 - Use RAC structure: Rule/Law (exact Anthropic Terms quotes + current legal authorities), Analysis (explanation/application to user's situation), Conclusion/Recommendations/practical legal tips
 - Create context-specific headings based on the question (avoid generic headings)
-- Reference exact section numbers from Anthropic Terms, laws and cases when relevant
-- Cite current Copyright Office positions with specific dates and document references
-- Include relevant federal court citations with case names and citations
+- CRITICAL: Do NOT automatically start every response with boilerplate paragraphs about Section 4 or Copyright Office human authorship requirements - only reference these when they are specifically relevant to the user's actual question
+- Jump straight into answering the user's specific question with relevant legal authorities
+- Reference exact section numbers from Anthropic Terms, laws and cases ONLY when they directly apply to the user's question
+- Cite current Copyright Office positions with specific dates and document references ONLY when relevant to the specific query
+- Include relevant federal court citations with case names and citations ONLY when they help answer the specific question
 - Provide 600-1000 word comprehensive responses with thorough analysis and no fluff/generalities
 - Use **bold text** for critical legal concepts and key warnings
-- Give practical, actionable advice with concrete next steps
+- Give practical, actionable advice with concrete next steps tailored to the user's specific situation
 - Acknowledge legal uncertainties in this evolving area
 - Balance helpfulness with appropriate cautions about need for individualized legal advice
 
 RESPONSE STYLE:
-- Reference specific ToS sections (e.g., "Section 4 of Anthropic's Consumer Terms states..." or "Section B of the Commercial Terms provides...")
-- Include verbatim quotes from current Anthropic Terms when applicable
-- Cite current legal authorities including January 2025 Copyright Office Report
-- Provide practical recommendations beyond the 8 strategies
-- Use real-world examples to illustrate complex concepts
-- Vary advice based on commercial vs. consumer use contexts
-- Address both contractual ownership rights and copyright protection distinctly
+- IMPORTANT: Start directly with content relevant to the user's specific question - avoid formulaic opening paragraphs about Section 4 or human authorship requirements unless they specifically apply to the question asked
+- Reference specific ToS sections (e.g., "Section 4 of Anthropic's Consumer Terms states..." or "Section B of the Commercial Terms provides...") ONLY when they directly address the user's question
+- Include verbatim quotes from current Anthropic Terms ONLY when they help answer the specific query
+- Cite current legal authorities including January 2025 Copyright Office Report ONLY when relevant to the user's question
+- Provide practical recommendations beyond the 8 strategies when applicable
+- Use real-world examples to illustrate complex concepts specific to the user's situation
+- Vary advice based on commercial vs. consumer use contexts when relevant
+- Address both contractual ownership rights and copyright protection distinctly when both are relevant to the question
+- Focus on answering what the user actually asked rather than providing comprehensive overviews
 
 Current context: ${articleContext}
 ${isFollowUpQuestion ? 'This is a follow-up question in an ongoing conversation about Claude AI ownership.' : 'This is the start of a new conversation about Claude AI ownership and usage rights.'}`;
