@@ -269,6 +269,32 @@
             margin-bottom: 8px;
         }
         
+        .message.assistant h1 {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 12px 0 8px 0;
+        }
+        
+        .message.assistant h2 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #374151;
+            margin: 10px 0 6px 0;
+        }
+        
+        .message.assistant h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4b5563;
+            margin: 8px 0 4px 0;
+        }
+        
+        .message.assistant em {
+            font-style: italic;
+            color: #64748b;
+        }
+        
         .typing-indicator {
             display: flex;
             align-items: center;
@@ -371,11 +397,14 @@
             ];
             
             const quickQuestions = [
-                "Can I claim copyright on AI outputs?",
-                "What about training data issues?",
-                "Do I need legal review?",
-                "What if I modify the outputs?",
-                "International usage differences?"
+                "What does Anthropic's 'if any' clause mean?",
+                "Can I claim copyright on Claude's outputs?",
+                "What are the high-risk use cases?",
+                "Do I need human review in legal matters?",
+                "What about the human authorship requirement?",
+                "How can I strengthen copyright claims?",
+                "What are my responsibilities for prompts?",
+                "Should I disclose AI assistance?"
             ];
             
             const toggleQA = (index) => {
@@ -412,6 +441,8 @@
                 setIsLoading(true);
                 setShouldAutoScroll(true); // Auto-scroll when user sends message
 
+                let preventScrollTimeout;
+
                 try {
                     const newHistoryItem = { role: "user", content: userMessage };
                     const updatedHistory = [...conversationHistory, newHistoryItem];
@@ -426,16 +457,17 @@
                     let response = null;
                     let lastError = null;
                     
-                    // Prevent page scrolling by stopping event propagation and setting position
-                    const originalPosition = window.pageYOffset || document.documentElement.scrollTop;
-                    const preventScroll = () => {
-                        window.scrollTo(0, originalPosition);
-                    };
-                    const preventTouch = (e) => e.preventDefault();
-                    
-                    // Add event listeners to prevent scrolling
-                    window.addEventListener('scroll', preventScroll, { passive: false });
-                    document.addEventListener('touchmove', preventTouch, { passive: false });
+                    // Prevent page scrolling by maintaining parent frame position
+                    if (window.parent && window.parent !== window) {
+                        const maintainScroll = () => {
+                            if (window.parent.originalScrollPosition !== undefined) {
+                                window.parent.scrollTo(0, window.parent.originalScrollPosition);
+                            }
+                        };
+                        
+                        // Maintain scroll position during the API call
+                        preventScrollTimeout = setInterval(maintainScroll, 50);
+                    }
                     
                     for (const url of apiUrls) {
                         try {
@@ -483,17 +515,28 @@
                     // Format the response with better paragraph breaks and structure
                     let formattedResponse = data.response;
                     
-                    // Add paragraph breaks for better readability
+                    // Convert markdown headings to HTML
                     formattedResponse = formattedResponse
-                        .replace(/\n\n/g, '\n')  // Remove double newlines first
-                        .replace(/\n/g, '\n\n')  // Then add proper paragraph spacing
-                        .replace(/(\d+\.\s)/g, '\n$1')  // Add breaks before numbered lists
-                        .replace(/(Key Points?:)/gi, '\n\n**$1**\n')  // Format key points
-                        .replace(/(Important:)/gi, '\n\n**$1**')  // Format important notes
-                        .replace(/(Note:)/gi, '\n\n**$1**')  // Format notes
-                        .replace(/(Summary:)/gi, '\n\n**$1**\n')  // Format summaries
-                        .replace(/(Recommendation:)/gi, '\n\n**$1**')  // Format recommendations
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Convert markdown bold to HTML
+                        .replace(/^### (.*$)/gim, '<h3>$1</h3>')  // Convert ### to h3
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')   // Convert ## to h2
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')    // Convert # to h1
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Convert **text** to bold
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')     // Convert *text* to italic
+                        .replace(/\n\n/g, '</p><p>')             // Convert double newlines to paragraphs
+                        .replace(/\n/g, '<br>')                  // Convert single newlines to breaks
+                        .replace(/^(.*)$/gm, function(match) {   // Wrap in paragraph tags if not already a heading
+                            if (match.startsWith('<h') || match.startsWith('<p>') || match.trim() === '') {
+                                return match;
+                            }
+                            return '<p>' + match + '</p>';
+                        });
+                    
+                    // Clean up any empty paragraphs or duplicate tags
+                    formattedResponse = formattedResponse
+                        .replace(/<p><\/p>/g, '')
+                        .replace(/<p>(<h[1-6]>.*?<\/h[1-6]>)<\/p>/g, '$1')
+                        .replace(/^<p>/, '')  // Remove opening p tag if at start
+                        .replace(/<\/p>$/, '') // Remove closing p tag if at end
                         .trim();
                     
                     setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
@@ -519,9 +562,10 @@
                     }]);
                 } finally {
                     setIsLoading(false);
-                    // Remove scroll prevention
-                    window.removeEventListener('scroll', preventScroll);
-                    document.removeEventListener('touchmove', preventTouch);
+                    // Clear the scroll position maintenance
+                    if (preventScrollTimeout) {
+                        clearInterval(preventScrollTimeout);
+                    }
                     // Allow normal scrolling again
                     document.body.style.overflow = '';
                 }
@@ -554,6 +598,13 @@
             const handleSendClick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // Store current scroll position of parent page
+                if (window.parent) {
+                    const parentScrollTop = window.parent.pageYOffset || window.parent.document.documentElement.scrollTop;
+                    window.parent.originalScrollPosition = parentScrollTop;
+                }
+                
                 sendMessage();
             };
             
