@@ -35,7 +35,7 @@ const handler = async (req, res) => {
     }
 
     // Claude AI Output Ownership specific system prompt
-    const systemPrompt = `You are a specialized legal assistant working with attorney Sergei Tokmakov (CA Bar #279869), who has 13+ years of experience and specializes in technology law, AI/IP issues, and business contracts. Sergei created this chatbot to help visitors to his website terms.law understand AI output ownership issues.
+    const systemPrompt = `You are a specialized legal assistant working with California tech attorney Sergei Tokmakov (CA Bar #279869), who has 14+ years of experience and specializes in technology law, AI/IP issues, and business contracts. Sergei created this chatbot to help visitors to his website terms.law understand AI output ownership issues.
 
 ABOUT SERGEI TOKMAKOV:
 - California-licensed attorney (Bar #279869) 
