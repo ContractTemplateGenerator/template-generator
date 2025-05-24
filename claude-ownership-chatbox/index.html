@@ -579,17 +579,148 @@
                 }
             };
             
-            const sendQuickQuestion = (question) => {
+            const sendQuickQuestion = async (question) => {
                 // Prevent page scroll
                 event?.preventDefault();
                 event?.stopPropagation();
                 
+                // Don't proceed if already loading
+                if (isLoading) return;
+                
                 // Mark this question as used
                 setUsedQuestions(prev => new Set([...prev, question]));
                 
-                setInputValue(question);
+                // Add user message directly instead of using inputValue
+                setMessages(prev => [...prev, { type: 'user', content: question }]);
+                setIsLoading(true);
                 setShouldAutoScroll(true);
-                setTimeout(() => sendMessage(), 100);
+                
+                let preventScrollTimeout;
+
+                try {
+                    const newHistoryItem = { role: "user", content: question };
+                    const updatedHistory = [...conversationHistory, newHistoryItem];
+                    setConversationHistory(updatedHistory);
+                    
+                    const apiUrls = [
+                        'https://template.terms.law/api/claude-ownership-groq-chat',
+                        'https://template-generator-aob3.vercel.app/api/claude-ownership-groq-chat',
+                        '/api/claude-ownership-groq-chat'
+                    ];
+                    
+                    let response = null;
+                    let lastError = null;
+                    
+                    // Prevent page scrolling by maintaining parent frame position
+                    if (window.parent && window.parent !== window) {
+                        const maintainScroll = () => {
+                            if (window.parent.originalScrollPosition !== undefined) {
+                                window.parent.scrollTo(0, window.parent.originalScrollPosition);
+                            }
+                        };
+                        
+                        // Maintain scroll position during the API call
+                        preventScrollTimeout = setInterval(maintainScroll, 50);
+                    }
+                    
+                    for (const url of apiUrls) {
+                        try {
+                            console.log(`Trying API URL: ${url}`);
+                            response = await fetch(url, {
+                                method: 'POST',
+                                headers: { 
+                                    'Content-Type': 'application/json',
+                                    'Accept': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    message: question,
+                                    articleContext: 'Comprehensive AI ownership guide covering user rights, commercial use, copyright implications',
+                                    conversationHistory: updatedHistory.slice(-4),
+                                    isFollowUpQuestion: conversationHistory.length > 0
+                                }),
+                            });
+
+                            console.log(`Response status: ${response.status}`);
+                            
+                            if (response.ok) {
+                                console.log(`Success with API URL: ${url}`);
+                                break;
+                            } else {
+                                const errorText = await response.text();
+                                console.log(`Failed with ${url}: ${response.status} - ${errorText}`);
+                                lastError = new Error(`HTTP ${response.status}: ${errorText}`);
+                                response = null;
+                            }
+                        } catch (error) {
+                            console.log(`Error with ${url}:`, error.message);
+                            lastError = error;
+                            response = null;
+                        }
+                    }
+                    
+                    if (!response) {
+                        console.error('All API endpoints failed. Last error:', lastError);
+                        throw lastError || new Error('All endpoints failed');
+                    }
+
+                    const data = await response.json();
+                    console.log('Received response data:', data);
+                    
+                    // Format the response with better paragraph breaks and structure
+                    let formattedResponse = data.response;
+                    
+                    // Convert markdown headings to HTML
+                    formattedResponse = formattedResponse
+                        .replace(/^### (.*$)/gim, '<h3>$1</h3>')  // Convert ### to h3
+                        .replace(/^## (.*$)/gim, '<h2>$1</h2>')   // Convert ## to h2
+                        .replace(/^# (.*$)/gim, '<h1>$1</h1>')    // Convert # to h1
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')  // Convert **text** to bold
+                        .replace(/\*(.*?)\*/g, '<em>$1</em>')     // Convert *text* to italic
+                        .replace(/\n\n/g, '</p><p>')             // Convert double newlines to paragraphs
+                        .replace(/\n/g, '<br>')                  // Convert single newlines to breaks
+                        .replace(/^(.*)$/gm, function(match) {   // Wrap in paragraph tags if not already a heading
+                            if (match.startsWith('<h') || match.startsWith('<p>') || match.trim() === '') {
+                                return match;
+                            }
+                            return '<p>' + match + '</p>';
+                        });
+                    
+                    // Clean up any empty paragraphs or duplicate tags
+                    formattedResponse = formattedResponse
+                        .replace(/<p><\/p>/g, '')
+                        .replace(/<p>(<h[1-6]>.*?<\/h[1-6]>)<\/p>/g, '$1')
+                        .replace(/^<p>/, '')  // Remove opening p tag if at start
+                        .replace(/<\/p>$/, '') // Remove closing p tag if at end
+                        .trim();
+                    
+                    setConversationHistory([...updatedHistory, { role: "assistant", content: data.response }]);
+                    setMessages(prev => [...prev, { type: 'assistant', content: formattedResponse, isFormatted: true }]);
+                } catch (error) {
+                    console.error('Detailed error:', error);
+                    let errorMessage = 'Sorry, I encountered an error. ';
+                    
+                    if (error.message.includes('Failed to fetch')) {
+                        errorMessage += 'Network connection issue. Please check your internet connection.';
+                    } else if (error.message.includes('500')) {
+                        errorMessage += 'Server configuration error. The API key may not be properly set.';
+                    } else if (error.message.includes('404')) {
+                        errorMessage += 'API endpoint not found. Please try again later.';
+                    } else {
+                        errorMessage += `Error details: ${error.message}`;
+                    }
+                    
+                    setMessages(prev => [...prev, { 
+                        type: 'assistant', 
+                        content: errorMessage,
+                        error: true 
+                    }]);
+                } finally {
+                    setIsLoading(false);
+                    // Clear the scroll position maintenance
+                    if (preventScrollTimeout) {
+                        clearInterval(preventScrollTimeout);
+                    }
+                }
             };
             
             const forceScrollToBottom = () => {
