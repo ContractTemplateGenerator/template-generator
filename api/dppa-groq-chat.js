@@ -248,4 +248,3 @@ RESPONSE STYLE:
 };
 
 export default handler;
-}

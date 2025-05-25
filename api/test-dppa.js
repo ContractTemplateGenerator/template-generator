@@ -8,11 +8,12 @@ const handler = async (req, res) => {
   }
 
   return res.status(200).json({
-    message: 'DPPA API Test - Working!',
+    message: 'DPPA API Test - Working! Fixed syntax error.',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'production',
     hasGroqKey: !!process.env.GROQ_API_KEY,
-    keyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0
+    keyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0,
+    version: '1.1'
   });
 };
 
