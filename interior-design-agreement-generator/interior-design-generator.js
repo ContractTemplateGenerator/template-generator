@@ -44,8 +44,8 @@ const InteriorDesignAgreementGenerator = () => {
         validityPeriod: '90',
         revisionRounds: '2',
         responseTime: '5',
-        paymentTerms: 'due_on_receipt'
-    });
+        paymentTerms: 'due_on_receipt',
+        
         // Payment Information
         depositPercentage: '50',
         latePaymentRate: '1.5',
@@ -144,9 +144,8 @@ const InteriorDesignAgreementGenerator = () => {
         setCurrentTab(index);
     };
 
-    // Generate document text
-    const generateDocument = () => {
-        return `**INTERIOR DESIGN SERVICES AGREEMENT**
+    // Complete the document generation
+    const documentText = `**INTERIOR DESIGN SERVICES AGREEMENT**
 
 This Interior Design Services Agreement ("Agreement") is entered into on ${formData.agreementDate} by and between ${formData.designerName}, a ${formData.designerEntity} with its principal place of business at ${formData.designerAddress} ("Designer"), and ${formData.clientName || '[CLIENT NAME]'}, ${formData.clientType === 'individual' ? 'an individual residing' : 'a company located'} at ${formData.clientAddress || '[CLIENT ADDRESS]'} ("Client") (collectively, the "Parties").
 
@@ -158,7 +157,7 @@ ${formData.projectRooms || '[LIST SPECIFIC ROOMS/AREAS]'}
 
 b) Services include creating 2D renderings, selecting furniture and decor items, and providing shoppable links or purchase locations for each space. Designer will provide up to three (3) selections per item in each room design.
 
-c) Designer will make best efforts to accommodate Client's design preferences and budget while adhering to the agreed-upon project scope and timeline, provided that Client fulfills all obligations and responsibilities under this Agreement.`;
+c) Designer will make best efforts to accommodate Client's design preferences and budget while adhering to the agreed-upon project scope and timeline, provided that Client fulfills all obligations and responsibilities under this Agreement.
 
 ## 2. Design Process
 
@@ -200,7 +199,7 @@ c) $${formData.itemRemovalFee} per hour will be charged if Designer is required 
 
 d) If a full redesign is required after final approval, a flat fee of $${formData.redesignFee} will be charged.
 
-${formData.includeRushOption ? `e) Rush projects requiring completion in less than ${formData.projectTimeline} days will incur a ${formData.rushSurcharge} percent surcharge on all applicable fees.` : ''}
+${formData.includeRushOption ? `e) Rush projects requiring completion in less than ${formData.projectTimeline} days will incur a ${formData.rushSurcharge} percent surcharge on all applicable fees.` : ''}`;
 
 ## 4. Client Responsibilities and Required Information
 
@@ -258,9 +257,6 @@ _________________________     _________________________
 Signature                      Signature
 
 Date: _______________          Date: _______________`;
-    };
-
-    const documentText = generateDocument();
 
     // Copy to clipboard function
     const copyToClipboard = async () => {
@@ -398,7 +394,7 @@ Date: _______________          Date: _______________`;
         }
     }, [highlightedText]);
 
-    // PayPall button effect
+    // PayPal button effect
     useEffect(() => {
         if (showPaywall && typeof paypal !== 'undefined') {
             handlePayment();
