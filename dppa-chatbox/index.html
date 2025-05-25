@@ -27,16 +27,18 @@
         .chatbot-container {
             display: flex;
             height: 600px;
-            max-width: 850px;
-            margin: 0 auto;
+            width: 100%;
+            max-width: none;
+            margin: 0;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border-radius: 0;
+            box-shadow: none;
             overflow: hidden;
         }
 
         .left-panel {
-            width: 400px;
+            flex: 1;
+            min-width: 350px;
             background: #f8fafc;
             border-right: 1px solid #e2e8f0;
             overflow-y: auto;
@@ -44,7 +46,8 @@
         }
 
         .right-panel {
-            width: 400px;
+            flex: 1;
+            min-width: 350px;
             display: flex;
             flex-direction: column;
             background: white;
@@ -445,17 +448,24 @@
                     });
 
                     if (!response.ok) {
+                        console.error('API Response not OK:', response.status, response.statusText);
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
                     const data = await response.json();
+                    
+                    if (!data.response) {
+                        console.error('No response in data:', data);
+                        throw new Error('No response received from API');
+                    }
+
                     const assistantMessage = { role: 'assistant', content: data.response };
                     setMessages(prev => [...prev, assistantMessage]);
                 } catch (error) {
-                    console.error('Error:', error);
+                    console.error('Error details:', error);
                     const errorMessage = { 
                         role: 'assistant', 
-                        content: 'I apologize, but I\'m experiencing technical difficulties. Please try again or schedule a consultation for immediate assistance.' 
+                        content: 'I\'m experiencing technical difficulties connecting to the AI service. This may be due to API configuration issues. Please try refreshing the page or schedule a consultation with Attorney Sergei Tokmakov for immediate assistance with your DPPA questions.' 
                     };
                     setMessages(prev => [...prev, errorMessage]);
                 }

@@ -13,17 +13,21 @@ export default async function handler(req, res) {
   }
 
   try {
+    console.log('API request received');
     const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
+      console.error('Invalid messages format:', messages);
       return res.status(400).json({ error: 'Invalid messages format' });
     }
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       console.error('GROQ_API_KEY not found in environment variables');
-      return res.status(500).json({ error: 'API configuration error' });
+      return res.status(500).json({ error: 'API configuration error - missing API key' });
     }
+
+    console.log('API key found, proceeding with request');
 
     const systemPrompt = `You are a specialized legal assistant working with attorney Sergei Tokmakov (CA Bar #279869), who has 13+ years of experience and specializes in technology law, privacy compliance, and business regulatory matters. Sergei created this chatbot to help visitors to his website terms.law understand Driver's Privacy Protection Act (DPPA) compliance and privacy issues based on current legal authorities.
 
@@ -226,17 +230,18 @@ RESPONSE STYLE:
     if (!response) {
       console.error('All models failed. Last error:', lastError);
       return res.status(500).json({ 
-        error: 'Unable to generate response. Please try again or schedule a consultation.',
-        details: lastError?.message 
+        error: 'All AI models are currently unavailable. Please try again in a few moments or schedule a direct consultation with Attorney Sergei Tokmakov.',
+        details: process.env.NODE_ENV === 'development' ? lastError?.message : undefined
       });
     }
 
+    console.log('Response generated successfully');
     return res.status(200).json({ response });
 
   } catch (error) {
     console.error('Handler error:', error);
     return res.status(500).json({ 
-      error: 'Internal server error. Please try again or schedule a consultation.',
+      error: 'Internal server error. The AI service may be temporarily unavailable. Please try again or schedule a consultation.',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
