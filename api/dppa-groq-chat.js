@@ -1,5 +1,5 @@
 const handler = async (req, res) => {
-  // Set CORS headers
+  // Set CORS headers  
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -13,7 +13,7 @@ const handler = async (req, res) => {
   }
 
   try {
-    console.log('API request received');
+    console.log('DPPA API request received - v2.0');
     const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
@@ -27,7 +27,7 @@ const handler = async (req, res) => {
       return res.status(500).json({ error: 'API configuration error - missing API key' });
     }
 
-    console.log('API key found, proceeding with request');
+    console.log('API key found, proceeding with request - v2.0');
 
     const systemPrompt = `You are a specialized legal assistant working with attorney Sergei Tokmakov (CA Bar #279869), who has 13+ years of experience and specializes in technology law, privacy compliance, and business regulatory matters. Sergei created this chatbot to help visitors to his website terms.law understand Driver's Privacy Protection Act (DPPA) compliance and privacy issues based on current legal authorities.
 
