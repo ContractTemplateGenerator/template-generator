@@ -1,33 +1,32 @@
+// API endpoint for Groq chatbox - DPPA Legal Assistant
 const handler = async (req, res) => {
-  // Set CORS headers  
+  // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
+  // Handle preflight requests
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    res.status(200).end();
+    return;
   }
 
+  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    console.log('DPPA API request received - v2.0');
     const { messages } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
-      console.error('Invalid messages format:', messages);
       return res.status(400).json({ error: 'Invalid messages format' });
     }
 
     const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
-      console.error('GROQ_API_KEY not found in environment variables');
-      return res.status(500).json({ error: 'API configuration error - missing API key' });
+      return res.status(500).json({ error: 'API configuration error' });
     }
-
-    console.log('API key found, proceeding with request - v2.0');
 
     const systemPrompt = `You are a specialized legal assistant working with attorney Sergei Tokmakov (CA Bar #279869), who has 13+ years of experience and specializes in technology law, privacy compliance, and business regulatory matters. Sergei created this chatbot to help visitors to his website terms.law understand Driver's Privacy Protection Act (DPPA) compliance and privacy issues based on current legal authorities.
 
@@ -102,42 +101,6 @@ CURRENT ENFORCEMENT TRENDS (2024-2025):
 - Maracich v. Spears (2013): Attorney solicitation not permissible use under DPPA
 - Reno v. Condon (2000): DPPA constitutional under Commerce Clause
 - Recent 7th Circuit (2023): Standing requirements increasingly scrutinized in DPPA cases
-
-STATE VARIATIONS:
-- Some states adopt only certain permissible uses (not all 14)
-- States may impose stricter requirements than federal DPPA minimums
-- "Opt-in" vs "Opt-out" approaches vary by state
-- Highly Restricted Personal Information: Some states provide additional protections
-
-PRACTICAL COMPLIANCE CONSIDERATIONS:
-
-**For Businesses Accessing DMV Data**
-- Verify legitimate permissible use before requesting data
-- Maintain detailed records of use purpose and data handling
-- Implement data security measures and access controls
-- Train employees on DPPA requirements and limitations
-- Regular compliance audits and policy updates
-
-**Documentation Requirements**
-- Record of permissible use justification
-- Data retention and destruction policies
-- Third-party vendor agreements with DPPA compliance clauses
-- Employee training records and access logs
-- Incident response procedures for potential violations
-
-**Red Flag Scenarios**
-- Extended warranty marketing based on vehicle age/registration
-- Debt collection using DMV data without court proceeding connection
-- Marketing lists compiled from bulk DMV purchases
-- Private investigators accessing data without specific permissible use
-- Parking enforcement companies selling violation data to third parties
-
-**Technology Compliance Issues**
-- License plate reader data sharing between jurisdictions
-- Automated parking enforcement accessing DMV databases
-- Mobile apps using DMV data for commercial purposes
-- Social media background check services using driver data
-- Insurance telematics programs accessing registration data
 
 RESPONSE FORMATTING REQUIREMENTS:
 - Provide consultation-quality legal analysis befitting a top-rated attorney's website
@@ -230,19 +193,18 @@ RESPONSE STYLE:
     if (!response) {
       console.error('All models failed. Last error:', lastError);
       return res.status(500).json({ 
-        error: 'All AI models are currently unavailable. Please try again in a few moments or schedule a direct consultation with Attorney Sergei Tokmakov.',
+        error: 'Unable to generate response. Please try again or schedule a consultation.',
         details: process.env.NODE_ENV === 'development' ? lastError?.message : undefined
       });
     }
 
-    console.log('Response generated successfully');
     return res.status(200).json({ response });
 
   } catch (error) {
-    console.error('Handler error:', error);
+    console.error('Error in DPPA chat API:', error);
     return res.status(500).json({ 
-      error: 'Internal server error. The AI service may be temporarily unavailable. Please try again or schedule a consultation.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      error: 'Internal server error',
+      message: error.message
     });
   }
 };
