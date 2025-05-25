@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DPPA Expert Legal Assistant | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .chatbot-container {
+            display: flex;
+            height: 600px;
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .left-panel {
+            width: 400px;
+            background: #f8fafc;
+            border-right: 1px solid #e2e8f0;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .right-panel {
+            width: 400px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: #2563eb;
+            color: white;
+            text-align: center;
+        }
+
+        .chat-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .chat-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .quick-questions {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            background: #f1f5f9;
+        }
+
+        .quick-questions h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #475569;
+        }
+
+        .quick-btn {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 8px 12px;
+            margin: 4px 0;
+            background: white;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 90%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: #2563eb;
+            color: white;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: #f1f5f9;
+            color: #1e293b;
+            border: 1px solid #e2e8f0;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            background: white;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .send-btn {
+            padding: 12px 20px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #1d4ed8;
+        }
+
+        .send-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .key-points {
+            margin-bottom: 25px;
+        }
+
+        .key-points h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .key-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+
+        .key-card-header {
+            padding: 12px 15px;
+            background: #f8fafc;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .key-card-header:hover {
+            background: #f1f5f9;
+        }
+
+        .key-card-content {
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #475569;
+            display: none;
+        }
+
+        .key-card-content.expanded {
+            display: block;
+        }
+
+        .faq-section {
+            margin-top: 20px;
+        }
+
+        .faq-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1e293b;
+        }
+
+        .faq-item {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 12px 15px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-question:hover {
+            background: #f1f5f9;
+        }
+
+        .faq-answer {
+            padding: 15px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: #475569;
+            display: none;
+        }
+
+        .faq-answer.expanded {
+            display: block;
+        }
+
+        .consultation-banner {
+            margin-top: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .consultation-banner h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .consultation-banner p {
+            font-size: 12px;
+            margin-bottom: 12px;
+            opacity: 0.9;
+        }
+
+        .consult-btn {
+            background: white;
+            color: #2563eb;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .consult-btn:hover {
+            background: #f8fafc;
+            transform: translateY(-1px);
+        }
+
+        .loading {
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        .error {
+            color: #dc2626;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            .chatbot-container {
+                flex-direction: column;
+                height: auto;
+                max-height: 600px;
+            }
+            
+            .left-panel,
+            .right-panel {
+                width: 100%;
+            }
+            
+            .left-panel {
+                max-height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        const DPPAChatbot = () => {
+            const [messages, setMessages] = useState([]);
+            const [inputValue, setInputValue] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const [quickQuestions, setQuickQuestions] = useState([
+                "Can my employer access my driving record?",
+                "Are extended warranty mailers legal?",
+                "How do parking companies get my address?",
+                "Can I sue for DPPA violations?",
+                "What are the 14 permissible uses?",
+                "Do license plate readers violate privacy?",
+                "How much can I recover in damages?",
+                "Can insurance companies access DMV data?"
+            ]);
+            const [expandedKeyCards, setExpandedKeyCards] = useState({});
+            const [expandedFaq, setExpandedFaq] = useState({});
+            const messagesEndRef = useRef(null);
+
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+
+            useEffect(scrollToBottom, [messages]);
+
+            const keyPoints = [
+                {
+                    id: 'penalties',
+                    title: 'DPPA Penalties',
+                    content: 'Minimum $2,500 statutory damages per violation, no actual damages required. Criminal fines up to $5,000 per day for substantial noncompliance. Recent class actions have resulted in millions in settlements.'
+                },
+                {
+                    id: 'uses',
+                    title: '14 Permissible Uses',
+                    content: 'Government functions, insurance purposes, legal proceedings, motor vehicle safety, theft prevention, licensed investigators, employer verification, toll facilities, surveys with consent, individual record requests, and other state-authorized uses.'
+                },
+                {
+                    id: 'enforcement',
+                    title: 'Recent Enforcement',
+                    content: 'Major focus on extended warranty scams, automated parking enforcement violations, and private companies accessing DMV data without proper permissible use. Park Happy, Cross-Sell LLC, and parking revenue companies facing class actions.'
+                },
+                {
+                    id: 'technology',
+                    title: 'Technology Issues',
+                    content: 'License plate readers by law enforcement generally permitted, but private parking companies increasingly challenged. Mobile apps, social media background checks, and automated systems face scrutiny.'
+                },
+                {
+                    id: 'state-variations',
+                    title: 'State Variations',
+                    content: 'Not all states adopt all 14 federal permissible uses. Some have stricter opt-in requirements. Highly restricted personal information varies by state. Always check specific state implementations.'
+                },
+                {
+                    id: 'protected-data',
+                    title: 'Personal Data Protected',
+                    content: 'Name, address (except 5-digit ZIP), phone, driver ID number, SSN, digital photo, height, weight, gender, age, disability info. Some states include fingerprints and biometric data.'
+                }
+            ];
+
+            const faqItems = [
+                {
+                    id: 'standing',
+                    question: 'Do I need actual damages to sue under DPPA?',
+                    answer: 'No, the DPPA provides statutory damages of at least $2,500 per violation without requiring proof of actual damages, as established in Kehoe v. Fidelity Federal Bank (11th Cir. 2005).'
+                },
+                {
+                    id: 'attorney-fees',
+                    question: 'Can I recover attorney fees in DPPA cases?',
+                    answer: 'Yes, 18 U.S.C. § 2724 allows prevailing plaintiffs to recover reasonable attorney fees and costs, making DPPA cases attractive for class action litigation.'
+                },
+                {
+                    id: 'bulk-data',
+                    question: 'Can companies buy bulk DMV data for marketing?',
+                    answer: 'Only with individual written consent (opt-in) since the 2000 amendment. Bulk distribution without consent is prohibited, leading to major enforcement actions against data brokers.'
+                },
+                {
+                    id: 'private-investigators',
+                    question: 'When can private investigators access DMV records?',
+                    answer: 'Licensed PIs can access records only for the other 13 permissible uses - not for general investigation. They must have a specific legitimate purpose like insurance fraud or legal proceedings.'
+                }
+            ];
+
+            const sendMessage = async (message) => {
+                if (!message.trim()) return;
+
+                const userMessage = { role: 'user', content: message };
+                setMessages(prev => [...prev, userMessage]);
+                setIsLoading(true);
+
+                try {
+                    const response = await fetch('/api/dppa-groq-chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            messages: [...messages, userMessage],
+                        }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    const assistantMessage = { role: 'assistant', content: data.response };
+                    setMessages(prev => [...prev, assistantMessage]);
+                } catch (error) {
+                    console.error('Error:', error);
+                    const errorMessage = { 
+                        role: 'assistant', 
+                        content: 'I apologize, but I\'m experiencing technical difficulties. Please try again or schedule a consultation for immediate assistance.' 
+                    };
+                    setMessages(prev => [...prev, errorMessage]);
+                }
+
+                setIsLoading(false);
+            };
+
+            const handleQuickQuestion = (question) => {
+                sendMessage(question);
+                setQuickQuestions(prev => prev.filter(q => q !== question));
+            };
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (inputValue.trim() && !isLoading) {
+                    sendMessage(inputValue);
+                    setInputValue('');
+                }
+            };
+
+            const toggleKeyCard = (id) => {
+                setExpandedKeyCards(prev => ({ ...prev, [id]: !prev[id] }));
+            };
+
+            const toggleFaq = (id) => {
+                setExpandedFaq(prev => ({ ...prev, [id]: !prev[id] }));
+            };
+
+            const openCalendly = () => {
+                if (window.Calendly) {
+                    window.Calendly.initPopupWidget({
+                        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
+                    });
+                }
+            };
+
+            return (
+                <div className="chatbot-container">
+                    <div className="left-panel">
+                        <div className="key-points">
+                            <h3>DPPA Key Points</h3>
+                            {keyPoints.map(point => (
+                                <div key={point.id} className="key-card">
+                                    <div 
+                                        className="key-card-header"
+                                        onClick={() => toggleKeyCard(point.id)}
+                                    >
+                                        <span>{point.title}</span>
+                                        <span>{expandedKeyCards[point.id] ? '−' : '+'}</span>
+                                    </div>
+                                    <div className={`key-card-content ${expandedKeyCards[point.id] ? 'expanded' : ''}`}>
+                                        {point.content}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="faq-section">
+                            <h3>Common Questions</h3>
+                            {faqItems.map(item => (
+                                <div key={item.id} className="faq-item">
+                                    <div 
+                                        className="faq-question"
+                                        onClick={() => toggleFaq(item.id)}
+                                    >
+                                        <span>{item.question}</span>
+                                        <span>{expandedFaq[item.id] ? '−' : '+'}</span>
+                                    </div>
+                                    <div className={`faq-answer ${expandedFaq[item.id] ? 'expanded' : ''}`}>
+                                        {item.answer}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="consultation-banner">
+                            <h4>Need Legal Consultation?</h4>
+                            <p>CA Bar #279869 • 13+ Years • 4.9/5 Rating</p>
+                            <button className="consult-btn" onClick={openCalendly}>
+                                Schedule 30-Min Call
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="right-panel">
+                        <div className="chat-header">
+                            <h2>DPPA Legal Assistant</h2>
+                            <p>Expert analysis of Driver's Privacy Protection Act issues</p>
+                        </div>
+
+                        {quickQuestions.length > 0 && (
+                            <div className="quick-questions">
+                                <h3>Quick Questions:</h3>
+                                {quickQuestions.map((question, index) => (
+                                    <button
+                                        key={index}
+                                        className="quick-btn"
+                                        onClick={() => handleQuickQuestion(question)}
+                                    >
+                                        {question}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+
+                        <div className="chat-messages">
+                            {messages.length === 0 && (
+                                <div className="message assistant">
+                                    <strong>Welcome!</strong> I'm your DPPA expert assistant. I can help you understand Driver's Privacy Protection Act compliance, violations, enforcement trends, and your rights. Click a quick question above or ask me anything about DPPA law.
+                                </div>
+                            )}
+                            {messages.map((message, index) => (
+                                <div key={index} className={`message ${message.role}`}>
+                                    {message.content}
+                                </div>
+                            ))}
+                            {isLoading && (
+                                <div className="message assistant loading">
+                                    Analyzing your DPPA question...
+                                </div>
+                            )}
+                            <div ref={messagesEndRef} />
+                        </div>
+
+                        <form className="chat-input" onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <input
+                                    type="text"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    placeholder="Ask about DPPA compliance, violations, or your rights..."
+                                    disabled={isLoading}
+                                />
+                                <button 
+                                    type="submit" 
+                                    className="send-btn"
+                                    disabled={isLoading || !inputValue.trim()}
+                                >
+                                    Send
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<DPPAChatbot />, document.getElementById('root'));
+    </script>
+</body>
+</html>
