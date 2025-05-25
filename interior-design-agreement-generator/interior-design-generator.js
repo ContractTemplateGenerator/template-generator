@@ -54,10 +54,17 @@ const InteriorDesignAgreementGenerator = () => {
         }
     };
 
+    // Skip payment for testing
+    const skipPayment = () => {
+        setIsPaid(true);
+        setShowPaywall(false);
+        localStorage.setItem('interiorDesignPaid', 'true');
+    };
+
     // PayPal effect
     useEffect(() => {
         if (showPaywall && !isPaid) {
-            setTimeout(handlePayment, 1000);
+            setTimeout(handlePayment, 2000);
         }
     }, [showPaywall]);
 
@@ -107,7 +114,24 @@ Fee: $${formData.eDesignFee} per room`;
                     <div style={{fontSize: '2rem', fontWeight: 'bold', color: '#059669', margin: '1rem 0'}}>
                         $14.95
                     </div>
-                    <div id="paypal-button-container"></div>
+                    <div id="paypal-button-container" style={{margin: '1rem 0'}}></div>
+                    <div style={{margin: '1rem 0', padding: '10px', background: '#f0f0f0', borderRadius: '4px'}}>
+                        PayPal buttons loading... If buttons don't appear in 5 seconds, click below:
+                    </div>
+                    <button 
+                        onClick={skipPayment}
+                        style={{
+                            backgroundColor: '#0070f3',
+                            color: 'white',
+                            padding: '10px 20px',
+                            border: 'none',
+                            borderRadius: '5px',
+                            cursor: 'pointer',
+                            margin: '10px'
+                        }}
+                    >
+                        Continue to Generator (Testing)
+                    </button>
                     <p style={{marginTop: '1rem', fontSize: '0.8rem', color: '#6b7280'}}>
                         One-time payment • Instant access
                     </p>
