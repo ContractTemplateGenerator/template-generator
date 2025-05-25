@@ -1,4 +1,4 @@
-// Simple test API for DPPA endpoints
+// Simple test API for DPPA - matches working pattern exactly
 const handler = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -12,13 +12,12 @@ const handler = async (req, res) => {
   }
 
   return res.status(200).json({
-    message: 'DPPA API TEST - EXACT STRUCTURE MATCH!',
+    message: 'DPPA Test API - Working with simplified naming!',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV || 'production',
     hasGroqKey: !!process.env.GROQ_API_KEY,
     keyLength: process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.length : 0,
-    version: '3.0-EXACT-MATCH',
-    deployTime: 'May 24 8:25 PM'
+    version: '4.0-SIMPLIFIED'
   });
 };
 
