@@ -152,11 +152,11 @@ const InteriorDesignAgreementGenerator = () => {
     };
 
     // Complete document generation
-    const documentText = `**INTERIOR DESIGN SERVICES AGREEMENT**
+    const documentText = `INTERIOR DESIGN SERVICES AGREEMENT
 
 This Interior Design Services Agreement ("Agreement") is entered into on ${formData.agreementDate} by and between ${formData.designerName}, a ${formData.designerEntity} with its principal place of business at ${formData.designerAddress} ("Designer"), and ${formData.clientName || '[CLIENT NAME]'}, ${formData.clientType === 'individual' ? 'an individual residing' : 'a company located'} at ${formData.clientAddress || '[CLIENT ADDRESS]'} ("Client") (collectively, the "Parties").
 
-## 1. Scope of Services
+1. Scope of Services
 
 a) The Designer agrees to provide interior design services for the following areas of the Client's property located at ${formData.projectAddress || '[PROJECT ADDRESS]'}:
 
@@ -166,7 +166,7 @@ b) Services include creating 2D renderings, selecting furniture and decor items,
 
 c) Designer will make best efforts to accommodate Client's design preferences and budget while adhering to the agreed-upon project scope and timeline, provided that Client fulfills all obligations and responsibilities under this Agreement.
 
-## 2. Design Process
+2. Design Process
 
 The design process consists of the following stages:
 
@@ -180,15 +180,15 @@ d) Installation - ${formData.includeInstallation ? 'Designer will coordinate ins
 
 e) Project Close Out - Upon completion of installation and final walk-through, the project will be considered complete.
 
-## 3. Service Types and Fees
+3. Service Types and Fees
 
-${formData.serviceType === 'e-design' ? `### A. E-Design Services
+${formData.serviceType === 'e-design' ? `A. E-Design Services
 
 a) The e-design fee for each space is $${formData.eDesignFee} per room. This fee covers furniture and decor selection only and does not include full-service design coordination, installation oversight, or project management.
 
 b) E-design packages are valid for ${formData.validityPeriod} days after final payment is received unless otherwise specified in writing.
 
-c) E-design services include initial design boards for each agreed-upon room, up to three (3) selections per item in each room, and up to ${formData.revisionRounds} rounds of revisions per item based on Client's feedback.` : `### A. Full-Service Interior Design
+c) E-design services include initial design boards for each agreed-upon room, up to three (3) selections per item in each room, and up to ${formData.revisionRounds} rounds of revisions per item based on Client's feedback.` : `A. Full-Service Interior Design
 
 a) Full-service design includes the e-design package plus additional hands-on services.
 
@@ -196,7 +196,7 @@ b) Hands-on services including furniture installation, in-person shopping, and s
 
 c) Project management services will be provided on a cost-plus basis at ${formData.projectManagementRate} percent above all subcontractor, vendor, and supplier costs.`}
 
-### B. Additional Fees
+B. Additional Fees
 
 a) $${formData.additionalSelectionsFee} will be charged for each additional set of three (3) selections per item beyond the initial three (3) provided.
 
@@ -208,7 +208,7 @@ d) If a full redesign is required after final approval, a flat fee of $${formDat
 
 ${formData.includeRushOption ? `e) Rush projects requiring completion in less than ${formData.projectTimeline} days will incur a ${formData.rushSurcharge} percent surcharge on all applicable fees.` : ''}
 
-## 4. Client Responsibilities and Required Information
+4. Client Responsibilities and Required Information
 
 a) Client must provide complete and accurate room measurements, high-quality photographs of each space, and realistic budget parameters within ten (10) business days of contract execution.
 
@@ -216,7 +216,7 @@ b) Client shall respond to Designer's requests for approvals, feedback, or addit
 
 c) Client acknowledges that Designer's ability to perform services is contingent upon Client's timely provision of accurate information and cooperation throughout the design process.
 
-## 5. Payment Terms
+5. Payment Terms
 
 a) ${formData.paymentTerms === 'due_on_receipt' ? 'All design fees are due upon receipt of invoice.' : 'Payment terms are net thirty (30) days.'}
 
@@ -226,37 +226,37 @@ c) For furniture and product purchases, Client must remit full payment to Design
 
 d) Late payments will incur a ${formData.latePaymentRate}% monthly interest charge if past due by fifteen (15) days.
 
-## 6. Project Timeline
+6. Project Timeline
 
 The estimated project completion timeline is ${formData.projectTimeline} days from contract execution, subject to Client's timely cooperation and approval of design selections.
 
-${formData.includePhotography ? `## 7. Photography and Publicity
+${formData.includePhotography ? `7. Photography and Publicity
 
 Designer may photograph the completed project for its portfolio, website, and promotional materials. Designer will not disclose Client's personal information without prior consent.` : ''}
 
-${formData.includeMaterialBreach ? `## 8. Material Breach and Termination
+${formData.includeMaterialBreach ? `8. Material Breach and Termination
 
 Material breaches include failure to provide required information, imposing unrealistic budget constraints, declining more than 80% of design selections without reasonable cause, or failure to make timely payments. Upon material breach, Designer may terminate this Agreement and retain all fees paid.` : ''}
 
-## 9. Intellectual Property
+9. Intellectual Property
 
 Upon full payment of all fees, Client shall own the final design plans created specifically for this project. Designer retains rights to pre-existing intellectual property and design methodologies.
 
-## 10. Limitation of Liability
+10. Limitation of Liability
 
 Designer's total liability under this Agreement shall not exceed the total amount of design fees paid by Client. Designer shall not be liable for indirect, incidental, or consequential damages.
 
-${formData.includeForcemajeure ? `## 11. Force Majeure
+${formData.includeForcemajeure ? `11. Force Majeure
 
 Neither party shall be liable for delays due to circumstances beyond reasonable control, including acts of God, natural disasters, or government orders.` : ''}
 
-## 12. Governing Law
+12. Governing Law
 
 This Agreement shall be governed by the laws of ${formData.designerState}.
 
-**IN WITNESS WHEREOF**, the Parties have executed this Agreement as of the date first above written.
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the date first above written.
 
-**CLIENT:**                    **DESIGNER:**
+CLIENT:                    DESIGNER:
 
 ${formData.clientName || '[CLIENT NAME]'}          ${formData.designerName}
 
@@ -308,7 +308,18 @@ Date: _______________          Date: _______________`;
             projectAddress: formData.projectAddress ? new RegExp(`(${formData.projectAddress.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi') : null,
             agreementDate: new RegExp(`(${formData.agreementDate})`, 'g'),
             eDesignFee: new RegExp(`(\\$${formData.eDesignFee})`, 'g'),
-            projectTimeline: new RegExp(`(${formData.projectTimeline} days)`, 'g')
+            projectTimeline: new RegExp(`(${formData.projectTimeline} days)`, 'g'),
+            validityPeriod: new RegExp(`(${formData.validityPeriod} days)`, 'g'),
+            revisionRounds: new RegExp(`(${formData.revisionRounds} rounds)`, 'g'),
+            responseTime: new RegExp(`(${formData.responseTime} business days)`, 'g'),
+            additionalSelectionsFee: new RegExp(`(\\$${formData.additionalSelectionsFee})`, 'g'),
+            delayedPurchaseFee: new RegExp(`(\\$${formData.delayedPurchaseFee})`, 'g'),
+            itemRemovalFee: new RegExp(`(\\$${formData.itemRemovalFee})`, 'g'),
+            redesignFee: new RegExp(`(\\$${formData.redesignFee})`, 'g'),
+            depositPercentage: new RegExp(`(${formData.depositPercentage} percent)`, 'g'),
+            latePaymentRate: new RegExp(`(${formData.latePaymentRate}%)`, 'g'),
+            fullServiceHourlyRate: new RegExp(`(\\$${formData.fullServiceHourlyRate})`, 'g'),
+            projectManagementRate: new RegExp(`(${formData.projectManagementRate} percent)`, 'g')
         };
         
         const pattern = highlightPatterns[lastChanged];
@@ -389,12 +400,18 @@ Date: _______________          Date: _______________`;
     // Effect to scroll to highlighted text
     useEffect(() => {
         if (previewRef.current && lastChanged) {
-            const highlightedElement = previewRef.current.querySelector('.highlighted-text');
-            if (highlightedElement) {
-                highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            setTimeout(() => {
+                const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                if (highlightedElement) {
+                    highlightedElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                }
+            }, 100);
         }
-    }, [highlightedText]);
+    }, [highlightedText, lastChanged]);
 
     // PayPal effect
     useEffect(() => {
@@ -509,11 +526,56 @@ Date: _______________          Date: _______________`;
                                 <div className="form-group">
                                     <label>Designer State</label>
                                     <select name="designerState" value={formData.designerState} onChange={handleChange}>
+                                        <option value="Alabama">Alabama</option>
+                                        <option value="Alaska">Alaska</option>
+                                        <option value="Arizona">Arizona</option>
+                                        <option value="Arkansas">Arkansas</option>
                                         <option value="California">California</option>
-                                        <option value="New York">New York</option>
-                                        <option value="Texas">Texas</option>
+                                        <option value="Colorado">Colorado</option>
+                                        <option value="Connecticut">Connecticut</option>
+                                        <option value="Delaware">Delaware</option>
                                         <option value="Florida">Florida</option>
+                                        <option value="Georgia">Georgia</option>
+                                        <option value="Hawaii">Hawaii</option>
+                                        <option value="Idaho">Idaho</option>
                                         <option value="Illinois">Illinois</option>
+                                        <option value="Indiana">Indiana</option>
+                                        <option value="Iowa">Iowa</option>
+                                        <option value="Kansas">Kansas</option>
+                                        <option value="Kentucky">Kentucky</option>
+                                        <option value="Louisiana">Louisiana</option>
+                                        <option value="Maine">Maine</option>
+                                        <option value="Maryland">Maryland</option>
+                                        <option value="Massachusetts">Massachusetts</option>
+                                        <option value="Michigan">Michigan</option>
+                                        <option value="Minnesota">Minnesota</option>
+                                        <option value="Mississippi">Mississippi</option>
+                                        <option value="Missouri">Missouri</option>
+                                        <option value="Montana">Montana</option>
+                                        <option value="Nebraska">Nebraska</option>
+                                        <option value="Nevada">Nevada</option>
+                                        <option value="New Hampshire">New Hampshire</option>
+                                        <option value="New Jersey">New Jersey</option>
+                                        <option value="New Mexico">New Mexico</option>
+                                        <option value="New York">New York</option>
+                                        <option value="North Carolina">North Carolina</option>
+                                        <option value="North Dakota">North Dakota</option>
+                                        <option value="Ohio">Ohio</option>
+                                        <option value="Oklahoma">Oklahoma</option>
+                                        <option value="Oregon">Oregon</option>
+                                        <option value="Pennsylvania">Pennsylvania</option>
+                                        <option value="Rhode Island">Rhode Island</option>
+                                        <option value="South Carolina">South Carolina</option>
+                                        <option value="South Dakota">South Dakota</option>
+                                        <option value="Tennessee">Tennessee</option>
+                                        <option value="Texas">Texas</option>
+                                        <option value="Utah">Utah</option>
+                                        <option value="Vermont">Vermont</option>
+                                        <option value="Virginia">Virginia</option>
+                                        <option value="Washington">Washington</option>
+                                        <option value="West Virginia">West Virginia</option>
+                                        <option value="Wisconsin">Wisconsin</option>
+                                        <option value="Wyoming">Wyoming</option>
                                     </select>
                                 </div>
                             </div>

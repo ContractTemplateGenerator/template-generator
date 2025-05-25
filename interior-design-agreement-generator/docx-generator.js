@@ -17,16 +17,14 @@ window.generateWordDoc = function(documentText, formData) {
 </style></head><body>`;
     // Process document text - convert newlines to HTML paragraphs
     const processedText = documentText
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold text
-      .replace(/\[(.*?)\]/g, '<strong>$1</strong>') // Bracketed text to bold
       .split('\n\n')
       .map(para => {
         para = para.trim();
         if (!para) return '';
         
-        // Handle headers
+        // Handle headers - look for numbered sections
         if (para.includes('INTERIOR DESIGN SERVICES AGREEMENT')) {
-          return `<h1>${para.replace(/[\*\[\]]/g, '')}</h1>`;
+          return `<h1>${para}</h1>`;
         } else if (para.match(/^\d+\./)) {
           return `<h2>${para}</h2>`;
         } else if (para.match(/^[A-Z]\./)) {
