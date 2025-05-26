@@ -11,6 +11,8 @@ const InteriorDesignAgreementGenerator = () => {
     const [chatInput, setChatInput] = useState('');
     const [chatLoading, setChatLoading] = useState(false);
     const [contextualTip, setContextualTip] = useState('');
+    const [paypalId, setPaypalId] = useState('');
+    const [paypalError, setPaypalError] = useState('');
     const previewRef = useRef(null);
     const chatMessagesRef = useRef(null);
 
@@ -122,6 +124,7 @@ const InteriorDesignAgreementGenerator = () => {
     useEffect(() => {
         const savedData = localStorage.getItem('interiorDesignFormData');
         const paidStatus = localStorage.getItem('interiorDesignPaid');
+        const savedPaypalId = localStorage.getItem('interiorDesignPaypalId');
         
         if (savedData && paidStatus === 'true') {
             setFormData(JSON.parse(savedData));
@@ -130,6 +133,9 @@ const InteriorDesignAgreementGenerator = () => {
         if (paidStatus === 'true') {
             setIsPaid(true);
             setShowPaywall(false);
+            if (savedPaypalId) {
+                setPaypalId(savedPaypalId);
+            }
         }
     }, []);
 
@@ -344,6 +350,41 @@ const InteriorDesignAgreementGenerator = () => {
         setIsPaid(true);
         setShowPaywall(false);
         localStorage.setItem('interiorDesignPaid', 'true');
+    };
+
+    // Validate PayPal ID format
+    const validatePaypalId = (id) => {
+        // Must be exactly 17 characters, containing both numbers and uppercase letters
+        if (id.length !== 17) return false;
+        
+        const hasNumbers = /\d/.test(id);
+        const hasUppercase = /[A-Z]/.test(id);
+        const hasLowercase = /[a-z]/.test(id);
+        const hasOnlyValidChars = /^[A-Z0-9]+$/.test(id);
+        
+        return hasNumbers && hasUppercase && !hasLowercase && hasOnlyValidChars;
+    };
+
+    // Handle PayPal ID submission
+    const handlePaypalIdSubmit = () => {
+        setPaypalError('');
+        
+        if (!paypalId.trim()) {
+            setPaypalError('Please enter your PayPal Transaction ID');
+            return;
+        }
+        
+        if (!validatePaypalId(paypalId.trim())) {
+            setPaypalError('Invalid PayPal ID format. Must be 17 characters with numbers and uppercase letters only.');
+            return;
+        }
+        
+        // Accept any valid format PayPal ID
+        setIsPaid(true);
+        setShowPaywall(false);
+        localStorage.setItem('interiorDesignPaid', 'true');
+        localStorage.setItem('interiorDesignPaypalId', paypalId.trim());
+        saveFormData(formData);
     };
 
     // Legal chat functions
@@ -804,9 +845,33 @@ Date: ____________________________        Date: ____________________________`;
     // PayPal effect
     useEffect(() => {
         if (showPaywall && !isPaid) {
-            setTimeout(handlePayment, 2000);
+            const initPayPal = () => {
+                if (typeof paypal !== 'undefined') {
+                    paypal.Buttons({
+                        createOrder: (data, actions) => {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    amount: { value: '14.95' }
+                                }]
+                            });
+                        },
+                        onApprove: (data, actions) => {
+                            return actions.order.capture().then((details) => {
+                                setIsPaid(true);
+                                setShowPaywall(false);
+                                localStorage.setItem('interiorDesignPaid', 'true');
+                                localStorage.setItem('interiorDesignPaypalId', details.id || 'PAYPAL_PAYMENT');
+                                saveFormData(formData);
+                            });
+                        }
+                    }).render('#paypal-button-container');
+                } else {
+                    setTimeout(initPayPal, 1000);
+                }
+            };
+            setTimeout(initPayPal, 1000);
         }
-    }, [showPaywall]);
+    }, [showPaywall, isPaid]);
 
     // Render paywall
     if (showPaywall && !isPaid) {
@@ -821,34 +886,103 @@ Date: ____________________________        Date: ____________________________`;
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                zIndex: 1000
+                zIndex: 1000,
+                padding: '20px'
             }}>
                 <div style={{
                     background: 'white',
-                    padding: '3rem',
-                    borderRadius: '12px',
-                    maxWidth: '500px',
-                    textAlign: 'center'
+                    padding: '2rem',
+                    borderRadius: '16px',
+                    maxWidth: '600px',
+                    width: '100%',
+                    textAlign: 'center',
+                    maxHeight: '90vh',
+                    overflowY: 'auto'
                 }}>
-                    <h2>Interior Design Services Agreement Generator</h2>
-                    <p>Generate a comprehensive interior design services agreement with 34 professional sections.</p>
+                    <h2 style={{ marginBottom: '1rem' }}>Interior Design Services Agreement Generator</h2>
+                    <p style={{ marginBottom: '1.5rem', color: '#666' }}>
+                        Generate a comprehensive interior design services agreement with 34 professional sections.
+                    </p>
                     <div style={{fontSize: '2rem', fontWeight: 'bold', color: '#059669', margin: '1rem 0'}}>
                         $14.95
                     </div>
-                    <div id="paypal-button-container" style={{margin: '1rem 0'}}></div>
+                    
+                    <div style={{ marginBottom: '2rem' }}>
+                        <div id="paypal-button-container" style={{margin: '1rem 0'}}></div>
+                    </div>
+                    
+                    <div style={{ 
+                        borderTop: '1px solid #e5e7eb', 
+                        paddingTop: '1.5rem',
+                        marginTop: '1.5rem'
+                    }}>
+                        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Already Paid? Enter Your PayPal Transaction ID</h3>
+                        <div style={{ marginBottom: '1rem' }}>
+                            <input
+                                type="text"
+                                value={paypalId}
+                                onChange={(e) => setPaypalId(e.target.value.toUpperCase())}
+                                placeholder="17-character PayPal ID (e.g., 1A2B3C4D5E6F7G8H9)"
+                                style={{
+                                    width: '100%',
+                                    padding: '0.75rem',
+                                    border: `1px solid ${paypalError ? '#dc2626' : '#d1d5db'}`,
+                                    borderRadius: '8px',
+                                    fontSize: '0.875rem',
+                                    fontFamily: 'monospace',
+                                    textAlign: 'center'
+                                }}
+                                maxLength="17"
+                            />
+                            {paypalError && (
+                                <div style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                                    {paypalError}
+                                </div>
+                            )}
+                        </div>
+                        <button 
+                            onClick={handlePaypalIdSubmit}
+                            style={{
+                                backgroundColor: '#059669',
+                                color: 'white',
+                                padding: '0.75rem 2rem',
+                                border: 'none',
+                                borderRadius: '8px',
+                                cursor: 'pointer',
+                                fontWeight: '600',
+                                marginBottom: '1rem'
+                            }}
+                        >
+                            Unlock Generator
+                        </button>
+                    </div>
+
+                    {/* Embedded Calendly */}
+                    <div style={{ 
+                        borderTop: '1px solid #e5e7eb', 
+                        paddingTop: '1.5rem',
+                        marginTop: '1.5rem'
+                    }}>
+                        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Need Custom Legal Advice?</h3>
+                        <div className="calendly-inline-widget" 
+                             data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" 
+                             style={{minWidth:'320px', height:'400px'}}></div>
+                    </div>
+                    
                     <button 
                         onClick={skipPayment}
                         style={{
-                            backgroundColor: '#0070f3',
+                            backgroundColor: '#6b7280',
                             color: 'white',
-                            padding: '10px 20px',
+                            padding: '0.5rem 1rem',
                             border: 'none',
-                            borderRadius: '5px',
+                            borderRadius: '4px',
                             cursor: 'pointer',
-                            margin: '10px'
+                            fontSize: '0.8rem',
+                            marginTop: '1rem'
                         }}
                     >
-                        Continue to Generator (Testing)
+                        Skip (Testing Only)
                     </button>
                 </div>
             </div>
@@ -1554,7 +1688,6 @@ Date: ____________________________        Date: ____________________________`;
                         </div>
                         
                         <div className="chat-popup-footer">
-                            Attorney Sergei Tokmakov • CA Bar #279869 • 
                             <button 
                                 onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
                                 className="consult-link"
