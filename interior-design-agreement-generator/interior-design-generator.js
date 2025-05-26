@@ -11,6 +11,8 @@ const InteriorDesignAgreementGenerator = () => {
     const [chatInput, setChatInput] = useState('');
     const [chatLoading, setChatLoading] = useState(false);
     const [contextualTip, setContextualTip] = useState('');
+    const [smartHelp, setSmartHelp] = useState('');
+    const [showTooltip, setShowTooltip] = useState({ field: null, content: '' });
     const [paypalId, setPaypalId] = useState('');
     const [paypalError, setPaypalError] = useState('');
     const previewRef = useRef(null);
@@ -97,6 +99,102 @@ const InteriorDesignAgreementGenerator = () => {
         'Wisconsin', 'Wyoming'
     ];
 
+    // Smart help suggestions based on user selections
+    const getSmartHelp = (fieldName, value) => {
+        const helpSuggestions = {
+            serviceType: value === 'e-design' ? 
+                "💡 <strong>E-Design Tip:</strong> E-design services have specific liability limitations. Clients are responsible for measurements and implementation. Consider adding measurement accuracy clauses." :
+                "💡 <strong>Full-Service Tip:</strong> Full-service projects require more comprehensive insurance and liability coverage. Consider higher indemnification protections.",
+            
+            includeMaterialBreach: value ? 
+                "⚖️ <strong>Material Breach Activated:</strong> This powerful clause lets you terminate clients who:<br>• Reject 80%+ of designs without cause<br>• Impose impossible budgets<br>• Bypass you to contact vendors<br>• Delay payments beyond terms" : 
+                "⚠️ <strong>Consider Material Breach:</strong> Without this protection, terminating difficult clients requires standard breach procedures, which can be lengthy and costly.",
+            
+            includeIndemnification: value ? 
+                "🛡️ <strong>Indemnification Enabled:</strong> Client will cover costs if they:<br>• Make unauthorized changes<br>• Fail to get permits<br>• Cause property damage<br>• Breach building codes" : 
+                "⚠️ <strong>Risk Alert:</strong> Without indemnification, you could be liable for client mistakes, permit issues, or code violations they cause.",
+            
+            paymentTerms: value === 'due_on_receipt' ? 
+                "💰 <strong>Smart Choice:</strong> Due-on-receipt terms improve cash flow by 40% compared to Net 30. Combined with late fees, this prevents payment delays." :
+                "⏳ <strong>Cash Flow Impact:</strong> Net 30 terms can strain cash flow. Consider due-on-receipt for better financial protection.",
+            
+            latePaymentGrace: parseInt(value) <= 10 ? 
+                "⚡ <strong>Aggressive Collection:</strong> " + value + "-day grace period ensures fast action on overdue accounts. Studies show shorter periods improve collection rates by 25%." :
+                parseInt(value) > 20 ? "🐌 <strong>Extended Grace:</strong> " + value + " days may be too lenient. Consider 10-15 days for better cash flow protection." : "",
+            
+            includeConfidentiality: value ? 
+                "🔒 <strong>IP Protection Active:</strong> Prevents clients from sharing your:<br>• Design processes<br>• Pricing strategies<br>• Vendor relationships<br>• Trade secrets" : 
+                "🔓 <strong>IP Risk:</strong> Without confidentiality protection, clients can share your proprietary methods with competitors.",
+            
+            validityPeriod: parseInt(value) <= 60 ? 
+                "⏰ <strong>Short Validity:</strong> " + value + " days creates urgency but may pressure clients. Consider if this timeframe works for your typical projects." :
+                parseInt(value) > 120 ? "📅 <strong>Extended Validity:</strong> " + value + " days is generous but reduces urgency. Most designers use 60-90 days." : "",
+            
+            revisionRounds: parseInt(value) <= 1 ? 
+                "🔄 <strong>Limited Revisions:</strong> Only " + value + " revision round is restrictive. Consider 2-3 rounds for better client satisfaction." :
+                parseInt(value) >= 4 ? "🔄 <strong>Generous Revisions:</strong> " + value + " rounds may encourage scope creep. Most successful designers limit to 2-3 rounds." : "",
+            
+            eDesignFee: parseInt(value) < 1500 ? 
+                "💵 <strong>Pricing Alert:</strong> $" + value + " per room is below market rate. Industry average is $1,800-$2,500 per room for comprehensive e-design." :
+                parseInt(value) > 3500 ? "💰 <strong>Premium Pricing:</strong> $" + value + " is above average. Ensure your portfolio and process justify premium rates." : "",
+            
+            includeRushOption: value ? 
+                "🚀 <strong>Rush Services:</strong> Smart revenue opportunity. Rush surcharges typically range from 25-75% depending on timeline compression." : "",
+            
+            disputeResolutionMethod: value === 'mediation' ? 
+                "🤝 <strong>Mediation First:</strong> Cost-effective dispute resolution, but adds steps before court action. Good for maintaining relationships." :
+                "⚖️ <strong>Court Resolution:</strong> Direct legal action available. Faster for clear-cut breaches but potentially more adversarial."
+        };
+        
+        return helpSuggestions[fieldName] || '';
+    };
+
+    // Tooltip content for form fields
+    const tooltips = {
+        designerEntity: "Choose the legal structure of your business. LLCs provide liability protection while maintaining tax flexibility.",
+        serviceType: "E-Design: Remote design services with client implementation. Full-Service: Complete design and installation management.",
+        eDesignFee: "Industry standard: $1,800-$2,500 per room. Price based on complexity, market, and your experience level.",
+        additionalSelectionsFee: "Charge for extra design options beyond initial 3 choices. Prevents unlimited revision requests.",
+        delayedPurchaseFee: "Fee for re-sourcing items when clients delay purchase decisions beyond approval window.",
+        itemRemovalFee: "Hourly rate for removing client's personal items during installation. Protects your time.",
+        redesignFee: "Flat fee for complete design overhaul after final approval. Prevents scope creep.",
+        rushSurcharge: "Percentage surcharge for expedited projects. Compensates for compressed timelines and priority scheduling.",
+        validityPeriod: "Time limit for package validity after final payment. Prevents indefinite support obligations.",
+        revisionRounds: "Number of included revision cycles per item. Additional rounds become billable.",
+        informationDeadline: "Deadline for client to provide measurements, photos, and requirements. Prevents project delays.",
+        responseTime: "Maximum time client has to respond to your requests. Keeps projects moving forward.",
+        depositPercentage: "Upfront payment percentage. Higher deposits reduce financial risk and client commitment.",
+        latePaymentRate: "Monthly interest rate on overdue payments. Legal limit varies by state (typically 1-2%).",
+        latePaymentGrace: "Days before late fees apply. Shorter periods improve cash flow, longer periods reduce disputes.",
+        projectTimeline: "Standard completion timeframe. Rush projects falling below this incur surcharges.",
+        inspectionWindow: "Client's time to identify issues after completion. Limits your liability exposure.",
+        designerResponseTime: "Your maximum response time to client inquiries. Sets professional expectations.",
+        communicationPlatform: "Designated communication channel. Centralizes project communication and documentation.",
+        paymentTerms: "Due on Receipt: Payment required immediately upon invoice (better cash flow). Net 30: Client has 30 days to pay (industry standard but riskier).",
+        includeMaterialBreach: "Allows immediate termination for specific problematic client behaviors. Powerful protection clause.",
+        includeIndemnification: "Client assumes liability for their actions, mistakes, and permit issues. Essential protection.",
+        includeConfidentiality: "Protects your trade secrets, pricing, and processes from being shared with competitors.",
+        includeForcemajeure: "Excuses performance delays due to circumstances beyond your control (pandemics, natural disasters).",
+        governingState: "State law that governs the contract. Choose your business state for familiar legal framework.",
+        disputeResolutionMethod: "How disputes are resolved. Mediation is cheaper but adds steps; courts are direct but costly."
+    };
+
+    // Show tooltip function
+    const showTooltipFunc = (field, event) => {
+        const rect = event.target.getBoundingClientRect();
+        setShowTooltip({
+            field,
+            content: tooltips[field] || '',
+            x: rect.left + rect.width / 2,
+            y: rect.top - 10
+        });
+    };
+
+    // Hide tooltip function
+    const hideTooltip = () => {
+        setShowTooltip({ field: null, content: '' });
+    };
+
     // Smart contextual tips based on user selections
     const getContextualTip = (fieldName, value) => {
         const tips = {
@@ -161,6 +259,13 @@ const InteriorDesignAgreementGenerator = () => {
         if (tip) {
             setContextualTip(tip);
             setTimeout(() => setContextualTip(''), 8000); // Clear after 8 seconds
+        }
+        
+        // Show smart help suggestion
+        const helpSuggestion = getSmartHelp(name, type === 'checkbox' ? checked : value);
+        if (helpSuggestion) {
+            setSmartHelp(helpSuggestion);
+            setTimeout(() => setSmartHelp(''), 12000); // Clear after 12 seconds
         }
         
         // Highlight changed field in preview and scroll to it
@@ -1015,7 +1120,13 @@ Date: ____________________________        Date: ____________________________`;
             <h3>Service Type Selection</h3>
             <div className="form-group">
                 <label>Primary Service Type</label>
-                <select name="serviceType" value={formData.serviceType} onChange={handleChange}>
+                <select 
+                    name="serviceType" 
+                    value={formData.serviceType} 
+                    onChange={handleChange}
+                    onMouseEnter={(e) => showTooltipFunc('serviceType', e)}
+                    onMouseLeave={hideTooltip}
+                >
                     <option value="e-design">E-Design Services</option>
                     <option value="full-service">Full-Service Interior Design</option>
                 </select>
@@ -1071,12 +1182,14 @@ Date: ____________________________        Date: ____________________________`;
             <h3>Core Service Fees</h3>
             <div className="form-row">
                 <div className="form-group">
-                    <label>E-Design Fee (per room)</label>
+                    <label>E-Design Fee (per room) 💡</label>
                     <input
                         type="number"
                         name="eDesignFee"
                         value={formData.eDesignFee}
                         onChange={handleChange}
+                        onMouseEnter={(e) => showTooltipFunc('eDesignFee', e)}
+                        onMouseLeave={hideTooltip}
                         placeholder="2000"
                     />
                 </div>
@@ -1174,8 +1287,14 @@ Date: ____________________________        Date: ____________________________`;
                     />
                 </div>
                 <div className="form-group">
-                    <label>Payment Terms</label>
-                    <select name="paymentTerms" value={formData.paymentTerms} onChange={handleChange}>
+                    <label>Payment Terms 💰</label>
+                    <select 
+                        name="paymentTerms" 
+                        value={formData.paymentTerms} 
+                        onChange={handleChange}
+                        onMouseEnter={(e) => showTooltipFunc('paymentTerms', e)}
+                        onMouseLeave={hideTooltip}
+                    >
                         <option value="due_on_receipt">Due on Receipt</option>
                         <option value="net_30">Net 30 Days</option>
                     </select>
@@ -1223,12 +1342,14 @@ Date: ____________________________        Date: ____________________________`;
                     />
                 </div>
                 <div className="form-group">
-                    <label>Package Validity Period (days)</label>
+                    <label>Package Validity Period (days) ⏰</label>
                     <input
                         type="number"
                         name="validityPeriod"
                         value={formData.validityPeriod}
                         onChange={handleChange}
+                        onMouseEnter={(e) => showTooltipFunc('validityPeriod', e)}
+                        onMouseLeave={hideTooltip}
                         placeholder="90"
                     />
                 </div>
@@ -1297,14 +1418,19 @@ Date: ____________________________        Date: ____________________________`;
     const renderProcessTab = () => (
         <div className="form-section">
             <h3>Service Process Features</h3>
-            <div className="checkbox-group">
+            <div className="checkbox-group tooltip-container">
                 <input
                     type="checkbox"
                     name="includeMaterialBreach"
                     checked={formData.includeMaterialBreach}
                     onChange={handleChange}
                 />
-                <label>Include Material Breach & Termination Clauses</label>
+                <label 
+                    onMouseEnter={(e) => showTooltipFunc('includeMaterialBreach', e)}
+                    onMouseLeave={hideTooltip}
+                >
+                    Include Material Breach & Termination Clauses ⚖️
+                </label>
             </div>
 
             <div className="checkbox-group">
@@ -1342,14 +1468,19 @@ Date: ____________________________        Date: ____________________________`;
                 <label>Include Force Majeure Provision</label>
             </div>
 
-            <div className="checkbox-group">
+            <div className="checkbox-group tooltip-container">
                 <input
                     type="checkbox"
                     name="includeIndemnification"
                     checked={formData.includeIndemnification}
                     onChange={handleChange}
                 />
-                <label>Include Client Indemnification Clause</label>
+                <label 
+                    onMouseEnter={(e) => showTooltipFunc('includeIndemnification', e)}
+                    onMouseLeave={hideTooltip}
+                >
+                    Include Client Indemnification Clause 🛡️
+                </label>
             </div>
         </div>
     );
@@ -1525,6 +1656,35 @@ Date: ____________________________        Date: ____________________________`;
                 <div className="contextual-tip">
                     <div dangerouslySetInnerHTML={{ __html: contextualTip }} />
                     <button onClick={() => setContextualTip('')} className="tip-close">×</button>
+                </div>
+            )}
+
+            {/* Smart Help Suggestion */}
+            {smartHelp && (
+                <div className="smart-help">
+                    <div className="smart-help-content">
+                        <div dangerouslySetInnerHTML={{ __html: smartHelp }} />
+                        <button onClick={() => setSmartHelp('')} className="help-close">×</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Tooltip */}
+            {showTooltip.field && (
+                <div 
+                    className="tooltip"
+                    style={{
+                        position: 'fixed',
+                        left: showTooltip.x,
+                        top: showTooltip.y,
+                        transform: 'translateX(-50%) translateY(-100%)',
+                        zIndex: 1000
+                    }}
+                >
+                    <div className="tooltip-content">
+                        {showTooltip.content}
+                    </div>
+                    <div className="tooltip-arrow"></div>
                 </div>
             )}
 
