@@ -66,28 +66,24 @@ window.generateWordDoc = function(documentText, formData) {
             <td class="signature-label">DESIGNER:</td>
           </tr>
           <tr>
-            <td>${clientName}</td>
-            <td>${designerName}</td>
+            <td style="padding-top: 10pt;">${clientName}</td>
+            <td style="padding-top: 10pt;">${designerName}</td>
           </tr>
           <tr>
-            <td><br><br></td>
-            <td>By: [AUTHORIZED SIGNATORY]</td>
+            <td></td>
+            <td style="padding-top: 10pt;">By: [AUTHORIZED SIGNATORY]</td>
           </tr>
           <tr>
-            <td><div class="signature-line"></div></td>
-            <td><div class="signature-line"></div></td>
+            <td style="padding-top: 20pt;"><div class="signature-line"></div></td>
+            <td style="padding-top: 20pt;"><div class="signature-line"></div></td>
           </tr>
           <tr>
-            <td>Signature</td>
-            <td>Signature</td>
+            <td style="text-align: center; font-size: 11pt;">Signature</td>
+            <td style="text-align: center; font-size: 11pt;">Signature</td>
           </tr>
           <tr>
-            <td><br></td>
-            <td><br></td>
-          </tr>
-          <tr>
-            <td>Date: ____________________________</td>
-            <td>Date: ____________________________</td>
+            <td style="padding-top: 15pt; text-align: left;">Date: ____________________________</td>
+            <td style="padding-top: 15pt; text-align: left;">Date: ____________________________</td>
           </tr>
         </table>
       </div>`;

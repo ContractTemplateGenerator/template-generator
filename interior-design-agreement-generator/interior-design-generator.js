@@ -69,7 +69,6 @@ const InteriorDesignAgreementGenerator = () => {
         includeIndemnification: true,
         includeConfidentiality: true,
         includePhotos: true,
-        includeArbitration: false,
         
         // Legal & Compliance
         disputeResolutionMethod: 'courts',
@@ -138,27 +137,44 @@ const InteriorDesignAgreementGenerator = () => {
 
     // Highlight and scroll to changed field in preview
     const highlightAndScrollToField = (fieldName, fieldValue) => {
-        if (!previewRef.current || !fieldValue) return;
+        if (!previewRef.current) return;
         
         const previewElement = previewRef.current;
         const previewText = previewElement.querySelector('.document-preview');
         
         if (!previewText) return;
         
-        // Create a temporary element to search for the field value
-        const searchValue = fieldValue.toString();
+        // Handle checkbox fields differently
+        if (typeof fieldValue === 'boolean') {
+            // For checkboxes, highlight the section they affect
+            const checkboxMappings = {
+                'includeMaterialBreach': '5. Material Breach and Termination',
+                'includePhotography': '26. Publicity and Photography',
+                'includeConfidentiality': '27. Confidentiality',
+                'includeForcemajeure': '29. Force Majeure',
+                'includeIndemnification': '31. Indemnification',
+                'includeInstallation': 'Installation',
+                'includeRushOption': 'Rush projects',
+                'includeSeverability': '33. Severability',
+                'includeEntireAgreement': '34. Entire Agreement'
+            };
+            
+            const searchTerm = checkboxMappings[fieldName];
+            if (searchTerm) {
+                highlightTextInPreview(previewText, searchTerm);
+            }
+        } else if (fieldValue && fieldValue.toString().length > 2) {
+            // For regular text fields, highlight the actual value
+            highlightTextInPreview(previewText, fieldValue.toString());
+        }
+    };
+
+    // Helper function to highlight text in preview
+    const highlightTextInPreview = (previewText, searchValue) => {
         const textContent = previewText.textContent;
-        
-        // Find the position of the field value in the text
         const index = textContent.indexOf(searchValue);
         
         if (index !== -1) {
-            // Create a highlighted version of the text
-            const beforeText = textContent.substring(0, index);
-            const highlightedText = searchValue;
-            const afterText = textContent.substring(index + searchValue.length);
-            
-            // Temporarily highlight the changed text
             const originalHTML = previewText.innerHTML;
             const highlightedHTML = originalHTML.replace(
                 new RegExp(escapeRegExp(searchValue), 'g'),
@@ -581,6 +597,26 @@ Date: ____________________________        Date: ____________________________`;
             alert("Error generating Word document. Please use copy to clipboard.");
         }
     };
+
+    // Tab navigation overflow detection
+    useEffect(() => {
+        const checkTabOverflow = () => {
+            const tabNav = document.querySelector('.tab-navigation');
+            if (tabNav) {
+                const hasOverflow = tabNav.scrollWidth > tabNav.clientWidth;
+                if (hasOverflow) {
+                    tabNav.classList.add('has-overflow');
+                } else {
+                    tabNav.classList.remove('has-overflow');
+                }
+            }
+        };
+
+        checkTabOverflow();
+        window.addEventListener('resize', checkTabOverflow);
+        
+        return () => window.removeEventListener('resize', checkTabOverflow);
+    }, []);
 
     // PayPal effect
     useEffect(() => {
@@ -1153,16 +1189,6 @@ Date: ____________________________        Date: ____________________________`;
                 />
                 <label>Include Entire Agreement Clause</label>
             </div>
-
-            <div className="checkbox-group">
-                <input
-                    type="checkbox"
-                    name="includeArbitration"
-                    checked={formData.includeArbitration}
-                    onChange={handleChange}
-                />
-                <label>Include Arbitration Requirements</label>
-            </div>
         </div>
     );
 
@@ -1212,13 +1238,21 @@ Date: ____________________________        Date: ____________________________`;
 
         return (
             <div className="form-section">
-                <h3>Agreement Analysis</h3>
+                <h3>Professional Tips & Risk Analysis</h3>
                 <div className="results-section">
-                    <h4>Document Statistics</h4>
-                    <p>• Total Sections: 34 comprehensive sections</p>
-                    <p>• Word Count: ~{Math.round(documentText.length / 5)} words</p>
-                    <p>• Service Type: {formData.serviceType === 'e-design' ? 'E-Design Services' : 'Full-Service Interior Design'}</p>
-                    <p>• Professional Clauses: {[formData.includeMaterialBreach, formData.includeIndemnification, formData.includeConfidentiality, formData.includeForcemajeure].filter(Boolean).length}/4 included</p>
+                    <h4>Key Legal Protections</h4>
+                    <div className="risk-card low">
+                        <h4>✓ Material Breach Clauses</h4>
+                        <p>Protects you from difficult clients by allowing immediate termination for specific problematic behaviors like rejecting 80% of designs without cause.</p>
+                    </div>
+                    <div className="risk-card low">
+                        <h4>✓ Payment Protection</h4>
+                        <p>Your agreement requires payment before work begins and includes late payment penalties to protect your cash flow.</p>
+                    </div>
+                    <div className="risk-card low">
+                        <h4>✓ Scope Management</h4>
+                        <p>Clear revision limits (${formData.revisionRounds} rounds) prevent scope creep and additional revision fees apply beyond that.</p>
+                    </div>
                 </div>
 
                 <div className="results-section">
@@ -1226,7 +1260,7 @@ Date: ____________________________        Date: ____________________________`;
                     {risks.length === 0 ? (
                         <div className="risk-card low">
                             <h4>Excellent Legal Protection</h4>
-                            <p>Your agreement includes comprehensive protection clauses and follows best practices.</p>
+                            <p>Your agreement includes comprehensive protection clauses and follows best practices for interior design businesses.</p>
                         </div>
                     ) : (
                         risks.map((risk, index) => (
@@ -1239,11 +1273,18 @@ Date: ____________________________        Date: ____________________________`;
                 </div>
 
                 <div className="results-section">
-                    <h4>Agreement Preview</h4>
+                    <h4>Professional Best Practices Included</h4>
+                    <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
+                        <strong>Timeline Protection:</strong> ${formData.informationDeadline}-day deadline for client information prevents delays caused by unresponsive clients.
+                    </p>
+                    <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
+                        <strong>Fee Structure:</strong> ${formData.serviceType === 'e-design' ? `$${formData.eDesignFee} per room for E-Design` : `$${formData.fullServiceHourlyRate}/hour for Full-Service`} with clear additional fees prevents disputes.
+                    </p>
+                    <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
+                        <strong>Communication:</strong> All feedback must go through ${formData.communicationPlatform} to maintain documentation and project flow.
+                    </p>
                     <p style={{fontSize: '0.9rem', color: '#666'}}>
-                        Your comprehensive Interior Design Services Agreement is ready for download. 
-                        It includes all {Object.keys(formData).filter(key => formData[key] && typeof formData[key] === 'boolean').length} selected professional features 
-                        and follows industry best practices.
+                        <strong>Legal Coverage:</strong> Agreement covers 34 comprehensive sections including force majeure, indemnification, and intellectual property protection.
                     </p>
                 </div>
             </div>
