@@ -127,7 +127,8 @@ const InteriorDesignAgreementGenerator = () => {
         // Highlight changed field in preview and scroll to it
         if (previewRef.current) {
             setTimeout(() => {
-                highlightAndScrollToField(name, value);
+                const fieldValueToHighlight = type === 'checkbox' ? checked : value;
+                highlightAndScrollToField(name, fieldValueToHighlight);
             }, 100);
         }
         
@@ -148,36 +149,94 @@ const InteriorDesignAgreementGenerator = () => {
         if (typeof fieldValue === 'boolean') {
             // For checkboxes, highlight the section they affect
             const checkboxMappings = {
-                'includeMaterialBreach': '5. Material Breach and Termination',
-                'includePhotography': '26. Publicity and Photography',
-                'includeConfidentiality': '27. Confidentiality',
-                'includeForcemajeure': '29. Force Majeure',
-                'includeIndemnification': '31. Indemnification',
+                'includeMaterialBreach': 'Material Breach and Termination',
+                'includePhotography': 'Publicity and Photography',
+                'includeConfidentiality': 'Confidentiality',
+                'includeForcemajeure': 'Force Majeure',
+                'includeIndemnification': 'Indemnification',
                 'includeInstallation': 'Installation',
                 'includeRushOption': 'Rush projects',
-                'includeSeverability': '33. Severability',
-                'includeEntireAgreement': '34. Entire Agreement'
+                'includeSeverability': 'Severability',
+                'includeEntireAgreement': 'Entire Agreement'
             };
             
             const searchTerm = checkboxMappings[fieldName];
             if (searchTerm) {
                 highlightTextInPreview(previewText, searchTerm);
             }
-        } else if (fieldValue && fieldValue.toString().length > 2) {
-            // For regular text fields, highlight the actual value
-            highlightTextInPreview(previewText, fieldValue.toString());
+        } else if (fieldValue && fieldValue.toString().length > 0) {
+            // Special handling for specific field names
+            const fieldMappings = {
+                'eDesignFee': `$${fieldValue}`,
+                'fullServiceHourlyRate': `$${fieldValue} per hour`,
+                'projectManagementRate': `${fieldValue} percent`,
+                'additionalSelectionsFee': `$${fieldValue} will be charged for each additional`,
+                'delayedPurchaseFee': `$${fieldValue} will be charged if Client requests`,
+                'itemRemovalFee': `$${fieldValue} per hour will be charged if Designer`,
+                'redesignFee': `$${fieldValue} will be charged`,
+                'rushSurcharge': `${fieldValue} percent surcharge`,
+                'validityPeriod': `${fieldValue} days after final payment`,
+                'revisionRounds': `${fieldValue} rounds of revisions`,
+                'informationDeadline': `${fieldValue} business days of contract`,
+                'responseTime': `${fieldValue} business days of receipt`,
+                'depositPercentage': `${fieldValue} percent of total estimated`,
+                'latePaymentRate': `${fieldValue}% monthly interest`,
+                'latePaymentGrace': `${fieldValue} days overdue`,
+                'projectTimeline': `${fieldValue} days`,
+                'inspectionWindow': `${fieldValue} day window`,
+                'designerResponseTime': `${fieldValue} business days during normal`,
+                'paymentTerms': fieldValue === 'due_on_receipt' ? 'due upon receipt of invoice' : 'net thirty (30) days'
+            };
+            
+            // Use field mapping if available, otherwise use the raw value
+            const searchValue = fieldMappings[fieldName] || fieldValue.toString();
+            
+            if (searchValue.length > 1) {
+                highlightTextInPreview(previewText, searchValue);
+            }
         }
     };
 
     // Helper function to highlight text in preview
     const highlightTextInPreview = (previewText, searchValue) => {
         const textContent = previewText.textContent;
-        const index = textContent.indexOf(searchValue);
+        let index = textContent.indexOf(searchValue);
+        
+        // If exact match not found, try partial matches
+        if (index === -1 && searchValue.length > 10) {
+            // Try first few words
+            const words = searchValue.split(' ');
+            if (words.length > 2) {
+                const partialSearch = words.slice(0, 3).join(' ');
+                index = textContent.indexOf(partialSearch);
+                if (index !== -1) {
+                    searchValue = partialSearch;
+                }
+            }
+        }
+        
+        // If still not found, try key words
+        if (index === -1) {
+            const keyWords = searchValue.split(' ').filter(word => 
+                word.length > 3 && !['will', 'the', 'and', 'for', 'per', 'are'].includes(word.toLowerCase())
+            );
+            
+            for (const word of keyWords) {
+                index = textContent.indexOf(word);
+                if (index !== -1) {
+                    searchValue = word;
+                    break;
+                }
+            }
+        }
         
         if (index !== -1) {
             const originalHTML = previewText.innerHTML;
+            
+            // Create regex for case-insensitive replacement
+            const regex = new RegExp(escapeRegExp(searchValue), 'gi');
             const highlightedHTML = originalHTML.replace(
-                new RegExp(escapeRegExp(searchValue), 'g'),
+                regex,
                 `<span class="highlighted-text">${searchValue}</span>`
             );
             
@@ -186,16 +245,32 @@ const InteriorDesignAgreementGenerator = () => {
             // Scroll to the highlighted element
             const highlightedElement = previewText.querySelector('.highlighted-text');
             if (highlightedElement) {
+                // Ensure the parent container scrolls to show the highlighted text
                 highlightedElement.scrollIntoView({
                     behavior: 'smooth',
                     block: 'center',
                     inline: 'nearest'
                 });
+                
+                // Also scroll the preview panel if needed
+                const previewPanel = previewRef.current;
+                if (previewPanel) {
+                    const elementTop = highlightedElement.offsetTop;
+                    const panelHeight = previewPanel.clientHeight;
+                    const scrollTop = elementTop - (panelHeight / 2);
+                    
+                    previewPanel.scrollTo({
+                        top: Math.max(0, scrollTop),
+                        behavior: 'smooth'
+                    });
+                }
             }
             
             // Restore original HTML after highlighting
             setTimeout(() => {
-                previewText.innerHTML = originalHTML;
+                if (previewText) {
+                    previewText.innerHTML = originalHTML;
+                }
             }, 3000);
         }
     };
