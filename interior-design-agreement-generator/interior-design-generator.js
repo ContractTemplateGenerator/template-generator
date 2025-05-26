@@ -342,12 +342,7 @@ const InteriorDesignAgreementGenerator = () => {
         }
     };
 
-    // Skip payment for testing
-    const skipPayment = () => {
-        setIsPaid(true);
-        setShowPaywall(false);
-        localStorage.setItem('interiorDesignPaid', 'true');
-    };
+
 
     // Validate PayPal ID format
     const validatePaypalId = (id) => {
@@ -1502,9 +1497,7 @@ Date: ____________________________        Date: ____________________________`;
                     <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
                         <strong>Communication:</strong> All feedback must go through {formData.communicationPlatform} to maintain documentation and project flow.
                     </p>
-                    <p style={{fontSize: '0.9rem', color: '#666'}}>
-                        <strong>Legal Coverage:</strong> Agreement covers {sectionCount} professional sections with comprehensive legal protections.
-                    </p>
+
                 </div>
             </div>
         );
@@ -1636,8 +1629,7 @@ Date: ____________________________        Date: ____________________________`;
                         >
                             Need Legal Advice?
                         </button>
-                        
-                        <button onClick={skipPayment} className="skip-btn">Skip (Testing)</button>
+
                     </div>
                 </div>
             )}
@@ -1659,7 +1651,6 @@ Date: ____________________________        Date: ____________________________`;
                                 {index + 1}. {tab.label}
                             </button>
                         ))}
-                        <div className="tab-overflow-indicator">→</div>
                     </div>
 
                     {/* Dynamic Tab Content */}
@@ -1732,7 +1723,18 @@ Date: ____________________________        Date: ____________________________`;
                                 </div>
                             )}
                         </div>
-                        <div className="document-preview" style={{whiteSpace: 'pre-wrap'}}>
+                        <div 
+                            className="document-preview" 
+                            style={{
+                                whiteSpace: 'pre-wrap',
+                                userSelect: isPaid ? 'text' : 'none',
+                                pointerEvents: isPaid ? 'auto' : 'none',
+                                filter: isPaid ? 'none' : 'blur(1px)'
+                            }}
+                            onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
+                            onSelectStart={!isPaid ? (e) => e.preventDefault() : undefined}
+                            onDragStart={!isPaid ? (e) => e.preventDefault() : undefined}
+                        >
                             {documentText}
                         </div>
                     </div>
