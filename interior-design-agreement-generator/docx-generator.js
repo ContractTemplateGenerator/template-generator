@@ -4,20 +4,84 @@ window.generateWordDoc = function(documentText, formData) {
     console.log("Starting Word document generation...");
     
     // Create HTML content that can be rendered in Word
-    let htmlContent = `<!DOCTYPE html>
-<html><head><meta charset="UTF-8"><title>Interior Design Services Agreement</title>
+    let htmlContent = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+<head>
+<meta charset="UTF-8">
+<meta name="ProgId" content="Word.Document">
+<meta name="Generator" content="Microsoft Word">
+<meta name="Originator" content="Microsoft Word">
+<title>Interior Design Services Agreement</title>
+<!--[if gte mso 9]>
+<xml>
+<w:WordDocument>
+<w:View>Print</w:View>
+<w:Zoom>90</w:Zoom>
+<w:DoNotPromptForConvert/>
+<w:DoNotShowRevisions/>
+<w:DoNotPrintRevisions/>
+<w:DisplayHorizontalDrawingGridEvery>0</w:DisplayHorizontalDrawingGridEvery>
+<w:DisplayVerticalDrawingGridEvery>2</w:DisplayVerticalDrawingGridEvery>
+<w:UseMarginsForDrawingGridOrigin/>
+<w:ValidateAgainstSchemas/>
+</w:WordDocument>
+</xml>
+<![endif]-->
 <style>
-  body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; margin: 0; padding: 0; }
-  h1 { text-align: center; font-size: 11pt; margin-bottom: 20pt; text-decoration: underline; font-weight: bold; }
-  h2 { font-size: 11pt; margin-top: 14pt; margin-bottom: 10pt; font-weight: bold; }
-  h3 { font-size: 11pt; margin-top: 12pt; margin-bottom: 8pt; font-weight: bold; }
-  p { margin-bottom: 10pt; text-align: justify; font-size: 11pt; }
-  .signature-section { margin-top: 40pt; }
-  .signature-table { width: 100%; border-collapse: collapse; }
-  .signature-table td { width: 50%; vertical-align: top; padding: 0 10pt; }
-  .signature-line { border-bottom: 1px solid black; margin-bottom: 5pt; height: 20pt; width: 80%; }
-  .signature-label { font-size: 11pt; margin-bottom: 10pt; font-weight: bold; }
-</style></head><body>`;
+  @page {
+    margin: 0in;
+  }
+  body { 
+    font-family: 'Times New Roman', serif; 
+    font-size: 11pt; 
+    line-height: 1.5; 
+    margin: 0; 
+    padding: 0; 
+  }
+  h1 { 
+    text-align: center; 
+    font-size: 11pt; 
+    margin-bottom: 20pt; 
+    text-decoration: underline; 
+    font-weight: bold; 
+  }
+  h2 { 
+    font-size: 11pt; 
+    margin-top: 14pt; 
+    margin-bottom: 10pt; 
+    font-weight: bold; 
+  }
+  h3 { 
+    font-size: 11pt; 
+    margin-top: 12pt; 
+    margin-bottom: 8pt; 
+    font-weight: bold; 
+  }
+  p { 
+    margin-bottom: 10pt; 
+    text-align: justify; 
+    font-size: 11pt; 
+  }
+  .signature-section { 
+    margin-top: 40pt; 
+  }
+  .signature-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+  }
+  .signature-table td { 
+    width: 50%; 
+    vertical-align: top; 
+    padding: 0 10pt; 
+  }
+  .signature-line { 
+    border-bottom: 1px solid black; 
+    margin-bottom: 5pt; 
+    height: 20pt; 
+    width: 80%; 
+  }
+</style>
+</head>
+<body>`;
 
     // Split document into main content and signature section
     const parts = documentText.split('IN WITNESS WHEREOF');
@@ -92,15 +156,15 @@ window.generateWordDoc = function(documentText, formData) {
     // Close HTML document
     htmlContent += '</body></html>';
     
-    // Convert HTML to Blob with proper DOCX MIME type
-    const blob = new Blob([htmlContent], { 
-      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8' 
+    // Convert HTML to Blob with proper DOC MIME type (better HTML compatibility)
+    const blob = new Blob(['\ufeff' + htmlContent], { 
+      type: 'application/msword;charset=utf-8' 
     });
     
     // Create download link and trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Interior-Design-Services-Agreement-${new Date().toISOString().split('T')[0]}.docx`;
+    link.download = `Interior-Design-Services-Agreement-${new Date().toISOString().split('T')[0]}.doc`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
