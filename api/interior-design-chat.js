@@ -20,6 +20,43 @@ const handler = async (req, res) => {
         return res.status(400).json({ error: 'Messages array is required' });
     }
 
+    // Simple token estimation function (roughly 4 characters per token)
+    const estimateTokens = (text) => {
+        return Math.ceil(text.length / 4);
+    };
+
+    // Limit chat history to max 3000 tokens to prevent API failures
+    const limitChatHistory = (messages, maxTokens = 3000) => {
+        if (messages.length === 0) return messages;
+        
+        let totalTokens = 0;
+        const limitedMessages = [];
+        
+        // Process messages from most recent to oldest
+        for (let i = messages.length - 1; i >= 0; i--) {
+            const message = messages[i];
+            const messageTokens = estimateTokens(message.content);
+            
+            // If adding this message would exceed limit, stop
+            if (totalTokens + messageTokens > maxTokens) {
+                break;
+            }
+            
+            totalTokens += messageTokens;
+            limitedMessages.unshift(message); // Add to beginning to maintain order
+        }
+        
+        return limitedMessages;
+    };
+
+    // Limit the chat history before sending to API
+    const limitedMessages = limitChatHistory(messages, 3000);
+    
+    // Log if we had to truncate messages
+    if (limitedMessages.length < messages.length) {
+        console.log(`Truncated chat history: ${messages.length} -> ${limitedMessages.length} messages`);
+    }
+
     const systemPrompt = `You are a specialized legal assistant working with attorney Sergei Tokmakov (CA Bar #279869), licensed in California since 2011, with 13+ years of experience specializing in interior design contracts and business protection.
 
 CRITICAL FORMATTING REQUIREMENTS:
@@ -88,7 +125,7 @@ Your responses should demonstrate the sophisticated legal thinking of an experie
                     model: model,
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        ...messages
+                        ...limitedMessages
                     ],
                     temperature: 0.7,
                     max_tokens: 2000,

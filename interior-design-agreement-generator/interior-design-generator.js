@@ -6,7 +6,13 @@ const InteriorDesignAgreementGenerator = () => {
     const [lastChanged, setLastChanged] = useState(null);
     const [isPaid, setIsPaid] = useState(false);
     const [showPaywall, setShowPaywall] = useState(true);
+    const [showLegalChat, setShowLegalChat] = useState(false);
+    const [chatMessages, setChatMessages] = useState([]);
+    const [chatInput, setChatInput] = useState('');
+    const [chatLoading, setChatLoading] = useState(false);
+    const [contextualTip, setContextualTip] = useState('');
     const previewRef = useRef(null);
+    const chatMessagesRef = useRef(null);
 
     // Complete form data state
     const [formData, setFormData] = useState({
@@ -89,6 +95,29 @@ const InteriorDesignAgreementGenerator = () => {
         'Wisconsin', 'Wyoming'
     ];
 
+    // Smart contextual tips based on user selections
+    const getContextualTip = (fieldName, value) => {
+        const tips = {
+            includeMaterialBreach: value ? "💡 <strong>Material Breach Protection Enabled</strong><br>This allows you to terminate clients who reject 80%+ of designs, impose impossible budgets, or bypass you to contact vendors. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Learn more →</span>" : "",
+            
+            includeIndemnification: value ? "⚖️ <strong>Indemnification Added</strong><br>Client will be liable for damages from their actions (permit issues, unauthorized changes). Essential protection for design professionals. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Learn more →</span>" : "",
+            
+            paymentTerms: value === 'due_on_receipt' ? "💰 <strong>Smart Payment Terms</strong><br>Due-on-receipt terms protect your cash flow better than Net 30. Combined with late fees, this prevents payment delays. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Payment protection tips →</span>" : "",
+            
+            revisionRounds: parseInt(value) <= 2 ? "🔄 <strong>Revision Limits Set</strong><br>Limiting to " + value + " rounds prevents scope creep. Additional revisions become billable change orders. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Scope protection →</span>" : "",
+            
+            validityPeriod: parseInt(value) <= 90 ? "⏰ <strong>Package Validity Period</strong><br>" + value + " days is standard. After expiration, no support/revisions without new agreement. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Timeline protection →</span>" : "",
+            
+            serviceType: value === 'e-design' ? "📐 <strong>E-Design Service Selected</strong><br>E-design has specific liability limitations and client responsibilities for measurements. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>E-design legal tips →</span>" : "",
+            
+            includeConfidentiality: value ? "🔒 <strong>Confidentiality Protection</strong><br>Prevents clients from sharing your processes/pricing with competitors. Also protects client's personal information. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>IP protection →</span>" : "",
+            
+            latePaymentGrace: parseInt(value) <= 15 ? "⚡ <strong>Quick Late Payment Enforcement</strong><br>" + value + " days grace period means fast action on overdue accounts. Shorter periods improve collection rates. <span style='color: #2563eb; cursor: pointer;' onclick='openLegalChat()'>Collection strategies →</span>" : ""
+        };
+        
+        return tips[fieldName] || '';
+    };
+
     // Check for saved progress
     useEffect(() => {
         const savedData = localStorage.getItem('interiorDesignFormData');
@@ -123,6 +152,13 @@ const InteriorDesignAgreementGenerator = () => {
         
         setFormData(newFormData);
         saveFormData(newFormData);
+        
+        // Show contextual tip
+        const tip = getContextualTip(name, type === 'checkbox' ? checked : value);
+        if (tip) {
+            setContextualTip(tip);
+            setTimeout(() => setContextualTip(''), 8000); // Clear after 8 seconds
+        }
         
         // Highlight changed field in preview and scroll to it
         if (previewRef.current) {
@@ -309,6 +345,78 @@ const InteriorDesignAgreementGenerator = () => {
         setShowPaywall(false);
         localStorage.setItem('interiorDesignPaid', 'true');
     };
+
+    // Legal chat functions
+    const openLegalChat = () => {
+        setShowLegalChat(true);
+        if (chatMessages.length === 0) {
+            setChatMessages([{
+                role: 'assistant',
+                content: '<strong>Legal Assistant Ready</strong><br><br>I can help with questions about your interior design agreement, difficult client situations, and legal protection strategies.<br><br>What would you like to know?'
+            }]);
+        }
+    };
+
+    const closeLegalChat = () => {
+        setShowLegalChat(false);
+    };
+
+    const sendChatMessage = async () => {
+        if (!chatInput.trim()) return;
+
+        const userMessage = { role: 'user', content: chatInput };
+        setChatMessages(prev => [...prev, userMessage]);
+        setChatInput('');
+        setChatLoading(true);
+
+        try {
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/interior-design-chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [...chatMessages, userMessage],
+                }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+            } else {
+                throw new Error('API Error');
+            }
+        } catch (error) {
+            setChatMessages(prev => [...prev, { 
+                role: 'assistant', 
+                content: 'Unable to get response right now. For complex legal questions, please <strong><a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" target="_blank" style="color: #2563eb;">schedule a consultation</a></strong>.' 
+            }]);
+        } finally {
+            setChatLoading(false);
+        }
+    };
+
+    const handleChatKeyPress = (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendChatMessage();
+        }
+    };
+
+    // Scroll chat to bottom
+    useEffect(() => {
+        if (chatMessagesRef.current) {
+            chatMessagesRef.current.scrollTop = chatMessagesRef.current.scrollHeight;
+        }
+    }, [chatMessages]);
+
+    // Global function for contextual tip links
+    useEffect(() => {
+        window.openLegalChat = openLegalChat;
+        return () => {
+            delete window.openLegalChat;
+        };
+    }, []);
 
     // Tab configuration
     const tabs = [
@@ -1382,6 +1490,82 @@ Date: ____________________________        Date: ____________________________`;
     // Main component render
     return (
         <div className="container">
+            {/* Contextual Tip */}
+            {contextualTip && (
+                <div className="contextual-tip">
+                    <div dangerouslySetInnerHTML={{ __html: contextualTip }} />
+                    <button onClick={() => setContextualTip('')} className="tip-close">×</button>
+                </div>
+            )}
+
+            {/* Floating Legal Help Button */}
+            <button 
+                className="floating-help-btn"
+                onClick={openLegalChat}
+                title="Get Legal Help"
+            >
+                ⚖️
+            </button>
+
+            {/* Legal Chat Popup Overlay */}
+            {showLegalChat && (
+                <div className="chat-overlay">
+                    <div className="chat-popup">
+                        <div className="chat-popup-header">
+                            <div>
+                                <h3>Legal Assistant</h3>
+                                <p>Interior Design Contract Expert</p>
+                            </div>
+                            <button onClick={closeLegalChat} className="chat-close">×</button>
+                        </div>
+                        
+                        <div className="chat-popup-messages" ref={chatMessagesRef}>
+                            {chatMessages.map((message, index) => (
+                                <div key={index} className={`chat-message ${message.role}`}>
+                                    {message.role === 'assistant' ? (
+                                        <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                                    ) : (
+                                        message.content
+                                    )}
+                                </div>
+                            ))}
+                            {chatLoading && (
+                                <div className="chat-message assistant">
+                                    <div className="chat-loading">⚖️ Analyzing your question...</div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="chat-popup-input">
+                            <textarea
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                                onKeyPress={handleChatKeyPress}
+                                placeholder="Ask about contracts, client issues, legal protection..."
+                                rows="2"
+                            />
+                            <button 
+                                onClick={sendChatMessage} 
+                                disabled={!chatInput.trim() || chatLoading}
+                                className="chat-send-btn"
+                            >
+                                Send
+                            </button>
+                        </div>
+                        
+                        <div className="chat-popup-footer">
+                            Attorney Sergei Tokmakov • CA Bar #279869 • 
+                            <button 
+                                onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                                className="consult-link"
+                            >
+                                Schedule Consultation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="main-content">
                 <div className="form-panel">
                     <div className="header">
