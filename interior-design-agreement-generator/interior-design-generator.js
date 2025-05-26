@@ -1626,7 +1626,7 @@ Date: ____________________________        Date: ____________________________`;
                     </div>
                     <div className="risk-card low">
                         <h4>✓ Scope Management</h4>
-                        <p>Clear revision limits (${formData.revisionRounds} rounds) prevent scope creep and additional revision fees apply beyond that.</p>
+                        <p>Clear revision limits ({formData.revisionRounds} rounds) prevent scope creep and additional revision fees apply beyond that.</p>
                     </div>
                 </div>
 
@@ -1650,16 +1650,16 @@ Date: ____________________________        Date: ____________________________`;
                 <div className="results-section">
                     <h4>Professional Best Practices Included</h4>
                     <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
-                        <strong>Timeline Protection:</strong> ${formData.informationDeadline}-day deadline for client information prevents delays caused by unresponsive clients.
+                        <strong>Timeline Protection:</strong> {formData.informationDeadline}-day deadline for client information prevents delays caused by unresponsive clients.
                     </p>
                     <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
-                        <strong>Fee Structure:</strong> ${formData.serviceType === 'e-design' ? `$${formData.eDesignFee} per room for E-Design` : `$${formData.fullServiceHourlyRate}/hour for Full-Service`} with clear additional fees prevents disputes.
+                        <strong>Fee Structure:</strong> {formData.serviceType === 'e-design' ? `$${formData.eDesignFee} per room for E-Design` : `$${formData.fullServiceHourlyRate}/hour for Full-Service`} with clear additional fees prevents disputes.
                     </p>
                     <p style={{fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem'}}>
-                        <strong>Communication:</strong> All feedback must go through ${formData.communicationPlatform} to maintain documentation and project flow.
+                        <strong>Communication:</strong> All feedback must go through {formData.communicationPlatform} to maintain documentation and project flow.
                     </p>
                     <p style={{fontSize: '0.9rem', color: '#666'}}>
-                        <strong>Legal Coverage:</strong> Agreement covers ${legalCoverage.sectionCount} professional sections including ${legalCoverage.featuresText}.
+                        <strong>Legal Coverage:</strong> Agreement covers {legalCoverage.sectionCount} professional sections including {legalCoverage.featuresText}.
                     </p>
                 </div>
             </div>
