@@ -14,8 +14,8 @@ window.generateWordDoc = function(documentText, formData) {
   p { margin-bottom: 10pt; text-align: justify; font-size: 11pt; }
   .signature-section { margin-top: 40pt; }
   .signature-table { width: 100%; border-collapse: collapse; }
-  .signature-table td { width: 50%; text-align: center; vertical-align: top; padding: 0 20pt; }
-  .signature-line { border-bottom: 1px solid black; margin-bottom: 5pt; height: 20pt; }
+  .signature-table td { width: 50%; vertical-align: top; padding: 0 10pt; }
+  .signature-line { border-bottom: 1px solid black; margin-bottom: 5pt; height: 20pt; width: 80%; }
   .signature-label { font-size: 11pt; margin-bottom: 10pt; font-weight: bold; }
 </style></head><body>`;
 
@@ -62,24 +62,24 @@ window.generateWordDoc = function(documentText, formData) {
       <div class="signature-section">
         <table class="signature-table">
           <tr>
-            <td class="signature-label">CLIENT:</td>
-            <td class="signature-label">DESIGNER:</td>
+            <td style="text-align: left;"><strong>CLIENT:</strong></td>
+            <td style="text-align: left;"><strong>DESIGNER:</strong></td>
           </tr>
           <tr>
-            <td style="padding-top: 10pt;">${clientName}</td>
-            <td style="padding-top: 10pt;">${designerName}</td>
+            <td style="padding-top: 10pt; text-align: left;">${clientName}</td>
+            <td style="padding-top: 10pt; text-align: left;">${designerName}</td>
           </tr>
           <tr>
             <td></td>
-            <td style="padding-top: 10pt;">By: [AUTHORIZED SIGNATORY]</td>
+            <td style="padding-top: 10pt; text-align: left;">By: [AUTHORIZED SIGNATORY]</td>
           </tr>
           <tr>
             <td style="padding-top: 20pt;"><div class="signature-line"></div></td>
             <td style="padding-top: 20pt;"><div class="signature-line"></div></td>
           </tr>
           <tr>
-            <td style="text-align: center; font-size: 11pt;">Signature</td>
-            <td style="text-align: center; font-size: 11pt;">Signature</td>
+            <td style="font-size: 11pt; text-align: left;">Signature</td>
+            <td style="font-size: 11pt; text-align: left;">Signature</td>
           </tr>
           <tr>
             <td style="padding-top: 15pt; text-align: left;">Date: ____________________________</td>
@@ -92,15 +92,15 @@ window.generateWordDoc = function(documentText, formData) {
     // Close HTML document
     htmlContent += '</body></html>';
     
-    // Convert HTML to Blob
+    // Convert HTML to Blob with proper DOCX MIME type
     const blob = new Blob([htmlContent], { 
-      type: 'application/vnd.ms-word;charset=utf-8' 
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document;charset=utf-8' 
     });
     
     // Create download link and trigger download
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `Interior-Design-Services-Agreement-${new Date().toISOString().split('T')[0]}.doc`;
+    link.download = `Interior-Design-Services-Agreement-${new Date().toISOString().split('T')[0]}.docx`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

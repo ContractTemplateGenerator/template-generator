@@ -1164,7 +1164,6 @@ Date: ____________________________        Date: ____________________________`;
                 <label>Dispute Resolution Method</label>
                 <select name="disputeResolutionMethod" value={formData.disputeResolutionMethod} onChange={handleChange}>
                     <option value="courts">State/Federal Courts</option>
-                    <option value="arbitration">Binding Arbitration</option>
                     <option value="mediation">Mediation First, Then Courts</option>
                 </select>
             </div>
