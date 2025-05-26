@@ -883,6 +883,124 @@ Date: ____________________________        Date: ____________________________`;
         setShowPaywall(true);
     };
 
+    // Main component render (no full-screen paywall)
+    return (
+        <div className="container">
+            {/* Contextual Tip */}
+            {contextualTip && (
+                <div className="contextual-tip">
+                    <div dangerouslySetInnerHTML={{ __html: contextualTip }} />
+                    <button onClick={() => setContextualTip('')} className="tip-close">×</button>
+                </div>
+            )}
+
+            {/* Floating Legal Help Button */}
+            <button 
+                className="floating-help-btn"
+                onClick={openLegalChat}
+                title="Get Legal Help"
+            >
+                ⚖️
+            </button>
+
+            {/* Legal Chat Popup Overlay */}
+            {showLegalChat && (
+                <div className="chat-overlay">
+                    <div className="chat-popup">
+                        <div className="chat-popup-header">
+                            <div>
+                                <h3>Legal Assistant</h3>
+                                <p>Interior Design Contract Expert</p>
+                            </div>
+                            <button onClick={closeLegalChat} className="chat-close">×</button>
+                        </div>
+                        
+                        <div className="chat-popup-messages" ref={chatMessagesRef}>
+                            {chatMessages.map((message, index) => (
+                                <div key={index} className={`chat-message ${message.role}`}>
+                                    {message.role === 'assistant' ? (
+                                        <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                                    ) : (
+                                        message.content
+                                    )}
+                                </div>
+                            ))}
+                            {chatLoading && (
+                                <div className="chat-message assistant">
+                                    <div className="chat-loading">⚖️ Analyzing your question...</div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="chat-popup-input">
+                            <textarea
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                                onKeyPress={handleChatKeyPress}
+                                placeholder="Ask about contracts, client issues, legal protection..."
+                                rows="2"
+                            />
+                            <button 
+                                onClick={sendChatMessage} 
+                                disabled={!chatInput.trim() || chatLoading}
+                                className="chat-send-btn"
+                            >
+                                Send
+                            </button>
+                        </div>
+                        
+                        <div className="chat-popup-footer">
+                            <button 
+                                onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                                className="consult-link"
+                            >
+                                Schedule Consultation
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Small Paywall Popup (only when triggered) */}
+            {showPaywall && !isPaid && (
+                <div className="paywall-overlay">
+                    <div className="paywall-popup">
+                        <button onClick={() => setShowPaywall(false)} className="paywall-close">×</button>
+                        <h3>Unlock Document Export</h3>
+                        <p>Copy and download your completed Interior Design Services Agreement.</p>
+                        <div className="paywall-price">$14.95</div>
+                        
+                        <div id="paypal-button-container"></div>
+                        
+                        <div className="paywall-divider">Already Paid?</div>
+                        
+                        <div className="paywall-unlock">
+                            <input
+                                type="text"
+                                value={paypalId}
+                                onChange={(e) => setPaypalId(e.target.value.toUpperCase())}
+                                placeholder="Enter PayPal Transaction ID"
+                                className="paypal-id-input"
+                                maxLength="17"
+                            />
+                            {paypalError && <div className="paypal-error">{paypalError}</div>}
+                            <button onClick={handlePaypalIdSubmit} className="unlock-btn">
+                                Unlock Now
+                            </button>
+                        </div>
+                        
+                        <button 
+                            onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                            className="consult-small-btn"
+                        >
+                            Need Legal Advice?
+                        </button>
+                        
+                        <button onClick={skipPayment} className="skip-btn">Skip (Testing)</button>
+                    </div>
+                </div>
+            )}
+
     // All render functions should be defined here, BEFORE the main return statement
     const renderPartiesTab = () => (
         <div className="form-section">
@@ -1598,46 +1716,6 @@ Date: ____________________________        Date: ____________________________`;
                                 Schedule Consultation
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Small Paywall Popup (only when triggered) */}
-            {showPaywall && !isPaid && (
-                <div className="paywall-overlay">
-                    <div className="paywall-popup">
-                        <button onClick={() => setShowPaywall(false)} className="paywall-close">×</button>
-                        <h3>Unlock Document Export</h3>
-                        <p>Copy and download your completed Interior Design Services Agreement.</p>
-                        <div className="paywall-price">$14.95</div>
-                        
-                        <div id="paypal-button-container"></div>
-                        
-                        <div className="paywall-divider">Already Paid?</div>
-                        
-                        <div className="paywall-unlock">
-                            <input
-                                type="text"
-                                value={paypalId}
-                                onChange={(e) => setPaypalId(e.target.value.toUpperCase())}
-                                placeholder="Enter PayPal Transaction ID"
-                                className="paypal-id-input"
-                                maxLength="17"
-                            />
-                            {paypalError && <div className="paypal-error">{paypalError}</div>}
-                            <button onClick={handlePaypalIdSubmit} className="unlock-btn">
-                                Unlock Now
-                            </button>
-                        </div>
-                        
-                        <button 
-                            onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
-                            className="consult-small-btn"
-                        >
-                            Need Legal Advice?
-                        </button>
-                        
-                        <button onClick={skipPayment} className="skip-btn">Skip (Testing)</button>
                     </div>
                 </div>
             )}
