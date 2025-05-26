@@ -1775,7 +1775,6 @@ Date: ____________________________        Date: ____________________________`;
                                 onChange={(e) => setPaypalId(e.target.value.toUpperCase())}
                                 placeholder="Enter PayPal Transaction ID"
                                 className="paypal-id-input"
-                                maxLength="17"
                             />
                             {paypalError && <div className="paypal-error">{paypalError}</div>}
                             <button onClick={handlePaypalIdSubmit} className="unlock-btn">
@@ -1889,7 +1888,7 @@ Date: ____________________________        Date: ____________________________`;
                                 whiteSpace: 'pre-wrap',
                                 userSelect: isPaid ? 'text' : 'none',
                                 pointerEvents: isPaid ? 'auto' : 'none',
-                                filter: isPaid ? 'none' : 'blur(1px)'
+                                filter: isPaid ? 'none' : 'blur(0.3px)'
                             }}
                             onContextMenu={!isPaid ? (e) => e.preventDefault() : undefined}
                             onSelectStart={!isPaid ? (e) => e.preventDefault() : undefined}
