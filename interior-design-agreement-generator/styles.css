@@ -77,7 +77,7 @@ body {
 }
 
 .tab-navigation::after {
-    content: '→';
+    content: '';
     position: absolute;
     right: 0;
     top: 50%;
@@ -92,7 +92,33 @@ body {
 }
 
 .tab-navigation.has-overflow::after {
+    content: '→';
     opacity: 1;
+}
+
+.tab-overflow-indicator {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #3b82f6;
+    font-size: 16px;
+    font-weight: bold;
+    pointer-events: none;
+    opacity: 0;
+    transition: all 0.3s;
+    background: linear-gradient(to right, transparent, white 60%);
+    padding-left: 15px;
+    animation: pulse 2s infinite;
+}
+
+.tab-navigation.has-overflow .tab-overflow-indicator {
+    opacity: 1;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
 }
 
 .tab-button {
@@ -680,5 +706,224 @@ body {
     
     .chat-send-btn {
         width: 100%;
+    }
+}
+
+/* Small Paywall Popup Styles */
+.paywall-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1002;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.paywall-popup {
+    background: white;
+    border-radius: 16px;
+    width: 400px;
+    max-width: 90vw;
+    padding: 2rem;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    animation: popIn 0.3s ease-out;
+    text-align: center;
+}
+
+.paywall-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: all 0.2s;
+}
+
+.paywall-close:hover {
+    background-color: #f3f4f6;
+    color: #374151;
+}
+
+.paywall-popup h3 {
+    margin: 0 0 0.5rem 0;
+    color: #1e40af;
+    font-size: 1.25rem;
+}
+
+.paywall-popup p {
+    margin: 0 0 1.5rem 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.paywall-price {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #059669;
+    margin: 1rem 0;
+}
+
+.paywall-divider {
+    margin: 1.5rem 0 1rem 0;
+    padding: 1rem 0;
+    border-top: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.paywall-unlock {
+    margin-bottom: 1.5rem;
+}
+
+.paypal-id-input {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 0.875rem;
+    text-align: center;
+    margin-bottom: 0.75rem;
+}
+
+.paypal-id-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.paypal-error {
+    color: #dc2626;
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.unlock-btn {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+}
+
+.unlock-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.consult-small-btn {
+    background: linear-gradient(135deg, #3b82f6, #1e40af);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 0.75rem;
+}
+
+.consult-small-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.skip-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.skip-btn:hover {
+    opacity: 1;
+}
+
+/* Disable pointer events on copy/download buttons when not paid */
+.nav-button.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.nav-button.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    font-size: 0.875rem;
+}
+
+@media (max-width: 640px) {
+    .paywall-popup {
+        width: 95vw;
+        padding: 1.5rem;
+    }
+    
+    .paywall-price {
+        font-size: 1.75rem;
+    }
+}
+
+/* Preview Notice Styles */
+.preview-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.preview-notice {
+    background: rgba(59, 130, 246, 0.1);
+    color: #1e40af;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .preview-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .preview-notice {
+        align-self: flex-end;
+    }
+}
+
+@media (max-width: 640px) {
+    .preview-notice {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.8rem;
     }
 }

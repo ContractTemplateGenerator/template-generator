@@ -5,7 +5,7 @@ const InteriorDesignAgreementGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [isPaid, setIsPaid] = useState(false);
-    const [showPaywall, setShowPaywall] = useState(true);
+    const [showPaywall, setShowPaywall] = useState(false); // Don't show paywall initially
     const [showLegalChat, setShowLegalChat] = useState(false);
     const [chatMessages, setChatMessages] = useState([]);
     const [chatInput, setChatInput] = useState('');
@@ -126,24 +126,21 @@ const InteriorDesignAgreementGenerator = () => {
         const paidStatus = localStorage.getItem('interiorDesignPaid');
         const savedPaypalId = localStorage.getItem('interiorDesignPaypalId');
         
-        if (savedData && paidStatus === 'true') {
+        if (savedData) {
             setFormData(JSON.parse(savedData));
         }
         
         if (paidStatus === 'true') {
             setIsPaid(true);
-            setShowPaywall(false);
             if (savedPaypalId) {
                 setPaypalId(savedPaypalId);
             }
         }
     }, []);
 
-    // Save form data
+    // Save form data (always save, not just when paid)
     const saveFormData = (data) => {
-        if (isPaid) {
-            localStorage.setItem('interiorDesignFormData', JSON.stringify(data));
-        }
+        localStorage.setItem('interiorDesignFormData', JSON.stringify(data));
     };
 
     // Handle form changes
@@ -375,7 +372,7 @@ const InteriorDesignAgreementGenerator = () => {
         }
         
         if (!validatePaypalId(paypalId.trim())) {
-            setPaypalError('Invalid PayPal ID format. Must be 17 characters with numbers and uppercase letters only.');
+            setPaypalError('Invalid PayPal Transaction ID format.');
             return;
         }
         
@@ -574,9 +571,9 @@ b) Client shall respond to Designer's requests for approvals, feedback, or addit
 
 c) Client acknowledges that Designer's ability to perform services under this Agreement is contingent upon Client's timely provision of accurate information and cooperation throughout the design process.
 
-5. Material Breach and Termination for Non-Cooperation
+${formData.includeMaterialBreach ? `5. Material Breach and Termination for Non-Cooperation
 
-${formData.includeMaterialBreach ? `A. E-Design Client Material Breaches
+A. E-Design Client Material Breaches
 
 a) The following actions by E-Design clients constitute material breaches of this Agreement that may result in immediate termination: 
    i. Failure to provide required measurements, photographs, or other essential information after two (2) written requests 
@@ -598,15 +595,15 @@ a) The following actions by Full-Service clients constitute material breaches of
 
 C. Consequences of Material Breach
 
-a) Upon material breach by Client, Designer may, at Designer's sole discretion, terminate this Agreement immediately upon written notice. In such event, Designer shall retain all fees paid for services performed and Client shall remain responsible for any costs incurred on Client's behalf.` : ''}
+a) Upon material breach by Client, Designer may, at Designer's sole discretion, terminate this Agreement immediately upon written notice. In such event, Designer shall retain all fees paid for services performed and Client shall remain responsible for any costs incurred on Client's behalf.
 
-6. Expenses and Sales Tax
+` : ''}${formData.includeMaterialBreach ? '6' : '5'}. Expenses and Sales Tax
 
 a) Client shall reimburse Designer for all reasonable out-of-pocket expenses incurred in connection with the project, including but not limited to travel, shipping, and materials costs. All costs associated with procurement, delivery, inspection, white glove delivery, and project coordination are Client's responsibility and separate from design fees.
 
 b) Client is responsible for paying all applicable sales taxes on furniture, products, and services.
 
-7. Budget and Fee Estimates
+${formData.includeMaterialBreach ? '7' : '6'}. Budget and Fee Estimates
 
 a) Designer will provide Client with a budget estimate for each space based on the agreed-upon scope of work and Client's design preferences, provided Client has supplied realistic budget parameters.
 
@@ -614,7 +611,7 @@ b) If the actual cost of furniture, products, or services exceeds the budget est
 
 c) Client acknowledges that Designer may offer vendor discounts when available, but that such discounts are provided as a courtesy and Designer is under no obligation to match pricing available from other sources or to conduct price comparisons on Client's behalf.
 
-8. Payment Terms
+${formData.includeMaterialBreach ? '8' : '7'}. Payment Terms
 
 a) ${formData.paymentTerms === 'due_on_receipt' ? 'All design fees are due upon receipt of invoice, not net thirty (30) days. Payment must be received before commencement of design work.' : 'Payment terms are net thirty (30) days from invoice date.'}
 
@@ -789,8 +786,13 @@ Signature                                  Signature
 
 Date: ____________________________        Date: ____________________________`;
 
-    // Copy to clipboard function
+    // Copy to clipboard function (blocked if not paid)
     const copyToClipboard = async () => {
+        if (!isPaid) {
+            showPreviewPaywall();
+            return;
+        }
+        
         try {
             await navigator.clipboard.writeText(documentText);
             alert('Interior Design Agreement copied to clipboard!');
@@ -800,8 +802,13 @@ Date: ____________________________        Date: ____________________________`;
         }
     };
 
-    // Download as Word document
+    // Download as Word document (blocked if not paid)
     const downloadAsWord = () => {
+        if (!isPaid) {
+            showPreviewPaywall();
+            return;
+        }
+        
         try {
             if (!documentText) {
                 alert("Cannot generate document - text is empty.");
@@ -842,154 +849,159 @@ Date: ____________________________        Date: ____________________________`;
         return () => window.removeEventListener('resize', checkTabOverflow);
     }, []);
 
-    // PayPal effect
+    // PayPal effect - only initialize when paywall is shown
     useEffect(() => {
+        const initPayPal = () => {
+            if (typeof paypal !== 'undefined' && document.getElementById('paypal-button-container')) {
+                paypal.Buttons({
+                    createOrder: (data, actions) => {
+                        return actions.order.create({
+                            purchase_units: [{
+                                amount: { value: '14.95' }
+                            }]
+                        });
+                    },
+                    onApprove: (data, actions) => {
+                        return actions.order.capture().then((details) => {
+                            setIsPaid(true);
+                            setShowPaywall(false);
+                            localStorage.setItem('interiorDesignPaid', 'true');
+                            localStorage.setItem('interiorDesignPaypalId', details.id || 'PAYPAL_PAYMENT');
+                        });
+                    }
+                }).render('#paypal-button-container');
+            }
+        };
+        
         if (showPaywall && !isPaid) {
-            const initPayPal = () => {
-                if (typeof paypal !== 'undefined') {
-                    paypal.Buttons({
-                        createOrder: (data, actions) => {
-                            return actions.order.create({
-                                purchase_units: [{
-                                    amount: { value: '14.95' }
-                                }]
-                            });
-                        },
-                        onApprove: (data, actions) => {
-                            return actions.order.capture().then((details) => {
-                                setIsPaid(true);
-                                setShowPaywall(false);
-                                localStorage.setItem('interiorDesignPaid', 'true');
-                                localStorage.setItem('interiorDesignPaypalId', details.id || 'PAYPAL_PAYMENT');
-                                saveFormData(formData);
-                            });
-                        }
-                    }).render('#paypal-button-container');
-                } else {
-                    setTimeout(initPayPal, 1000);
-                }
-            };
             setTimeout(initPayPal, 1000);
         }
     }, [showPaywall, isPaid]);
 
-    // Render paywall
-    if (showPaywall && !isPaid) {
-        return (
-            <div style={{
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: 'rgba(0, 0, 0, 0.8)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-                padding: '20px'
-            }}>
-                <div style={{
-                    background: 'white',
-                    padding: '2rem',
-                    borderRadius: '16px',
-                    maxWidth: '600px',
-                    width: '100%',
-                    textAlign: 'center',
-                    maxHeight: '90vh',
-                    overflowY: 'auto'
-                }}>
-                    <h2 style={{ marginBottom: '1rem' }}>Interior Design Services Agreement Generator</h2>
-                    <p style={{ marginBottom: '1.5rem', color: '#666' }}>
-                        Generate a comprehensive interior design services agreement with 34 professional sections.
-                    </p>
-                    <div style={{fontSize: '2rem', fontWeight: 'bold', color: '#059669', margin: '1rem 0'}}>
-                        $14.95
+    // Show preview paywall
+    const showPreviewPaywall = () => {
+        setShowPaywall(true);
+    };
+
+    // Main component render (no full-screen paywall)
+    return (
+        <div className="container">
+            {/* Contextual Tip */}
+            {contextualTip && (
+                <div className="contextual-tip">
+                    <div dangerouslySetInnerHTML={{ __html: contextualTip }} />
+                    <button onClick={() => setContextualTip('')} className="tip-close">×</button>
+                </div>
+            )}
+
+            {/* Floating Legal Help Button */}
+            <button 
+                className="floating-help-btn"
+                onClick={openLegalChat}
+                title="Get Legal Help"
+            >
+                ⚖️
+            </button>
+
+            {/* Legal Chat Popup Overlay */}
+            {showLegalChat && (
+                <div className="chat-overlay">
+                    <div className="chat-popup">
+                        <div className="chat-popup-header">
+                            <div>
+                                <h3>Legal Assistant</h3>
+                                <p>Interior Design Contract Expert</p>
+                            </div>
+                            <button onClick={closeLegalChat} className="chat-close">×</button>
+                        </div>
+                        
+                        <div className="chat-popup-messages" ref={chatMessagesRef}>
+                            {chatMessages.map((message, index) => (
+                                <div key={index} className={`chat-message ${message.role}`}>
+                                    {message.role === 'assistant' ? (
+                                        <div dangerouslySetInnerHTML={{ __html: message.content }} />
+                                    ) : (
+                                        message.content
+                                    )}
+                                </div>
+                            ))}
+                            {chatLoading && (
+                                <div className="chat-message assistant">
+                                    <div className="chat-loading">⚖️ Analyzing your question...</div>
+                                </div>
+                            )}
+                        </div>
+                        
+                        <div className="chat-popup-input">
+                            <textarea
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                                onKeyPress={handleChatKeyPress}
+                                placeholder="Ask about contracts, client issues, legal protection..."
+                                rows="2"
+                            />
+                            <button 
+                                onClick={sendChatMessage} 
+                                disabled={!chatInput.trim() || chatLoading}
+                                className="chat-send-btn"
+                            >
+                                Send
+                            </button>
+                        </div>
+                        
+                        <div className="chat-popup-footer">
+                            <button 
+                                onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                                className="consult-link"
+                            >
+                                Schedule Consultation
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div style={{ marginBottom: '2rem' }}>
-                        <div id="paypal-button-container" style={{margin: '1rem 0'}}></div>
-                    </div>
-                    
-                    <div style={{ 
-                        borderTop: '1px solid #e5e7eb', 
-                        paddingTop: '1.5rem',
-                        marginTop: '1.5rem'
-                    }}>
-                        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Already Paid? Enter Your PayPal Transaction ID</h3>
-                        <div style={{ marginBottom: '1rem' }}>
+                </div>
+            )}
+
+            {/* Small Paywall Popup (only when triggered) */}
+            {showPaywall && !isPaid && (
+                <div className="paywall-overlay">
+                    <div className="paywall-popup">
+                        <button onClick={() => setShowPaywall(false)} className="paywall-close">×</button>
+                        <h3>Unlock Document Export</h3>
+                        <p>Copy and download your completed Interior Design Services Agreement.</p>
+                        <div className="paywall-price">$14.95</div>
+                        
+                        <div id="paypal-button-container"></div>
+                        
+                        <div className="paywall-divider">Already Paid?</div>
+                        
+                        <div className="paywall-unlock">
                             <input
                                 type="text"
                                 value={paypalId}
                                 onChange={(e) => setPaypalId(e.target.value.toUpperCase())}
-                                placeholder="17-character PayPal ID (e.g., 1A2B3C4D5E6F7G8H9)"
-                                style={{
-                                    width: '100%',
-                                    padding: '0.75rem',
-                                    border: `1px solid ${paypalError ? '#dc2626' : '#d1d5db'}`,
-                                    borderRadius: '8px',
-                                    fontSize: '0.875rem',
-                                    fontFamily: 'monospace',
-                                    textAlign: 'center'
-                                }}
+                                placeholder="Enter PayPal Transaction ID"
+                                className="paypal-id-input"
                                 maxLength="17"
                             />
-                            {paypalError && (
-                                <div style={{ color: '#dc2626', fontSize: '0.875rem', marginTop: '0.5rem' }}>
-                                    {paypalError}
-                                </div>
-                            )}
+                            {paypalError && <div className="paypal-error">{paypalError}</div>}
+                            <button onClick={handlePaypalIdSubmit} className="unlock-btn">
+                                Unlock Now
+                            </button>
                         </div>
+                        
                         <button 
-                            onClick={handlePaypalIdSubmit}
-                            style={{
-                                backgroundColor: '#059669',
-                                color: 'white',
-                                padding: '0.75rem 2rem',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontWeight: '600',
-                                marginBottom: '1rem'
-                            }}
+                            onClick={() => window.Calendly?.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'})}
+                            className="consult-small-btn"
                         >
-                            Unlock Generator
+                            Need Legal Advice?
                         </button>
+                        
+                        <button onClick={skipPayment} className="skip-btn">Skip (Testing)</button>
                     </div>
-
-                    {/* Embedded Calendly */}
-                    <div style={{ 
-                        borderTop: '1px solid #e5e7eb', 
-                        paddingTop: '1.5rem',
-                        marginTop: '1.5rem'
-                    }}>
-                        <h3 style={{ marginBottom: '1rem', fontSize: '1.1rem' }}>Need Custom Legal Advice?</h3>
-                        <div className="calendly-inline-widget" 
-                             data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" 
-                             style={{minWidth:'320px', height:'400px'}}></div>
-                    </div>
-                    
-                    <button 
-                        onClick={skipPayment}
-                        style={{
-                            backgroundColor: '#6b7280',
-                            color: 'white',
-                            padding: '0.5rem 1rem',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '0.8rem',
-                            marginTop: '1rem'
-                        }}
-                    >
-                        Skip (Testing Only)
-                    </button>
                 </div>
-            </div>
-        );
-    }
+            )}
 
-    // Tab Content Rendering Functions
+            <div className="main-content">
     const renderPartiesTab = () => (
         <div className="form-section">
             <h3>Designer Information</h3>
@@ -1552,15 +1564,62 @@ Date: ____________________________        Date: ____________________________`;
             });
         }
 
+        // Calculate dynamic legal coverage
+        const calculateLegalCoverage = () => {
+            let sectionCount = 30; // Base sections always included
+            const includedFeatures = [];
+            
+            // Add conditional sections
+            if (formData.includeMaterialBreach) {
+                sectionCount += 1;
+                includedFeatures.push('material breach protection');
+            }
+            if (formData.includePhotography) {
+                sectionCount += 1;
+                includedFeatures.push('photography rights');
+            }
+            if (formData.includeConfidentiality) {
+                sectionCount += 1;
+                includedFeatures.push('confidentiality protection');
+            }
+            if (formData.includeForcemajeure) {
+                sectionCount += 1;
+                includedFeatures.push('force majeure');
+            }
+            if (formData.includeIndemnification) {
+                includedFeatures.push('indemnification');
+            }
+            if (formData.includeSeverability) {
+                includedFeatures.push('severability');
+            }
+            if (formData.includeEntireAgreement) {
+                includedFeatures.push('entire agreement');
+            }
+            
+            // Always included features
+            includedFeatures.unshift('intellectual property protection');
+            
+            return {
+                sectionCount: sectionCount,
+                featuresText: includedFeatures.length > 3 
+                    ? `${includedFeatures.slice(0, 2).join(', ')}, and ${includedFeatures.length - 2} other protections`
+                    : includedFeatures.join(', ')
+            };
+        };
+
+        const legalCoverage = calculateLegalCoverage();
+
         return (
             <div className="form-section">
                 <h3>Professional Tips & Risk Analysis</h3>
                 <div className="results-section">
                     <h4>Key Legal Protections</h4>
-                    <div className="risk-card low">
-                        <h4>✓ Material Breach Clauses</h4>
-                        <p>Protects you from difficult clients by allowing immediate termination for specific problematic behaviors like rejecting 80% of designs without cause.</p>
-                    </div>
+                    {formData.includeMaterialBreach && (
+                        <div className="risk-card low">
+                            <h4>✓ Material Breach Clauses</h4>
+                            <p>Protects you from difficult clients by allowing immediate termination for specific problematic behaviors like rejecting 80% of designs without cause.</p>
+                        </div>
+                    )}
                     <div className="risk-card low">
                         <h4>✓ Payment Protection</h4>
                         <p>Your agreement requires payment before work begins and includes late payment penalties to protect your cash flow.</p>
@@ -1600,7 +1659,7 @@ Date: ____________________________        Date: ____________________________`;
                         <strong>Communication:</strong> All feedback must go through ${formData.communicationPlatform} to maintain documentation and project flow.
                     </p>
                     <p style={{fontSize: '0.9rem', color: '#666'}}>
-                        <strong>Legal Coverage:</strong> Agreement covers 34 comprehensive sections including force majeure, indemnification, and intellectual property protection.
+                        <strong>Legal Coverage:</strong> Agreement covers ${legalCoverage.sectionCount} professional sections including ${legalCoverage.featuresText}.
                     </p>
                 </div>
             </div>
@@ -1716,6 +1775,7 @@ Date: ____________________________        Date: ____________________________`;
                                 {index + 1}. {tab.label}
                             </button>
                         ))}
+                        <div className="tab-overflow-indicator">→</div>
                     </div>
 
                     {/* Dynamic Tab Content */}
@@ -1733,7 +1793,7 @@ Date: ____________________________        Date: ____________________________`;
                         
                         <button
                             onClick={copyToClipboard}
-                            className="nav-button"
+                            className={`nav-button ${!isPaid ? 'locked' : ''}`}
                             style={{
                                 backgroundColor: "#4f46e5", 
                                 color: "white",
@@ -1745,7 +1805,7 @@ Date: ____________________________        Date: ____________________________`;
                         
                         <button
                             onClick={downloadAsWord}
-                            className="nav-button"
+                            className={`nav-button ${!isPaid ? 'locked' : ''}`}
                             style={{
                                 backgroundColor: "#2563eb", 
                                 color: "white",
@@ -1780,7 +1840,14 @@ Date: ____________________________        Date: ____________________________`;
                 {/* Live Preview Panel */}
                 <div className="preview-panel" ref={previewRef}>
                     <div className="preview-content">
-                        <h2>Live Agreement Preview</h2>
+                        <div className="preview-header">
+                            <h2>Live Agreement Preview</h2>
+                            {!isPaid && (
+                                <div className="preview-notice">
+                                    🔓 Free to explore • Pay to copy/download
+                                </div>
+                            )}
+                        </div>
                         <div className="document-preview" style={{whiteSpace: 'pre-wrap'}}>
                             {documentText}
                         </div>
