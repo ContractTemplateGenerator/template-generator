@@ -125,8 +125,68 @@ const InteriorDesignAgreementGenerator = () => {
         setFormData(newFormData);
         saveFormData(newFormData);
         
-        // Highlight changed field in preview
+        // Highlight changed field in preview and scroll to it
+        if (previewRef.current) {
+            setTimeout(() => {
+                highlightAndScrollToField(name, value);
+            }, 100);
+        }
+        
+        // Clear highlighting after 3 seconds
         setTimeout(() => setLastChanged(null), 3000);
+    };
+
+    // Highlight and scroll to changed field in preview
+    const highlightAndScrollToField = (fieldName, fieldValue) => {
+        if (!previewRef.current || !fieldValue) return;
+        
+        const previewElement = previewRef.current;
+        const previewText = previewElement.querySelector('.document-preview');
+        
+        if (!previewText) return;
+        
+        // Create a temporary element to search for the field value
+        const searchValue = fieldValue.toString();
+        const textContent = previewText.textContent;
+        
+        // Find the position of the field value in the text
+        const index = textContent.indexOf(searchValue);
+        
+        if (index !== -1) {
+            // Create a highlighted version of the text
+            const beforeText = textContent.substring(0, index);
+            const highlightedText = searchValue;
+            const afterText = textContent.substring(index + searchValue.length);
+            
+            // Temporarily highlight the changed text
+            const originalHTML = previewText.innerHTML;
+            const highlightedHTML = originalHTML.replace(
+                new RegExp(escapeRegExp(searchValue), 'g'),
+                `<span class="highlighted-text">${searchValue}</span>`
+            );
+            
+            previewText.innerHTML = highlightedHTML;
+            
+            // Scroll to the highlighted element
+            const highlightedElement = previewText.querySelector('.highlighted-text');
+            if (highlightedElement) {
+                highlightedElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+            }
+            
+            // Restore original HTML after highlighting
+            setTimeout(() => {
+                previewText.innerHTML = originalHTML;
+            }, 3000);
+        }
+    };
+
+    // Escape special regex characters
+    const escapeRegExp = (string) => {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     };
 
     // PayPal payment handling

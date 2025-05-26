@@ -7,16 +7,25 @@ window.generateWordDoc = function(documentText, formData) {
     let htmlContent = `<!DOCTYPE html>
 <html><head><meta charset="UTF-8"><title>Interior Design Services Agreement</title>
 <style>
-  body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; margin: 0; padding: 0; }
-  h1 { text-align: center; font-size: 16pt; margin-bottom: 20pt; text-decoration: underline; }
-  h2 { font-size: 14pt; margin-top: 14pt; margin-bottom: 10pt; }
-  h3 { font-size: 12pt; margin-top: 12pt; margin-bottom: 8pt; }
-  p { margin-bottom: 10pt; text-align: justify; }
-  .signature-line { margin-top: 40pt; border-bottom: 1px solid black; width: 300pt; margin-bottom: 5pt; }
+  body { font-family: 'Times New Roman', serif; font-size: 11pt; line-height: 1.5; margin: 0; padding: 0; }
+  h1 { text-align: center; font-size: 11pt; margin-bottom: 20pt; text-decoration: underline; font-weight: bold; }
+  h2 { font-size: 11pt; margin-top: 14pt; margin-bottom: 10pt; font-weight: bold; }
+  h3 { font-size: 11pt; margin-top: 12pt; margin-bottom: 8pt; font-weight: bold; }
+  p { margin-bottom: 10pt; text-align: justify; font-size: 11pt; }
   .signature-section { margin-top: 40pt; }
+  .signature-table { width: 100%; border-collapse: collapse; }
+  .signature-table td { width: 50%; text-align: center; vertical-align: top; padding: 0 20pt; }
+  .signature-line { border-bottom: 1px solid black; margin-bottom: 5pt; height: 20pt; }
+  .signature-label { font-size: 11pt; margin-bottom: 10pt; font-weight: bold; }
 </style></head><body>`;
-    // Process document text - convert newlines to HTML paragraphs
-    const processedText = documentText
+
+    // Split document into main content and signature section
+    const parts = documentText.split('IN WITNESS WHEREOF');
+    const mainContent = parts[0];
+    const signatureContent = parts[1] || '';
+
+    // Process main document text
+    const processedMainText = mainContent
       .split('\n\n')
       .map(para => {
         para = para.trim();
@@ -34,9 +43,55 @@ window.generateWordDoc = function(documentText, formData) {
         }
       })
       .join('');
-    
-    // Add processed text to HTML content
-    htmlContent += processedText;
+
+    // Add processed main text
+    htmlContent += processedMainText;
+
+    // Add signature section with proper alignment
+    if (signatureContent) {
+      htmlContent += `<p style="font-weight: bold; font-size: 11pt;">IN WITNESS WHEREOF, the Parties hereto have executed this Agreement as of the date first above written.</p>`;
+      
+      // Extract client and designer names from the signature content
+      const clientMatch = signatureContent.match(/CLIENT:\s*([^\n]*)/);
+      const designerMatch = signatureContent.match(/DESIGNER:\s*([^\n]*)/);
+      
+      const clientName = clientMatch ? clientMatch[1].trim() : '[CLIENT NAME]';
+      const designerName = designerMatch ? designerMatch[1].trim() : 'Prestige Interiors LLC';
+      
+      htmlContent += `
+      <div class="signature-section">
+        <table class="signature-table">
+          <tr>
+            <td class="signature-label">CLIENT:</td>
+            <td class="signature-label">DESIGNER:</td>
+          </tr>
+          <tr>
+            <td>${clientName}</td>
+            <td>${designerName}</td>
+          </tr>
+          <tr>
+            <td><br><br></td>
+            <td>By: [AUTHORIZED SIGNATORY]</td>
+          </tr>
+          <tr>
+            <td><div class="signature-line"></div></td>
+            <td><div class="signature-line"></div></td>
+          </tr>
+          <tr>
+            <td>Signature</td>
+            <td>Signature</td>
+          </tr>
+          <tr>
+            <td><br></td>
+            <td><br></td>
+          </tr>
+          <tr>
+            <td>Date: ____________________________</td>
+            <td>Date: ____________________________</td>
+          </tr>
+        </table>
+      </div>`;
+    }
     
     // Close HTML document
     htmlContent += '</body></html>';
