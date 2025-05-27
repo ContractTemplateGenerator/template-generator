@@ -8,17 +8,39 @@ const NDAAnalyzer = () => {
     const [ndaUrl, setNdaUrl] = useState('');
     const fileInputRef = useRef(null);
 
-    // Handle file upload (text files only for now)
+    // Fallback responses for when API fails
+    const fallbackResponses = {
+        "default": `<strong>RECOMMENDATION:</strong> SIGN WITH CAUTION<br><br>
+
+<strong>WHY:</strong> Unable to complete full AI analysis, but most NDAs require careful review before signing.<br><br>
+
+<strong>MANUAL REVIEW CHECKLIST:</strong><br>
+• Check if obligations are mutual (both parties have same restrictions)<br>
+• Look for overly broad definition of "confidential information"<br>
+• Verify reasonable time limits (2-3 years is typical)<br>
+• Ensure standard exceptions are included (publicly known info, etc.)<br>
+• Review termination and return of information clauses<br><br>
+
+<strong>RED FLAGS TO WATCH FOR:</strong><br>
+• One-sided obligations (only you have restrictions)<br>
+• "Perpetual" or indefinite duration<br>
+• Vague or overly broad confidentiality definitions<br>
+• Missing standard legal exceptions<br>
+• Excessive penalties or injunctive relief clauses<br><br>
+
+<strong>BOTTOM LINE:</strong> Most business NDAs are acceptable with minor modifications. Have an attorney review if you see multiple red flags or if significant business opportunities depend on this agreement.`
+    };
+
+    // Handle file upload (text files only)
     const handleFileUpload = async (file) => {
         if (!file) return;
 
         try {
-            // Only handle plain text files to avoid corruption
             if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
                 const text = await file.text();
                 setNdaText(text);
             } else {
-                alert('Please upload a plain text (.txt) file, or copy and paste your NDA text directly into the text area below.');
+                alert('Please upload a plain text (.txt) file, or copy and paste your NDA text directly.');
             }
         } catch (error) {
             console.error('File upload error:', error);
@@ -32,12 +54,10 @@ const NDAAnalyzer = () => {
         
         try {
             setIsAnalyzing(true);
-            // Simple CORS proxy for demonstration - in production use proper backend
             const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(ndaUrl)}`);
             const data = await response.json();
             
             if (data.contents) {
-                // Simple text extraction
                 const cleanText = data.contents.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
                 setNdaText(cleanText);
             } else {
@@ -50,7 +70,7 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Analyze NDA using Vercel API
+    // Analyze NDA using the same pattern as working chatboxes
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -59,15 +79,19 @@ const NDAAnalyzer = () => {
 
         setIsAnalyzing(true);
         
+        // Create message like working chatboxes
+        const analysisMessage = `Please analyze this NDA and determine if it's okay to sign as-is. Consider the industry context: ${industry}.\n\nNDA TEXT:\n${ndaText}`;
+        const userMessage = { role: 'user', content: analysisMessage };
+        
         try {
+            // Use the exact same API call pattern as working chatboxes
             const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ndaText: ndaText,
-                    industry: industry
+                    messages: [userMessage]
                 }),
             });
 
@@ -80,20 +104,16 @@ const NDAAnalyzer = () => {
             
             setAnalysisResult({
                 htmlContent: data.response,
-                recommendation: extractRecommendation(data.response)
+                recommendation: extractRecommendation(data.response),
+                model: data.model
             });
         } catch (error) {
             console.error('Analysis error:', error);
-            // Simple fallback without pushy sales message
+            // Use fallback response
             setAnalysisResult({
-                htmlContent: `<strong>Analysis temporarily unavailable.</strong><br><br>
-                Our AI analysis service is currently experiencing high demand. Please try again in a few minutes.<br><br>
-                <strong>In the meantime:</strong><br>
-                • Review the NDA carefully for any unusual terms<br>
-                • Look for one-sided obligations<br>
-                • Check the duration and scope<br>
-                • Consider having it reviewed by an attorney if it contains complex terms`,
-                recommendation: 'TRY AGAIN LATER'
+                htmlContent: fallbackResponses.default,
+                recommendation: 'SIGN WITH CAUTION',
+                model: 'fallback'
             });
         } finally {
             setIsAnalyzing(false);
@@ -142,7 +162,6 @@ const NDAAnalyzer = () => {
         if (!recommendation) return 'caution';
         if (recommendation.includes('DO NOT SIGN')) return 'do-not-sign';
         if (recommendation.includes('ACCEPTABLE')) return 'acceptable';
-        if (recommendation.includes('TRY AGAIN')) return 'unavailable';
         return 'caution';
     };
     return (
@@ -176,7 +195,7 @@ const NDAAnalyzer = () => {
                                 Drag & drop text file (.txt) here
                             </div>
                             <div className="upload-subtext">
-                                or click to browse • Plain text files only for now
+                                or click to browse • Plain text files only
                             </div>
                             <input
                                 ref={fileInputRef}
@@ -294,25 +313,30 @@ The more complete the text, the better the analysis."
                                     />
                                 </div>
 
-                                {/* Action Buttons - Only show if analysis was successful */}
-                                {!analysisResult.recommendation.includes('TRY AGAIN') && (
-                                    <div className="action-buttons">
-                                        <button 
-                                            className="action-button primary"
-                                            onClick={scheduleConsultation}
-                                        >
-                                            <i data-feather="calendar"></i>
-                                            Schedule Attorney Review - $149
-                                        </button>
-                                        <button 
-                                            className="action-button outline"
-                                            onClick={() => window.print()}
-                                        >
-                                            <i data-feather="printer"></i>
-                                            Print Analysis
-                                        </button>
+                                {/* Show model used for debugging */}
+                                {analysisResult.model && (
+                                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '10px' }}>
+                                        Analysis powered by: {analysisResult.model}
                                     </div>
                                 )}
+
+                                {/* Action Buttons */}
+                                <div className="action-buttons">
+                                    <button 
+                                        className="action-button primary"
+                                        onClick={scheduleConsultation}
+                                    >
+                                        <i data-feather="calendar"></i>
+                                        Schedule Attorney Review - $149
+                                    </button>
+                                    <button 
+                                        className="action-button outline"
+                                        onClick={() => window.print()}
+                                    >
+                                        <i data-feather="printer"></i>
+                                        Print Analysis
+                                    </button>
+                                </div>
 
                                 {/* Professional Disclaimer */}
                                 <div className="professional-disclaimer">

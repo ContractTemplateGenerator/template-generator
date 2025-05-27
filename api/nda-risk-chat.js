@@ -16,10 +16,10 @@ const handler = async (req, res) => {
   }
 
   try {
-    const { message, ndaText = '', industry = 'auto-detect' } = req.body;
+    const { messages } = req.body;
 
-    if (!message && !ndaText) {
-      return res.status(400).json({ error: 'NDA text or message is required' });
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array is required' });
     }
 
     // Check for Groq API key
@@ -29,7 +29,7 @@ const handler = async (req, res) => {
     }
 
     // NDA Risk Analysis system prompt
-    const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs.
+    const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Use <strong></strong> tags for critical legal concepts (NOT ** markdown)
@@ -57,15 +57,11 @@ Specific redraft suggestions using actual party names from the NDA<br><br>
 
 ANALYSIS FOCUS:
 - Extract actual party names from NDA and use them in suggestions
-- Industry context: ${industry === 'auto-detect' ? 'Determine from NDA context' : industry}
-- Focus on practical business impact
+- Focus on practical business impact, not academic theory
 - Be specific and actionable
 - Answer: "Should I sign this or not?"
 
 Provide attorney-grade analysis that's actionable for business owners.`;
-
-    // Construct the analysis message
-    const analysisMessage = message || `Analyze this NDA and determine if it's okay to sign as-is:\n\n${ndaText}`;
 
     // Try different models in order of preference
     const models = [
@@ -96,10 +92,7 @@ Provide attorney-grade analysis that's actionable for business owners.`;
                 role: 'system',
                 content: systemPrompt
               },
-              {
-                role: 'user',
-                content: analysisMessage
-              }
+              ...messages
             ],
             max_tokens: 2000,
             temperature: 0.2
@@ -126,8 +119,8 @@ Provide attorney-grade analysis that's actionable for business owners.`;
     if (!assistantMessage) {
       console.error('All models failed');
       return res.status(500).json({ 
-        error: 'Analysis temporarily unavailable',
-        details: 'Please try again in a moment'
+        error: 'All available models failed',
+        details: 'Please try again later'
       });
     }
 
