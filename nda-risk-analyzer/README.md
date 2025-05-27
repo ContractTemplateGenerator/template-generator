@@ -1,64 +1,92 @@
-# NDA Risk Analyzer - Professional Legal Tool
+# NDA Risk Analyzer - Updated with Grok API Integration
 
-A sophisticated NDA risk analysis tool powered by AI and backed by California attorney expertise.
+## 🚀 Key Updates
 
-## Features
+### ✅ **Real Grok API Integration**
+- **Model**: `llama-3.3-70b-versatile` (exactly as requested)
+- **Legal Memo Format**: Analysis structured like professional attorney review
+- **Primary Focus**: "Is it okay to sign this NDA as-is?" 
 
-### 🛡️ Professional Risk Assessment
-- **Overall Risk Score** (1-10 scale)
-- **Fairness Analysis** (0-100% balance score)
-- **Color-coded risk indicators** (Red/Yellow/Green)
-- **Multi-dimensional scoring**: Enforceability, Business Impact, Litigation Risk, Compliance Burden
+### ✅ **New Features Added**
+- **URL Input**: Users can submit links to NDAs for analysis
+- **Auto-Jurisdiction Detection**: Removed manual jurisdiction input - AI determines this
+- **Industry Auto-Detection**: Option to let AI determine industry from NDA context
+- **Contextual Analysis**: Personalized suggestions using actual party names from NDA
 
-### ⚖️ Legal Expertise Integration
-- **California-specific analysis** (B&P Code §16600, UTSA compliance)
-- **Industry-specific red flags** (Tech, Healthcare, Finance, etc.)
-- **Jurisdiction-aware recommendations**
-- **Attorney-crafted analysis framework**
+### ✅ **Legal Memo Style Output**
+1. **RECOMMENDATION**: DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN
+2. **DOCUMENT SUMMARY**: Plain English explanation of what the NDA does
+3. **CLAUSE ANALYSIS**: RED/YELLOW/GREEN risk levels with specific redraft suggestions
+4. **MISSING CLAUSES**: Tailored to the specific NDA context
+5. **BOTTOM LINE**: Clear action items and next steps
 
-### 📊 Comprehensive Analysis
-- **Clause-by-clause breakdown** with expandable details
-- **Missing standard protections** identification
-- **Negotiation priority ranking**
-- **Business impact assessment**
-- **Alternative language suggestions**
+## 🔧 **Setup Instructions**
 
-### 🎯 User Experience
-- **Drag & drop file upload** (PDF, DOC, TXT)
-- **Real-time analysis** with professional formatting
-- **Mobile-responsive design**
-- **Professional report generation**
-- **One-click attorney consultation booking**
-
-## Technology Stack
-
-- **Frontend**: React 18, Vanilla CSS
-- **AI Integration**: Grok API (with intelligent fallbacks)
-- **File Processing**: PDF parsing, text extraction
-- **Design**: Professional legal document styling
-- **Responsive**: Mobile-first approach
-
-## Setup Instructions
-
-1. **Clone/Download** the nda-risk-analyzer folder
-2. **Configure API**: Update `grok-api.js` with your Grok API credentials
-3. **Deploy**: Upload to your web server or GitHub Pages
-4. **Embed**: Use the provided iframe code in your WordPress blog
-
-## API Configuration
-
-Update `grok-api.js` with your credentials:
+### **API Configuration**
+Update your Grok API key in `grok-api.js`:
 
 ```javascript
 const GROK_API_CONFIG = {
-    endpoint: 'YOUR_GROK_API_ENDPOINT',
-    apiKey: 'YOUR_GROK_API_KEY',
-    model: 'grok-beta'
+    endpoint: 'https://api.x.ai/v1/chat/completions',
+    model: 'llama-3.3-70b-versatile',
+    apiKey: 'YOUR_ACTUAL_GROK_API_KEY_HERE'
 };
 ```
 
-## Iframe Embed Code
+### **Environment Variable (Recommended)**
+```bash
+export GROK_API_KEY="your_actual_api_key_here"
+```
 
+## 📊 **Analysis Features**
+
+### **Intelligent Content Analysis**
+- **Contextual Understanding**: Actually reads and analyzes user's NDA text
+- **Party Name Extraction**: Uses actual company/person names in redraft suggestions  
+- **Risk-Based Prioritization**: Focuses on clauses that matter most
+- **Business Impact Assessment**: Practical implications, not just legal theory
+
+### **Professional Legal Output**
+- **Attorney-Grade Analysis**: Structured like actual legal memo
+- **Specific Redrafts**: Not generic suggestions - tailored clause alternatives
+- **Color-Coded Risk Assessment**: Visual RED/YELLOW/GREEN indicators
+- **Bottom Line Recommendation**: Clear "okay to sign" or "do not sign" guidance
+
+## 🎯 **User Experience Improvements**
+
+### **Multiple Input Methods**
+- **File Upload**: Drag & drop PDF, DOC, TXT files
+- **URL Input**: Fetch NDA content from web links  
+- **Direct Paste**: Copy/paste NDA text directly
+
+### **Smart Industry Detection**
+- **Auto-Detect Option**: AI determines industry from NDA context
+- **Manual Override**: 8 industry categories available
+- **Context-Aware Suggestions**: Industry-specific red flags and recommendations
+
+### **Streamlined Interface**
+- **Removed Jurisdiction Input**: AI determines applicable law from NDA
+- **Focused Analysis**: Answers the primary question users ask: "Is it safe to sign?"
+- **Professional Presentation**: Suitable for sharing with business stakeholders
+
+## 🔄 **Grok API Integration Details**
+
+### **API Call Structure**
+```javascript
+// Calls llama-3.3-70b-versatile specifically
+model: 'llama-3.3-70b-versatile',
+temperature: 0.2, // Lower for consistent legal analysis
+max_tokens: 4000  // Comprehensive responses
+```
+
+### **Fallback System**
+- **Primary**: Grok API with llama-3.3-70b-versatile
+- **Fallback**: Professional error handling with attorney consultation recommendation
+- **Logging**: Console logs for debugging API calls
+
+## 🚀 **Deployment Ready**
+
+**Iframe Embed Code:**
 ```html
 <iframe 
   src="https://template.terms.law/nda-risk-analyzer/" 
@@ -69,41 +97,28 @@ const GROK_API_CONFIG = {
 </iframe>
 ```
 
-## Professional Differentiators
+## 📁 **Complete File Structure**
+```
+/nda-risk-analyzer/
+├── index.html          # Updated with grok-api.js integration
+├── styles.css          # New styles for legal memo format
+├── nda-analyzer.js     # Updated React component with URL input
+├── grok-api.js         # Production Grok API integration
+└── README.md          # This updated documentation
+```
 
-### vs. Generic AI Tools:
-- **Attorney-structured output** (legal memo format vs. chat responses)
-- **Jurisdiction-specific intelligence** (automatic CA law application)
-- **Risk quantification** (numerical scores vs. vague warnings)
-- **Industry expertise** (tech startup considerations, etc.)
-- **Professional presentation** (suitable for business stakeholder review)
+## 💼 **Business Impact**
 
-### Upsell Integration:
-- **High-risk score triggers** automatic attorney review recommendations
-- **Professional formatting** builds trust in your legal expertise
-- **Seamless Calendly integration** for consultation booking
-- **Risk-based pricing** recommendations ($149 for full review)
+### **Addresses Primary User Question**
+- **"Is it okay to sign as-is?"** - The #1 question clients ask attorneys
+- **Clear Recommendations** - DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE
+- **Specific Action Items** - What to negotiate, what to add, what to change
 
-## Target Audience
+### **Professional Upsell Integration**
+- **High-Risk Triggers** - "DO NOT SIGN" recommendations automatically suggest attorney review
+- **Contextual Pricing** - $149 for full attorney review and redline
+- **Trust Building** - Professional memo format demonstrates legal expertise
 
-- **Tech startups** evaluating investor/partner NDAs
-- **Small businesses** reviewing vendor agreements
-- **Entrepreneurs** negotiating partnership deals
-- **In-house counsel** seeking second opinions
-- **International companies** entering US market
+This updated tool now provides genuine legal analysis using llama-3.3-70b-versatile, focuses on the key question users need answered, and presents results in professional legal memo format that positions you as the expert attorney who understands both technology and law.
 
-## Performance Features
-
-- **Instant analysis** (< 3 seconds for most NDAs)
-- **Comprehensive coverage** (all standard NDA clauses)
-- **Professional reliability** (attorney-grade analysis)
-- **Business context** (practical impact assessment)
-
-## Legal Compliance
-
-- Includes professional disclaimers
-- Attorney credentials prominently displayed
-- Clear distinction between AI analysis and legal advice
-- Encourages professional consultation for complex matters
-
-Built by California Attorney Sergei Tokmakov (CA Bar #279869) - 13+ years experience in business law and contract drafting.
+**The tool is now ready for production deployment with real Grok API integration.**

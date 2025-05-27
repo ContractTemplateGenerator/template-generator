@@ -4,10 +4,9 @@ const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [industry, setIndustry] = useState('technology');
-    const [jurisdiction, setJurisdiction] = useState('california');
-    const [companySize, setCompanySize] = useState('startup');
+    const [industry, setIndustry] = useState('auto-detect');
     const [uploadedFile, setUploadedFile] = useState(null);
+    const [ndaUrl, setNdaUrl] = useState('');
     const fileInputRef = useRef(null);
 
     // Handle file upload
@@ -26,23 +25,52 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Handle drag and drop
-    const handleDragOver = (e) => {
-        e.preventDefault();
-        e.currentTarget.classList.add('drag-over');
+    // Handle URL input
+    const handleUrlSubmit = async () => {
+        if (!ndaUrl.trim()) return;
+        
+        try {
+            setIsAnalyzing(true);
+            const response = await fetch(ndaUrl);
+            const text = await response.text();
+            
+            // Simple text extraction (in production, use proper HTML parsing)
+            const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+            setNdaText(cleanText);
+        } catch (error) {
+            alert('Could not fetch content from URL. Please try copying the text directly.');
+        } finally {
+            setIsAnalyzing(false);
+        }
     };
 
-    const handleDragLeave = (e) => {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-    };
+    // Updated analyze function using real Grok API
+    const analyzeNDA = async () => {
+        if (!ndaText.trim()) {
+            alert('Please provide an NDA text to analyze.');
+            return;
+        }
 
-    const handleDrop = (e) => {
-        e.preventDefault();
-        e.currentTarget.classList.remove('drag-over');
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleFileUpload(files[0]);
+        setIsAnalyzing(true);
+        
+        try {
+            // Call the actual Grok API
+            const analysis = await window.callGrokAPI(ndaText, industry);
+            setAnalysisResult(analysis);
+        } catch (error) {
+            console.error('Analysis error:', error);
+            // Fallback analysis
+            setAnalysisResult({
+                recommendation: 'SIGN WITH CAUTION',
+                executiveSummary: 'API temporarily unavailable. This NDA requires manual attorney review to determine if it\'s safe to sign.',
+                documentSummary: 'Standard confidentiality agreement requiring careful evaluation.',
+                clauses: [],
+                missingClauses: ['Manual review needed for complete analysis'],
+                bottomLine: 'Schedule consultation with attorney for detailed analysis.',
+                overallRisk: 6
+            });
+        } finally {
+            setIsAnalyzing(false);
         }
     };
     // Create analysis prompt for Grok API
@@ -271,6 +299,26 @@ ${ndaText}`;
                                 style={{ display: 'none' }}
                             />
                         </div>
+                        
+                        <div className="url-input-section">
+                            <div className="url-input-header">Or enter URL to NDA:</div>
+                            <div className="url-input-group">
+                                <input
+                                    type="url"
+                                    className="url-input"
+                                    placeholder="https://example.com/nda-document.pdf"
+                                    value={ndaUrl}
+                                    onChange={(e) => setNdaUrl(e.target.value)}
+                                />
+                                <button 
+                                    className="url-submit-btn"
+                                    onClick={handleUrlSubmit}
+                                    disabled={!ndaUrl.trim() || isAnalyzing}
+                                >
+                                    Fetch
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
                     <div className="text-input-section">
@@ -285,24 +333,17 @@ ${ndaText}`;
                     <div className="analysis-options">
                         <div className="options-grid">
                             <div className="option-group">
-                                <label>Industry:</label>
+                                <label>Industry Context:</label>
                                 <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
+                                    <option value="auto-detect">Auto-detect from NDA</option>
                                     <option value="technology">Technology/Software</option>
-                                    <option value="healthcare">Healthcare</option>
-                                    <option value="finance">Finance</option>
+                                    <option value="healthcare">Healthcare/Medical</option>
+                                    <option value="finance">Finance/Banking</option>
                                     <option value="manufacturing">Manufacturing</option>
                                     <option value="retail">Retail/E-commerce</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div className="option-group">
-                                <label>Jurisdiction:</label>
-                                <select value={jurisdiction} onChange={(e) => setJurisdiction(e.target.value)}>
-                                    <option value="california">California</option>
-                                    <option value="new-york">New York</option>
-                                    <option value="delaware">Delaware</option>
-                                    <option value="texas">Texas</option>
-                                    <option value="federal">Federal</option>
+                                    <option value="consulting">Consulting/Services</option>
+                                    <option value="real-estate">Real Estate</option>
+                                    <option value="other">Other/Multiple Industries</option>
                                 </select>
                             </div>
                         </div>
@@ -645,5 +686,23 @@ ReactDOM.render(<NDAAnalyzer />, document.getElementById('root'));
             return "This NDA has moderate risk levels with some concerning provisions. Several clauses should be negotiated to better protect your interests while maintaining necessary confidentiality protections.";
         } else {
             return "This NDA appears to have acceptable risk levels, though minor modifications may improve the balance of obligations between parties.";
+        }
+    };    // Handle drag and drop
+    const handleDragOver = (e) => {
+        e.preventDefault();
+        e.currentTarget.classList.add('drag-over');
+    };
+
+    const handleDragLeave = (e) => {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.currentTarget.classList.remove('drag-over');
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            handleFileUpload(files[0]);
         }
     };
