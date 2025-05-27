@@ -84,11 +84,11 @@ const NDAAnalyzer = () => {
         const userMessage = { role: 'user', content: analysisMessage };
         
         try {
-            console.log('=== CALLING DEBUG API ===');
+            console.log('=== CALLING NDA RISK API ===');
             console.log('Message:', analysisMessage.substring(0, 200) + '...');
             
-            // Use debug endpoint to see exactly what's happening
-            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-debug', {
+            // Use the production NDA risk analysis endpoint
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -101,28 +101,26 @@ const NDAAnalyzer = () => {
             console.log('Response status:', response.status);
             
             if (!response.ok) {
-                const errorData = await response.json();
-                console.log('Error response:', errorData);
-                throw new Error(`API Error: ${errorData.error} - ${errorData.details || ''}`);
+                const errorText = await response.text();
+                console.log('Error response:', errorText);
+                throw new Error(`API Error ${response.status}: ${errorText}`);
             }
 
             const data = await response.json();
-            console.log('Success response:', data);
+            console.log('Success response received');
             
             setAnalysisResult({
                 htmlContent: data.response,
                 recommendation: extractRecommendation(data.response),
-                model: data.model,
-                debug: data.debug
+                model: data.model || 'unknown'
             });
         } catch (error) {
             console.error('Analysis error:', error);
-            // Use fallback response with error details
+            // Use fallback response
             setAnalysisResult({
-                htmlContent: `<strong>DEBUG INFO:</strong> ${error.message}<br><br>${fallbackResponses.default}`,
-                recommendation: 'DEBUG MODE',
-                model: 'fallback',
-                debug: 'error'
+                htmlContent: fallbackResponses.default,
+                recommendation: 'SIGN WITH CAUTION',
+                model: 'fallback'
             });
         } finally {
             setIsAnalyzing(false);
@@ -321,27 +319,6 @@ The more complete the text, the better the analysis."
                                         }}
                                     />
                                 </div>
-
-                                {/* Show debug info */}
-                                {analysisResult.debug && (
-                                    <div style={{ 
-                                        fontSize: '0.8rem', 
-                                        color: '#64748b', 
-                                        marginTop: '10px',
-                                        padding: '10px',
-                                        background: '#f8fafc',
-                                        borderRadius: '4px',
-                                        border: '1px solid #e2e8f0'
-                                    }}>
-                                        <strong>Debug Info:</strong> {analysisResult.debug} | 
-                                        <strong> Model:</strong> {analysisResult.model}
-                                        {analysisResult.recommendation === 'DEBUG MODE' && (
-                                            <div style={{ color: '#dc2626', marginTop: '5px' }}>
-                                                <strong>⚠️ Debug Mode Active</strong> - Check browser console for details
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
 
                                 {/* Action Buttons */}
                                 <div className="action-buttons">
