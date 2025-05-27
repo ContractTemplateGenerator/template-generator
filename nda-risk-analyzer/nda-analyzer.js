@@ -54,51 +54,99 @@ const NDAAnalyzer = () => {
         setIsAnalyzing(true);
         
         try {
-            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
+            console.log('Starting NDA analysis...', { 
+                textLength: ndaText.length, 
+                industry 
+            });
+            
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-groq-chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ndaText: ndaText,
-                    industry: industry,
-                    messages: [] // For compatibility with the API structure
+                    message: `Analyze this NDA and determine: "Is it okay to sign as-is?" 
+
+Industry: ${industry}
+
+Please provide your analysis in HTML format with:
+- RECOMMENDATION: DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN
+- WHY: Brief explanation
+- DOCUMENT SUMMARY: What this NDA does
+- KEY ISSUES: List major problems with risk levels (RED/YELLOW/GREEN)
+- SUGGESTED CHANGES: Specific improvements needed
+- BOTTOM LINE: Final recommendation
+
+NDA Text:
+${ndaText}`,
+                    contractType: 'NDA Risk Analysis'
                 }),
             });
 
+            console.log('API Response Status:', response.status);
+
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('API Error:', response.status, errorText);
+                throw new Error(`API Error: ${response.status} - ${errorText}`);
             }
 
             const data = await response.json();
-            console.log('API Response:', data);
+            console.log('API Response Data:', data);
             
             // Parse the HTML response into a structured format for display
             const analysisData = parseAnalysisResponse(data.response);
             setAnalysisResult(analysisData);
         } catch (error) {
             console.error('Analysis error:', error);
-            // Fallback analysis
-            setAnalysisResult({
-                htmlContent: `<strong>API temporarily unavailable.</strong><br><br>
-                This NDA requires manual attorney review to determine if it's safe to sign.<br><br>
-                <strong>RECOMMENDATION:</strong> SCHEDULE CONSULTATION<br><br>
-                Professional legal review recommended before signing any NDA.`,
-                recommendation: 'SCHEDULE CONSULTATION'
-            });
+            // More specific error handling
+            if (error.message.includes('Failed to fetch')) {
+                setAnalysisResult({
+                    htmlContent: `<strong>Connection Issue</strong><br><br>
+                    Unable to connect to our analysis service. Please check your internet connection and try again.<br><br>
+                    <strong>Alternative Options:</strong><br>
+                    • Try refreshing the page and analyzing again<br>
+                    • Copy your NDA text to ChatGPT or Claude for quick analysis<br>
+                    • Schedule a consultation for professional legal review`,
+                    recommendation: 'CONNECTION ERROR'
+                });
+            } else {
+                setAnalysisResult({
+                    htmlContent: `<strong>Service Temporarily Unavailable</strong><br><br>
+                    Our AI analysis service is currently experiencing issues. Here are your options:<br><br>
+                    <strong>Option 1:</strong> Try again in a few minutes<br><br>
+                    <strong>Option 2:</strong> Copy your NDA text and paste it into ChatGPT or Claude for quick analysis<br><br>
+                    <strong>Option 3:</strong> For professional legal review, you can schedule a consultation<br><br>
+                    <em>We apologize for the inconvenience and are working to restore service.</em>`,
+                    recommendation: 'SERVICE UNAVAILABLE'
+                });
+            }
         } finally {
             setIsAnalyzing(false);
         }
     };
 
-    // Parse the HTML response from the API
-    const parseAnalysisResponse = (htmlResponse) => {
-        // Extract recommendation
-        const recommendationMatch = htmlResponse.match(/<strong>RECOMMENDATION:<\/strong>\s*([^<]+)/);
-        const recommendation = recommendationMatch ? recommendationMatch[1].trim() : 'SIGN WITH CAUTION';
+    // Parse the response from the API
+    const parseAnalysisResponse = (apiResponse) => {
+        // Extract recommendation from the response
+        let recommendation = 'SIGN WITH CAUTION';
+        
+        const lowerResponse = apiResponse.toLowerCase();
+        if (lowerResponse.includes('not recommended') || lowerResponse.includes('do not sign')) {
+            recommendation = 'DO NOT SIGN';
+        } else if (lowerResponse.includes('acceptable') || lowerResponse.includes('okay to sign')) {
+            recommendation = 'ACCEPTABLE TO SIGN';
+        }
+        
+        // Convert plain text response to HTML format for better display
+        const htmlContent = apiResponse
+            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+            .replace(/\n\n/g, '<br><br>')
+            .replace(/\n/g, '<br>')
+            .replace(/(\d+\.\s)/g, '<br>$1');
         
         return {
-            htmlContent: htmlResponse,
+            htmlContent: htmlContent,
             recommendation: recommendation
         };
     };
@@ -138,6 +186,7 @@ const NDAAnalyzer = () => {
         if (!recommendation) return 'caution';
         if (recommendation.includes('DO NOT SIGN')) return 'do-not-sign';
         if (recommendation.includes('ACCEPTABLE')) return 'acceptable';
+        if (recommendation.includes('SERVICE UNAVAILABLE') || recommendation.includes('CONNECTION ERROR')) return 'service-unavailable';
         return 'caution';
     };
 
