@@ -32,26 +32,26 @@ window.generateWordDoc = function(documentText, formData) {
   }
   body { 
     font-family: 'Times New Roman', serif; 
-    font-size: 11pt; 
+    font-size: 10.5pt; 
     line-height: 1.5; 
     margin: 0; 
     padding: 0; 
   }
   h1 { 
     text-align: center; 
-    font-size: 11pt; 
+    font-size: 10.5pt; 
     margin-bottom: 20pt; 
     text-decoration: underline; 
     font-weight: bold; 
   }
   h2 { 
-    font-size: 11pt; 
+    font-size: 10.5pt; 
     margin-top: 14pt; 
     margin-bottom: 10pt; 
     font-weight: bold; 
   }
   h3 { 
-    font-size: 11pt; 
+    font-size: 10.5pt; 
     margin-top: 12pt; 
     margin-bottom: 8pt; 
     font-weight: bold; 
@@ -59,7 +59,7 @@ window.generateWordDoc = function(documentText, formData) {
   p { 
     margin-bottom: 10pt; 
     text-align: justify; 
-    font-size: 11pt; 
+    font-size: 10.5pt; 
   }
   .signature-section { 
     margin-top: 40pt; 
@@ -113,7 +113,7 @@ window.generateWordDoc = function(documentText, formData) {
 
     // Add signature section with proper alignment
     if (signatureContent) {
-      htmlContent += `<p style="font-weight: bold; font-size: 11pt;">IN WITNESS WHEREOF, the Parties hereto have executed this Agreement as of the date first above written.</p>`;
+      htmlContent += `<p style="font-weight: bold; font-size: 10.5pt;">IN WITNESS WHEREOF, the Parties hereto have executed this Agreement as of the date first above written.</p>`;
       
       // Extract client and designer names from the signature content
       const clientMatch = signatureContent.match(/CLIENT:\s*([^\n]*)/);
@@ -142,8 +142,8 @@ window.generateWordDoc = function(documentText, formData) {
             <td style="padding-top: 20pt;"><div class="signature-line"></div></td>
           </tr>
           <tr>
-            <td style="font-size: 11pt; text-align: left;">Signature</td>
-            <td style="font-size: 11pt; text-align: left;">Signature</td>
+            <td style="font-size: 10.5pt; text-align: left;">Signature</td>
+            <td style="font-size: 10.5pt; text-align: left;">Signature</td>
           </tr>
           <tr>
             <td style="padding-top: 15pt; text-align: left;">Date: ____________________________</td>

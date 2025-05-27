@@ -1827,7 +1827,7 @@ Date: ____________________________        Date: ____________________________`;
                 <div className="form-panel">
                     <div className="header">
                         <h1>Interior Design Services Agreement Generator</h1>
-                        <p>Create a comprehensive 34-section professional interior design services agreement</p>
+                        <p>Battle-tested agreement protecting against the 9 most devastating client behaviors: measurement failures, budget bait-and-switch, serial design rejection, scope creep, payment delays, and vendor interference. Developed from 200+ interior design disputes.</p>
                     </div>
 
                     <div className="tab-navigation">
