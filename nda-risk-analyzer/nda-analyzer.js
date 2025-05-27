@@ -70,7 +70,7 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Analyze NDA using the same pattern as working chatboxes
+    // Analyze NDA using debug endpoint to see what's happening
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -84,8 +84,11 @@ const NDAAnalyzer = () => {
         const userMessage = { role: 'user', content: analysisMessage };
         
         try {
-            // Use the exact same API call pattern as working chatboxes
-            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
+            console.log('=== CALLING DEBUG API ===');
+            console.log('Message:', analysisMessage.substring(0, 200) + '...');
+            
+            // Use debug endpoint to see exactly what's happening
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-debug', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -95,25 +98,31 @@ const NDAAnalyzer = () => {
                 }),
             });
 
+            console.log('Response status:', response.status);
+            
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorData = await response.json();
+                console.log('Error response:', errorData);
+                throw new Error(`API Error: ${errorData.error} - ${errorData.details || ''}`);
             }
 
             const data = await response.json();
-            console.log('API Response:', data);
+            console.log('Success response:', data);
             
             setAnalysisResult({
                 htmlContent: data.response,
                 recommendation: extractRecommendation(data.response),
-                model: data.model
+                model: data.model,
+                debug: data.debug
             });
         } catch (error) {
             console.error('Analysis error:', error);
-            // Use fallback response
+            // Use fallback response with error details
             setAnalysisResult({
-                htmlContent: fallbackResponses.default,
-                recommendation: 'SIGN WITH CAUTION',
-                model: 'fallback'
+                htmlContent: `<strong>DEBUG INFO:</strong> ${error.message}<br><br>${fallbackResponses.default}`,
+                recommendation: 'DEBUG MODE',
+                model: 'fallback',
+                debug: 'error'
             });
         } finally {
             setIsAnalyzing(false);
@@ -313,10 +322,24 @@ The more complete the text, the better the analysis."
                                     />
                                 </div>
 
-                                {/* Show model used for debugging */}
-                                {analysisResult.model && (
-                                    <div style={{ fontSize: '0.8rem', color: '#64748b', marginTop: '10px' }}>
-                                        Analysis powered by: {analysisResult.model}
+                                {/* Show debug info */}
+                                {analysisResult.debug && (
+                                    <div style={{ 
+                                        fontSize: '0.8rem', 
+                                        color: '#64748b', 
+                                        marginTop: '10px',
+                                        padding: '10px',
+                                        background: '#f8fafc',
+                                        borderRadius: '4px',
+                                        border: '1px solid #e2e8f0'
+                                    }}>
+                                        <strong>Debug Info:</strong> {analysisResult.debug} | 
+                                        <strong> Model:</strong> {analysisResult.model}
+                                        {analysisResult.recommendation === 'DEBUG MODE' && (
+                                            <div style={{ color: '#dc2626', marginTop: '5px' }}>
+                                                <strong>⚠️ Debug Mode Active</strong> - Check browser console for details
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 

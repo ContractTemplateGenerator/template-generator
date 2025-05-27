@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NDA API Debug Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; max-width: 1000px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 15px; background: #f8f9fa; border-radius: 4px; font-family: monospace; white-space: pre-wrap; }
+        .success { background: #d4edda; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; border: 1px solid #f5c6cb; }
+        textarea { width: 100%; height: 150px; font-family: monospace; }
+        h1 { color: #333; }
+        h3 { color: #666; }
+    </style>
+</head>
+<body>
+    <h1>🔧 NDA API Debug Tool</h1>
+    <p>Let's figure out exactly what's wrong with the API...</p>
+    
+    <div class="test-section">
+        <h3>Step 1: Test Basic API Connection</h3>
+        <button onclick="testBasicAPI()">Test API Endpoint</button>
+        <div id="basicTest" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 2: Test With Sample NDA</h3>
+        <button onclick="testNDAAPI()">Test NDA Analysis</button>
+        <div id="ndaTest" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 3: Test Current Frontend</h3>
+        <textarea id="testNDA" placeholder="Paste NDA text here for testing...">
+This Non-Disclosure Agreement ("Agreement") is entered into between ABC Company and XYZ Corp for the purpose of evaluating a potential business relationship.
+
+1. Confidential Information shall mean any and all information disclosed by either party.
+2. The receiving party agrees not to disclose confidential information to third parties.
+3. This agreement shall remain in effect for five (5) years from the date of execution.
+4. The parties agree that any breach may result in irreparable harm.
+        </textarea>
+        <br>
+        <button onclick="testFrontend()">Test Frontend Call</button>
+        <div id="frontendTest" class="result"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Step 4: Compare With Working Chatbox</h3>
+        <button onclick="testWorkingAPI()">Test Interior Design API</button>
+        <div id="workingTest" class="result"></div>
+    </div>
+
+    <script>
+        async function testBasicAPI() {
+            const result = document.getElementById('basicTest');
+            result.innerHTML = 'Testing basic API connection...';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-debug');
+                const data = await response.json();
+                
+                result.innerHTML = `✅ SUCCESS - Basic API Working\n\nResponse: ${JSON.stringify(data, null, 2)}`;
+                result.className = 'result success';
+            } catch (error) {
+                result.innerHTML = `❌ ERROR - API Connection Failed\n\nError: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        async function testNDAAPI() {
+            const result = document.getElementById('ndaTest');
+            result.innerHTML = 'Testing NDA analysis...';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-debug', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [{
+                            role: 'user',
+                            content: 'Analyze this simple NDA: This agreement is between Company A and Company B. Both parties agree not to disclose confidential information for 2 years.'
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `✅ SUCCESS - NDA Analysis Working\n\nModel: ${data.model}\nResponse: ${data.response}\nDebug: ${data.debug}`;
+                    result.className = 'result success';
+                } else {
+                    result.innerHTML = `❌ ERROR - NDA Analysis Failed\n\nStatus: ${response.status}\nError: ${data.error}\nDetails: ${data.details}\nDebug: ${data.debug}`;
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.innerHTML = `❌ ERROR - Request Failed\n\nError: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        async function testFrontend() {
+            const result = document.getElementById('frontendTest');
+            const ndaText = document.getElementById('testNDA').value;
+            result.innerHTML = 'Testing current frontend approach...';
+            result.className = 'result';
+            
+            try {
+                const analysisMessage = `Please analyze this NDA and determine if it's okay to sign as-is.\n\nNDA TEXT:\n${ndaText}`;
+                const userMessage = { role: 'user', content: analysisMessage };
+                
+                const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-debug', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: [userMessage] })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `✅ SUCCESS - Frontend Working\n\nModel: ${data.model}\nResponse Length: ${data.response.length} chars\nDebug: ${data.debug}\n\nSample Response:\n${data.response.substring(0, 500)}...`;
+                    result.className = 'result success';
+                } else {
+                    result.innerHTML = `❌ ERROR - Frontend Failed\n\nStatus: ${response.status}\nError: ${data.error}\nDetails: ${data.details}\nDebug: ${data.debug}`;
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.innerHTML = `❌ ERROR - Frontend Request Failed\n\nError: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        async function testWorkingAPI() {
+            const result = document.getElementById('workingTest');
+            result.innerHTML = 'Testing working interior design API for comparison...';
+            result.className = 'result';
+            
+            try {
+                const response = await fetch('https://template-generator-aob3.vercel.app/api/interior-design-chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        messages: [{
+                            role: 'user',
+                            content: 'Can I terminate a client who rejects designs?'
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    result.innerHTML = `✅ SUCCESS - Working API Confirmed\n\nModel: ${data.model}\nResponse Length: ${data.response.length} chars\n\nThis proves the API infrastructure works!`;
+                    result.className = 'result success';
+                } else {
+                    result.innerHTML = `❌ ERROR - Even Working API Failed\n\nStatus: ${response.status}\nThis suggests a broader infrastructure issue.`;
+                    result.className = 'result error';
+                }
+            } catch (error) {
+                result.innerHTML = `❌ ERROR - Working API Test Failed\n\nError: ${error.message}`;
+                result.className = 'result error';
+            }
+        }
+
+        // Auto-run basic test on page load
+        window.onload = function() {
+            testBasicAPI();
+        };
+    </script>
+</body>
+</html>
