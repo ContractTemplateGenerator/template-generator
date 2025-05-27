@@ -1,27 +1,28 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useRef } = React;
 
 const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [industry, setIndustry] = useState('auto-detect');
-    const [uploadedFile, setUploadedFile] = useState(null);
     const [ndaUrl, setNdaUrl] = useState('');
     const fileInputRef = useRef(null);
 
-    // Handle file upload
+    // Handle file upload (text files only for now)
     const handleFileUpload = async (file) => {
         if (!file) return;
 
-        setUploadedFile(file);
-        
-        if (file.type === 'application/pdf') {
-            alert('PDF upload feature coming soon. Please copy and paste your NDA text for now.');
-            return;
-        } else {
-            // Handle text files
-            const text = await file.text();
-            setNdaText(text);
+        try {
+            // Only handle plain text files to avoid corruption
+            if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                const text = await file.text();
+                setNdaText(text);
+            } else {
+                alert('Please upload a plain text (.txt) file, or copy and paste your NDA text directly into the text area below.');
+            }
+        } catch (error) {
+            console.error('File upload error:', error);
+            alert('Error reading file. Please copy and paste your NDA text directly.');
         }
     };
 
@@ -31,125 +32,80 @@ const NDAAnalyzer = () => {
         
         try {
             setIsAnalyzing(true);
-            const response = await fetch(ndaUrl);
-            const text = await response.text();
+            // Simple CORS proxy for demonstration - in production use proper backend
+            const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(ndaUrl)}`);
+            const data = await response.json();
             
-            // Simple text extraction (in production, use proper HTML parsing)
-            const cleanText = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
-            setNdaText(cleanText);
+            if (data.contents) {
+                // Simple text extraction
+                const cleanText = data.contents.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                setNdaText(cleanText);
+            } else {
+                throw new Error('Could not fetch content');
+            }
         } catch (error) {
-            alert('Could not fetch content from URL. Please try copying the text directly.');
+            alert('Could not fetch content from URL. Please copy and paste your NDA text directly.');
         } finally {
             setIsAnalyzing(false);
         }
     };
 
-    // Analyze NDA using Vercel API endpoint
+    // Analyze NDA using Vercel API
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
-            alert('Please provide an NDA text to analyze.');
+            alert('Please enter your NDA text to analyze.');
             return;
         }
 
         setIsAnalyzing(true);
         
         try {
-            console.log('Starting NDA analysis...', { 
-                textLength: ndaText.length, 
-                industry 
-            });
-            
-            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-groq-chat', {
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    message: `Analyze this NDA and determine: "Is it okay to sign as-is?" 
-
-Industry: ${industry}
-
-Please provide your analysis in HTML format with:
-- RECOMMENDATION: DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN
-- WHY: Brief explanation
-- DOCUMENT SUMMARY: What this NDA does
-- KEY ISSUES: List major problems with risk levels (RED/YELLOW/GREEN)
-- SUGGESTED CHANGES: Specific improvements needed
-- BOTTOM LINE: Final recommendation
-
-NDA Text:
-${ndaText}`,
-                    contractType: 'NDA Risk Analysis'
+                    ndaText: ndaText,
+                    industry: industry
                 }),
             });
 
-            console.log('API Response Status:', response.status);
-
             if (!response.ok) {
-                const errorText = await response.text();
-                console.error('API Error:', response.status, errorText);
-                throw new Error(`API Error: ${response.status} - ${errorText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('API Response Data:', data);
+            console.log('API Response:', data);
             
-            // Parse the HTML response into a structured format for display
-            const analysisData = parseAnalysisResponse(data.response);
-            setAnalysisResult(analysisData);
+            setAnalysisResult({
+                htmlContent: data.response,
+                recommendation: extractRecommendation(data.response)
+            });
         } catch (error) {
             console.error('Analysis error:', error);
-            // More specific error handling
-            if (error.message.includes('Failed to fetch')) {
-                setAnalysisResult({
-                    htmlContent: `<strong>Connection Issue</strong><br><br>
-                    Unable to connect to our analysis service. Please check your internet connection and try again.<br><br>
-                    <strong>Alternative Options:</strong><br>
-                    • Try refreshing the page and analyzing again<br>
-                    • Copy your NDA text to ChatGPT or Claude for quick analysis<br>
-                    • Schedule a consultation for professional legal review`,
-                    recommendation: 'CONNECTION ERROR'
-                });
-            } else {
-                setAnalysisResult({
-                    htmlContent: `<strong>Service Temporarily Unavailable</strong><br><br>
-                    Our AI analysis service is currently experiencing issues. Here are your options:<br><br>
-                    <strong>Option 1:</strong> Try again in a few minutes<br><br>
-                    <strong>Option 2:</strong> Copy your NDA text and paste it into ChatGPT or Claude for quick analysis<br><br>
-                    <strong>Option 3:</strong> For professional legal review, you can schedule a consultation<br><br>
-                    <em>We apologize for the inconvenience and are working to restore service.</em>`,
-                    recommendation: 'SERVICE UNAVAILABLE'
-                });
-            }
+            // Simple fallback without pushy sales message
+            setAnalysisResult({
+                htmlContent: `<strong>Analysis temporarily unavailable.</strong><br><br>
+                Our AI analysis service is currently experiencing high demand. Please try again in a few minutes.<br><br>
+                <strong>In the meantime:</strong><br>
+                • Review the NDA carefully for any unusual terms<br>
+                • Look for one-sided obligations<br>
+                • Check the duration and scope<br>
+                • Consider having it reviewed by an attorney if it contains complex terms`,
+                recommendation: 'TRY AGAIN LATER'
+            });
         } finally {
             setIsAnalyzing(false);
         }
     };
 
-    // Parse the response from the API
-    const parseAnalysisResponse = (apiResponse) => {
-        // Extract recommendation from the response
-        let recommendation = 'SIGN WITH CAUTION';
-        
-        const lowerResponse = apiResponse.toLowerCase();
-        if (lowerResponse.includes('not recommended') || lowerResponse.includes('do not sign')) {
-            recommendation = 'DO NOT SIGN';
-        } else if (lowerResponse.includes('acceptable') || lowerResponse.includes('okay to sign')) {
-            recommendation = 'ACCEPTABLE TO SIGN';
-        }
-        
-        // Convert plain text response to HTML format for better display
-        const htmlContent = apiResponse
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-            .replace(/\n\n/g, '<br><br>')
-            .replace(/\n/g, '<br>')
-            .replace(/(\d+\.\s)/g, '<br>$1');
-        
-        return {
-            htmlContent: htmlContent,
-            recommendation: recommendation
-        };
+    // Extract recommendation from response
+    const extractRecommendation = (htmlResponse) => {
+        const match = htmlResponse.match(/<strong>RECOMMENDATION:<\/strong>\s*([^<]+)/);
+        return match ? match[1].trim() : 'REVIEW NEEDED';
     };
+
     // Handle drag and drop
     const handleDragOver = (e) => {
         e.preventDefault();
@@ -186,15 +142,14 @@ ${ndaText}`,
         if (!recommendation) return 'caution';
         if (recommendation.includes('DO NOT SIGN')) return 'do-not-sign';
         if (recommendation.includes('ACCEPTABLE')) return 'acceptable';
-        if (recommendation.includes('SERVICE UNAVAILABLE') || recommendation.includes('CONNECTION ERROR')) return 'service-unavailable';
+        if (recommendation.includes('TRY AGAIN')) return 'unavailable';
         return 'caution';
     };
-
     return (
         <div className="nda-analyzer">
             <div className="header">
                 <h1>🛡️ NDA Risk Analyzer</h1>
-                <p>Professional-Grade Legal Analysis by California Attorney</p>
+                <p>Professional Legal Analysis by California Attorney</p>
                 <div className="attorney-info">
                     Sergei Tokmakov, Esq. • CA Bar #279869 • 13+ Years Experience
                 </div>
@@ -218,15 +173,15 @@ ${ndaText}`,
                         >
                             <div className="upload-icon">📄</div>
                             <div className="upload-text">
-                                Drag & drop your NDA file here
+                                Drag & drop text file (.txt) here
                             </div>
                             <div className="upload-subtext">
-                                or click to browse (PDF, DOC, TXT)
+                                or click to browse • Plain text files only for now
                             </div>
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept=".pdf,.doc,.docx,.txt"
+                                accept=".txt,text/plain"
                                 onChange={(e) => handleFileUpload(e.target.files[0])}
                                 style={{ display: 'none' }}
                             />
@@ -238,7 +193,7 @@ ${ndaText}`,
                                 <input
                                     type="url"
                                     className="url-input"
-                                    placeholder="https://example.com/nda-document.pdf"
+                                    placeholder="https://example.com/nda-document.html"
                                     value={ndaUrl}
                                     onChange={(e) => setNdaUrl(e.target.value)}
                                 />
@@ -252,34 +207,36 @@ ${ndaText}`,
                             </div>
                         </div>
                     </div>
+
                     <div className="text-input-section">
                         <textarea
                             className="nda-textarea"
-                            placeholder="Or paste your NDA text here for instant analysis..."
+                            placeholder="Paste your NDA text here for instant analysis...
+
+Example: 'This Non-Disclosure Agreement is entered into between Company A and Company B for the purpose of...'
+
+The more complete the text, the better the analysis."
                             value={ndaText}
                             onChange={(e) => setNdaText(e.target.value)}
                         />
                     </div>
 
                     <div className="analysis-options">
-                        <div className="options-grid">
-                            <div className="option-group">
-                                <label>Industry Context:</label>
-                                <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
-                                    <option value="auto-detect">Auto-detect from NDA</option>
-                                    <option value="technology">Technology/Software</option>
-                                    <option value="healthcare">Healthcare/Medical</option>
-                                    <option value="finance">Finance/Banking</option>
-                                    <option value="manufacturing">Manufacturing</option>
-                                    <option value="retail">Retail/E-commerce</option>
-                                    <option value="consulting">Consulting/Services</option>
-                                    <option value="real-estate">Real Estate</option>
-                                    <option value="other">Other/Multiple Industries</option>
-                                </select>
-                            </div>
+                        <div className="option-group">
+                            <label>Industry Context (optional):</label>
+                            <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
+                                <option value="auto-detect">Let AI determine from NDA</option>
+                                <option value="technology">Technology/Software</option>
+                                <option value="healthcare">Healthcare/Medical</option>
+                                <option value="finance">Finance/Banking</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="retail">Retail/E-commerce</option>
+                                <option value="consulting">Consulting/Services</option>
+                                <option value="real-estate">Real Estate</option>
+                                <option value="other">Other</option>
+                            </select>
                         </div>
                     </div>
-
                     <button
                         className="analyze-button"
                         onClick={analyzeNDA}
@@ -312,7 +269,7 @@ ${ndaText}`,
                                 <div className="waiting-icon">⚖️</div>
                                 <div className="waiting-text">Ready to analyze your NDA</div>
                                 <div className="waiting-subtext">
-                                    Upload or paste your NDA text and click "Analyze NDA Risk" to get started
+                                    Paste your NDA text and click "Analyze NDA Risk" to get professional legal analysis
                                 </div>
                             </div>
                         ) : (
@@ -324,7 +281,7 @@ ${ndaText}`,
                                         Is it okay to sign as-is?
                                     </h3>
                                     <div className="recommendation-answer">
-                                        <strong>{analysisResult.recommendation || 'SIGN WITH CAUTION'}</strong>
+                                        <strong>{analysisResult.recommendation}</strong>
                                     </div>
                                 </div>
 
@@ -332,34 +289,36 @@ ${ndaText}`,
                                 <div className="legal-analysis-content">
                                     <div 
                                         dangerouslySetInnerHTML={{ 
-                                            __html: analysisResult.htmlContent || 'Analysis unavailable. Please try again or schedule a consultation.' 
+                                            __html: analysisResult.htmlContent 
                                         }}
                                     />
                                 </div>
-                                {/* Action Buttons */}
-                                <div className="action-buttons">
-                                    <button 
-                                        className="action-button primary"
-                                        onClick={scheduleConsultation}
-                                    >
-                                        <i data-feather="calendar"></i>
-                                        Schedule Attorney Review - $149
-                                    </button>
-                                    <button className="action-button secondary">
-                                        <i data-feather="download"></i>
-                                        Download Report
-                                    </button>
-                                    <button className="action-button outline">
-                                        <i data-feather="share-2"></i>
-                                        Share Analysis
-                                    </button>
-                                </div>
+
+                                {/* Action Buttons - Only show if analysis was successful */}
+                                {!analysisResult.recommendation.includes('TRY AGAIN') && (
+                                    <div className="action-buttons">
+                                        <button 
+                                            className="action-button primary"
+                                            onClick={scheduleConsultation}
+                                        >
+                                            <i data-feather="calendar"></i>
+                                            Schedule Attorney Review - $149
+                                        </button>
+                                        <button 
+                                            className="action-button outline"
+                                            onClick={() => window.print()}
+                                        >
+                                            <i data-feather="printer"></i>
+                                            Print Analysis
+                                        </button>
+                                    </div>
+                                )}
 
                                 {/* Professional Disclaimer */}
                                 <div className="professional-disclaimer">
-                                    <p style={{ fontSize: '0.9rem', fontStyle: 'italic', color: '#64748b', marginTop: '20px' }}>
+                                    <p>
                                         This analysis is provided for informational purposes only and does not constitute legal advice. 
-                                        For specific legal guidance tailored to your situation, schedule a consultation with attorney Sergei Tokmakov.
+                                        For specific legal guidance, consult with a qualified attorney.
                                     </p>
                                 </div>
                             </div>
