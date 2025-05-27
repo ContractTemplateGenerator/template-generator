@@ -584,98 +584,142 @@ const InteriorDesignAgreementGenerator = () => {
         setCurrentTab(index);
     };
 
-    // Complete sophisticated document generation matching original 34-section agreement
+    // Complete sophisticated document generation with rearranged sections
     const documentText = `INTERIOR DESIGN SERVICES AGREEMENT
 
 This Interior Design Services Agreement ("Agreement") is entered into on ${formData.agreementDate} by and between ${formData.designerName}, a ${formData.designerEntity} with its principal place of business at ${formData.designerAddress} ("Designer"), and ${formData.clientName || '[CLIENT NAME]'}, ${formData.clientType === 'individual' ? 'an individual residing' : 'a company located'} at ${formData.clientAddress || '[CLIENT ADDRESS]'} ("Client") (collectively, the "Parties").
 
-1. Scope of Services
+1. Project Scope and Design Services
 
-a) The Designer agrees to provide interior design services for the following areas of the Client's property located at ${formData.projectAddress || '[PROJECT ADDRESS]'}:
+A. Service Areas and Scope
+
+a) Designer agrees to provide interior design services for the following specific areas of Client's property located at ${formData.projectAddress || '[PROJECT ADDRESS]'}:
 
 ${formData.projectRooms || '[LIST SPECIFIC ROOMS/AREAS]'}
 
-b) Services include creating 2D renderings, selecting furniture and decor items, and providing shoppable links or purchase locations for each space. Designer will provide up to three (3) selections per item in each room design.
+b) Services encompass creating 2D renderings, curating furniture and decor selections, and providing purchasing information including shoppable links or vendor locations for each designed space. Designer will present up to three (3) alternative selections per item category in each room design.
 
-c) Designer will make best efforts to accommodate Client's design preferences and budget while adhering to the agreed-upon project scope and timeline, provided that Client fulfills all obligations and responsibilities under this Agreement, including but not limited to providing accurate measurements, timely feedback, and maintaining commercially reasonable budget parameters.
+c) Designer will exercise best efforts to accommodate Client's aesthetic preferences and budget parameters while maintaining the agreed project scope and timeline, contingent upon Client's fulfillment of all obligations specified herein, including provision of accurate measurements, timely feedback, and maintenance of commercially reasonable budget expectations.
 
-2. Design Process
+B. Design Process Workflow
 
-The design process consists of the following stages:
+The design workflow consists of the following sequential stages:
 
-a) Intake - Free consultation to assess the project scope, Client's design preferences, and budget.
+a) Initial Consultation - Complimentary consultation to evaluate project scope, Client's design objectives, and budget parameters.
 
-b) Locate - Web search to fulfill Client's needs with all shoppable links or purchase locations. Designer will present selections to Client for approval.
+b) Research and Sourcing - Comprehensive search to identify items meeting Client's requirements with complete purchasing information and vendor locations. Designer will present curated selections to Client for approval.
 
-c) Order - Designer will provide available discounts at applicable stores/retailers/vendors/suppliers. Upon Client's approval of items and receipt of full payment from Client, Designer will coordinate ordering and procurement of all items through Designer's vendor accounts. Client must remit payment to Designer for all approved items before any orders are placed. Orders will only be processed after funds have cleared Designer's bank account.
+c) Procurement Coordination - Designer will offer available trade discounts at participating vendors and suppliers. Upon Client's approval of items and receipt of full payment, Designer will coordinate ordering and procurement through established vendor relationships. Client must remit payment to Designer for all approved items prior to order placement. Orders will be processed exclusively after Client's payment has cleared Designer's business account.
 
-d) Installation - ${formData.includeInstallation ? 'Designer will coordinate installation services and oversight.' : 'All materials to be placed accordingly by the homeowner or white glove delivery, as coordinated by the Client at Client\'s expense.'}
+d) Implementation Phase - ${formData.includeInstallation ? 'Designer will coordinate installation services and provide oversight.' : 'All materials to be arranged by homeowner or through white glove delivery service, as coordinated by Client at Client\'s expense.'}
 
-e) Project Close Out - Upon completion of installation and final walk-through, the project will be considered complete.
+e) Project Completion - Upon completion of installation and final walkthrough, the project will be considered finished and accepted.
 
-3. Service Types and Fees
+2. Fee Structure and Payment Terms
 
-${formData.serviceType === 'e-design' ? `A. E-Design Services
+2. Fee Structure and Payment Terms
 
-a) The e-design fee for each space is $${formData.eDesignFee} per room. This fee covers furniture and decor selection only and does not include full-service design coordination, installation oversight, or project management.
+A. Service Categories and Pricing
 
-b) E-design packages are valid for ${formData.validityPeriod} days after final payment is received unless otherwise specified in writing. After expiration, no revisions, support, or additional services will be provided without execution of a new agreement.
+${formData.serviceType === 'e-design' ? `E-Design Service Package
 
-c) E-design packages are created specifically for the property address specified in this Agreement and may not be transferred to, used for, or adapted to any other property or location unless specified in writing prior to the execution of this Agreement.
+a) The e-design service fee is $${formData.eDesignFee} per room/space. This fee encompasses furniture and decor selection exclusively and does not include full-service design coordination, installation oversight, or project management services.
 
-d) E-design services include initial design boards for each agreed-upon room, up to three (3) selections per item in each room, and up to ${formData.revisionRounds} rounds of revisions per item based on Client's feedback.` : `A. Full-Service Interior Design
+b) E-design packages remain valid for ${formData.validityPeriod} days following final payment receipt unless otherwise specified in writing. Upon expiration, no revisions, support, or additional services will be provided without execution of a new service agreement.
 
-a) Full-service design includes the e-design package plus additional services as specified below.
+c) E-design packages are developed specifically for the property address designated in this Agreement and may not be transferred to, utilized for, or adapted to any other property or location without prior written specification and Designer approval.
 
-b) Hands-on services including furniture installation, in-person shopping, and styling will be billed at a rate of $${formData.fullServiceHourlyRate} per hour.
+d) E-design services encompass initial design boards for each contracted room, up to three (3) alternative selections per item category in each room, and up to ${formData.revisionRounds} revision cycles per item based on Client's feedback.` : `Full-Service Interior Design Package
 
-c) Project management services, when specifically contracted, will be provided on a cost-plus basis at ${formData.projectManagementRate} percent above all subcontractor, vendor, and supplier costs for oversight and coordination of contractors, vendors, installations, wallpaper installation, and other trade services.`}
+a) Full-service design encompasses the e-design package plus additional comprehensive services as detailed below.
 
-B. Additional Fees
+b) Hands-on services including furniture installation, in-person shopping assistance, and styling will be invoiced at $${formData.fullServiceHourlyRate} per hour.
 
-a) $${formData.additionalSelectionsFee} will be charged for each additional set of three (3) selections per item beyond the initial three (3) provided.
+c) Project management services, when specifically contracted, will be provided on a cost-plus basis at ${formData.projectManagementRate} percent above all subcontractor, vendor, and supplier costs for coordination and oversight of contractors, vendors, installations, wallpaper installation, and other trade services.`}
 
-b) $${formData.delayedPurchaseFee} will be charged if Client requests new item selections due to delayed purchasing beyond three (3) business days after approval.
+B. Additional Service Fees
 
-c) $${formData.itemRemovalFee} per hour will be charged if Designer is required to remove unwanted personal items from the design area on installation day.
+a) Each additional set of three (3) selections per item beyond the initial presentation will incur a $${formData.additionalSelectionsFee} charge.
 
-d) If a full redesign is required after final approval, a flat fee of $${formData.redesignFee} will be charged.
+b) Client requests for new item selections due to purchase delays beyond three (3) business days after approval will result in a $${formData.delayedPurchaseFee} re-sourcing fee.
 
-${formData.includeRushOption ? `e) Rush projects requiring completion in less than ${formData.projectTimeline} days will incur a ${formData.rushSurcharge} percent surcharge on all applicable fees.` : ''}
+c) Designer time required to remove unwanted personal items from the design area on installation day will be charged at $${formData.itemRemovalFee} per hour.
 
-4. Client Responsibilities and Required Information
+d) Complete redesign requirements after final approval will incur a flat fee of $${formData.redesignFee}.
 
-A. E-Design Client Responsibilities
+${formData.includeRushOption ? `e) Projects requiring completion in less than ${formData.projectTimeline} days will incur a ${formData.rushSurcharge} percent surcharge on all applicable fees.` : ''}
+
+C. Payment Terms and Billing
+
+a) ${formData.paymentTerms === 'due_on_receipt' ? 'All design fees are due upon receipt of invoice, not net thirty (30) days. Payment must be received prior to commencement of design work.' : 'Payment terms are net thirty (30) days from invoice date.'}
+
+b) For full-service projects, ${formData.depositPercentage} percent of total estimated fees is due upon contract execution, with the remaining ${100 - parseInt(formData.depositPercentage)} percent due prior to furniture ordering commencement.
+
+c) For furniture and product purchases, Client must remit full payment to Designer prior to any order placement. Designer will process orders exclusively after Client's payment has cleared Designer's business account.
+
+d) Client has three (3) business days following approval to commit to purchasing approved items by remitting payment to Designer. If items become unavailable due to Client's payment delay beyond this timeframe, Designer may charge additional sourcing fees to locate replacement items.
+
+e) Payments shall be made to ${formData.designerName} via check, wire transfer, or Zelle${formData.designerEmail ? ` (${formData.designerEmail})` : ''}. All design fees and project services are non-refundable.
+
+D. Budget Estimates and Cost Management
+
+a) Designer will provide Client with budget estimates for each space based on the agreed scope of work and Client's design preferences, provided Client has supplied realistic budget parameters.
+
+b) If actual costs of furniture, products, or services exceed budget estimates due to Client's requests or changes, Designer will notify Client and obtain approval before proceeding with purchases.
+
+c) Client acknowledges that Designer may offer vendor discounts when available, but such discounts are provided as a courtesy and Designer is under no obligation to match pricing available from other sources or to conduct price comparisons on Client's behalf.
+
+E. Late Payment and Collections
+
+a) Late payments will incur ${formData.latePaymentRate}% monthly interest charges if past due by ${formData.latePaymentGrace} days.
+
+b) If payment exceeds ${formData.latePaymentGrace} days overdue, Designer reserves the right to suspend services until payment is received in full.
+
+c) Client shall be responsible for all collection costs, including reasonable attorneys' fees.
+
+d) If Client disputes any portion of an invoice, Client shall notify Designer in writing within ten (10) days of receipt, specifying the reason for the dispute. Client shall pay all undisputed portions of the invoice according to the payment terms herein.
+
+F. Project Expenses and Taxes
+
+a) Client shall reimburse Designer for all reasonable out-of-pocket expenses incurred in connection with the project, including but not limited to travel, shipping, and materials costs. All costs associated with procurement, delivery, inspection, white glove delivery, and project coordination are Client's responsibility and separate from design fees.
+
+b) Client is responsible for paying all applicable sales taxes on furniture, products, and services.
+
+3. Client Obligations and Information Requirements
+
+3. Client Obligations and Information Requirements
+
+A. E-Design Client Requirements
 
 a) E-Design clients must provide the following within ${formData.informationDeadline} business days of contract execution: 
-   i. Complete and accurate room measurements following Designer's provided measurement guide, including but not limited to room dimensions, ceiling heights, window and door measurements and locations, electrical outlet and switch locations, HVAC vent locations, and any architectural features 
-   ii. High-quality, well-lit photographs of each space from multiple angles showing current condition 
+   i. Complete and accurate room measurements following Designer's measurement guidelines, including room dimensions, ceiling heights, window and door measurements and locations, electrical outlet and switch locations, HVAC vent locations, and any architectural features 
+   ii. High-quality, well-lit photographs of each space from multiple angles showing current conditions 
    iii. Architectural drawings or floor plans if available 
    iv. Realistic budget parameters for each room consistent with Client's stated preferences and requirements 
-   v. No more than two (2) professional inspiration images per room showing desired design aesthetic
+   v. Maximum of two (2) professional inspiration images per room showing desired design aesthetic
 
-B. Full-Service Client Responsibilities
+B. Full-Service Client Requirements
 
 a) For full-service clients, Designer will obtain necessary measurements and photographs as part of the service package.
 
 b) Full-service clients must provide: 
    i. Access to the property for measurement and photography purposes 
    ii. Realistic budget parameters for each room consistent with Client's stated preferences and requirements 
-   iii. No more than two (2) professional inspiration images per room showing desired design aesthetic
+   iii. Maximum of two (2) professional inspiration images per room showing desired design aesthetic
 
-C. Universal Client Responsibilities
+C. Universal Client Obligations
 
-a) All clients shall provide timely input and feedback throughout the design process to ensure that the project meets their expectations. All feedback must be specific, constructive, and provided through ${formData.communicationPlatform}.
+a) All clients shall provide timely input and feedback throughout the design process to ensure projects meet their expectations. All feedback must be specific, constructive, and provided through ${formData.communicationPlatform}.
 
 b) Client shall respond to Designer's requests for approvals, feedback, or additional information within ${formData.responseTime} business days of receipt.
 
-c) Client acknowledges that Designer's ability to perform services under this Agreement is contingent upon Client's timely provision of accurate information and cooperation throughout the design process.
+c) Client acknowledges that Designer's ability to perform services under this Agreement depends upon Client's timely provision of accurate information and cooperation throughout the design process.
 
-${formData.includeMaterialBreach ? `5. Material Breach and Termination for Non-Cooperation
+${formData.includeMaterialBreach ? `4. Material Breach and Termination Rights
 
 A. E-Design Client Material Breaches
 
-a) The following actions by E-Design clients constitute material breaches of this Agreement that may result in immediate termination: 
+The following actions by E-Design clients constitute material breaches of this Agreement that may result in immediate termination: 
    i. Failure to provide required measurements, photographs, or other essential information after two (2) written requests 
    ii. Imposing budget constraints that make commercially reasonable completion of the project impossible given Client's stated requirements 
    iii. Exhibiting a pattern of declining design selections without constructive feedback, specifically rejecting more than eighty percent (80%) of presented options without reasonable cause 
@@ -685,7 +729,7 @@ a) The following actions by E-Design clients constitute material breaches of thi
 
 B. Full-Service Client Material Breaches
 
-a) The following actions by Full-Service clients constitute material breaches of this Agreement that may result in immediate termination: 
+The following actions by Full-Service clients constitute material breaches of this Agreement that may result in immediate termination: 
    i. Failure to provide reasonable access to the property for measurement and photography purposes after two (2) written requests 
    ii. Imposing budget constraints that make commercially reasonable completion of the project impossible given Client's stated requirements 
    iii. Exhibiting a pattern of declining design selections without constructive feedback, specifically rejecting more than eighty percent (80%) of presented options without reasonable cause 
@@ -693,67 +737,29 @@ a) The following actions by Full-Service clients constitute material breaches of
    v. Failure to make timely payments as specified in this Agreement 
    vi. Attempting to bypass Designer to contact vendors, contractors, or suppliers directly regarding project-related matters
 
-C. Consequences of Material Breach
+C. Breach Consequences
 
-a) Upon material breach by Client, Designer may, at Designer's sole discretion, terminate this Agreement immediately upon written notice. In such event, Designer shall retain all fees paid for services performed and Client shall remain responsible for any costs incurred on Client's behalf.
+Upon material breach by Client, Designer may, at Designer's sole discretion, terminate this Agreement immediately upon written notice. In such event, Designer shall retain all fees paid for services performed and Client shall remain responsible for any costs incurred on Client's behalf.
 
-` : ''}${formData.includeMaterialBreach ? '6' : '5'}. Expenses and Sales Tax
+` : ''}${formData.includeMaterialBreach ? '5' : '4'}. Design Development and Approval Process
 
-a) Client shall reimburse Designer for all reasonable out-of-pocket expenses incurred in connection with the project, including but not limited to travel, shipping, and materials costs. All costs associated with procurement, delivery, inspection, white glove delivery, and project coordination are Client's responsibility and separate from design fees.
-
-b) Client is responsible for paying all applicable sales taxes on furniture, products, and services.
-
-${formData.includeMaterialBreach ? '7' : '6'}. Budget and Fee Estimates
-
-a) Designer will provide Client with a budget estimate for each space based on the agreed-upon scope of work and Client's design preferences, provided Client has supplied realistic budget parameters.
-
-b) If the actual cost of furniture, products, or services exceeds the budget estimate due to Client's requests or changes, Designer will notify Client and obtain approval before proceeding with purchases.
-
-c) Client acknowledges that Designer may offer vendor discounts when available, but that such discounts are provided as a courtesy and Designer is under no obligation to match pricing available from other sources or to conduct price comparisons on Client's behalf.
-
-${formData.includeMaterialBreach ? '8' : '7'}. Payment Terms
-
-a) ${formData.paymentTerms === 'due_on_receipt' ? 'All design fees are due upon receipt of invoice, not net thirty (30) days. Payment must be received before commencement of design work.' : 'Payment terms are net thirty (30) days from invoice date.'}
-
-b) For full-service projects, ${formData.depositPercentage} percent of total estimated fees is due upon contract execution, with the remaining ${100 - parseInt(formData.depositPercentage)} percent due before furniture ordering begins.
-
-c) For furniture and product purchases, Client must remit full payment to Designer before any orders are placed. Designer will only process orders after Client's payment has cleared Designer's bank account.
-
-d) Client has three (3) business days after approval to commit to purchasing approved items by remitting payment to Designer. If items become unavailable due to Client's delay in payment beyond this timeframe, Designer may charge additional sourcing fees to locate replacement items.
-
-e) Payments shall be made to ${formData.designerName} via check, wire transfer, or Zelle${formData.designerEmail ? ` (${formData.designerEmail})` : ''}. All design fees and project services are non-refundable.
-
-9. Late Payment and Overdue Accounts
-
-a) Late payments will incur a ${formData.latePaymentRate}% monthly interest charge if past due by ${formData.latePaymentGrace} days.
-
-b) If payment is more than ${formData.latePaymentGrace} days overdue, Designer reserves the right to suspend services until payment is received in full.
-
-c) Client shall be responsible for all costs of collection, including reasonable attorneys' fees.
-
-10. Fee Disputes
-
-If Client disputes any portion of an invoice, Client shall notify Designer in writing within ten (10) days of receipt, specifying the reason for the dispute. Client shall pay all undisputed portions of the invoice according to the payment terms herein.
-
-11. Delivery Estimates
-
-Designer will provide estimated delivery dates for all furniture and products based on information provided by vendors. However, Designer is not responsible for delays in delivery caused by factors outside its control, such as manufacturer issues, shipping delays, or customs holdups.
-
-12. Design Plans and Approvals
+${formData.includeMaterialBreach ? '5' : '4'}. Design Development and Approval Process
 
 a) Designer will present Client with design plans, renderings, and product selections for each space. Client shall review and approve all designs within ${formData.responseTime} business days of receipt.
 
-b) Client may request up to ${formData.revisionRounds} rounds of revisions per item per space at no additional cost. Further revisions will be billed at Designer's current hourly rate. If a full redesign is required after final approval, a flat fee of $${formData.redesignFee} will be charged.
+b) Client may request up to ${formData.revisionRounds} rounds of revisions per item per space at no additional cost. Further revisions will be billed at Designer's current hourly rate. If a complete redesign is required after final approval, a flat fee of $${formData.redesignFee} will be charged.
 
 c) Once Client approves the final design, any changes or deviations will be treated as a Change Order and subject to additional fees at Designer's current hourly rate.
 
-13. Procurement and Receiving
+${formData.includeMaterialBreach ? '6' : '5'}. Procurement, Installation and Project Management
 
-a) Upon Client's approval of design plans and product selections and receipt of full payment from Client, Designer will coordinate ordering and procurement of all items through Designer's vendor accounts. All orders will be processed only after Client's payment has cleared Designer's bank account.
+A. Ordering and Procurement
+
+a) Upon Client's approval of design plans and product selections and receipt of full payment from Client, Designer will coordinate ordering and procurement of all items through Designer's vendor accounts. All orders will be processed exclusively after Client's payment has cleared Designer's business account.
 
 b) Designer will coordinate the delivery and inspection of items as part of the procurement service. In some cases, a third party may be hired to receive, inspect, and deliver the items, or the Client may choose to handle final delivery directly, as agreed upon by the Parties. All associated costs are Client's responsibility.
 
-14. Installation
+B. Installation Services
 
 a) ${formData.includeInstallation ? 'Designer will coordinate the installation of all furniture and products in accordance with the approved design plans, subject to additional hourly billing.' : 'Installation services are not included in the base package. If Designer is contracted to oversee installation, Designer will coordinate the installation of all furniture and products in accordance with the approved design plans.'}
 
@@ -761,11 +767,23 @@ b) Client is responsible for ensuring that the installation area is clean, clear
 
 c) If Client requires storage of items prior to installation, additional fees may apply.
 
-15. Project Closure
+C. Third-Party Contractors and Subcontractors
 
-Upon completion of the project, the Client shall have a ${formData.inspectionWindow} day window to inspect the work and notify the Designer of any deficiencies or issues that need to be addressed. After this period, the project will be considered complete and accepted by the Client, and no further changes or revisions will be made under this Agreement.
+a) Designer may engage third-party contractors or subcontractors as needed to complete the project. Client will be notified in advance and shall approve all such engagements.
 
-16. Refunds, Exchanges, and Cancellations
+b) If specifically hired to do so, Designer shall coordinate and supervise the work of contractors and subcontractors but is not responsible for their performance, errors, or omissions. The extent of Designer's supervision may vary from contract to contract.
+
+${formData.includeMaterialBreach ? '7' : '6'}. Project Completion and Delivery
+
+A. Project Closure and Inspection
+
+Upon completion of the project, Client shall have a ${formData.inspectionWindow} day window to inspect the work and notify Designer of any deficiencies or issues that need to be addressed. After this period, the project will be considered complete and accepted by Client, and no further changes or revisions will be made under this Agreement.
+
+B. Delivery Estimates and Delays
+
+Designer will provide estimated delivery dates for all furniture and products based on information provided by vendors. However, Designer is not responsible for delays in delivery caused by factors outside its control, such as manufacturer issues, shipping delays, or customs holdups.
+
+C. Refunds, Exchanges, and Cancellations
 
 a) All furniture and product sales are final. Refunds and exchanges are at the discretion of the vendor and subject to their individual policies.
 
@@ -773,37 +791,31 @@ b) Custom or made-to-order items are non-refundable and cannot be exchanged.
 
 c) If Client cancels the project after placing orders, Client shall be responsible for all restocking fees, return shipping costs, and any other charges imposed by the vendor.
 
-17. Damages and Insurance
+${formData.includeMaterialBreach ? '8' : '7'}. Site Access and Regulatory Compliance
 
-a) Designer shall exercise reasonable care in the delivery and installation of all items but is not responsible for damage caused by pre-existing conditions or the negligence of third parties.
-
-b) Client shall maintain adequate property insurance coverage for all furniture and products. Designer is not liable for any loss or damage to items after installation.
-
-18. Access and Preparation
+A. Property Access and Preparation
 
 Client shall provide Designer and its subcontractors with reasonable access to the project site during normal business hours for the purposes of design, delivery, and installation. Client is responsible for ensuring that the site is safe, secure, and free of hazards.
 
-19. Permits and Compliance
+B. Permits and Legal Compliance
 
 Client is responsible for obtaining any necessary permits, licenses, or approvals required for the project. Designer will comply with all applicable laws, codes, and regulations in the performance of its services.
 
-20. Third-Party Contractors and Subcontractors
-
-a) Designer may engage third-party contractors or subcontractors as needed to complete the project. Client will be notified in advance and shall approve all such engagements.
-
-b) If specifically hired to do so, Designer shall coordinate and supervise the work of contractors and subcontractors but is not responsible for their performance, errors, or omissions. The extent of Designer's supervision may vary from contract to contract.
-
-21. Maintenance and Repairs
+C. Maintenance and Ongoing Care
 
 Designer's services do not include ongoing maintenance or repairs after installation. Client is responsible for maintaining all furniture and products in accordance with the manufacturer's guidelines.
 
-22. Creative Discretion and Client Input
+${formData.includeMaterialBreach ? '9' : '8'}. Creative Control and Communication Standards
+
+${formData.includeMaterialBreach ? '9' : '8'}. Creative Control and Communication Standards
+
+A. Designer's Creative Authority
 
 a) Designer shall have creative discretion in the selection of furniture, products, and design elements, consistent with Client's stated preferences and budget, provided that Client has provided clear guidance and maintains commercially reasonable expectations.
 
 b) Client shall provide timely input and feedback throughout the design process to ensure that the project meets their expectations.
 
-23. Meetings and Communication
+B. Communication Protocols
 
 a) Designer and Client shall communicate regularly to review progress, address concerns, and make decisions regarding the project. Communications may be conducted in person, by phone, via video conference, or through ${formData.communicationPlatform}.
 
@@ -811,41 +823,37 @@ b) Designer will respond to Client's inquiries and communications within ${formD
 
 c) All design-related feedback and approvals must be communicated through ${formData.communicationPlatform} to maintain proper documentation and project flow.
 
-24. Professional Conduct and Non-Discrimination
+${formData.includeMaterialBreach ? '10' : '9'}. Intellectual Property and Confidentiality
 
-Designer shall perform all services in a professional and ethical manner, without discrimination or harassment on the basis of race, color, religion, sex, national origin, age, disability, or any other protected characteristic.
-
-25. Intellectual Property Ownership
+A. Intellectual Property Rights
 
 a) Designer retains all rights, title, and interest in and to its pre-existing intellectual property, including but not limited to design templates, processes, and proprietary tools.
 
 b) Upon full payment of all fees due under this Agreement, Client shall own the final design plans and renderings created specifically for the project and the property specified herein. Such designs may not be transferred to or used for any other property without Designer's express written consent.
 
-${formData.includePhotography ? `26. Publicity and Photography
-
-a) Designer may photograph the completed project for its portfolio, website, and promotional materials. Designer will not disclose Client's personal information without prior consent.
-
-b) If Client wishes to publicize or feature the project in any media, Client shall properly attribute and credit Designer's contributions.` : ''}
-
-${formData.includeConfidentiality ? `27. Confidentiality
+${formData.includeConfidentiality ? `B. Confidentiality Provisions
 
 a) Designer shall maintain the confidentiality of all non-public information provided by Client, including but not limited to personal data, financial information, and project details.
 
 b) Client shall not disclose Designer's proprietary processes, methodologies, or pricing to any third party without Designer's express written consent.` : ''}
 
-28. Termination and Postponement
+${formData.includePhotography ? `${formData.includeMaterialBreach ? '11' : '10'}. Publicity and Photography Rights
 
-a) Either party may terminate this Agreement upon written notice if the other party materially breaches any term or condition and fails to cure such breach within ten (10) days of receipt of notice.
+a) Designer may photograph the completed project for its portfolio, website, and promotional materials. Designer will not disclose Client's personal information without prior consent.
 
-b) If Client postpones the project for more than ${formData.projectTimeline} days, Designer may, at its discretion, terminate the Agreement and retain any deposits or payments made to date.
+b) If Client wishes to publicize or feature the project in any media, Client shall properly attribute and credit Designer's contributions.` : ''}
 
-c) In the event of termination, Designer shall be compensated for all services performed and expenses incurred up to the date of termination.
+${(formData.includePhotography && formData.includeMaterialBreach) ? '12' : (formData.includePhotography ? '11' : (formData.includeMaterialBreach ? '11' : '10'))}. Risk Allocation and Insurance
 
-${formData.includeForcemajeure ? `29. Force Majeure
+${(formData.includePhotography && formData.includeMaterialBreach) ? '12' : (formData.includePhotography ? '11' : (formData.includeMaterialBreach ? '11' : '10'))}. Risk Allocation and Insurance
 
-Neither party shall be liable for any delay or failure to perform its obligations under this Agreement if such delay or failure is due to circumstances beyond its reasonable control, including but not limited to acts of God, natural disasters, government orders, or labor strikes.` : ''}
+A. Property Damage and Insurance
 
-30. Limitation of Liability
+a) Designer shall exercise reasonable care in the delivery and installation of all items but is not responsible for damage caused by pre-existing conditions or the negligence of third parties.
+
+b) Client shall maintain adequate property insurance coverage for all furniture and products. Designer is not liable for any loss or damage to items after installation.
+
+B. Limitation of Liability
 
 a) Designer shall not be liable for any indirect, incidental, consequential, or punitive damages arising out of or related to this Agreement, including but not limited to loss of profits, loss of business opportunity, or damage to Client's property.
 
@@ -853,11 +861,21 @@ b) Designer's total liability under this Agreement shall not exceed the total am
 
 c) The limitations set forth in this section shall apply regardless of whether the liability arises in contract, tort, strict liability, or any other legal theory.
 
-${formData.includeIndemnification ? `31. Indemnification
+${formData.includeIndemnification ? `C. Client Indemnification
 
 Client shall indemnify, defend, and hold harmless Designer, its employees, agents, and affiliates from and against any and all claims, damages, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or related to Client's breach of this Agreement, misuse of the design plans, unauthorized modifications to the design, or Client's failure to comply with applicable laws or obtain necessary permits.` : ''}
 
-32. Dispute Resolution and Governing Law
+${(formData.includePhotography && formData.includeMaterialBreach) ? '13' : (formData.includePhotography ? '12' : (formData.includeMaterialBreach ? '12' : '11'))}. Contract Administration
+
+A. Agreement Termination and Postponement
+
+a) Either party may terminate this Agreement upon written notice if the other party materially breaches any term or condition and fails to cure such breach within ten (10) days of receipt of notice.
+
+b) If Client postpones the project for more than ${formData.projectTimeline} days, Designer may, at its discretion, terminate the Agreement and retain any deposits or payments made to date.
+
+c) In the event of termination, Designer shall be compensated for all services performed and expenses incurred up to the date of termination.
+
+B. Dispute Resolution and Governing Law
 
 a) This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingState || formData.designerState}, without giving effect to any choice of law or conflict of law provision or rule.
 
@@ -865,11 +883,23 @@ b) Any controversy or claim arising out of or relating to this Agreement, or the
 
 c) The prevailing party in any legal proceeding shall be entitled to recover its reasonable attorneys' fees and costs.
 
-${formData.includeSeverability ? `33. Severability
+${(formData.includePhotography && formData.includeMaterialBreach) ? '14' : (formData.includePhotography ? '13' : (formData.includeMaterialBreach ? '13' : '12'))}. Miscellaneous Provisions
+
+${(formData.includePhotography && formData.includeMaterialBreach) ? '14' : (formData.includePhotography ? '13' : (formData.includeMaterialBreach ? '13' : '12'))}. Miscellaneous Provisions
+
+A. Professional Standards and Conduct
+
+Designer shall perform all services in a professional and ethical manner, without discrimination or harassment on the basis of race, color, religion, sex, national origin, age, disability, or any other protected characteristic.
+
+${formData.includeForcemajeure ? `B. Force Majeure Events
+
+Neither party shall be liable for any delay or failure to perform its obligations under this Agreement if such delay or failure is due to circumstances beyond its reasonable control, including but not limited to acts of God, natural disasters, government orders, or labor strikes.` : ''}
+
+${formData.includeSeverability ? `${formData.includeForcemajeure ? 'C' : 'B'}. Severability
 
 If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the remaining provisions shall continue in full force and effect to the fullest extent permitted by law.` : ''}
 
-${formData.includeEntireAgreement ? `34. Entire Agreement and Amendments
+${formData.includeEntireAgreement ? `${(formData.includeForcemajeure && formData.includeSeverability) ? 'D' : (formData.includeForcemajeure || formData.includeSeverability) ? 'C' : 'B'}. Entire Agreement and Modifications
 
 This Agreement constitutes the entire understanding and agreement between the Parties and supersedes all prior negotiations, representations, or agreements, whether written or oral. This Agreement may only be amended or modified by a written instrument signed by both Parties.` : ''}
 
