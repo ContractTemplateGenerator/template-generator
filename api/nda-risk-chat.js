@@ -1,4 +1,4 @@
-const handler = async (req, res) => {
+export default async function handler(req, res) {
     // Set CORS headers
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -14,64 +14,47 @@ const handler = async (req, res) => {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { messages, ndaText, industry } = req.body;
+    const { ndaText, industry } = req.body;
 
-    if (!ndaText) {
-        return res.status(400).json({ error: 'NDA text is required' });
+    if (!ndaText || ndaText.trim().length < 50) {
+        return res.status(400).json({ error: 'Please provide a valid NDA text for analysis' });
     }
 
-    // Simple token estimation function
-    const estimateTokens = (text) => {
-        return Math.ceil(text.length / 4);
-    };
+    console.log('Received NDA analysis request:', { 
+        textLength: ndaText.length, 
+        industry,
+        apiKeyExists: !!process.env.GROQ_API_KEY 
+    });
 
-    const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for tech startups and modern businesses.
+    const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) analyzing NDAs.
 
-CRITICAL FORMATTING REQUIREMENTS:
-- Use <strong></strong> tags for critical legal concepts (NOT ** markdown)
-- Use <br><br> for paragraph breaks (NOT \n\n)
-- Format responses in HTML, not markdown
-- Never use ## headings or **bold** or *italic* markdown
-- Always use HTML tags like <strong>, <em>, <br>
+CRITICAL: Format response in HTML (not markdown)
+- Use <strong></strong> for emphasis
+- Use <br><br> for line breaks
+- Use <span style="color: #dc2626;">RED</span> for high risk
+- Use <span style="color: #d97706;">YELLOW</span> for medium risk  
+- Use <span style="color: #059669;">GREEN</span> for low risk
 
-YOUR PRIMARY TASK: Answer the question "Is it okay to sign this NDA as-is?"
+ANSWER: "Is it okay to sign this NDA as-is?"
 
-REQUIRED ANALYSIS FORMAT:
+FORMAT:
 <strong>RECOMMENDATION:</strong> [DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN]<br><br>
+<strong>WHY:</strong> Brief explanation<br><br>
+<strong>DOCUMENT SUMMARY:</strong> What this NDA does<br><br>
+<strong>KEY ISSUES:</strong><br>
+• Issue 1: <span style="color: #dc2626;">RED</span> - Problem description<br>
+• Issue 2: <span style="color: #d97706;">YELLOW</span> - Another issue<br><br>
+<strong>SUGGESTED CHANGES:</strong> Specific improvements needed<br><br>
+<strong>BOTTOM LINE:</strong> Final recommendation
 
-<strong>WHY:</strong> Brief explanation of your recommendation<br><br>
+Industry: ${industry}`;
 
-<strong>DOCUMENT SUMMARY:</strong> What this NDA does in plain English<br><br>
-
-<strong>CLAUSE ANALYSIS:</strong><br>
-For each significant clause, provide:
-- <strong>Risk Level:</strong> <span style="color: #dc2626;">RED</span> / <span style="color: #d97706;">YELLOW</span> / <span style="color: #059669;">GREEN</span><br>
-- <strong>Issue:</strong> Specific problem with the clause<br>
-- <strong>Suggested Redraft:</strong> Use actual party names from the NDA<br><br>
-
-<strong>MISSING CLAUSES:</strong> Specific suggestions tailored to this NDA context<br><br>
-
-<strong>BOTTOM LINE:</strong> Clear action items and next steps<br><br>
-
-ANALYSIS FOCUS:
-- Extract actual party names from the NDA and use them in redraft suggestions
-- Industry context: ${industry === 'auto-detect' ? 'Determine industry from NDA context' : industry}
-- Focus on practical business impact, not academic legal theory
-- Be specific and actionable - not generic
-- Answer the core question: "Should I sign this or not?"
-
-Provide professional attorney-grade analysis that demonstrates legal expertise while being actionable for business owners.`;
-
-    const models = [
-        'llama-3.3-70b-versatile',
-        'llama3-70b-8192', 
-        'llama-3.1-8b-instant',
-        'llama3-8b-8192',
-        'gemma2-9b-it'
-    ];
+    const models = ['llama-3.3-70b-versatile', 'llama3-70b-8192', 'llama-3.1-8b-instant'];
 
     for (const model of models) {
         try {
+            console.log(`Trying model: ${model}`);
+            
             const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
@@ -82,30 +65,30 @@ Provide professional attorney-grade analysis that demonstrates legal expertise w
                     model: model,
                     messages: [
                         { role: 'system', content: systemPrompt },
-                        { role: 'user', content: `Analyze this NDA and determine if it's okay to sign as-is:\n\n${ndaText}` }
+                        { role: 'user', content: `Analyze this NDA:\n\n${ndaText.substring(0, 8000)}` }
                     ],
-                    temperature: 0.2, // Lower for consistent legal analysis
-                    max_tokens: 4000,
+                    temperature: 0.3,
+                    max_tokens: 3000,
                 }),
             });
 
             if (response.ok) {
                 const data = await response.json();
+                console.log(`Success with model: ${model}`);
                 return res.status(200).json({
                     response: data.choices[0].message.content,
                     model: model
                 });
+            } else {
+                console.error(`Model ${model} failed:`, response.status, await response.text());
             }
         } catch (error) {
-            console.error(`Error with model ${model}:`, error);
-            continue;
+            console.error(`Error with model ${model}:`, error.message);
         }
     }
 
-    // If all models fail, return error
+    console.log('All models failed');
     return res.status(500).json({ 
-        error: 'AI analysis temporarily unavailable. Schedule a consultation with attorney Sergei Tokmakov for immediate NDA review and risk assessment.' 
+        error: 'Unable to analyze NDA at this time. Please try again in a few minutes or copy the text to ChatGPT/Claude for a quick review.' 
     });
-};
-
-export default handler;
+}
