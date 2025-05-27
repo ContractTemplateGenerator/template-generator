@@ -1,0 +1,683 @@
+/* NDA Risk Analyzer Styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8fafc;
+    color: #334155;
+    line-height: 1.6;
+}
+
+.nda-analyzer {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    background: white;
+    min-height: 100vh;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    border-radius: 12px;
+}
+
+.header h1 {
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 5px;
+}
+
+.attorney-info {
+    font-size: 0.95rem;
+    opacity: 0.8;
+    font-style: italic;
+}
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    height: calc(100vh - 200px);
+    min-height: 600px;
+}
+
+/* Input Panel */
+.input-panel {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.input-panel h2 {
+    color: #1e40af;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.upload-section {
+    margin-bottom: 25px;
+}
+
+.file-upload {
+    border: 2px dashed #cbd5e1;
+    border-radius: 8px;
+    padding: 30px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: #f8fafc;
+}
+
+.file-upload:hover {
+    border-color: #3b82f6;
+    background: #f1f5f9;
+}
+
+.file-upload.drag-over {
+    border-color: #1e40af;
+    background: #dbeafe;
+}
+
+.upload-icon {
+    font-size: 3rem;
+    color: #64748b;
+    margin-bottom: 15px;
+}
+
+.upload-text {
+    font-size: 1.1rem;
+    color: #475569;
+    margin-bottom: 10px;
+}
+.upload-subtext {
+    font-size: 0.9rem;
+    color: #64748b;
+}
+
+.text-input-section {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.nda-textarea {
+    flex: 1;
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-family: 'Courier New', monospace;
+    resize: vertical;
+    min-height: 300px;
+}
+
+.nda-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.analysis-options {
+    margin: 20px 0;
+    padding: 15px;
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.option-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.option-group label {
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.option-group select {
+    padding: 8px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.9rem;
+}
+.analyze-button {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.analyze-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.analyze-button:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Analysis Panel */
+.analysis-panel {
+    background: white;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.analysis-panel h2 {
+    color: #1e40af;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.analysis-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+.waiting-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #64748b;
+    text-align: center;
+}
+
+.waiting-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.waiting-text {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.waiting-subtext {
+    font-size: 0.95rem;
+}
+
+/* Risk Summary */
+.risk-summary {
+    background: #f8fafc;
+    border-left: 4px solid #3b82f6;
+    padding: 20px;
+    margin-bottom: 25px;
+    border-radius: 0 8px 8px 0;
+}
+
+.risk-summary h3 {
+    color: #1e40af;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.risk-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.risk-score-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid;
+    text-align: center;
+}
+
+.risk-score-card.high {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.risk-score-card.medium {
+    border-color: #d97706;
+    background: #fffbeb;
+}
+
+.risk-score-card.low {
+    border-color: #059669;
+    background: #f0fdf4;
+}
+.risk-score-number {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.risk-score-card.high .risk-score-number {
+    color: #dc2626;
+}
+
+.risk-score-card.medium .risk-score-number {
+    color: #d97706;
+}
+
+.risk-score-card.low .risk-score-number {
+    color: #059669;
+}
+
+.risk-score-label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #374151;
+}
+
+/* Fairness Assessment */
+.fairness-assessment {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 25px;
+}
+
+.fairness-assessment h3 {
+    color: #92400e;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.fairness-score {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.fairness-meter {
+    flex: 1;
+    height: 12px;
+    background: #fee2e2;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.fairness-fill {
+    height: 100%;
+    transition: width 0.5s ease;
+    border-radius: 6px;
+}
+
+.fairness-fill.unfair {
+    background: linear-gradient(90deg, #dc2626 0%, #ef4444 100%);
+}
+
+.fairness-fill.somewhat-fair {
+    background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%);
+}
+.fairness-fill.fair {
+    background: linear-gradient(90deg, #059669 0%, #10b981 100%);
+}
+
+.fairness-percentage {
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: #92400e;
+}
+
+/* Clause Analysis */
+.clause-analysis {
+    margin-bottom: 30px;
+}
+
+.clause-analysis h3 {
+    color: #1e40af;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+}
+
+.clause-item {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    overflow: hidden;
+}
+
+.clause-header {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.clause-header:hover {
+    background: #f9fafb;
+}
+
+.risk-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.risk-indicator.high {
+    background: #dc2626;
+}
+
+.risk-indicator.medium {
+    background: #d97706;
+}
+
+.risk-indicator.low {
+    background: #059669;
+}
+
+.clause-title {
+    flex: 1;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.clause-content {
+    padding: 0 20px 20px 47px;
+    border-top: 1px solid #f3f4f6;
+    display: none;
+}
+
+.clause-content.expanded {
+    display: block;
+}
+.clause-text {
+    background: #f8fafc;
+    padding: 15px;
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    border-left: 3px solid #cbd5e1;
+}
+
+.clause-analysis-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #374151;
+}
+
+.clause-suggestions {
+    margin-top: 15px;
+    padding: 15px;
+    background: #f0f9ff;
+    border-radius: 6px;
+    border-left: 3px solid #0ea5e9;
+}
+
+.clause-suggestions h4 {
+    color: #0c4a6e;
+    margin-bottom: 10px;
+    font-size: 0.95rem;
+}
+
+.clause-suggestions ul {
+    margin-left: 20px;
+}
+
+.clause-suggestions li {
+    margin-bottom: 5px;
+    font-size: 0.9rem;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+    flex-wrap: wrap;
+}
+
+.action-button {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+}
+
+.action-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+.action-button.primary {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+}
+
+.action-button.secondary {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+}
+
+.action-button.outline {
+    background: white;
+    color: #374151;
+    border: 2px solid #d1d5db;
+}
+
+/* Professional Report */
+.professional-report {
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 25px;
+    margin-top: 25px;
+}
+
+.report-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.report-header h3 {
+    color: #1e40af;
+    font-size: 1.4rem;
+}
+
+.attorney-badge {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.report-content {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #374151;
+}
+
+.report-content h4 {
+    color: #1f2937;
+    margin: 20px 0 10px 0;
+    font-size: 1.1rem;
+}
+
+.report-content p {
+    margin-bottom: 15px;
+}
+
+.report-content ul {
+    margin: 10px 0 15px 20px;
+}
+
+.report-content li {
+    margin-bottom: 8px;
+}
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .main-content {
+        grid-template-columns: 1fr;
+        height: auto;
+        gap: 20px;
+    }
+    
+    .options-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .risk-scores {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .nda-analyzer {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .header p {
+        font-size: 1rem;
+    }
+    
+    .input-panel, .analysis-panel {
+        padding: 20px;
+    }
+    
+    .risk-scores {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .action-button {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Custom Scrollbar */
+.analysis-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.analysis-content::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 4px;
+}
+
+.analysis-content::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 4px;
+}
+
+.analysis-content::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.clause-item, .risk-summary, .fairness-assessment {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Print Styles */
+@media print {
+    .input-panel {
+        display: none;
+    }
+    
+    .main-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-buttons {
+        display: none;
+    }
+    
+    body {
+        background: white;
+    }
+}
