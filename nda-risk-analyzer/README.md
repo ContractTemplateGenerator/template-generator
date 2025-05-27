@@ -1,92 +1,117 @@
-# NDA Risk Analyzer - Updated with Grok API Integration
+# NDA Risk Analyzer - FIXED WITH VERCEL API ROUTING
 
-## 🚀 Key Updates
+## ✅ **FIXED: API Routing Issue**
 
-### ✅ **Real Grok API Integration**
-- **Model**: `llama-3.3-70b-versatile` (exactly as requested)
-- **Legal Memo Format**: Analysis structured like professional attorney review
-- **Primary Focus**: "Is it okay to sign this NDA as-is?" 
+The NDA analyzer was showing a blank page because it was trying to call Grok API directly from the frontend instead of using Vercel API routing like the other working chatboxes.
 
-### ✅ **New Features Added**
-- **URL Input**: Users can submit links to NDAs for analysis
-- **Auto-Jurisdiction Detection**: Removed manual jurisdiction input - AI determines this
-- **Industry Auto-Detection**: Option to let AI determine industry from NDA context
-- **Contextual Analysis**: Personalized suggestions using actual party names from NDA
+### **Problem Identified:**
+- ❌ Frontend was calling Grok API directly (which doesn't work with CORS)
+- ❌ No Vercel API endpoint was set up
+- ❌ Using wrong URL pattern (GitHub Pages instead of Vercel)
 
-### ✅ **Legal Memo Style Output**
-1. **RECOMMENDATION**: DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN
-2. **DOCUMENT SUMMARY**: Plain English explanation of what the NDA does
-3. **CLAUSE ANALYSIS**: RED/YELLOW/GREEN risk levels with specific redraft suggestions
-4. **MISSING CLAUSES**: Tailored to the specific NDA context
-5. **BOTTOM LINE**: Clear action items and next steps
+### **Solution Implemented:**
+- ✅ Created `/api/nda-risk-chat.js` Vercel API endpoint
+- ✅ Updated frontend to call `https://template-generator-aob3.vercel.app/api/nda-risk-chat`
+- ✅ Followed exact pattern from working `interior-design-chat.js`
+- ✅ Added proper CORS headers and error handling
+- ✅ Implemented model fallback system with `llama-3.3-70b-versatile`
 
-## 🔧 **Setup Instructions**
+## 🔧 **API Endpoint Configuration**
 
-### **API Configuration**
-Update your Grok API key in `grok-api.js`:
+### **File: `/api/nda-risk-chat.js`**
+- **Model Priority**: `llama-3.3-70b-versatile` (first choice)
+- **Fallback Models**: llama3-70b-8192, llama-3.1-8b-instant, etc.
+- **Response Format**: HTML with proper legal memo structure
+- **Authentication**: Uses `process.env.GROQ_API_KEY`
 
+### **System Prompt Focus:**
+```
+Answer: "Is it okay to sign this NDA as-is?"
+
+FORMAT:
+RECOMMENDATION: [DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN]
+WHY: Brief explanation
+DOCUMENT SUMMARY: Plain English explanation
+CLAUSE ANALYSIS: RED/YELLOW/GREEN risk levels + specific redrafts
+MISSING CLAUSES: Tailored suggestions
+BOTTOM LINE: Clear action items
+```
+
+## 🎯 **Frontend Updates**
+
+### **API Call Pattern:**
 ```javascript
-const GROK_API_CONFIG = {
-    endpoint: 'https://api.x.ai/v1/chat/completions',
-    model: 'llama-3.3-70b-versatile',
-    apiKey: 'YOUR_ACTUAL_GROK_API_KEY_HERE'
-};
+const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+        ndaText: ndaText,
+        industry: industry,
+        messages: []
+    })
+});
 ```
 
-### **Environment Variable (Recommended)**
-```bash
-export GROK_API_KEY="your_actual_api_key_here"
+### **Features Working:**
+- ✅ File upload (drag & drop)
+- ✅ URL input for NDA links
+- ✅ Industry auto-detection
+- ✅ Real-time analysis with llama-3.3-70b-versatile
+- ✅ HTML-formatted legal memo output
+- ✅ Color-coded risk assessment
+- ✅ Attorney consultation booking integration
+
+## 📊 **Professional Analysis Output**
+
+### **Legal Memo Format:**
+1. **Primary Recommendation**: DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE
+2. **Document Summary**: Plain English explanation
+3. **Clause Analysis**: RED/YELLOW/GREEN risk coding with specific redrafts
+4. **Missing Protections**: Contextual suggestions using actual party names
+5. **Bottom Line**: Clear action items
+
+### **Business Focus:**
+- **Answers Core Question**: "Is it okay to sign as-is?"
+- **Professional Presentation**: Suitable for business stakeholders
+- **Specific Redrafts**: Uses actual company/party names from NDA
+- **Risk-Based Upselling**: High-risk analyses trigger consultation offers
+
+## 🚀 **Deployment Status**
+
+### **File Structure:**
+```
+/nda-risk-analyzer/
+├── index.html          # Updated frontend (no grok-api.js reference)
+├── styles.css          # Complete styling with legal memo formatting
+├── nda-analyzer.js     # React component calling Vercel API
+└── README.md          # This documentation
+
+/api/
+└── nda-risk-chat.js    # Vercel API endpoint (llama-3.3-70b-versatile)
 ```
 
-## 📊 **Analysis Features**
+### **Ready for Production:**
+- **API Endpoint**: `https://template-generator-aob3.vercel.app/api/nda-risk-chat`
+- **Frontend URL**: `https://template.terms.law/nda-risk-analyzer/`
+- **Model**: llama-3.3-70b-versatile (as requested)
+- **Console Logging**: API responses logged for debugging
 
-### **Intelligent Content Analysis**
-- **Contextual Understanding**: Actually reads and analyzes user's NDA text
-- **Party Name Extraction**: Uses actual company/person names in redraft suggestions  
-- **Risk-Based Prioritization**: Focuses on clauses that matter most
-- **Business Impact Assessment**: Practical implications, not just legal theory
+## 💼 **Business Impact**
 
-### **Professional Legal Output**
-- **Attorney-Grade Analysis**: Structured like actual legal memo
-- **Specific Redrafts**: Not generic suggestions - tailored clause alternatives
-- **Color-Coded Risk Assessment**: Visual RED/YELLOW/GREEN indicators
-- **Bottom Line Recommendation**: Clear "okay to sign" or "do not sign" guidance
+### **Client Question Focused:**
+- **Primary Answer**: "Is it okay to sign this NDA as-is?"
+- **Clear Recommendations**: Specific DO NOT SIGN / CAUTION / ACCEPTABLE guidance
+- **Actionable Results**: Specific redraft suggestions and next steps
 
-## 🎯 **User Experience Improvements**
+### **Professional Conversion:**
+- **High-Risk Trigger**: "DO NOT SIGN" recommendations auto-suggest attorney review
+- **Attorney Credentials**: CA Bar #279869 prominently displayed
+- **$149 Price Point**: Professional consultation booking integration
+- **Trust Building**: Legal memo format demonstrates expertise
 
-### **Multiple Input Methods**
-- **File Upload**: Drag & drop PDF, DOC, TXT files
-- **URL Input**: Fetch NDA content from web links  
-- **Direct Paste**: Copy/paste NDA text directly
+**The NDA Risk Analyzer is now fully functional with proper Vercel API routing, calling llama-3.3-70b-versatile, and providing professional legal analysis in memo format!** 🎉
 
-### **Smart Industry Detection**
-- **Auto-Detect Option**: AI determines industry from NDA context
-- **Manual Override**: 8 industry categories available
-- **Context-Aware Suggestions**: Industry-specific red flags and recommendations
-
-### **Streamlined Interface**
-- **Removed Jurisdiction Input**: AI determines applicable law from NDA
-- **Focused Analysis**: Answers the primary question users ask: "Is it safe to sign?"
-- **Professional Presentation**: Suitable for sharing with business stakeholders
-
-## 🔄 **Grok API Integration Details**
-
-### **API Call Structure**
-```javascript
-// Calls llama-3.3-70b-versatile specifically
-model: 'llama-3.3-70b-versatile',
-temperature: 0.2, // Lower for consistent legal analysis
-max_tokens: 4000  // Comprehensive responses
-```
-
-### **Fallback System**
-- **Primary**: Grok API with llama-3.3-70b-versatile
-- **Fallback**: Professional error handling with attorney consultation recommendation
-- **Logging**: Console logs for debugging API calls
-
-## 🚀 **Deployment Ready**
-
-**Iframe Embed Code:**
+## 🔗 **Embed Code (Working):**
 ```html
 <iframe 
   src="https://template.terms.law/nda-risk-analyzer/" 
@@ -96,29 +121,3 @@ max_tokens: 4000  // Comprehensive responses
   style="border: 1px solid #ccc; border-radius: 8px;">
 </iframe>
 ```
-
-## 📁 **Complete File Structure**
-```
-/nda-risk-analyzer/
-├── index.html          # Updated with grok-api.js integration
-├── styles.css          # New styles for legal memo format
-├── nda-analyzer.js     # Updated React component with URL input
-├── grok-api.js         # Production Grok API integration
-└── README.md          # This updated documentation
-```
-
-## 💼 **Business Impact**
-
-### **Addresses Primary User Question**
-- **"Is it okay to sign as-is?"** - The #1 question clients ask attorneys
-- **Clear Recommendations** - DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE
-- **Specific Action Items** - What to negotiate, what to add, what to change
-
-### **Professional Upsell Integration**
-- **High-Risk Triggers** - "DO NOT SIGN" recommendations automatically suggest attorney review
-- **Contextual Pricing** - $149 for full attorney review and redline
-- **Trust Building** - Professional memo format demonstrates legal expertise
-
-This updated tool now provides genuine legal analysis using llama-3.3-70b-versatile, focuses on the key question users need answered, and presents results in professional legal memo format that positions you as the expert attorney who understands both technology and law.
-
-**The tool is now ready for production deployment with real Grok API integration.**
