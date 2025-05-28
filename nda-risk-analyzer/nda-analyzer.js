@@ -70,7 +70,7 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Analyze NDA using the working pattern
+    // Analyze NDA using the exact same pattern as working chatboxes
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -79,30 +79,30 @@ const NDAAnalyzer = () => {
 
         setIsAnalyzing(true);
         
+        // Create user message in the same format as working chatboxes
+        const userMessage = { 
+            role: 'user', 
+            content: `Please analyze this NDA and determine if it's okay to sign as-is. Consider the industry context: ${industry}.\n\nNDA TEXT:\n${ndaText}` 
+        };
+        
         try {
-            // Use the same API pattern as working generators
-            const apiUrl = window.location.origin.includes('template.terms.law') 
-                ? 'https://template-generator-aob3.vercel.app/api/nda-risk-chat'
-                : window.location.origin + '/api/nda-risk-chat';
-            
-            console.log('API URL:', apiUrl);
-            console.log('Sending data:', { ndaText, industry });
-            
-            const response = await fetch(apiUrl, {
+            // Use the exact same API call pattern as working chatboxes
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    ndaText: ndaText,
-                    industry: industry
+                    messages: [userMessage]
                 }),
             });
+
+            console.log('Response status:', response.status);
 
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('API Error Response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
