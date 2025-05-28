@@ -4,13 +4,11 @@ const handler = async (req, res) => {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Handle preflight requests
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
 
-  // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -22,13 +20,12 @@ const handler = async (req, res) => {
       return res.status(400).json({ error: 'Messages array is required' });
     }
 
-    // Check for Groq API key
     if (!process.env.GROQ_API_KEY) {
       console.error('No Groq API key found');
       return res.status(500).json({ error: 'Server configuration error' });
     }
 
-    // NDA Risk Analysis system prompt
+    // Enhanced NDA Risk Analysis system prompt with clause-by-clause analysis
     const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
 
 CRITICAL FORMATTING REQUIREMENTS:
@@ -47,21 +44,35 @@ REQUIRED ANALYSIS FORMAT:
 
 <strong>DOCUMENT SUMMARY:</strong> What this NDA does in plain English<br><br>
 
-<strong>KEY ISSUES:</strong><br>
-List the main problems with specific clause references<br><br>
+<strong>CLAUSE-BY-CLAUSE ANALYSIS:</strong><br>
+For each significant clause, provide:
+<div class="clause-analysis-item">
+<strong>CLAUSE:</strong> [Brief clause description]<br>
+<strong>RISK LEVEL:</strong> <span class="risk-[red/yellow/green]">[RED/YELLOW/GREEN]</span><br>
+<strong>ISSUE:</strong> [Specific problem or concern]<br>
+<strong>ORIGINAL TEXT:</strong> "[Relevant excerpt from NDA]"<br>
+<strong>SUGGESTED REDRAFT:</strong> "[Specific alternative using actual party names from the NDA]"<br><br>
+</div>
 
-<strong>SUGGESTED CHANGES:</strong><br>
-Specific redraft suggestions using actual party names from the NDA<br><br>
+<strong>MISSING PROTECTIONS:</strong><br>
+List critical clauses that should be added, with specific suggestions using actual party names<br><br>
 
-<strong>BOTTOM LINE:</strong> Clear action items<br><br>
+<strong>BOTTOM LINE:</strong> Clear action items and next steps<br><br>
 
-ANALYSIS FOCUS:
-- Extract actual party names from NDA and use them in suggestions
+ANALYSIS REQUIREMENTS:
+- Extract actual party names from the NDA and use them consistently in redrafts
+- Identify specific problematic language and provide exact alternatives
+- Use RED for dangerous/unenforceable clauses, YELLOW for biased/unusual clauses, GREEN for standard/acceptable clauses
 - Focus on practical business impact, not academic theory
-- Be specific and actionable
+- Be specific and actionable - provide exact replacement language
 - Answer: "Should I sign this or not?"
 
-Provide attorney-grade analysis that's actionable for business owners.`;
+CLAUSE RISK CRITERIA:
+RED (High Risk): Unenforceable, one-sided, overly broad, or dangerous terms
+YELLOW (Medium Risk): Biased toward one party, unusual, or potentially problematic
+GREEN (Low Risk): Standard, balanced, and reasonable terms
+
+Provide attorney-grade analysis with specific redraft suggestions that business owners can actually use.`;
 
     // Try different models in order of preference
     const models = [
@@ -94,7 +105,7 @@ Provide attorney-grade analysis that's actionable for business owners.`;
               },
               ...messages
             ],
-            max_tokens: 2000,
+            max_tokens: 3000,
             temperature: 0.2
           })
         });
