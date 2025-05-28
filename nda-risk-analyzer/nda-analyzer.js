@@ -256,3 +256,107 @@ The more complete the text, the better the analysis."
                             </select>
                         </div>
                     </div>
+
+                    <button
+                        className="analyze-button"
+                        onClick={analyzeNDA}
+                        disabled={!ndaText.trim() || isAnalyzing}
+                    >
+                        {isAnalyzing ? (
+                            <>
+                                <div className="loading-spinner"></div>
+                                Analyzing NDA...
+                            </>
+                        ) : (
+                            <>
+                                <i data-feather="shield"></i>
+                                Analyze Risk Level
+                            </>
+                        )}
+                    </button>
+                </div>
+
+                {/* Analysis Panel */}
+                <div className="analysis-panel">
+                    <h2>
+                        <i data-feather="file-text"></i>
+                        Legal Analysis
+                    </h2>
+
+                    <div className="analysis-content">
+                        {!analysisResult ? (
+                            <div className="waiting-state">
+                                <div className="waiting-icon">⚖️</div>
+                                <div className="waiting-text">Ready to Analyze Your NDA</div>
+                                <div className="waiting-subtext">
+                                    Enter your NDA text and click "Analyze Risk Level" to get professional legal analysis
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="analysis-results">
+                                <div className={`recommendation-card ${getRecommendationClass(analysisResult.recommendation)}`}>
+                                    <h3>
+                                        <span className="recommendation-icon">
+                                            {analysisResult.recommendation?.includes('DO NOT SIGN') ? '🚫' : 
+                                             analysisResult.recommendation?.includes('ACCEPTABLE') ? '✅' : '⚠️'}
+                                        </span>
+                                        Recommendation
+                                    </h3>
+                                    <div className="recommendation-answer">
+                                        {analysisResult.recommendation || 'REVIEW NEEDED'}
+                                    </div>
+                                </div>
+
+                                <div className="legal-analysis-content">
+                                    <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
+                                </div>
+
+                                <div className="action-buttons">
+                                    <button 
+                                        className="action-button primary"
+                                        onClick={scheduleConsultation}
+                                    >
+                                        <i data-feather="calendar"></i>
+                                        Schedule Legal Consultation
+                                    </button>
+                                    
+                                    <button 
+                                        className="action-button secondary"
+                                        onClick={() => window.open('https://terms.law/', '_blank')}
+                                    >
+                                        <i data-feather="external-link"></i>
+                                        Visit terms.law
+                                    </button>
+                                    
+                                    <button 
+                                        className="action-button outline"
+                                        onClick={() => {
+                                            setAnalysisResult(null);
+                                            setNdaText('');
+                                        }}
+                                    >
+                                        <i data-feather="refresh-cw"></i>
+                                        New Analysis
+                                    </button>
+                                </div>
+
+                                <div className="professional-disclaimer">
+                                    <small>
+                                        <strong>Disclaimer:</strong> This analysis is provided for informational purposes only and does not constitute legal advice. 
+                                        For specific legal guidance, consult with a qualified attorney. Analysis by Sergei Tokmakov, Esq., CA Bar #279869.
+                                        {analysisResult.model && (
+                                            <span style={{opacity: 0.7}}> • Powered by {analysisResult.model}</span>
+                                        )}
+                                    </small>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Render the component
+ReactDOM.render(<NDAAnalyzer />, document.getElementById('root'));
