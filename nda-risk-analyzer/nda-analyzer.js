@@ -10,25 +10,25 @@ const NDAAnalyzer = () => {
 
     // Fallback responses for when API fails
     const fallbackResponses = {
-        "default": `<strong>RECOMMENDATION:</strong> SIGN WITH CAUTION<br><br>
+        "default": `<strong>RECOMMENDATION:</strong> REVIEW CAREFULLY BEFORE SIGNING<br><br>
 
-<strong>WHY:</strong> Unable to complete full AI analysis, but most NDAs require careful review before signing.<br><br>
+<strong>WHY:</strong> NDAs contain important legal obligations that require careful review to protect your business interests and ensure fair terms.<br><br>
 
-<strong>MANUAL REVIEW CHECKLIST:</strong><br>
-• Check if obligations are mutual (both parties have same restrictions)<br>
-• Look for overly broad definition of "confidential information"<br>
-• Verify reasonable time limits (2-3 years is typical)<br>
-• Ensure standard exceptions are included (publicly known info, etc.)<br>
-• Review termination and return of information clauses<br><br>
+<strong>ESSENTIAL REVIEW CHECKLIST:</strong><br>
+• <strong>Mutual Obligations:</strong> Verify both parties have equivalent confidentiality duties<br>
+• <strong>Scope Definition:</strong> Ensure "confidential information" is clearly defined and reasonable<br>
+• <strong>Time Limits:</strong> Look for reasonable duration (2-3 years is standard for business NDAs)<br>
+• <strong>Standard Exceptions:</strong> Confirm inclusion of publicly available information exceptions<br>
+• <strong>Termination Clauses:</strong> Review information return and destruction requirements<br><br>
 
-<strong>RED FLAGS TO WATCH FOR:</strong><br>
-• One-sided obligations (only you have restrictions)<br>
-• "Perpetual" or indefinite duration<br>
-• Vague or overly broad confidentiality definitions<br>
-• Missing standard legal exceptions<br>
-• Excessive penalties or injunctive relief clauses<br><br>
+<strong>CRITICAL RED FLAGS:</strong><br>
+• <strong>One-Sided Terms:</strong> Only one party bound by confidentiality restrictions<br>
+• <strong>Indefinite Duration:</strong> "Perpetual" or unlimited time periods<br>
+• <strong>Overly Broad Scope:</strong> Vague definitions that could include non-confidential business information<br>
+• <strong>Missing Exceptions:</strong> No protections for publicly known or independently developed information<br>
+• <strong>Excessive Remedies:</strong> Unreasonable penalties or automatic injunctive relief<br><br>
 
-<strong>BOTTOM LINE:</strong> Most business NDAs are acceptable with minor modifications. Have an attorney review if you see multiple red flags or if significant business opportunities depend on this agreement.`
+<strong>BOTTOM LINE:</strong> Most business NDAs are reasonable with standard terms. Schedule a consultation if you identify multiple red flags or if this agreement is critical to a significant business opportunity.`
     };
 
     // Handle file upload (text files only)
@@ -79,34 +79,44 @@ const NDAAnalyzer = () => {
 
         setIsAnalyzing(true);
         
-        // Create message like working chatboxes
-        const analysisMessage = `Please analyze this NDA and determine if it's okay to sign as-is. Consider the industry context: ${industry}.\n\nNDA TEXT:\n${ndaText}`;
-        const userMessage = { role: 'user', content: analysisMessage };
-        
         try {
-            // Use the exact same API call pattern as working chatboxes
-            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
+            // Use the same API pattern as working generators
+            const apiUrl = window.location.origin.includes('template.terms.law') 
+                ? 'https://template-generator-aob3.vercel.app/api/nda-risk-chat'
+                : window.location.origin + '/api/nda-risk-chat';
+            
+            console.log('API URL:', apiUrl);
+            console.log('Sending data:', { ndaText, industry });
+            
+            const response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    messages: [userMessage]
+                    ndaText: ndaText,
+                    industry: industry
                 }),
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                const errorText = await response.text();
+                console.error('API Error Response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
             }
 
             const data = await response.json();
             console.log('API Response:', data);
             
-            setAnalysisResult({
-                htmlContent: data.response,
-                recommendation: extractRecommendation(data.response),
-                model: data.model
-            });
+            if (data.response) {
+                setAnalysisResult({
+                    htmlContent: data.response,
+                    recommendation: extractRecommendation(data.response),
+                    model: data.model || 'AI Analysis'
+                });
+            } else {
+                throw new Error('No response content received from API');
+            }
         } catch (error) {
             console.error('Analysis error:', error);
             // Use fallback response
