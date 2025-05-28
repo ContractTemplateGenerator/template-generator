@@ -85,8 +85,14 @@ const NDAAnalyzer = () => {
             content: `Please analyze this NDA and determine if it's okay to sign as-is. Consider the industry context: ${industry}.\n\nNDA TEXT:\n${ndaText}` 
         };
         
+        console.log('🔍 Debug: Starting NDA analysis...');
+        console.log('🔍 Debug: User message:', userMessage);
+        console.log('🔍 Debug: Industry context:', industry);
+        console.log('🔍 Debug: NDA text length:', ndaText.length);
+        
         try {
             // Use the exact same API call pattern as working chatboxes
+            console.log('🔍 Debug: Sending request to API...');
             const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
@@ -97,34 +103,53 @@ const NDAAnalyzer = () => {
                 }),
             });
 
-            console.log('Response status:', response.status);
+            console.log('🔍 Debug: Response status:', response.status);
+            console.log('🔍 Debug: Response ok:', response.ok);
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('API Error Response:', errorText);
-                throw new Error(`HTTP error! status: ${response.status}`);
+                console.error('🔍 Debug: API Error Response:', errorText);
+                throw new Error(`HTTP error! status: ${response.status}, details: ${errorText}`);
             }
 
             const data = await response.json();
-            console.log('API Response:', data);
+            console.log('🔍 Debug: API Response received:', data);
+            console.log('🔍 Debug: Response has data.response:', !!data.response);
+            console.log('🔍 Debug: Model used:', data.model);
             
             if (data.response) {
+                console.log('🔍 Debug: Setting analysis result...');
                 setAnalysisResult({
                     htmlContent: data.response,
                     recommendation: extractRecommendation(data.response),
                     model: data.model || 'AI Analysis'
                 });
+                console.log('🔍 Debug: Analysis result set successfully!');
             } else {
                 throw new Error('No response content received from API');
             }
         } catch (error) {
             console.error('Analysis error:', error);
-            // Use fallback response
-            setAnalysisResult({
-                htmlContent: fallbackResponses.default,
-                recommendation: 'SIGN WITH CAUTION',
-                model: 'fallback'
-            });
+            
+            // Use fallback response for common questions, otherwise show error
+            if (fallbackResponses[analysisMessage]) {
+                setAnalysisResult({
+                    htmlContent: fallbackResponses[analysisMessage],
+                    recommendation: extractRecommendation(fallbackResponses[analysisMessage]),
+                    model: 'fallback'
+                });
+            } else {
+                // Show the actual error for debugging
+                setAnalysisResult({
+                    htmlContent: `<strong>API CONNECTION ERROR</strong><br><br>
+                        <strong>Error Details:</strong> ${error.message}<br><br>
+                        <strong>Debug Info:</strong> Please check browser console for full details.<br><br>
+                        <strong>Fallback Analysis:</strong><br><br>
+                        ${fallbackResponses.default}`,
+                    recommendation: 'SIGN WITH CAUTION',
+                    model: 'error-fallback'
+                });
+            }
         } finally {
             setIsAnalyzing(false);
         }
