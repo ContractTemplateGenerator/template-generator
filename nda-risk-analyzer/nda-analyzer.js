@@ -6,7 +6,6 @@ const NDAAnalyzer = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [industry, setIndustry] = useState('auto-detect');
     const [ndaUrl, setNdaUrl] = useState('');
-    const [isProcessingFile, setIsProcessingFile] = useState(false);
     const fileInputRef = useRef(null);
 
     // Fallback responses for when API fails
@@ -16,109 +15,36 @@ const NDAAnalyzer = () => {
 <strong>WHY:</strong> Unable to complete full AI analysis, but most NDAs require careful review before signing.<br><br>
 
 <strong>MANUAL REVIEW CHECKLIST:</strong><br>
-<div style="margin: 15px 0; padding: 15px; border-left: 4px solid #d97706; background: #fffbeb;">
-<strong>Key Areas to Review</strong> - <span style="color: #d97706; font-weight: bold;">YELLOW</span><br>
 • Check if obligations are mutual (both parties have same restrictions)<br>
 • Look for overly broad definition of "confidential information"<br>
 • Verify reasonable time limits (2-3 years is typical)<br>
 • Ensure standard exceptions are included (publicly known info, etc.)<br>
-• Review termination and return of information clauses<br>
-</div><br>
+• Review termination and return of information clauses<br><br>
 
 <strong>RED FLAGS TO WATCH FOR:</strong><br>
-<div style="margin: 15px 0; padding: 15px; border-left: 4px solid #dc2626; background: #fef2f2;">
-<strong>High Risk Issues</strong> - <span style="color: #dc2626; font-weight: bold;">RED</span><br>
 • One-sided obligations (only you have restrictions)<br>
 • "Perpetual" or indefinite duration<br>
 • Vague or overly broad confidentiality definitions<br>
 • Missing standard legal exceptions<br>
-• Excessive penalties or injunctive relief clauses<br>
-</div><br>
+• Excessive penalties or injunctive relief clauses<br><br>
 
 <strong>BOTTOM LINE:</strong> Most business NDAs are acceptable with minor modifications. Have an attorney review if you see multiple red flags or if significant business opportunities depend on this agreement.`
     };
 
-    // Enhanced file upload with support for multiple formats
+    // Handle file upload (text files only)
     const handleFileUpload = async (file) => {
         if (!file) return;
 
-        setIsProcessingFile(true);
-        
         try {
-            let extractedText = '';
-            
-            if (file.type === 'application/pdf') {
-                // Handle PDF files
-                extractedText = await extractPDFText(file);
-            } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || 
-                       file.type === 'application/msword') {
-                // Handle DOC/DOCX files
-                extractedText = await extractWordText(file);
-            } else if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-                // Handle text files
-                extractedText = await file.text();
+            if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                const text = await file.text();
+                setNdaText(text);
             } else {
-                throw new Error('Unsupported file format. Please use PDF, DOC, DOCX, or TXT files.');
-            }
-
-            if (extractedText && extractedText.trim()) {
-                setNdaText(extractedText);
-            } else {
-                throw new Error('No text could be extracted from the file.');
+                alert('Please upload a plain text (.txt) file, or copy and paste your NDA text directly.');
             }
         } catch (error) {
-            console.error('File processing error:', error);
-            alert(`Error processing file: ${error.message}\n\nPlease try:\n1. Converting to PDF format\n2. Copy and paste the text directly`);
-        } finally {
-            setIsProcessingFile(false);
-        }
-    };
-
-    // Extract text from PDF files
-    const extractPDFText = async (file) => {
-        try {
-            // Use PDF.js library for text extraction
-            const arrayBuffer = await file.arrayBuffer();
-            const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
-            let fullText = '';
-            
-            for (let i = 1; i <= pdf.numPages; i++) {
-                const page = await pdf.getPage(i);
-                const textContent = await page.getTextContent();
-                const pageText = textContent.items.map(item => item.str).join(' ');
-                fullText += pageText + '\n';
-            }
-            
-            return fullText;
-        } catch (error) {
-            throw new Error('Could not extract text from PDF. Please try converting to text format or copy/paste the content.');
-        }
-    };
-
-    // Extract text from Word documents
-    const extractWordText = async (file) => {
-        try {
-            const arrayBuffer = await file.arrayBuffer();
-            
-            if (file.name.endsWith('.docx')) {
-                // Use JSZip and XML parsing for DOCX
-                const zip = new JSZip();
-                const zipFile = await zip.loadAsync(arrayBuffer);
-                const documentXML = await zipFile.file('word/document.xml').async('string');
-                
-                // Simple XML text extraction (removes tags)
-                const textContent = documentXML
-                    .replace(/<[^>]*>/g, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
-                    
-                return textContent;
-            } else {
-                // For older DOC files, suggest conversion
-                throw new Error('Legacy DOC files require conversion. Please save as DOCX or PDF, or copy/paste the text.');
-            }
-        } catch (error) {
-            throw new Error('Could not extract text from Word document. Please save as PDF or copy/paste the content.');
+            console.error('File upload error:', error);
+            alert('Error reading file. Please copy and paste your NDA text directly.');
         }
     };
 
@@ -127,7 +53,7 @@ const NDAAnalyzer = () => {
         if (!ndaUrl.trim()) return;
         
         try {
-            setIsProcessingFile(true);
+            setIsAnalyzing(true);
             const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(ndaUrl)}`);
             const data = await response.json();
             
@@ -140,10 +66,11 @@ const NDAAnalyzer = () => {
         } catch (error) {
             alert('Could not fetch content from URL. Please copy and paste your NDA text directly.');
         } finally {
-            setIsProcessingFile(false);
+            setIsAnalyzing(false);
         }
     };
-    // Enhanced NDA analysis with detailed clause breakdown
+
+    // Analyze NDA using the working pattern
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -152,20 +79,12 @@ const NDAAnalyzer = () => {
 
         setIsAnalyzing(true);
         
-        // Create detailed analysis message
-        const analysisMessage = `Please perform a comprehensive clause-by-clause analysis of this NDA. Focus on Red/Yellow/Green risk assessment for each clause, and provide specific redraft suggestions using the exact party names and defined terms from the original document.
-
-Industry context: ${industry}
-
-NDA TEXT:
-${ndaText}`;
-        
+        // Create message like working chatboxes
+        const analysisMessage = `Please analyze this NDA and determine if it's okay to sign as-is. Consider the industry context: ${industry}.\n\nNDA TEXT:\n${ndaText}`;
         const userMessage = { role: 'user', content: analysisMessage };
         
         try {
-            console.log('Calling enhanced NDA analysis API...');
-            
-            // Use the main API endpoint (not debug) for production analysis
+            // Use the exact same API call pattern as working chatboxes
             const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: {
@@ -177,27 +96,24 @@ ${ndaText}`;
             });
 
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`API Error: ${errorData.error}`);
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log('Enhanced analysis received:', data.model);
+            console.log('API Response:', data);
             
             setAnalysisResult({
                 htmlContent: data.response,
                 recommendation: extractRecommendation(data.response),
-                model: data.model,
-                clauseCount: countClauses(data.response)
+                model: data.model
             });
         } catch (error) {
             console.error('Analysis error:', error);
-            // Use enhanced fallback response
+            // Use fallback response
             setAnalysisResult({
                 htmlContent: fallbackResponses.default,
                 recommendation: 'SIGN WITH CAUTION',
-                model: 'fallback-enhanced',
-                clauseCount: 0
+                model: 'fallback'
             });
         } finally {
             setIsAnalyzing(false);
@@ -208,12 +124,6 @@ ${ndaText}`;
     const extractRecommendation = (htmlResponse) => {
         const match = htmlResponse.match(/<strong>RECOMMENDATION:<\/strong>\s*([^<]+)/);
         return match ? match[1].trim() : 'REVIEW NEEDED';
-    };
-
-    // Count analyzed clauses for user feedback
-    const countClauses = (htmlResponse) => {
-        const matches = htmlResponse.match(/border-left:\s*4px\s*solid/g);
-        return matches ? matches.length : 0;
     };
 
     // Handle drag and drop
@@ -254,3 +164,95 @@ ${ndaText}`;
         if (recommendation.includes('ACCEPTABLE')) return 'acceptable';
         return 'caution';
     };
+    return (
+        <div className="nda-analyzer">
+            <div className="header">
+                <h1>🛡️ NDA Risk Analyzer</h1>
+                <p>Professional Legal Analysis by California Attorney</p>
+                <div className="attorney-info">
+                    Sergei Tokmakov, Esq. • CA Bar #279869 • 13+ Years Experience
+                </div>
+            </div>
+
+            <div className="main-content">
+                {/* Input Panel */}
+                <div className="input-panel">
+                    <h2>
+                        <i data-feather="upload-cloud"></i>
+                        Upload or Paste NDA
+                    </h2>
+
+                    <div className="upload-section">
+                        <div 
+                            className="file-upload"
+                            onDragOver={handleDragOver}
+                            onDragLeave={handleDragLeave}
+                            onDrop={handleDrop}
+                            onClick={() => fileInputRef.current?.click()}
+                        >
+                            <div className="upload-icon">📄</div>
+                            <div className="upload-text">
+                                Drag & drop text file (.txt) here
+                            </div>
+                            <div className="upload-subtext">
+                                or click to browse • Plain text files only
+                            </div>
+                            <input
+                                ref={fileInputRef}
+                                type="file"
+                                accept=".txt,text/plain"
+                                onChange={(e) => handleFileUpload(e.target.files[0])}
+                                style={{ display: 'none' }}
+                            />
+                        </div>
+                        
+                        <div className="url-input-section">
+                            <div className="url-input-header">Or enter URL to NDA:</div>
+                            <div className="url-input-group">
+                                <input
+                                    type="url"
+                                    className="url-input"
+                                    placeholder="https://example.com/nda-document.html"
+                                    value={ndaUrl}
+                                    onChange={(e) => setNdaUrl(e.target.value)}
+                                />
+                                <button 
+                                    className="url-submit-btn"
+                                    onClick={handleUrlSubmit}
+                                    disabled={!ndaUrl.trim() || isAnalyzing}
+                                >
+                                    Fetch
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="text-input-section">
+                        <textarea
+                            className="nda-textarea"
+                            placeholder="Paste your NDA text here for instant analysis...
+
+Example: 'This Non-Disclosure Agreement is entered into between Company A and Company B for the purpose of...'
+
+The more complete the text, the better the analysis."
+                            value={ndaText}
+                            onChange={(e) => setNdaText(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="analysis-options">
+                        <div className="option-group">
+                            <label>Industry Context (optional):</label>
+                            <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
+                                <option value="auto-detect">Let AI determine from NDA</option>
+                                <option value="technology">Technology/Software</option>
+                                <option value="healthcare">Healthcare/Medical</option>
+                                <option value="finance">Finance/Banking</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="retail">Retail/E-commerce</option>
+                                <option value="consulting">Consulting/Services</option>
+                                <option value="real-estate">Real Estate</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
