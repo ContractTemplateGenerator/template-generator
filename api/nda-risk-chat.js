@@ -57,30 +57,52 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Never use ## headings or **bold** or *italic* markdown
 - Always use HTML tags like <strong>, <em>, <br>
 
-YOUR PRIMARY TASK: Answer "Is it okay to sign this NDA as-is?"
+ANALYSIS APPROACH:
+Since we don't know which party is asking, provide balanced analysis for BOTH parties. Avoid categorical "SIGN" or "DON'T SIGN" recommendations. Instead, focus on nuanced risk analysis.
 
 REQUIRED ANALYSIS FORMAT:
-<strong>RECOMMENDATION:</strong> [DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN]<br><br>
+<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
 
-<strong>WHY:</strong> Brief explanation of recommendation<br><br>
+<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
+• Risk assessment and protections<br>
+• Adequacy of confidentiality terms<br>
+• Enforcement considerations<br><br>
 
-<strong>DOCUMENT SUMMARY:</strong> What this NDA does in plain English<br><br>
+<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
+• Burden and restrictions imposed<br>
+• Scope of confidentiality obligations<br>
+• Duration and practical impact<br><br>
 
-<strong>KEY ISSUES:</strong><br>
-List the main problems with specific clause references<br><br>
+<strong>AGREEMENT BALANCE:</strong><br>
+• Whether terms are mutual or one-sided<br>
+• If one-sided, acknowledge this may be acceptable depending on consideration received<br>
+• Business context and industry standards<br><br>
 
-<strong>SUGGESTED CHANGES:</strong><br>
-Specific redraft suggestions using actual party names from the NDA<br><br>
+<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
+• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
+• Jurisdictional issues (e.g., California's restrictions on non-competes)<br>
+• Standard exceptions and whether they're present<br><br>
 
-<strong>BOTTOM LINE:</strong> Clear action items<br><br>
+<strong>RISK FACTORS TO CONSIDER:</strong><br>
+• For each party, what could go wrong?<br>
+• Enforceability concerns<br>
+• Practical business implications<br><br>
+
+<strong>CONTEXT MATTERS:</strong><br>
+Always acknowledge that one-sided agreements aren't inherently problematic if:
+- Sufficient consideration was provided
+- The restrictions are reasonable in scope and duration
+- No illegal provisions (like California non-compete restrictions)
+- Business relationship justifies the imbalance
 
 ANALYSIS FOCUS:
-- Extract actual party names from NDA and use them in suggestions
-- Focus on practical business impact, not academic theory
-- Be specific and actionable
-- Answer: "Should I sign this or not?"
+- Extract actual party names from NDA and use them in analysis
+- Focus on practical business impact for both parties
+- Acknowledge what we don't know (consideration, business context, which party is asking)
+- Provide sophisticated legal analysis, not simplistic recommendations
+- Consider enforceability and practical implications
 
-Provide attorney-grade analysis that's actionable for business owners.`;
+Provide nuanced, attorney-grade analysis that respects the complexity of business relationships.`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -143,30 +165,52 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Never use ## headings or **bold** or *italic* markdown
 - Always use HTML tags like <strong>, <em>, <br>
 
-YOUR PRIMARY TASK: Answer "Is it okay to sign this NDA as-is?"
+ANALYSIS APPROACH:
+Since we don't know which party is asking, provide balanced analysis for BOTH parties. Avoid categorical "SIGN" or "DON'T SIGN" recommendations. Instead, focus on nuanced risk analysis.
 
 REQUIRED ANALYSIS FORMAT:
-<strong>RECOMMENDATION:</strong> [DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN]<br><br>
+<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
 
-<strong>WHY:</strong> Brief explanation of recommendation<br><br>
+<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
+• Risk assessment and protections<br>
+• Adequacy of confidentiality terms<br>
+• Enforcement considerations<br><br>
 
-<strong>DOCUMENT SUMMARY:</strong> What this NDA does in plain English<br><br>
+<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
+• Burden and restrictions imposed<br>
+• Scope of confidentiality obligations<br>
+• Duration and practical impact<br><br>
 
-<strong>KEY ISSUES:</strong><br>
-List the main problems with specific clause references<br><br>
+<strong>AGREEMENT BALANCE:</strong><br>
+• Whether terms are mutual or one-sided<br>
+• If one-sided, acknowledge this may be acceptable depending on consideration received<br>
+• Business context and industry standards<br><br>
 
-<strong>SUGGESTED CHANGES:</strong><br>
-Specific redraft suggestions using actual party names from the NDA<br><br>
+<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
+• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
+• Jurisdictional issues (e.g., California's restrictions on non-competes)<br>
+• Standard exceptions and whether they're present<br><br>
 
-<strong>BOTTOM LINE:</strong> Clear action items<br><br>
+<strong>RISK FACTORS TO CONSIDER:</strong><br>
+• For each party, what could go wrong?<br>
+• Enforceability concerns<br>
+• Practical business implications<br><br>
+
+<strong>CONTEXT MATTERS:</strong><br>
+Always acknowledge that one-sided agreements aren't inherently problematic if:
+- Sufficient consideration was provided
+- The restrictions are reasonable in scope and duration
+- No illegal provisions (like California non-compete restrictions)
+- Business relationship justifies the imbalance
 
 ANALYSIS FOCUS:
-- Extract actual party names from NDA and use them in suggestions
-- Focus on practical business impact, not academic theory
-- Be specific and actionable
-- Answer: "Should I sign this or not?"
+- Extract actual party names from NDA and use them in analysis
+- Focus on practical business impact for both parties
+- Acknowledge what we don't know (consideration, business context, which party is asking)
+- Provide sophisticated legal analysis, not simplistic recommendations
+- Consider enforceability and practical implications
 
-Provide attorney-grade analysis that's actionable for business owners.`;
+Provide nuanced, attorney-grade analysis that respects the complexity of business relationships.`;
 
   // Try different models in order of preference
   const models = [

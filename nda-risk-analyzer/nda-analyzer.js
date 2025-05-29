@@ -11,25 +11,38 @@ const NDAAnalyzer = () => {
 
     // Fallback responses for when API fails
     const fallbackResponses = {
-        "default": `<strong>RECOMMENDATION:</strong> REVIEW CAREFULLY BEFORE SIGNING<br><br>
+        "default": `<strong>DOCUMENT OVERVIEW:</strong> Professional legal analysis requires reviewing specific NDA clauses, but I can provide general guidance based on common NDA structures and issues.<br><br>
 
-<strong>WHY:</strong> NDAs contain important legal obligations that require careful review to protect your business interests and ensure fair terms.<br><br>
+<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
+• <strong>Protection Level:</strong> Standard NDAs typically provide reasonable confidentiality protection<br>
+• <strong>Enforcement:</strong> Most business NDAs are enforceable if properly drafted with standard exceptions<br>
+• <strong>Duration:</strong> Look for reasonable time limits (2-3 years is typical for business relationships)<br><br>
 
-<strong>ESSENTIAL REVIEW CHECKLIST:</strong><br>
-• <strong>Mutual Obligations:</strong> Verify both parties have equivalent confidentiality duties<br>
-• <strong>Scope Definition:</strong> Ensure "confidential information" is clearly defined and reasonable<br>
-• <strong>Time Limits:</strong> Look for reasonable duration (2-3 years is standard for business NDAs)<br>
-• <strong>Standard Exceptions:</strong> Confirm inclusion of publicly available information exceptions<br>
-• <strong>Termination Clauses:</strong> Review information return and destruction requirements<br><br>
+<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
+• <strong>Obligation Scope:</strong> Review what information is considered "confidential" - should be clearly defined<br>
+• <strong>Practical Impact:</strong> Consider how restrictions will affect your business operations<br>
+• <strong>Standard Exceptions:</strong> Ensure publicly available information, independently developed information, and legally required disclosures are excluded<br><br>
 
-<strong>CRITICAL RED FLAGS:</strong><br>
-• <strong>One-Sided Terms:</strong> Only one party bound by confidentiality restrictions<br>
-• <strong>Indefinite Duration:</strong> "Perpetual" or unlimited time periods<br>
-• <strong>Overly Broad Scope:</strong> Vague definitions that could include non-confidential business information<br>
-• <strong>Missing Exceptions:</strong> No protections for publicly known or independently developed information<br>
-• <strong>Excessive Remedies:</strong> Unreasonable penalties or automatic injunctive relief<br><br>
+<strong>AGREEMENT BALANCE:</strong><br>
+• <strong>Mutual vs One-Sided:</strong> Many business NDAs are one-sided, which may be appropriate depending on the business relationship<br>
+• <strong>Consideration Context:</strong> One-sided terms may be acceptable if you're receiving valuable business opportunities, partnerships, or access to proprietary information<br>
+• <strong>Industry Standards:</strong> Technology and investment contexts often involve one-sided NDAs<br><br>
 
-<strong>BOTTOM LINE:</strong> Most business NDAs are reasonable with standard terms. Schedule a consultation if you identify multiple red flags or if this agreement is critical to a significant business opportunity.`
+<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
+• <strong>Overly Broad Definitions:</strong> Watch for vague "confidential information" definitions that could include non-confidential business discussions<br>
+• <strong>California Restrictions:</strong> In California, non-compete clauses are generally unenforceable, so ensure NDA doesn't contain disguised non-compete provisions<br>
+• <strong>Perpetual Terms:</strong> Indefinite confidentiality periods may be problematic - reasonable duration is preferred<br><br>
+
+<strong>RISK FACTORS TO CONSIDER:</strong><br>
+• <strong>Disclosing Party Risks:</strong> Information leakage, competitive disadvantage, loss of trade secret protection<br>
+• <strong>Receiving Party Risks:</strong> Operational restrictions, potential litigation exposure, compliance burden<br>
+• <strong>Enforceability:</strong> Courts generally enforce reasonable confidentiality agreements but may reject overly broad restrictions<br><br>
+
+<strong>CONTEXT MATTERS:</strong><br>
+The appropriateness of any NDA depends heavily on factors we don't know: the value of consideration being exchanged, the business relationship context, the competitive landscape, and which party you represent. One-sided agreements aren't inherently problematic in business contexts where one party genuinely needs to protect valuable confidential information while the other party benefits from access to business opportunities.<br><br>
+
+<strong>PROFESSIONAL RECOMMENDATION:</strong><br>
+For specific clause-by-clause analysis and personalized guidance based on your business context, schedule a consultation to discuss the particular circumstances of your situation.`
     };
 
     // Handle file upload (text files only)
@@ -137,7 +150,7 @@ const NDAAnalyzer = () => {
             // Always use fallback response when API fails
             setAnalysisResult({
                 htmlContent: fallbackResponses.default,
-                recommendation: extractRecommendation(fallbackResponses.default),
+                recommendation: 'CONTEXTUAL DUAL-PARTY ANALYSIS',
                 model: 'Professional Fallback Analysis',
                 provider: 'Terms.law Legal Guidance'
             });
@@ -146,18 +159,26 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Extract recommendation from response
+    // Extract key insight from response instead of categorical recommendation
     const extractRecommendation = (htmlResponse) => {
-        const match = htmlResponse.match(/<strong>RECOMMENDATION:<\/strong>\s*([^<]+)/);
-        if (match) {
-            return match[1].trim();
+        // Look for document overview or analysis summary
+        const overviewMatch = htmlResponse.match(/<strong>DOCUMENT OVERVIEW:<\/strong>\s*([^<]+)/);
+        if (overviewMatch) {
+            return overviewMatch[1].trim().substring(0, 80) + '...';
         }
-        // Fallback for different formats
-        if (htmlResponse.includes('REVIEW CAREFULLY')) return 'REVIEW CAREFULLY BEFORE SIGNING';
-        if (htmlResponse.includes('SIGN WITH CAUTION')) return 'SIGN WITH CAUTION';
-        if (htmlResponse.includes('DO NOT SIGN')) return 'DO NOT SIGN';
-        if (htmlResponse.includes('ACCEPTABLE')) return 'ACCEPTABLE TO SIGN';
-        return 'REVIEW NEEDED';
+        
+        // Look for balance assessment
+        const balanceMatch = htmlResponse.match(/<strong>AGREEMENT BALANCE:<\/strong>(.*?)<br><br>/s);
+        if (balanceMatch) {
+            const balanceText = balanceMatch[1].replace(/<[^>]*>/g, '').trim();
+            return balanceText.substring(0, 80) + '...';
+        }
+        
+        // Fallback to generic analysis indicator
+        if (htmlResponse.includes('DOCUMENT OVERVIEW')) return 'NUANCED LEGAL ANALYSIS';
+        if (htmlResponse.includes('ANALYSIS FOR')) return 'DUAL-PARTY ANALYSIS';
+        if (htmlResponse.includes('CONTEXT MATTERS')) return 'CONTEXTUAL REVIEW';
+        return 'PROFESSIONAL ANALYSIS';
     };
 
     // Handle drag and drop
@@ -191,18 +212,17 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Get recommendation styling class
+    // Get styling class based on analysis type (more neutral than before)
     const getRecommendationClass = (recommendation) => {
-        if (!recommendation) return 'caution';
-        if (recommendation.includes('DO NOT SIGN')) return 'do-not-sign';
-        if (recommendation.includes('ACCEPTABLE')) return 'acceptable';
-        return 'caution';
+        if (!recommendation) return 'analysis';
+        // All analyses use neutral styling since we don't give categorical recommendations
+        return 'analysis';
     };
     return (
         <div className="nda-analyzer">
             <div className="header">
                 <h1>🛡️ NDA Risk Analyzer</h1>
-                <p>Professional Legal Analysis by California Attorney</p>
+                <p>Sophisticated Dual-Party Legal Analysis by California Attorney</p>
                 <div className="attorney-info">
                     Sergei Tokmakov, Esq. • CA Bar #279869 • 13+ Years Experience
                 </div>
@@ -264,11 +284,13 @@ const NDAAnalyzer = () => {
                     <div className="text-input-section">
                         <textarea
                             className="nda-textarea"
-                            placeholder="Paste your NDA text here for instant analysis...
+                            placeholder="Paste your NDA text here for sophisticated dual-party analysis...
+
+We'll analyze risks and considerations for both the disclosing party (information sharer) and receiving party (information recipient).
 
 Example: 'This Non-Disclosure Agreement is entered into between Company A and Company B for the purpose of...'
 
-The more complete the text, the better the analysis."
+The more complete the text, the more nuanced the analysis."
                             value={ndaText}
                             onChange={(e) => setNdaText(e.target.value)}
                         />
@@ -331,12 +353,12 @@ The more complete the text, the better the analysis."
                         {isAnalyzing ? (
                             <>
                                 <div className="loading-spinner"></div>
-                                Analyzing NDA...
+                                Analyzing NDA for Both Parties...
                             </>
                         ) : (
                             <>
                                 <i data-feather="shield"></i>
-                                Analyze Risk Level
+                                Analyze Dual-Party Risk
                             </>
                         )}
                     </button>
@@ -346,7 +368,7 @@ The more complete the text, the better the analysis."
                 <div className="analysis-panel">
                     <h2>
                         <i data-feather="file-text"></i>
-                        Legal Analysis
+                        Dual-Party Legal Analysis
                     </h2>
 
                     <div className="analysis-content">
@@ -355,7 +377,7 @@ The more complete the text, the better the analysis."
                                 <div className="waiting-icon">⚖️</div>
                                 <div className="waiting-text">Ready to Analyze Your NDA</div>
                                 <div className="waiting-subtext">
-                                    Enter your NDA text and click "Analyze Risk Level" to get professional legal analysis
+                                    Enter your NDA text and click "Analyze Risk Level" to get sophisticated dual-party legal analysis from both disclosing and receiving party perspectives
                                 </div>
                             </div>
                         ) : (
@@ -363,13 +385,12 @@ The more complete the text, the better the analysis."
                                 <div className={`recommendation-card ${getRecommendationClass(analysisResult.recommendation)}`}>
                                     <h3>
                                         <span className="recommendation-icon">
-                                            {analysisResult.recommendation?.includes('DO NOT SIGN') ? '🚫' : 
-                                             analysisResult.recommendation?.includes('ACCEPTABLE') ? '✅' : '⚠️'}
+                                            ⚖️
                                         </span>
-                                        Recommendation
+                                        Legal Analysis Summary
                                     </h3>
                                     <div className="recommendation-answer">
-                                        {analysisResult.recommendation || 'REVIEW NEEDED'}
+                                        {analysisResult.recommendation || 'PROFESSIONAL ANALYSIS'}
                                     </div>
                                 </div>
 
