@@ -16,21 +16,39 @@ const handler = async (req, res) => {
   }
 
   try {
-    const { messages } = req.body;
+    const { messages, useClaudeAI } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' });
     }
 
-    // Check for Groq API key
-    const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
-    if (!groqApiKey) {
-      console.error('No Groq API key found');
-      return res.status(500).json({ error: 'Server configuration error' });
+    // Choose AI provider based on user selection
+    if (useClaudeAI) {
+      return await handleClaudeRequest(req, res, messages);
+    } else {
+      return await handleGroqRequest(req, res, messages);
     }
 
-    // NDA Risk Analysis system prompt
-    const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
+  } catch (error) {
+    console.error('Error in NDA risk analysis API:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error',
+      message: error.message
+    });
+  }
+};
+
+// Handle Claude AI requests
+const handleClaudeRequest = async (req, res, messages) => {
+  // Check for Claude API key
+  const claudeApiKey = process.env.ANTHROPIC_API_KEY;
+  if (!claudeApiKey) {
+    console.error('No Claude API key found');
+    return res.status(500).json({ error: 'Claude API not configured' });
+  }
+
+  // Claude-specific system prompt
+  const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
 
 CRITICAL FORMATTING REQUIREMENTS:
 - Use <strong></strong> tags for critical legal concepts (NOT ** markdown)
@@ -64,80 +82,159 @@ ANALYSIS FOCUS:
 
 Provide attorney-grade analysis that's actionable for business owners.`;
 
-    // Try different models in order of preference
-    const models = [
-      'llama-3.3-70b-versatile',
-      'llama3-70b-8192',
-      'llama-3.1-8b-instant',
-      'llama3-8b-8192',
-      'gemma2-9b-it'
-    ];
-    
-    let assistantMessage = null;
-    let modelUsed = null;
-    
-    for (const model of models) {
-      try {
-        console.log(`Trying model: ${model}`);
-        
-        const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${groqApiKey}`
-          },
-          body: JSON.stringify({
-            model: model,
-            messages: [
-              {
-                role: 'system',
-                content: systemPrompt
-              },
-              ...messages
-            ],
-            max_tokens: 2000,
-            temperature: 0.2
-          })
-        });
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': claudeApiKey,
+        'anthropic-version': '2023-06-01'
+      },
+      body: JSON.stringify({
+        model: 'claude-3-5-sonnet-20241022',
+        max_tokens: 2000,
+        system: systemPrompt,
+        messages: messages.map(msg => ({
+          role: msg.role,
+          content: msg.content
+        }))
+      })
+    });
 
-        if (response.ok) {
-          const data = await response.json();
-          assistantMessage = data.choices[0].message.content;
-          modelUsed = model;
-          console.log(`Success with model: ${model}`);
-          break;
-        } else {
-          const errorText = await response.text();
-          console.log(`Model ${model} failed:`, errorText);
-          continue;
-        }
-      } catch (error) {
-        console.log(`Model ${model} error:`, error.message);
+    if (response.ok) {
+      const data = await response.json();
+      const assistantMessage = data.content[0].text;
+      
+      console.log('Successful Claude analysis response generated');
+      return res.status(200).json({ 
+        response: assistantMessage,
+        model: 'claude-3.5-sonnet',
+        provider: 'Anthropic Claude'
+      });
+    } else {
+      const errorText = await response.text();
+      console.error('Claude API Error:', errorText);
+      throw new Error(`Claude API error: ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Claude request failed:', error);
+    // Fall back to Groq if Claude fails
+    console.log('Falling back to Groq...');
+    return await handleGroqRequest(req, res, messages);
+  }
+};
+
+// Handle Groq/Llama requests (existing logic)
+const handleGroqRequest = async (req, res, messages) => {
+  // Check for Groq API key
+  const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    console.error('No Groq API key found');
+    return res.status(500).json({ error: 'Server configuration error' });
+  }
+
+  // NDA Risk Analysis system prompt
+  const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
+
+CRITICAL FORMATTING REQUIREMENTS:
+- Use <strong></strong> tags for critical legal concepts (NOT ** markdown)
+- Use <br><br> for paragraph breaks (NOT \\n\\n)
+- Format responses in HTML, not markdown
+- Never use ## headings or **bold** or *italic* markdown
+- Always use HTML tags like <strong>, <em>, <br>
+
+YOUR PRIMARY TASK: Answer "Is it okay to sign this NDA as-is?"
+
+REQUIRED ANALYSIS FORMAT:
+<strong>RECOMMENDATION:</strong> [DO NOT SIGN / SIGN WITH CAUTION / ACCEPTABLE TO SIGN]<br><br>
+
+<strong>WHY:</strong> Brief explanation of recommendation<br><br>
+
+<strong>DOCUMENT SUMMARY:</strong> What this NDA does in plain English<br><br>
+
+<strong>KEY ISSUES:</strong><br>
+List the main problems with specific clause references<br><br>
+
+<strong>SUGGESTED CHANGES:</strong><br>
+Specific redraft suggestions using actual party names from the NDA<br><br>
+
+<strong>BOTTOM LINE:</strong> Clear action items<br><br>
+
+ANALYSIS FOCUS:
+- Extract actual party names from NDA and use them in suggestions
+- Focus on practical business impact, not academic theory
+- Be specific and actionable
+- Answer: "Should I sign this or not?"
+
+Provide attorney-grade analysis that's actionable for business owners.`;
+
+  // Try different models in order of preference
+  const models = [
+    'llama-3.3-70b-versatile',
+    'llama3-70b-8192',
+    'llama-3.1-8b-instant',
+    'llama3-8b-8192',
+    'gemma2-9b-it'
+  ];
+  
+  let assistantMessage = null;
+  let modelUsed = null;
+  
+  for (const model of models) {
+    try {
+      console.log(`Trying model: ${model}`);
+      
+      const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${groqApiKey}`
+        },
+        body: JSON.stringify({
+          model: model,
+          messages: [
+            {
+              role: 'system',
+              content: systemPrompt
+            },
+            ...messages
+          ],
+          max_tokens: 2000,
+          temperature: 0.2
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        assistantMessage = data.choices[0].message.content;
+        modelUsed = model;
+        console.log(`Success with model: ${model}`);
+        break;
+      } else {
+        const errorText = await response.text();
+        console.log(`Model ${model} failed:`, errorText);
         continue;
       }
+    } catch (error) {
+      console.log(`Model ${model} error:`, error.message);
+      continue;
     }
-    
-    if (!assistantMessage) {
-      console.error('All models failed');
-      return res.status(500).json({ 
-        error: 'All available models failed',
-        details: 'Please try again later'
-      });
-    }
-
-    console.log('Successful analysis response generated');
-    return res.status(200).json({ 
-      response: assistantMessage,
-      model: modelUsed
-    });
-
-  } catch (error) {
-    console.error('Error in NDA risk analysis API:', error);
+  }
+  
+  if (!assistantMessage) {
+    console.error('All Groq models failed');
     return res.status(500).json({ 
-      error: 'Internal server error',
-      message: error.message
+      error: 'All available models failed',
+      details: 'Please try again later'
     });
   }
+
+  console.log('Successful Groq analysis response generated');
+  return res.status(200).json({ 
+    response: assistantMessage,
+    model: modelUsed,
+    provider: 'Groq Llama'
+  });
 };
 
 export default handler;

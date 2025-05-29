@@ -6,6 +6,7 @@ const NDAAnalyzer = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [industry, setIndustry] = useState('auto-detect');
     const [ndaUrl, setNdaUrl] = useState('');
+    const [useClaudeAI, setUseClaudeAI] = useState(false); // Toggle for AI provider
     const fileInputRef = useRef(null);
 
     // Fallback responses for when API fails
@@ -99,7 +100,8 @@ const NDAAnalyzer = () => {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    messages: [userMessage]
+                    messages: [userMessage],
+                    useClaudeAI: useClaudeAI
                 }),
             });
 
@@ -122,7 +124,8 @@ const NDAAnalyzer = () => {
                 setAnalysisResult({
                     htmlContent: data.response,
                     recommendation: extractRecommendation(data.response),
-                    model: data.model || 'AI Analysis'
+                    model: data.model || 'AI Analysis',
+                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude' : 'Groq Llama')
                 });
                 console.log('🔍 Debug: Analysis result set successfully!');
             } else {
@@ -135,7 +138,8 @@ const NDAAnalyzer = () => {
             setAnalysisResult({
                 htmlContent: fallbackResponses.default,
                 recommendation: extractRecommendation(fallbackResponses.default),
-                model: 'Professional Fallback Analysis'
+                model: 'Professional Fallback Analysis',
+                provider: 'Terms.law Legal Guidance'
             });
         } finally {
             setIsAnalyzing(false);
@@ -285,6 +289,38 @@ The more complete the text, the better the analysis."
                                 <option value="other">Other</option>
                             </select>
                         </div>
+                        
+                        <div className="option-group ai-toggle-group">
+                            <label>AI Analysis Provider:</label>
+                            <div className="ai-toggle-container">
+                                <div className="ai-toggle-switch">
+                                    <input
+                                        type="checkbox"
+                                        id="ai-toggle"
+                                        checked={useClaudeAI}
+                                        onChange={(e) => setUseClaudeAI(e.target.checked)}
+                                    />
+                                    <label htmlFor="ai-toggle" className="toggle-label">
+                                        <span className="toggle-slider"></span>
+                                    </label>
+                                </div>
+                                <div className="ai-provider-labels">
+                                    <span className={`provider-label ${!useClaudeAI ? 'active' : ''}`}>
+                                        🚀 Llama (Default)
+                                    </span>
+                                    <span className={`provider-label ${useClaudeAI ? 'active' : ''}`}>
+                                        🧠 Claude AI
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="ai-provider-info">
+                                {useClaudeAI ? (
+                                    <small>Claude AI: Advanced reasoning and detailed legal analysis</small>
+                                ) : (
+                                    <small>Llama: Fast, reliable legal analysis (recommended for most cases)</small>
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     <button
@@ -374,8 +410,11 @@ The more complete the text, the better the analysis."
                                     <small>
                                         <strong>Disclaimer:</strong> This analysis is provided for informational purposes only and does not constitute legal advice. 
                                         For specific legal guidance, consult with a qualified attorney. Analysis by Sergei Tokmakov, Esq., CA Bar #279869.
-                                        {analysisResult.model && (
-                                            <span style={{opacity: 0.7}}> • Powered by {analysisResult.model}</span>
+                                        {analysisResult.provider && (
+                                            <span style={{opacity: 0.7}}> • Powered by {analysisResult.provider}</span>
+                                        )}
+                                        {analysisResult.model && analysisResult.provider && (
+                                            <span style={{opacity: 0.6}}> ({analysisResult.model})</span>
                                         )}
                                     </small>
                                 </div>
