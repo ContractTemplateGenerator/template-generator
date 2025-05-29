@@ -7,42 +7,119 @@ const NDAAnalyzer = () => {
     const [industry, setIndustry] = useState('auto-detect');
     const [ndaUrl, setNdaUrl] = useState('');
     const [useClaudeAI, setUseClaudeAI] = useState(false); // Toggle for AI provider
+    const [showFollowUp, setShowFollowUp] = useState(false);
+    const [userParty, setUserParty] = useState('');
+    const [businessContext, setBusinessContext] = useState('');
+    const [timeframe, setTimeframe] = useState('');
+    const [showUpgradeOptions, setShowUpgradeOptions] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Fallback responses for when API fails
+    // Enhanced fallback responses with structured presentation
     const fallbackResponses = {
-        "default": `<strong>DOCUMENT OVERVIEW:</strong> Professional legal analysis requires reviewing specific NDA clauses, but I can provide general guidance based on common NDA structures and issues.<br><br>
+        "default": `
+        <div class="analysis-overview">
+            <div class="risk-assessment-grid">
+                <div class="risk-card medium-risk">
+                    <div class="risk-icon">⚠️</div>
+                    <div class="risk-title">Risk Level</div>
+                    <div class="risk-value">Moderate</div>
+                    <div class="risk-subtitle">Requires Context</div>
+                </div>
+                <div class="risk-card balance-risk">
+                    <div class="risk-icon">⚖️</div>
+                    <div class="risk-title">Agreement Balance</div>
+                    <div class="risk-value">Unknown</div>
+                    <div class="risk-subtitle">Need Party Info</div>
+                </div>
+                <div class="risk-card enforceability">
+                    <div class="risk-icon">🛡️</div>
+                    <div class="risk-title">Enforceability</div>
+                    <div class="risk-value">Likely</div>
+                    <div class="risk-subtitle">Standard Clauses</div>
+                </div>
+            </div>
+        </div>
 
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• <strong>Protection Level:</strong> Standard NDAs typically provide reasonable confidentiality protection<br>
-• <strong>Enforcement:</strong> Most business NDAs are enforceable if properly drafted with standard exceptions<br>
-• <strong>Duration:</strong> Look for reasonable time limits (2-3 years is typical for business relationships)<br><br>
+        <div class="dual-party-analysis">
+            <table class="analysis-table">
+                <thead>
+                    <tr>
+                        <th>Analysis Factor</th>
+                        <th class="disclosing-party">Disclosing Party<br><small>(Information Sharer)</small></th>
+                        <th class="receiving-party">Receiving Party<br><small>(Information Recipient)</small></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Primary Risk</strong></td>
+                        <td class="disclosing-party">Information leakage & competitive disadvantage</td>
+                        <td class="receiving-party">Operational restrictions & compliance burden</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Key Benefit</strong></td>
+                        <td class="disclosing-party">Trade secret protection & competitive advantage</td>
+                        <td class="receiving-party">Access to valuable business opportunities</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Enforcement Power</strong></td>
+                        <td class="disclosing-party">Can seek injunctive relief & damages</td>
+                        <td class="receiving-party">Limited - must comply with obligations</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Duration Impact</strong></td>
+                        <td class="disclosing-party">Longer = better protection</td>
+                        <td class="receiving-party">Shorter = less restriction</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
 
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• <strong>Obligation Scope:</strong> Review what information is considered "confidential" - should be clearly defined<br>
-• <strong>Practical Impact:</strong> Consider how restrictions will affect your business operations<br>
-• <strong>Standard Exceptions:</strong> Ensure publicly available information, independently developed information, and legally required disclosures are excluded<br><br>
+        <div class="suggested-redrafts">
+            <h3><strong>🔧 Common Improvement Areas</strong></h3>
+            <div class="redraft-cards">
+                <div class="redraft-card">
+                    <div class="redraft-issue">Overly Broad Definition</div>
+                    <div class="redraft-before"><strong>Before:</strong> "All information shared..."</div>
+                    <div class="redraft-after"><strong>Better:</strong> "Information clearly marked as confidential..."</div>
+                </div>
+                <div class="redraft-card">
+                    <div class="redraft-issue">Missing Exceptions</div>
+                    <div class="redraft-before"><strong>Issue:</strong> No standard exceptions</div>
+                    <div class="redraft-after"><strong>Add:</strong> Publicly available, independently developed, legally required disclosures</div>
+                </div>
+                <div class="redraft-card">
+                    <div class="redraft-issue">Indefinite Duration</div>
+                    <div class="redraft-before"><strong>Before:</strong> "Perpetual confidentiality"</div>
+                    <div class="redraft-after"><strong>Better:</strong> "3 years from disclosure date"</div>
+                </div>
+            </div>
+        </div>
 
-<strong>AGREEMENT BALANCE:</strong><br>
-• <strong>Mutual vs One-Sided:</strong> Many business NDAs are one-sided, which may be appropriate depending on the business relationship<br>
-• <strong>Consideration Context:</strong> One-sided terms may be acceptable if you're receiving valuable business opportunities, partnerships, or access to proprietary information<br>
-• <strong>Industry Standards:</strong> Technology and investment contexts often involve one-sided NDAs<br><br>
+        <div class="context-questions">
+            <h3><strong>❓ To Provide Better Analysis, We Need Context</strong></h3>
+            <div class="question-prompts">
+                <div class="question-card">Which party do you represent?</div>
+                <div class="question-card">What's the business relationship context?</div>
+                <div class="question-card">What consideration is being exchanged?</div>
+                <div class="question-card">What's your timeline for finalization?</div>
+            </div>
+        </div>
 
-<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
-• <strong>Overly Broad Definitions:</strong> Watch for vague "confidential information" definitions that could include non-confidential business discussions<br>
-• <strong>California Restrictions:</strong> In California, non-compete clauses are generally unenforceable, so ensure NDA doesn't contain disguised non-compete provisions<br>
-• <strong>Perpetual Terms:</strong> Indefinite confidentiality periods may be problematic - reasonable duration is preferred<br><br>
-
-<strong>RISK FACTORS TO CONSIDER:</strong><br>
-• <strong>Disclosing Party Risks:</strong> Information leakage, competitive disadvantage, loss of trade secret protection<br>
-• <strong>Receiving Party Risks:</strong> Operational restrictions, potential litigation exposure, compliance burden<br>
-• <strong>Enforceability:</strong> Courts generally enforce reasonable confidentiality agreements but may reject overly broad restrictions<br><br>
-
-<strong>CONTEXT MATTERS:</strong><br>
-The appropriateness of any NDA depends heavily on factors we don't know: the value of consideration being exchanged, the business relationship context, the competitive landscape, and which party you represent. One-sided agreements aren't inherently problematic in business contexts where one party genuinely needs to protect valuable confidential information while the other party benefits from access to business opportunities.<br><br>
-
-<strong>PROFESSIONAL RECOMMENDATION:</strong><br>
-For specific clause-by-clause analysis and personalized guidance based on your business context, schedule a consultation to discuss the particular circumstances of your situation.`
+        <div class="upgrade-teasers">
+            <div class="upgrade-card tier-1">
+                <div class="tier-badge">Enhanced Analysis - $97</div>
+                <div class="tier-benefits">✓ Party-specific risk assessment<br>✓ Industry-specific recommendations<br>✓ Negotiation strategy guidance</div>
+            </div>
+            <div class="upgrade-card tier-2">
+                <div class="tier-badge">Complete Redraft - $297</div>
+                <div class="tier-benefits">✓ Fully redrafted agreement<br>✓ Summary of all changes<br>✓ 30-minute strategy call</div>
+            </div>
+            <div class="upgrade-card tier-3">
+                <div class="tier-badge">Full Legal Package - $597</div>
+                <div class="tier-benefits">✓ Multiple agreement versions<br>✓ Legal memo & strategy<br>✓ Ongoing negotiation support</div>
+            </div>
+        </div>
+        `
     };
 
     // Handle file upload (text files only)
@@ -141,6 +218,10 @@ For specific clause-by-clause analysis and personalized guidance based on your b
                     provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama')
                 });
                 console.log('🔍 Debug: Analysis result set successfully!');
+                
+                // Show follow-up questions after analysis
+                setShowFollowUp(true);
+                setShowUpgradeOptions(true);
             } else {
                 throw new Error('No response content received from API');
             }
@@ -198,6 +279,77 @@ For specific clause-by-clause analysis and personalized guidance based on your b
         const files = e.dataTransfer.files;
         if (files.length > 0) {
             handleFileUpload(files[0]);
+        }
+    };
+
+    // Handle enhanced analysis with context
+    const requestEnhancedAnalysis = async () => {
+        if (!ndaText.trim()) {
+            alert('Please enter your NDA text first.');
+            return;
+        }
+
+        setIsAnalyzing(true);
+        
+        // Create enhanced user message with context
+        const contextInfo = `
+        User Context:
+        - Party Represented: ${userParty || 'Not specified'}
+        - Business Context: ${businessContext || 'Not specified'}  
+        - Industry Context: ${industry}
+        - Timeline: ${timeframe || 'Not specified'}
+        `;
+        
+        const userMessage = { 
+            role: 'user', 
+            content: `Please provide an enhanced analysis of this NDA with the following context:
+            
+            ${contextInfo}
+            
+            Please provide:
+            1. Specific recommendations for my position
+            2. Suggested clause redrafts
+            3. Negotiation strategy
+            4. Risk quantification where possible
+            
+            NDA TEXT:
+            ${ndaText}` 
+        };
+        
+        try {
+            const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    messages: [userMessage],
+                    useClaudeAI: useClaudeAI
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            if (data.response) {
+                setAnalysisResult({
+                    htmlContent: data.response,
+                    recommendation: 'CUSTOMIZED ANALYSIS FOR YOUR POSITION',
+                    model: data.model || 'Enhanced AI Analysis',
+                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama'),
+                    isEnhanced: true
+                });
+            } else {
+                throw new Error('No response content received from API');
+            }
+        } catch (error) {
+            console.error('Enhanced analysis error:', error);
+            alert('Enhanced analysis temporarily unavailable. Please try the consultation option.');
+        } finally {
+            setIsAnalyzing(false);
         }
     };
 
@@ -397,6 +549,125 @@ The more complete the text, the more nuanced the analysis."
                                 <div className="legal-analysis-content">
                                     <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
                                 </div>
+
+                                {/* Follow-up Questions Section */}
+                                {showFollowUp && !analysisResult.isEnhanced && (
+                                    <div className="follow-up-section">
+                                        <h3 className="followup-title">🎯 Get Customized Analysis for Your Position</h3>
+                                        <div className="context-questions-grid">
+                                            <div className="question-group">
+                                                <label>Which party do you represent?</label>
+                                                <select value={userParty} onChange={(e) => setUserParty(e.target.value)}>
+                                                    <option value="">Select your position</option>
+                                                    <option value="disclosing">Disclosing Party (Information Sharer)</option>
+                                                    <option value="receiving">Receiving Party (Information Recipient)</option>
+                                                    <option value="both">Both parties (drafting mutual NDA)</option>
+                                                </select>
+                                            </div>
+                                            <div className="question-group">
+                                                <label>Business relationship context?</label>
+                                                <select value={businessContext} onChange={(e) => setBusinessContext(e.target.value)}>
+                                                    <option value="">Select context</option>
+                                                    <option value="m&a">M&A Due Diligence</option>
+                                                    <option value="partnership">Strategic Partnership</option>
+                                                    <option value="employment">Employment/Contractor</option>
+                                                    <option value="investment">Investment Discussion</option>
+                                                    <option value="vendor">Vendor/Supplier Relationship</option>
+                                                    <option value="licensing">Technology Licensing</option>
+                                                    <option value="other">Other Business Relationship</option>
+                                                </select>
+                                            </div>
+                                            <div className="question-group">
+                                                <label>When do you need this finalized?</label>
+                                                <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
+                                                    <option value="">Select timeline</option>
+                                                    <option value="asap">ASAP (within 24 hours)</option>
+                                                    <option value="week">Within 1 week</option>
+                                                    <option value="month">Within 1 month</option>
+                                                    <option value="flexible">Flexible timeline</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            className="enhanced-analysis-btn"
+                                            onClick={requestEnhancedAnalysis}
+                                            disabled={isAnalyzing || !userParty}
+                                        >
+                                            {isAnalyzing ? (
+                                                <>
+                                                    <div className="loading-spinner"></div>
+                                                    Generating Customized Analysis...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <i data-feather="target"></i>
+                                                    Get Customized Analysis for My Position
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Upgrade Options Mock */}
+                                {showUpgradeOptions && !analysisResult.isEnhanced && (
+                                    <div className="upgrade-options-section">
+                                        <h3 className="upgrade-title">💼 Professional Services Available</h3>
+                                        <div className="service-tiers">
+                                            <div className="service-tier tier-1">
+                                                <div className="tier-header">
+                                                    <div className="tier-name">Enhanced Analysis</div>
+                                                    <div className="tier-price">$97</div>
+                                                </div>
+                                                <div className="tier-features">
+                                                    ✓ Party-specific risk assessment<br>
+                                                    ✓ Industry-specific recommendations<br>
+                                                    ✓ Negotiation strategy guidance<br>
+                                                    ✓ Email consultation included
+                                                </div>
+                                                <button className="tier-button" onClick={scheduleConsultation}>
+                                                    Schedule Consultation
+                                                </button>
+                                            </div>
+                                            <div className="service-tier tier-2 featured">
+                                                <div className="tier-badge">Most Popular</div>
+                                                <div className="tier-header">
+                                                    <div className="tier-name">Complete Redraft</div>
+                                                    <div className="tier-price">$297</div>
+                                                </div>
+                                                <div className="tier-features">
+                                                    ✓ Fully redrafted NDA optimized for you<br>
+                                                    ✓ Summary of all changes<br>
+                                                    ✓ Negotiation talking points<br>
+                                                    ✓ 30-minute strategy call
+                                                </div>
+                                                <button className="tier-button primary" onClick={scheduleConsultation}>
+                                                    Schedule Consultation
+                                                </button>
+                                            </div>
+                                            <div className="service-tier tier-3">
+                                                <div className="tier-header">
+                                                    <div className="tier-name">Full Legal Package</div>
+                                                    <div className="tier-price">$597</div>
+                                                </div>
+                                                <div className="tier-features">
+                                                    ✓ Multiple agreement versions<br>
+                                                    ✓ Legal memo & strategic positioning<br>
+                                                    ✓ Follow-up negotiation support<br>
+                                                    ✓ Template library access
+                                                </div>
+                                                <button className="tier-button" onClick={scheduleConsultation}>
+                                                    Schedule Consultation
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div className="upgrade-disclaimer">
+                                            <small>
+                                                <strong>Note:</strong> These are example service offerings. Actual pricing and services 
+                                                will be discussed during consultation based on your specific needs.
+                                            </small>
+                                        </div>
+                                    </div>
+                                )}
 
                                 <div className="action-buttons">
                                     <button 

@@ -56,53 +56,88 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Format responses in HTML, not markdown
 - Never use ## headings or **bold** or *italic* markdown
 - Always use HTML tags like <strong>, <em>, <br>
+- Include structured HTML elements for better presentation
 
-ANALYSIS APPROACH:
-Since we don't know which party is asking, provide balanced analysis for BOTH parties. Avoid categorical "SIGN" or "DON'T SIGN" recommendations. Instead, focus on nuanced risk analysis.
+ENHANCED ANALYSIS APPROACH:
+Provide engaging, structured analysis with visual elements. Start with risk assessment cards, then dual-party analysis table, then suggested improvements.
 
-REQUIRED ANALYSIS FORMAT:
-<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
+REQUIRED ENHANCED FORMAT:
 
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• Risk assessment and protections<br>
-• Adequacy of confidentiality terms<br>
-• Enforcement considerations<br><br>
+<div class="analysis-overview">
+    <div class="risk-assessment-grid">
+        <div class="risk-card [high-risk|medium-risk|low-risk]">
+            <div class="risk-icon">[emoji]</div>
+            <div class="risk-title">Overall Risk</div>
+            <div class="risk-value">[High|Medium|Low]</div>
+            <div class="risk-subtitle">[brief description]</div>
+        </div>
+        <div class="risk-card balance-risk">
+            <div class="risk-icon">⚖️</div>
+            <div class="risk-title">Agreement Balance</div>
+            <div class="risk-value">[Balanced|One-Sided|Mutual]</div>
+            <div class="risk-subtitle">[context]</div>
+        </div>
+        <div class="risk-card enforceability">
+            <div class="risk-icon">🛡️</div>
+            <div class="risk-title">Enforceability</div>
+            <div class="risk-value">[Strong|Moderate|Weak]</div>
+            <div class="risk-subtitle">[reason]</div>
+        </div>
+    </div>
+</div>
 
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• Burden and restrictions imposed<br>
-• Scope of confidentiality obligations<br>
-• Duration and practical impact<br><br>
+<div class="dual-party-analysis">
+    <table class="analysis-table">
+        <thead>
+            <tr>
+                <th>Analysis Factor</th>
+                <th class="disclosing-party">Disclosing Party<br><small>(Information Sharer)</small></th>
+                <th class="receiving-party">Receiving Party<br><small>(Information Recipient)</small></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Primary Risk</strong></td>
+                <td class="disclosing-party">[specific risk for disclosing party]</td>
+                <td class="receiving-party">[specific risk for receiving party]</td>
+            </tr>
+            [additional relevant comparison rows]
+        </tbody>
+    </table>
+</div>
 
-<strong>AGREEMENT BALANCE:</strong><br>
-• Whether terms are mutual or one-sided<br>
-• If one-sided, acknowledge this may be acceptable depending on consideration received<br>
-• Business context and industry standards<br><br>
+<div class="suggested-redrafts">
+    <h3><strong>🔧 Suggested Clause Improvements</strong></h3>
+    <div class="redraft-cards">
+        <div class="redraft-card">
+            <div class="redraft-issue">[Issue Title]</div>
+            <div class="redraft-before"><strong>Current:</strong> "[problematic clause text]"</div>
+            <div class="redraft-after"><strong>Suggested:</strong> "[improved clause text]"</div>
+        </div>
+        [additional redraft cards as needed]
+    </div>
+</div>
 
-<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
-• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
-• Jurisdictional issues (e.g., California's restrictions on non-competes)<br>
-• Standard exceptions and whether they're present<br><br>
-
-<strong>RISK FACTORS TO CONSIDER:</strong><br>
-• For each party, what could go wrong?<br>
-• Enforceability concerns<br>
-• Practical business implications<br><br>
-
-<strong>CONTEXT MATTERS:</strong><br>
-Always acknowledge that one-sided agreements aren't inherently problematic if:
-- Sufficient consideration was provided
-- The restrictions are reasonable in scope and duration
-- No illegal provisions (like California non-compete restrictions)
-- Business relationship justifies the imbalance
+<div class="context-questions">
+    <h3><strong>❓ Questions for Better Analysis</strong></h3>
+    <div class="question-prompts">
+        <div class="question-card">Which party do you represent?</div>
+        <div class="question-card">What's the business context?</div>
+        <div class="question-card">What consideration is being exchanged?</div>
+        <div class="question-card">What's your timeline?</div>
+    </div>
+</div>
 
 ANALYSIS FOCUS:
 - Extract actual party names from NDA and use them in analysis
+- Identify specific problematic clauses with exact text
+- Provide concrete redraft suggestions
 - Focus on practical business impact for both parties
-- Acknowledge what we don't know (consideration, business context, which party is asking)
-- Provide sophisticated legal analysis, not simplistic recommendations
-- Consider enforceability and practical implications
+- Quantify risks where possible (e.g., "could result in $X compliance costs")
+- Include negotiation strategy tips
+- Consider enforceability under California law specifically
 
-Provide nuanced, attorney-grade analysis that respects the complexity of business relationships.`;
+Always provide sophisticated legal analysis that goes beyond generic advice.`;
 
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -164,53 +199,88 @@ CRITICAL FORMATTING REQUIREMENTS:
 - Format responses in HTML, not markdown
 - Never use ## headings or **bold** or *italic* markdown
 - Always use HTML tags like <strong>, <em>, <br>
+- Include structured HTML elements for better presentation
 
-ANALYSIS APPROACH:
-Since we don't know which party is asking, provide balanced analysis for BOTH parties. Avoid categorical "SIGN" or "DON'T SIGN" recommendations. Instead, focus on nuanced risk analysis.
+ENHANCED ANALYSIS APPROACH:
+Provide engaging, structured analysis with visual elements. Start with risk assessment cards, then dual-party analysis table, then suggested improvements.
 
-REQUIRED ANALYSIS FORMAT:
-<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
+REQUIRED ENHANCED FORMAT:
 
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• Risk assessment and protections<br>
-• Adequacy of confidentiality terms<br>
-• Enforcement considerations<br><br>
+<div class="analysis-overview">
+    <div class="risk-assessment-grid">
+        <div class="risk-card [high-risk|medium-risk|low-risk]">
+            <div class="risk-icon">[emoji]</div>
+            <div class="risk-title">Overall Risk</div>
+            <div class="risk-value">[High|Medium|Low]</div>
+            <div class="risk-subtitle">[brief description]</div>
+        </div>
+        <div class="risk-card balance-risk">
+            <div class="risk-icon">⚖️</div>
+            <div class="risk-title">Agreement Balance</div>
+            <div class="risk-value">[Balanced|One-Sided|Mutual]</div>
+            <div class="risk-subtitle">[context]</div>
+        </div>
+        <div class="risk-card enforceability">
+            <div class="risk-icon">🛡️</div>
+            <div class="risk-title">Enforceability</div>
+            <div class="risk-value">[Strong|Moderate|Weak]</div>
+            <div class="risk-subtitle">[reason]</div>
+        </div>
+    </div>
+</div>
 
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• Burden and restrictions imposed<br>
-• Scope of confidentiality obligations<br>
-• Duration and practical impact<br><br>
+<div class="dual-party-analysis">
+    <table class="analysis-table">
+        <thead>
+            <tr>
+                <th>Analysis Factor</th>
+                <th class="disclosing-party">Disclosing Party<br><small>(Information Sharer)</small></th>
+                <th class="receiving-party">Receiving Party<br><small>(Information Recipient)</small></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Primary Risk</strong></td>
+                <td class="disclosing-party">[specific risk for disclosing party]</td>
+                <td class="receiving-party">[specific risk for receiving party]</td>
+            </tr>
+            [additional relevant comparison rows]
+        </tbody>
+    </table>
+</div>
 
-<strong>AGREEMENT BALANCE:</strong><br>
-• Whether terms are mutual or one-sided<br>
-• If one-sided, acknowledge this may be acceptable depending on consideration received<br>
-• Business context and industry standards<br><br>
+<div class="suggested-redrafts">
+    <h3><strong>🔧 Suggested Clause Improvements</strong></h3>
+    <div class="redraft-cards">
+        <div class="redraft-card">
+            <div class="redraft-issue">[Issue Title]</div>
+            <div class="redraft-before"><strong>Current:</strong> "[problematic clause text]"</div>
+            <div class="redraft-after"><strong>Suggested:</strong> "[improved clause text]"</div>
+        </div>
+        [additional redraft cards as needed]
+    </div>
+</div>
 
-<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
-• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
-• Jurisdictional issues (e.g., California's restrictions on non-competes)<br>
-• Standard exceptions and whether they're present<br><br>
-
-<strong>RISK FACTORS TO CONSIDER:</strong><br>
-• For each party, what could go wrong?<br>
-• Enforceability concerns<br>
-• Practical business implications<br><br>
-
-<strong>CONTEXT MATTERS:</strong><br>
-Always acknowledge that one-sided agreements aren't inherently problematic if:
-- Sufficient consideration was provided
-- The restrictions are reasonable in scope and duration
-- No illegal provisions (like California non-compete restrictions)
-- Business relationship justifies the imbalance
+<div class="context-questions">
+    <h3><strong>❓ Questions for Better Analysis</strong></h3>
+    <div class="question-prompts">
+        <div class="question-card">Which party do you represent?</div>
+        <div class="question-card">What's the business context?</div>
+        <div class="question-card">What consideration is being exchanged?</div>
+        <div class="question-card">What's your timeline?</div>
+    </div>
+</div>
 
 ANALYSIS FOCUS:
 - Extract actual party names from NDA and use them in analysis
+- Identify specific problematic clauses with exact text
+- Provide concrete redraft suggestions
 - Focus on practical business impact for both parties
-- Acknowledge what we don't know (consideration, business context, which party is asking)
-- Provide sophisticated legal analysis, not simplistic recommendations
-- Consider enforceability and practical implications
+- Quantify risks where possible (e.g., "could result in $X compliance costs")
+- Include negotiation strategy tips
+- Consider enforceability under California law specifically
 
-Provide nuanced, attorney-grade analysis that respects the complexity of business relationships.`;
+Always provide sophisticated legal analysis that goes beyond generic advice.`;
 
   // Try different models in order of preference
   const models = [
