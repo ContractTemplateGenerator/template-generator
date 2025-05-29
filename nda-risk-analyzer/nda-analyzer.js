@@ -125,7 +125,7 @@ const NDAAnalyzer = () => {
                     htmlContent: data.response,
                     recommendation: extractRecommendation(data.response),
                     model: data.model || 'AI Analysis',
-                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude' : 'Groq Llama')
+                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama')
                 });
                 console.log('🔍 Debug: Analysis result set successfully!');
             } else {
@@ -309,13 +309,13 @@ The more complete the text, the better the analysis."
                                         🚀 Llama (Default)
                                     </span>
                                     <span className={`provider-label ${useClaudeAI ? 'active' : ''}`}>
-                                        🧠 Claude AI
+                                        🧠 Claude 4.0
                                     </span>
                                 </div>
                             </div>
                             <div className="ai-provider-info">
                                 {useClaudeAI ? (
-                                    <small>Claude AI: Advanced reasoning and detailed legal analysis</small>
+                                    <small>Claude 4.0: Most advanced AI reasoning with superior legal analysis</small>
                                 ) : (
                                     <small>Llama: Fast, reliable legal analysis (recommended for most cases)</small>
                                 )}

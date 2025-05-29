@@ -91,7 +91,7 @@ Provide attorney-grade analysis that's actionable for business owners.`;
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 2000,
         system: systemPrompt,
         messages: messages.map(msg => ({
@@ -108,8 +108,8 @@ Provide attorney-grade analysis that's actionable for business owners.`;
       console.log('Successful Claude analysis response generated');
       return res.status(200).json({ 
         response: assistantMessage,
-        model: 'claude-3.5-sonnet',
-        provider: 'Anthropic Claude'
+        model: 'claude-sonnet-4',
+        provider: 'Anthropic Claude 4.0'
       });
     } else {
       const errorText = await response.text();
