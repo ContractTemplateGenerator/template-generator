@@ -6,46 +6,32 @@ const NDAAnalyzer = () => {
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [industry, setIndustry] = useState('auto-detect');
     const [ndaUrl, setNdaUrl] = useState('');
-    const [useClaudeAI, setUseClaudeAI] = useState(false); // Toggle for AI provider
-    const [showFollowUp, setShowFollowUp] = useState(false);
-    const [userParty, setUserParty] = useState('');
-    const [businessContext, setBusinessContext] = useState('');
-    const [timeframe, setTimeframe] = useState('');
-    const [showUpgradeOptions, setShowUpgradeOptions] = useState(false);
+    const [useClaudeAI, setUseClaudeAI] = useState(false);
+    
+    // Dialogue system state
+    const [dialogueStep, setDialogueStep] = useState(0);
+    const [ndaContext, setNdaContext] = useState(null); // Store extracted NDA details
+    const [userAnswers, setUserAnswers] = useState({});
+    const [dialogueQuestions, setDialogueQuestions] = useState([]);
+    
     const fileInputRef = useRef(null);
 
-    // Simplified fallback responses
+    // Simple fallback response
     const fallbackResponses = {
-        "default": `<div class="simple-analysis">
-<h3><strong>🛡️ Risk Assessment Summary</strong></h3>
-<div class="risk-cards">
-    <div class="risk-card moderate">⚠️ <strong>Moderate Risk</strong><br>Requires context to provide specific guidance</div>
-    <div class="risk-card balanced">⚖️ <strong>Agreement Balance</strong><br>Need to know which party you represent</div>
-</div>
+        "default": `<strong>DOCUMENT OVERVIEW:</strong> Professional legal analysis requires reviewing specific NDA clauses, but I can provide general guidance based on common NDA structures and issues.<br><br>
 
-<h3><strong>📊 Dual-Party Analysis</strong></h3>
-<p><strong>For Disclosing Party:</strong> Information leakage risk vs. trade secret protection</p>
-<p><strong>For Receiving Party:</strong> Operational restrictions vs. access to valuable opportunities</p>
+<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
+• <strong>Protection Level:</strong> Standard NDAs typically provide reasonable confidentiality protection<br>
+• <strong>Enforcement:</strong> Most business NDAs are enforceable if properly drafted with standard exceptions<br>
+• <strong>Duration:</strong> Look for reasonable time limits (2-3 years is typical for business relationships)<br><br>
 
-<h3><strong>🔧 Common Issues to Watch For</strong></h3>
-<p>• <strong>Overly broad definitions</strong> - "All information" should be "clearly marked confidential information"</p>
-<p>• <strong>Missing standard exceptions</strong> - Should exclude publicly available and independently developed info</p>
-<p>• <strong>Indefinite duration</strong> - Consider reasonable time limits (2-3 years typical)</p>
+<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
+• <strong>Obligation Scope:</strong> Review what information is considered "confidential" - should be clearly defined<br>
+• <strong>Practical Impact:</strong> Consider how restrictions will affect your business operations<br>
+• <strong>Standard Exceptions:</strong> Ensure publicly available information, independently developed information, and legally required disclosures are excluded<br><br>
 
-<h3><strong>❓ Questions for Better Analysis</strong></h3>
-<div class="context-questions">
-    <p><strong>Which party do you represent?</strong> (Disclosing vs. Receiving)</p>
-    <p><strong>What's the business context?</strong> (M&A, partnership, employment, etc.)</p>
-    <p><strong>Timeline for finalization?</strong></p>
-</div>
-
-<div class="upgrade-preview">
-<h3><strong>💼 Available Services</strong></h3>
-<p>📋 <strong>Enhanced Analysis ($97)</strong> - Party-specific recommendations & strategy</p>
-<p>📝 <strong>Complete Redraft ($297)</strong> - Fully customized NDA + consultation</p>
-<p>⚖️ <strong>Full Legal Package ($597)</strong> - Multiple versions + ongoing support</p>
-</div>
-</div>`
+<strong>PROFESSIONAL RECOMMENDATION:</strong><br>
+For specific clause-by-clause analysis and personalized guidance based on your business context, schedule a consultation to discuss the particular circumstances of your situation.`
     };
 
     // Handle file upload (text files only)
@@ -137,30 +123,51 @@ const NDAAnalyzer = () => {
             
             if (data.response) {
                 console.log('🔍 Debug: Setting analysis result...');
+                
+                // Extract NDA context for dialogue system
+                const context = extractNDAContext(ndaText);
+                setNdaContext(context);
+                
+                // Generate dialogue questions based on NDA content
+                const questions = generateDialogueQuestions(context);
+                setDialogueQuestions(questions);
+                
                 setAnalysisResult({
                     htmlContent: data.response,
                     recommendation: extractRecommendation(data.response),
                     model: data.model || 'AI Analysis',
-                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama')
+                    provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama'),
+                    hasDialogue: true
                 });
                 console.log('🔍 Debug: Analysis result set successfully!');
                 
-                // Show follow-up questions after analysis
-                setShowFollowUp(true);
-                setShowUpgradeOptions(true);
+                // Start dialogue system
+                setDialogueStep(0);
             } else {
                 throw new Error('No response content received from API');
             }
         } catch (error) {
             console.error('Analysis error:', error);
             
+            // Extract NDA context even for fallback
+            const context = extractNDAContext(ndaText);
+            setNdaContext(context);
+            
+            // Generate dialogue questions
+            const questions = generateDialogueQuestions(context);
+            setDialogueQuestions(questions);
+            
             // Always use fallback response when API fails
             setAnalysisResult({
                 htmlContent: fallbackResponses.default,
                 recommendation: 'CONTEXTUAL DUAL-PARTY ANALYSIS',
                 model: 'Professional Fallback Analysis',
-                provider: 'Terms.law Legal Guidance'
+                provider: 'Terms.law Legal Guidance',
+                hasDialogue: true
             });
+            
+            // Start dialogue system
+            setDialogueStep(0);
         } finally {
             setIsAnalyzing(false);
         }
@@ -208,38 +215,146 @@ const NDAAnalyzer = () => {
         }
     };
 
-    // Handle enhanced analysis with context
-    const requestEnhancedAnalysis = async () => {
-        if (!ndaText.trim()) {
-            alert('Please enter your NDA text first.');
-            return;
+    // Extract key NDA details for dialogue system (token-efficient)
+    const extractNDAContext = (ndaText) => {
+        const context = {
+            parties: [],
+            term: null,
+            restrictions: [],
+            clauses: []
+        };
+        
+        // Extract party names (simple regex approach)
+        const partyMatches = ndaText.match(/between\s+([^,\n]+)\s+(?:and|&)\s+([^,\n]+)/i);
+        if (partyMatches) {
+            context.parties = [
+                partyMatches[1].trim().replace(/['"]/g, ''),
+                partyMatches[2].trim().replace(/['"]/g, '')
+            ];
         }
+        
+        // Extract term duration
+        const termMatch = ndaText.match(/(\d+)\s+(year|month|day)s?/i);
+        if (termMatch) {
+            context.term = `${termMatch[1]} ${termMatch[2]}${termMatch[1] > 1 ? 's' : ''}`;
+        }
+        
+        // Check for common clauses
+        if (ndaText.toLowerCase().includes('non-solicit')) {
+            context.restrictions.push('non-solicitation');
+        }
+        if (ndaText.toLowerCase().includes('non-compete')) {
+            context.restrictions.push('non-compete');
+        }
+        if (ndaText.toLowerCase().includes('return') && ndaText.toLowerCase().includes('materials')) {
+            context.restrictions.push('return-materials');
+        }
+        
+        return context;
+    };
 
+    // Generate dialogue questions based on NDA context
+    const generateDialogueQuestions = (context) => {
+        const questions = [];
+        
+        // Question 1: Which party are you?
+        if (context.parties.length >= 2) {
+            questions.push({
+                id: 'party',
+                question: 'Which party do you represent in this agreement?',
+                options: [
+                    { value: 'party1', label: `${context.parties[0]} (Disclosing Party)`, shortLabel: context.parties[0] },
+                    { value: 'party2', label: `${context.parties[1]} (Receiving Party)`, shortLabel: context.parties[1] }
+                ]
+            });
+        } else {
+            questions.push({
+                id: 'party',
+                question: 'Which party do you represent?',
+                options: [
+                    { value: 'disclosing', label: 'Disclosing Party (Information Sharer)', shortLabel: 'Disclosing Party' },
+                    { value: 'receiving', label: 'Receiving Party (Information Recipient)', shortLabel: 'Receiving Party' }
+                ]
+            });
+        }
+        
+        // Question 2: Restrictiveness preference
+        questions.push({
+            id: 'restrictiveness',
+            question: 'How restrictive do you want this agreement to be?',
+            options: [
+                { value: 'minimal', label: 'Minimal restrictions - Focus on essential protections only', shortLabel: 'Minimal' },
+                { value: 'balanced', label: 'Balanced approach - Standard business protections', shortLabel: 'Balanced' },
+                { value: 'strict', label: 'Strict protections - Maximum confidentiality safeguards', shortLabel: 'Strict' }
+            ]
+        });
+        
+        // Question 3: Term duration (if extracted)
+        if (context.term) {
+            questions.push({
+                id: 'term',
+                question: `The current term is ${context.term}. Is this appropriate?`,
+                options: [
+                    { value: 'shorter', label: 'Too long - I want a shorter term', shortLabel: 'Shorter' },
+                    { value: 'current', label: `${context.term} is appropriate`, shortLabel: 'Keep current' },
+                    { value: 'longer', label: 'Too short - I want a longer term', shortLabel: 'Longer' }
+                ]
+            });
+        }
+        
+        // Question 4: Non-solicitation clause
+        if (context.restrictions.includes('non-solicitation')) {
+            questions.push({
+                id: 'nonsolicitation',
+                question: 'This NDA includes a non-solicitation clause. Do you want to keep it?',
+                options: [
+                    { value: 'keep', label: 'Keep the non-solicitation clause', shortLabel: 'Keep' },
+                    { value: 'remove', label: 'Remove the non-solicitation clause', shortLabel: 'Remove' },
+                    { value: 'modify', label: 'Modify to be less restrictive', shortLabel: 'Modify' }
+                ]
+            });
+        } else {
+            questions.push({
+                id: 'nonsolicitation',
+                question: 'Do you want to add a non-solicitation clause?',
+                options: [
+                    { value: 'add', label: 'Yes, add non-solicitation protections', shortLabel: 'Add' },
+                    { value: 'no', label: 'No, keep it focused on confidentiality only', shortLabel: 'No' }
+                ]
+            });
+        }
+        
+        return questions;
+    };
+
+    // Handle dialogue answer (token-efficient API call)
+    const handleDialogueAnswer = async (questionId, answer) => {
+        const newAnswers = { ...userAnswers, [questionId]: answer };
+        setUserAnswers(newAnswers);
+        
+        // If this is the last question, get final analysis
+        if (dialogueStep >= dialogueQuestions.length - 1) {
+            await getFinalAnalysis(newAnswers);
+        } else {
+            setDialogueStep(dialogueStep + 1);
+        }
+    };
+
+    // Get final customized analysis (token-efficient)
+    const getFinalAnalysis = async (answers) => {
         setIsAnalyzing(true);
         
-        // Create enhanced user message with context
-        const contextInfo = `
-        User Context:
-        - Party Represented: ${userParty || 'Not specified'}
-        - Business Context: ${businessContext || 'Not specified'}  
-        - Industry Context: ${industry}
-        - Timeline: ${timeframe || 'Not specified'}
-        `;
+        // Build context summary instead of sending full NDA text again
+        const contextSummary = {
+            parties: ndaContext.parties,
+            term: ndaContext.term,
+            restrictions: ndaContext.restrictions,
+            userAnswers: answers
+        };
         
-        const userMessage = { 
-            role: 'user', 
-            content: `Please provide an enhanced analysis of this NDA with the following context:
-            
-            ${contextInfo}
-            
-            Please provide:
-            1. Specific recommendations for my position
-            2. Suggested clause redrafts
-            3. Negotiation strategy
-            4. Risk quantification where possible
-            
-            NDA TEXT:
-            ${ndaText}` 
+        const userMessage = {
+            role: 'user',
+            content: `Based on this NDA context: ${JSON.stringify(contextSummary)}, provide customized analysis for the user's specific position and preferences. Focus on practical recommendations and specific clause suggestions.`
         };
         
         try {
@@ -266,14 +381,14 @@ const NDAAnalyzer = () => {
                     recommendation: 'CUSTOMIZED ANALYSIS FOR YOUR POSITION',
                     model: data.model || 'Enhanced AI Analysis',
                     provider: data.provider || (useClaudeAI ? 'Anthropic Claude 4.0' : 'Groq Llama'),
-                    isEnhanced: true
+                    isCustomized: true
                 });
             } else {
                 throw new Error('No response content received from API');
             }
         } catch (error) {
-            console.error('Enhanced analysis error:', error);
-            alert('Enhanced analysis temporarily unavailable. Please try the consultation option.');
+            console.error('Final analysis error:', error);
+            alert('Final analysis temporarily unavailable. Please try again.');
         } finally {
             setIsAnalyzing(false);
         }
@@ -476,61 +591,58 @@ The more complete the text, the more nuanced the analysis."
                                     <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
                                 </div>
 
-                                {/* Simplified Follow-up Questions */}
-                                {showFollowUp && !analysisResult.isEnhanced && (
-                                    <div className="follow-up-section">
-                                        <h3>🎯 Get Customized Analysis</h3>
-                                        <div className="simple-questions">
-                                            <div className="question-row">
-                                                <label>Which party are you?</label>
-                                                <select value={userParty} onChange={(e) => setUserParty(e.target.value)}>
-                                                    <option value="">Select...</option>
-                                                    <option value="disclosing">Disclosing Party (Info Sharer)</option>
-                                                    <option value="receiving">Receiving Party (Info Recipient)</option>
-                                                </select>
+                                {/* Dialogue System */}
+                                {analysisResult.hasDialogue && !analysisResult.isCustomized && dialogueQuestions.length > 0 && (
+                                    <div className="dialogue-section">
+                                        <h3 className="dialogue-title">
+                                            🎯 Let's customize this analysis for your specific situation
+                                        </h3>
+                                        
+                                        {/* Progress indicator */}
+                                        <div className="dialogue-progress">
+                                            <div className="progress-text">
+                                                Question {dialogueStep + 1} of {dialogueQuestions.length}
                                             </div>
-                                            <div className="question-row">
-                                                <label>Business context?</label>
-                                                <select value={businessContext} onChange={(e) => setBusinessContext(e.target.value)}>
-                                                    <option value="">Select...</option>
-                                                    <option value="m&a">M&A Due Diligence</option>
-                                                    <option value="partnership">Partnership</option>
-                                                    <option value="employment">Employment</option>
-                                                    <option value="investment">Investment</option>
-                                                </select>
+                                            <div className="progress-bar">
+                                                <div 
+                                                    className="progress-fill" 
+                                                    style={{width: `${((dialogueStep + 1) / dialogueQuestions.length) * 100}%`}}
+                                                ></div>
                                             </div>
                                         </div>
-                                        <button 
-                                            className="simple-enhance-btn"
-                                            onClick={requestEnhancedAnalysis}
-                                            disabled={isAnalyzing || !userParty}
-                                        >
-                                            Get My Customized Analysis
-                                        </button>
-                                    </div>
-                                )}
 
-                                {/* Simplified Service Options */}
-                                {showUpgradeOptions && !analysisResult.isEnhanced && (
-                                    <div className="simple-services">
-                                        <h3>💼 Professional Services</h3>
-                                        <div className="service-list">
-                                            <div className="service-item">
-                                                <strong>Enhanced Analysis - $97</strong><br>
-                                                Party-specific recommendations & strategy
+                                        {/* Current question */}
+                                        {dialogueQuestions[dialogueStep] && (
+                                            <div className="dialogue-question">
+                                                <h4 className="question-text">
+                                                    {dialogueQuestions[dialogueStep].question}
+                                                </h4>
+                                                <div className="question-options">
+                                                    {dialogueQuestions[dialogueStep].options.map((option, index) => (
+                                                        <button
+                                                            key={option.value}
+                                                            className="dialogue-option"
+                                                            onClick={() => handleDialogueAnswer(dialogueQuestions[dialogueStep].id, option)}
+                                                            disabled={isAnalyzing}
+                                                        >
+                                                            <div className="option-label">{option.label}</div>
+                                                        </button>
+                                                    ))}
+                                                </div>
                                             </div>
-                                            <div className="service-item featured">
-                                                <strong>Complete Redraft - $297</strong><br>
-                                                Fully customized NDA + consultation
+                                        )}
+
+                                        {/* Previous answers summary */}
+                                        {Object.keys(userAnswers).length > 0 && (
+                                            <div className="answers-summary">
+                                                <h5>Your selections:</h5>
+                                                {Object.entries(userAnswers).map(([questionId, answer]) => (
+                                                    <div key={questionId} className="answer-item">
+                                                        <strong>{questionId}:</strong> {answer.shortLabel || answer.label}
+                                                    </div>
+                                                ))}
                                             </div>
-                                            <div className="service-item">
-                                                <strong>Full Package - $597</strong><br>
-                                                Multiple versions + ongoing support
-                                            </div>
-                                        </div>
-                                        <button className="consult-btn" onClick={scheduleConsultation}>
-                                            Schedule Consultation
-                                        </button>
+                                        )}
                                     </div>
                                 )}
 
