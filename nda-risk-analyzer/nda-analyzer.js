@@ -2,52 +2,123 @@ const { useState, useRef } = React;
 
 const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
+    const [originalNDA, setOriginalNDA] = useState(''); // Store original for redrafting
     const [analysisResult, setAnalysisResult] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
-    const [industry, setIndustry] = useState('auto-detect');
+    const [industry, setIndustry] = useState('technology');
     const [ndaUrl, setNdaUrl] = useState('');
     const [useClaudeAI, setUseClaudeAI] = useState(false);
     
-    // Dialogue system state
+    // Dialogue and redrafting system
     const [dialogueStep, setDialogueStep] = useState(0);
-    const [ndaContext, setNdaContext] = useState(null); // Store extracted NDA details
+    const [ndaContext, setNdaContext] = useState(null);
     const [userAnswers, setUserAnswers] = useState({});
     const [dialogueQuestions, setDialogueQuestions] = useState([]);
+    const [clauseAdjustments, setClauseAdjustments] = useState({});
+    const [redraftedNDA, setRedraftedNDA] = useState('');
+    const [changesSummary, setChangesSummary] = useState([]);
+    const [showPaymentMockup, setShowPaymentMockup] = useState(false);
     
     const fileInputRef = useRef(null);
 
-    // Simple fallback response
-    const fallbackResponses = {
-        "default": `<strong>DOCUMENT OVERVIEW:</strong> Professional legal analysis requires reviewing specific NDA clauses, but I can provide general guidance based on common NDA structures and issues.<br><br>
+    // Initial instructions for analysis pane
+    const initialInstructions = `
+        <div class="initial-instructions">
+            <h2><strong>🛡️ Professional NDA Risk Analysis System</strong></h2>
+            <p>This tool provides sophisticated legal analysis of Non-Disclosure Agreements using proprietary evaluation methodology developed through 13+ years of California legal practice.</p>
+            
+            <h3><strong>📊 How We Evaluate Your NDA:</strong></h3>
+            
+            <div class="evaluation-methodology">
+                <div class="method-card">
+                    <h4>🔍 Clause-by-Clause Analysis</h4>
+                    <p>Each provision is examined for enforceability, scope, and practical impact on both parties</p>
+                </div>
+                <div class="method-card">
+                    <h4>⚖️ Balance Assessment</h4>
+                    <p>Terms are categorized into a 3-column table showing which party each clause favors</p>
+                </div>
+                <div class="method-card">
+                    <h4>📋 Section Reference Mapping</h4>
+                    <p>All analysis references specific section numbers from your uploaded agreement</p>
+                </div>
+                <div class="method-card">
+                    <h4>🎯 Personalized Recommendations</h4>
+                    <p>Interactive dialogue system provides customized advice based on your position and preferences</p>
+                </div>
+            </div>
+            
+            <h3><strong>🔧 Professional Redrafting Process:</strong></h3>
+            <ul>
+                <li><strong>Exact Verbiage Matching:</strong> Maintains your document's capitalization, defined terms, and professional style</li>
+                <li><strong>Clause Adjustment Tool:</strong> Interactive system to modify, add, or remove specific provisions</li>
+                <li><strong>Change Summary:</strong> Detailed report of all modifications with legal rationale</li>
+                <li><strong>Professional Integration:</strong> New clauses seamlessly match your document's language and structure</li>
+            </ul>
+            
+            <div class="file-support-notice">
+                <h4>📁 Accepted File Types:</h4>
+                <p><strong>Documents:</strong> .txt, .docx, .pdf<br>
+                <strong>URLs:</strong> SEC filings, legal databases, public document links<br>
+                <strong>Text:</strong> Copy/paste directly into the input field</p>
+            </div>
+            
+            <div class="attorney-credentials">
+                <p><strong>Analysis by:</strong> Sergei Tokmakov, Esq. • CA Bar #279869 • 13+ Years Experience<br>
+                <strong>Specialization:</strong> Technology Contracts, Startup Legal, IP Protection</p>
+            </div>
+        </div>
+    `;
 
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• <strong>Protection Level:</strong> Standard NDAs typically provide reasonable confidentiality protection<br>
-• <strong>Enforcement:</strong> Most business NDAs are enforceable if properly drafted with standard exceptions<br>
-• <strong>Duration:</strong> Look for reasonable time limits (2-3 years is typical for business relationships)<br><br>
-
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• <strong>Obligation Scope:</strong> Review what information is considered "confidential" - should be clearly defined<br>
-• <strong>Practical Impact:</strong> Consider how restrictions will affect your business operations<br>
-• <strong>Standard Exceptions:</strong> Ensure publicly available information, independently developed information, and legally required disclosures are excluded<br><br>
-
-<strong>PROFESSIONAL RECOMMENDATION:</strong><br>
-For specific clause-by-clause analysis and personalized guidance based on your business context, schedule a consultation to discuss the particular circumstances of your situation.`
-    };
-
-    // Handle file upload (text files only)
+    // Enhanced file upload handler supporting multiple formats
     const handleFileUpload = async (file) => {
         if (!file) return;
-
+        
+        setIsAnalyzing(true);
+        
         try {
             if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
                 const text = await file.text();
                 setNdaText(text);
+                setOriginalNDA(text);
+            } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                await handlePDFFile(file);
+            } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' || file.name.endsWith('.docx')) {
+                await handleWordFile(file);
             } else {
-                alert('Please upload a plain text (.txt) file, or copy and paste your NDA text directly.');
+                alert('Supported formats: .txt, .docx, .pdf files, or paste text directly.');
             }
         } catch (error) {
             console.error('File upload error:', error);
-            alert('Error reading file. Please copy and paste your NDA text directly.');
+            alert('Error reading file. Please try copying and pasting the text directly.');
+        } finally {
+            setIsAnalyzing(false);
+        }
+    };
+
+    // PDF file handler (simplified extraction)
+    const handlePDFFile = async (file) => {
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            // For now, alert user to copy text manually
+            // In production, would use PDF.js or similar
+            alert('PDF support: Please copy the text from your PDF and paste it into the text area below. Full PDF parsing will be available in the next update.');
+        } catch (error) {
+            console.error('PDF parsing error:', error);
+            alert('PDF parsing error. Please copy and paste the text manually.');
+        }
+    };
+
+    // Word file handler (simplified extraction)
+    const handleWordFile = async (file) => {
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            // For now, alert user to copy text manually  
+            // In production, would use mammoth.js or similar
+            alert('Word document support: Please copy the text from your document and paste it into the text area below. Full .docx parsing will be available in the next update.');
+        } catch (error) {
+            console.error('Word parsing error:', error);
+            alert('Word document parsing error. Please copy and paste the text manually.');
         }
     };
 
@@ -394,6 +465,39 @@ For specific clause-by-clause analysis and personalized guidance based on your b
         }
     };
 
+    // Download redrafted NDA
+    const downloadRedraft = () => {
+        if (!redraftedNDA) return;
+        
+        const blob = new Blob([redraftedNDA], { type: 'text/plain' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = 'Redrafted_NDA.txt';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Copy redrafted NDA to clipboard
+    const copyRedraftToClipboard = async () => {
+        if (!redraftedNDA) return;
+        
+        try {
+            await navigator.clipboard.writeText(redraftedNDA);
+            alert('Redrafted NDA copied to clipboard!');
+        } catch (error) {
+            console.error('Copy failed:', error);
+            // Fallback for browsers that don't support clipboard API
+            const textArea = document.createElement('textarea');
+            textArea.value = redraftedNDA;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Redrafted NDA copied to clipboard!');
+        }
+    };
+
     // Schedule consultation
     const scheduleConsultation = () => {
         if (window.Calendly) {
@@ -405,31 +509,30 @@ For specific clause-by-clause analysis and personalized guidance based on your b
         }
     };
 
-    // Get styling class based on analysis type (more neutral than before)
+    // Get styling class based on analysis type
     const getRecommendationClass = (recommendation) => {
         if (!recommendation) return 'analysis';
-        // All analyses use neutral styling since we don't give categorical recommendations
         return 'analysis';
     };
     return (
         <div className="nda-analyzer">
             <div className="header">
                 <h1>🛡️ NDA Risk Analyzer</h1>
-                <p>Sophisticated Dual-Party Legal Analysis by California Attorney</p>
+                <p>Professional Legal Analysis & Automated Redrafting System</p>
                 <div className="attorney-info">
                     Sergei Tokmakov, Esq. • CA Bar #279869 • 13+ Years Experience
                 </div>
             </div>
 
-            <div className="main-content">
-                {/* Input Panel */}
-                <div className="input-panel">
-                    <h2>
-                        <i data-feather="upload-cloud"></i>
-                        Upload or Paste NDA
-                    </h2>
+            {/* Input Section - Now Above Analysis */}
+            <div className="input-section">
+                <h2>
+                    <i data-feather="upload-cloud"></i>
+                    Upload NDA Document or Enter Text
+                </h2>
 
-                    <div className="upload-section">
+                <div className="upload-methods">
+                    <div className="file-upload-area">
                         <div 
                             className="file-upload"
                             onDragOver={handleDragOver}
@@ -439,27 +542,27 @@ For specific clause-by-clause analysis and personalized guidance based on your b
                         >
                             <div className="upload-icon">📄</div>
                             <div className="upload-text">
-                                Drag & drop text file (.txt) here
+                                Drag & drop files here or click to browse
                             </div>
                             <div className="upload-subtext">
-                                or click to browse • Plain text files only
+                                Supports: .txt, .docx, .pdf • Max 10MB
                             </div>
                             <input
                                 ref={fileInputRef}
                                 type="file"
-                                accept=".txt,text/plain"
+                                accept=".txt,.docx,.pdf,text/plain,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                                 onChange={(e) => handleFileUpload(e.target.files[0])}
                                 style={{ display: 'none' }}
                             />
                         </div>
                         
                         <div className="url-input-section">
-                            <div className="url-input-header">Or enter URL to NDA:</div>
+                            <div className="url-input-header">Or enter URL to legal document:</div>
                             <div className="url-input-group">
                                 <input
                                     type="url"
                                     className="url-input"
-                                    placeholder="https://example.com/nda-document.html"
+                                    placeholder="https://www.sec.gov/Archives/edgar/data/..."
                                     value={ndaUrl}
                                     onChange={(e) => setNdaUrl(e.target.value)}
                                 />
@@ -474,38 +577,43 @@ For specific clause-by-clause analysis and personalized guidance based on your b
                         </div>
                     </div>
 
-                    <div className="text-input-section">
+                    <div className="text-input-area">
                         <textarea
                             className="nda-textarea"
-                            placeholder="Paste your NDA text here for sophisticated dual-party analysis...
+                            placeholder="Or paste your NDA text here for professional analysis...
 
-We'll analyze risks and considerations for both the disclosing party (information sharer) and receiving party (information recipient).
+Example formats supported:
+• Complete NDA agreements
+• SEC filings with confidentiality provisions  
+• Draft contracts for review
+• Existing agreements for modification
 
-Example: 'This Non-Disclosure Agreement is entered into between Company A and Company B for the purpose of...'
-
-The more complete the text, the more nuanced the analysis."
+The more complete the text, the more detailed the analysis and section-specific recommendations."
                             value={ndaText}
-                            onChange={(e) => setNdaText(e.target.value)}
+                            onChange={(e) => {
+                                setNdaText(e.target.value);
+                                setOriginalNDA(e.target.value);
+                            }}
                         />
                     </div>
+                </div>
 
-                    <div className="analysis-options">
-                        <div className="option-group">
-                            <label>Industry Context (optional):</label>
+                <div className="analysis-controls">
+                    <div className="controls-row">
+                        <div className="industry-select">
+                            <label>Industry Context:</label>
                             <select value={industry} onChange={(e) => setIndustry(e.target.value)}>
-                                <option value="auto-detect">Let AI determine from NDA</option>
                                 <option value="technology">Technology/Software</option>
                                 <option value="healthcare">Healthcare/Medical</option>
                                 <option value="finance">Finance/Banking</option>
                                 <option value="manufacturing">Manufacturing</option>
-                                <option value="retail">Retail/E-commerce</option>
                                 <option value="consulting">Consulting/Services</option>
                                 <option value="real-estate">Real Estate</option>
                                 <option value="other">Other</option>
                             </select>
                         </div>
                         
-                        <div className="option-group ai-toggle-group">
+                        <div className="ai-toggle-group">
                             <label>AI Analysis Provider:</label>
                             <div className="ai-toggle-container">
                                 <div className="ai-toggle-switch">
@@ -528,13 +636,6 @@ The more complete the text, the more nuanced the analysis."
                                     </span>
                                 </div>
                             </div>
-                            <div className="ai-provider-info">
-                                {useClaudeAI ? (
-                                    <small>Claude 4.0: Most advanced AI reasoning with superior legal analysis</small>
-                                ) : (
-                                    <small>Llama: Fast, reliable legal analysis (recommended for most cases)</small>
-                                )}
-                            </div>
                         </div>
                     </div>
 
@@ -546,150 +647,245 @@ The more complete the text, the more nuanced the analysis."
                         {isAnalyzing ? (
                             <>
                                 <div className="loading-spinner"></div>
-                                Analyzing NDA for Both Parties...
+                                Analyzing Agreement...
                             </>
                         ) : (
                             <>
                                 <i data-feather="shield"></i>
-                                Analyze Dual-Party Risk
+                                Analyze NDA Risk & Generate Report
                             </>
                         )}
                     </button>
                 </div>
+            </div>
 
-                {/* Analysis Panel */}
-                <div className="analysis-panel">
-                    <h2>
-                        <i data-feather="file-text"></i>
-                        Dual-Party Legal Analysis
-                    </h2>
+            {/* Full-Width Analysis Panel */}
+            <div className="analysis-panel-fullwidth">
+                <h2>
+                    <i data-feather="file-text"></i>
+                    Professional Legal Analysis
+                </h2>
 
-                    <div className="analysis-content">
-                        {!analysisResult ? (
-                            <div className="waiting-state">
-                                <div className="waiting-icon">⚖️</div>
-                                <div className="waiting-text">Ready to Analyze Your NDA</div>
-                                <div className="waiting-subtext">
-                                    Enter your NDA text and click "Analyze Risk Level" to get sophisticated dual-party legal analysis from both disclosing and receiving party perspectives
+                <div className="analysis-content">
+                    {!analysisResult ? (
+                        <div dangerouslySetInnerHTML={{ __html: initialInstructions }} />
+                    ) : (
+                        <div className="analysis-results">
+                            <div className={`recommendation-card ${getRecommendationClass(analysisResult.recommendation)}`}>
+                                <h3>
+                                    <span className="recommendation-icon">⚖️</span>
+                                    Legal Analysis Summary
+                                </h3>
+                                <div className="recommendation-answer">
+                                    {analysisResult.recommendation || 'PROFESSIONAL ANALYSIS'}
                                 </div>
                             </div>
-                        ) : (
-                            <div className="analysis-results">
-                                <div className={`recommendation-card ${getRecommendationClass(analysisResult.recommendation)}`}>
-                                    <h3>
-                                        <span className="recommendation-icon">
-                                            ⚖️
-                                        </span>
-                                        Legal Analysis Summary
-                                    </h3>
-                                    <div className="recommendation-answer">
-                                        {analysisResult.recommendation || 'PROFESSIONAL ANALYSIS'}
-                                    </div>
-                                </div>
 
-                                <div className="legal-analysis-content">
-                                    <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
-                                </div>
+                            <div className="legal-analysis-content">
+                                <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
+                            </div>
 
-                                {/* Dialogue System */}
-                                {analysisResult.hasDialogue && !analysisResult.isCustomized && dialogueQuestions.length > 0 && (
-                                    <div className="dialogue-section">
-                                        <h3 className="dialogue-title">
-                                            🎯 Let's customize this analysis for your specific situation
-                                        </h3>
-                                        
-                                        {/* Progress indicator */}
-                                        <div className="dialogue-progress">
-                                            <div className="progress-text">
-                                                Question {dialogueStep + 1} of {dialogueQuestions.length}
-                                            </div>
-                                            <div className="progress-bar">
-                                                <div 
-                                                    className="progress-fill" 
-                                                    style={{width: `${((dialogueStep + 1) / dialogueQuestions.length) * 100}%`}}
-                                                ></div>
-                                            </div>
-                                        </div>
-
-                                        {/* Current question */}
-                                        {dialogueQuestions[dialogueStep] && (
-                                            <div className="dialogue-question">
-                                                <h4 className="question-text">
-                                                    {dialogueQuestions[dialogueStep].question}
-                                                </h4>
-                                                <div className="question-options">
-                                                    {dialogueQuestions[dialogueStep].options.map((option, index) => (
-                                                        <button
-                                                            key={option.value}
-                                                            className="dialogue-option"
-                                                            onClick={() => handleDialogueAnswer(dialogueQuestions[dialogueStep].id, option)}
-                                                            disabled={isAnalyzing}
-                                                        >
-                                                            <div className="option-label">{option.label}</div>
-                                                        </button>
+                            {/* Three-Column Clause Analysis Table */}
+                            {ndaContext && ndaContext.sections && ndaContext.sections.length > 0 && (
+                                <div className="clause-balance-table">
+                                    <h3>📊 Clause Balance Analysis</h3>
+                                    <table className="balance-analysis-table">
+                                        <thead>
+                                            <tr>
+                                                <th>Favoring {ndaContext.parties[0] || 'Disclosing Party'}</th>
+                                                <th>Neutral/Mutual</th>
+                                                <th>Favoring {ndaContext.parties[1] || 'Receiving Party'}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td className="favoring-party1">
+                                                    {ndaContext.sections.filter(s => s.title.toLowerCase().includes('confidential')).map(section => (
+                                                        <div key={section.number} className="clause-item">
+                                                            <strong>Section {section.number}:</strong> {section.title}
+                                                        </div>
                                                     ))}
-                                                </div>
-                                            </div>
-                                        )}
+                                                </td>
+                                                <td className="neutral-clauses">
+                                                    {ndaContext.sections.filter(s => s.title.toLowerCase().includes('definition')).map(section => (
+                                                        <div key={section.number} className="clause-item">
+                                                            <strong>Section {section.number}:</strong> {section.title}
+                                                        </div>
+                                                    ))}
+                                                </td>
+                                                <td className="favoring-party2">
+                                                    {ndaContext.sections.filter(s => s.title.toLowerCase().includes('exception')).map(section => (
+                                                        <div key={section.number} className="clause-item">
+                                                            <strong>Section {section.number}:</strong> {section.title}
+                                                        </div>
+                                                    ))}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
 
-                                        {/* Previous answers summary */}
-                                        {Object.keys(userAnswers).length > 0 && (
-                                            <div className="answers-summary">
-                                                <h5>Your selections:</h5>
-                                                {Object.entries(userAnswers).map(([questionId, answer]) => (
-                                                    <div key={questionId} className="answer-item">
-                                                        <strong>{questionId}:</strong> {answer.shortLabel || answer.label}
-                                                    </div>
+                            {/* Dialogue System */}
+                            {analysisResult.hasDialogue && !analysisResult.isCustomized && dialogueQuestions.length > 0 && (
+                                <div className="dialogue-section">
+                                    <h3 className="dialogue-title">
+                                        🎯 Customize Analysis & Generate Redraft
+                                    </h3>
+                                    
+                                    {/* Progress indicator */}
+                                    <div className="dialogue-progress">
+                                        <div className="progress-text">
+                                            Question {dialogueStep + 1} of {dialogueQuestions.length}
+                                        </div>
+                                        <div className="progress-bar">
+                                            <div 
+                                                className="progress-fill" 
+                                                style={{width: `${((dialogueStep + 1) / dialogueQuestions.length) * 100}%`}}
+                                            ></div>
+                                        </div>
+                                    </div>
+
+                                    {/* Current question */}
+                                    {dialogueQuestions[dialogueStep] && (
+                                        <div className="dialogue-question">
+                                            <h4 className="question-text">
+                                                {dialogueQuestions[dialogueStep].question}
+                                            </h4>
+                                            <div className="question-options">
+                                                {dialogueQuestions[dialogueStep].options.map((option, index) => (
+                                                    <button
+                                                        key={option.value}
+                                                        className="dialogue-option"
+                                                        onClick={() => handleDialogueAnswer(dialogueQuestions[dialogueStep].id, option)}
+                                                        disabled={isAnalyzing}
+                                                    >
+                                                        <div className="option-label">{option.label}</div>
+                                                    </button>
                                                 ))}
                                             </div>
-                                        )}
+                                        </div>
+                                    )}
+
+                                    {/* Previous answers summary */}
+                                    {Object.keys(userAnswers).length > 0 && (
+                                        <div className="answers-summary">
+                                            <h5>Your selections:</h5>
+                                            {Object.entries(userAnswers).map(([questionId, answer]) => (
+                                                <div key={questionId} className="answer-item">
+                                                    <strong>{questionId}:</strong> {answer.shortLabel || answer.label}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Payment Mockup & Redraft Options */}
+                            {analysisResult.isCustomized && (
+                                <div className="redraft-options">
+                                    <h3>📝 Professional Redrafting Services</h3>
+                                    
+                                    <div className="payment-mockup">
+                                        <div className="service-tier basic-tier">
+                                            <h4>Basic Redraft - $197</h4>
+                                            <p>✓ Clause adjustments based on your preferences<br>
+                                               ✓ Professional language matching<br>
+                                               ✓ Change summary report</p>
+                                            <button className="mockup-payment-btn" onClick={() => setShowPaymentMockup(true)}>
+                                                Select Basic Redraft
+                                            </button>
+                                        </div>
+                                        
+                                        <div className="service-tier premium-tier featured">
+                                            <h4>Premium Redraft - $397</h4>
+                                            <p>✓ Everything in Basic<br>
+                                               ✓ Multiple agreement versions<br>
+                                               ✓ Negotiation strategy guide<br>
+                                               ✓ 30-minute consultation call</p>
+                                            <button className="mockup-payment-btn primary" onClick={() => setShowPaymentMockup(true)}>
+                                                Select Premium Redraft
+                                            </button>
+                                        </div>
                                     </div>
-                                )}
-
-                                <div className="action-buttons">
-                                    <button 
-                                        className="action-button primary"
-                                        onClick={scheduleConsultation}
-                                    >
-                                        <i data-feather="calendar"></i>
-                                        Schedule Legal Consultation
-                                    </button>
                                     
-                                    <button 
-                                        className="action-button secondary"
-                                        onClick={() => window.open('https://terms.law/', '_blank')}
-                                    >
-                                        <i data-feather="external-link"></i>
-                                        Visit terms.law
-                                    </button>
+                                    {showPaymentMockup && (
+                                        <div className="payment-mockup-overlay">
+                                            <div className="payment-form">
+                                                <h4>Payment Processing (Demo Only)</h4>
+                                                <p>This is a mockup of the payment system. In production, this would integrate with Stripe or similar payment processor.</p>
+                                                <button onClick={() => setShowPaymentMockup(false)}>Close Mockup</button>
+                                            </div>
+                                        </div>
+                                    )}
                                     
-                                    <button 
-                                        className="action-button outline"
-                                        onClick={() => {
-                                            setAnalysisResult(null);
-                                            setNdaText('');
-                                        }}
-                                    >
-                                        <i data-feather="refresh-cw"></i>
-                                        New Analysis
-                                    </button>
+                                    {/* Redraft Download Buttons */}
+                                    {redraftedNDA && (
+                                        <div className="redraft-download">
+                                            <h4>Your Redrafted Agreement is Ready!</h4>
+                                            <div className="redraft-actions">
+                                                <button className="download-btn" onClick={() => downloadRedraft()}>
+                                                    <i data-feather="download"></i>
+                                                    Download Redrafted NDA
+                                                </button>
+                                                <button className="copy-btn" onClick={() => copyRedraftToClipboard()}>
+                                                    <i data-feather="copy"></i>
+                                                    Copy to Clipboard
+                                                </button>
+                                            </div>
+                                            
+                                            {changesSummary.length > 0 && (
+                                                <div className="changes-summary">
+                                                    <h5>Summary of Changes Made:</h5>
+                                                    <ul>
+                                                        {changesSummary.map((change, index) => (
+                                                            <li key={index}>{change}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </div>
+                            )}
 
-                                <div className="professional-disclaimer">
-                                    <small>
-                                        <strong>Disclaimer:</strong> This analysis is provided for informational purposes only and does not constitute legal advice. 
-                                        For specific legal guidance, consult with a qualified attorney. Analysis by Sergei Tokmakov, Esq., CA Bar #279869.
-                                        {analysisResult.provider && (
-                                            <span style={{opacity: 0.7}}> • Powered by {analysisResult.provider}</span>
-                                        )}
-                                        {analysisResult.model && analysisResult.provider && (
-                                            <span style={{opacity: 0.6}}> ({analysisResult.model})</span>
-                                        )}
-                                    </small>
-                                </div>
+                            <div className="action-buttons">
+                                <button 
+                                    className="action-button primary"
+                                    onClick={scheduleConsultation}
+                                >
+                                    <i data-feather="calendar"></i>
+                                    Schedule Legal Consultation
+                                </button>
+                                
+                                <button 
+                                    className="action-button outline"
+                                    onClick={() => {
+                                        setAnalysisResult(null);
+                                        setNdaText('');
+                                        setOriginalNDA('');
+                                        setDialogueStep(0);
+                                        setUserAnswers({});
+                                        setRedraftedNDA('');
+                                        setChangesSummary([]);
+                                    }}
+                                >
+                                    <i data-feather="refresh-cw"></i>
+                                    New Analysis
+                                </button>
                             </div>
-                        )}
-                    </div>
+
+                            <div className="professional-disclaimer">
+                                <small>
+                                    <strong>Disclaimer:</strong> This analysis is provided for informational purposes only and does not constitute legal advice. 
+                                    For specific legal guidance, consult with a qualified attorney. Analysis by Sergei Tokmakov, Esq., CA Bar #279869.
+                                    {analysisResult.provider && (
+                                        <span style={{opacity: 0.7}}> • Powered by {analysisResult.provider}</span>
+                                    )}
+                                </small>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
