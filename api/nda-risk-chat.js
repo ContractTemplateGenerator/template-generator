@@ -16,7 +16,7 @@ const handler = async (req, res) => {
   }
 
   try {
-    const { messages, useClaudeAI } = req.body;
+    const { messages, useClaudeAI, extractedData } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array is required' });
@@ -24,9 +24,9 @@ const handler = async (req, res) => {
 
     // Choose AI provider based on user selection
     if (useClaudeAI) {
-      return await handleClaudeRequest(req, res, messages);
+      return await handleClaudeRequest(req, res, messages, extractedData);
     } else {
-      return await handleGroqRequest(req, res, messages);
+      return await handleGroqRequest(req, res, messages, extractedData);
     }
 
   } catch (error) {
@@ -37,9 +37,8 @@ const handler = async (req, res) => {
     });
   }
 };
-
-// Handle Claude AI requests
-const handleClaudeRequest = async (req, res, messages) => {
+// Handle Claude AI requests with personalization
+const handleClaudeRequest = async (req, res, messages, extractedData) => {
   // Check for Claude API key
   const claudeApiKey = process.env.ANTHROPIC_API_KEY;
   if (!claudeApiKey) {
@@ -47,42 +46,48 @@ const handleClaudeRequest = async (req, res, messages) => {
     return res.status(500).json({ error: 'Claude API not configured' });
   }
 
-  // Simple system prompt for reliable analysis
+  // Enhanced system prompt for personalized analysis
   const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
+
+PERSONALIZATION CONTEXT:
+${extractedData ? `
+- Detected Parties: ${extractedData.parties?.join(' and ') || 'Not specified'}
+- Business Purpose: ${extractedData.businessPurpose || 'Not specified'}
+- Jurisdiction: ${extractedData.jurisdiction || 'Not specified'}
+- Key Terms: ${Object.keys(extractedData.terms || {}).join(', ') || 'None detected'}
+- Duration Terms: ${Object.values(extractedData.durations || {}).join(', ') || 'None detected'}
+- Sections Found: ${extractedData.sections?.join(', ') || 'None detected'}
+` : 'No extracted data available'}
 
 FORMATTING REQUIREMENTS:
 - Use <strong></strong> tags for important concepts 
 - Use <br><br> for paragraph breaks
 - Format in HTML, not markdown
 - Provide clear, actionable advice
+- ALWAYS use the actual party names extracted from the agreement when referring to the parties
 
-ANALYSIS APPROACH:
-Provide balanced analysis for BOTH parties with specific improvements suggested.
+PERSONALIZED ANALYSIS APPROACH:
+Provide hyper-personalized analysis that uses the EXACT party names, specific terms, and contextual details from this particular agreement.
 
-BASIC FORMAT:
-<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
+REQUIRED FORMAT:
+<strong>PERSONALIZED DOCUMENT OVERVIEW:</strong> Brief summary using actual party names and business context<br><br>
 
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• Risk assessment and protections<br>
-• Adequacy of confidentiality terms<br>
+<strong>ANALYSIS FOR ${extractedData?.parties?.[0] || 'DISCLOSING PARTY'} (Information Sharer):</strong><br>
+• Specific risk assessment for this party<br>
+• Adequacy of confidentiality protections<br>
 • Enforcement considerations<br><br>
 
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• Burden and restrictions imposed<br>
+<strong>ANALYSIS FOR ${extractedData?.parties?.[1] || 'RECEIVING PARTY'} (Information Recipient):</strong><br>
+• Burden and restrictions imposed on this specific party<br>
 • Scope of confidentiality obligations<br>
 • Duration and practical impact<br><br>
 
-<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
-• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
-• Standard exceptions and whether they're present<br>
-• Enforceability concerns<br><br>
+<strong>PERSONALIZED REDRAFT SUGGESTIONS:</strong><br>
+• Specific improvements favoring ${extractedData?.parties?.[0] || 'first party'}<br>
+• Neutral/mutual improvements<br>
+• Specific improvements favoring ${extractedData?.parties?.[1] || 'second party'}<br><br>
 
-<strong>RECOMMENDATIONS:</strong><br>
-• Specific improvements and suggested language<br>
-• Negotiation priorities<br><br>
-
-Focus on practical, actionable advice with specific clause improvements.`;
-
+Focus on actionable advice using the specific party names, terms, and context from this exact agreement.`;
   try {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -93,7 +98,7 @@ Focus on practical, actionable advice with specific clause improvements.`;
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2000,
+        max_tokens: 2500,
         system: systemPrompt,
         messages: messages.map(msg => ({
           role: msg.role,
@@ -106,11 +111,12 @@ Focus on practical, actionable advice with specific clause improvements.`;
       const data = await response.json();
       const assistantMessage = data.content[0].text;
       
-      console.log('Successful Claude analysis response generated');
+      console.log('Successful personalized Claude analysis response generated');
       return res.status(200).json({ 
         response: assistantMessage,
         model: 'claude-sonnet-4',
-        provider: 'Anthropic Claude 4.0'
+        provider: 'Anthropic Claude 4.0',
+        personalizedContext: extractedData
       });
     } else {
       const errorText = await response.text();
@@ -121,12 +127,11 @@ Focus on practical, actionable advice with specific clause improvements.`;
     console.error('Claude request failed:', error);
     // Fall back to Groq if Claude fails
     console.log('Falling back to Groq...');
-    return await handleGroqRequest(req, res, messages);
+    return await handleGroqRequest(req, res, messages, extractedData);
   }
 };
-
-// Handle Groq/Llama requests (existing logic)
-const handleGroqRequest = async (req, res, messages) => {
+// Handle Groq/Llama requests with personalization
+const handleGroqRequest = async (req, res, messages, extractedData) => {
   // Check for Groq API key
   const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
   if (!groqApiKey) {
@@ -134,41 +139,29 @@ const handleGroqRequest = async (req, res, messages) => {
     return res.status(500).json({ error: 'Server configuration error' });
   }
 
-  // Simple system prompt for reliable analysis (Groq)
+  // Enhanced system prompt for personalized analysis (Groq)
   const systemPrompt = `You are California attorney Sergei Tokmakov (CA Bar #279869) with 13+ years experience analyzing NDAs for startups and businesses.
+
+PERSONALIZATION CONTEXT:
+${extractedData ? `
+- Detected Parties: ${extractedData.parties?.join(' and ') || 'Not specified'}
+- Business Purpose: ${extractedData.businessPurpose || 'Not specified'}
+- Jurisdiction: ${extractedData.jurisdiction || 'Not specified'}
+- Key Terms: ${Object.keys(extractedData.terms || {}).join(', ') || 'None detected'}
+- Duration Terms: ${Object.values(extractedData.durations || {}).join(', ') || 'None detected'}
+` : 'No extracted data available'}
 
 FORMATTING REQUIREMENTS:
 - Use <strong></strong> tags for important concepts 
 - Use <br><br> for paragraph breaks
 - Format in HTML, not markdown
 - Provide clear, actionable advice
+- ALWAYS use the actual party names when referring to the parties
 
-ANALYSIS APPROACH:
-Provide balanced analysis for BOTH parties with specific improvements suggested.
+PERSONALIZED ANALYSIS APPROACH:
+Provide hyper-personalized analysis using the EXACT party names and contextual details from this agreement.
 
-BASIC FORMAT:
-<strong>DOCUMENT OVERVIEW:</strong> Brief summary of what this NDA accomplishes<br><br>
-
-<strong>ANALYSIS FOR DISCLOSING PARTY (Information Sharer):</strong><br>
-• Risk assessment and protections<br>
-• Adequacy of confidentiality terms<br>
-• Enforcement considerations<br><br>
-
-<strong>ANALYSIS FOR RECEIVING PARTY (Information Recipient):</strong><br>
-• Burden and restrictions imposed<br>
-• Scope of confidentiality obligations<br>
-• Duration and practical impact<br><br>
-
-<strong>KEY LEGAL CONSIDERATIONS:</strong><br>
-• Any problematic clauses (e.g., overly broad definitions, perpetual terms)<br>
-• Standard exceptions and whether they're present<br>
-• Enforceability concerns<br><br>
-
-<strong>RECOMMENDATIONS:</strong><br>
-• Specific improvements and suggested language<br>
-• Negotiation priorities<br><br>
-
-Focus on practical, actionable advice with specific clause improvements.`;
+Focus on practical, actionable advice with specific clause improvements using the actual party names and terms from this agreement.`;
 
   // Try different models in order of preference
   const models = [
@@ -205,7 +198,6 @@ Focus on practical, actionable advice with specific clause improvements.`;
           temperature: 0.2
         })
       });
-
       if (response.ok) {
         const data = await response.json();
         assistantMessage = data.choices[0].message.content;
@@ -231,11 +223,12 @@ Focus on practical, actionable advice with specific clause improvements.`;
     });
   }
 
-  console.log('Successful Groq analysis response generated');
+  console.log('Successful personalized Groq analysis response generated');
   return res.status(200).json({ 
     response: assistantMessage,
     model: modelUsed,
-    provider: 'Groq Llama'
+    provider: 'Groq Llama',
+    personalizedContext: extractedData
   });
 };
 
