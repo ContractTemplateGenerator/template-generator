@@ -113,12 +113,15 @@ Your responses should demonstrate the sophisticated legal thinking of an experie
         'gemma2-9b-it'
     ];
 
+    // Get API key from environment variables
+    const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
+    
     for (const model of models) {
         try {
             const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${process.env.GROQ_API_KEY}`,
+                    'Authorization': `Bearer ${groqApiKey}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({

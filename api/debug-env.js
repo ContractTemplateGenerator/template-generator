@@ -12,8 +12,9 @@ const handler = async (req, res) => {
 
   try {
     // Check environment variables (safely)
-    const hasGroqKey = !!process.env.GROQ_API_KEY;
-    const keyPrefix = process.env.GROQ_API_KEY ? process.env.GROQ_API_KEY.substring(0, 8) + '...' : 'NOT_SET';
+    const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
+    const hasGroqKey = !!groqApiKey;
+    const keyPrefix = groqApiKey ? groqApiKey.substring(0, 8) + '...' : 'NOT_SET';
     
     const debugInfo = {
       timestamp: new Date().toISOString(),
@@ -30,7 +31,7 @@ const handler = async (req, res) => {
       try {
         const testResponse = await fetch('https://api.groq.com/openai/v1/models', {
           headers: {
-            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+            'Authorization': `Bearer ${groqApiKey}`
           }
         });
         

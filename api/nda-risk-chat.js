@@ -23,7 +23,8 @@ const handler = async (req, res) => {
     }
 
     // Check for Groq API key
-    if (!process.env.GROQ_API_KEY) {
+    const groqApiKey = process.env.GROQ_API_KEY_NEW || process.env.GROQ_API_KEY;
+    if (!groqApiKey) {
       console.error('No Groq API key found');
       return res.status(500).json({ error: 'Server configuration error' });
     }
@@ -83,7 +84,7 @@ Provide attorney-grade analysis that's actionable for business owners.`;
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+            'Authorization': `Bearer ${groqApiKey}`
           },
           body: JSON.stringify({
             model: model,
