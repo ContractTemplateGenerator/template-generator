@@ -1,68 +1,111 @@
 const { useState, useRef } = React;
-
 const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [useClaudeAI, setUseClaudeAI] = useState(false);
-    const [extractedData, setExtractedData] = useState({ parties: [], sections: [], terms: {}, businessPurpose: '', jurisdiction: '', durations: {} });
-    const [selectedChanges, setSelectedChanges] = useState({ favoringParty1: {}, neutral: {}, favoringParty2: {} });
-    const [redraftSuggestions, setRedraftSuggestions] = useState({ favoringParty1: [], neutral: [], favoringParty2: [] });
+    const [ndaUrl, setNdaUrl] = useState('');
+    const [extractedData, setExtractedData] = useState({ parties: [], businessPurpose: '', jurisdiction: '' });
+    const [selectedChanges, setSelectedChanges] = useState({});
+    const [personalizedSuggestions, setPersonalizedSuggestions] = useState([]);
     const [showRedraftPreview, setShowRedraftPreview] = useState(false);
     const fileInputRef = useRef(null);
 
     const extractNDAData = (text) => {
-        const data = { parties: [], sections: [], terms: {}, businessPurpose: '', jurisdiction: '', durations: {} };
+        const data = { parties: [], businessPurpose: '', jurisdiction: '' };
         const partyMatches = text.match(/\b([A-Z][A-Za-z\s]+(?:Inc|LLC|Corp|Ltd|Company)\.?)\b/g);
         if (partyMatches) data.parties = [...new Set(partyMatches.map(p => p.trim()))].slice(0, 2);
-        const sectionMatches = text.match(/(?:Section|Article)\s+(\d+[\.\d]*)/gi);
-        if (sectionMatches) data.sections = [...new Set(sectionMatches)];
         const purposeMatch = text.match(/(?:purpose of|in connection with|relating to)\s+([^.\n]{10,100})/i);
         if (purposeMatch) data.businessPurpose = purposeMatch[1].trim();
         const jurisdictionMatch = text.match(/(?:governed by|jurisdiction of|laws of)\s+(?:the\s+)?([^,.\n]+)/i);
         if (jurisdictionMatch) data.jurisdiction = jurisdictionMatch[1].trim();
-        const durationMatches = text.match(/(\d+)\s*(?:year|month|day)s?/gi);
-        if (durationMatches) durationMatches.forEach(d => { const [n, u] = d.toLowerCase().split(/\s+/); data.durations[`${n}_${u}`] = d; });
         return data;
     };
 
-    const generateEnhancedFallback = (data) => {
-        const party1 = data.parties[0] || 'First Party';
-        const party2 = data.parties[1] || 'Second Party';
-        return {
-            htmlContent: `<div class="analysis-header"><h3>🛡️ Personalized NDA Risk Analysis</h3><p><strong>Parties:</strong> ${party1} and ${party2}</p><p><strong>Analyst:</strong> California Attorney Sergei Tokmakov (CA Bar #279869)</p></div><div class="recommendation moderate">CONTEXT-SPECIFIC ANALYSIS REQUIRED</div><div class="section"><div class="section-title">PERSONALIZED ASSESSMENT</div><p>This NDA involves <strong>${party1}</strong> and <strong>${party2}</strong>. Based on the agreement structure, I've identified specific areas where each party's interests may diverge.</p>${data.businessPurpose ? `<p><strong>Business Context:</strong> ${data.businessPurpose}</p>` : ''}${data.jurisdiction ? `<p><strong>Governing Law:</strong> ${data.jurisdiction}</p>` : ''}</div>`,
-            suggestions: {
-                favoringParty1: [{ id: 'broader_definition', title: `Broader Protection for ${party1}`, originalClause: 'Information marked as confidential', improvedClause: `All information disclosed by ${party1}, whether marked or not`, rationale: `Provides broader protection for ${party1}'s information` }],
-                neutral: [{ id: 'mutual_termination', title: 'Equal Termination Rights', originalClause: 'Either party may terminate with notice', improvedClause: 'Either party may terminate with 30 days written notice', rationale: 'Provides equal rights for both parties' }],
-                favoringParty2: [{ id: 'narrow_definition', title: `Narrower Scope for ${party2}`, originalClause: 'All shared information', improvedClause: `Only information specifically marked "CONFIDENTIAL" by ${party1}`, rationale: `Reduces ${party2}'s compliance burden` }]
+    const extractPersonalizedSuggestions = (aiResponse) => {
+        const suggestions = [];
+        const lines = aiResponse.split('\n');
+        let currentCategory = '';
+        for (let line of lines) {
+            line = line.trim();
+            if (line.includes('Favoring First Party')) currentCategory = 'favoringParty1';
+            else if (line.includes('Favoring Second Party')) currentCategory = 'favoringParty2';
+            else if (line.includes('Neutral') || line.includes('Mutual')) currentCategory = 'neutral';
+            if ((line.startsWith('•') || line.startsWith('-') || line.startsWith('*')) && currentCategory) {
+                const suggestionText = line.replace(/^[•\-*]\s*/, '').trim();
+                if (suggestionText) {
+                    suggestions.push({ 
+                        id: `suggestion_${suggestions.length}`, 
+                        category: currentCategory, 
+                        title: suggestionText.substring(0, 60), 
+                        description: suggestionText, 
+                        originalText: 'Current agreement language', 
+                        improvedText: suggestionText 
+                    });
+                }
             }
-        };
+        }
+        return suggestions;
     };
     const handleFileUpload = async (file) => {
         if (!file) return;
         try {
+            let text = '';
             if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
-                const text = await file.text();
-                setNdaText(text);
-                const extracted = extractNDAData(text);
-                setExtractedData(extracted);
+                text = await file.text();
+            } else if (file.type === 'application/pdf' || file.name.endsWith('.pdf')) {
+                alert('PDF support: Please copy text content for now. Full PDF support coming soon.');
+                return;
+            } else if (file.type.includes('word') || file.name.endsWith('.docx') || file.name.endsWith('.doc')) {
+                alert('Word support: Please copy text content for now. Full Word support coming soon.');
+                return;
             } else {
-                alert('Please upload a plain text (.txt) file.');
+                alert('Please upload .txt files or paste text directly.');
+                return;
             }
+            setNdaText(text);
+            setExtractedData(extractNDAData(text));
         } catch (error) {
             console.error('File upload error:', error);
-            alert('Error reading file. Please copy and paste your NDA text directly.');
+            alert('Error reading file. Please paste text directly.');
+        }
+    };
+
+    const handleUrlSubmit = async () => {
+        if (!ndaUrl.trim()) return;
+        setIsAnalyzing(true);
+        try {
+            const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(ndaUrl)}`;
+            const response = await fetch(proxyUrl);
+            if (response.ok) {
+                const data = await response.json();
+                let content = data.contents;
+                content = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                content = content.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+                content = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                if (content.length > 50) {
+                    setNdaText(content);
+                    setExtractedData(extractNDAData(content));
+                } else {
+                    throw new Error('No meaningful content found');
+                }
+            } else {
+                throw new Error(`Failed to fetch: ${response.status}`);
+            }
+        } catch (error) {
+            console.error('URL fetch error:', error);
+            alert('Could not fetch URL content. Please check URL or paste text directly.');
+        } finally {
+            setIsAnalyzing(false);
         }
     };
 
     const handleTextChange = (text) => {
         setNdaText(text);
         if (text.trim().length > 100) {
-            const extracted = extractNDAData(text);
-            setExtractedData(extracted);
+            setExtractedData(extractNDAData(text));
         }
     };
-
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -71,7 +114,17 @@ const NDAAnalyzer = () => {
         setIsAnalyzing(true);
         const party1 = extractedData.parties[0] || 'First Party';
         const party2 = extractedData.parties[1] || 'Second Party';
-        const personalizedPrompt = `Please analyze this NDA between ${party1} and ${party2}. KEY CONTEXT: - Parties: ${party1} and ${party2} - Business Purpose: ${extractedData.businessPurpose || 'Not specified'} - Jurisdiction: ${extractedData.jurisdiction || 'Not specified'} - Key Terms: ${Object.keys(extractedData.terms).join(', ') || 'None identified'} NDA TEXT: ${ndaText}`;
+        
+        const personalizedPrompt = `Please analyze this NDA between ${party1} and ${party2}. 
+KEY CONTEXT: - Parties: ${party1} and ${party2} - Business Purpose: ${extractedData.businessPurpose || 'Not specified'} - Jurisdiction: ${extractedData.jurisdiction || 'Not specified'}
+
+IMPORTANT: Please structure your response with clear sections for:
+**PERSONALIZED REDRAFT SUGGESTIONS:**
+• Improvements Favoring First Party: [list specific suggestions]
+• Neutral/Mutual Improvements: [list balanced suggestions]  
+• Improvements Favoring Second Party: [list specific suggestions]
+
+NDA TEXT: ${ndaText}`;
         
         try {
             const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
@@ -83,21 +136,28 @@ const NDAAnalyzer = () => {
             if (response.ok) {
                 const data = await response.json();
                 setAnalysisResult({ htmlContent: data.response, recommendation: 'PERSONALIZED ANALYSIS', model: data.model, provider: data.provider });
-                setRedraftSuggestions(generateEnhancedFallback(extractedData).suggestions);
+                const suggestions = extractPersonalizedSuggestions(data.response);
+                setPersonalizedSuggestions(suggestions);
+                console.log('Extracted suggestions:', suggestions);
             } else {
                 throw new Error('API request failed');
             }
         } catch (error) {
             console.error('Analysis error:', error);
-            const fallbackData = generateEnhancedFallback(extractedData);
-            setAnalysisResult({ htmlContent: fallbackData.htmlContent, recommendation: 'PERSONALIZED FALLBACK ANALYSIS', model: 'Professional Analysis', provider: 'Terms.law Legal Guidance' });
-            setRedraftSuggestions(fallbackData.suggestions);
+            const fallbackHtml = `<div class="analysis-header"><h3>🛡️ Personalized NDA Risk Analysis</h3><p><strong>Parties:</strong> ${party1} and ${party2}</p></div><div class="recommendation moderate">CONTEXT-SPECIFIC ANALYSIS REQUIRED</div><div class="section"><div class="section-title">PERSONALIZED ASSESSMENT</div><p>This NDA involves <strong>${party1}</strong> and <strong>${party2}</strong>. Professional analysis requires reviewing specific clauses.</p></div>`;
+            setAnalysisResult({ htmlContent: fallbackHtml, recommendation: 'PERSONALIZED FALLBACK ANALYSIS', model: 'Professional Analysis', provider: 'Terms.law Legal Guidance' });
+            const fallbackSuggestions = [
+                { id: 'suggestion_0', category: 'favoringParty1', title: `Broader Protection for ${party1}`, description: `Add stronger confidentiality protections for ${party1}`, originalText: 'Current agreement language', improvedText: `Enhanced protection clauses favoring ${party1}` },
+                { id: 'suggestion_1', category: 'neutral', title: 'Equal Termination Rights', description: 'Both parties have equal termination rights', originalText: 'Current agreement language', improvedText: 'Equal 30-day notice period for both parties' },
+                { id: 'suggestion_2', category: 'favoringParty2', title: `Narrower Scope for ${party2}`, description: `Reduce compliance burden for ${party2}`, originalText: 'Current agreement language', improvedText: `Limited obligations for ${party2}` }
+            ];
+            setPersonalizedSuggestions(fallbackSuggestions);
         } finally {
             setIsAnalyzing(false);
         }
     };
-    const handleRedraftSelection = (category, changeId, isSelected) => {
-        setSelectedChanges(prev => ({ ...prev, [category]: { ...prev[category], [changeId]: isSelected } }));
+    const handleSuggestionChange = (suggestionId, isSelected) => {
+        setSelectedChanges(prev => ({ ...prev, [suggestionId]: isSelected }));
     };
 
     const generateFinalRedraft = () => {
@@ -105,23 +165,45 @@ const NDAAnalyzer = () => {
         const party2 = extractedData.parties[1] || 'Second Party';
         let redraftedText = `REDRAFTED NON-DISCLOSURE AGREEMENT\n\nBetween: ${party1} and ${party2}\n\nPERSONALIZED IMPROVEMENTS APPLIED:\n\n`;
         
-        Object.entries(selectedChanges).forEach(([category, selections]) => {
-            const categoryName = category === 'favoringParty1' ? `Favoring ${party1}` : category === 'favoringParty2' ? `Favoring ${party2}` : 'Neutral/Mutual';
-            const selectedItems = Object.entries(selections).filter(([_, isSelected]) => isSelected);
-            
-            if (selectedItems.length > 0) {
-                redraftedText += `\n${categoryName.toUpperCase()} IMPROVEMENTS:\n`;
-                selectedItems.forEach(([changeId, _]) => {
-                    const suggestion = redraftSuggestions[category]?.find(s => s.id === changeId);
-                    if (suggestion) {
-                        redraftedText += `\n${suggestion.title}:\n• Original: ${suggestion.originalClause}\n• Improved: ${suggestion.improvedClause}\n• Rationale: ${suggestion.rationale}\n\n`;
-                    }
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        
+        const categories = {
+            favoringParty1: `IMPROVEMENTS FAVORING ${party1.toUpperCase()}`,
+            neutral: 'NEUTRAL/MUTUAL IMPROVEMENTS',
+            favoringParty2: `IMPROVEMENTS FAVORING ${party2.toUpperCase()}`
+        };
+        
+        Object.keys(categories).forEach(category => {
+            const categorySuggestions = selectedSuggestions.filter(s => s.category === category);
+            if (categorySuggestions.length > 0) {
+                redraftedText += `\n${categories[category]}:\n`;
+                categorySuggestions.forEach(suggestion => {
+                    redraftedText += `\n• ${suggestion.title}:\n`;
+                    redraftedText += `  Original: ${suggestion.originalText}\n`;
+                    redraftedText += `  Improved: ${suggestion.improvedText}\n\n`;
                 });
             }
         });
         
-        redraftedText += `\nINTEGRATION WITH ORIGINAL AGREEMENT:\nThe above improvements should be incorporated into the original agreement structure.\n\n${ndaText ? 'ORIGINAL AGREEMENT TEXT:\n' + ndaText : ''}\n\nATTORNEY CERTIFICATION:\nAnalysis by: Sergei Tokmakov, Esq.\nCalifornia Bar #279869\nDate: ${new Date().toLocaleDateString()}`;
+        if (ndaText) {
+            redraftedText += `\nORIGINAL AGREEMENT TEXT:\n${ndaText}\n\n`;
+        }
+        
+        redraftedText += `ATTORNEY CERTIFICATION:\nThis redraft incorporates personalized legal analysis.\nAnalysis by: Sergei Tokmakov, Esq.\nCalifornia Bar #279869\nDate: ${new Date().toLocaleDateString()}`;
         return redraftedText;
+    };
+
+    const generateHighlightedPreview = () => {
+        const baseText = generateFinalRedraft();
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        let highlightedText = baseText;
+        
+        selectedSuggestions.forEach(suggestion => {
+            const highlightPattern = new RegExp(`(${suggestion.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            highlightedText = highlightedText.replace(highlightPattern, '<mark class="highlight-change">$1</mark>');
+        });
+        
+        return highlightedText;
     };
 
     const copyRedraftToClipboard = async () => {
@@ -150,7 +232,6 @@ const NDAAnalyzer = () => {
         link.click();
         document.body.removeChild(link);
     };
-
     const scheduleConsultation = () => {
         if (window.Calendly) {
             window.Calendly.initPopupWidget({ url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1' });
@@ -160,8 +241,9 @@ const NDAAnalyzer = () => {
     };
 
     const getTotalSelectedChanges = () => {
-        return Object.values(selectedChanges).reduce((total, category) => total + Object.values(category).filter(Boolean).length, 0);
+        return Object.values(selectedChanges).filter(Boolean).length;
     };
+
     return (
         <div className="nda-analyzer full-width">
             <div className="header">
@@ -179,9 +261,17 @@ const NDAAnalyzer = () => {
                 <div className="upload-section">
                     <div className="file-upload" onClick={() => fileInputRef.current?.click()}>
                         <div className="upload-icon">📄</div>
-                        <div className="upload-text">Drag & drop text file (.txt) here</div>
-                        <div className="upload-subtext">or click to browse • Plain text files</div>
-                        <input ref={fileInputRef} type="file" accept=".txt,text/plain" onChange={(e) => handleFileUpload(e.target.files[0])} style={{ display: 'none' }} />
+                        <div className="upload-text">Drop files here or click to browse</div>
+                        <div className="upload-subtext">Supports .txt files • PDF & Word coming soon</div>
+                        <input ref={fileInputRef} type="file" accept=".txt,.pdf,.doc,.docx,text/plain,application/pdf" onChange={(e) => handleFileUpload(e.target.files[0])} style={{ display: 'none' }} />
+                    </div>
+                    
+                    <div className="url-input-section">
+                        <div className="url-input-header">Or fetch from URL (SEC filings, etc.):</div>
+                        <div className="url-input-group">
+                            <input type="url" className="url-input" placeholder="https://www.sec.gov/Archives/edgar/..." value={ndaUrl} onChange={(e) => setNdaUrl(e.target.value)} />
+                            <button className="url-submit-btn" onClick={handleUrlSubmit} disabled={!ndaUrl.trim() || isAnalyzing}>Fetch</button>
+                        </div>
                     </div>
                 </div>
 
@@ -211,11 +301,7 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                     </div>
 
                     <button className="analyze-button-fullwidth" onClick={analyzeNDA} disabled={!ndaText.trim() || isAnalyzing}>
-                        {isAnalyzing ? (
-                            <><div className="loading-spinner"></div>Analyzing & Extracting Details...</>
-                        ) : (
-                            <><i data-feather="shield"></i>Analyze & Personalize NDA</>
-                        )}
+                        {isAnalyzing ? <><div className="loading-spinner"></div>Analyzing & Extracting Details...</> : <><i data-feather="shield"></i>Analyze & Personalize NDA</>}
                     </button>
                 </div>
             </div>
@@ -234,7 +320,6 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                     <p><strong>Parties:</strong> {extractedData.parties.join(' and ')}</p>
                                     {extractedData.businessPurpose && <p><strong>Purpose:</strong> {extractedData.businessPurpose}</p>}
                                     {extractedData.jurisdiction && <p><strong>Jurisdiction:</strong> {extractedData.jurisdiction}</p>}
-                                    {Object.keys(extractedData.durations).length > 0 && <p><strong>Terms:</strong> {Object.values(extractedData.durations).join(', ')}</p>}
                                 </div>
                             )}
                         </div>
@@ -248,68 +333,38 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                             <div className="legal-analysis-content-fullwidth">
                                 <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
                             </div>
-                            {Object.keys(redraftSuggestions).some(key => redraftSuggestions[key]?.length > 0) && (
-                                <div className="redraft-system-fullwidth">
-                                    <h3 className="redraft-title">📝 Personalized Redraft Options</h3>
-                                    <p className="redraft-subtitle">Select improvements tailored to your specific agreement between <strong>{extractedData.parties.join(' and ')}</strong>:</p>
 
-                                    <div className="three-column-redraft">
-                                        <div className="redraft-column favoring-party1">
-                                            <h4>Favoring {extractedData.parties[0] || 'First Party'}</h4>
-                                            <div className="column-suggestions">
-                                                {redraftSuggestions.favoringParty1?.map((suggestion) => (
-                                                    <div key={suggestion.id} className="suggestion-card">
-                                                        <div className="suggestion-header">
-                                                            <input type="checkbox" id={`party1-${suggestion.id}`} checked={selectedChanges.favoringParty1[suggestion.id] || false} onChange={(e) => handleRedraftSelection('favoringParty1', suggestion.id, e.target.checked)} />
-                                                            <label htmlFor={`party1-${suggestion.id}`} className="suggestion-title">{suggestion.title}</label>
-                                                        </div>
-                                                        <div className="suggestion-content">
-                                                            <div className="original-clause"><strong>Current:</strong> {suggestion.originalClause}</div>
-                                                            <div className="improved-clause"><strong>Improved:</strong> {suggestion.improvedClause}</div>
-                                                            <div className="rationale"><strong>Why:</strong> {suggestion.rationale}</div>
-                                                        </div>
+                            {personalizedSuggestions.length > 0 && (
+                                <div className="personalized-suggestions-section">
+                                    <h3 className="suggestions-title">📝 Select Your Personalized Improvements</h3>
+                                    <p className="suggestions-subtitle">Choose which AI-generated suggestions to include in your customized redraft:</p>
+                                    
+                                    <div className="suggestions-list">
+                                        {personalizedSuggestions.map((suggestion) => (
+                                            <div key={suggestion.id} className={`suggestion-item ${suggestion.category}`}>
+                                                <div className="suggestion-header">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={suggestion.id}
+                                                        checked={selectedChanges[suggestion.id] || false}
+                                                        onChange={(e) => handleSuggestionChange(suggestion.id, e.target.checked)}
+                                                    />
+                                                    <label htmlFor={suggestion.id} className="suggestion-title">{suggestion.title}</label>
+                                                    <span className={`category-badge ${suggestion.category}`}>
+                                                        {suggestion.category === 'favoringParty1' ? `Favoring ${extractedData.parties[0] || 'First Party'}` :
+                                                         suggestion.category === 'favoringParty2' ? `Favoring ${extractedData.parties[1] || 'Second Party'}` :
+                                                         'Neutral/Mutual'}
+                                                    </span>
+                                                </div>
+                                                <div className="suggestion-content">
+                                                    <div className="suggestion-description">{suggestion.description}</div>
+                                                    <div className="suggestion-comparison">
+                                                        <div className="original-text"><strong>Original:</strong> {suggestion.originalText}</div>
+                                                        <div className="improved-text"><strong>Improved:</strong> {suggestion.improvedText}</div>
                                                     </div>
-                                                ))}
+                                                </div>
                                             </div>
-                                        </div>
-
-                                        <div className="redraft-column neutral">
-                                            <h4>Neutral/Mutual Clauses</h4>
-                                            <div className="column-suggestions">
-                                                {redraftSuggestions.neutral?.map((suggestion) => (
-                                                    <div key={suggestion.id} className="suggestion-card">
-                                                        <div className="suggestion-header">
-                                                            <input type="checkbox" id={`neutral-${suggestion.id}`} checked={selectedChanges.neutral[suggestion.id] || false} onChange={(e) => handleRedraftSelection('neutral', suggestion.id, e.target.checked)} />
-                                                            <label htmlFor={`neutral-${suggestion.id}`} className="suggestion-title">{suggestion.title}</label>
-                                                        </div>
-                                                        <div className="suggestion-content">
-                                                            <div className="original-clause"><strong>Current:</strong> {suggestion.originalClause}</div>
-                                                            <div className="improved-clause"><strong>Improved:</strong> {suggestion.improvedClause}</div>
-                                                            <div className="rationale"><strong>Why:</strong> {suggestion.rationale}</div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-
-                                        <div className="redraft-column favoring-party2">
-                                            <h4>Favoring {extractedData.parties[1] || 'Second Party'}</h4>
-                                            <div className="column-suggestions">
-                                                {redraftSuggestions.favoringParty2?.map((suggestion) => (
-                                                    <div key={suggestion.id} className="suggestion-card">
-                                                        <div className="suggestion-header">
-                                                            <input type="checkbox" id={`party2-${suggestion.id}`} checked={selectedChanges.favoringParty2[suggestion.id] || false} onChange={(e) => handleRedraftSelection('favoringParty2', suggestion.id, e.target.checked)} />
-                                                            <label htmlFor={`party2-${suggestion.id}`} className="suggestion-title">{suggestion.title}</label>
-                                                        </div>
-                                                        <div className="suggestion-content">
-                                                            <div className="original-clause"><strong>Current:</strong> {suggestion.originalClause}</div>
-                                                            <div className="improved-clause"><strong>Improved:</strong> {suggestion.improvedClause}</div>
-                                                            <div className="rationale"><strong>Why:</strong> {suggestion.rationale}</div>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
+                                        ))}
                                     </div>
                                     <div className="redraft-actions-fullwidth">
                                         <div className="redraft-buttons-fullwidth">
@@ -329,21 +384,14 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                         
                                         <div className="selected-summary">
                                             <strong>{getTotalSelectedChanges()}</strong> personalized improvement(s) selected
-                                            {extractedData.parties.length === 2 && (
-                                                <div className="party-breakdown">
-                                                    <span>Favoring {extractedData.parties[0]}: {Object.values(selectedChanges.favoringParty1).filter(Boolean).length}</span>
-                                                    <span>Neutral: {Object.values(selectedChanges.neutral).filter(Boolean).length}</span>
-                                                    <span>Favoring {extractedData.parties[1]}: {Object.values(selectedChanges.favoringParty2).filter(Boolean).length}</span>
-                                                </div>
-                                            )}
                                         </div>
                                     </div>
 
                                     {showRedraftPreview && getTotalSelectedChanges() > 0 && (
                                         <div className="redraft-preview-fullwidth">
-                                            <h4>📄 Personalized Redraft Preview</h4>
+                                            <h4>📄 Personalized Redraft Preview with Highlights</h4>
                                             <div className="preview-content-fullwidth">
-                                                <pre>{generateFinalRedraft()}</pre>
+                                                <div dangerouslySetInnerHTML={{ __html: generateHighlightedPreview() }} />
                                             </div>
                                         </div>
                                     )}
@@ -354,9 +402,9 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                 <button className="action-button outline" onClick={() => {
                                     setAnalysisResult(null);
                                     setNdaText('');
-                                    setExtractedData({ parties: [], sections: [], terms: {}, businessPurpose: '', jurisdiction: '', durations: {} });
-                                    setSelectedChanges({ favoringParty1: {}, neutral: {}, favoringParty2: {} });
-                                    setRedraftSuggestions({ favoringParty1: [], neutral: [], favoringParty2: [] });
+                                    setExtractedData({ parties: [], businessPurpose: '', jurisdiction: '' });
+                                    setSelectedChanges({});
+                                    setPersonalizedSuggestions([]);
                                     setShowRedraftPreview(false);
                                 }}>
                                     <i data-feather="refresh-cw"></i> New Analysis
