@@ -14,112 +14,38 @@ const NDAAnalyzer = () => {
     const [showUpgradeOptions, setShowUpgradeOptions] = useState(false);
     const fileInputRef = useRef(null);
 
-    // Enhanced fallback responses with structured presentation
+    // Simplified fallback responses
     const fallbackResponses = {
-        "default": `
-        <div class="analysis-overview">
-            <div class="risk-assessment-grid">
-                <div class="risk-card medium-risk">
-                    <div class="risk-icon">⚠️</div>
-                    <div class="risk-title">Risk Level</div>
-                    <div class="risk-value">Moderate</div>
-                    <div class="risk-subtitle">Requires Context</div>
-                </div>
-                <div class="risk-card balance-risk">
-                    <div class="risk-icon">⚖️</div>
-                    <div class="risk-title">Agreement Balance</div>
-                    <div class="risk-value">Unknown</div>
-                    <div class="risk-subtitle">Need Party Info</div>
-                </div>
-                <div class="risk-card enforceability">
-                    <div class="risk-icon">🛡️</div>
-                    <div class="risk-title">Enforceability</div>
-                    <div class="risk-value">Likely</div>
-                    <div class="risk-subtitle">Standard Clauses</div>
-                </div>
-            </div>
-        </div>
+        "default": `<div class="simple-analysis">
+<h3><strong>🛡️ Risk Assessment Summary</strong></h3>
+<div class="risk-cards">
+    <div class="risk-card moderate">⚠️ <strong>Moderate Risk</strong><br>Requires context to provide specific guidance</div>
+    <div class="risk-card balanced">⚖️ <strong>Agreement Balance</strong><br>Need to know which party you represent</div>
+</div>
 
-        <div class="dual-party-analysis">
-            <table class="analysis-table">
-                <thead>
-                    <tr>
-                        <th>Analysis Factor</th>
-                        <th class="disclosing-party">Disclosing Party<br><small>(Information Sharer)</small></th>
-                        <th class="receiving-party">Receiving Party<br><small>(Information Recipient)</small></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Primary Risk</strong></td>
-                        <td class="disclosing-party">Information leakage & competitive disadvantage</td>
-                        <td class="receiving-party">Operational restrictions & compliance burden</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Key Benefit</strong></td>
-                        <td class="disclosing-party">Trade secret protection & competitive advantage</td>
-                        <td class="receiving-party">Access to valuable business opportunities</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Enforcement Power</strong></td>
-                        <td class="disclosing-party">Can seek injunctive relief & damages</td>
-                        <td class="receiving-party">Limited - must comply with obligations</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Duration Impact</strong></td>
-                        <td class="disclosing-party">Longer = better protection</td>
-                        <td class="receiving-party">Shorter = less restriction</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+<h3><strong>📊 Dual-Party Analysis</strong></h3>
+<p><strong>For Disclosing Party:</strong> Information leakage risk vs. trade secret protection</p>
+<p><strong>For Receiving Party:</strong> Operational restrictions vs. access to valuable opportunities</p>
 
-        <div class="suggested-redrafts">
-            <h3><strong>🔧 Common Improvement Areas</strong></h3>
-            <div class="redraft-cards">
-                <div class="redraft-card">
-                    <div class="redraft-issue">Overly Broad Definition</div>
-                    <div class="redraft-before"><strong>Before:</strong> "All information shared..."</div>
-                    <div class="redraft-after"><strong>Better:</strong> "Information clearly marked as confidential..."</div>
-                </div>
-                <div class="redraft-card">
-                    <div class="redraft-issue">Missing Exceptions</div>
-                    <div class="redraft-before"><strong>Issue:</strong> No standard exceptions</div>
-                    <div class="redraft-after"><strong>Add:</strong> Publicly available, independently developed, legally required disclosures</div>
-                </div>
-                <div class="redraft-card">
-                    <div class="redraft-issue">Indefinite Duration</div>
-                    <div class="redraft-before"><strong>Before:</strong> "Perpetual confidentiality"</div>
-                    <div class="redraft-after"><strong>Better:</strong> "3 years from disclosure date"</div>
-                </div>
-            </div>
-        </div>
+<h3><strong>🔧 Common Issues to Watch For</strong></h3>
+<p>• <strong>Overly broad definitions</strong> - "All information" should be "clearly marked confidential information"</p>
+<p>• <strong>Missing standard exceptions</strong> - Should exclude publicly available and independently developed info</p>
+<p>• <strong>Indefinite duration</strong> - Consider reasonable time limits (2-3 years typical)</p>
 
-        <div class="context-questions">
-            <h3><strong>❓ To Provide Better Analysis, We Need Context</strong></h3>
-            <div class="question-prompts">
-                <div class="question-card">Which party do you represent?</div>
-                <div class="question-card">What's the business relationship context?</div>
-                <div class="question-card">What consideration is being exchanged?</div>
-                <div class="question-card">What's your timeline for finalization?</div>
-            </div>
-        </div>
+<h3><strong>❓ Questions for Better Analysis</strong></h3>
+<div class="context-questions">
+    <p><strong>Which party do you represent?</strong> (Disclosing vs. Receiving)</p>
+    <p><strong>What's the business context?</strong> (M&A, partnership, employment, etc.)</p>
+    <p><strong>Timeline for finalization?</strong></p>
+</div>
 
-        <div class="upgrade-teasers">
-            <div class="upgrade-card tier-1">
-                <div class="tier-badge">Enhanced Analysis - $97</div>
-                <div class="tier-benefits">✓ Party-specific risk assessment<br>✓ Industry-specific recommendations<br>✓ Negotiation strategy guidance</div>
-            </div>
-            <div class="upgrade-card tier-2">
-                <div class="tier-badge">Complete Redraft - $297</div>
-                <div class="tier-benefits">✓ Fully redrafted agreement<br>✓ Summary of all changes<br>✓ 30-minute strategy call</div>
-            </div>
-            <div class="upgrade-card tier-3">
-                <div class="tier-badge">Full Legal Package - $597</div>
-                <div class="tier-benefits">✓ Multiple agreement versions<br>✓ Legal memo & strategy<br>✓ Ongoing negotiation support</div>
-            </div>
-        </div>
-        `
+<div class="upgrade-preview">
+<h3><strong>💼 Available Services</strong></h3>
+<p>📋 <strong>Enhanced Analysis ($97)</strong> - Party-specific recommendations & strategy</p>
+<p>📝 <strong>Complete Redraft ($297)</strong> - Fully customized NDA + consultation</p>
+<p>⚖️ <strong>Full Legal Package ($597)</strong> - Multiple versions + ongoing support</p>
+</div>
+</div>`
     };
 
     // Handle file upload (text files only)
@@ -550,122 +476,61 @@ The more complete the text, the more nuanced the analysis."
                                     <div dangerouslySetInnerHTML={{ __html: analysisResult.htmlContent }} />
                                 </div>
 
-                                {/* Follow-up Questions Section */}
+                                {/* Simplified Follow-up Questions */}
                                 {showFollowUp && !analysisResult.isEnhanced && (
                                     <div className="follow-up-section">
-                                        <h3 className="followup-title">🎯 Get Customized Analysis for Your Position</h3>
-                                        <div className="context-questions-grid">
-                                            <div className="question-group">
-                                                <label>Which party do you represent?</label>
+                                        <h3>🎯 Get Customized Analysis</h3>
+                                        <div className="simple-questions">
+                                            <div className="question-row">
+                                                <label>Which party are you?</label>
                                                 <select value={userParty} onChange={(e) => setUserParty(e.target.value)}>
-                                                    <option value="">Select your position</option>
-                                                    <option value="disclosing">Disclosing Party (Information Sharer)</option>
-                                                    <option value="receiving">Receiving Party (Information Recipient)</option>
-                                                    <option value="both">Both parties (drafting mutual NDA)</option>
+                                                    <option value="">Select...</option>
+                                                    <option value="disclosing">Disclosing Party (Info Sharer)</option>
+                                                    <option value="receiving">Receiving Party (Info Recipient)</option>
                                                 </select>
                                             </div>
-                                            <div className="question-group">
-                                                <label>Business relationship context?</label>
+                                            <div className="question-row">
+                                                <label>Business context?</label>
                                                 <select value={businessContext} onChange={(e) => setBusinessContext(e.target.value)}>
-                                                    <option value="">Select context</option>
+                                                    <option value="">Select...</option>
                                                     <option value="m&a">M&A Due Diligence</option>
-                                                    <option value="partnership">Strategic Partnership</option>
-                                                    <option value="employment">Employment/Contractor</option>
-                                                    <option value="investment">Investment Discussion</option>
-                                                    <option value="vendor">Vendor/Supplier Relationship</option>
-                                                    <option value="licensing">Technology Licensing</option>
-                                                    <option value="other">Other Business Relationship</option>
-                                                </select>
-                                            </div>
-                                            <div className="question-group">
-                                                <label>When do you need this finalized?</label>
-                                                <select value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
-                                                    <option value="">Select timeline</option>
-                                                    <option value="asap">ASAP (within 24 hours)</option>
-                                                    <option value="week">Within 1 week</option>
-                                                    <option value="month">Within 1 month</option>
-                                                    <option value="flexible">Flexible timeline</option>
+                                                    <option value="partnership">Partnership</option>
+                                                    <option value="employment">Employment</option>
+                                                    <option value="investment">Investment</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <button 
-                                            className="enhanced-analysis-btn"
+                                            className="simple-enhance-btn"
                                             onClick={requestEnhancedAnalysis}
                                             disabled={isAnalyzing || !userParty}
                                         >
-                                            {isAnalyzing ? (
-                                                <>
-                                                    <div className="loading-spinner"></div>
-                                                    Generating Customized Analysis...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <i data-feather="target"></i>
-                                                    Get Customized Analysis for My Position
-                                                </>
-                                            )}
+                                            Get My Customized Analysis
                                         </button>
                                     </div>
                                 )}
 
-                                {/* Upgrade Options Mock */}
+                                {/* Simplified Service Options */}
                                 {showUpgradeOptions && !analysisResult.isEnhanced && (
-                                    <div className="upgrade-options-section">
-                                        <h3 className="upgrade-title">💼 Professional Services Available</h3>
-                                        <div className="service-tiers">
-                                            <div className="service-tier tier-1">
-                                                <div className="tier-header">
-                                                    <div className="tier-name">Enhanced Analysis</div>
-                                                    <div className="tier-price">$97</div>
-                                                </div>
-                                                <div className="tier-features">
-                                                    ✓ Party-specific risk assessment<br>
-                                                    ✓ Industry-specific recommendations<br>
-                                                    ✓ Negotiation strategy guidance<br>
-                                                    ✓ Email consultation included
-                                                </div>
-                                                <button className="tier-button" onClick={scheduleConsultation}>
-                                                    Schedule Consultation
-                                                </button>
+                                    <div className="simple-services">
+                                        <h3>💼 Professional Services</h3>
+                                        <div className="service-list">
+                                            <div className="service-item">
+                                                <strong>Enhanced Analysis - $97</strong><br>
+                                                Party-specific recommendations & strategy
                                             </div>
-                                            <div className="service-tier tier-2 featured">
-                                                <div className="tier-badge">Most Popular</div>
-                                                <div className="tier-header">
-                                                    <div className="tier-name">Complete Redraft</div>
-                                                    <div className="tier-price">$297</div>
-                                                </div>
-                                                <div className="tier-features">
-                                                    ✓ Fully redrafted NDA optimized for you<br>
-                                                    ✓ Summary of all changes<br>
-                                                    ✓ Negotiation talking points<br>
-                                                    ✓ 30-minute strategy call
-                                                </div>
-                                                <button className="tier-button primary" onClick={scheduleConsultation}>
-                                                    Schedule Consultation
-                                                </button>
+                                            <div className="service-item featured">
+                                                <strong>Complete Redraft - $297</strong><br>
+                                                Fully customized NDA + consultation
                                             </div>
-                                            <div className="service-tier tier-3">
-                                                <div className="tier-header">
-                                                    <div className="tier-name">Full Legal Package</div>
-                                                    <div className="tier-price">$597</div>
-                                                </div>
-                                                <div className="tier-features">
-                                                    ✓ Multiple agreement versions<br>
-                                                    ✓ Legal memo & strategic positioning<br>
-                                                    ✓ Follow-up negotiation support<br>
-                                                    ✓ Template library access
-                                                </div>
-                                                <button className="tier-button" onClick={scheduleConsultation}>
-                                                    Schedule Consultation
-                                                </button>
+                                            <div className="service-item">
+                                                <strong>Full Package - $597</strong><br>
+                                                Multiple versions + ongoing support
                                             </div>
                                         </div>
-                                        <div className="upgrade-disclaimer">
-                                            <small>
-                                                <strong>Note:</strong> These are example service offerings. Actual pricing and services 
-                                                will be discussed during consultation based on your specific needs.
-                                            </small>
-                                        </div>
+                                        <button className="consult-btn" onClick={scheduleConsultation}>
+                                            Schedule Consultation
+                                        </button>
                                     </div>
                                 )}
 
