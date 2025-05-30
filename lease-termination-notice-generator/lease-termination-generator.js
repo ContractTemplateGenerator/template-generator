@@ -7,9 +7,10 @@ const LeaseTerminationGenerator = () => {
   const [noticeType, setNoticeType] = useState(''); // 'landlord' or 'tenant'
   const [showChatbox, setShowChatbox] = useState(false);
   const [chatMessages, setChatMessages] = useState([
-    { type: 'assistant', text: 'Hi! I\'m here to help you create a lease termination notice. What questions do you have?' }
+    { type: 'assistant', text: 'Hi! I\'m your legal assistant for lease termination notices. I can help with notice periods, breach terms, landlord/tenant rights, and specific legal requirements. What questions do you have?' }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [isLoadingChat, setIsLoadingChat] = useState(false);
   
   // Form data state
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ const LeaseTerminationGenerator = () => {
     terminationDate: '',
     noticeReason: '',
     customReason: '',
+    breachTerms: [],
     moveOutDate: '',
     
     // Contact information
@@ -55,6 +57,20 @@ const LeaseTerminationGenerator = () => {
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    // Clear highlighting after 3 seconds
+    setTimeout(() => setLastChanged(null), 3000);
+  };
+
+  // Handle array changes (for breach terms)
+  const handleArrayChange = (name, value, checked) => {
+    setLastChanged(name);
+    setFormData(prev => ({
+      ...prev,
+      [name]: checked 
+        ? [...prev[name], value]
+        : prev[name].filter(item => item !== value)
     }));
     
     // Clear highlighting after 3 seconds
@@ -110,7 +126,11 @@ const LeaseTerminationGenerator = () => {
     } else if (noticeReason === 'month-to-month') {
       reasonText = 'termination of month-to-month tenancy';
     } else if (noticeReason === 'breach') {
-      reasonText = 'breach of lease terms';
+      if (formData.breachTerms.length > 0) {
+        reasonText = `breach of the following lease terms: ${formData.breachTerms.join(', ')}`;
+      } else {
+        reasonText = 'breach of lease terms';
+      }
     } else if (noticeReason === 'custom') {
       reasonText = customReason || '[REASON]';
     } else {
@@ -138,7 +158,7 @@ ${moveOutDate && moveOutDate !== terminationDate ? `You must vacate the premises
 
 ${securityDeposit ? `SECURITY DEPOSIT: ${securityDeposit}` : ''}
 
-${forwardingAddress ? `Please provide your forwarding address for return of security deposit and final communications: ${forwardingAddress}` : 'Please provide a forwarding address for return of security deposit and final communications.'}
+${forwardingAddress ? `FORWARDING ADDRESS PROVIDED: ${forwardingAddress}` : 'Please provide a forwarding address for return of security deposit and final communications.'}
 
 ${additionalTerms ? `ADDITIONAL TERMS: ${additionalTerms}` : ''}
 
@@ -205,31 +225,74 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
     setShowChatbox(!showChatbox);
   };
 
-  const sendChatMessage = () => {
-    if (!chatInput.trim()) return;
+  // Handle chatbox with Groq API
+  const sendChatMessage = async () => {
+    if (!chatInput.trim() || isLoadingChat) return;
     
     const userMessage = { type: 'user', text: chatInput };
     setChatMessages(prev => [...prev, userMessage]);
+    setIsLoadingChat(true);
     
-    // Simple AI responses based on keywords
-    let response = "I understand your question. For specific legal advice, I recommend scheduling a consultation with Attorney Sergei Tokmakov.";
-    
-    if (chatInput.toLowerCase().includes('notice period') || chatInput.toLowerCase().includes('how long')) {
-      response = "Notice periods vary by state and lease type. In California, 30 days notice is typically required for month-to-month tenancies. Fixed-term leases usually require notice before the lease ends. Check your lease agreement and local laws.";
-    } else if (chatInput.toLowerCase().includes('eviction') || chatInput.toLowerCase().includes('kick out')) {
-      response = "This generator creates termination notices, not eviction notices. Eviction is a legal process that requires court proceedings. A termination notice is the first step. If the tenant doesn't comply, formal eviction proceedings may be necessary.";
-    } else if (chatInput.toLowerCase().includes('security deposit')) {
-      response = "Security deposit return laws vary by state. In California, landlords typically have 21 days to return deposits or provide itemized deductions. Include your forwarding address in the notice for deposit return.";
-    } else if (chatInput.toLowerCase().includes('reason') || chatInput.toLowerCase().includes('why')) {
-      response = "Valid reasons for termination include lease expiration, month-to-month termination, lease violations, or other reasons specified in your lease. Make sure your reason is legally valid in your jurisdiction.";
-    }
-    
-    setTimeout(() => {
-      const assistantMessage = { type: 'assistant', text: response };
-      setChatMessages(prev => [...prev, assistantMessage]);
-    }, 1000);
-    
+    // Clear input immediately
+    const currentInput = chatInput;
     setChatInput('');
+    
+    try {
+      // Prepare context data for the API
+      const contextData = {
+        message: currentInput,
+        contractType: 'Lease Termination Notice',
+        formData: {
+          noticeType,
+          ...formData,
+          breachTermsCount: formData.breachTerms.length,
+          hasBreachTerms: formData.breachTerms.length > 0
+        },
+        documentText: documentText.substring(0, 3000), // Limit for API
+        conversationHistory: chatMessages.slice(-4), // Last 2 exchanges
+        isFollowUpQuestion: chatMessages.length > 1
+      };
+
+      // Call the Groq API
+      const response = await fetch('https://template.terms.law/api/lease-termination-chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contextData)
+      });
+
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      
+      const assistantMessage = { 
+        type: 'assistant', 
+        text: data.response || 'I apologize, but I encountered an issue. Please try again or schedule a consultation for detailed legal advice.'
+      };
+      
+      setChatMessages(prev => [...prev, assistantMessage]);
+      
+    } catch (error) {
+      console.error('Chat API error:', error);
+      
+      // Fallback responses for common topics when API fails
+      let fallbackResponse = "I'm having trouble connecting to my knowledge base right now. For immediate help, please schedule a consultation with Attorney Sergei Tokmakov.";
+      
+      const input = currentInput.toLowerCase();
+      if (input.includes('notice period') || input.includes('how long')) {
+        fallbackResponse = "**Notice Periods (General):** California typically requires 30 days notice for month-to-month tenancies, 3 days for non-payment of rent. Check your lease and local laws for specific requirements. For detailed advice, schedule a consultation.";
+      } else if (input.includes('breach') || input.includes('violation')) {
+        fallbackResponse = `**Breach Terms:** I see you're asking about ${noticeType === 'landlord' ? 'tenant' : 'landlord'} violations. The form includes common ${noticeType === 'landlord' ? 'tenant' : 'landlord'} breach terms. Select all that apply to your situation. For legal strategy, schedule a consultation.`;
+      }
+      
+      const assistantMessage = { type: 'assistant', text: fallbackResponse };
+      setChatMessages(prev => [...prev, assistantMessage]);
+    } finally {
+      setIsLoadingChat(false);
+    }
   };
   // Highlighting logic
   const getSectionToHighlight = () => {
@@ -245,7 +308,7 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
         break;
       case 2: // Termination Details
         if (['terminationDate', 'moveOutDate'].includes(lastChanged)) return 'dates';
-        if (['noticeReason', 'customReason'].includes(lastChanged)) return 'reason';
+        if (['noticeReason', 'customReason', 'breachTerms'].includes(lastChanged)) return 'reason';
         break;
       case 3: // Contact & Additional
         if (['contactMethod', 'contactInfo'].includes(lastChanged)) return 'contact';
@@ -289,6 +352,13 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
       }
     }
   }, [highlightedText, lastChanged]);
+
+  // Replace feather icons when component mounts
+  useEffect(() => {
+    if (window.feather) {
+      window.feather.replace();
+    }
+  }, [currentTab]);
   // Render tab content
   const renderTabContent = () => {
     switch (currentTab) {
@@ -439,6 +509,51 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
                 <option value="custom">Custom reason</option>
               </select>
             </div>
+
+            {formData.noticeReason === 'breach' && (
+              <div className="form-group">
+                <label>Breach Details (Select all that apply)</label>
+                <div className="checkbox-group">
+                  {(noticeType === 'landlord' ? [
+                    // Landlord-to-Tenant (Tenant Violations)
+                    'Non-payment of rent',
+                    'Unauthorized pets',
+                    'Excessive noise/disturbance',
+                    'Unauthorized occupants',
+                    'Property damage',
+                    'Illegal activity',
+                    'Violation of no-smoking policy',
+                    'Failure to maintain property cleanliness',
+                    'Subletting without permission',
+                    'Violation of parking rules',
+                    'Disturbing other tenants'
+                  ] : [
+                    // Tenant-to-Landlord (Landlord Violations)
+                    'Failure to maintain habitability',
+                    'Failure to make necessary repairs',
+                    'Illegal entry without proper notice',
+                    'Harassment or intimidation',
+                    'Failure to provide essential services',
+                    'Violation of quiet enjoyment',
+                    'Discrimination or retaliation',
+                    'Failure to return security deposit',
+                    'Breach of warranty of habitability',
+                    'Failure to comply with local housing codes',
+                    'Constructive eviction'
+                  ]).map(term => (
+                    <div key={term} className="checkbox-item">
+                      <input
+                        type="checkbox"
+                        id={term}
+                        checked={formData.breachTerms.includes(term)}
+                        onChange={(e) => handleArrayChange('breachTerms', term, e.target.checked)}
+                      />
+                      <label htmlFor={term}>{term}</label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {formData.noticeReason === 'custom' && (
               <div className="form-group">
@@ -610,6 +725,11 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
                 {message.text}
               </div>
             ))}
+            {isLoadingChat && (
+              <div className="message assistant">
+                <div className="spinner"></div> Thinking...
+              </div>
+            )}
           </div>
           
           <div className="chatbox-input">
@@ -617,11 +737,24 @@ Print Name: ${senderName || `[${senderRole.toUpperCase()} PRINTED NAME]`}`;
               type="text"
               value={chatInput}
               onChange={(e) => setChatInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && sendChatMessage()}
-              placeholder="Ask a question..."
+              onKeyPress={(e) => {
+                if (e.key === 'Enter' && !isLoadingChat) {
+                  sendChatMessage();
+                }
+              }}
+              placeholder={isLoadingChat ? "Thinking..." : "Ask a question..."}
+              disabled={isLoadingChat}
             />
-            <button onClick={sendChatMessage}>
-              <i data-feather="send"></i>
+            <button 
+              onClick={sendChatMessage}
+              disabled={isLoadingChat || !chatInput.trim()}
+              className={isLoadingChat ? 'loading' : ''}
+            >
+              {isLoadingChat ? (
+                <div className="spinner"></div>
+              ) : (
+                <i data-feather="send"></i>
+              )}
             </button>
           </div>
         </div>
