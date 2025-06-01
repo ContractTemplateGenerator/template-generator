@@ -154,7 +154,8 @@ const NDAAnalyzer = () => {
                 title: 'Broader Confidentiality Definition', 
                 description: `Expand the definition of confidential information to better protect ${party1}'s business interests`, 
                 originalText: 'Information disclosed in connection with this transaction', 
-                improvedText: `Any and all information, data, materials, or knowledge disclosed by ${party1}, whether written, oral, or in any other form, including technical data, business plans, and proprietary methodologies` 
+                improvedText: `Any and all information, data, materials, or knowledge disclosed by ${party1}, whether written, oral, or in any other form, including technical data, business plans, and proprietary methodologies`,
+                sectionReference: 'Section 1 (Definitions)' 
             },
             { 
                 id: 'suggestion_1', 
@@ -162,7 +163,8 @@ const NDAAnalyzer = () => {
                 title: 'Add Mutual Termination Rights', 
                 description: 'Ensure both parties have equal rights to terminate the agreement', 
                 originalText: 'This Agreement shall remain in effect indefinitely', 
-                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party' 
+                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party',
+                sectionReference: 'Section 3 (Term and Termination)' 
             },
             { 
                 id: 'suggestion_2', 
@@ -170,7 +172,8 @@ const NDAAnalyzer = () => {
                 title: 'Reasonable Disclosure Exceptions', 
                 description: `Add practical exceptions to reduce compliance burden for ${party2}`, 
                 originalText: `${party2} shall not disclose any information under any circumstances`, 
-                improvedText: `${party2} shall not disclose confidential information except as required by law, court order, or regulatory requirement with prior written notice to ${party1} where legally permissible` 
+                improvedText: `${party2} shall not disclose confidential information except as required by law, court order, or regulatory requirement with prior written notice to ${party1} where legally permissible`,
+                sectionReference: 'Section 4 (Use and Disclosure)' 
             },
             { 
                 id: 'suggestion_3', 
@@ -178,7 +181,8 @@ const NDAAnalyzer = () => {
                 title: 'Standard Exclusions Clause', 
                 description: 'Include industry-standard exclusions from confidentiality obligations', 
                 originalText: 'All disclosed information shall be deemed confidential', 
-                improvedText: 'Confidential Information excludes: (a) information in the public domain through no breach, (b) information independently developed, (c) information rightfully received from third parties' 
+                improvedText: 'Confidential Information excludes: (a) information in the public domain through no breach, (b) information independently developed, (c) information rightfully received from third parties',
+                sectionReference: 'Section 2 (Exclusions)' 
             }
         ];
     };
@@ -308,16 +312,65 @@ ${ndaText}`;
             
             if (response.ok) {
                 const data = await response.json();
-                setAnalysisResult({ htmlContent: data.response, recommendation: 'PERSONALIZED ANALYSIS', model: data.model, provider: data.provider });
+                const formattedHtml = formatAnalysisResponse(data.response);
+                setAnalysisResult({ htmlContent: formattedHtml, recommendation: 'PERSONALIZED ANALYSIS', model: data.model, provider: data.provider });
                 const suggestions = extractPersonalizedSuggestions(data.response);
                 setPersonalizedSuggestions(suggestions);
                 console.log('Extracted suggestions:', suggestions);
             } else {
                 throw new Error('API request failed');
             }
-        } catch (error) {
-            console.error('Analysis error:', error);
-            const fallbackHtml = `<div class="analysis-header"><h3>🛡️ Personalized NDA Risk Analysis</h3><p><strong>Parties:</strong> ${party1} and ${party2}</p></div><div class="recommendation moderate">CONTEXT-SPECIFIC ANALYSIS REQUIRED</div><div class="section"><div class="section-title">PERSONALIZED ASSESSMENT</div><p>This NDA involves <strong>${party1}</strong> and <strong>${party2}</strong>. Professional analysis requires reviewing specific clauses.</p></div>`;
+    const formatAnalysisResponse = (htmlContent) => {
+        // Clean up the analysis response to make it more organized
+        let formattedContent = htmlContent;
+        
+        // Replace wall of text suggestions with organized cards
+        formattedContent = formattedContent.replace(
+            /PERSONALIZED REDRAFT SUGGESTIONS:(.*?)(?=<\/div>|$)/is,
+            (match, content) => {
+                // Parse suggestions from the content
+                const suggestions = content.split(/IMPROVEMENTS FAVORING|NEUTRAL\/MUTUAL IMPROVEMENTS/i);
+                let organized = '<div class="suggestions-analysis-section">';
+                organized += '<h3 class="analysis-section-title">📋 Detailed Analysis Summary</h3>';
+                
+                suggestions.forEach((section, index) => {
+                    if (section.trim().length > 20) {
+                        const sectionTitle = index === 1 ? 'Improvements Favoring Disclosing Party' :
+                                           index === 2 ? 'Neutral/Mutual Improvements' :
+                                           index === 3 ? 'Improvements Favoring Receiving Party' :
+                                           'General Improvements';
+                        
+                        if (index > 0) {
+                            organized += `<div class="analysis-subsection">`;
+                            organized += `<h4 class="analysis-subsection-title">${sectionTitle}</h4>`;
+                            
+                            // Parse bullet points and format them nicely
+                            const bullets = section.split(/[•\-\*]/).filter(item => item.trim().length > 10);
+                            organized += '<ul class="analysis-suggestions-list">';
+                            bullets.forEach(bullet => {
+                                const cleanBullet = bullet.trim().replace(/Original:|Improved:/gi, '<strong>$&</strong>');
+                                if (cleanBullet.length > 10) {
+                                    organized += `<li class="analysis-suggestion-item">${cleanBullet}</li>`;
+                                }
+                            });
+                            organized += '</ul></div>';
+                        }
+                    }
+                });
+                
+                organized += '</div>';
+                return organized;
+            }
+        );
+        
+        // Format analysis sections better
+        formattedContent = formattedContent.replace(
+            /ANALYSIS FOR ([^:]+):/g,
+            '<h3 class="party-analysis-title">🎯 Analysis for $1:</h3>'
+        );
+        
+        return formattedContent;
+    };
             setAnalysisResult({ htmlContent: fallbackHtml, recommendation: 'PERSONALIZED FALLBACK ANALYSIS', model: 'Professional Analysis', provider: 'Terms.law Legal Guidance' });
             const fallbackSuggestions = [
                 { 
@@ -326,7 +379,8 @@ ${ndaText}`;
                     title: 'Broader Confidentiality Definition', 
                     description: `Expand the definition of confidential information to better protect ${party1}'s business interests`, 
                     originalText: '"Confidential Information" means information disclosed by one party to the other', 
-                    improvedText: `"Confidential Information" means any and all information, data, materials, or knowledge disclosed by ${party1} to ${party2}, whether written, oral, or in any other form` 
+                    improvedText: `"Confidential Information" means any and all information, data, materials, or knowledge disclosed by ${party1} to ${party2}, whether written, oral, or in any other form`,
+                    sectionReference: 'Section 1 (Definitions)' 
                 },
                 { 
                     id: 'suggestion_1', 
@@ -334,7 +388,8 @@ ${ndaText}`;
                     title: 'Add Mutual Termination Rights', 
                     description: 'Ensure both parties have equal rights to terminate the agreement', 
                     originalText: 'This Agreement shall remain in effect indefinitely', 
-                    improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party' 
+                    improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party',
+                    sectionReference: 'Section 3 (Term and Termination)' 
                 },
                 { 
                     id: 'suggestion_2', 
@@ -342,7 +397,8 @@ ${ndaText}`;
                     title: 'Reasonable Disclosure Exceptions', 
                     description: `Add reasonable exceptions to reduce compliance burden for ${party2}`, 
                     originalText: `${party2} shall not disclose any Confidential Information under any circumstances`, 
-                    improvedText: `${party2} shall not disclose Confidential Information except as required by law or court order with prior written notice to ${party1}` 
+                    improvedText: `${party2} shall not disclose Confidential Information except as required by law or court order with prior written notice to ${party1}`,
+                    sectionReference: 'Section 4 (Use and Disclosure)' 
                 },
                 { 
                     id: 'suggestion_3', 
@@ -350,7 +406,8 @@ ${ndaText}`;
                     title: 'Add Standard Exclusions', 
                     description: 'Include industry-standard exclusions from confidentiality obligations', 
                     originalText: 'All information disclosed shall be deemed confidential', 
-                    improvedText: 'Confidential Information excludes: (a) information in the public domain, (b) information independently developed, (c) information rightfully received from third parties' 
+                    improvedText: 'Confidential Information excludes: (a) information in the public domain, (b) information independently developed, (c) information rightfully received from third parties',
+                    sectionReference: 'Section 2 (Exclusions)' 
                 },
                 { 
                     id: 'suggestion_4', 
@@ -358,7 +415,8 @@ ${ndaText}`;
                     title: 'Add Injunctive Relief Rights', 
                     description: `Strengthen ${party1}'s remedies for breach of confidentiality`, 
                     originalText: 'Remedies for breach shall be limited to monetary damages', 
-                    improvedText: `${party1} shall be entitled to seek injunctive relief and other equitable remedies for any breach or threatened breach of this Agreement` 
+                    improvedText: `${party1} shall be entitled to seek injunctive relief and other equitable remedies for any breach or threatened breach of this Agreement`,
+                    sectionReference: 'Section 8 (Remedies)' 
                 },
                 { 
                     id: 'suggestion_5', 
@@ -366,7 +424,8 @@ ${ndaText}`;
                     title: 'Add Return of Information Clause', 
                     description: `Clarify ${party2}'s obligations upon termination`, 
                     originalText: 'Upon termination, all confidential information shall be destroyed', 
-                    improvedText: `Upon termination or request by ${party1}, ${party2} shall return or destroy all Confidential Information, with the option to retain one copy for legal compliance purposes` 
+                    improvedText: `Upon termination or request by ${party1}, ${party2} shall return or destroy all Confidential Information, with the option to retain one copy for legal compliance purposes`,
+                    sectionReference: 'Section 5 (Return of Information)' 
                 }
             ];
             setPersonalizedSuggestions(fallbackSuggestions);
@@ -381,29 +440,41 @@ ${ndaText}`;
     const generateFinalRedraft = () => {
         const party1 = extractedData.parties[0] || 'First Party';
         const party2 = extractedData.parties[1] || 'Second Party';
-        let redraftedText = `${ndaText}\n\n`;
-        
         const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
         
-        // Apply the selected improvements directly to the agreement text
         let amendedText = ndaText;
         
+        // Apply the selected improvements directly to the agreement text
         selectedSuggestions.forEach((suggestion, index) => {
-            // Try to find and replace the original text with improved text
             if (suggestion.originalText && suggestion.improvedText) {
-                // Clean the original text for matching (remove quotes and extra spaces)
                 const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                 const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                 
                 // Try exact match first
                 if (amendedText.includes(cleanOriginal)) {
                     amendedText = amendedText.replace(cleanOriginal, cleanImproved);
-                } else {
-                    // If no exact match, append as an amendment
-                    amendedText += `\n\nAMENDMENT ${index + 1}: ${suggestion.title}\n${cleanImproved}`;
                 }
             }
         });
+        
+        // Add revisions at the end for changes that couldn't be directly substituted
+        if (selectedSuggestions.length > 0) {
+            amendedText += `\n\n${'='.repeat(50)}\nREVISIONS AND CLARIFICATIONS\n${'='.repeat(50)}\n\n`;
+            
+            selectedSuggestions.forEach((suggestion, index) => {
+                const revisionNumber = index + 1;
+                amendedText += `REVISION ${revisionNumber}: ${suggestion.title}\n`;
+                amendedText += `Section: ${suggestion.sectionReference || 'General Provisions'}\n`;
+                amendedText += `Type: ${suggestion.category === 'favoringParty1' ? `Favoring ${party1}` : 
+                                       suggestion.category === 'favoringParty2' ? `Favoring ${party2}` : 
+                                       'Neutral/Mutual'}\n\n`;
+                
+                amendedText += `Current Language:\n"${suggestion.originalText}"\n\n`;
+                amendedText += `Revised Language:\n"${suggestion.improvedText}"\n\n`;
+                amendedText += `Rationale: ${suggestion.description}\n\n`;
+                amendedText += `${'-'.repeat(60)}\n\n`;
+            });
+        }
         
         return amendedText;
     };
@@ -432,9 +503,29 @@ ${ndaText}`;
         const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
         let highlightedText = baseText;
         
-        // Format text into proper paragraphs
-        highlightedText = highlightedText.replace(/\n\n/g, '</p><p>');
-        highlightedText = '<p>' + highlightedText + '</p>';
+        // Format text into proper legal document paragraphs
+        // Split by double newlines and wrap each paragraph in <p> tags
+        const paragraphs = highlightedText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+        highlightedText = paragraphs.map(paragraph => {
+            // Handle special formatting for section headers and legal formatting
+            const trimmedPara = paragraph.trim();
+            
+            // Check if it's a section header (all caps or starts with numbers/sections)
+            if (trimmedPara.match(/^[A-Z\s]{10,}$/) || 
+                trimmedPara.match(/^\d+\./) || 
+                trimmedPara.match(/^SECTION|^ARTICLE|^REVISION|^WHEREAS/)) {
+                return `<p class="legal-header"><strong>${trimmedPara}</strong></p>`;
+            }
+            
+            // Check if it's an "IN WITNESS WHEREOF" or signature section
+            if (trimmedPara.includes('IN WITNESS WHEREOF') || 
+                trimmedPara.includes('X: _____') ||
+                trimmedPara.match(/^[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+$/)) {
+                return `<p class="legal-signature">${trimmedPara}</p>`;
+            }
+            
+            return `<p class="legal-paragraph">${trimmedPara}</p>`;
+        }).join('');
         
         // Highlight only the improved text content that was actually changed
         selectedSuggestions.forEach(suggestion => {
@@ -482,7 +573,7 @@ ${ndaText}`;
         }
     };
 
-    const downloadRedraft = () => {
+    const downloadTextRedraft = () => {
         const redraft = generateCleanRedraft();
         const blob = new Blob([redraft], { type: 'text/plain' });
         const link = document.createElement('a');
@@ -491,6 +582,220 @@ ${ndaText}`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+    };
+
+    const downloadWordWithRedlines = () => {
+        const redraft = generateCleanRedraft();
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        
+        try {
+            console.log("Download MS Word button clicked");
+            
+            // Create HTML content for Word document with redlined changes
+            let wordContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA - Redlined Version</title>
+<style>
+  body {
+    font-family: "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+  }
+  .legal-paragraph {
+    margin-bottom: 12pt;
+    text-align: justify;
+  }
+  .legal-header {
+    font-weight: bold;
+    margin-top: 18pt;
+    margin-bottom: 12pt;
+    text-align: center;
+  }
+  .revision-section {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 12pt;
+    margin: 12pt 0;
+  }
+  .deleted-text {
+    text-decoration: line-through;
+    color: red;
+  }
+  .inserted-text {
+    background-color: yellow;
+    color: blue;
+  }
+  .revision-note {
+    color: blue;
+    font-style: italic;
+    margin: 6pt 0;
+  }
+</style>
+</head>
+<body>
+`;
+
+            // Process the original text and apply redlining
+            let processedText = ndaText;
+            
+            selectedSuggestions.forEach(suggestion => {
+                if (suggestion.originalText && suggestion.improvedText) {
+                    const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                    const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                    
+                    if (processedText.includes(cleanOriginal)) {
+                        // Create redlined version showing both deleted and inserted text
+                        const redlinedReplacement = `<span class="deleted-text">${cleanOriginal}</span> <span class="inserted-text">${cleanImproved}</span>`;
+                        processedText = processedText.replace(cleanOriginal, redlinedReplacement);
+                    }
+                }
+            });
+            
+            // Convert to HTML paragraphs
+            const paragraphs = processedText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+            paragraphs.forEach(paragraph => {
+                const trimmedPara = paragraph.trim();
+                if (trimmedPara.match(/^[A-Z\s]{10,}$/) || trimmedPara.match(/^\d+\./) || trimmedPara.match(/^SECTION|^ARTICLE/)) {
+                    wordContent += `<p class="legal-header">${trimmedPara}</p>`;
+                } else {
+                    wordContent += `<p class="legal-paragraph">${trimmedPara}</p>`;
+                }
+            });
+            
+            // Add revision summary
+            if (selectedSuggestions.length > 0) {
+                wordContent += `<div class="revision-section">`;
+                wordContent += `<h2>REVISION SUMMARY</h2>`;
+                selectedSuggestions.forEach((suggestion, index) => {
+                    wordContent += `<div class="revision-note">Revision ${index + 1}: ${suggestion.description}</div>`;
+                });
+                wordContent += `</div>`;
+            }
+            
+            wordContent += '</body></html>';
+            
+            // Create and download the file
+            const blob = new Blob([wordContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `NDA_Redlined_${new Date().toISOString().split('T')[0]}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log("Redlined Word document generated and download triggered");
+            
+        } catch (error) {
+            console.error("Error generating Word document:", error);
+            alert("Error generating Word document. Please try again or use the copy option.");
+        }
+    };
+
+    const downloadWordWithRedlines = () => {
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        let wordContent = generateWordDocumentWithRedlines();
+        
+        const blob = new Blob([wordContent], { 
+            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+        });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = `NDA_Redlined_Changes_${new Date().toISOString().split('T')[0]}.doc`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    const generateWordDocumentWithRedlines = () => {
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        let wordHtml = `
+<!DOCTYPE html>
+<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word" xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<meta charset="utf-8">
+<title>NDA with Tracked Changes</title>
+<style>
+body {
+    font-family: Calibri, Arial, sans-serif;
+    font-size: 12pt;
+    line-height: 1.15;
+    margin: 1in;
+}
+.deleted {
+    color: red;
+    text-decoration: line-through;
+}
+.inserted {
+    color: blue;
+    text-decoration: underline;
+}
+.revision-comment {
+    background-color: #ffffcc;
+    border-left: 3px solid #ffcc00;
+    padding: 5pt;
+    margin: 10pt 0;
+    font-style: italic;
+    font-size: 10pt;
+}
+h1, h2 {
+    color: #1f497d;
+}
+p {
+    margin-bottom: 6pt;
+}
+</style>
+</head>
+<body>`;
+
+        let processedText = ndaText;
+        
+        // Apply redlined changes
+        selectedSuggestions.forEach((suggestion, index) => {
+            if (suggestion.originalText && suggestion.improvedText) {
+                const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                
+                if (processedText.includes(cleanOriginal)) {
+                    const redlinedChange = `<span class="deleted">${cleanOriginal}</span> <span class="inserted">${cleanImproved}</span>`;
+                    processedText = processedText.replace(cleanOriginal, redlinedChange);
+                    
+                    // Add revision comment
+                    processedText += `<div class="revision-comment">
+                        <strong>Revision ${index + 1}:</strong> ${suggestion.title}<br>
+                        <strong>Rationale:</strong> ${suggestion.description}
+                    </div>`;
+                }
+            }
+        });
+        
+        // Convert line breaks to HTML paragraphs
+        const paragraphs = processedText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
+        const htmlContent = paragraphs.map(paragraph => {
+            const trimmedPara = paragraph.trim();
+            if (trimmedPara.match(/^[A-Z\s]{10,}$/) || trimmedPara.match(/^\d+\./)) {
+                return `<h2>${trimmedPara}</h2>`;
+            }
+            return `<p>${trimmedPara}</p>`;
+        }).join('');
+        
+        wordHtml += htmlContent;
+        wordHtml += `
+<div class="revision-comment">
+    <strong>Document Information:</strong><br>
+    Original Agreement modified with ${selectedSuggestions.length} revision(s)<br>
+    Generated on: ${new Date().toLocaleDateString()}<br>
+    Analysis by: Sergei Tokmakov, Esq., CA Bar #279869<br>
+    Tool: NDA Risk Analyzer (template.terms.law)
+</div>
+</body>
+</html>`;
+
+        return wordHtml;
     };
     const scheduleConsultation = () => {
         if (window.Calendly) {
@@ -640,7 +945,10 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                                 <i data-feather="file-text"></i> Copy with Notes
                                             </button>
                                             <button className="redraft-btn download-btn" onClick={downloadRedraft} disabled={getTotalSelectedChanges() === 0}>
-                                                <i data-feather="download"></i> Download Redraft
+                                                <i data-feather="download"></i> Download Text
+                                            </button>
+                                            <button className="redraft-btn download-btn" onClick={downloadWordWithRedlines} disabled={getTotalSelectedChanges() === 0} style={{backgroundColor: "#2563eb"}}>
+                                                <i data-feather="file-text"></i> Download Word (Redlined)
                                             </button>
                                             <button className="redraft-btn preview-btn" onClick={() => setShowRedraftPreview(!showRedraftPreview)} disabled={getTotalSelectedChanges() === 0}>
                                                 <i data-feather="eye"></i> {showRedraftPreview ? 'Hide Preview' : 'Preview Changes'}
