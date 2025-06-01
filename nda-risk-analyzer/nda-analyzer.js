@@ -151,7 +151,7 @@ const NDAAnalyzer = () => {
             { 
                 id: 'suggestion_0', 
                 category: 'favoringParty1', 
-                title: `Broader Confidentiality Definition`, 
+                title: 'Broader Confidentiality Definition', 
                 description: `Expand the definition of confidential information to better protect ${party1}'s business interests`, 
                 originalText: 'Information disclosed in connection with this transaction', 
                 improvedText: `Any and all information, data, materials, or knowledge disclosed by ${party1}, whether written, oral, or in any other form, including technical data, business plans, and proprietary methodologies` 
@@ -167,7 +167,7 @@ const NDAAnalyzer = () => {
             { 
                 id: 'suggestion_2', 
                 category: 'favoringParty2', 
-                title: `Reasonable Disclosure Exceptions`, 
+                title: 'Reasonable Disclosure Exceptions', 
                 description: `Add practical exceptions to reduce compliance burden for ${party2}`, 
                 originalText: `${party2} shall not disclose any information under any circumstances`, 
                 improvedText: `${party2} shall not disclose confidential information except as required by law, court order, or regulatory requirement with prior written notice to ${party1} where legally permissible` 
@@ -323,7 +323,7 @@ ${ndaText}`;
                 { 
                     id: 'suggestion_0', 
                     category: 'favoringParty1', 
-                    title: `Add Broader Confidentiality Definition for ${party1}`, 
+                    title: 'Broader Confidentiality Definition', 
                     description: `Expand the definition of confidential information to better protect ${party1}'s business interests`, 
                     originalText: '"Confidential Information" means information disclosed by one party to the other', 
                     improvedText: `"Confidential Information" means any and all information, data, materials, or knowledge disclosed by ${party1} to ${party2}, whether written, oral, or in any other form` 
@@ -339,7 +339,7 @@ ${ndaText}`;
                 { 
                     id: 'suggestion_2', 
                     category: 'favoringParty2', 
-                    title: `Limit ${party2}'s Disclosure Obligations`, 
+                    title: 'Reasonable Disclosure Exceptions', 
                     description: `Add reasonable exceptions to reduce compliance burden for ${party2}`, 
                     originalText: `${party2} shall not disclose any Confidential Information under any circumstances`, 
                     improvedText: `${party2} shall not disclose Confidential Information except as required by law or court order with prior written notice to ${party1}` 
@@ -355,7 +355,7 @@ ${ndaText}`;
                 { 
                     id: 'suggestion_4', 
                     category: 'favoringParty1', 
-                    title: `Add Injunctive Relief Rights for ${party1}`, 
+                    title: 'Add Injunctive Relief Rights', 
                     description: `Strengthen ${party1}'s remedies for breach of confidentiality`, 
                     originalText: 'Remedies for breach shall be limited to monetary damages', 
                     improvedText: `${party1} shall be entitled to seek injunctive relief and other equitable remedies for any breach or threatened breach of this Agreement` 
@@ -363,7 +363,7 @@ ${ndaText}`;
                 { 
                     id: 'suggestion_5', 
                     category: 'favoringParty2', 
-                    title: `Add Return of Information Clause for ${party2}`, 
+                    title: 'Add Return of Information Clause', 
                     description: `Clarify ${party2}'s obligations upon termination`, 
                     originalText: 'Upon termination, all confidential information shall be destroyed', 
                     improvedText: `Upon termination or request by ${party1}, ${party2} shall return or destroy all Confidential Information, with the option to retain one copy for legal compliance purposes` 
@@ -381,50 +381,50 @@ ${ndaText}`;
     const generateFinalRedraft = () => {
         const party1 = extractedData.parties[0] || 'First Party';
         const party2 = extractedData.parties[1] || 'Second Party';
-        let redraftedText = `PERSONALIZED NDA REDRAFT\n\nBetween: ${party1} and ${party2}\n\nSELECTED IMPROVEMENTS:\n\n`;
+        let redraftedText = `${ndaText}\n\n`;
         
         const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
         
-        const categories = {
-            favoringParty1: `IMPROVEMENTS FAVORING ${party1.toUpperCase()}`,
-            neutral: 'NEUTRAL/MUTUAL IMPROVEMENTS',
-            favoringParty2: `IMPROVEMENTS FAVORING ${party2.toUpperCase()}`
-        };
+        // Apply the selected improvements directly to the agreement text
+        let amendedText = ndaText;
         
-        Object.keys(categories).forEach(category => {
-            const categorySuggestions = selectedSuggestions.filter(s => s.category === category);
-            if (categorySuggestions.length > 0) {
-                redraftedText += `\n${categories[category]}:\n`;
-                redraftedText += `${'='.repeat(categories[category].length)}\n\n`;
+        selectedSuggestions.forEach((suggestion, index) => {
+            // Try to find and replace the original text with improved text
+            if (suggestion.originalText && suggestion.improvedText) {
+                // Clean the original text for matching (remove quotes and extra spaces)
+                const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                 
-                categorySuggestions.forEach((suggestion, index) => {
-                    redraftedText += `${index + 1}. ${suggestion.title}\n`;
-                    redraftedText += `   Description: ${suggestion.description}\n\n`;
-                    redraftedText += `   ORIGINAL LANGUAGE:\n`;
-                    redraftedText += `   "${suggestion.originalText}"\n\n`;
-                    redraftedText += `   IMPROVED LANGUAGE:\n`;
-                    redraftedText += `   "${suggestion.improvedText}"\n\n`;
-                    redraftedText += `   ${'─'.repeat(60)}\n\n`;
-                });
+                // Try exact match first
+                if (amendedText.includes(cleanOriginal)) {
+                    amendedText = amendedText.replace(cleanOriginal, cleanImproved);
+                } else {
+                    // If no exact match, append as an amendment
+                    amendedText += `\n\nAMENDMENT ${index + 1}: ${suggestion.title}\n${cleanImproved}`;
+                }
             }
         });
         
-        if (selectedSuggestions.length === 0) {
-            redraftedText += `\nNo specific improvements selected. Please select suggestions above to generate a personalized redraft.\n\n`;
-        }
+        return amendedText;
+    };
+
+    const generateCleanRedraft = () => {
+        const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
+        let cleanText = ndaText;
         
-        redraftedText += `\nORIGINAL AGREEMENT:\n`;
-        redraftedText += `${'='.repeat(20)}\n\n`;
-        redraftedText += `${ndaText}\n\n`;
+        // Apply improvements directly to the text
+        selectedSuggestions.forEach(suggestion => {
+            if (suggestion.originalText && suggestion.improvedText) {
+                const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                
+                if (cleanText.includes(cleanOriginal)) {
+                    cleanText = cleanText.replace(cleanOriginal, cleanImproved);
+                }
+            }
+        });
         
-        redraftedText += `\nATTORNEY CERTIFICATION:\n`;
-        redraftedText += `This personalized redraft incorporates ${selectedSuggestions.length} selected improvement(s).\n`;
-        redraftedText += `Analysis by: Sergei Tokmakov, Esq.\n`;
-        redraftedText += `California Bar #279869\n`;
-        redraftedText += `Date: ${new Date().toLocaleDateString()}\n`;
-        redraftedText += `Tool: NDA Risk Analyzer (template.terms.law)`;
-        
-        return redraftedText;
+        return cleanText;
     };
 
     const generateHighlightedPreview = () => {
@@ -432,22 +432,23 @@ ${ndaText}`;
         const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
         let highlightedText = baseText;
         
-        // Highlight only the actual suggestion content, not metadata
+        // Format text into proper paragraphs
+        highlightedText = highlightedText.replace(/\n\n/g, '</p><p>');
+        highlightedText = '<p>' + highlightedText + '</p>';
+        
+        // Highlight only the improved text content that was actually changed
         selectedSuggestions.forEach(suggestion => {
-            // Highlight the suggestion title (but avoid metadata words)
-            if (suggestion.title && suggestion.title.length > 5 && 
-                !suggestion.title.toLowerCase().includes('original:') && 
-                !suggestion.title.toLowerCase().includes('improved:')) {
-                const titlePattern = new RegExp(`(${suggestion.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-                highlightedText = highlightedText.replace(titlePattern, '<mark class="highlight-change">$1</mark>');
-            }
-            
-            // Highlight the improved text content (but not the label)
             if (suggestion.improvedText && suggestion.improvedText.length > 10) {
-                // Escape the text for regex and highlight only the quoted content
-                const improvedTextEscaped = suggestion.improvedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                const improvedPattern = new RegExp(`("${improvedTextEscaped}")`, 'gi');
+                const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                // Escape the text for regex and highlight the actual improved content
+                const improvedTextEscaped = cleanImproved.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const improvedPattern = new RegExp(`(${improvedTextEscaped})`, 'gi');
                 highlightedText = highlightedText.replace(improvedPattern, '<mark class="highlight-improvement">$1</mark>');
+            }
+        });
+        
+        return highlightedText;
+    };
             }
         });
         
@@ -455,10 +456,10 @@ ${ndaText}`;
     };
 
     const copyRedraftToClipboard = async () => {
-        const redraft = generateFinalRedraft();
+        const redraft = generateCleanRedraft();
         try {
             await navigator.clipboard.writeText(redraft);
-            alert('Personalized redraft copied to clipboard!');
+            alert('Clean redrafted agreement copied to clipboard!');
         } catch (error) {
             const textArea = document.createElement('textarea');
             textArea.value = redraft;
@@ -466,16 +467,32 @@ ${ndaText}`;
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            alert('Personalized redraft copied to clipboard!');
+            alert('Clean redrafted agreement copied to clipboard!');
+        }
+    };
+
+    const copyOriginalToClipboard = async () => {
+        const original = generateFinalRedraft();
+        try {
+            await navigator.clipboard.writeText(original);
+            alert('Redraft with annotations copied to clipboard!');
+        } catch (error) {
+            const textArea = document.createElement('textarea');
+            textArea.value = original;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            alert('Redraft with annotations copied to clipboard!');
         }
     };
 
     const downloadRedraft = () => {
-        const redraft = generateFinalRedraft();
+        const redraft = generateCleanRedraft();
         const blob = new Blob([redraft], { type: 'text/plain' });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
-        link.download = `Personalized_NDA_Redraft_${new Date().toISOString().split('T')[0]}.txt`;
+        link.download = `Redrafted_NDA_${new Date().toISOString().split('T')[0]}.txt`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -597,15 +614,14 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                                         checked={selectedChanges[suggestion.id] || false}
                                                         onChange={(e) => handleSuggestionChange(suggestion.id, e.target.checked)}
                                                     />
-                                                    <label htmlFor={suggestion.id} className="suggestion-title">{suggestion.title}</label>
                                                     <span className={`category-badge ${suggestion.category}`}>
-                                                        {suggestion.category === 'favoringParty1' ? `Favoring ${extractedData.parties[0] || 'First Party'}` :
-                                                         suggestion.category === 'favoringParty2' ? `Favoring ${extractedData.parties[1] || 'Second Party'}` :
+                                                        {suggestion.category === 'favoringParty1' ? `Favoring ${extractedData.parties[0] || 'Disclosing Party'}` :
+                                                         suggestion.category === 'favoringParty2' ? `Favoring ${extractedData.parties[1] || 'Receiving Party'}` :
                                                          'Neutral/Mutual'}
                                                     </span>
                                                 </div>
                                                 <div className="suggestion-content">
-                                                    <div className="suggestion-description">{suggestion.description}</div>
+                                                    <div className="suggestion-description">• {suggestion.description}</div>
                                                     <div className="suggestion-comparison">
                                                         <div className="original-text">
                                                             <strong>Current Language:</strong><br />
@@ -623,7 +639,10 @@ The more complete the text, the more personalized the analysis." value={ndaText}
                                     <div className="redraft-actions-fullwidth">
                                         <div className="redraft-buttons-fullwidth">
                                             <button className="redraft-btn copy-btn" onClick={copyRedraftToClipboard} disabled={getTotalSelectedChanges() === 0}>
-                                                <i data-feather="copy"></i> Copy Personalized Redraft
+                                                <i data-feather="copy"></i> Copy Clean Agreement
+                                            </button>
+                                            <button className="redraft-btn copy-btn" onClick={copyOriginalToClipboard} disabled={getTotalSelectedChanges() === 0} style={{backgroundColor: "#6366f1"}}>
+                                                <i data-feather="file-text"></i> Copy with Notes
                                             </button>
                                             <button className="redraft-btn download-btn" onClick={downloadRedraft} disabled={getTotalSelectedChanges() === 0}>
                                                 <i data-feather="download"></i> Download Redraft
