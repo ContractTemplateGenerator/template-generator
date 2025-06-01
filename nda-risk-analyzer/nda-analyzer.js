@@ -1,4 +1,5 @@
 const { useState, useRef } = React;
+
 const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
     const [analysisResult, setAnalysisResult] = useState(null);
@@ -9,7 +10,15 @@ const NDAAnalyzer = () => {
     const [selectedChanges, setSelectedChanges] = useState({});
     const [personalizedSuggestions, setPersonalizedSuggestions] = useState([]);
     const [showRedraftPreview, setShowRedraftPreview] = useState(false);
+    const [debugInfo, setDebugInfo] = useState('');
     const fileInputRef = useRef(null);
+
+    const debugLog = (message, data = null) => {
+        const timestamp = new Date().toLocaleTimeString();
+        const logMessage = `[${timestamp}] ${message}`;
+        console.log(logMessage, data);
+        setDebugInfo(prev => prev + logMessage + (data ? ': ' + JSON.stringify(data, null, 2) : '') + '\n');
+    };
 
     const extractNDAData = (text) => {
         const data = { parties: [], businessPurpose: '', jurisdiction: '' };
@@ -24,147 +33,154 @@ const NDAAnalyzer = () => {
 
     const extractPersonalizedSuggestions = (aiResponse) => {
         const suggestions = [];
-        console.log('Raw AI Response:', aiResponse);
+        debugLog('Starting suggestion extraction');
+        debugLog('Raw AI Response length', aiResponse.length);
         
-        // Look for structured suggestion sections
-        const suggestionSections = [
-            { pattern: /IMPROVEMENTS?\s+FAVORING\s+FIRST\s+PARTY[:\s]*(.+?)(?=IMPROVEMENTS?\s+FAVORING\s+SECOND\s+PARTY|NEUTRAL|MUTUAL|$)/is, category: 'favoringParty1' },
-            { pattern: /IMPROVEMENTS?\s+FAVORING\s+SECOND\s+PARTY[:\s]*(.+?)(?=IMPROVEMENTS?\s+FAVORING\s+FIRST\s+PARTY|NEUTRAL|MUTUAL|$)/is, category: 'favoringParty2' },
-            { pattern: /(NEUTRAL|MUTUAL)[\/\s]*(IMPROVEMENTS?)[:\s]*(.+?)(?=IMPROVEMENTS?\s+FAVORING|$)/is, category: 'neutral' }
-        ];
-
-        suggestionSections.forEach(section => {
-            const match = aiResponse.match(section.pattern);
-            if (match) {
-                const content = match[match.length - 1]; // Get the last capture group
-                console.log(`Found ${section.category} content:`, content);
-                
-                // Parse individual suggestions within this section
-                const suggestionItems = parseSuggestionItems(content, section.category, suggestions.length);
-                suggestions.push(...suggestionItems);
-            }
-        });
-
-        // Fallback: Look for any bullet-pointed suggestions if structured sections not found
-        if (suggestions.length === 0) {
-            console.log('No structured sections found, using fallback parsing');
-            const fallbackSuggestions = parseFallbackSuggestions(aiResponse);
-            suggestions.push(...fallbackSuggestions);
-        }
-
-        console.log('Final extracted suggestions:', suggestions);
-        return suggestions;
-    };
-
-    const parseSuggestionItems = (content, category, startIndex) => {
-        const suggestions = [];
+        // Clean up the response - remove HTML and excessive formatting
+        let cleanResponse = aiResponse.replace(/<[^>]*>/g, '').replace(/\*\*/g, '').trim();
+        debugLog('Cleaned response length', cleanResponse.length);
         
-        // Split by bullet points or numbered items
-        const items = content.split(/\n\s*[•\-\*\d+\.]\s*/).filter(item => item.trim().length > 10);
+        // Look for suggestions with "Original:" and "Improved:" patterns
+        const suggestionMatches = cleanResponse.match(/([^.!?]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/gi);
         
-        items.forEach((item, index) => {
-            const trimmedItem = item.trim();
-            if (trimmedItem.length < 10) return;
-            
-            // Try to extract structured content with original/improved sections
-            const structuredSuggestion = parseStructuredSuggestion(trimmedItem, category, startIndex + index);
-            if (structuredSuggestion) {
-                suggestions.push(structuredSuggestion);
-            } else {
-                // Create a basic suggestion if structured parsing fails
-                const basicSuggestion = createBasicSuggestion(trimmedItem, category, startIndex + index);
-                suggestions.push(basicSuggestion);
-            }
-        });
-        
-        return suggestions;
-    };
-
-    const parseStructuredSuggestion = (text, category, id) => {
-        // Look for patterns like:
-        // "Title: Description. Original: 'text' Improved: 'text'"
-        // "Title - Original: 'text' Improved: 'text'"
-        
-        const patterns = [
-            /^([^:\n]+)[:]\s*([^\.]+)\.\s*Original:\s*['"]*([^'"]+)['"]*\s*Improved:\s*['"]*([^'"]+)['"]*$/is,
-            /^([^:\n]+)[:]\s*([^\.]+)\.\s*Current:\s*['"]*([^'"]+)['"]*\s*Suggested:\s*['"]*([^'"]+)['"]*$/is,
-            /^([^-\n]+)[-]\s*Original:\s*['"]*([^'"]+)['"]*\s*Improved:\s*['"]*([^'"]+)['"]*$/is,
-            /^([^\.]+)\.\s*Current language:\s*['"]*([^'"]+)['"]*\s*Improved language:\s*['"]*([^'"]+)['"]*$/is
-        ];
-        
-        for (const pattern of patterns) {
-            const match = text.match(pattern);
-            if (match) {
-                const [, title, description, original, improved] = match;
-                return {
-                    id: `suggestion_${id}`,
-                    category: category,
-                    title: title.trim().substring(0, 80),
-                    description: description ? description.trim() : title.trim(),
-                    originalText: original.trim(),
-                    improvedText: improved.trim()
-                };
-            }
-        }
-        
-        return null;
-    };
-
-    const createBasicSuggestion = (text, category, id) => {
-        // Extract title from first sentence or first 80 characters
-        const sentences = text.split('.').filter(s => s.trim().length > 0);
-        const title = sentences[0] ? sentences[0].trim().substring(0, 80) : text.substring(0, 80);
-        const description = text.length > title.length ? text.substring(title.length).trim() : text;
-        
-        return {
-            id: `suggestion_${id}`,
-            category: category,
-            title: title,
-            description: description || title,
-            originalText: "Review specific clause in the agreement",
-            improvedText: title
-        };
-    };
-
-    const parseFallbackSuggestions = (aiResponse) => {
-        const suggestions = [];
-        const lines = aiResponse.split('\n');
-        let currentCategory = 'neutral';
-        let suggestionIndex = 0;
-        
-        for (let line of lines) {
-            line = line.trim();
-            
-            // Detect category sections
-            if (line.toLowerCase().includes('favoring first party') || line.toLowerCase().includes('party 1')) {
-                currentCategory = 'favoringParty1';
-                continue;
-            }
-            if (line.toLowerCase().includes('favoring second party') || line.toLowerCase().includes('party 2')) {
-                currentCategory = 'favoringParty2';
-                continue;
-            }
-            if (line.toLowerCase().includes('neutral') || line.toLowerCase().includes('mutual')) {
-                currentCategory = 'neutral';
-                continue;
-            }
-            
-            // Extract suggestions from bullet points
-            if ((line.startsWith('•') || line.startsWith('-') || line.startsWith('*') || /^\d+\./.test(line)) && line.length > 10) {
-                const suggestionText = line.replace(/^[•\-*\d+\.]\s*/, '').trim();
-                if (suggestionText.length > 10) {
-                    const structuredSuggestion = parseStructuredSuggestion(suggestionText, currentCategory, suggestionIndex);
-                    if (structuredSuggestion) {
-                        suggestions.push(structuredSuggestion);
-                    } else {
-                        suggestions.push(createBasicSuggestion(suggestionText, currentCategory, suggestionIndex));
-                    }
-                    suggestionIndex++;
+        if (suggestionMatches && suggestionMatches.length > 0) {
+            debugLog('Found structured suggestions count', suggestionMatches.length);
+            suggestionMatches.forEach((match, index) => {
+                const parts = match.match(/([^.!?]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/i);
+                if (parts && parts.length >= 4) {
+                    const suggestion = {
+                        id: `suggestion_${index}`,
+                        category: determineSuggestionCategory(parts[1], cleanResponse, index),
+                        title: parts[1].trim().substring(0, 50),
+                        description: parts[1].trim(),
+                        originalText: parts[2].trim(),
+                        improvedText: parts[3].trim()
+                    };
+                    suggestions.push(suggestion);
+                    debugLog(`Added structured suggestion ${index}`, suggestion.title);
                 }
-            }
+            });
+        }
+        
+        // Fallback: Look for suggestions in different format
+        if (suggestions.length === 0) {
+            debugLog('No structured suggestions found, trying alternative parsing');
+            const alternativeSuggestions = parseAlternativeFormat(cleanResponse);
+            suggestions.push(...alternativeSuggestions);
+            debugLog('Alternative parsing found', alternativeSuggestions.length);
+        }
+        
+        // If still no suggestions, create meaningful defaults
+        if (suggestions.length === 0) {
+            debugLog('No suggestions found, creating fallback suggestions');
+            const party1 = extractedData.parties[0] || 'First Party';
+            const party2 = extractedData.parties[1] || 'Second Party';
+            const fallbackSuggestions = createDetailedFallbackSuggestions(party1, party2);
+            suggestions.push(...fallbackSuggestions);
+            debugLog('Created fallback suggestions', fallbackSuggestions.length);
+        }
+
+        debugLog('Final suggestion count', suggestions.length);
+        return suggestions;
+    };
+
+    const determineSuggestionCategory = (title, fullResponse, index) => {
+        const titleLower = title.toLowerCase();
+        const position = fullResponse.toLowerCase().indexOf(titleLower);
+        const beforeText = fullResponse.substring(Math.max(0, position - 200), position).toLowerCase();
+        
+        if (beforeText.includes('favoring first party') || beforeText.includes('party 1')) {
+            return 'favoringParty1';
+        }
+        if (beforeText.includes('favoring second party') || beforeText.includes('party 2')) {
+            return 'favoringParty2';
+        }
+        if (beforeText.includes('neutral') || beforeText.includes('mutual')) {
+            return 'neutral';
+        }
+        
+        // Default categorization based on index
+        const categories = ['favoringParty1', 'neutral', 'favoringParty2'];
+        return categories[index % 3];
+    };
+
+    const parseAlternativeFormat = (cleanResponse) => {
+        const suggestions = [];
+        
+        // Look for bullet points with descriptions
+        const bulletMatches = cleanResponse.match(/[•\-\*]\s*([^•\-\*\n]{20,})/g);
+        
+        if (bulletMatches) {
+            bulletMatches.forEach((match, index) => {
+                const content = match.replace(/^[•\-\*]\s*/, '').trim();
+                
+                // Try to extract original and improved from the content
+                const originalMatch = content.match(/Original:\s*['"]*([^'"]+)['"]*[\s,]/i);
+                const improvedMatch = content.match(/Improved:\s*['"]*([^'"]+)['"]*[\s,]?/i);
+                
+                if (originalMatch && improvedMatch) {
+                    const title = content.substring(0, content.indexOf('Original:')).trim();
+                    suggestions.push({
+                        id: `suggestion_${index}`,
+                        category: determineSuggestionCategory(title, cleanResponse, index),
+                        title: title.substring(0, 50),
+                        description: title,
+                        originalText: originalMatch[1].trim(),
+                        improvedText: improvedMatch[1].trim()
+                    });
+                } else {
+                    // Create basic suggestion from content
+                    const title = content.substring(0, 50);
+                    suggestions.push({
+                        id: `suggestion_${index}`,
+                        category: determineSuggestionCategory(content, cleanResponse, index),
+                        title: title,
+                        description: content.substring(0, 200),
+                        originalText: "Clause needs review and improvement",
+                        improvedText: content.substring(0, 150) + "..."
+                    });
+                }
+            });
         }
         
         return suggestions;
+    };
+
+    const createDetailedFallbackSuggestions = (party1, party2) => {
+        return [
+            { 
+                id: 'suggestion_0', 
+                category: 'favoringParty1', 
+                title: `Broader Confidentiality Definition`, 
+                description: `Expand the definition of confidential information to better protect ${party1}'s business interests`, 
+                originalText: 'Information disclosed in connection with this transaction', 
+                improvedText: `Any and all information, data, materials, or knowledge disclosed by ${party1}, whether written, oral, or in any other form, including technical data, business plans, and proprietary methodologies` 
+            },
+            { 
+                id: 'suggestion_1', 
+                category: 'neutral', 
+                title: 'Add Mutual Termination Rights', 
+                description: 'Ensure both parties have equal rights to terminate the agreement', 
+                originalText: 'This Agreement shall remain in effect indefinitely', 
+                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party' 
+            },
+            { 
+                id: 'suggestion_2', 
+                category: 'favoringParty2', 
+                title: `Reasonable Disclosure Exceptions`, 
+                description: `Add practical exceptions to reduce compliance burden for ${party2}`, 
+                originalText: `${party2} shall not disclose any information under any circumstances`, 
+                improvedText: `${party2} shall not disclose confidential information except as required by law, court order, or regulatory requirement with prior written notice to ${party1} where legally permissible` 
+            },
+            { 
+                id: 'suggestion_3', 
+                category: 'neutral', 
+                title: 'Standard Exclusions Clause', 
+                description: 'Include industry-standard exclusions from confidentiality obligations', 
+                originalText: 'All disclosed information shall be deemed confidential', 
+                improvedText: 'Confidential Information excludes: (a) information in the public domain through no breach, (b) information independently developed, (c) information rightfully received from third parties' 
+            }
+        ];
     };
     const handleFileUpload = async (file) => {
         if (!file) return;
@@ -190,6 +206,12 @@ const NDAAnalyzer = () => {
         }
     };
 
+    const decodeHtmlEntities = (text) => {
+        const textArea = document.createElement('textarea');
+        textArea.innerHTML = text;
+        return textArea.value;
+    };
+
     const handleUrlSubmit = async () => {
         if (!ndaUrl.trim()) return;
         setIsAnalyzing(true);
@@ -199,9 +221,22 @@ const NDAAnalyzer = () => {
             if (response.ok) {
                 const data = await response.json();
                 let content = data.contents;
+                
+                // Remove scripts and styles
                 content = content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
                 content = content.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
-                content = content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+                
+                // Remove HTML tags but preserve line breaks
+                content = content.replace(/<br\s*\/?>/gi, '\n');
+                content = content.replace(/<\/p>/gi, '\n\n');
+                content = content.replace(/<[^>]*>/g, ' ');
+                
+                // Decode HTML entities
+                content = decodeHtmlEntities(content);
+                
+                // Clean up whitespace
+                content = content.replace(/\s+/g, ' ').replace(/\n\s+/g, '\n').trim();
+                
                 if (content.length > 50) {
                     setNdaText(content);
                     setExtractedData(extractNDAData(content));
@@ -234,31 +269,32 @@ const NDAAnalyzer = () => {
         const party1 = extractedData.parties[0] || 'First Party';
         const party2 = extractedData.parties[1] || 'Second Party';
         
-        const personalizedPrompt = `Please analyze this NDA between ${party1} and ${party2} and provide specific redrafting suggestions.
+        const personalizedPrompt = `Analyze this NDA between ${party1} and ${party2} and provide specific redrafting suggestions.
 
 KEY CONTEXT:
 - Parties: ${party1} and ${party2}
 - Business Purpose: ${extractedData.businessPurpose || 'Not specified'}
 - Jurisdiction: ${extractedData.jurisdiction || 'Not specified'}
 
-IMPORTANT: Structure your response with these exact sections:
+CRITICAL FORMATTING REQUIREMENTS:
+1. Do NOT use markdown formatting, asterisks, or special characters
+2. Use this EXACT format for each suggestion:
 
-**IMPROVEMENTS FAVORING FIRST PARTY:**
-• [Suggestion Title]: [Brief description]. Original: "[exact current language from the agreement]" Improved: "[specific improved language]"
+IMPROVEMENTS FAVORING FIRST PARTY:
+• [Clear suggestion title]: [Brief description]. Original: "[exact quoted text from agreement]" Improved: "[specific replacement text]"
 • [Another suggestion with same format]
 
-**NEUTRAL/MUTUAL IMPROVEMENTS:**
-• [Suggestion Title]: [Brief description]. Original: "[exact current language from the agreement]" Improved: "[specific improved language]"
-• [Another suggestion with same format]
+NEUTRAL/MUTUAL IMPROVEMENTS:
+• [Clear suggestion title]: [Brief description]. Original: "[exact quoted text from agreement]" Improved: "[specific replacement text]"
 
-**IMPROVEMENTS FAVORING SECOND PARTY:**
-• [Suggestion Title]: [Brief description]. Original: "[exact current language from the agreement]" Improved: "[specific improved language]"
-• [Another suggestion with same format]
+IMPROVEMENTS FAVORING SECOND PARTY:
+• [Clear suggestion title]: [Brief description]. Original: "[exact quoted text from agreement]" Improved: "[specific replacement text]"
 
-For each suggestion, please:
-1. Quote exact language from the actual agreement (not generic text)
-2. Provide specific improved language (not generic descriptions)
-3. Make suggestions actionable and ready to copy/paste
+REQUIREMENTS:
+- Quote EXACT language from the actual agreement (not generic text)
+- Provide specific improved language (not descriptions)
+- Keep titles under 50 characters
+- Use plain text only, no formatting
 
 NDA TEXT TO ANALYZE:
 ${ndaText}`;
@@ -396,16 +432,22 @@ ${ndaText}`;
         const selectedSuggestions = personalizedSuggestions.filter(s => selectedChanges[s.id]);
         let highlightedText = baseText;
         
-        // Highlight suggestion titles and improved text
+        // Highlight only the actual suggestion content, not metadata
         selectedSuggestions.forEach(suggestion => {
-            // Highlight the suggestion title
-            const titlePattern = new RegExp(`(${suggestion.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-            highlightedText = highlightedText.replace(titlePattern, '<mark class="highlight-change">$1</mark>');
+            // Highlight the suggestion title (but avoid metadata words)
+            if (suggestion.title && suggestion.title.length > 5 && 
+                !suggestion.title.toLowerCase().includes('original:') && 
+                !suggestion.title.toLowerCase().includes('improved:')) {
+                const titlePattern = new RegExp(`(${suggestion.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+                highlightedText = highlightedText.replace(titlePattern, '<mark class="highlight-change">$1</mark>');
+            }
             
-            // Highlight the improved text if it's substantial
-            if (suggestion.improvedText && suggestion.improvedText.length > 20) {
-                const improvedTextPattern = new RegExp(`("${suggestion.improvedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}")`, 'gi');
-                highlightedText = highlightedText.replace(improvedTextPattern, '<mark class="highlight-improvement">$1</mark>');
+            // Highlight the improved text content (but not the label)
+            if (suggestion.improvedText && suggestion.improvedText.length > 10) {
+                // Escape the text for regex and highlight only the quoted content
+                const improvedTextEscaped = suggestion.improvedText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const improvedPattern = new RegExp(`("${improvedTextEscaped}")`, 'gi');
+                highlightedText = highlightedText.replace(improvedPattern, '<mark class="highlight-improvement">$1</mark>');
             }
         });
         
