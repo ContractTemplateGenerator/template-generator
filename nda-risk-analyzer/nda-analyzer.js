@@ -449,11 +449,6 @@ ${ndaText}`;
         
         return highlightedText;
     };
-            }
-        });
-        
-        return highlightedText;
-    };
 
     const copyRedraftToClipboard = async () => {
         const redraft = generateCleanRedraft();
