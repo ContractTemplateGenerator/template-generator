@@ -20,6 +20,58 @@ const NDAAnalyzer = () => {
         setDebugInfo(prev => prev + logMessage + (data ? ': ' + JSON.stringify(data, null, 2) : '') + '\n');
     };
 
+    const formatAnalysisResponse = (htmlContent) => {
+        // Clean up the analysis response to make it more organized
+        let formattedContent = htmlContent;
+        
+        // Replace wall of text suggestions with organized cards
+        formattedContent = formattedContent.replace(
+            /PERSONALIZED REDRAFT SUGGESTIONS:(.*?)(?=<\/div>|$)/is,
+            (match, content) => {
+                // Parse suggestions from the content
+                const suggestions = content.split(/IMPROVEMENTS FAVORING|NEUTRAL\/MUTUAL IMPROVEMENTS/i);
+                let organized = '<div class="suggestions-analysis-section">';
+                organized += '<h3 class="analysis-section-title">📋 Detailed Analysis Summary</h3>';
+                
+                suggestions.forEach((section, index) => {
+                    if (section.trim().length > 20) {
+                        const sectionTitle = index === 1 ? 'Improvements Favoring Disclosing Party' :
+                                           index === 2 ? 'Neutral/Mutual Improvements' :
+                                           index === 3 ? 'Improvements Favoring Receiving Party' :
+                                           'General Improvements';
+                        
+                        if (index > 0) {
+                            organized += `<div class="analysis-subsection">`;
+                            organized += `<h4 class="analysis-subsection-title">${sectionTitle}</h4>`;
+                            
+                            // Parse bullet points and format them nicely
+                            const bullets = section.split(/[•\-\*]/).filter(item => item.trim().length > 10);
+                            organized += '<ul class="analysis-suggestions-list">';
+                            bullets.forEach(bullet => {
+                                const cleanBullet = bullet.trim().replace(/Original:|Improved:/gi, '<strong>$&</strong>');
+                                if (cleanBullet.length > 10) {
+                                    organized += `<li class="analysis-suggestion-item">${cleanBullet}</li>`;
+                                }
+                            });
+                            organized += '</ul></div>';
+                        }
+                    }
+                });
+                
+                organized += '</div>';
+                return organized;
+            }
+        );
+        
+        // Format analysis sections better
+        formattedContent = formattedContent.replace(
+            /ANALYSIS FOR ([^:]+):/g,
+            '<h3 class="party-analysis-title">🎯 Analysis for $1:</h3>'
+        );
+        
+        return formattedContent;
+    };
+
     const extractNDAData = (text) => {
         const data = { parties: [], businessPurpose: '', jurisdiction: '' };
         const partyMatches = text.match(/\b([A-Z][A-Za-z\s]+(?:Inc|LLC|Corp|Ltd|Company)\.?)\b/g);
@@ -264,6 +316,7 @@ const NDAAnalyzer = () => {
             setExtractedData(extractNDAData(text));
         }
     };
+
     const analyzeNDA = async () => {
         if (!ndaText.trim()) {
             alert('Please enter your NDA text to analyze.');
@@ -320,7 +373,7 @@ ${ndaText}`;
             } else {
                 throw new Error('API request failed');
             }
-    const formatAnalysisResponse = (htmlContent) => {
+        } catch (error) {
         // Clean up the analysis response to make it more organized
         let formattedContent = htmlContent;
         
