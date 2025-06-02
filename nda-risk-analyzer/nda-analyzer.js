@@ -556,6 +556,228 @@ ${ndaText}`;
     };
 
     const downloadAsWord = () => {
+        const selectedSuggestions = [...suggestions.quickFixes, ...suggestions.party1, ...suggestions.party2, ...suggestions.neutral]
+            .filter(s => selectedChanges[s.id]);
+        
+        if (selectedSuggestions.length === 0) {
+            alert('Please select at least one improvement to download.');
+            return;
+        }
+
+        try {
+            // Start with original text and track changes
+            let processedText = ndaText;
+            
+            // Apply changes with track changes markup
+            selectedSuggestions.forEach(suggestion => {
+                if (suggestion.originalText && suggestion.improvedText) {
+                    const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                    const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                    
+                    if (processedText.includes(cleanOriginal)) {
+                        // Create redlined replacement with track changes
+                        const redlinedReplacement = `<span class="deleted-text">${cleanOriginal}</span> <span class="inserted-text">${cleanImproved}</span>`;
+                        processedText = processedText.replace(cleanOriginal, redlinedReplacement);
+                    }
+                }
+            });
+
+            let wordContent = `
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA - Redlined Version with Track Changes</title>
+<style>
+  body {
+    font-family: "Times New Roman", serif;
+    font-size: 12pt;
+    line-height: 1.6;
+    margin: 1in;
+    color: #000;
+  }
+  .document-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20pt;
+    text-decoration: underline;
+  }
+  .section-header {
+    font-weight: bold;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    font-size: 12pt;
+  }
+  .paragraph {
+    margin-bottom: 12pt;
+    text-align: justify;
+    text-indent: 0pt;
+  }
+  .subsection {
+    margin-left: 20pt;
+    margin-bottom: 8pt;
+  }
+  .signature-section {
+    margin-top: 30pt;
+    page-break-inside: avoid;
+  }
+  .signature-line {
+    margin-top: 20pt;
+    margin-bottom: 20pt;
+  }
+  
+  /* Track Changes Styles */
+  .deleted-text {
+    text-decoration: line-through;
+    color: #d32f2f;
+    background-color: #ffebee;
+  }
+  .inserted-text {
+    background-color: #e8f5e8;
+    color: #2e7d32;
+    text-decoration: underline;
+  }
+  .track-changes-comment {
+    border: 1px solid #2196f3;
+    background-color: #e3f2fd;
+    padding: 8pt;
+    margin: 8pt 0;
+    font-size: 10pt;
+    border-radius: 4pt;
+  }
+</style>
+</head>
+<body>
+`;
+
+            // Parse and format the document properly
+            const lines = processedText.split('\n').filter(line => line.trim().length > 0);
+            let inDefinitions = false;
+            let currentSection = '';
+
+            lines.forEach((line, index) => {
+                const trimmedLine = line.trim();
+                
+                // Document title
+                if (trimmedLine.match(/^CONFIDENTIALITY AGREEMENT/i) || trimmedLine.match(/^\[CONFIDENTIALITY AGREEMENT/)) {
+                    wordContent += `<p class="document-title">CONFIDENTIALITY AGREEMENT</p>`;
+                    return;
+                }
+                
+                // Main opening paragraph
+                if (trimmedLine.startsWith('This Confidentiality Agreement')) {
+                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
+                    return;
+                }
+                
+                // Section headers (numbered)
+                const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+                if (sectionMatch) {
+                    const sectionNum = sectionMatch[1];
+                    const sectionTitle = sectionMatch[2].replace(/\./g, '').toUpperCase();
+                    wordContent += `<p class="section-header">${sectionNum}. ${sectionTitle}</p>`;
+                    currentSection = sectionTitle;
+                    inDefinitions = sectionTitle.includes('DEFINITIONS');
+                    return;
+                }
+                
+                // Subsections (lettered)
+                const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
+                if (subsectionMatch && inDefinitions) {
+                    wordContent += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
+                    return;
+                }
+                
+                // Subsections for other sections
+                if (subsectionMatch && !inDefinitions) {
+                    wordContent += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
+                    return;
+                }
+                
+                // Special handling for signature section
+                if (trimmedLine.includes('IN WITNESS WHEREOF')) {
+                    wordContent += `<div class="signature-section">`;
+                    wordContent += `<p class="paragraph"><strong>${trimmedLine}</strong></p>`;
+                    return;
+                }
+                
+                // Signature lines
+                if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/)) {
+                    wordContent += `<p class="signature-line">${trimmedLine}</p>`;
+                    return;
+                }
+                
+                // Regular paragraphs
+                if (trimmedLine.length > 10) {
+                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
+                }
+            });
+            
+            // Close signature section if opened
+            if (processedText.includes('IN WITNESS WHEREOF')) {
+                wordContent += `</div>`;
+            }
+
+            // Add summary of changes
+            if (selectedSuggestions.length > 0) {
+                wordContent += `
+<div style="page-break-before: always;">
+<p class="section-header">SUMMARY OF TRACK CHANGES</p>
+<div class="track-changes-comment">
+<p><strong>Document Review Summary:</strong></p>
+<p><strong>Total Changes Made:</strong> ${selectedSuggestions.length}</p>
+<p><strong>Review Date:</strong> ${new Date().toLocaleDateString()}</p>
+<p><strong>Reviewer:</strong> Professional Legal Analysis Tool</p>
+</div>
+`;
+
+                selectedSuggestions.forEach((suggestion, index) => {
+                    const categoryNames = {
+                        quickFixes: 'Critical Fix',
+                        party1: 'Disclosing Party Improvement',
+                        party2: 'Receiving Party Improvement',
+                        neutral: 'Mutual Improvement'
+                    };
+                    
+                    const category = Object.keys(suggestions).find(key => 
+                        suggestions[key].some(s => s.id === suggestion.id)
+                    );
+                    
+                    wordContent += `
+<div class="track-changes-comment">
+<p><strong>Change ${index + 1}: ${suggestion.title}</strong></p>
+<p><strong>Category:</strong> ${categoryNames[category] || 'General Improvement'}</p>
+<p><strong>Description:</strong> ${suggestion.description}</p>
+<p><strong>Original Text:</strong> <span class="deleted-text">"${suggestion.originalText}"</span></p>
+<p><strong>Revised Text:</strong> <span class="inserted-text">"${suggestion.improvedText}"</span></p>
+<p><strong>Impact Level:</strong> ${suggestion.impact.charAt(0).toUpperCase() + suggestion.impact.slice(1)}</p>
+</div>
+`;
+                });
+                
+                wordContent += `</div>`;
+            }
+            
+            wordContent += '</body></html>';
+            
+            const blob = new Blob([wordContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `NDA_Redlined_TrackChanges_${new Date().toISOString().split('T')[0]}.doc`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            console.log(`Document generated with ${selectedSuggestions.length} track changes`);
+            
+        } catch (error) {
+            console.error("Error generating Word document:", error);
+            alert("Error generating Word document. Please try the copy option.");
+        }
+    };
+
+    const downloadCleanVersion = () => {
         const text = generatePreviewText();
         try {
             let wordContent = `
@@ -563,52 +785,122 @@ ${ndaText}`;
 <html>
 <head>
 <meta charset="UTF-8">
-<title>NDA - Improved Version</title>
+<title>NDA - Clean Final Version</title>
 <style>
   body {
     font-family: "Times New Roman", serif;
     font-size: 12pt;
-    line-height: 1.5;
-    margin: 0;
-    padding: 0;
+    line-height: 1.6;
+    margin: 1in;
+    color: #000;
   }
-  .legal-paragraph {
+  .document-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20pt;
+    text-decoration: underline;
+  }
+  .section-header {
+    font-weight: bold;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    font-size: 12pt;
+  }
+  .paragraph {
     margin-bottom: 12pt;
     text-align: justify;
+    text-indent: 0pt;
   }
-  .legal-header {
-    font-weight: bold;
-    margin-top: 18pt;
-    margin-bottom: 12pt;
-    text-align: center;
+  .subsection {
+    margin-left: 20pt;
+    margin-bottom: 8pt;
+  }
+  .signature-section {
+    margin-top: 30pt;
+    page-break-inside: avoid;
+  }
+  .signature-line {
+    margin-top: 20pt;
+    margin-bottom: 20pt;
   }
 </style>
 </head>
 <body>
 `;
 
-            const paragraphs = text.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-            paragraphs.forEach(paragraph => {
-                const trimmedPara = paragraph.trim();
-                if (trimmedPara.match(/^[A-Z\s]{10,}$/) || trimmedPara.match(/^\d+\./) || trimmedPara.match(/^SECTION|^ARTICLE/)) {
-                    wordContent += `<p class="legal-header">${trimmedPara}</p>`;
-                } else {
-                    wordContent += `<p class="legal-paragraph">${trimmedPara}</p>`;
+            // Parse and format the clean document
+            const lines = text.split('\n').filter(line => line.trim().length > 0);
+            let inDefinitions = false;
+
+            lines.forEach((line, index) => {
+                const trimmedLine = line.trim();
+                
+                // Document title
+                if (trimmedLine.match(/^CONFIDENTIALITY AGREEMENT/i) || trimmedLine.match(/^\[CONFIDENTIALITY AGREEMENT/)) {
+                    wordContent += `<p class="document-title">CONFIDENTIALITY AGREEMENT</p>`;
+                    return;
+                }
+                
+                // Main opening paragraph
+                if (trimmedLine.startsWith('This Confidentiality Agreement')) {
+                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
+                    return;
+                }
+                
+                // Section headers (numbered)
+                const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+                if (sectionMatch) {
+                    const sectionNum = sectionMatch[1];
+                    const sectionTitle = sectionMatch[2].replace(/\./g, '').toUpperCase();
+                    wordContent += `<p class="section-header">${sectionNum}. ${sectionTitle}</p>`;
+                    inDefinitions = sectionTitle.includes('DEFINITIONS');
+                    return;
+                }
+                
+                // Subsections (lettered)
+                const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
+                if (subsectionMatch) {
+                    wordContent += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
+                    return;
+                }
+                
+                // Special handling for signature section
+                if (trimmedLine.includes('IN WITNESS WHEREOF')) {
+                    wordContent += `<div class="signature-section">`;
+                    wordContent += `<p class="paragraph"><strong>${trimmedLine}</strong></p>`;
+                    return;
+                }
+                
+                // Signature lines
+                if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/)) {
+                    wordContent += `<p class="signature-line">${trimmedLine}</p>`;
+                    return;
+                }
+                
+                // Regular paragraphs
+                if (trimmedLine.length > 10) {
+                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
                 }
             });
+            
+            // Close signature section if opened
+            if (text.includes('IN WITNESS WHEREOF')) {
+                wordContent += `</div>`;
+            }
             
             wordContent += '</body></html>';
             
             const blob = new Blob([wordContent], { type: 'application/vnd.ms-word;charset=utf-8' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `NDA_Improved_${new Date().toISOString().split('T')[0]}.doc`;
+            link.download = `NDA_Clean_Final_${new Date().toISOString().split('T')[0]}.doc`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
         } catch (error) {
-            console.error("Error generating Word document:", error);
+            console.error("Error generating clean Word document:", error);
             alert("Error generating Word document. Please try the copy option.");
         }
     };
@@ -842,10 +1134,18 @@ ${ndaText}`;
                                 </button>
                                 <button 
                                     className="action-btn download-btn" 
-                                    onClick={downloadAsWord}
+                                    onClick={downloadCleanVersion}
                                     disabled={getTotalSelectedChanges() === 0}
                                 >
-                                    <i data-feather="download"></i> Download Word
+                                    <i data-feather="download"></i> Clean Word
+                                </button>
+                                <button 
+                                    className="action-btn download-btn" 
+                                    onClick={downloadAsWord}
+                                    disabled={getTotalSelectedChanges() === 0}
+                                    style={{backgroundColor: "#dc2626"}}
+                                >
+                                    <i data-feather="file-text"></i> Redlined Word
                                 </button>
                                 <button 
                                     className="action-btn consult-btn" 
