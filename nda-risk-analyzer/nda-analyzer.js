@@ -102,6 +102,11 @@ const NDAAnalyzer = () => {
         const party1 = extractedData.parties[0] || 'Disclosing Party';
         const party2 = extractedData.parties[1] || 'Receiving Party';
         
+        // Clean HTML formatting from response
+        let cleanResponse = aiResponse.replace(/<\/?[^>]+(>|$)/g, "");
+        cleanResponse = cleanResponse.replace(/&[a-zA-Z0-9#]+;/g, ' ');
+        cleanResponse = cleanResponse.replace(/\*\*/g, '');
+        
         // Parse suggestions from AI response
         const suggestions = {
             quickFixes: [],
@@ -110,48 +115,57 @@ const NDAAnalyzer = () => {
             neutral: []
         };
 
-        // Extract sections based on analysis
-        const sections = aiResponse.split(/(?=ANALYSIS FOR|IMPROVEMENTS FOR|QUICK FIXES|CRITICAL ISSUES)/i);
+        // Split by clear section headers
+        const quickFixSection = cleanResponse.match(/QUICK FIXES.*?(?=ANALYSIS FOR|IMPROVEMENTS FOR|$)/is)?.[0] || '';
+        const party1Section = cleanResponse.match(/(?:ANALYSIS FOR|IMPROVEMENTS FOR).*?(?:DISCLOSING|PARTY 1).*?(?=ANALYSIS FOR|IMPROVEMENTS FOR|$)/is)?.[0] || '';
+        const party2Section = cleanResponse.match(/(?:ANALYSIS FOR|IMPROVEMENTS FOR).*?(?:RECEIVING|PARTY 2).*?(?=ANALYSIS FOR|IMPROVEMENTS FOR|NEUTRAL|$)/is)?.[0] || '';
+        const neutralSection = cleanResponse.match(/(?:NEUTRAL|MUTUAL).*?IMPROVEMENTS.*?(?=$)/is)?.[0] || '';
         
-        sections.forEach((section, index) => {
-            const sectionLower = section.toLowerCase();
-            
-            // Extract individual suggestions with Original/Improved pattern
-            const suggestionMatches = section.match(/([^.!?]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/gi) || [];
-            
-            suggestionMatches.forEach((match, suggestionIndex) => {
-                const parts = match.match(/([^.!?]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/i);
-                if (parts && parts.length >= 4) {
-                    const suggestion = {
-                        id: `suggestion_${index}_${suggestionIndex}`,
-                        title: parts[1].trim().substring(0, 60),
-                        description: parts[1].trim(),
-                        originalText: parts[2].trim(),
-                        improvedText: parts[3].trim(),
-                        impact: determineImpact(parts[1]),
-                        riskLevel: determineRiskLevel(parts[1])
-                    };
-                    
-                    // Categorize suggestion
-                    if (sectionLower.includes('quick') || sectionLower.includes('critical') || sectionLower.includes('urgent')) {
-                        suggestions.quickFixes.push(suggestion);
-                    } else if (sectionLower.includes('disclosing') || sectionLower.includes('party 1') || sectionLower.includes(party1.toLowerCase())) {
-                        suggestions.party1.push(suggestion);
-                    } else if (sectionLower.includes('receiving') || sectionLower.includes('party 2') || sectionLower.includes(party2.toLowerCase())) {
-                        suggestions.party2.push(suggestion);
-                    } else {
-                        suggestions.neutral.push(suggestion);
-                    }
-                }
-            });
-        });
+        // Extract suggestions from each section
+        suggestions.quickFixes = extractSuggestionsFromSection(quickFixSection, 'quickFixes');
+        suggestions.party1 = extractSuggestionsFromSection(party1Section, 'party1');
+        suggestions.party2 = extractSuggestionsFromSection(party2Section, 'party2');
+        suggestions.neutral = extractSuggestionsFromSection(neutralSection, 'neutral');
 
-        // Add fallback suggestions if none found
-        if (suggestions.quickFixes.length === 0 && suggestions.party1.length === 0 && 
-            suggestions.party2.length === 0 && suggestions.neutral.length === 0) {
-            suggestions.quickFixes = createFallbackSuggestions(party1, party2);
+        // Add fallback suggestions if sections are empty
+        if (suggestions.quickFixes.length === 0) {
+            suggestions.quickFixes = createFallbackQuickFixes(party1, party2);
+        }
+        if (suggestions.party1.length === 0) {
+            suggestions.party1 = createFallbackParty1Suggestions(party1);
+        }
+        if (suggestions.party2.length === 0) {
+            suggestions.party2 = createFallbackParty2Suggestions(party2);
+        }
+        if (suggestions.neutral.length === 0) {
+            suggestions.neutral = createFallbackNeutralSuggestions();
         }
 
+        return suggestions;
+    };
+
+    const extractSuggestionsFromSection = (sectionText, category) => {
+        const suggestions = [];
+        
+        // Extract individual suggestions with Original/Improved pattern
+        const suggestionMatches = sectionText.match(/([^.!?\n]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/gi) || [];
+        
+        suggestionMatches.forEach((match, index) => {
+            const parts = match.match(/([^.!?\n]+)[:.]\s*Original:\s*"([^"]+)"\s*Improved:\s*"([^"]+)"/i);
+            if (parts && parts.length >= 4) {
+                const suggestion = {
+                    id: `${category}_${index}`,
+                    title: parts[1].trim().substring(0, 80),
+                    description: parts[1].trim(),
+                    originalText: parts[2].trim(),
+                    improvedText: parts[3].trim(),
+                    impact: determineImpact(parts[1]),
+                    riskLevel: determineRiskLevel(parts[1])
+                };
+                suggestions.push(suggestion);
+            }
+        });
+        
         return suggestions;
     };
 
@@ -177,33 +191,120 @@ const NDAAnalyzer = () => {
         return 'green';
     };
 
-    const createFallbackSuggestions = (party1, party2) => {
+    const createFallbackQuickFixes = (party1, party2) => {
         return [
             {
-                id: 'fallback_1',
+                id: 'quick_1',
                 title: 'Add Mutual Termination Rights',
-                description: 'Ensure both parties can terminate the agreement with reasonable notice',
-                originalText: 'This Agreement shall remain in effect indefinitely',
-                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice',
+                description: 'Either party should be able to terminate with reasonable notice period',
+                originalText: 'This Agreement takes effect on the Effective Date, and shall remain in effect for 5 year(s)',
+                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party',
                 impact: 'high',
-                riskLevel: 'yellow'
+                riskLevel: 'red'
             },
             {
-                id: 'fallback_2',
-                title: 'Limit Confidentiality Period',
-                description: 'Set reasonable time limits on confidentiality obligations',
-                originalText: 'Confidentiality obligations shall survive termination indefinitely',
-                improvedText: 'Confidentiality obligations shall survive termination for a period of three (3) years',
+                id: 'quick_2',
+                title: 'Narrow Overly Broad Confidentiality Definition',
+                description: 'Current definition of "all information" is excessively broad and unenforceable',
+                originalText: 'all information furnished by the Disclosing Party',
+                improvedText: 'information that is marked as confidential or disclosed under circumstances indicating its confidential nature',
+                impact: 'high',
+                riskLevel: 'red'
+            },
+            {
+                id: 'quick_3',
+                title: 'Balance IP Assignment Clause',
+                description: 'Current IP assignment heavily favors one party - make it more mutual or scope-limited',
+                originalText: 'all Work Product is and will be the sole and exclusive property of Sergei Tokmakov',
+                improvedText: 'Work Product directly related to Disclosing Party\'s business shall be owned by Disclosing Party',
+                impact: 'high',
+                riskLevel: 'red'
+            }
+        ];
+    };
+
+    const createFallbackParty1Suggestions = (party1) => {
+        return [
+            {
+                id: 'party1_1',
+                title: 'Add Liquidated Damages Clause',
+                description: `Strengthen ${party1}'s position by adding specific monetary penalties for breaches`,
+                originalText: 'any breach or threatened breach of this Agreement will cause not only financial harm',
+                improvedText: `any breach will result in liquidated damages of $10,000 per incident, plus injunctive relief`,
                 impact: 'medium',
                 riskLevel: 'yellow'
             },
             {
-                id: 'fallback_3',
-                title: 'Add Standard Exclusions',
-                description: 'Include industry-standard exceptions to confidentiality',
-                originalText: 'All disclosed information shall be deemed confidential',
-                improvedText: 'Confidential Information excludes information that: (a) is publicly available, (b) was independently developed, or (c) was rightfully received from third parties',
+                id: 'party1_2',
+                title: 'Strengthen Return Obligations',
+                description: `Enhance ${party1}'s ability to ensure complete return of confidential materials`,
+                originalText: 'Return to the Disclosing Party all Confidential Information provided',
+                improvedText: 'Return all Confidential Information and provide written certification of destruction of all copies within 10 days',
+                impact: 'medium',
+                riskLevel: 'green'
+            },
+            {
+                id: 'party1_3',
+                title: 'Add Survival Clause for Key Provisions',
+                description: `Ensure ${party1}'s protections continue after agreement termination`,
+                originalText: 'This Agreement takes effect on the Effective Date',
+                improvedText: 'Confidentiality, IP assignment, and indemnification obligations shall survive termination for 5 years',
+                impact: 'medium',
+                riskLevel: 'green'
+            }
+        ];
+    };
+
+    const createFallbackParty2Suggestions = (party2) => {
+        return [
+            {
+                id: 'party2_1',
+                title: 'Limit Confidentiality Scope',
+                description: `Reduce ${party2}'s compliance burden by narrowing what constitutes confidential information`,
+                originalText: 'all information furnished by the Disclosing Party',
+                improvedText: 'information specifically marked "CONFIDENTIAL" or identified as confidential in writing',
                 impact: 'high',
+                riskLevel: 'yellow'
+            },
+            {
+                id: 'party2_2',
+                title: 'Add Residual Knowledge Exception',
+                description: `Protect ${party2}'s ability to use general knowledge gained during relationship`,
+                originalText: 'shall not use Confidential Information for any purpose other than in connection with the Purpose',
+                improvedText: 'may retain and use general knowledge, skills, and experience gained, provided no specific confidential information is disclosed',
+                impact: 'medium',
+                riskLevel: 'yellow'
+            },
+            {
+                id: 'party2_3',
+                title: 'Limit Indemnification Exposure',
+                description: `Reduce ${party2}'s financial risk by capping indemnification obligations`,
+                originalText: 'Each Party shall fully indemnify the other against any and all actions, claims, liability',
+                improvedText: 'Indemnification shall be limited to direct damages up to $50,000 and exclude consequential damages',
+                impact: 'high',
+                riskLevel: 'red'
+            }
+        ];
+    };
+
+    const createFallbackNeutralSuggestions = () => {
+        return [
+            {
+                id: 'neutral_1',
+                title: 'Add Dispute Resolution Mechanism',
+                description: 'Include mediation/arbitration process to resolve conflicts efficiently',
+                originalText: 'All disputes arising out of this Agreement shall be resolved by courts',
+                improvedText: 'Disputes shall first be subject to mediation, then binding arbitration under AAA rules',
+                impact: 'medium',
+                riskLevel: 'green'
+            },
+            {
+                id: 'neutral_2',
+                title: 'Clarify Notice Requirements',
+                description: 'Specify how confidentiality marking should be done to avoid disputes',
+                originalText: 'identified as confidential or proprietary at the time of disclosure',
+                improvedText: 'clearly marked "CONFIDENTIAL" or identified as confidential in writing within 30 days of disclosure',
+                impact: 'low',
                 riskLevel: 'green'
             }
         ];
@@ -219,32 +320,39 @@ const NDAAnalyzer = () => {
         const party1 = extractedData.parties[0] || 'Disclosing Party';
         const party2 = extractedData.parties[1] || 'Receiving Party';
         
-        const analysisPrompt = `Analyze this NDA from multiple perspectives and provide specific suggestions. Focus on identifying clauses that unfairly disadvantage each party.
+        const analysisPrompt = `Analyze this NDA from multiple perspectives focusing on standard NDA concerns. Each party wants to know: How restrictive is it? How well protected am I? What am I giving up?
 
 PARTIES: ${party1} (Disclosing Party) and ${party2} (Receiving Party)
 BUSINESS PURPOSE: ${extractedData.businessPurpose || 'Not specified'}
 JURISDICTION: ${extractedData.jurisdiction || 'Not specified'}
 
 ANALYSIS REQUIREMENTS:
+
 1. OVERALL RISK ASSESSMENT: Is this safe to sign? (ACCEPTABLE / SIGN WITH CAUTION / DO NOT SIGN)
 
-2. ANALYSIS FOR ${party1.toUpperCase()} (DISCLOSING PARTY):
-   - What clauses disadvantage ${party1}?
-   - What protections are missing for ${party1}?
-   - Specific improvements favoring ${party1}
+2. QUICK FIXES - Most Critical Issues (3-4 items):
+Focus on: Overly broad definitions, missing termination rights, one-sided clauses, unenforceable terms
 
-3. ANALYSIS FOR ${party2.toUpperCase()} (RECEIVING PARTY):
-   - What clauses are overly burdensome for ${party2}?
-   - What unfair obligations does ${party2} face?
-   - Specific improvements favoring ${party2}
+3. ANALYSIS FOR ${party1.toUpperCase()} (DISCLOSING PARTY):
+Key concerns: Is my confidential info well protected? Can I enforce this? Do I have adequate remedies?
+Issues to check: Weak confidentiality definitions, insufficient return obligations, lack of liquidated damages, poor enforcement mechanisms
 
-4. QUICK FIXES (Most Critical Issues):
-   - Top 3-4 most important changes needed
-   - Issues that could make this agreement unenforceable
+4. ANALYSIS FOR ${party2.toUpperCase()} (RECEIVING PARTY):
+Key concerns: How restrictive is this? What am I giving up? What's my liability exposure?
+Issues to check: Overly broad confidentiality scope, excessive compliance burdens, one-sided IP assignment, unlimited indemnification, no residual knowledge rights
 
 5. NEUTRAL IMPROVEMENTS:
-   - Changes that benefit both parties equally
-   - Standard industry practices missing
+Changes benefiting both parties: Clearer terms, better dispute resolution, mutual protections
+
+STANDARD NDA ISSUES TO EVALUATE:
+- Confidentiality definition scope (too broad "all information" vs. properly marked)
+- Term length and termination rights
+- IP ownership and work product assignment
+- Indemnification and liability exposure
+- Return/destruction obligations
+- Standard exclusions (public domain, independently developed, etc.)
+- Survival clauses
+- Enforcement mechanisms and remedies
 
 FORMAT EACH SUGGESTION AS:
 [Clear title]: [Description]. Original: "[exact text from agreement]" Improved: "[specific replacement text]"
@@ -308,11 +416,47 @@ ${ndaText}`;
     };
 
     const extractSummary = (response) => {
-        const summaryMatch = response.match(/OVERALL RISK ASSESSMENT:([^.]*\.)/i);
-        if (summaryMatch) {
-            return summaryMatch[1].trim();
+        // Clean HTML formatting
+        let cleanResponse = response.replace(/<\/?[^>]+(>|$)/g, "");
+        cleanResponse = cleanResponse.replace(/&[a-zA-Z0-9#]+;/g, ' ');
+        cleanResponse = cleanResponse.replace(/\*\*/g, '');
+        cleanResponse = cleanResponse.replace(/<br\s*\/?>/gi, ' ');
+        
+        const party1 = extractedData.parties[0] || 'Disclosing Party';
+        const party2 = extractedData.parties[1] || 'Receiving Party';
+        
+        // Try to extract specific summary sections
+        const riskMatch = cleanResponse.match(/OVERALL RISK ASSESSMENT:([^.]*\.)/i);
+        const party1Analysis = cleanResponse.match(/ANALYSIS FOR.*?DISCLOSING.*?:(.*?)(?=ANALYSIS FOR|$)/is);
+        const party2Analysis = cleanResponse.match(/ANALYSIS FOR.*?RECEIVING.*?:(.*?)(?=QUICK FIXES|NEUTRAL|$)/is);
+        
+        let summary = '';
+        
+        if (riskMatch) {
+            summary += riskMatch[1].trim() + ' ';
         }
-        return 'Professional legal analysis completed with personalized recommendations.';
+        
+        // Add party-specific insights
+        summary += `FOR ${party1.toUpperCase()}: `;
+        if (party1Analysis) {
+            const party1Text = party1Analysis[1].trim().split(/[.!?]/)[0];
+            summary += party1Text + '. ';
+        } else {
+            summary += 'This agreement provides standard protections but may benefit from stronger enforcement mechanisms. ';
+        }
+        
+        summary += `FOR ${party2.toUpperCase()}: `;
+        if (party2Analysis) {
+            const party2Text = party2Analysis[1].trim().split(/[.!?]/)[0];
+            summary += party2Text + '. ';
+        } else {
+            summary += 'This agreement imposes significant obligations and should be carefully reviewed for compliance burden. ';
+        }
+        
+        // Add general assessment
+        summary += 'Professional review recommended to optimize terms for both parties.';
+        
+        return summary;
     };
 
     const handleSuggestionChange = (suggestionId, isSelected) => {
@@ -372,17 +516,33 @@ ${ndaText}`;
         }).join('');
     };
 
-    // Auto-scroll to highlighted changes
+    // Auto-scroll to highlighted changes with improved reliability
     useEffect(() => {
         if (previewRef.current && lastChanged) {
-            const highlightedElement = previewRef.current.querySelector('.highlight-change');
-            if (highlightedElement) {
-                highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                // Clear highlighting after 3 seconds
-                setTimeout(() => setLastChanged(null), 3000);
-            }
+            // Small delay to ensure DOM is updated
+            setTimeout(() => {
+                const highlightedElement = previewRef.current.querySelector('.highlight-change');
+                if (highlightedElement) {
+                    highlightedElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center',
+                        inline: 'nearest'
+                    });
+                    
+                    // Add enhanced highlighting effect
+                    highlightedElement.style.animation = 'highlight-pulse 3s ease-in-out';
+                    
+                    // Clear highlighting after 4 seconds
+                    setTimeout(() => {
+                        setLastChanged(null);
+                        if (highlightedElement) {
+                            highlightedElement.style.animation = '';
+                        }
+                    }, 4000);
+                }
+            }, 200);
         }
-    }, [lastChanged]);
+    }, [lastChanged, selectedChanges]);
 
     const copyToClipboard = async () => {
         const text = generatePreviewText();
@@ -589,12 +749,11 @@ ${ndaText}`;
                 </div>
             </div>
 
-            {/* Two-Pane Layout */}
+            {/* Analysis Results */}
             {analysisResult && (
                 <div className="two-pane-layout">
-                    {/* Left Pane - Suggestions (40%) */}
-                    <div className="left-pane">
-                        {/* Risk Summary Card */}
+                    {/* Full-Width Risk Summary */}
+                    <div className="analysis-summary-section">
                         <div className={`risk-summary-card ${analysisResult.recommendation.toLowerCase().replace(/\s+/g, '-')}`}>
                             <div className="risk-icon">
                                 {analysisResult.recommendation === 'ACCEPTABLE' ? '✅' :
@@ -605,124 +764,130 @@ ${ndaText}`;
                                 <div className="risk-summary">{analysisResult.summary}</div>
                             </div>
                         </div>
-
-                        {/* Tab Navigation */}
-                        <div className="tab-navigation">
-                            {tabs.map((tab, index) => (
-                                <button
-                                    key={tab.id}
-                                    className={`tab-button ${activeTab === index ? 'active' : ''}`}
-                                    onClick={() => setActiveTab(index)}
-                                >
-                                    <span className="tab-icon">{tab.icon}</span>
-                                    <span className="tab-label">{tab.label}</span>
-                                    <span className="tab-count">({suggestions[tab.id]?.length || 0})</span>
-                                </button>
-                            ))}
-                        </div>
-
-                        {/* Suggestions List */}
-                        <div className="suggestions-container">
-                            {getCurrentTabSuggestions().map((suggestion) => (
-                                <div key={suggestion.id} className="suggestion-card">
-                                    <div className="suggestion-header">
-                                        <input
-                                            type="checkbox"
-                                            id={suggestion.id}
-                                            checked={selectedChanges[suggestion.id] || false}
-                                            onChange={(e) => handleSuggestionChange(suggestion.id, e.target.checked)}
-                                        />
-                                        <div className="suggestion-meta">
-                                            <span className={`risk-badge ${getRiskBadgeClass(suggestion.riskLevel)}`}>
-                                                {suggestion.riskLevel === 'red' ? 'Critical' :
-                                                 suggestion.riskLevel === 'yellow' ? 'Important' : 'Recommended'}
-                                            </span>
-                                            <span className={`impact-badge impact-${suggestion.impact}`}>
-                                                {suggestion.impact} impact
-                                            </span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className="suggestion-content">
-                                        <div className="suggestion-title">{suggestion.title}</div>
-                                        <div className="suggestion-description">{suggestion.description}</div>
-                                        
-                                        <div className="suggestion-comparison">
-                                            <div className="original-text">
-                                                <strong>Current:</strong> "{suggestion.originalText}"
-                                            </div>
-                                            <div className="improved-text">
-                                                <strong>Improved:</strong> "{suggestion.improvedText}"
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                            
-                            {getCurrentTabSuggestions().length === 0 && (
-                                <div className="no-suggestions">
-                                    <div className="no-suggestions-icon">📝</div>
-                                    <div className="no-suggestions-text">No suggestions in this category</div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Action Buttons */}
-                        <div className="action-buttons">
-                            <button 
-                                className="action-btn copy-btn" 
-                                onClick={copyToClipboard}
-                                disabled={getTotalSelectedChanges() === 0}
-                            >
-                                <i data-feather="copy"></i> Copy Agreement
-                            </button>
-                            <button 
-                                className="action-btn download-btn" 
-                                onClick={downloadAsWord}
-                                disabled={getTotalSelectedChanges() === 0}
-                            >
-                                <i data-feather="download"></i> Download Word
-                            </button>
-                            <button 
-                                className="action-btn consult-btn" 
-                                onClick={scheduleConsultation}
-                            >
-                                <i data-feather="calendar"></i> Schedule Consultation
-                            </button>
-                        </div>
-
-                        <div className="selection-summary">
-                            <strong>{getTotalSelectedChanges()}</strong> improvement(s) selected
-                        </div>
                     </div>
 
-                    {/* Right Pane - Live Preview (60%) */}
-                    <div className="right-pane">
-                        <div className="preview-header">
-                            <h3><i data-feather="eye"></i> Live Document Preview</h3>
-                            <div className="preview-info">
-                                Changes highlight automatically • Scroll to view updates
+                    {/* Two-Pane Container */}
+                    <div className="panes-container">
+                        {/* Left Pane - Suggestions (45%) */}
+                        <div className="left-pane">
+                            {/* Tab Navigation */}
+                            <div className="tab-navigation">
+                                {tabs.map((tab, index) => (
+                                    <button
+                                        key={tab.id}
+                                        className={`tab-button ${activeTab === index ? 'active' : ''}`}
+                                        onClick={() => setActiveTab(index)}
+                                    >
+                                        <span className="tab-icon">{tab.icon}</span>
+                                        <span className="tab-label">{tab.label}</span>
+                                        <span className="tab-count">({suggestions[tab.id]?.length || 0})</span>
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Suggestions List */}
+                            <div className="suggestions-container">
+                                {getCurrentTabSuggestions().map((suggestion) => (
+                                    <div key={suggestion.id} className="suggestion-card">
+                                        <div className="suggestion-header">
+                                            <input
+                                                type="checkbox"
+                                                id={suggestion.id}
+                                                checked={selectedChanges[suggestion.id] || false}
+                                                onChange={(e) => handleSuggestionChange(suggestion.id, e.target.checked)}
+                                            />
+                                            <div className="suggestion-meta">
+                                                <span className={`risk-badge ${getRiskBadgeClass(suggestion.riskLevel)}`}>
+                                                    {suggestion.riskLevel === 'red' ? 'Critical' :
+                                                     suggestion.riskLevel === 'yellow' ? 'Important' : 'Recommended'}
+                                                </span>
+                                                <span className={`impact-badge impact-${suggestion.impact}`}>
+                                                    {suggestion.impact} impact
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="suggestion-content">
+                                            <div className="suggestion-title">{suggestion.title}</div>
+                                            <div className="suggestion-description">{suggestion.description}</div>
+                                            
+                                            <div className="suggestion-comparison">
+                                                <div className="original-text">
+                                                    <strong>Current:</strong> "{suggestion.originalText}"
+                                                </div>
+                                                <div className="improved-text">
+                                                    <strong>Improved:</strong> "{suggestion.improvedText}"
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                                
+                                {getCurrentTabSuggestions().length === 0 && (
+                                    <div className="no-suggestions">
+                                        <div className="no-suggestions-icon">📝</div>
+                                        <div className="no-suggestions-text">No suggestions in this category</div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="action-buttons">
+                                <button 
+                                    className="action-btn copy-btn" 
+                                    onClick={copyToClipboard}
+                                    disabled={getTotalSelectedChanges() === 0}
+                                >
+                                    <i data-feather="copy"></i> Copy Agreement
+                                </button>
+                                <button 
+                                    className="action-btn download-btn" 
+                                    onClick={downloadAsWord}
+                                    disabled={getTotalSelectedChanges() === 0}
+                                >
+                                    <i data-feather="download"></i> Download Word
+                                </button>
+                                <button 
+                                    className="action-btn consult-btn" 
+                                    onClick={scheduleConsultation}
+                                >
+                                    <i data-feather="calendar"></i> Schedule Consultation
+                                </button>
+                            </div>
+
+                            <div className="selection-summary">
+                                <strong>{getTotalSelectedChanges()}</strong> improvement(s) selected
                             </div>
                         </div>
-                        
-                        <div className="preview-content" ref={previewRef}>
-                            {getTotalSelectedChanges() > 0 ? (
-                                <div 
-                                    className="document-preview"
-                                    dangerouslySetInnerHTML={{ __html: generateHighlightedPreview() }}
-                                />
-                            ) : (
-                                <div className="preview-placeholder">
-                                    <div className="placeholder-icon">📄</div>
-                                    <div className="placeholder-text">
-                                        Select improvements to see live preview with changes
-                                    </div>
-                                    <div className="original-preview">
-                                        <h4>Original Document:</h4>
-                                        <pre className="original-text-preview">{ndaText}</pre>
-                                    </div>
+
+                        {/* Right Pane - Live Preview (55%) */}
+                        <div className="right-pane">
+                            <div className="preview-header">
+                                <h3><i data-feather="eye"></i> Live Document Preview</h3>
+                                <div className="preview-info">
+                                    Changes highlight automatically • Scroll to view updates
                                 </div>
-                            )}
+                            </div>
+                            
+                            <div className="preview-content" ref={previewRef}>
+                                {getTotalSelectedChanges() > 0 ? (
+                                    <div 
+                                        className="document-preview"
+                                        dangerouslySetInnerHTML={{ __html: generateHighlightedPreview() }}
+                                    />
+                                ) : (
+                                    <div className="preview-placeholder">
+                                        <div className="placeholder-icon">📄</div>
+                                        <div className="placeholder-text">
+                                            Select improvements to see live preview with changes
+                                        </div>
+                                        <div className="original-preview">
+                                            <h4>Original Document:</h4>
+                                            <pre className="original-text-preview">{ndaText}</pre>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
