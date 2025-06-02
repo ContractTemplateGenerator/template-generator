@@ -501,19 +501,67 @@ ${ndaText}`;
             }
         }
         
-        // Format for display
-        const paragraphs = highlightedText.split(/\n\s*\n/).filter(p => p.trim().length > 0);
-        return paragraphs.map(paragraph => {
-            const trimmedPara = paragraph.trim();
+        // Format document with proper legal structure
+        const lines = highlightedText.split('\n').filter(line => line.trim().length > 0);
+        let formattedHtml = '';
+        let inDefinitions = false;
+        
+        lines.forEach((line, index) => {
+            const trimmedLine = line.trim();
             
-            if (trimmedPara.match(/^[A-Z\s]{10,}$/) || 
-                trimmedPara.match(/^\d+\./) || 
-                trimmedPara.match(/^SECTION|^ARTICLE|^WHEREAS/)) {
-                return `<p class="legal-header"><strong>${trimmedPara}</strong></p>`;
+            // Document title
+            if (trimmedLine.match(/^(\[)?CONFIDENTIALITY AGREEMENT/i)) {
+                formattedHtml += `<h1 class="document-title">CONFIDENTIALITY AGREEMENT</h1>`;
+                return;
             }
             
-            return `<p class="legal-paragraph">${trimmedPara}</p>`;
-        }).join('');
+            // Main opening paragraph
+            if (trimmedLine.startsWith('This Confidentiality Agreement')) {
+                formattedHtml += `<p class="opening-paragraph">${trimmedLine}</p>`;
+                return;
+            }
+            
+            // Section headers (numbered)
+            const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+            if (sectionMatch) {
+                const sectionNum = sectionMatch[1];
+                const sectionTitle = sectionMatch[2].replace(/\.$/, '');
+                formattedHtml += `<h2 class="section-header">${sectionNum}. ${sectionTitle.toUpperCase()}</h2>`;
+                inDefinitions = sectionTitle.toLowerCase().includes('definition');
+                return;
+            }
+            
+            // Subsections (lettered)
+            const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
+            if (subsectionMatch) {
+                formattedHtml += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
+                return;
+            }
+            
+            // Special handling for signature section
+            if (trimmedLine.includes('IN WITNESS WHEREOF')) {
+                formattedHtml += `<div class="signature-section"><p class="signature-paragraph"><strong>${trimmedLine}</strong></p>`;
+                return;
+            }
+            
+            // Signature lines and names
+            if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/) || trimmedLine.match(/^\d{1,2}\/\d{1,2}\/\d{4}|[A-Z][a-z]+ \d+, \d{4}/)) {
+                formattedHtml += `<p class="signature-line">${trimmedLine}</p>`;
+                return;
+            }
+            
+            // Regular paragraphs
+            if (trimmedLine.length > 10) {
+                formattedHtml += `<p class="legal-paragraph">${trimmedLine}</p>`;
+            }
+        });
+        
+        // Close signature section if opened
+        if (highlightedText.includes('IN WITNESS WHEREOF')) {
+            formattedHtml += `</div>`;
+        }
+        
+        return formattedHtml;
     };
 
     // Auto-scroll to highlighted changes with improved reliability
@@ -565,211 +613,95 @@ ${ndaText}`;
         }
 
         try {
-            // Start with original text and track changes
+            // Start with original text and apply changes
             let processedText = ndaText;
             
-            // Apply changes with track changes markup
+            // Apply changes with proper track changes markup
             selectedSuggestions.forEach(suggestion => {
                 if (suggestion.originalText && suggestion.improvedText) {
                     const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                     const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                     
                     if (processedText.includes(cleanOriginal)) {
-                        // Create redlined replacement with track changes
-                        const redlinedReplacement = `<span class="deleted-text">${cleanOriginal}</span> <span class="inserted-text">${cleanImproved}</span>`;
+                        // Create Word-compatible track changes
+                        const redlinedReplacement = `<w:del w:id="1" w:author="Legal Analyzer" w:date="${new Date().toISOString()}">${cleanOriginal}</w:del><w:ins w:id="2" w:author="Legal Analyzer" w:date="${new Date().toISOString()}">${cleanImproved}</w:ins>`;
                         processedText = processedText.replace(cleanOriginal, redlinedReplacement);
                     }
                 }
             });
 
-            let wordContent = `
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>NDA - Redlined Version with Track Changes</title>
-<style>
-  body {
-    font-family: "Times New Roman", serif;
-    font-size: 12pt;
-    line-height: 1.6;
-    margin: 1in;
-    color: #000;
-  }
-  .document-title {
-    font-size: 14pt;
-    font-weight: bold;
-    text-align: center;
-    margin-bottom: 20pt;
-    text-decoration: underline;
-  }
-  .section-header {
-    font-weight: bold;
-    margin-top: 16pt;
-    margin-bottom: 8pt;
-    font-size: 12pt;
-  }
-  .paragraph {
-    margin-bottom: 12pt;
-    text-align: justify;
-    text-indent: 0pt;
-  }
-  .subsection {
-    margin-left: 20pt;
-    margin-bottom: 8pt;
-  }
-  .signature-section {
-    margin-top: 30pt;
-    page-break-inside: avoid;
-  }
-  .signature-line {
-    margin-top: 20pt;
-    margin-bottom: 20pt;
-  }
-  
-  /* Track Changes Styles */
-  .deleted-text {
-    text-decoration: line-through;
-    color: #d32f2f;
-    background-color: #ffebee;
-  }
-  .inserted-text {
-    background-color: #e8f5e8;
-    color: #2e7d32;
-    text-decoration: underline;
-  }
-  .track-changes-comment {
-    border: 1px solid #2196f3;
-    background-color: #e3f2fd;
-    padding: 8pt;
-    margin: 8pt 0;
-    font-size: 10pt;
-    border-radius: 4pt;
-  }
-</style>
-</head>
-<body>
+            let wordContent = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+<w:body>
+<w:p><w:pPr><w:jc w:val="center"/><w:rPr><w:b/><w:u w:val="single"/></w:rPr></w:pPr><w:r><w:rPr><w:b/><w:u w:val="single"/></w:rPr><w:t>CONFIDENTIALITY AGREEMENT</w:t></w:r></w:p>
 `;
 
-            // Parse and format the document properly
+            // Parse and format the document
             const lines = processedText.split('\n').filter(line => line.trim().length > 0);
-            let inDefinitions = false;
-            let currentSection = '';
-
+            
             lines.forEach((line, index) => {
                 const trimmedLine = line.trim();
                 
-                // Document title
-                if (trimmedLine.match(/^CONFIDENTIALITY AGREEMENT/i) || trimmedLine.match(/^\[CONFIDENTIALITY AGREEMENT/)) {
-                    wordContent += `<p class="document-title">CONFIDENTIALITY AGREEMENT</p>`;
+                // Skip title line
+                if (trimmedLine.match(/^(\[)?CONFIDENTIALITY AGREEMENT/i)) {
                     return;
                 }
                 
-                // Main opening paragraph
+                // Opening paragraph
                 if (trimmedLine.startsWith('This Confidentiality Agreement')) {
-                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
+                    wordContent += `<w:p><w:r><w:t>${trimmedLine}</w:t></w:r></w:p>`;
                     return;
                 }
                 
-                // Section headers (numbered)
+                // Section headers
                 const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
                 if (sectionMatch) {
                     const sectionNum = sectionMatch[1];
-                    const sectionTitle = sectionMatch[2].replace(/\./g, '').toUpperCase();
-                    wordContent += `<p class="section-header">${sectionNum}. ${sectionTitle}</p>`;
-                    currentSection = sectionTitle;
-                    inDefinitions = sectionTitle.includes('DEFINITIONS');
+                    const sectionTitle = sectionMatch[2].replace(/\.$/, '');
+                    wordContent += `<w:p><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${sectionNum}. ${sectionTitle.toUpperCase()}</w:t></w:r></w:p>`;
                     return;
                 }
                 
-                // Subsections (lettered)
+                // Subsections
                 const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
-                if (subsectionMatch && inDefinitions) {
-                    wordContent += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
+                if (subsectionMatch) {
+                    wordContent += `<w:p><w:pPr><w:ind w:left="360"/></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>${subsectionMatch[1].toLowerCase()})</w:t></w:r><w:r><w:t> ${subsectionMatch[2]}</w:t></w:r></w:p>`;
                     return;
                 }
                 
-                // Subsections for other sections
-                if (subsectionMatch && !inDefinitions) {
-                    wordContent += `<p class="subsection"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>`;
-                    return;
-                }
-                
-                // Special handling for signature section
+                // Signature section
                 if (trimmedLine.includes('IN WITNESS WHEREOF')) {
-                    wordContent += `<div class="signature-section">`;
-                    wordContent += `<p class="paragraph"><strong>${trimmedLine}</strong></p>`;
-                    return;
-                }
-                
-                // Signature lines
-                if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/)) {
-                    wordContent += `<p class="signature-line">${trimmedLine}</p>`;
+                    wordContent += `<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>${trimmedLine}</w:t></w:r></w:p>`;
                     return;
                 }
                 
                 // Regular paragraphs
                 if (trimmedLine.length > 10) {
-                    wordContent += `<p class="paragraph">${trimmedLine}</p>`;
+                    wordContent += `<w:p><w:r><w:t>${trimmedLine}</w:t></w:r></w:p>`;
                 }
             });
             
-            // Close signature section if opened
-            if (processedText.includes('IN WITNESS WHEREOF')) {
-                wordContent += `</div>`;
-            }
-
             // Add summary of changes
-            if (selectedSuggestions.length > 0) {
-                wordContent += `
-<div style="page-break-before: always;">
-<p class="section-header">SUMMARY OF TRACK CHANGES</p>
-<div class="track-changes-comment">
-<p><strong>Document Review Summary:</strong></p>
-<p><strong>Total Changes Made:</strong> ${selectedSuggestions.length}</p>
-<p><strong>Review Date:</strong> ${new Date().toLocaleDateString()}</p>
-<p><strong>Reviewer:</strong> Professional Legal Analysis Tool</p>
-</div>
-`;
-
-                selectedSuggestions.forEach((suggestion, index) => {
-                    const categoryNames = {
-                        quickFixes: 'Critical Fix',
-                        party1: 'Disclosing Party Improvement',
-                        party2: 'Receiving Party Improvement',
-                        neutral: 'Mutual Improvement'
-                    };
-                    
-                    const category = Object.keys(suggestions).find(key => 
-                        suggestions[key].some(s => s.id === suggestion.id)
-                    );
-                    
-                    wordContent += `
-<div class="track-changes-comment">
-<p><strong>Change ${index + 1}: ${suggestion.title}</strong></p>
-<p><strong>Category:</strong> ${categoryNames[category] || 'General Improvement'}</p>
-<p><strong>Description:</strong> ${suggestion.description}</p>
-<p><strong>Original Text:</strong> <span class="deleted-text">"${suggestion.originalText}"</span></p>
-<p><strong>Revised Text:</strong> <span class="inserted-text">"${suggestion.improvedText}"</span></p>
-<p><strong>Impact Level:</strong> ${suggestion.impact.charAt(0).toUpperCase() + suggestion.impact.slice(1)}</p>
-</div>
-`;
-                });
-                
-                wordContent += `</div>`;
-            }
+            wordContent += `<w:p><w:r><w:br w:type="page"/></w:r></w:p>`;
+            wordContent += `<w:p><w:pPr><w:rPr><w:b/></w:rPr></w:pPr><w:r><w:rPr><w:b/></w:rPr><w:t>SUMMARY OF CHANGES</w:t></w:r></w:p>`;
+            wordContent += `<w:p><w:r><w:t>Total Changes: ${selectedSuggestions.length}</w:t></w:r></w:p>`;
+            wordContent += `<w:p><w:r><w:t>Review Date: ${new Date().toLocaleDateString()}</w:t></w:r></w:p>`;
             
-            wordContent += '</body></html>';
+            selectedSuggestions.forEach((suggestion, index) => {
+                wordContent += `<w:p><w:r><w:rPr><w:b/></w:rPr><w:t>Change ${index + 1}: ${suggestion.title}</w:t></w:r></w:p>`;
+                wordContent += `<w:p><w:r><w:t>Original: ${suggestion.originalText}</w:t></w:r></w:p>`;
+                wordContent += `<w:p><w:r><w:t>Revised: ${suggestion.improvedText}</w:t></w:r></w:p>`;
+            });
             
-            const blob = new Blob([wordContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+            wordContent += `</w:body></w:document>`;
+            
+            const blob = new Blob([wordContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `NDA_Redlined_TrackChanges_${new Date().toISOString().split('T')[0]}.doc`;
+            link.download = `NDA_Redlined_${new Date().toISOString().split('T')[0]}.docx`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-            
-            console.log(`Document generated with ${selectedSuggestions.length} track changes`);
             
         } catch (error) {
             console.error("Error generating Word document:", error);
@@ -791,7 +723,6 @@ ${ndaText}`;
     font-family: "Times New Roman", serif;
     font-size: 12pt;
     line-height: 1.6;
-    margin: 1in;
     color: #000;
   }
   .document-title {
