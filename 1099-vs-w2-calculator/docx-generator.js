@@ -2,7 +2,31 @@ window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
     
-    // Create HTML content that can be rendered in Word with proper table formatting
+    // Extract comparison data directly from document text
+    const lines = documentText.split('\n');
+    let comparisonData = [];
+    let inTable = false;
+    
+    // Parse table data
+    lines.forEach(line => {
+      line = line.trim();
+      if (line.includes('SIDE-BY-SIDE COMPARISON')) {
+        inTable = true;
+      } else if (line.includes('=======') && inTable) {
+        inTable = false;
+      } else if (inTable && line.includes('|') && !line.includes('SIDE-BY-SIDE')) {
+        const parts = line.split('|').map(p => p.trim()).filter(p => p && p !== '');
+        if (parts.length === 3) {
+          comparisonData.push({
+            component: parts[0],
+            w2: parts[1],
+            contractor: parts[2]
+          });
+        }
+      }
+    });
+    
+    // Create HTML content with proper table structure
     let htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -56,6 +80,10 @@ window.generateWordDoc = function(documentText, formData) {
     border: 1px solid #bdc3c7;
     text-align: center;
   }
+  .comparison-table td:first-child {
+    text-align: left;
+    font-weight: bold;
+  }
   .comparison-table tr:nth-child(even) {
     background-color: #f8f9fa;
   }
@@ -84,11 +112,6 @@ window.generateWordDoc = function(documentText, formData) {
     border: 1px solid #e9ecef;
     border-radius: 5pt;
   }
-  .highlight {
-    background-color: #fff3cd;
-    padding: 2pt 4pt;
-    border-radius: 3pt;
-  }
   ul {
     margin: 8pt 0;
     padding-left: 20pt;
@@ -100,10 +123,59 @@ window.generateWordDoc = function(documentText, formData) {
 </head>
 <body>
 `;
+
+    // Add title
+    htmlContent += '<h1>1099 vs W-2 Tax Comparison Analysis</h1>';
+    
+    // Add basic information section
+    htmlContent += '<div class="summary-section">';
+    htmlContent += '<h3>Basic Information</h3>';
+    
+    // Parse basic info from document
+    lines.forEach(line => {
+      if (line.includes('Tax Year:') || line.includes('Filing Status:') || 
+          line.includes('State:') || line.includes('Dependents:') || 
+          line.includes('Annual Income:') || line.includes('Working Days:') || 
+          line.includes('Total Working Hours:') || line.includes('Effective Hourly Rate:')) {
+        const parts = line.split(':');
+        if (parts.length === 2) {
+          htmlContent += `<p><strong>${parts[0].trim()}:</strong> ${parts[1].trim()}</p>`;
+        }
+      }
+    });
+    htmlContent += '</div>';
+    
+    // Add comparison table
+    htmlContent += '<h2>Tax Comparison Results</h2>';
+    htmlContent += '<table class="comparison-table">';
+    htmlContent += '<thead>';
+    htmlContent += '<tr>';
+    htmlContent += '<th>Component</th>';
+    htmlContent += '<th class="w2-column">W-2 Employee</th>';
+    htmlContent += '<th class="contractor-column">1099 Contractor</th>';
+    htmlContent += '</tr>';
+    htmlContent += '</thead>';
+    htmlContent += '<tbody>';
+    
+    // Add table rows
+    comparisonData.forEach(row => {
+      const isNetIncome = row.component.includes('NET INCOME');
+      const rowClass = isNetIncome ? ' class="net-income-row"' : '';
+      const w2Class = isNetIncome ? '' : ' class="w2-column"';
+      const contractorClass = isNetIncome ? '' : ' class="contractor-column"';
+      
+      htmlContent += `<tr${rowClass}>`;
+      htmlContent += `<td>${row.component}</td>`;
+      htmlContent += `<td${w2Class}>${row.w2}</td>`;
+      htmlContent += `<td${contractorClass}>${row.contractor}</td>`;
+      htmlContent += '</tr>';
+    });
+    
+    htmlContent += '</tbody>';
+    htmlContent += '</table>';
     // Parse the document text and create structured HTML
     const lines = documentText.split('\n');
     let inTable = false;
-    let tableRows = [];
     
     lines.forEach(line => {
       line = line.trim();
@@ -116,25 +188,39 @@ window.generateWordDoc = function(documentText, formData) {
       else if (line.includes('SIDE-BY-SIDE COMPARISON')) {
         inTable = true;
         htmlContent += '<h2>Tax Comparison Results</h2>';
-        htmlContent += '<table class="comparison-table">';
-        htmlContent += '<thead><tr><th>Component</th><th class="w2-column">W-2 Employee</th><th class="contractor-column">1099 Contractor</th></tr></thead><tbody>';
+        // Create the actual comparison table with data
+        htmlContent += `
+<table class="comparison-table">
+<thead>
+<tr>
+<th>Component</th>
+<th class="w2-column">W-2 Employee</th>
+<th class="contractor-column">1099 Contractor</th>
+</tr>
+</thead>
+<tbody>`;
       }
       else if (line.includes('=======') && inTable) {
-        // End of table
+        // End of table - close it
         inTable = false;
         htmlContent += '</tbody></table>';
       }
-      else if (inTable && line.includes('|') && !line.includes('Component')) {
-        // Parse table row
-        const parts = line.split('|').map(p => p.trim()).filter(p => p);
+      else if (inTable && line.includes('|') && !line.includes('Component') && !line.includes('-------')) {
+        // Parse table row data
+        const parts = line.split('|').map(p => p.trim()).filter(p => p && p !== '');
         if (parts.length >= 3) {
-          const rowClass = parts[0].includes('NET INCOME') ? ' class="net-income-row"' : '';
-          const w2Class = parts[0].includes('NET INCOME') ? '' : 'w2-column';
-          const contractorClass = parts[0].includes('NET INCOME') ? '' : 'contractor-column';
+          const component = parts[0];
+          const w2Value = parts[1];
+          const contractorValue = parts[2];
+          
+          const rowClass = component.includes('NET INCOME') ? ' class="net-income-row"' : '';
+          const w2Class = component.includes('NET INCOME') ? '' : ' class="w2-column"';
+          const contractorClass = component.includes('NET INCOME') ? '' : ' class="contractor-column"';
+          
           htmlContent += `<tr${rowClass}>`;
-          htmlContent += `<td><strong>${parts[0]}</strong></td>`;
-          htmlContent += `<td class="${w2Class}">${parts[1]}</td>`;
-          htmlContent += `<td class="${contractorClass}">${parts[2]}</td>`;
+          htmlContent += `<td><strong>${component}</strong></td>`;
+          htmlContent += `<td${w2Class}>${w2Value}</td>`;
+          htmlContent += `<td${contractorClass}>${contractorValue}</td>`;
           htmlContent += '</tr>';
         }
       }
@@ -149,6 +235,9 @@ window.generateWordDoc = function(documentText, formData) {
       else if (line.includes('W-2 EMPLOYEE DETAILS:') || line.includes('1099 CONTRACTOR DETAILS:')) {
         htmlContent += `</div><div class="detail-section"><h3>${line}</h3>`;
       }
+      else if (line.includes('FINANCIAL IMPACT SUMMARY:')) {
+        htmlContent += `</div><div class="summary-section"><h3>${line}</h3>`;
+      }
       // Handle bullet points
       else if (line.startsWith('•')) {
         if (!htmlContent.includes('<ul>') || htmlContent.lastIndexOf('</ul>') > htmlContent.lastIndexOf('<ul>')) {
@@ -156,22 +245,22 @@ window.generateWordDoc = function(documentText, formData) {
         }
         htmlContent += `<li>${line.substring(1).trim()}</li>`;
       }
-      // Handle regular lines
-      else if (line && !line.includes('Generated by')) {
+      // Handle regular lines with key-value pairs
+      else if (line && !line.includes('Generated by') && !line.includes('=====')) {
         // Close any open ul tags
         if (htmlContent.includes('<ul>') && htmlContent.lastIndexOf('<ul>') > htmlContent.lastIndexOf('</ul>')) {
           htmlContent += '</ul>';
         }
         
         // Handle key-value pairs
-        if (line.includes(':') && !line.includes('DETAILS') && !line.includes('SUMMARY')) {
+        if (line.includes(':') && !line.includes('DETAILS') && !line.includes('SUMMARY') && !line.includes('CONSIDERATIONS')) {
           const parts = line.split(':');
           if (parts.length === 2) {
             htmlContent += `<p><strong>${parts[0].trim()}:</strong> ${parts[1].trim()}</p>`;
           } else {
             htmlContent += `<p>${line}</p>`;
           }
-        } else if (line) {
+        } else if (line && line.length > 0) {
           htmlContent += `<p>${line}</p>`;
         }
       }
@@ -182,6 +271,85 @@ window.generateWordDoc = function(documentText, formData) {
       htmlContent += '</ul>';
     }
     if (htmlContent.includes('<div class="detail-section">') && !htmlContent.includes('</div>')) {
+      htmlContent += '</div>';
+    }
+    
+    // Add footer
+    htmlContent += `<div class="summary-section">
+      <p><em>Generated by terms.law Tax Calculator on ${new Date().toLocaleDateString()}</em></p>
+      <p><strong>Disclaimer:</strong> This analysis is for educational purposes only. Consult a qualified tax professional for personalized advice.</p>
+    </div>`;
+    
+    // Close HTML document
+    htmlContent += '</body></html>';
+    
+    // Convert HTML to Blob
+    const blob = new Blob([htmlContent], { type: 'application/vnd.ms-word;charset=utf-8' });
+    
+    // Create download link and trigger download
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${formData.fileName || '1099-vs-W2-Tax-Comparison'}.doc`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    console.log("Document generated and download triggered");
+    
+  } catch (error) {
+    console.error("Error generating Word document:", error);
+    alert("Error generating Word document. Please try again or use the copy option.");
+  }
+};    
+    // Add details sections
+    let inDetails = false;
+    let currentSection = '';
+    
+    lines.forEach(line => {
+      line = line.trim();
+      
+      if (line.includes('W-2 EMPLOYEE DETAILS:')) {
+        htmlContent += '<div class="detail-section">';
+        htmlContent += '<h3>W-2 Employee Details</h3>';
+        htmlContent += '<ul>';
+        currentSection = 'w2';
+        inDetails = true;
+      } else if (line.includes('1099 CONTRACTOR DETAILS:')) {
+        if (currentSection === 'w2') htmlContent += '</ul></div>';
+        htmlContent += '<div class="detail-section">';
+        htmlContent += '<h3>1099 Contractor Details</h3>';
+        htmlContent += '<ul>';
+        currentSection = '1099';
+        inDetails = true;
+      } else if (line.includes('FINANCIAL IMPACT SUMMARY:')) {
+        if (inDetails) htmlContent += '</ul></div>';
+        htmlContent += '<div class="summary-section">';
+        htmlContent += '<h3>Financial Impact Summary</h3>';
+        currentSection = 'summary';
+        inDetails = false;
+      } else if (line.includes('IMPORTANT CONSIDERATIONS:')) {
+        if (currentSection === 'summary') htmlContent += '</div>';
+        htmlContent += '<div class="detail-section">';
+        htmlContent += '<h3>Important Considerations</h3>';
+        htmlContent += '<ul>';
+        currentSection = 'considerations';
+        inDetails = true;
+      } else if (line.startsWith('•') && inDetails) {
+        htmlContent += `<li>${line.substring(1).trim()}</li>`;
+      } else if (line.includes(':') && !line.includes('Generated by') && currentSection === 'summary') {
+        const parts = line.split(':');
+        if (parts.length === 2) {
+          htmlContent += `<p><strong>${parts[0].trim()}:</strong> ${parts[1].trim()}</p>`;
+        }
+      } else if (line.includes('-') && inDetails && currentSection !== 'considerations') {
+        htmlContent += `<li>${line.substring(1).trim()}</li>`;
+      }
+    });
+    
+    // Close any remaining open tags
+    if (inDetails) {
+      htmlContent += '</ul></div>';
+    } else if (currentSection === 'summary') {
       htmlContent += '</div>';
     }
     

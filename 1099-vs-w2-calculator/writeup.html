@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>1099 vs W-2: Master Your Employment Tax Strategy | terms.law</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -75,10 +71,16 @@
             margin-top: 20px;
         }
         
-        .author-badge img {
+        .author-avatar {
             width: 40px;
             height: 40px;
             border-radius: 50%;
+            background: linear-gradient(135deg, #4f46e5, #06b6d4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
             margin-right: 12px;
         }
         
@@ -96,6 +98,7 @@
             transition: all 0.3s ease;
             overflow: hidden;
             border: 1px solid #e2e8f0;
+            cursor: pointer;
         }
         
         .card:hover {
@@ -118,6 +121,7 @@
             margin-bottom: 16px;
             color: white;
             font-size: 24px;
+            font-weight: bold;
         }
         
         .risk-high { background: linear-gradient(135deg, #ef4444, #dc2626); }
@@ -151,30 +155,15 @@
         .medium-risk { background: #fffbeb; color: #d97706; }
         .low-risk { background: #f0fdf4; color: #059669; }
         
-        .interactive-element {
+        .action-tip {
+            padding: 12px;
             background: #f8fafc;
-            border: 2px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .interactive-element:hover {
-            background: #f1f5f9;
-            border-color: #4f46e5;
-        }
-        
-        .interactive-element.active {
-            background: #eff6ff;
-            border-color: #3b82f6;
-            border-style: solid;
-        }
-        
-        .calculator-embed {
-            margin: 40px 0;
-            text-align: center;
+            border-radius: 8px;
+            border-left: 4px solid #4f46e5;
+            font-size: 14px;
+            font-weight: 600;
+            color: #4f46e5;
+            margin-top: 16px;
         }
         
         .cta-button {
@@ -187,7 +176,7 @@
             border-radius: 12px;
             font-weight: 600;
             transition: all 0.3s ease;
-            margin: 20px 10px;
+            margin: 10px;
         }
         
         .cta-button:hover {
@@ -195,31 +184,8 @@
             box-shadow: 0 10px 30px rgba(79, 70, 229, 0.3);
         }
         
-        .collapsible {
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            margin-bottom: 16px;
-            overflow: hidden;
-        }
-        
-        .collapsible-header {
-            padding: 20px;
-            background: #f8fafc;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-        }
-        
-        .collapsible-content {
-            padding: 20px;
-            display: none;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .collapsible.active .collapsible-content {
-            display: block;
+        .cta-button.success {
+            background: linear-gradient(135deg, #10b981, #059669);
         }
         
         .comparison-table {
@@ -243,14 +209,15 @@
             background: #f8fafc;
             font-weight: 600;
             color: #374151;
+            text-align: center;
         }
         
-        .comparison-table td {
-            color: #4b5563;
+        .comparison-table td:first-child {
+            font-weight: 500;
         }
         
-        .w2-column { background: #fef7f0; }
-        .contractor-column { background: #f0f9ff; }
+        .w2-column { background: #fef7f0; text-align: center; }
+        .contractor-column { background: #f0f9ff; text-align: center; }
         
         .highlight {
             background: linear-gradient(120deg, #fbbf24, #f59e0b);
@@ -260,294 +227,324 @@
             font-weight: 600;
         }
         
+        .faq-section {
+            margin-top: 40px;
+        }
+        
+        .faq-item {
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .faq-question {
+            padding: 20px;
+            background: #f8fafc;
+            cursor: pointer;
+            font-weight: 600;
+            user-select: none;
+        }
+        
+        .faq-question:hover {
+            background: #f1f5f9;
+        }
+        
+        .faq-answer {
+            padding: 20px;
+            border-top: 1px solid #e2e8f0;
+            display: none;
+        }
+        
+        .faq-item.active .faq-answer {
+            display: block;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            text-align: center;
+            padding: 16px;
+            background: #f8fafc;
+            border-radius: 8px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4f46e5;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+        
         @media (max-width: 768px) {
             .hero h1 { font-size: 32px; }
             .grid { grid-template-columns: 1fr; }
             .hero { padding: 40px 20px; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .cta-button { display: block; text-align: center; margin: 10px 0; }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+    <div class="container">
+        <div class="hero">
+            <h1>1099 vs W-2 Tax Strategy</h1>
+            <p class="hero-subtitle">
+                Navigate employment classification with data-driven tax analysis
+            </p>
+            <div class="author-badge">
+                <div class="author-avatar">ST</div>
+                <div>
+                    <div style="font-weight: 600;">Sergei Tokmakov, Esq.</div>
+                    <div style="font-size: 14px; color: #64748b;">CA Bar #279869 | 13+ Years Experience</div>
+                </div>
+            </div>
+        </div>
         
-        const TaxGuide = () => {
-            const [activeCard, setActiveCard] = useState(null);
-            const [activeFaq, setActiveFaq] = useState(null);
-            
-            const toggleCard = (index) => {
-                setActiveCard(activeCard === index ? null : index);
-            };
-            
-            const toggleFaq = (index) => {
-                setActiveFaq(activeFaq === index ? null : index);
-            };
-            
-            useEffect(() => {
-                if (window.feather) {
-                    window.feather.replace();
-                }
-            }, []);
-            
-            const riskCards = [
-                {
-                    icon: "alert-triangle",
-                    title: "Self-Employment Tax Impact",
-                    risk: "high",
-                    content: "1099 contractors pay 15.3% self-employment tax vs 7.65% for W-2 employees. This doubles your Social Security and Medicare tax burden, but you can deduct half of it.",
-                    action: "Strategy: Maximize business deductions to offset higher SE tax burden"
-                },
-                {
-                    icon: "shield",
-                    title: "Retirement Planning Advantage",
-                    risk: "low",
-                    content: "Contractors can contribute up to $69,000 annually to retirement plans (SEP-IRA/Solo 401k) vs $23,000 W-2 limit. This creates massive tax savings for high earners.",
-                    action: "Opportunity: Use enhanced retirement contributions for tax planning"
-                },
-                {
-                    icon: "trending-up",
-                    title: "Business Expense Deductions",
-                    risk: "medium",
-                    content: "Home office, equipment, travel, and professional development are fully deductible for contractors. W-2 employees lost these deductions in 2018 tax reform.",
-                    action: "Critical: Track every business expense with proper documentation"
-                },
-                {
-                    icon: "calendar",
-                    title: "Quarterly Payment Requirements",
-                    risk: "high",
-                    content: "Contractors must make estimated quarterly payments or face penalties. Missing payments can result in significant interest charges and cash flow problems.",
-                    action: "Essential: Set aside 25-30% of income and pay quarterly"
-                }
-            ];
-            
-            const faqs = [
-                {
-                    question: "When does 1099 status make financial sense?",
-                    answer: "Generally when you can charge 30-40% more than W-2 equivalent to offset higher taxes and lack of benefits. High earners with significant business expenses benefit most from contractor status due to enhanced deduction opportunities and retirement contribution limits."
-                },
-                {
-                    question: "What's the biggest tax mistake contractors make?",
-                    answer: "Not setting aside enough for taxes. Unlike W-2 employees with automatic withholding, contractors must self-manage tax payments. Set aside 25-30% of gross income in a separate account and make quarterly payments to avoid penalties."
-                },
-                {
-                    question: "Can I switch between W-2 and 1099 with the same client?",
-                    answer: "This is risky and often indicates worker misclassification. The IRS examines the actual work relationship, not just the tax forms. True contractors have autonomy over how and when work is performed, use their own tools, and work for multiple clients."
-                },
-                {
-                    question: "How do I maximize deductions as a 1099 contractor?",
-                    answer: "Key deductions include: home office (simplified $5/sq ft method), business equipment, professional development, health insurance premiums, retirement contributions, and business travel. Keep detailed records and receipts for all business expenses."
-                },
-                {
-                    question: "What retirement planning options do contractors have?",
-                    answer: "SEP-IRA allows up to 25% of net self-employment income ($69,000 max). Solo 401(k) allows employee contributions ($23,000) plus employer contributions (25% of income), potentially reaching $69,000 total. Both far exceed W-2 limits."
-                }
-            ];
-            
-            return (
-                <div className="container">
-                    <div className="hero">
-                        <h1>1099 vs W-2 Tax Strategy</h1>
-                        <p className="hero-subtitle">
-                            Navigate employment classification with data-driven tax analysis
-                        </p>
-                        <div className="author-badge">
-                            <div style={{width: 40, height: 40, borderRadius: '50%', background: 'linear-gradient(135deg, #4f46e5, #06b6d4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold', marginRight: 12}}>ST</div>
-                            <div>
-                                <div style={{fontWeight: 600}}>Sergei Tokmakov, Esq.</div>
-                                <div style={{fontSize: 14, color: '#64748b'}}>CA Bar #279869 | 13+ Years Experience</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="grid">
-                        {riskCards.map((card, index) => (
-                            <div 
-                                key={index} 
-                                className={`card ${activeCard === index ? 'active' : ''}`}
-                                onClick={() => toggleCard(index)}
-                            >
-                                <div className="card-header">
-                                    <div className={`card-icon risk-${card.risk === 'high' ? 'high' : card.risk === 'medium' ? 'medium' : 'low'}`}>
-                                        <i data-feather={card.icon}></i>
-                                    </div>
-                                    <h3 className="card-title">{card.title}</h3>
-                                    <span className={`risk-indicator ${card.risk}-risk`}>
-                                        {card.risk} risk
-                                    </span>
-                                </div>
-                                <div className="card-content">
-                                    <p style={{marginBottom: 16}}>{card.content}</p>
-                                    <div style={{
-                                        padding: 12,
-                                        background: '#f8fafc',
-                                        borderRadius: 8,
-                                        borderLeft: '4px solid #4f46e5',
-                                        fontSize: 14,
-                                        fontWeight: 600,
-                                        color: '#4f46e5'
-                                    }}>
-                                        {card.action}
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                    
-                    <div className="card" style={{marginBottom: 40}}>
-                        <div className="card-header">
-                            <div className="card-icon info">
-                                <i data-feather="calculator"></i>
-                            </div>
-                            <h3 className="card-title">Interactive Tax Calculator</h3>
-                        </div>
-                        <div className="card-content">
-                            <p style={{marginBottom: 20}}>
-                                Calculate your exact tax burden under both employment classifications. 
-                                Our advanced calculator includes work schedule analysis, retirement planning, 
-                                and comprehensive business expense tracking.
-                            </p>
-                            <div style={{textAlign: 'center'}}>
-                                <a href="./index.html" className="cta-button">
-                                    <i data-feather="calculator" style={{marginRight: 8}}></i>
-                                    Use Tax Calculator
-                                </a>
-                                <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" className="cta-button" style={{background: 'linear-gradient(135deg, #10b981, #059669)'}}>
-                                    <i data-feather="calendar" style={{marginRight: 8}}></i>
-                                    Schedule Consultation
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div className="card" style={{marginBottom: 40}}>
-                        <div className="card-header">
-                            <div className="card-icon success">
-                                <i data-feather="bar-chart-2"></i>
-                            </div>
-                            <h3 className="card-title">Tax Impact Comparison</h3>
-                        </div>
-                        <div className="card-content">
-                            <table className="comparison-table">
-                                <thead>
-                                    <tr>
-                                        <th>Tax Component</th>
-                                        <th className="w2-column">W-2 Employee</th>
-                                        <th className="contractor-column">1099 Contractor</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td><strong>Payroll Taxes</strong></td>
-                                        <td>7.65% (employer pays half)</td>
-                                        <td><span className="highlight">15.3%</span> (you pay both halves)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Business Deductions</strong></td>
-                                        <td>Limited (mostly eliminated 2018)</td>
-                                        <td><span className="highlight">Extensive</span> (home office, equipment, travel)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Retirement Contributions</strong></td>
-                                        <td>$23,000 limit (401k)</td>
-                                        <td><span className="highlight">$69,000 limit</span> (SEP-IRA/Solo 401k)</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>QBI Deduction</strong></td>
-                                        <td>Not applicable</td>
-                                        <td><span className="highlight">Up to 20%</span> of qualified income</td>
-                                    </tr>
-                                    <tr>
-                                        <td><strong>Tax Withholding</strong></td>
-                                        <td>Automatic</td>
-                                        <td><span className="highlight">Quarterly payments</span> required</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <div className="card" style={{marginBottom: 40}}>
-                        <div className="card-header">
-                            <div className="card-icon info">
-                                <i data-feather="help-circle"></i>
-                            </div>
-                            <h3 className="card-title">Frequently Asked Questions</h3>
-                        </div>
-                        <div className="card-content">
-                            {faqs.map((faq, index) => (
-                                <div key={index} className={`collapsible ${activeFaq === index ? 'active' : ''}`}>
-                                    <div className="collapsible-header" onClick={() => toggleFaq(index)}>
-                                        <span>{faq.question}</span>
-                                        <i data-feather={activeFaq === index ? 'chevron-up' : 'chevron-down'}></i>
-                                    </div>
-                                    <div className="collapsible-content">
-                                        <p>{faq.answer}</p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                    
-                    <div className="card">
-                        <div className="card-header">
-                            <div className="card-icon success">
-                                <i data-feather="user-check"></i>
-                            </div>
-                            <h3 className="card-title">Expert Legal Guidance</h3>
-                        </div>
-                        <div className="card-content">
-                            <p style={{marginBottom: 20}}>
-                                Employment classification affects your taxes, benefits, and legal protections. 
-                                Get personalized advice from a California-licensed attorney with 13+ years 
-                                of experience in business law and tax planning.
-                            </p>
-                            <div style={{
-                                display: 'grid',
-                                gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                                gap: 16,
-                                marginBottom: 20
-                            }}>
-                                <div style={{textAlign: 'center', padding: 16, background: '#f8fafc', borderRadius: 8}}>
-                                    <div style={{fontSize: 24, fontWeight: 'bold', color: '#4f46e5'}}>1,750+</div>
-                                    <div style={{fontSize: 14, color: '#64748b'}}>Completed Projects</div>
-                                </div>
-                                <div style={{textAlign: 'center', padding: 16, background: '#f8fafc', borderRadius: 8}}>
-                                    <div style={{fontSize: 24, fontWeight: 'bold', color: '#4f46e5'}}>4.9/5</div>
-                                    <div style={{fontSize: 14, color: '#64748b'}}>Client Rating</div>
-                                </div>
-                                <div style={{textAlign: 'center', padding: 16, background: '#f8fafc', borderRadius: 8}}>
-                                    <div style={{fontSize: 24, fontWeight: 'bold', color: '#4f46e5'}}>13+</div>
-                                    <div style={{fontSize: 14, color: '#64748b'}}>Years Experience</div>
-                                </div>
-                            </div>
-                            <div style={{textAlign: 'center'}}>
-                                <a href="https://terms.law/call/" className="cta-button">
-                                    <i data-feather="phone" style={{marginRight: 8}}></i>
-                                    Schedule Consultation
-                                </a>
-                            </div>
-                        </div>
+        <div class="grid">
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-icon risk-high">⚠️</div>
+                    <h3 class="card-title">Self-Employment Tax Impact</h3>
+                    <span class="risk-indicator high-risk">high risk</span>
+                </div>
+                <div class="card-content">
+                    <p>1099 contractors pay 15.3% self-employment tax vs 7.65% for W-2 employees. This doubles your Social Security and Medicare tax burden, but you can deduct half of it.</p>
+                    <div class="action-tip">
+                        Strategy: Maximize business deductions to offset higher SE tax burden
                     </div>
                 </div>
-            );
-        };
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-icon risk-low">🛡️</div>
+                    <h3 class="card-title">Retirement Planning Advantage</h3>
+                    <span class="risk-indicator low-risk">low risk</span>
+                </div>
+                <div class="card-content">
+                    <p>Contractors can contribute up to $69,000 annually to retirement plans (SEP-IRA/Solo 401k) vs $23,000 W-2 limit. This creates massive tax savings for high earners.</p>
+                    <div class="action-tip">
+                        Opportunity: Use enhanced retirement contributions for tax planning
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-icon risk-medium">📈</div>
+                    <h3 class="card-title">Business Expense Deductions</h3>
+                    <span class="risk-indicator medium-risk">medium risk</span>
+                </div>
+                <div class="card-content">
+                    <p>Home office, equipment, travel, and professional development are fully deductible for contractors. W-2 employees lost these deductions in 2018 tax reform.</p>
+                    <div class="action-tip">
+                        Critical: Track every business expense with proper documentation
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" onclick="toggleCard(this)">
+                <div class="card-header">
+                    <div class="card-icon risk-high">📅</div>
+                    <h3 class="card-title">Quarterly Payment Requirements</h3>
+                    <span class="risk-indicator high-risk">high risk</span>
+                </div>
+                <div class="card-content">
+                    <p>Contractors must make estimated quarterly payments or face penalties. Missing payments can result in significant interest charges and cash flow problems.</p>
+                    <div class="action-tip">
+                        Essential: Set aside 25-30% of income and pay quarterly
+                    </div>
+                </div>
+            </div>
+        </div>
         
-        ReactDOM.render(<TaxGuide />, document.getElementById('root'));
-    </script>
-    
+        <div class="card" style="margin-bottom: 40px;">
+            <div class="card-header">
+                <div class="card-icon info">🧮</div>
+                <h3 class="card-title">Interactive Tax Calculator</h3>
+            </div>
+            <div class="card-content">
+                <p style="margin-bottom: 20px;">
+                    Calculate your exact tax burden under both employment classifications. 
+                    My calculator includes work schedule analysis, retirement planning, 
+                    and comprehensive business expense tracking.
+                </p>
+                <div style="text-align: center;">
+                    <a href="./index.html" class="cta-button">
+                        🧮 Use Tax Calculator
+                    </a>
+                    <a href="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting" class="cta-button success">
+                        📅 Schedule Consultation
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: 40px;">
+            <div class="card-header">
+                <div class="card-icon success">📊</div>
+                <h3 class="card-title">Tax Impact Comparison</h3>
+            </div>
+            <div class="card-content">
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Tax Component</th>
+                            <th class="w2-column">W-2 Employee</th>
+                            <th class="contractor-column">1099 Contractor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Payroll Taxes</strong></td>
+                            <td class="w2-column">7.65% (employer pays half)</td>
+                            <td class="contractor-column"><span class="highlight">15.3%</span> (you pay both halves)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Business Deductions</strong></td>
+                            <td class="w2-column">Limited (mostly eliminated 2018)</td>
+                            <td class="contractor-column"><span class="highlight">Extensive</span> (home office, equipment, travel)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Retirement Contributions</strong></td>
+                            <td class="w2-column">$23,000 limit (401k)</td>
+                            <td class="contractor-column"><span class="highlight">$69,000 limit</span> (SEP-IRA/Solo 401k)</td>
+                        </tr>
+                        <tr>
+                            <td><strong>QBI Deduction</strong></td>
+                            <td class="w2-column">Not applicable</td>
+                            <td class="contractor-column"><span class="highlight">Up to 20%</span> of qualified income</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Tax Withholding</strong></td>
+                            <td class="w2-column">Automatic</td>
+                            <td class="contractor-column"><span class="highlight">Quarterly payments</span> required</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="card faq-section">
+            <div class="card-header">
+                <div class="card-icon info">❓</div>
+                <h3 class="card-title">Frequently Asked Questions</h3>
+            </div>
+            <div class="card-content">
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        When does 1099 status make financial sense?
+                    </div>
+                    <div class="faq-answer">
+                        Generally when you can charge 30-40% more than W-2 equivalent to offset higher taxes and lack of benefits. High earners with significant business expenses benefit most from contractor status due to enhanced deduction opportunities and retirement contribution limits.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        What's the biggest tax mistake contractors make?
+                    </div>
+                    <div class="faq-answer">
+                        Not setting aside enough for taxes. Unlike W-2 employees with automatic withholding, contractors must self-manage tax payments. Set aside 25-30% of gross income in a separate account and make quarterly payments to avoid penalties.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        Can I switch between W-2 and 1099 with the same client?
+                    </div>
+                    <div class="faq-answer">
+                        This is risky and often indicates worker misclassification. The IRS examines the actual work relationship, not just the tax forms. True contractors have autonomy over how and when work is performed, use their own tools, and work for multiple clients.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        How do I maximize deductions as a 1099 contractor?
+                    </div>
+                    <div class="faq-answer">
+                        Key deductions include: home office (simplified $5/sq ft method), business equipment, professional development, health insurance premiums, retirement contributions, and business travel. Keep detailed records and receipts for all business expenses.
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        What retirement planning options do contractors have?
+                    </div>
+                    <div class="faq-answer">
+                        SEP-IRA allows up to 25% of net self-employment income ($69,000 max). Solo 401(k) allows employee contributions ($23,000) plus employer contributions (25% of income), potentially reaching $69,000 total. Both far exceed W-2 limits.
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon success">✅</div>
+                <h3 class="card-title">Expert Legal Guidance</h3>
+            </div>
+            <div class="card-content">
+                <p style="margin-bottom: 20px;">
+                    Employment classification affects your taxes, benefits, and legal protections. 
+                    Get personalized advice from a California-licensed attorney with 13+ years 
+                    of experience in business law and tax planning.
+                </p>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-number">1,750+</div>
+                        <div class="stat-label">Completed Projects</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">4.9/5</div>
+                        <div class="stat-label">Client Rating</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-number">13+</div>
+                        <div class="stat-label">Years Experience</div>
+                    </div>
+                </div>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="https://terms.law/call/" class="cta-button">
+                        📞 Schedule Consultation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            if (window.feather) {
-                window.feather.replace();
+        function toggleCard(card) {
+            // Optional: Add some visual feedback when cards are clicked
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 150);
+        }
+        
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't already active
+            if (!isActive) {
+                faqItem.classList.add('active');
             }
-        });
+        }
     </script>
-    
-    <!-- Calendly inline widget begin -->
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
-    <!-- Calendly inline widget end -->
 </body>
 </html>

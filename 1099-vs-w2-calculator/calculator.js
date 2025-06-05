@@ -300,16 +300,14 @@ Effective Hourly Rate: $${workingHours.effectiveHourlyRate.toFixed(2)}
 ===================================================================================
 |                              SIDE-BY-SIDE COMPARISON                            |
 ===================================================================================
-| Component                    | W-2 Employee        | 1099 Contractor        |
-|------------------------------|--------------------|-----------------------|
-| Gross Income                 | $${w2.grossIncome.toLocaleString().padEnd(15)} | $${c1099.grossIncome.toLocaleString().padEnd(15)} |
-| Deductions                   | $${w2.preTaxDeductions.toLocaleString().padEnd(15)} | $${c1099.businessDeductions.toLocaleString().padEnd(15)} |
-| Federal Income Tax           | $${w2.federalTax.toLocaleString().padEnd(15)} | $${c1099.federalTax.toLocaleString().padEnd(15)} |
-| State Income Tax             | $${w2.stateTax.toLocaleString().padEnd(15)} | $${c1099.stateTax.toLocaleString().padEnd(15)} |
-| Payroll/SE Tax               | $${(w2.socialSecurityTax + w2.medicareTax).toLocaleString().padEnd(15)} | $${c1099.selfEmploymentTax.toLocaleString().padEnd(15)} |
-| Total Taxes                  | $${w2.totalTaxes.toLocaleString().padEnd(15)} | $${c1099.totalTaxes.toLocaleString().padEnd(15)} |
-| NET INCOME                   | $${w2.netIncome.toLocaleString().padEnd(15)} | $${c1099.netIncome.toLocaleString().padEnd(15)} |
-| Effective Tax Rate           | ${w2.effectiveTaxRate.toFixed(2)}%${''.padEnd(12)} | ${c1099.effectiveTaxRate.toFixed(2)}%${''.padEnd(12)} |
+| Gross Income | $${w2.grossIncome.toLocaleString()} | $${c1099.grossIncome.toLocaleString()} |
+| Deductions | $${w2.preTaxDeductions.toLocaleString()} | $${c1099.businessDeductions.toLocaleString()} |
+| Federal Income Tax | $${w2.federalTax.toLocaleString()} | $${c1099.federalTax.toLocaleString()} |
+| State Income Tax | $${w2.stateTax.toLocaleString()} | $${c1099.stateTax.toLocaleString()} |
+| Payroll/SE Tax | $${(w2.socialSecurityTax + w2.medicareTax).toLocaleString()} | $${c1099.selfEmploymentTax.toLocaleString()} |
+| Total Taxes | $${w2.totalTaxes.toLocaleString()} | $${c1099.totalTaxes.toLocaleString()} |
+| NET INCOME | $${w2.netIncome.toLocaleString()} | $${c1099.netIncome.toLocaleString()} |
+| Effective Tax Rate | ${w2.effectiveTaxRate.toFixed(2)}% | ${c1099.effectiveTaxRate.toFixed(2)}% |
 ===================================================================================
 
 W-2 EMPLOYEE DETAILS:
