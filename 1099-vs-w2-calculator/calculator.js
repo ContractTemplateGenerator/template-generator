@@ -277,70 +277,73 @@ const TaxCalculator = () => {
       [name]: type === 'checkbox' ? checked : value
     }));
   };
-  // Enhanced document generation
+  // Enhanced document generation with side-by-side table format
   const generateDocumentText = () => {
     const w2 = w2Results;
     const c1099 = c1099Results;
     const difference = c1099.netIncome - w2.netIncome;
     
     return `1099 vs W-2 TAX COMPARISON ANALYSIS
-Tax Year: ${formData.taxYear} | Filing Status: ${formData.filingStatus === 'single' ? 'Single' : 'Married Filing Jointly'}
-State: ${formData.workingState} | Dependents: ${formData.dependents}
 
-WORK SCHEDULE ANALYSIS:
+Basic Information:
+Tax Year: ${formData.taxYear}
+Filing Status: ${formData.filingStatus === 'single' ? 'Single' : 'Married Filing Jointly'}
+State: ${formData.workingState}
+Dependents: ${formData.dependents}
 Annual Income: $${formData.annualIncome.toLocaleString()}
+
+Work Schedule Analysis:
 Working Days per Year: ${workingHours.workingDaysPerYear}
 Total Working Hours: ${workingHours.totalHours.toLocaleString()}
 Effective Hourly Rate: $${workingHours.effectiveHourlyRate.toFixed(2)}
 
-W-2 EMPLOYEE RESULTS:
-Gross Income: $${w2.grossIncome.toLocaleString()}
-Pre-Tax Deductions: $${w2.preTaxDeductions.toLocaleString()}
+===================================================================================
+|                              SIDE-BY-SIDE COMPARISON                            |
+===================================================================================
+| Component                    | W-2 Employee        | 1099 Contractor        |
+|------------------------------|--------------------|-----------------------|
+| Gross Income                 | $${w2.grossIncome.toLocaleString().padEnd(15)} | $${c1099.grossIncome.toLocaleString().padEnd(15)} |
+| Deductions                   | $${w2.preTaxDeductions.toLocaleString().padEnd(15)} | $${c1099.businessDeductions.toLocaleString().padEnd(15)} |
+| Federal Income Tax           | $${w2.federalTax.toLocaleString().padEnd(15)} | $${c1099.federalTax.toLocaleString().padEnd(15)} |
+| State Income Tax             | $${w2.stateTax.toLocaleString().padEnd(15)} | $${c1099.stateTax.toLocaleString().padEnd(15)} |
+| Payroll/SE Tax               | $${(w2.socialSecurityTax + w2.medicareTax).toLocaleString().padEnd(15)} | $${c1099.selfEmploymentTax.toLocaleString().padEnd(15)} |
+| Total Taxes                  | $${w2.totalTaxes.toLocaleString().padEnd(15)} | $${c1099.totalTaxes.toLocaleString().padEnd(15)} |
+| NET INCOME                   | $${w2.netIncome.toLocaleString().padEnd(15)} | $${c1099.netIncome.toLocaleString().padEnd(15)} |
+| Effective Tax Rate           | ${w2.effectiveTaxRate.toFixed(2)}%${''.padEnd(12)} | ${c1099.effectiveTaxRate.toFixed(2)}%${''.padEnd(12)} |
+===================================================================================
+
+W-2 EMPLOYEE DETAILS:
+• Pre-Tax Deductions: $${w2.preTaxDeductions.toLocaleString()}
   - 401(k) Contribution: $${((w2.grossIncome * formData.personalContribution401k) / 100).toLocaleString()}
   - FSA Contribution: $${w2.fsaContribution.toLocaleString()}
   - Health Insurance: $${formData.healthInsuranceCost.toLocaleString()}
+• Employer Benefits: $${w2.benefits.toLocaleString()}
+  - 401(k) Match: $${w2.employer401kMatch.toLocaleString()}
+  - Other Benefits: $${formData.otherW2Benefits.toLocaleString()}
+• Total Compensation Package: $${w2.totalCompensation.toLocaleString()}
 
-Tax Breakdown:
-Federal Income Tax: $${w2.federalTax.toLocaleString()}
-State Income Tax: $${w2.stateTax.toLocaleString()}
-Social Security Tax: $${w2.socialSecurityTax.toLocaleString()}
-Medicare Tax: $${w2.medicareTax.toLocaleString()}
-Total Taxes: $${w2.totalTaxes.toLocaleString()}
+1099 CONTRACTOR DETAILS:
+• Business Deductions: $${c1099.businessDeductions.toLocaleString()}
+• Tax Advantages:
+  - QBI Deduction: $${c1099.qbiDeduction.toLocaleString()}
+  - SE Tax Deduction: $${c1099.selfEmploymentTaxDeduction.toLocaleString()}
+  - Retirement Contribution: $${c1099.retirementContribution.toLocaleString()}
+  - Plan Type: ${formData.retirementPlanType === 'none' ? 'None Selected' : formData.retirementPlanType === 'sepira' ? 'SEP-IRA' : 'Solo 401(k)'}
+• Quarterly Payment: $${c1099.quarterlyPayment.toLocaleString()}
 
-Benefits:
-Employer 401(k) Match: $${w2.employer401kMatch.toLocaleString()}
-Total Benefits Value: $${w2.benefits.toLocaleString()}
-
-Net Take-Home: $${w2.netIncome.toLocaleString()}
-Total Compensation: $${w2.totalCompensation.toLocaleString()}
-Effective Tax Rate: ${w2.effectiveTaxRate.toFixed(2)}%
-
-1099 CONTRACTOR RESULTS:
-Gross Income: $${c1099.grossIncome.toLocaleString()}
-Business Deductions: $${c1099.businessDeductions.toLocaleString()}
-Net Business Earnings: $${c1099.netEarnings.toLocaleString()}
-
-Tax Breakdown:
-Federal Income Tax: $${c1099.federalTax.toLocaleString()}
-State Income Tax: $${c1099.stateTax.toLocaleString()}
-Self-Employment Tax: $${c1099.selfEmploymentTax.toLocaleString()}
-Total Taxes: $${c1099.totalTaxes.toLocaleString()}
-
-Tax Advantages:
-QBI Deduction: $${c1099.qbiDeduction.toLocaleString()}
-SE Tax Deduction: $${c1099.selfEmploymentTaxDeduction.toLocaleString()}
-Retirement Contribution: $${c1099.retirementContribution.toLocaleString()}
-Plan Type: ${formData.retirementPlanType === 'none' ? 'None' : formData.retirementPlanType === 'sepira' ? 'SEP-IRA' : 'Solo 401(k)'}
-
-Net Take-Home: $${c1099.netIncome.toLocaleString()}
-Effective Tax Rate: ${c1099.effectiveTaxRate.toFixed(2)}%
-Quarterly Payment: $${c1099.quarterlyPayment.toLocaleString()}
-
-COMPARISON SUMMARY:
+FINANCIAL IMPACT SUMMARY:
 Net Income Difference: $${difference.toLocaleString()} ${difference >= 0 ? '(1099 advantage)' : '(W-2 advantage)'}
 Tax Burden Difference: $${(c1099.totalTaxes - w2.totalTaxes).toLocaleString()}
+Effective Tax Rate Difference: ${(c1099.effectiveTaxRate - w2.effectiveTaxRate).toFixed(2)}%
 
-Generated by terms.law Tax Calculator`;
+IMPORTANT CONSIDERATIONS:
+• 1099 contractors pay double the self-employment taxes (15.3% vs 7.65%)
+• Contractors have extensive business deduction opportunities
+• W-2 employees receive employer benefits and automatic tax withholding
+• Quarterly estimated payments required for 1099 contractors
+• Enhanced retirement contribution limits available for contractors
+
+Generated by terms.law Tax Calculator - ${new Date().toLocaleDateString()}`;
   };
   const documentText = generateDocumentText();
   
@@ -348,9 +351,20 @@ Generated by terms.law Tax Calculator`;
   const copyToClipboard = async () => {
     try {
       await navigator.clipboard.writeText(documentText);
-      alert('Advanced tax comparison copied to clipboard!');
+      alert('Tax comparison copied to clipboard!');
     } catch (err) {
-      alert('Failed to copy to clipboard. Please try again.');
+      // Fallback for browsers that don't support clipboard API
+      const textArea = document.createElement('textarea');
+      textArea.value = documentText;
+      document.body.appendChild(textArea);
+      textArea.select();
+      try {
+        document.execCommand('copy');
+        alert('Tax comparison copied to clipboard!');
+      } catch (fallbackErr) {
+        alert('Copy failed. Please try again or use the download option.');
+      }
+      document.body.removeChild(textArea);
     }
   };
   

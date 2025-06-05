@@ -2,7 +2,7 @@ window.generateWordDoc = function(documentText, formData) {
   try {
     console.log("Starting Word document generation...");
     
-    // Create HTML content that can be rendered in Word
+    // Create HTML content that can be rendered in Word with proper table formatting
     let htmlContent = `
 <!DOCTYPE html>
 <html>
@@ -12,74 +12,184 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: Calibri, Arial, sans-serif;
-    font-size: 12pt;
-    line-height: 1.5;
-    margin: 0;
+    font-size: 11pt;
+    line-height: 1.4;
+    margin: 0.5in;
+    color: #333;
   }
   h1 {
     text-align: center;
     font-size: 16pt;
     margin-bottom: 20pt;
+    color: #2c3e50;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10pt;
   }
   h2 {
     font-size: 14pt;
-    margin-top: 14pt;
-    margin-bottom: 10pt;
+    margin-top: 16pt;
+    margin-bottom: 8pt;
+    color: #2c3e50;
   }
-  p {
-    margin-bottom: 10pt;
+  h3 {
+    font-size: 12pt;
+    margin-top: 12pt;
+    margin-bottom: 6pt;
+    color: #34495e;
   }
-  table {
+  .comparison-table {
     width: 100%;
     border-collapse: collapse;
-    margin-bottom: 12pt;
+    margin: 20pt 0;
+    border: 2px solid #2c3e50;
   }
-  th, td {
-    border: 1px solid #000;
-    padding: 8pt;
-    text-align: left;
-  }
-  th {
-    background-color: #f0f0f0;
+  .comparison-table th {
+    background-color: #3498db;
+    color: white;
     font-weight: bold;
+    padding: 12pt 8pt;
+    text-align: center;
+    border: 1px solid #2980b9;
+  }
+  .comparison-table td {
+    padding: 8pt;
+    border: 1px solid #bdc3c7;
+    text-align: center;
+  }
+  .comparison-table tr:nth-child(even) {
+    background-color: #f8f9fa;
+  }
+  .comparison-table tr:nth-child(odd) {
+    background-color: white;
+  }
+  .w2-column {
+    background-color: #fff3cd !important;
+  }
+  .contractor-column {
+    background-color: #d1ecf1 !important;
+  }
+  .net-income-row {
+    font-weight: bold;
+    background-color: #d4edda !important;
+  }
+  .summary-section {
+    background-color: #f8f9fa;
+    padding: 15pt;
+    border-left: 4px solid #3498db;
+    margin: 15pt 0;
+  }
+  .detail-section {
+    margin: 15pt 0;
+    padding: 10pt;
+    border: 1px solid #e9ecef;
+    border-radius: 5pt;
+  }
+  .highlight {
+    background-color: #fff3cd;
+    padding: 2pt 4pt;
+    border-radius: 3pt;
+  }
+  ul {
+    margin: 8pt 0;
+    padding-left: 20pt;
+  }
+  li {
+    margin: 4pt 0;
   }
 </style>
 </head>
 <body>
 `;
-    // Split document text if there's a form feed character (for separate pages)
-    let mainText = documentText;
-    let appendixText = '';
+    // Parse the document text and create structured HTML
+    const lines = documentText.split('\n');
+    let inTable = false;
+    let tableRows = [];
     
-    if (documentText.includes('\f')) {
-      const parts = documentText.split(/\f/);
-      mainText = parts[0];
-      appendixText = parts.length > 1 ? parts[1] : '';
+    lines.forEach(line => {
+      line = line.trim();
+      
+      // Handle main title
+      if (line.includes('TAX COMPARISON ANALYSIS')) {
+        htmlContent += `<h1>${line}</h1>`;
+      }
+      // Handle table section
+      else if (line.includes('SIDE-BY-SIDE COMPARISON')) {
+        inTable = true;
+        htmlContent += '<h2>Tax Comparison Results</h2>';
+        htmlContent += '<table class="comparison-table">';
+        htmlContent += '<thead><tr><th>Component</th><th class="w2-column">W-2 Employee</th><th class="contractor-column">1099 Contractor</th></tr></thead><tbody>';
+      }
+      else if (line.includes('=======') && inTable) {
+        // End of table
+        inTable = false;
+        htmlContent += '</tbody></table>';
+      }
+      else if (inTable && line.includes('|') && !line.includes('Component')) {
+        // Parse table row
+        const parts = line.split('|').map(p => p.trim()).filter(p => p);
+        if (parts.length >= 3) {
+          const rowClass = parts[0].includes('NET INCOME') ? ' class="net-income-row"' : '';
+          const w2Class = parts[0].includes('NET INCOME') ? '' : 'w2-column';
+          const contractorClass = parts[0].includes('NET INCOME') ? '' : 'contractor-column';
+          htmlContent += `<tr${rowClass}>`;
+          htmlContent += `<td><strong>${parts[0]}</strong></td>`;
+          htmlContent += `<td class="${w2Class}">${parts[1]}</td>`;
+          htmlContent += `<td class="${contractorClass}">${parts[2]}</td>`;
+          htmlContent += '</tr>';
+        }
+      }
+      // Handle section headers
+      else if (line.includes('DETAILS:') || line.includes('SUMMARY:') || line.includes('CONSIDERATIONS:')) {
+        htmlContent += `<h2>${line}</h2>`;
+      }
+      // Handle subsections
+      else if (line.includes('Basic Information:') || line.includes('Work Schedule Analysis:')) {
+        htmlContent += `<div class="summary-section"><h3>${line}</h3>`;
+      }
+      else if (line.includes('W-2 EMPLOYEE DETAILS:') || line.includes('1099 CONTRACTOR DETAILS:')) {
+        htmlContent += `</div><div class="detail-section"><h3>${line}</h3>`;
+      }
+      // Handle bullet points
+      else if (line.startsWith('•')) {
+        if (!htmlContent.includes('<ul>') || htmlContent.lastIndexOf('</ul>') > htmlContent.lastIndexOf('<ul>')) {
+          htmlContent += '<ul>';
+        }
+        htmlContent += `<li>${line.substring(1).trim()}</li>`;
+      }
+      // Handle regular lines
+      else if (line && !line.includes('Generated by')) {
+        // Close any open ul tags
+        if (htmlContent.includes('<ul>') && htmlContent.lastIndexOf('<ul>') > htmlContent.lastIndexOf('</ul>')) {
+          htmlContent += '</ul>';
+        }
+        
+        // Handle key-value pairs
+        if (line.includes(':') && !line.includes('DETAILS') && !line.includes('SUMMARY')) {
+          const parts = line.split(':');
+          if (parts.length === 2) {
+            htmlContent += `<p><strong>${parts[0].trim()}:</strong> ${parts[1].trim()}</p>`;
+          } else {
+            htmlContent += `<p>${line}</p>`;
+          }
+        } else if (line) {
+          htmlContent += `<p>${line}</p>`;
+        }
+      }
+    });
+    
+    // Close any remaining open tags
+    if (htmlContent.includes('<ul>') && htmlContent.lastIndexOf('<ul>') > htmlContent.lastIndexOf('</ul>')) {
+      htmlContent += '</ul>';
+    }
+    if (htmlContent.includes('<div class="detail-section">') && !htmlContent.includes('</div>')) {
+      htmlContent += '</div>';
     }
     
-    // Process main text - convert newlines to HTML paragraphs
-    const mainTextHtml = mainText
-      .split('\n\n')
-      .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
-      .join('');
-    
-    // Add main text to HTML content
-    htmlContent += mainTextHtml;
-    
-    // Add appendix on a new page if applicable
-    if (appendixText) {
-      // Add page break
-      htmlContent += '<div class="page-break"></div>';
-      
-      // Process appendix text
-      const appendixHtml = appendixText
-        .split('\n\n')
-        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
-        .join('');
-      
-      // Add appendix to HTML content
-      htmlContent += appendixHtml;
-    }
+    // Add footer
+    htmlContent += `<div class="summary-section">
+      <p><em>Generated by terms.law Tax Calculator on ${new Date().toLocaleDateString()}</em></p>
+      <p><strong>Disclaimer:</strong> This analysis is for educational purposes only. Consult a qualified tax professional for personalized advice.</p>
+    </div>`;
     
     // Close HTML document
     htmlContent += '</body></html>';

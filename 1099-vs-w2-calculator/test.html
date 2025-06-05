@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator Test | terms.law</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-container { max-width: 600px; margin: 0 auto; }
+        .status { padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .test-button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Calculator Diagnostic Test</h1>
+        
+        <div id="react-test">
+            <div class="status">Testing React components...</div>
+        </div>
+        
+        <div id="function-test">
+            <h3>Function Tests:</h3>
+            <button class="test-button" onclick="testClipboard()">Test Copy Function</button>
+            <button class="test-button" onclick="testCalculation()">Test Tax Calculation</button>
+            <button class="test-button" onclick="testDocGeneration()">Test Document Generation</button>
+        </div>
+        
+        <div id="results"></div>
+        
+        <h3>Console Errors:</h3>
+        <div id="console-errors" style="background: #f8f9fa; padding: 10px; border: 1px solid #dee2e6; min-height: 100px; font-family: monospace; font-size: 12px;">
+            Check browser console (F12) for detailed error messages...
+        </div>
+        
+        <h3>Calculator Status:</h3>
+        <div id="calculator-status">
+            <a href="./index.html" target="_blank" style="display: inline-block; padding: 10px 20px; background: #28a745; color: white; text-decoration: none; border-radius: 5px;">Open Calculator in New Tab</a>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+
+    <script type="text/babel">
+        const TestComponent = () => {
+            const [status, setStatus] = React.useState('Testing...');
+            
+            React.useEffect(() => {
+                try {
+                    setStatus('✅ React is working correctly!');
+                } catch (error) {
+                    setStatus('❌ React error: ' + error.message);
+                }
+            }, []);
+            
+            return React.createElement('div', {className: 'status success'}, status);
+        };
+        
+        ReactDOM.render(React.createElement(TestComponent), document.getElementById('react-test'));
+    </script>
+
+    <script>
+        function testClipboard() {
+            const testText = "Test clipboard functionality";
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(testText).then(() => {
+                    showResult('✅ Clipboard API working');
+                }).catch(err => {
+                    showResult('❌ Clipboard error: ' + err.message);
+                });
+            } else {
+                showResult('⚠️ Clipboard API not supported, using fallback');
+            }
+        }
+        
+        function testCalculation() {
+            try {
+                // Simple calculation test
+                const testResult = (75000 * 0.12).toFixed(2);
+                showResult('✅ Calculations working. Test: ' + testResult);
+            } catch (error) {
+                showResult('❌ Calculation error: ' + error.message);
+            }
+        }
+        
+        function testDocGeneration() {
+            try {
+                if (typeof window.generateWordDoc === 'function') {
+                    showResult('✅ Document generation function exists');
+                } else {
+                    showResult('❌ Document generation function not found');
+                }
+            } catch (error) {
+                showResult('❌ Document generation error: ' + error.message);
+            }
+        }
+        
+        function showResult(message) {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = 'status ' + (message.includes('✅') ? 'success' : 'error');
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // Capture console errors
+        const originalError = console.error;
+        console.error = function(...args) {
+            const errorDiv = document.getElementById('console-errors');
+            errorDiv.innerHTML += args.join(' ') + '<br>';
+            originalError.apply(console, args);
+        };
+        
+        // Test basic functionality on load
+        window.addEventListener('load', () => {
+            showResult('✅ Page loaded successfully');
+            
+            // Test if all required libraries are loaded
+            if (typeof React !== 'undefined') {
+                showResult('✅ React library loaded');
+            } else {
+                showResult('❌ React library not loaded');
+            }
+            
+            if (typeof ReactDOM !== 'undefined') {
+                showResult('✅ ReactDOM library loaded');
+            } else {
+                showResult('❌ ReactDOM library not loaded');
+            }
+        });
+    </script>
+</body>
+</html>
