@@ -46,6 +46,13 @@ const IndependentContractorGenerator = () => {
     setCurrentTab(index);
   };
 
+  // Initialize feather icons when component mounts
+  useEffect(() => {
+    if (window.feather) {
+      window.feather.replace();
+    }
+  }, [currentTab]);
+
   const copyToClipboard = () => {
     navigator.clipboard.writeText(documentText);
     alert('Agreement copied to clipboard!');
@@ -508,11 +515,6 @@ Date: _______________________         Date: _______________________`;
       <div className="info-card warning">
         <p><strong>⚠️ Important:</strong> This is a simplified agreement template. For complex projects or high-value contracts, consider consulting with an attorney to ensure all necessary protections are included.</p>
       </div>
-      
-      <!-- Calendly inline widget begin -->
-      <div className="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style={{minWidth:'320px',height:'700px'}}></div>
-      <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-      <!-- Calendly inline widget end -->
     </div>
   );
 
@@ -600,14 +602,20 @@ Date: _______________________         Date: _______________________`;
           Download MS Word
         </button>
         
-        <!-- Calendly link widget begin -->
-        <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-        <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
-        <a href="" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});return false;" className="nav-button" style={{backgroundColor: "#28a745", color: "white", border: "none", textDecoration: "none"}}>
+        <button
+          onClick={() => {
+            if (window.Calendly) {
+              window.Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});
+            } else {
+              window.open('https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting', '_blank');
+            }
+          }}
+          className="nav-button"
+          style={{backgroundColor: "#28a745", color: "white", border: "none"}}
+        >
           <i data-feather="calendar"></i>
           Consult
-        </a>
-        <!-- Calendly link widget end -->
+        </button>
         
         <button
           onClick={nextTab}
