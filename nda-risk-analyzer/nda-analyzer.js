@@ -192,122 +192,371 @@ const NDAAnalyzer = () => {
     };
 
     const createFallbackQuickFixes = (party1, party2) => {
-        return [
-            {
-                id: 'quick_1',
-                title: 'Add Mutual Termination Rights',
-                description: 'Either party should be able to terminate with reasonable notice period',
-                originalText: 'This Agreement takes effect on the Effective Date, and shall remain in effect for 5 year(s)',
-                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice to the other party',
-                impact: 'high',
-                riskLevel: 'red'
-            },
-            {
-                id: 'quick_2',
-                title: 'Narrow Overly Broad Confidentiality Definition',
+        const fixes = [];
+        const text = ndaText.toLowerCase();
+        
+        // Check for overly broad confidentiality definition
+        if (text.includes('all information') || text.includes('any information')) {
+            fixes.push({
+                id: 'quick_broad_def',
+                title: '🚨 Overly Broad Confidentiality Definition',
                 description: 'Current definition of "all information" is excessively broad and unenforceable',
                 originalText: 'all information furnished by the Disclosing Party',
                 improvedText: 'information that is marked as confidential or disclosed under circumstances indicating its confidential nature',
                 impact: 'high',
                 riskLevel: 'red'
-            },
-            {
-                id: 'quick_3',
-                title: 'Balance IP Assignment Clause',
-                description: 'Current IP assignment heavily favors one party - make it more mutual or scope-limited',
-                originalText: 'all Work Product is and will be the sole and exclusive property of Sergei Tokmakov',
-                improvedText: 'Work Product directly related to Disclosing Party\'s business shall be owned by Disclosing Party',
+            });
+        }
+        
+        // Check for excessive term length
+        const termMatch = text.match(/(\d+)\s*year/);
+        if (termMatch && parseInt(termMatch[1]) > 3) {
+            fixes.push({
+                id: 'quick_term_length',
+                title: '⚠️ Excessive Confidentiality Term',
+                description: `${termMatch[1]} years is unreasonably long for confidentiality obligations`,
+                originalText: `shall remain in effect for ${termMatch[1]} year(s)`,
+                improvedText: 'shall remain in effect for 2 years with confidentiality obligations lasting 3 years maximum',
                 impact: 'high',
                 riskLevel: 'red'
-            }
-        ];
+            });
+        }
+        
+        // Check for missing termination rights
+        if (!text.includes('terminate') || !text.includes('thirty') && !text.includes('30')) {
+            fixes.push({
+                id: 'quick_termination',
+                title: '⚠️ Add Mutual Termination Rights',
+                description: 'Either party should be able to terminate with reasonable notice period',
+                originalText: 'This Agreement takes effect on the Effective Date',
+                improvedText: 'Either party may terminate this Agreement upon thirty (30) days written notice',
+                impact: 'high',
+                riskLevel: 'red'
+            });
+        }
+        
+        // Check for problematic IP assignment
+        if (text.includes('all work product') || text.includes('sole and exclusive property')) {
+            fixes.push({
+                id: 'quick_ip_assignment',
+                title: '🚨 Excessive IP Assignment Clause',
+                description: 'Current IP assignment heavily favors one party - should be scope-limited',
+                originalText: 'all Work Product is and will be the sole and exclusive property',
+                improvedText: 'Work Product specifically created for and relating to Disclosing Party\'s business',
+                impact: 'high',
+                riskLevel: 'red'
+            });
+        }
+        
+        // Check for missing standard exclusions
+        if (!text.includes('public domain') || !text.includes('independently developed')) {
+            fixes.push({
+                id: 'quick_exclusions',
+                title: '⚠️ Add Standard Confidentiality Exclusions',
+                description: 'Missing critical exclusions for public domain and independently developed information',
+                originalText: 'The above restrictions on the use or disclosure',
+                improvedText: 'Confidentiality obligations do not apply to information that: (a) is public domain, (b) independently developed, (c) rightfully received from third parties, (d) required by law',
+                impact: 'medium',
+                riskLevel: 'yellow'
+            });
+        }
+        
+        // Check for unlimited indemnification
+        if (text.includes('fully indemnify') || text.includes('any and all')) {
+            fixes.push({
+                id: 'quick_indemnification',
+                title: '🚨 Unlimited Indemnification Exposure',
+                description: 'Indemnification creates unlimited liability - should be capped and mutual',
+                originalText: 'Each Party shall fully indemnify the other against any and all actions, claims, liability',
+                improvedText: 'Indemnification limited to direct damages up to $50,000, excluding consequential damages',
+                impact: 'high',
+                riskLevel: 'red'
+            });
+        }
+        
+        return fixes;
     };
 
     const createFallbackParty1Suggestions = (party1) => {
-        return [
-            {
-                id: 'party1_1',
+        const suggestions = [];
+        const text = ndaText.toLowerCase();
+        
+        // Add liquidated damages clause
+        if (!text.includes('liquidated damages') && !text.includes('$')) {
+            suggestions.push({
+                id: 'party1_liquidated_damages',
                 title: 'Add Liquidated Damages Clause',
                 description: `Strengthen ${party1}'s position by adding specific monetary penalties for breaches`,
                 originalText: 'any breach or threatened breach of this Agreement will cause not only financial harm',
                 improvedText: `any breach will result in liquidated damages of $10,000 per incident, plus injunctive relief`,
                 impact: 'medium',
                 riskLevel: 'yellow'
-            },
-            {
-                id: 'party1_2',
+            });
+        }
+        
+        // Strengthen return obligations
+        if (!text.includes('certification') || !text.includes('10 days')) {
+            suggestions.push({
+                id: 'party1_return_obligations',
                 title: 'Strengthen Return Obligations',
                 description: `Enhance ${party1}'s ability to ensure complete return of confidential materials`,
                 originalText: 'Return to the Disclosing Party all Confidential Information provided',
                 improvedText: 'Return all Confidential Information and provide written certification of destruction of all copies within 10 days',
                 impact: 'medium',
                 riskLevel: 'green'
-            },
-            {
-                id: 'party1_3',
+            });
+        }
+        
+        // Add survival clause
+        if (!text.includes('survive') && !text.includes('survival')) {
+            suggestions.push({
+                id: 'party1_survival',
                 title: 'Add Survival Clause for Key Provisions',
                 description: `Ensure ${party1}'s protections continue after agreement termination`,
                 originalText: 'This Agreement takes effect on the Effective Date',
                 improvedText: 'Confidentiality, IP assignment, and indemnification obligations shall survive termination for 5 years',
                 impact: 'medium',
                 riskLevel: 'green'
-            }
-        ];
+            });
+        }
+        
+        // Add employee non-solicitation
+        if (!text.includes('solicit') && !text.includes('recruit') && !text.includes('hire')) {
+            suggestions.push({
+                id: 'party1_non_solicitation',
+                title: 'Add Employee Non-Solicitation Clause',
+                description: `Protect ${party1} against employee poaching during sensitive business discussions`,
+                originalText: 'The Receiving Party: (a) shall take all reasonable steps',
+                improvedText: 'The Receiving Party: (a) agrees not to directly or indirectly solicit, recruit, or hire any employees of Disclosing Party during the term and for 12 months thereafter; (b) shall take all reasonable steps',
+                impact: 'medium',
+                riskLevel: 'yellow'
+            });
+        }
+        
+        // Strengthen confidentiality definition
+        if (!text.includes('regardless of marking') || text.includes('all information')) {
+            suggestions.push({
+                id: 'party1_broader_definition',
+                title: 'Expand Confidentiality Definition',
+                description: `Broaden protection to include information that ${party1} considers confidential`,
+                originalText: 'information that is marked, accompanied or supported by documents clearly and conspicuously designating',
+                improvedText: 'all information disclosed regardless of marking, including information that a reasonable person would understand to be confidential',
+                impact: 'high',
+                riskLevel: 'yellow'
+            });
+        }
+        
+        // Add stronger enforcement rights
+        if (!text.includes('without bond') || !text.includes('attorney')) {
+            suggestions.push({
+                id: 'party1_enforcement',
+                title: 'Strengthen Enforcement Mechanisms',
+                description: `Give ${party1} stronger legal remedies and cost recovery rights`,
+                originalText: 'Therefore, Disclosing Party shall be entitled, in addition to any other legal or equitable remedies',
+                improvedText: 'Disclosing Party shall be entitled to immediate injunctive relief without posting bond, plus attorney\'s fees and costs for successful enforcement',
+                impact: 'medium',
+                riskLevel: 'green'
+            });
+        }
+        
+        return suggestions;
     };
 
     const createFallbackParty2Suggestions = (party2) => {
-        return [
-            {
-                id: 'party2_1',
-                title: 'Limit Confidentiality Scope',
-                description: `Reduce ${party2}'s compliance burden by narrowing what constitutes confidential information`,
+        const suggestions = [];
+        const text = ndaText.toLowerCase();
+        
+        // Limit confidentiality scope - marking requirement
+        if (text.includes('all information') || !text.includes('marked')) {
+            suggestions.push({
+                id: 'party2_narrow_definition',
+                title: '🚨 Limit Confidentiality Scope - Add Marking Requirement',
+                description: `Reduce ${party2}'s compliance burden by requiring clear marking of confidential information`,
                 originalText: 'all information furnished by the Disclosing Party',
-                improvedText: 'information specifically marked "CONFIDENTIAL" or identified as confidential in writing',
+                improvedText: 'information specifically marked "CONFIDENTIAL" or identified as confidential in writing within 30 days',
                 impact: 'high',
-                riskLevel: 'yellow'
-            },
-            {
-                id: 'party2_2',
+                riskLevel: 'red'
+            });
+        }
+        
+        // Add residual knowledge exception
+        if (!text.includes('residual') && !text.includes('general knowledge')) {
+            suggestions.push({
+                id: 'party2_residual_knowledge',
                 title: 'Add Residual Knowledge Exception',
                 description: `Protect ${party2}'s ability to use general knowledge gained during relationship`,
                 originalText: 'shall not use Confidential Information for any purpose other than in connection with the Purpose',
                 improvedText: 'may retain and use general knowledge, skills, and experience gained, provided no specific confidential information is disclosed',
                 impact: 'medium',
                 riskLevel: 'yellow'
-            },
-            {
-                id: 'party2_3',
-                title: 'Limit Indemnification Exposure',
-                description: `Reduce ${party2}'s financial risk by capping indemnification obligations`,
-                originalText: 'Each Party shall fully indemnify the other against any and all actions, claims, liability',
-                improvedText: 'Indemnification shall be limited to direct damages up to $50,000 and exclude consequential damages',
+            });
+        }
+        
+        // Limit excessive term
+        const termMatch = text.match(/(\d+)\s*year/);
+        if (termMatch && parseInt(termMatch[1]) > 3) {
+            suggestions.push({
+                id: 'party2_limit_term',
+                title: '⚠️ Reduce Excessive Confidentiality Term',
+                description: `${termMatch[1]} years creates unreasonable long-term compliance burden for ${party2}`,
+                originalText: `shall remain in effect for ${termMatch[1]} year(s)`,
+                improvedText: 'shall remain in effect for 2 years with confidentiality obligations ending 3 years from disclosure',
                 impact: 'high',
                 riskLevel: 'red'
-            }
-        ];
+            });
+        }
+        
+        // Limit indemnification exposure
+        if (text.includes('fully indemnify') || text.includes('any and all')) {
+            suggestions.push({
+                id: 'party2_limit_indemnification',
+                title: '🚨 Cap Indemnification Exposure',
+                description: `Reduce ${party2}'s financial risk by limiting indemnification obligations`,
+                originalText: 'Each Party shall fully indemnify the other against any and all actions, claims, liability',
+                improvedText: 'Indemnification shall be limited to direct damages up to the compensation received, excluding consequential damages',
+                impact: 'high',
+                riskLevel: 'red'
+            });
+        }
+        
+        // Limit IP assignment scope
+        if (text.includes('all work product') || text.includes('sole and exclusive')) {
+            suggestions.push({
+                id: 'party2_limit_ip_assignment',
+                title: '🚨 Limit Scope of IP Assignment',
+                description: `Prevent ${party2} from losing rights to all intellectual property and improvements`,
+                originalText: 'all Work Product is and will be the sole and exclusive property',
+                improvedText: 'Work Product directly created for Disclosing Party\'s specific project, excluding pre-existing IP and general improvements',
+                impact: 'high',
+                riskLevel: 'red'
+            });
+        }
+        
+        // Add permitted disclosures
+        if (!text.includes('legal counsel') && !text.includes('advisors')) {
+            suggestions.push({
+                id: 'party2_permitted_disclosures',
+                title: 'Add Permitted Disclosure to Advisors',
+                description: `Allow ${party2} to share information with legal and financial advisors`,
+                originalText: 'shall not disclose or reveal any Confidential Information to any person',
+                improvedText: 'may disclose Confidential Information to legal counsel, accountants, and financial advisors under confidentiality obligations',
+                impact: 'medium',
+                riskLevel: 'yellow'
+            });
+        }
+        
+        // Add backup/compliance retention exception
+        if (!text.includes('backup') && !text.includes('compliance')) {
+            suggestions.push({
+                id: 'party2_backup_retention',
+                title: 'Add Backup and Compliance Retention Exception',
+                description: `Allow ${party2} to retain information in standard business systems`,
+                originalText: 'Destroy all copies it made of Confidential Information',
+                improvedText: 'Destroy all copies except those retained in automated backup systems or for legal compliance purposes',
+                impact: 'low',
+                riskLevel: 'green'
+            });
+        }
+        
+        // Limit "reasonable steps" definition
+        if (text.includes('reasonable steps') && !text.includes('ordinary care')) {
+            suggestions.push({
+                id: 'party2_reasonable_steps',
+                title: 'Clarify "Reasonable Steps" Standard',
+                description: `Define reasonable care standard to prevent excessive security requirements for ${party2}`,
+                originalText: 'reasonable steps means those steps the Receiving Party takes to protect its own similar proprietary',
+                improvedText: 'reasonable steps means ordinary care, which shall not require extraordinary security measures',
+                impact: 'medium',
+                riskLevel: 'yellow'
+            });
+        }
+        
+        return suggestions;
     };
 
     const createFallbackNeutralSuggestions = () => {
-        return [
-            {
-                id: 'neutral_1',
+        const suggestions = [];
+        const text = ndaText.toLowerCase();
+        
+        // Add dispute resolution mechanism
+        if (!text.includes('arbitration') && !text.includes('mediation')) {
+            suggestions.push({
+                id: 'neutral_dispute_resolution',
                 title: 'Add Dispute Resolution Mechanism',
-                description: 'Include mediation/arbitration process to resolve conflicts efficiently',
+                description: 'Include mediation/arbitration process to resolve conflicts efficiently and cost-effectively',
                 originalText: 'All disputes arising out of this Agreement shall be resolved by courts',
-                improvedText: 'Disputes shall first be subject to mediation, then binding arbitration under AAA rules',
+                improvedText: 'Disputes shall first be subject to mediation, then binding arbitration under AAA Commercial Rules',
                 impact: 'medium',
                 riskLevel: 'green'
-            },
-            {
-                id: 'neutral_2',
-                title: 'Clarify Notice Requirements',
-                description: 'Specify how confidentiality marking should be done to avoid disputes',
+            });
+        }
+        
+        // Clarify notice requirements
+        if (!text.includes('30 days') && text.includes('identified as confidential')) {
+            suggestions.push({
+                id: 'neutral_notice_requirements',
+                title: 'Clarify Confidentiality Marking Timeline',
+                description: 'Specify timeframe for marking oral disclosures to avoid future disputes',
                 originalText: 'identified as confidential or proprietary at the time of disclosure',
                 improvedText: 'clearly marked "CONFIDENTIAL" or identified as confidential in writing within 30 days of disclosure',
                 impact: 'low',
                 riskLevel: 'green'
-            }
-        ];
+            });
+        }
+        
+        // Add mutual warranty disclaimers
+        if (!text.includes('as is') || !text.includes('accuracy')) {
+            suggestions.push({
+                id: 'neutral_warranty_disclaimers',
+                title: 'Add Balanced Warranty Disclaimers',
+                description: 'Include mutual disclaimers while maintaining basic authority representations',
+                originalText: 'All Confidential Information is provided "AS IS" and without warranty',
+                improvedText: 'Each party represents authority to enter this agreement and warrants no known inaccuracies in disclosed information',
+                impact: 'low',
+                riskLevel: 'green'
+            });
+        }
+        
+        // Add force majeure clause
+        if (!text.includes('force majeure') && !text.includes('acts of god')) {
+            suggestions.push({
+                id: 'neutral_force_majeure',
+                title: 'Add Force Majeure Protection',
+                description: 'Protect both parties from liability due to unforeseeable circumstances',
+                originalText: 'Each Party acknowledges and confirms that a breach of its obligations',
+                improvedText: 'Neither party shall be liable for delays or failures due to circumstances beyond reasonable control, including force majeure events. Each Party acknowledges and confirms that a breach of its obligations',
+                impact: 'low',
+                riskLevel: 'green'
+            });
+        }
+        
+        // Improve governing law clarity
+        if (text.includes('laws of') && !text.includes('venue')) {
+            suggestions.push({
+                id: 'neutral_jurisdiction_clarity',
+                title: 'Clarify Jurisdiction and Venue',
+                description: 'Specify both governing law and court jurisdiction for dispute resolution',
+                originalText: 'This Agreement and any action related thereto will be governed and interpreted by and under the laws',
+                improvedText: 'This Agreement shall be governed by [State] law, with exclusive jurisdiction in [State] courts, or as specified in dispute resolution provisions',
+                impact: 'low',
+                riskLevel: 'green'
+            });
+        }
+        
+        // Add assignment restrictions
+        if (!text.includes('assign') && !text.includes('transfer')) {
+            suggestions.push({
+                id: 'neutral_assignment_restrictions',
+                title: 'Add Assignment Restrictions',
+                description: 'Prevent unauthorized transfer of agreement obligations to third parties',
+                originalText: 'Each Party must deliver all notices or other communications',
+                improvedText: 'Neither party may assign this Agreement without written consent, except to affiliates or successors. Each Party must deliver all notices or other communications',
+                impact: 'medium',
+                riskLevel: 'green'
+            });
+        }
+        
+        return suggestions;
     };
 
     const analyzeNDA = async () => {
@@ -346,13 +595,39 @@ Changes benefiting both parties: Clearer terms, better dispute resolution, mutua
 
 STANDARD NDA ISSUES TO EVALUATE:
 - Confidentiality definition scope (too broad "all information" vs. properly marked)
-- Term length and termination rights
-- IP ownership and work product assignment
-- Indemnification and liability exposure
-- Return/destruction obligations
-- Standard exclusions (public domain, independently developed, etc.)
-- Survival clauses
-- Enforcement mechanisms and remedies
+- Purpose/permitted use (narrow specific purpose vs. broad business relationship)
+- Term length and termination rights (excessive 5+ year terms vs. reasonable 2-3 years)
+- IP ownership and work product assignment (excessive "all work product" vs. scope-limited)
+- Indemnification and liability exposure (unlimited vs. capped with exclusions)
+- Return/destruction obligations (immediate vs. reasonable timeframes with exceptions)
+- Standard exclusions (public domain, independently developed, rightfully received, required by law)
+- Marking requirements (no marking requirement vs. clear marking obligations)
+- Residual knowledge exceptions (missing vs. included to protect general learning)
+- Employee/third party obligations (excessive liability vs. reasonable care standards)
+- Survival clauses (unclear vs. specific provisions that survive termination)
+- Enforcement mechanisms and remedies (one-sided vs. balanced with proper limitations)
+- Disclosure to third parties (overly restrictive vs. reasonable exceptions for advisors)
+- Reverse engineering prohibitions (absolute vs. qualified for publicly available info)
+- Compliance with law disclosures (no notice requirement vs. advance notice and cooperation)
+
+RED FLAGS TO IDENTIFY:
+- "All information" without marking requirements
+- Terms longer than 3 years
+- "Sole and exclusive property" for all work product  
+- "Fully indemnify...any and all" unlimited liability
+- No termination rights or difficult termination
+- Missing standard confidentiality exclusions
+- No residual knowledge protection
+- Automatic injunctive relief without showing harm
+- One-way confidentiality or IP assignment
+
+YELLOW FLAGS TO HIGHLIGHT:
+- Vague "business relationship" purpose without specificity
+- Missing destruction certification requirements
+- Unclear "reasonable steps" standards
+- No survival clause for key provisions
+- Missing employee non-solicitation (if relevant)
+- Broad indemnification without caps
 
 FORMAT EACH SUGGESTION AS:
 [Clear title]: [Description]. Original: "[exact text from agreement]" Improved: "[specific replacement text]"
@@ -397,10 +672,10 @@ ${ndaText}`;
             
             // Fallback analysis
             const fallbackSuggestions = {
-                quickFixes: createFallbackSuggestions(party1, party2),
-                party1: [],
-                party2: [],
-                neutral: []
+                quickFixes: createFallbackQuickFixes(party1, party2),
+                party1: createFallbackParty1Suggestions(party1),
+                party2: createFallbackParty2Suggestions(party2),
+                neutral: createFallbackNeutralSuggestions()
             };
             setSuggestions(fallbackSuggestions);
             
