@@ -789,14 +789,29 @@ ${ndaText}`;
         let previewText = ndaText;
         const allSuggestions = [...suggestions.quickFixes, ...suggestions.party1, ...suggestions.party2, ...suggestions.neutral];
         
-        // Apply selected changes
+        console.log("Generating preview with", Object.keys(selectedChanges).filter(key => selectedChanges[key]).length, "selected changes");
+        
+        // Apply selected changes in order
         allSuggestions.forEach(suggestion => {
             if (selectedChanges[suggestion.id] && suggestion.originalText && suggestion.improvedText) {
                 const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                 const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                 
+                console.log("Applying change:", cleanOriginal, "->", cleanImproved);
+                
+                // Try multiple replacement strategies
                 if (previewText.includes(cleanOriginal)) {
                     previewText = previewText.replace(cleanOriginal, cleanImproved);
+                    console.log("Applied exact match replacement");
+                } else {
+                    // Try case-insensitive replacement
+                    const regex = new RegExp(cleanOriginal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                    if (regex.test(previewText)) {
+                        previewText = previewText.replace(regex, cleanImproved);
+                        console.log("Applied case-insensitive replacement");
+                    } else {
+                        console.log("No match found for:", cleanOriginal);
+                    }
                 }
             }
         });
@@ -808,21 +823,33 @@ ${ndaText}`;
         let highlightedText = generatePreviewText();
         const allSuggestions = [...suggestions.quickFixes, ...suggestions.party1, ...suggestions.party2, ...suggestions.neutral];
         
+        console.log("=== HIGHLIGHTED PREVIEW GENERATION ===");
+        console.log("Preview text length:", highlightedText.length);
+        console.log("Last changed:", lastChanged);
+        
         // Highlight recently changed text
         if (lastChanged) {
             const changedSuggestion = allSuggestions.find(s => s.id === lastChanged);
             if (changedSuggestion && selectedChanges[lastChanged] && changedSuggestion.improvedText) {
                 const cleanImproved = changedSuggestion.improvedText.replace(/['"]/g, '').trim();
+                console.log("Highlighting text:", cleanImproved);
+                
+                // Create a more robust highlighting pattern
                 const improvedTextEscaped = cleanImproved.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                 const improvedPattern = new RegExp(`(${improvedTextEscaped})`, 'gi');
-                highlightedText = highlightedText.replace(improvedPattern, '<mark class="highlight-change">$1</mark>');
+                
+                if (improvedPattern.test(highlightedText)) {
+                    highlightedText = highlightedText.replace(improvedPattern, '<mark class="highlight-change">$1</mark>');
+                    console.log("✓ Applied highlighting");
+                } else {
+                    console.log("✗ No text found to highlight");
+                }
             }
         }
-        
+
         // Format document with proper legal structure
         const lines = highlightedText.split('\n').filter(line => line.trim().length > 0);
         let formattedHtml = '';
-        let inDefinitions = false;
         
         lines.forEach((line, index) => {
             const trimmedLine = line.trim();
@@ -834,18 +861,17 @@ ${ndaText}`;
             }
             
             // Main opening paragraph
-            if (trimmedLine.startsWith('This Confidentiality Agreement')) {
+            if (trimmedLine.startsWith('This Confidentiality Agreement') || trimmedLine.startsWith('This Nondisclosure Agreement')) {
                 formattedHtml += `<p class="opening-paragraph">${trimmedLine}</p>`;
                 return;
             }
             
             // Section headers (numbered)
-            const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+            const sectionMatch = trimmedLine.match(/^(\d+)\.?\s*(.+)/);
             if (sectionMatch) {
                 const sectionNum = sectionMatch[1];
                 const sectionTitle = sectionMatch[2].replace(/\.$/, '');
                 formattedHtml += `<h2 class="section-header">${sectionNum}. ${sectionTitle}</h2>`;
-                inDefinitions = sectionTitle.toLowerCase().includes('definition');
                 return;
             }
             
@@ -857,13 +883,13 @@ ${ndaText}`;
             }
             
             // Special handling for signature section
-            if (trimmedLine.includes('IN WITNESS WHEREOF')) {
-                formattedHtml += `<div class="signature-section"><p class="signature-paragraph"><strong>${trimmedLine}</strong></p>`;
+            if (trimmedLine.includes('IN WITNESS WHEREOF') || trimmedLine.includes('Disclosing Party') || trimmedLine.includes('Receiving Party')) {
+                formattedHtml += `<div class="signature-section"><p class="signature-paragraph"><strong>${trimmedLine}</strong></p></div>`;
                 return;
             }
             
             // Signature lines and names
-            if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/) || trimmedLine.match(/^\d{1,2}\/\d{1,2}\/\d{4}|[A-Z][a-z]+ \d+, \d{4}/)) {
+            if (trimmedLine.includes('By:') || trimmedLine.includes('Printed Name:') || trimmedLine.includes('Title:') || trimmedLine.includes('Dated:')) {
                 formattedHtml += `<p class="signature-line">${trimmedLine}</p>`;
                 return;
             }
@@ -874,11 +900,7 @@ ${ndaText}`;
             }
         });
         
-        // Close signature section if opened
-        if (highlightedText.includes('IN WITNESS WHEREOF')) {
-            formattedHtml += `</div>`;
-        }
-        
+        console.log("Final formatted HTML length:", formattedHtml.length);
         return formattedHtml;
     };
 
@@ -955,17 +977,33 @@ ${ndaText}`;
                     const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                     const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                     
+                    console.log(`Processing RTF change ${index + 1}:`, cleanOriginal.substring(0, 30), "->", cleanImproved.substring(0, 30));
+                    
                     if (processedText.includes(cleanOriginal)) {
-                        // Create RTF redlined replacement with strikethrough and highlighting
-                        const redlinedReplacement = `{\\strike ${cleanOriginal}}{\\highlight3 ${cleanImproved}}`;
+                        // Escape RTF special characters
+                        const escapedOriginal = cleanOriginal
+                            .replace(/\\/g, '\\\\')
+                            .replace(/\{/g, '\\{')
+                            .replace(/\}/g, '\\}');
+                        const escapedImproved = cleanImproved
+                            .replace(/\\/g, '\\\\')
+                            .replace(/\{/g, '\\{')
+                            .replace(/\}/g, '\\}');
+                        
+                        // Create working RTF redlined replacement
+                        const redlinedReplacement = `{\\strike\\cf2 ${escapedOriginal}} {\\cf3\\chcbpat4 ${escapedImproved}}`;
                         processedText = processedText.replace(cleanOriginal, redlinedReplacement);
+                        console.log("✓ Applied RTF redlining");
+                    } else {
+                        console.log("✗ Text not found in document");
                     }
                 }
             });
 
-            // Create RTF content
-            let rtfContent = `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-{\\colortbl;\\red255\\green255\\blue255;\\red255\\green0\\blue0;\\red0\\green255\\blue0;\\red255\\green255\\blue0;}
+            // Create RTF content with proper color table for redlining
+            let rtfContent = `{\\rtf1\\ansi\\deff0 
+{\\fonttbl {\\f0 Times New Roman;}}
+{\\colortbl;\\red0\\green0\\blue0;\\red255\\green0\\blue0;\\red0\\green150\\blue0;\\red255\\green255\\blue0;}
 \\f0\\fs24
 \\qc\\b\\ul CONFIDENTIALITY AGREEMENT\\b0\\ul0\\par
 \\pard\\par
