@@ -967,25 +967,55 @@ ${ndaText}`;
 
         try {
             console.log("Starting HTML-to-Word document generation...");
+            console.log(`Processing ${selectedSuggestions.length} selected changes`);
             
-            // Start with original text and apply changes with HTML redlining
+            // Use the same logic as generatePreviewText to apply changes sequentially
             let processedText = ndaText;
+            const allSuggestions = [...suggestions.quickFixes, ...suggestions.party1, ...suggestions.party2, ...suggestions.neutral];
             
-            // Apply changes with HTML-compatible redlining
+            // First apply all text changes sequentially (same logic as generatePreviewText)
+            allSuggestions.forEach((suggestion, index) => {
+                if (selectedChanges[suggestion.id] && suggestion.originalText && suggestion.improvedText) {
+                    const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
+                    const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
+                    
+                    console.log(`Step 1 - Applying change ${index + 1}:`, cleanOriginal.substring(0, 30), "->", cleanImproved.substring(0, 30));
+                    
+                    // Try multiple replacement strategies (same as generatePreviewText)
+                    if (processedText.includes(cleanOriginal)) {
+                        processedText = processedText.replace(cleanOriginal, cleanImproved);
+                        console.log("✓ Applied exact match replacement");
+                    } else {
+                        // Try case-insensitive replacement
+                        const regex = new RegExp(cleanOriginal.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+                        if (regex.test(processedText)) {
+                            processedText = processedText.replace(regex, cleanImproved);
+                            console.log("✓ Applied case-insensitive replacement");
+                        } else {
+                            console.log("✗ No match found for:", cleanOriginal);
+                        }
+                    }
+                }
+            });
+            
+            // Now create redlined version by comparing original to final
+            let redlinedText = ndaText;
+            
+            // Apply redlined changes for visual comparison in Word
             selectedSuggestions.forEach((suggestion, index) => {
                 if (suggestion.originalText && suggestion.improvedText) {
                     const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                     const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                     
-                    console.log(`Processing change ${index + 1}:`, cleanOriginal.substring(0, 30), "->", cleanImproved.substring(0, 30));
+                    console.log(`Step 2 - Creating redline ${index + 1}:`, cleanOriginal.substring(0, 30));
                     
-                    if (processedText.includes(cleanOriginal)) {
+                    if (redlinedText.includes(cleanOriginal)) {
                         // Create HTML redlined replacement for Word compatibility
                         const redlinedReplacement = `<span style="text-decoration: line-through; color: red;">${cleanOriginal}</span> <span style="background-color: #90EE90; color: black;">${cleanImproved}</span>`;
-                        processedText = processedText.replace(cleanOriginal, redlinedReplacement);
+                        redlinedText = redlinedText.replace(cleanOriginal, redlinedReplacement);
                         console.log("✓ Applied HTML redlining");
                     } else {
-                        console.log("✗ Text not found in document");
+                        console.log("✗ Original text not found for redlining");
                     }
                 }
             });
@@ -1044,8 +1074,8 @@ ${ndaText}`;
 <h1>CONFIDENTIALITY AGREEMENT</h1>
 `;
 
-            // Parse and format the document
-            const lines = processedText.split('\n').filter(line => line.trim().length > 0);
+            // Parse and format the document using the redlined version
+            const lines = redlinedText.split('\n').filter(line => line.trim().length > 0);
             
             lines.forEach((line, index) => {
                 const trimmedLine = line.trim();
