@@ -4,6 +4,8 @@ const NDAAnalyzer = () => {
     const [ndaText, setNdaText] = useState('');
     const [analysisResult, setAnalysisResult] = useState(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisProgress, setAnalysisProgress] = useState(0);
+    const [analysisStatus, setAnalysisStatus] = useState('');
     const [useClaudeAI, setUseClaudeAI] = useState(false);
     const [ndaUrl, setNdaUrl] = useState('');
     const [extractedData, setExtractedData] = useState({ parties: [], businessPurpose: '', jurisdiction: '' });
@@ -564,10 +566,20 @@ const NDAAnalyzer = () => {
             alert('Please enter your NDA text to analyze.');
             return;
         }
+        
+        // Initialize progress tracking
         setIsAnalyzing(true);
+        setAnalysisProgress(0);
+        setAnalysisStatus('Initializing analysis...');
         
         const party1 = extractedData.parties[0] || 'Disclosing Party';
         const party2 = extractedData.parties[1] || 'Receiving Party';
+        
+        // Progress update
+        setTimeout(() => {
+            setAnalysisProgress(20);
+            setAnalysisStatus('Extracting contract clauses...');
+        }, 500);
         
         const analysisPrompt = `Analyze this NDA from multiple perspectives focusing on standard NDA concerns. Each party wants to know: How restrictive is it? How well protected am I? What am I giving up?
 
@@ -635,7 +647,19 @@ FORMAT EACH SUGGESTION AS:
 NDA TEXT:
 ${ndaText}`;
         
+        // Progress update
+        setTimeout(() => {
+            setAnalysisProgress(40);
+            setAnalysisStatus('Analyzing legal provisions...');
+        }, 1000);
+        
         try {
+            // Progress update
+            setTimeout(() => {
+                setAnalysisProgress(60);
+                setAnalysisStatus('Generating recommendations...');
+            }, 2000);
+            
             const response = await fetch('https://template-generator-aob3.vercel.app/api/nda-risk-chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -645,6 +669,10 @@ ${ndaText}`;
                     extractedData: extractedData
                 })
             });
+            
+            // Progress update
+            setAnalysisProgress(80);
+            setAnalysisStatus('Processing results...');
             
             if (response.ok) {
                 const data = await response.json();
@@ -664,11 +692,18 @@ ${ndaText}`;
                     provider: data.provider
                 });
                 
+                // Complete progress
+                setAnalysisProgress(100);
+                setAnalysisStatus('Analysis complete!');
+                
             } else {
                 throw new Error('API request failed');
             }
         } catch (error) {
             console.error('Analysis error:', error);
+            
+            setAnalysisProgress(80);
+            setAnalysisStatus('Using backup analysis...');
             
             // Fallback analysis
             const fallbackSuggestions = {
@@ -685,8 +720,16 @@ ${ndaText}`;
                 model: 'Fallback Analysis',
                 provider: 'Terms.law'
             });
+            
+            setAnalysisProgress(100);
+            setAnalysisStatus('Backup analysis complete!');
         } finally {
-            setIsAnalyzing(false);
+            // Clear progress after a short delay
+            setTimeout(() => {
+                setIsAnalyzing(false);
+                setAnalysisProgress(0);
+                setAnalysisStatus('');
+            }, 1500);
         }
     };
 
@@ -801,7 +844,7 @@ ${ndaText}`;
             if (sectionMatch) {
                 const sectionNum = sectionMatch[1];
                 const sectionTitle = sectionMatch[2].replace(/\.$/, '');
-                formattedHtml += `<h2 class="section-header">${sectionNum}. ${sectionTitle.toUpperCase()}</h2>`;
+                formattedHtml += `<h2 class="section-header">${sectionNum}. ${sectionTitle}</h2>`;
                 inDefinitions = sectionTitle.toLowerCase().includes('definition');
                 return;
             }
@@ -842,28 +885,41 @@ ${ndaText}`;
     // Auto-scroll to highlighted changes with improved reliability
     useEffect(() => {
         if (previewRef.current && lastChanged) {
-            // Small delay to ensure DOM is updated
+            // Increased delay to ensure DOM is fully updated
             setTimeout(() => {
                 const highlightedElement = previewRef.current.querySelector('.highlight-change');
                 if (highlightedElement) {
-                    highlightedElement.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'center',
-                        inline: 'nearest'
-                    });
+                    // First check if element is visible
+                    const rect = highlightedElement.getBoundingClientRect();
+                    const container = previewRef.current;
+                    const containerRect = container.getBoundingClientRect();
+                    
+                    // Only scroll if element is not fully visible
+                    if (rect.top < containerRect.top || rect.bottom > containerRect.bottom) {
+                        highlightedElement.scrollIntoView({ 
+                            behavior: 'smooth', 
+                            block: 'center',
+                            inline: 'nearest'
+                        });
+                    }
                     
                     // Add enhanced highlighting effect
                     highlightedElement.style.animation = 'highlight-pulse 3s ease-in-out';
+                    highlightedElement.style.backgroundColor = '#ffeb3b';
                     
                     // Clear highlighting after 4 seconds
                     setTimeout(() => {
-                        setLastChanged(null);
                         if (highlightedElement) {
                             highlightedElement.style.animation = '';
+                            highlightedElement.style.backgroundColor = '#fff9c4';
                         }
+                        setLastChanged(null);
                     }, 4000);
+                } else {
+                    // If no highlighted element found, clear the lastChanged state
+                    setTimeout(() => setLastChanged(null), 1000);
                 }
-            }, 200);
+            }, 500); // Increased from 200ms to 500ms
         }
     }, [lastChanged, selectedChanges]);
 
@@ -1235,7 +1291,17 @@ ${ndaText}`;
                         {isAnalyzing ? (
                             <>
                                 <div className="loading-spinner"></div>
-                                Analyzing NDA...
+                                <div className="progress-container">
+                                    <div className="progress-bar">
+                                        <div 
+                                            className="progress-fill" 
+                                            style={{ width: `${analysisProgress}%` }}
+                                        ></div>
+                                    </div>
+                                    <div className="progress-text">
+                                        {analysisStatus || 'Analyzing NDA...'}
+                                    </div>
+                                </div>
                             </>
                         ) : (
                             <>
