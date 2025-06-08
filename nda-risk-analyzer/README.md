@@ -118,3 +118,29 @@ BOTTOM LINE: [Next steps]
 - Console logging shows API responses
 - Test page available for troubleshooting
 - Fallback responses provide helpful guidance
+
+## 🔧 **RECENT REDLINING FIX (June 8, 2025):**
+
+### **Problem Fixed:**
+The "Download Redlined Version" feature was generating RTF files with complex markup that displayed as plain text instead of proper redlines in Microsoft Word.
+
+### **Solution Implemented:**
+✅ Replaced RTF generation with HTML-to-Word conversion
+✅ Simple, reliable redlining: red strikethrough for deletions, green highlighting for additions
+✅ Professional document formatting with proper margins and fonts
+✅ Compatible with Microsoft Word, Google Docs, and other word processors
+
+### **Testing the Redlining Fix:**
+```javascript
+// Console commands for testing:
+testHTMLToWord()           // Download test redlined document
+validateRedlineGeneration() // Validate redline logic
+```
+
+### **Files Updated for Redlining:**
+- `nda-analyzer.js`: Fixed `downloadAsWord()` and `downloadCleanVersion()`
+- `styles.css`: Added redline preview styles
+- `test-html-to-word.js`: New test validation file
+- `REDLINING_FIX.md`: Detailed documentation
+
+The NDA Risk Analyzer now provides both proper API functionality AND correctly formatted redlined Word documents! 🎉

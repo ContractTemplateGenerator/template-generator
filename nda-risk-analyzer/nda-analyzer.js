@@ -966,47 +966,82 @@ ${ndaText}`;
         }
 
         try {
-            console.log("Starting RTF Word document generation...");
+            console.log("Starting HTML-to-Word document generation...");
             
-            // Start with original text and apply changes with RTF redlining
+            // Start with original text and apply changes with HTML redlining
             let processedText = ndaText;
             
-            // Apply changes with RTF-compatible redlining
+            // Apply changes with HTML-compatible redlining
             selectedSuggestions.forEach((suggestion, index) => {
                 if (suggestion.originalText && suggestion.improvedText) {
                     const cleanOriginal = suggestion.originalText.replace(/['"]/g, '').trim();
                     const cleanImproved = suggestion.improvedText.replace(/['"]/g, '').trim();
                     
-                    console.log(`Processing RTF change ${index + 1}:`, cleanOriginal.substring(0, 30), "->", cleanImproved.substring(0, 30));
+                    console.log(`Processing change ${index + 1}:`, cleanOriginal.substring(0, 30), "->", cleanImproved.substring(0, 30));
                     
                     if (processedText.includes(cleanOriginal)) {
-                        // Escape RTF special characters
-                        const escapedOriginal = cleanOriginal
-                            .replace(/\\/g, '\\\\')
-                            .replace(/\{/g, '\\{')
-                            .replace(/\}/g, '\\}');
-                        const escapedImproved = cleanImproved
-                            .replace(/\\/g, '\\\\')
-                            .replace(/\{/g, '\\{')
-                            .replace(/\}/g, '\\}');
-                        
-                        // Create working RTF redlined replacement
-                        const redlinedReplacement = `{\\strike\\cf2 ${escapedOriginal}} {\\cf3\\chcbpat4 ${escapedImproved}}`;
+                        // Create HTML redlined replacement for Word compatibility
+                        const redlinedReplacement = `<span style="text-decoration: line-through; color: red;">${cleanOriginal}</span> <span style="background-color: #90EE90; color: black;">${cleanImproved}</span>`;
                         processedText = processedText.replace(cleanOriginal, redlinedReplacement);
-                        console.log("✓ Applied RTF redlining");
+                        console.log("✓ Applied HTML redlining");
                     } else {
                         console.log("✗ Text not found in document");
                     }
                 }
             });
 
-            // Create RTF content with proper color table for redlining
-            let rtfContent = `{\\rtf1\\ansi\\deff0 
-{\\fonttbl {\\f0 Times New Roman;}}
-{\\colortbl;\\red0\\green0\\blue0;\\red255\\green0\\blue0;\\red0\\green150\\blue0;\\red255\\green255\\blue0;}
-\\f0\\fs24
-\\qc\\b\\ul CONFIDENTIALITY AGREEMENT\\b0\\ul0\\par
-\\pard\\par
+            // Create HTML content that can be properly imported into Word
+            let htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA Redlined Version</title>
+<style>
+  body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    margin: 1in;
+    color: black;
+  }
+  h1 {
+    text-align: center;
+    font-size: 16pt;
+    margin-bottom: 20pt;
+    text-decoration: underline;
+  }
+  h2 {
+    font-size: 14pt;
+    margin-top: 14pt;
+    margin-bottom: 10pt;
+    font-weight: bold;
+  }
+  p {
+    margin-bottom: 10pt;
+    text-align: justify;
+  }
+  .redline-delete {
+    text-decoration: line-through;
+    color: red;
+    background-color: #ffeeee;
+  }
+  .redline-insert {
+    background-color: #90EE90;
+    color: black;
+  }
+  .page-break {
+    page-break-before: always;
+  }
+  .change-summary {
+    margin-top: 20pt;
+    border: 1px solid #ccc;
+    padding: 10pt;
+    background-color: #f9f9f9;
+  }
+</style>
+</head>
+<body>
+<h1>CONFIDENTIALITY AGREEMENT</h1>
 `;
 
             // Parse and format the document
@@ -1021,80 +1056,79 @@ ${ndaText}`;
                 }
                 
                 // Opening paragraph
-                if (trimmedLine.startsWith('This Confidentiality Agreement')) {
-                    rtfContent += `${trimmedLine}\\par\\par\n`;
+                if (trimmedLine.includes('This Confidentiality Agreement') || trimmedLine.includes('This Agreement')) {
+                    htmlContent += `<p><strong>${trimmedLine}</strong></p>\n`;
                     return;
                 }
                 
-                // Section headers
-                const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+                // Section headers (look for numbered sections)
+                const sectionMatch = trimmedLine.match(/^(\d+)\.?\s*(.+)/);
                 if (sectionMatch) {
                     const sectionNum = sectionMatch[1];
                     const sectionTitle = sectionMatch[2].replace(/\.$/, '');
-                    rtfContent += `\\b ${sectionNum}. ${sectionTitle}\\b0\\par\n`;
+                    htmlContent += `<h2>${sectionNum}. ${sectionTitle}</h2>\n`;
                     return;
                 }
                 
-                // Subsections
+                // Subsections (lettered)
                 const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
                 if (subsectionMatch) {
-                    rtfContent += `\\li360 \\b ${subsectionMatch[1].toLowerCase()})\\b0 ${subsectionMatch[2]}\\par\n`;
+                    htmlContent += `<p style="margin-left: 20pt;"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>\n`;
                     return;
                 }
                 
                 // Signature section
-                if (trimmedLine.includes('IN WITNESS WHEREOF')) {
-                    rtfContent += `\\par\\b ${trimmedLine}\\b0\\par\n`;
+                if (trimmedLine.includes('IN WITNESS WHEREOF') || trimmedLine.includes('DISCLOSING PARTY:') || trimmedLine.includes('RECEIVING PARTY:')) {
+                    htmlContent += `<p><strong>${trimmedLine}</strong></p>\n`;
                     return;
                 }
                 
                 // Regular paragraphs
                 if (trimmedLine.length > 10) {
-                    // Escape RTF special characters
-                    const escapedLine = trimmedLine
-                        .replace(/\\/g, '\\\\')
-                        .replace(/\{/g, '\\{')
-                        .replace(/\}/g, '\\}');
-                    rtfContent += `${escapedLine}\\par\\par\n`;
+                    htmlContent += `<p>${trimmedLine}</p>\n`;
                 }
             });
             
             // Add page break and change summary
-            rtfContent += `\\page\n`;
-            rtfContent += `\\qc\\b\\fs28 SUMMARY OF CHANGES\\b0\\fs24\\par\\par\n`;
-            rtfContent += `\\pard\\b Total Changes Applied:\\b0 ${selectedSuggestions.length}\\par\n`;
-            rtfContent += `\\b Review Date:\\b0 ${new Date().toLocaleDateString()}\\par\n`;
-            rtfContent += `\\b Analyzed by:\\b0 NDA Legal Risk Analyzer\\par\\par\n`;
+            htmlContent += `<div class="page-break"></div>\n`;
+            htmlContent += `<h1>SUMMARY OF CHANGES</h1>\n`;
+            htmlContent += `<div class="change-summary">\n`;
+            htmlContent += `<p><strong>Total Changes Applied:</strong> ${selectedSuggestions.length}</p>\n`;
+            htmlContent += `<p><strong>Review Date:</strong> ${new Date().toLocaleDateString()}</p>\n`;
+            htmlContent += `<p><strong>Analyzed by:</strong> NDA Legal Risk Analyzer</p>\n`;
+            htmlContent += `</div>\n`;
             
             selectedSuggestions.forEach((suggestion, index) => {
-                rtfContent += `\\b Change ${index + 1}:\\b0 ${suggestion.title}\\par\n`;
-                rtfContent += `\\b Risk Level:\\b0 ${suggestion.riskLevel} - ${suggestion.impact} impact\\par\n`;
-                rtfContent += `\\b Original:\\b0 {\\strike ${suggestion.originalText}}\\par\n`;
-                rtfContent += `\\b Revised:\\b0 {\\highlight3 ${suggestion.improvedText}}\\par\n`;
-                rtfContent += `\\b Rationale:\\b0 ${suggestion.description}\\par\\par\n`;
+                htmlContent += `<div class="change-summary" style="margin-top: 15pt;">\n`;
+                htmlContent += `<p><strong>Change ${index + 1}:</strong> ${suggestion.title}</p>\n`;
+                htmlContent += `<p><strong>Risk Level:</strong> ${suggestion.riskLevel} - ${suggestion.impact} impact</p>\n`;
+                htmlContent += `<p><strong>Original:</strong> <span class="redline-delete">${suggestion.originalText}</span></p>\n`;
+                htmlContent += `<p><strong>Revised:</strong> <span class="redline-insert">${suggestion.improvedText}</span></p>\n`;
+                htmlContent += `<p><strong>Rationale:</strong> ${suggestion.description}</p>\n`;
+                htmlContent += `</div>\n`;
             });
             
-            // Close RTF document
-            rtfContent += `}`;
+            // Close HTML document
+            htmlContent += `</body></html>`;
             
-            // Create and download the file
-            const blob = new Blob([rtfContent], { 
-                type: 'application/rtf'
+            // Create and download as Word document using HTML format
+            const blob = new Blob([htmlContent], { 
+                type: 'application/vnd.ms-word'
             });
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `NDA_Redlined_${new Date().toISOString().split('T')[0]}.rtf`;
+            link.download = `NDA_Redlined_${new Date().toISOString().split('T')[0]}.doc`;
             
             // Trigger download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            console.log("RTF Word document generated successfully");
+            console.log("HTML-to-Word document generated successfully");
             
         } catch (error) {
-            console.error("Error generating RTF document:", error);
+            console.error("Error generating Word document:", error);
             alert("Error generating Word document. Please try the copy option or contact support.");
         }
     };
@@ -1102,13 +1136,45 @@ ${ndaText}`;
     const downloadCleanVersion = () => {
         const text = generatePreviewText();
         try {
-            console.log("Starting clean RTF document generation...");
+            console.log("Starting clean HTML-to-Word document generation...");
             
-            // Create RTF content for clean document
-            let rtfContent = `{\\rtf1\\ansi\\deff0 {\\fonttbl {\\f0 Times New Roman;}}
-\\f0\\fs24
-\\qc\\b\\ul CONFIDENTIALITY AGREEMENT\\b0\\ul0\\par
-\\pard\\par
+            // Create HTML content for clean document
+            let htmlContent = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NDA Clean Version</title>
+<style>
+  body {
+    font-family: 'Times New Roman', serif;
+    font-size: 12pt;
+    line-height: 1.5;
+    margin: 1in;
+    color: black;
+  }
+  h1 {
+    text-align: center;
+    font-size: 16pt;
+    margin-bottom: 20pt;
+    text-decoration: underline;
+  }
+  h2 {
+    font-size: 14pt;
+    margin-top: 14pt;
+    margin-bottom: 10pt;
+    font-weight: bold;
+  }
+  p {
+    margin-bottom: 10pt;
+    text-align: justify;
+  }
+  .signature-section {
+    margin-top: 30pt;
+  }
+</style>
+</head>
+<body>
+<h1>CONFIDENTIALITY AGREEMENT</h1>
 `;
 
             // Parse and format the clean document
@@ -1123,78 +1189,66 @@ ${ndaText}`;
                 }
                 
                 // Main opening paragraph
-                if (trimmedLine.startsWith('This Confidentiality Agreement')) {
-                    const escapedLine = trimmedLine
-                        .replace(/\\/g, '\\\\')
-                        .replace(/\{/g, '\\{')
-                        .replace(/\}/g, '\\}');
-                    rtfContent += `${escapedLine}\\par\\par\n`;
+                if (trimmedLine.includes('This Confidentiality Agreement') || trimmedLine.includes('This Agreement')) {
+                    htmlContent += `<p><strong>${trimmedLine}</strong></p>\n`;
                     return;
                 }
                 
                 // Section headers (numbered)
-                const sectionMatch = trimmedLine.match(/^(\d+)\)\s*(.+)/);
+                const sectionMatch = trimmedLine.match(/^(\d+)\.?\s*(.+)/);
                 if (sectionMatch) {
                     const sectionNum = sectionMatch[1];
                     const sectionTitle = sectionMatch[2].replace(/\.$/, '');
-                    rtfContent += `\\b ${sectionNum}. ${sectionTitle}\\b0\\par\n`;
+                    htmlContent += `<h2>${sectionNum}. ${sectionTitle}</h2>\n`;
                     return;
                 }
                 
                 // Subsections (lettered)
                 const subsectionMatch = trimmedLine.match(/^([a-z])\)\s*(.+)/i);
                 if (subsectionMatch) {
-                    const escapedSubsection = subsectionMatch[2]
-                        .replace(/\\/g, '\\\\')
-                        .replace(/\{/g, '\\{')
-                        .replace(/\}/g, '\\}');
-                    rtfContent += `\\li360 \\b ${subsectionMatch[1].toLowerCase()})\\b0 ${escapedSubsection}\\par\n`;
+                    htmlContent += `<p style="margin-left: 20pt;"><strong>${subsectionMatch[1].toLowerCase()})</strong> ${subsectionMatch[2]}</p>\n`;
                     return;
                 }
                 
                 // Special handling for signature section
-                if (trimmedLine.includes('IN WITNESS WHEREOF')) {
-                    rtfContent += `\\par\\b ${trimmedLine}\\b0\\par\n`;
+                if (trimmedLine.includes('IN WITNESS WHEREOF') || trimmedLine.includes('DISCLOSING PARTY:') || trimmedLine.includes('RECEIVING PARTY:')) {
+                    htmlContent += `<div class="signature-section"><p><strong>${trimmedLine}</strong></p></div>\n`;
                     return;
                 }
                 
-                // Signature lines
-                if (trimmedLine.includes('X:') || trimmedLine.match(/^[A-Z][a-z]+ [A-Z]/) || trimmedLine.match(/^\d{1,2}\/\d{1,2}\/\d{4}/)) {
-                    rtfContent += `${trimmedLine}\\par\n`;
+                // Signature lines and names
+                if (trimmedLine.includes('By:') || trimmedLine.includes('Name:') || trimmedLine.includes('Title:') || trimmedLine.includes('Date:')) {
+                    htmlContent += `<p style="margin-left: 20pt;">${trimmedLine}</p>\n`;
                     return;
                 }
                 
                 // Regular paragraphs
                 if (trimmedLine.length > 10) {
-                    const escapedLine = trimmedLine
-                        .replace(/\\/g, '\\\\')
-                        .replace(/\{/g, '\\{')
-                        .replace(/\}/g, '\\}');
-                    rtfContent += `${escapedLine}\\par\\par\n`;
+                    htmlContent += `<p>${trimmedLine}</p>\n`;
                 }
             });
             
-            // Close RTF document
-            rtfContent += `}`;
+            // Close HTML document
+            htmlContent += `</body></html>`;
             
-            // Create and download the file
-            const blob = new Blob([rtfContent], { 
-                type: 'application/rtf'
+            // Create and download the file using HTML-to-Word format
+            const blob = new Blob([htmlContent], { 
+                type: 'application/vnd.ms-word'
             });
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
-            link.download = `NDA_Clean_Final_${new Date().toISOString().split('T')[0]}.rtf`;
+            link.download = `NDA_Clean_Final_${new Date().toISOString().split('T')[0]}.doc`;
             
             // Trigger download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            console.log("Clean RTF document generated successfully");
+            console.log("Clean HTML-to-Word document generated successfully");
             
         } catch (error) {
-            console.error("Error generating clean RTF document:", error);
+            console.error("Error generating clean Word document:", error);
             alert("Error generating Word document. Please try the copy option.");
         }
     };
