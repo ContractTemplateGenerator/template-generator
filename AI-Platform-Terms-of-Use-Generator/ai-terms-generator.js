@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useCallback, useMemo } = React;
 
 // Icon component
 const Icon = ({ name, size = 16, className = "", style = {} }) => {
@@ -81,6 +81,33 @@ const AITermsGenerator = () => {
       marketing: false,
       analytics: true
     },
+    shareServiceProviders: true,
+    shareAffiliates: false,
+    shareLegal: true,
+    shareAcquisition: true,
+    rightAccess: true,
+    rightCorrect: true,
+    rightDelete: true,
+    rightPortability: true,
+    
+    // IP and Content
+    ipOwnership: 'user',
+    licenseType: 'broad',
+    aiOutputOwnership: 'user',
+    ipFeedback: true,
+    ipTraining: true,
+    ipReverseEngineering: false,
+    ipAttribution: false,
+    
+    // Payment Terms
+    paymentModel: 'freemium',
+    billingCycle: 'monthly',
+    autoRenewal: 'yes',
+    refundPolicy: 'limited',
+    acceptCreditCard: true,
+    acceptPayPal: true,
+    acceptCrypto: false,
+    acceptWire: false,
     
     // Payment Terms
     paymentModel: 'freemium',
@@ -109,7 +136,7 @@ const AITermsGenerator = () => {
     { id: 7, label: 'Finalization', icon: 'check-circle' }
   ];
 
-  // Handle form changes
+  // Handle form changes with debouncing for better performance
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     
@@ -906,9 +933,39 @@ Last Updated: ${effectiveDate}
     );
   };
 
-  // Live Preview Component
+  // Live Preview Component with optimized performance
   const LivePreview = () => {
-    const documentText = generateDocumentText();
+    // Memoize document text generation to prevent unnecessary recalculations
+    const documentText = useMemo(() => {
+      return generateDocumentText();
+    }, [formData]);
+    
+    // Optimize preview rendering
+    const previewHTML = useMemo(() => {
+      return documentText
+        .replace(/\n/g, '<br>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^(\d+\.\s+[A-Z\s&]+)$/gm, '<h2>$1</h2>')
+        .replace(/^(\d+\.\d+\s+[A-Za-z\s]+)\./gm, '<h3>$1</h3>');
+    }, [documentText]);
+    
+    // Scroll to highlighted section when lastChanged updates
+    useEffect(() => {
+      if (lastChanged && previewRef.current) {
+        const timeout = setTimeout(() => {
+          // Simple highlighting - find section based on current tab
+          const sections = previewRef.current.querySelectorAll('h2, h3');
+          if (sections.length > currentTab) {
+            sections[currentTab]?.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'start' 
+            });
+          }
+        }, 100);
+        
+        return () => clearTimeout(timeout);
+      }
+    }, [lastChanged, currentTab]);
     
     return (
       <div className="preview-panel">
@@ -916,21 +973,19 @@ Last Updated: ${effectiveDate}
           <h3 className="preview-title">
             <Icon name="file-text" size={20} style={{marginRight: '8px'}} />
             Live Preview - AI Terms of Use
-            {!isPaid && <span className="premium-badge">Premium Content</span>}
+            {!isPaid && <span className="premium-badge">Download Requires Payment</span>}
           </h3>
         </div>
         
         <div 
-          className={`preview-content ${!isPaid ? 'preview-content' : ''}`}
+          className="preview-content"
           ref={previewRef}
           style={{
-            userSelect: isPaid ? 'text' : 'none',
-            pointerEvents: isPaid ? 'auto' : 'none'
+            userSelect: 'text',
+            pointerEvents: 'auto'
           }}
         >
-          <div dangerouslySetInnerHTML={{
-            __html: documentText.replace(/\n/g, '<br>').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-          }} />
+          <div dangerouslySetInnerHTML={{ __html: previewHTML }} />
         </div>
       </div>
     );
@@ -966,62 +1021,10 @@ Last Updated: ${effectiveDate}
             {currentTab === 0 && <CompanyInfoTab />}
             {currentTab === 1 && <PlatformDetailsTab />}
             {currentTab === 2 && <UserTermsTab />}
-            {currentTab === 3 && (
-              <div className="premium-feature">
-                <div className="premium-badge">Premium</div>
-                <div className="section-title">IP & Content Rights</div>
-                <p>Advanced intellectual property and content licensing options available in premium version.</p>
-                <button 
-                  className="nav-button" 
-                  onClick={() => setShowPaymentModal(true)}
-                  style={{background: 'var(--premium-gradient)', color: 'white', border: 'none'}}
-                >
-                  Unlock Premium Features
-                </button>
-              </div>
-            )}
-            {currentTab === 4 && (
-              <div className="premium-feature">
-                <div className="premium-badge">Premium</div>
-                <div className="section-title">Privacy & Data Protection</div>
-                <p>Comprehensive privacy controls and GDPR/CCPA compliance options available in premium version.</p>
-                <button 
-                  className="nav-button" 
-                  onClick={() => setShowPaymentModal(true)}
-                  style={{background: 'var(--premium-gradient)', color: 'white', border: 'none'}}
-                >
-                  Unlock Premium Features
-                </button>
-              </div>
-            )}
-            {currentTab === 5 && (
-              <div className="premium-feature">
-                <div className="premium-badge">Premium</div>
-                <div className="section-title">Payment Terms</div>
-                <p>Advanced payment terms, billing cycles, and refund policy options available in premium version.</p>
-                <button 
-                  className="nav-button" 
-                  onClick={() => setShowPaymentModal(true)}
-                  style={{background: 'var(--premium-gradient)', color: 'white', border: 'none'}}
-                >
-                  Unlock Premium Features
-                </button>
-              </div>
-            )}
-            {currentTab === 6 && (
-              <div className="premium-feature">
-                <div className="premium-badge">Premium</div>
-                <div className="section-title">Legal & Dispute Resolution</div>
-                <p>Comprehensive legal protections, liability limitations, and dispute resolution options available in premium version.</p>
-                <button 
-                  className="nav-button" 
-                  onClick={() => setShowPaymentModal(true)}
-                  style={{background: 'var(--premium-gradient)', color: 'white', border: 'none'}}
-                >
-                  Unlock Premium Features
-                </button>
-              </div>
-            )}
+            {currentTab === 3 && <IPContentTab />}
+            {currentTab === 4 && <PrivacyDataTab />}
+            {currentTab === 5 && <PaymentTermsTab />}
+            {currentTab === 6 && <LegalDisputesTab />}
             {currentTab === 7 && (
               <div className="finalization-tab">
                 <div className="section-title">Document Summary & Risk Analysis</div>
@@ -1131,3 +1134,486 @@ Last Updated: ${effectiveDate}
 
 // Render the app
 ReactDOM.render(<AITermsGenerator />, document.getElementById('root'));
+  const IPContentTab = () => (
+    <div className="tab-content">
+      <div className="form-section">
+        <div className="section-title">Intellectual Property Rights</div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="ipOwnership">User Content Ownership</label>
+            <select
+              id="ipOwnership"
+              name="ipOwnership"
+              value={formData.ipOwnership || 'user'}
+              onChange={handleChange}
+            >
+              <option value="user">User retains ownership</option>
+              <option value="company">Company claims ownership</option>
+              <option value="joint">Joint ownership</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="licenseType">License to User Content</label>
+            <select
+              id="licenseType"
+              name="licenseType"
+              value={formData.licenseType || 'broad'}
+              onChange={handleChange}
+            >
+              <option value="limited">Limited license (service operation only)</option>
+              <option value="broad">Broad license (includes AI training)</option>
+              <option value="commercial">Commercial license (marketing use)</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="aiOutputOwnership">AI-Generated Content Ownership</label>
+            <select
+              id="aiOutputOwnership"
+              name="aiOutputOwnership"
+              value={formData.aiOutputOwnership || 'user'}
+              onChange={handleChange}
+            >
+              <option value="user">User owns AI outputs</option>
+              <option value="company">Company owns AI outputs</option>
+              <option value="public">Public domain</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="section-title">Additional IP Provisions</div>
+        
+        <div className="checkbox-group">
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="ipFeedback"
+              name="ipFeedback"
+              checked={formData.ipFeedback || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="ipFeedback">License to user feedback and suggestions</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="ipTraining"
+              name="ipTraining"
+              checked={formData.ipTraining || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="ipTraining">Right to use content for AI training</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="ipReverseEngineering"
+              name="ipReverseEngineering"
+              checked={formData.ipReverseEngineering || false}
+              onChange={handleChange}
+            />
+            <label htmlFor="ipReverseEngineering">Prohibit reverse engineering</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="ipAttribution"
+              name="ipAttribution"
+              checked={formData.ipAttribution || false}
+              onChange={handleChange}
+            />
+            <label htmlFor="ipAttribution">Require attribution for AI outputs</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const PrivacyDataTab = () => (
+    <div className="tab-content">
+      <div className="form-section">
+        <div className="section-title">Privacy Policy Integration</div>
+        
+        <div className="form-group">
+          <label htmlFor="privacyPolicyUrl">Privacy Policy URL</label>
+          <input
+            type="url"
+            id="privacyPolicyUrl"
+            name="privacyPolicyUrl"
+            value={formData.privacyPolicyUrl}
+            onChange={handleChange}
+            placeholder="https://www.yourcompany.com/privacy"
+          />
+        </div>
+        
+        <div className="section-title">Data Collection Purposes</div>
+        
+        <div className="checkbox-group">
+          {Object.entries({
+            service: 'Providing and maintaining the service',
+            improvement: 'Improving AI models and algorithms',
+            personalization: 'Personalizing user experience',
+            marketing: 'Marketing and promotional activities',
+            analytics: 'Analytics and usage statistics'
+          }).map(([key, label]) => (
+            <div key={key} className="checkbox-item">
+              <input
+                type="checkbox"
+                id={`dataCollection.${key}`}
+                name={`dataCollection.${key}`}
+                checked={formData.dataCollection[key]}
+                onChange={handleChange}
+              />
+              <label htmlFor={`dataCollection.${key}`}>{label}</label>
+            </div>
+          ))}
+        </div>
+        
+        <div className="section-title">Data Sharing</div>
+        
+        <div className="checkbox-group">
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="shareServiceProviders"
+              name="shareServiceProviders"
+              checked={formData.shareServiceProviders || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="shareServiceProviders">Third-party service providers</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="shareAffiliates"
+              name="shareAffiliates"
+              checked={formData.shareAffiliates || false}
+              onChange={handleChange}
+            />
+            <label htmlFor="shareAffiliates">Company affiliates</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="shareLegal"
+              name="shareLegal"
+              checked={formData.shareLegal || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="shareLegal">Legal compliance and law enforcement</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="shareAcquisition"
+              name="shareAcquisition"
+              checked={formData.shareAcquisition || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="shareAcquisition">Business transfers and acquisitions</label>
+          </div>
+        </div>
+        
+        <div className="section-title">User Rights (GDPR/CCPA)</div>
+        
+        <div className="checkbox-group">
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="rightAccess"
+              name="rightAccess"
+              checked={formData.rightAccess || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="rightAccess">Right to access personal data</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="rightCorrect"
+              name="rightCorrect"
+              checked={formData.rightCorrect || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="rightCorrect">Right to correct inaccurate data</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="rightDelete"
+              name="rightDelete"
+              checked={formData.rightDelete || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="rightDelete">Right to delete personal data</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="rightPortability"
+              name="rightPortability"
+              checked={formData.rightPortability || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="rightPortability">Right to data portability</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const PaymentTermsTab = () => (
+    <div className="tab-content">
+      <div className="form-section">
+        <div className="section-title">Payment Model</div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="paymentModel">Business Model</label>
+            <select
+              id="paymentModel"
+              name="paymentModel"
+              value={formData.paymentModel}
+              onChange={handleChange}
+            >
+              <option value="free">Free service</option>
+              <option value="freemium">Freemium (free + paid tiers)</option>
+              <option value="subscription">Subscription only</option>
+              <option value="usage">Usage-based pricing</option>
+              <option value="hybrid">Hybrid subscription + usage</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="billingCycle">Billing Cycle</label>
+            <select
+              id="billingCycle"
+              name="billingCycle"
+              value={formData.billingCycle}
+              onChange={handleChange}
+            >
+              <option value="monthly">Monthly</option>
+              <option value="quarterly">Quarterly</option>
+              <option value="annual">Annual</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="autoRenewal">Auto-Renewal Policy</label>
+            <select
+              id="autoRenewal"
+              name="autoRenewal"
+              value={formData.autoRenewal}
+              onChange={handleChange}
+            >
+              <option value="yes">Yes, with notification</option>
+              <option value="opt-in">Opt-in only</option>
+              <option value="no">No auto-renewal</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="refundPolicy">Refund Policy</label>
+            <select
+              id="refundPolicy"
+              name="refundPolicy"
+              value={formData.refundPolicy}
+              onChange={handleChange}
+            >
+              <option value="none">No refunds</option>
+              <option value="limited">Limited (case-by-case)</option>
+              <option value="days-7">7-day refund period</option>
+              <option value="days-14">14-day refund period</option>
+              <option value="days-30">30-day refund period</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="section-title">Accepted Payment Methods</div>
+        
+        <div className="checkbox-group">
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="acceptCreditCard"
+              name="acceptCreditCard"
+              checked={formData.acceptCreditCard || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="acceptCreditCard">Credit/Debit Cards</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="acceptPayPal"
+              name="acceptPayPal"
+              checked={formData.acceptPayPal || true}
+              onChange={handleChange}
+            />
+            <label htmlFor="acceptPayPal">PayPal</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="acceptCrypto"
+              name="acceptCrypto"
+              checked={formData.acceptCrypto || false}
+              onChange={handleChange}
+            />
+            <label htmlFor="acceptCrypto">Cryptocurrency</label>
+          </div>
+          
+          <div className="checkbox-item">
+            <input
+              type="checkbox"
+              id="acceptWire"
+              name="acceptWire"
+              checked={formData.acceptWire || false}
+              onChange={handleChange}
+            />
+            <label htmlFor="acceptWire">Wire Transfer</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const LegalDisputesTab = () => (
+    <div className="tab-content">
+      <div className="form-section">
+        <div className="section-title">Governing Law</div>
+        
+        <div className="form-group">
+          <label htmlFor="governingLaw">Governing Law State</label>
+          <select
+            id="governingLaw"
+            name="governingLaw"
+            value={formData.governingLaw}
+            onChange={handleChange}
+          >
+            <option value="California">California</option>
+            <option value="New York">New York</option>
+            <option value="Delaware">Delaware</option>
+            <option value="Texas">Texas</option>
+            <option value="Florida">Florida</option>
+            <option value="Illinois">Illinois</option>
+            <option value="Washington">Washington</option>
+            <option value="Nevada">Nevada</option>
+            <option value="Colorado">Colorado</option>
+            <option value="Georgia">Georgia</option>
+          </select>
+        </div>
+        
+        <div className="section-title">Dispute Resolution</div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="disputeResolution">Resolution Method</label>
+            <select
+              id="disputeResolution"
+              name="disputeResolution"
+              value={formData.disputeResolution}
+              onChange={handleChange}
+            >
+              <option value="courts">Courts only</option>
+              <option value="arbitration">Binding arbitration</option>
+              <option value="mediation-first">Mediation first, then courts</option>
+              <option value="mediation-arbitration">Mediation first, then arbitration</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="arbitrationProvider">Arbitration Provider</label>
+            <select
+              id="arbitrationProvider"
+              name="arbitrationProvider"
+              value={formData.arbitrationProvider}
+              onChange={handleChange}
+            >
+              <option value="aaa">American Arbitration Association</option>
+              <option value="jams">JAMS</option>
+              <option value="icc">International Chamber of Commerce</option>
+            </select>
+          </div>
+        </div>
+        
+        <div className="section-title">Liability and Warranties</div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="liabilityCap">Liability Cap</label>
+            <select
+              id="liabilityCap"
+              name="liabilityCap"
+              value={formData.liabilityCap}
+              onChange={handleChange}
+            >
+              <option value="fees-paid">Fees paid in last 12 months</option>
+              <option value="fees-total">Total fees paid</option>
+              <option value="fixed-amount">Fixed amount</option>
+              <option value="no-cap">No cap (maximum by law)</option>
+            </select>
+          </div>
+          
+          {formData.liabilityCap === 'fixed-amount' && (
+            <div className="form-group">
+              <label htmlFor="fixedLiabilityAmount">Fixed Amount ($)</label>
+              <input
+                type="number"
+                id="fixedLiabilityAmount"
+                name="fixedLiabilityAmount"
+                value={formData.fixedLiabilityAmount}
+                onChange={handleChange}
+                placeholder="1000"
+              />
+            </div>
+          )}
+        </div>
+        
+        <div className="form-row">
+          <div className="form-group">
+            <label htmlFor="classAction">Class Action Waiver</label>
+            <select
+              id="classAction"
+              name="classAction"
+              value={formData.classAction}
+              onChange={handleChange}
+            >
+              <option value="yes">Include class action waiver</option>
+              <option value="no">Allow class actions</option>
+            </select>
+          </div>
+          
+          <div className="form-group">
+            <label htmlFor="warrantyDisclaimer">Warranty Disclaimer</label>
+            <select
+              id="warrantyDisclaimer"
+              name="warrantyDisclaimer"
+              value={formData.warrantyDisclaimer}
+              onChange={handleChange}
+            >
+              <option value="standard">Standard disclaimer (as-is)</option>
+              <option value="limited">Limited warranty</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
