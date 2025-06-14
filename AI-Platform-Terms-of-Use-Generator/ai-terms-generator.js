@@ -21,7 +21,7 @@ const AITermsGenerator = () => {
   const previewRef = useRef(null);
 
   // Form data state with stable initial values
-  const [formData, setFormData] = useState(() => ({
+  const [formData, setFormData] = useState({
     // Company Information
     companyName: '',
     platformName: '',
@@ -119,7 +119,7 @@ const AITermsGenerator = () => {
     liabilityCap: 'fees-paid',
     fixedLiabilityAmount: '1000',
     warrantyDisclaimer: 'standard'
-  }));
+  });
 
   const tabs = [
     { id: 0, label: 'Company Info', icon: 'building' },
@@ -132,38 +132,13 @@ const AITermsGenerator = () => {
     { id: 7, label: 'Finalization', icon: 'check-circle' }
   ];
 
-  // Optimized handle change function that doesn't cause re-renders
-  const handleInputChange = useCallback((name, value, type = 'text') => {
-    setLastChanged(name);
-    
-    // Batch state updates to prevent multiple re-renders
-    setFormData(prevData => {
-      if (name.includes('.')) {
-        const [parent, child] = name.split('.');
-        return {
-          ...prevData,
-          [parent]: {
-            ...prevData[parent],
-            [child]: type === 'checkbox' ? value : value
-          }
-        };
-      } else {
-        return {
-          ...prevData,
-          [name]: type === 'checkbox' ? value : value
-        };
-      }
-    });
-  }, []);
-
   // Validate PayPal transaction ID
   const validateTransactionId = (id) => {
-    // Must be exactly 17 characters, contain both uppercase letters and numbers, no lowercase
-    if (id.length !== 17) return false;
+    // Must contain both uppercase letters and numbers, no lowercase
     if (!/^[A-Z0-9]+$/.test(id)) return false; // Only uppercase letters and numbers
     if (!/[A-Z]/.test(id)) return false; // Must contain at least one uppercase letter
     if (!/[0-9]/.test(id)) return false; // Must contain at least one number
-    return true;
+    return id.length > 10; // Reasonable length without being specific
   };
 
   // Handle transaction ID submission
@@ -174,7 +149,7 @@ const AITermsGenerator = () => {
       setTransactionId('');
       alert('Access unlocked! You can now copy and download your document.');
     } else {
-      alert('Invalid transaction ID. Must be 17 characters with uppercase letters and numbers only.');
+      alert('Invalid transaction ID format.');
     }
   };
 
@@ -194,6 +169,74 @@ const AITermsGenerator = () => {
   const goToTab = useCallback((index) => {
     setCurrentTab(index);
   }, []);
+
+  // Scroll to relevant section in preview
+  const scrollToRelevantSection = useCallback(() => {
+    if (!previewRef.current) return;
+    
+    setTimeout(() => {
+      // Remove previous highlights
+      const prevHighlighted = previewRef.current.querySelectorAll('.highlight-section');
+      prevHighlighted.forEach(el => el.classList.remove('highlight-section'));
+      
+      // Determine section based on current tab
+      let targetQuery = '';
+      switch(currentTab) {
+        case 0: // Company Info
+          targetQuery = 'h2, h3';
+          break;
+        case 1: // Platform Details  
+          targetQuery = 'h2';
+          break;
+        case 2: // User Terms
+          targetQuery = 'h2:nth-of-type(2), h2:nth-of-type(3)';
+          break;
+        case 3: // IP & Content
+          targetQuery = 'h2:nth-of-type(4)';
+          break;
+        case 4: // Privacy & Data
+          targetQuery = 'h2:nth-of-type(5)';
+          break;
+        case 5: // Payment Terms
+          targetQuery = 'h2:nth-of-type(6)';
+          break;
+        case 6: // Legal & Disputes
+          targetQuery = 'h2:nth-of-type(8), h2:nth-of-type(9), h2:nth-of-type(10)';
+          break;
+        default:
+          targetQuery = 'h2:first-of-type';
+      }
+      
+      const targetElements = previewRef.current.querySelectorAll(targetQuery);
+      if (targetElements.length > 0) {
+        const firstTarget = targetElements[0];
+        
+        // Highlight the section
+        firstTarget.classList.add('highlight-section');
+        
+        // Highlight next few elements
+        let currentElement = firstTarget.nextElementSibling;
+        let count = 0;
+        while (currentElement && count < 3 && !currentElement.tagName?.match(/^H[12]$/)) {
+          currentElement.classList.add('highlight-section');
+          currentElement = currentElement.nextElementSibling;
+          count++;
+        }
+        
+        // Scroll to section
+        firstTarget.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start' 
+        });
+        
+        // Remove highlights after 3 seconds
+        setTimeout(() => {
+          const highlighted = previewRef.current?.querySelectorAll('.highlight-section');
+          highlighted?.forEach(el => el.classList.remove('highlight-section'));
+        }, 3000);
+      }
+    }, 300);
+  }, [currentTab]);
 
   // PayPal payment handling
   useEffect(() => {
@@ -261,6 +304,62 @@ const AITermsGenerator = () => {
       fileName: `${formData.platformName || 'AI-Platform'}-Terms-of-Use`
     });
   };
+
+  // Initialize form event listeners after component mounts
+  useEffect(() => {
+    const handleFormChange = (e) => {
+      const { name, value, type, checked } = e.target;
+      
+      setLastChanged(name);
+      
+      if (name.includes('.')) {
+        const [parent, child] = name.split('.');
+        setFormData(prev => ({
+          ...prev,
+          [parent]: {
+            ...prev[parent],
+            [child]: type === 'checkbox' ? checked : value
+          }
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value
+        }));
+      }
+      
+      // Trigger scroll to view
+      scrollToRelevantSection();
+    };
+
+    // Add event listeners to all form elements
+    const addListeners = () => {
+      const inputs = document.querySelectorAll('input, select, textarea');
+      inputs.forEach(input => {
+        input.removeEventListener('input', handleFormChange);
+        input.removeEventListener('change', handleFormChange);
+        input.addEventListener('input', handleFormChange);
+        input.addEventListener('change', handleFormChange);
+      });
+    };
+
+    // Add listeners initially and whenever the DOM changes
+    addListeners();
+    const observer = new MutationObserver(addListeners);
+    observer.observe(document.getElementById('root'), { 
+      childList: true, 
+      subtree: true 
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [scrollToRelevantSection]);
+
+  // Trigger scroll when tab changes
+  useEffect(() => {
+    scrollToRelevantSection();
+  }, [currentTab, scrollToRelevantSection]);
   // Generate comprehensive document text
   const generateDocumentText = useCallback(() => {
     const company = formData.companyName || '[Company Name]';
@@ -484,108 +583,7 @@ Last Updated: ${effectiveDate}`;
     };
     return methods[formData.disputeResolution] || methods.courts;
   };
-  // Custom Input Component that handles its own state to prevent re-render issues
-  const CustomInput = ({ id, name, value, onChange, placeholder, type = "text", required = false }) => {
-    const [localValue, setLocalValue] = useState(value);
-    const inputRef = useRef(null);
-    
-    // Update local value when prop changes
-    useEffect(() => {
-      setLocalValue(value);
-    }, [value]);
-    
-    // Handle input change without causing parent re-render immediately
-    const handleChange = (e) => {
-      const newValue = e.target.value;
-      setLocalValue(newValue);
-      
-      // Debounce the parent update to prevent excessive re-renders
-      clearTimeout(inputRef.current?.timeoutId);
-      inputRef.current.timeoutId = setTimeout(() => {
-        onChange(name, newValue, type);
-      }, 100);
-    };
-    
-    return (
-      <input
-        ref={inputRef}
-        type={type}
-        id={id}
-        name={name}
-        value={localValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        required={required}
-      />
-    );
-  };
-
-  // Custom Select Component
-  const CustomSelect = ({ id, name, value, onChange, children }) => {
-    const handleChange = (e) => {
-      onChange(name, e.target.value);
-    };
-    
-    return (
-      <select id={id} name={name} value={value} onChange={handleChange}>
-        {children}
-      </select>
-    );
-  };
-
-  // Custom Checkbox Component
-  const CustomCheckbox = ({ id, name, checked, onChange, label }) => {
-    const handleChange = (e) => {
-      onChange(name, e.target.checked, 'checkbox');
-    };
-    
-    return (
-      <div className="checkbox-item">
-        <input
-          type="checkbox"
-          id={id}
-          name={name}
-          checked={checked}
-          onChange={handleChange}
-        />
-        <label htmlFor={id}>{label}</label>
-      </div>
-    );
-  };
-
-  // Custom Textarea Component
-  const CustomTextarea = ({ id, name, value, onChange, placeholder, rows = 3 }) => {
-    const [localValue, setLocalValue] = useState(value);
-    const textareaRef = useRef(null);
-    
-    useEffect(() => {
-      setLocalValue(value);
-    }, [value]);
-    
-    const handleChange = (e) => {
-      const newValue = e.target.value;
-      setLocalValue(newValue);
-      
-      clearTimeout(textareaRef.current?.timeoutId);
-      textareaRef.current.timeoutId = setTimeout(() => {
-        onChange(name, newValue);
-      }, 100);
-    };
-    
-    return (
-      <textarea
-        ref={textareaRef}
-        id={id}
-        name={name}
-        value={localValue}
-        onChange={handleChange}
-        placeholder={placeholder}
-        rows={rows}
-      />
-    );
-  };
-
-  // Tab Components with proper input handling
+  // Tab Components using simple HTML inputs
   const CompanyInfoTab = () => (
     <div className="form-section">
       <div className="section-title">Basic Company Information</div>
@@ -593,25 +591,23 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="companyName">Company Legal Name *</label>
-          <CustomInput
+          <input
+            type="text"
             id="companyName"
             name="companyName"
-            value={formData.companyName}
-            onChange={handleInputChange}
+            defaultValue={formData.companyName}
             placeholder="e.g., AI Innovations, Inc."
-            required
           />
         </div>
         
         <div className="form-group">
           <label htmlFor="platformName">AI Platform/Product Name *</label>
-          <CustomInput
+          <input
+            type="text"
             id="platformName"
             name="platformName"
-            value={formData.platformName}
-            onChange={handleInputChange}
+            defaultValue={formData.platformName}
             placeholder="e.g., IntelliBot, SmartAI, DataMind"
-            required
           />
         </div>
       </div>
@@ -619,66 +615,61 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="companyWebsite">Company Website</label>
-          <CustomInput
+          <input
+            type="url"
             id="companyWebsite"
             name="companyWebsite"
-            value={formData.companyWebsite}
-            onChange={handleInputChange}
+            defaultValue={formData.companyWebsite}
             placeholder="https://www.yourcompany.com"
-            type="url"
           />
         </div>
         
         <div className="form-group">
           <label htmlFor="businessType">Business Entity Type</label>
-          <CustomSelect
+          <select
             id="businessType"
             name="businessType"
-            value={formData.businessType}
-            onChange={handleInputChange}
+            defaultValue={formData.businessType}
           >
             <option value="corporation">Corporation</option>
             <option value="llc">Limited Liability Company (LLC)</option>
             <option value="partnership">Partnership</option>
             <option value="sole-proprietorship">Sole Proprietorship</option>
             <option value="other">Other</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="form-group">
         <label htmlFor="companyAddress">Company Address</label>
-        <CustomTextarea
+        <textarea
           id="companyAddress"
           name="companyAddress"
-          value={formData.companyAddress}
-          onChange={handleInputChange}
+          defaultValue={formData.companyAddress}
           placeholder="Full business address including street, city, state, zip code"
-          rows={3}
+          rows="3"
         />
       </div>
       
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="companyContact">Legal Contact Email *</label>
-          <CustomInput
+          <input
+            type="email"
             id="companyContact"
             name="companyContact"
-            value={formData.companyContact}
-            onChange={handleInputChange}
+            defaultValue={formData.companyContact}
             placeholder="legal@yourcompany.com"
-            type="email"
-            required
           />
         </div>
         
         <div className="form-group">
           <label htmlFor="effectiveDate">Terms Effective Date</label>
-          <CustomInput
+          <input
+            type="text"
             id="effectiveDate"
             name="effectiveDate"
-            value={formData.effectiveDate}
-            onChange={handleInputChange}
+            defaultValue={formData.effectiveDate}
             placeholder="e.g., January 1, 2025"
           />
         </div>
@@ -693,11 +684,10 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="platformType">Platform Type</label>
-          <CustomSelect
+          <select
             id="platformType"
             name="platformType"
-            value={formData.platformType}
-            onChange={handleInputChange}
+            defaultValue={formData.platformType}
           >
             <option value="saas">Software as a Service (SaaS)</option>
             <option value="api">API Service</option>
@@ -707,16 +697,15 @@ Last Updated: ${effectiveDate}`;
             <option value="analytics">Analytics Platform</option>
             <option value="automation">Automation Tool</option>
             <option value="creative">Creative Tool</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="primaryFunction">Primary AI Function</label>
-          <CustomSelect
+          <select
             id="primaryFunction"
             name="primaryFunction"
-            value={formData.primaryFunction}
-            onChange={handleInputChange}
+            defaultValue={formData.primaryFunction}
           >
             <option value="general-ai">General Purpose AI</option>
             <option value="nlp">Natural Language Processing</option>
@@ -726,54 +715,59 @@ Last Updated: ${effectiveDate}`;
             <option value="automation">Process Automation</option>
             <option value="creative">Creative Content Generation</option>
             <option value="analysis">Data Analysis</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="targetAudience">Target Audience</label>
-          <CustomSelect
+          <select
             id="targetAudience"
             name="targetAudience"
-            value={formData.targetAudience}
-            onChange={handleInputChange}
+            defaultValue={formData.targetAudience}
           >
             <option value="business">Business Users</option>
             <option value="consumer">General Consumers</option>
             <option value="developer">Developers/Technical Users</option>
             <option value="research">Researchers/Academics</option>
             <option value="enterprise">Enterprise Clients</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="section-title">Data and AI Processing</div>
       
       <div className="checkbox-group">
-        <CustomCheckbox
-          id="dataProcessing"
-          name="dataProcessing"
-          checked={formData.dataProcessing}
-          onChange={handleInputChange}
-          label="Platform processes user data for AI operations"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="dataProcessing"
+            name="dataProcessing"
+            defaultChecked={formData.dataProcessing}
+          />
+          <label htmlFor="dataProcessing">Platform processes user data for AI operations</label>
+        </div>
         
-        <CustomCheckbox
-          id="aiTraining"
-          name="aiTraining"
-          checked={formData.aiTraining}
-          onChange={handleInputChange}
-          label="Use user interactions to improve AI models"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="aiTraining"
+            name="aiTraining"
+            defaultChecked={formData.aiTraining}
+          />
+          <label htmlFor="aiTraining">Use user interactions to improve AI models</label>
+        </div>
         
-        <CustomCheckbox
-          id="apiAccess"
-          name="apiAccess"
-          checked={formData.apiAccess}
-          onChange={handleInputChange}
-          label="Provide API access to third-party developers"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="apiAccess"
+            name="apiAccess"
+            defaultChecked={formData.apiAccess}
+          />
+          <label htmlFor="apiAccess">Provide API access to third-party developers</label>
+        </div>
       </div>
     </div>
   );
@@ -784,17 +778,16 @@ Last Updated: ${effectiveDate}`;
       
       <div className="form-group">
         <label htmlFor="minAge">Minimum Age Requirement</label>
-        <CustomSelect
+        <select
           id="minAge"
           name="minAge"
-          value={formData.minAge}
-          onChange={handleInputChange}
+          defaultValue={formData.minAge}
         >
           <option value="13">13 years old (COPPA compliant)</option>
           <option value="16">16 years old (GDPR Article 8)</option>
           <option value="18">18 years old (Adult only)</option>
           <option value="21">21 years old (Restricted content)</option>
-        </CustomSelect>
+        </select>
       </div>
       
       <div className="section-title">Account Registration Requirements</div>
@@ -810,14 +803,15 @@ Last Updated: ${effectiveDate}`;
           businessInfo: 'Business information (B2B accounts)',
           identification: 'Government ID verification'
         }).map(([key, label]) => (
-          <CustomCheckbox
-            key={key}
-            id={`accountRequirements.${key}`}
-            name={`accountRequirements.${key}`}
-            checked={formData.accountRequirements[key]}
-            onChange={handleInputChange}
-            label={label}
-          />
+          <div key={key} className="checkbox-item">
+            <input
+              type="checkbox"
+              id={`accountRequirements.${key}`}
+              name={`accountRequirements.${key}`}
+              defaultChecked={formData.accountRequirements[key]}
+            />
+            <label htmlFor={`accountRequirements.${key}`}>{label}</label>
+          </div>
         ))}
       </div>
       
@@ -844,18 +838,20 @@ Last Updated: ${effectiveDate}`;
           adultContent: 'Explicit adult content generation',
           competitiveAnalysis: 'Competitive intelligence gathering'
         }).map(([key, label]) => (
-          <CustomCheckbox
-            key={key}
-            id={`prohibitedActivities.${key}`}
-            name={`prohibitedActivities.${key}`}
-            checked={formData.prohibitedActivities[key]}
-            onChange={handleInputChange}
-            label={label}
-          />
+          <div key={key} className="checkbox-item">
+            <input
+              type="checkbox"
+              id={`prohibitedActivities.${key}`}
+              name={`prohibitedActivities.${key}`}
+              defaultChecked={formData.prohibitedActivities[key]}
+            />
+            <label htmlFor={`prohibitedActivities.${key}`}>{label}</label>
+          </div>
         ))}
       </div>
     </div>
   );
+
   const IPContentTab = () => (
     <div className="form-section">
       <div className="section-title">Intellectual Property Rights</div>
@@ -863,100 +859,103 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="ipOwnership">User Content Ownership</label>
-          <CustomSelect
+          <select
             id="ipOwnership"
             name="ipOwnership"
-            value={formData.ipOwnership}
-            onChange={handleInputChange}
+            defaultValue={formData.ipOwnership}
           >
             <option value="user">User retains ownership</option>
             <option value="company">Company claims ownership</option>
             <option value="joint">Joint ownership</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="licenseType">License to User Content</label>
-          <CustomSelect
+          <select
             id="licenseType"
             name="licenseType"
-            value={formData.licenseType}
-            onChange={handleInputChange}
+            defaultValue={formData.licenseType}
           >
             <option value="limited">Limited license (service operation only)</option>
             <option value="broad">Broad license (includes AI training)</option>
             <option value="commercial">Commercial license (marketing use)</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="aiOutputOwnership">AI-Generated Content Ownership</label>
-          <CustomSelect
+          <select
             id="aiOutputOwnership"
             name="aiOutputOwnership"
-            value={formData.aiOutputOwnership}
-            onChange={handleInputChange}
+            defaultValue={formData.aiOutputOwnership}
           >
             <option value="user">User owns AI outputs</option>
             <option value="company">Company owns AI outputs</option>
             <option value="public">Public domain</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="section-title">Additional IP Provisions</div>
       
       <div className="checkbox-group">
-        <CustomCheckbox
-          id="ipFeedback"
-          name="ipFeedback"
-          checked={formData.ipFeedback}
-          onChange={handleInputChange}
-          label="License to user feedback and suggestions"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="ipFeedback"
+            name="ipFeedback"
+            defaultChecked={formData.ipFeedback}
+          />
+          <label htmlFor="ipFeedback">License to user feedback and suggestions</label>
+        </div>
         
-        <CustomCheckbox
-          id="ipTraining"
-          name="ipTraining"
-          checked={formData.ipTraining}
-          onChange={handleInputChange}
-          label="Right to use content for AI training"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="ipTraining"
+            name="ipTraining"
+            defaultChecked={formData.ipTraining}
+          />
+          <label htmlFor="ipTraining">Right to use content for AI training</label>
+        </div>
         
-        <CustomCheckbox
-          id="ipReverseEngineering"
-          name="ipReverseEngineering"
-          checked={formData.ipReverseEngineering}
-          onChange={handleInputChange}
-          label="Prohibit reverse engineering"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="ipReverseEngineering"
+            name="ipReverseEngineering"
+            defaultChecked={formData.ipReverseEngineering}
+          />
+          <label htmlFor="ipReverseEngineering">Prohibit reverse engineering</label>
+        </div>
         
-        <CustomCheckbox
-          id="ipAttribution"
-          name="ipAttribution"
-          checked={formData.ipAttribution}
-          onChange={handleInputChange}
-          label="Require attribution for AI outputs"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="ipAttribution"
+            name="ipAttribution"
+            defaultChecked={formData.ipAttribution}
+          />
+          <label htmlFor="ipAttribution">Require attribution for AI outputs</label>
+        </div>
       </div>
     </div>
   );
-
   const PrivacyDataTab = () => (
     <div className="form-section">
       <div className="section-title">Privacy Policy Integration</div>
       
       <div className="form-group">
         <label htmlFor="privacyPolicyUrl">Privacy Policy URL</label>
-        <CustomInput
+        <input
+          type="url"
           id="privacyPolicyUrl"
           name="privacyPolicyUrl"
-          value={formData.privacyPolicyUrl}
-          onChange={handleInputChange}
+          defaultValue={formData.privacyPolicyUrl}
           placeholder="https://www.yourcompany.com/privacy"
-          type="url"
         />
       </div>
       
@@ -970,87 +969,104 @@ Last Updated: ${effectiveDate}`;
           marketing: 'Marketing and promotional activities',
           analytics: 'Analytics and usage statistics'
         }).map(([key, label]) => (
-          <CustomCheckbox
-            key={key}
-            id={`dataCollection.${key}`}
-            name={`dataCollection.${key}`}
-            checked={formData.dataCollection[key]}
-            onChange={handleInputChange}
-            label={label}
-          />
+          <div key={key} className="checkbox-item">
+            <input
+              type="checkbox"
+              id={`dataCollection.${key}`}
+              name={`dataCollection.${key}`}
+              defaultChecked={formData.dataCollection[key]}
+            />
+            <label htmlFor={`dataCollection.${key}`}>{label}</label>
+          </div>
         ))}
       </div>
       
       <div className="section-title">Data Sharing</div>
       
       <div className="checkbox-group">
-        <CustomCheckbox
-          id="shareServiceProviders"
-          name="shareServiceProviders"
-          checked={formData.shareServiceProviders}
-          onChange={handleInputChange}
-          label="Third-party service providers"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="shareServiceProviders"
+            name="shareServiceProviders"
+            defaultChecked={formData.shareServiceProviders}
+          />
+          <label htmlFor="shareServiceProviders">Third-party service providers</label>
+        </div>
         
-        <CustomCheckbox
-          id="shareAffiliates"
-          name="shareAffiliates"
-          checked={formData.shareAffiliates}
-          onChange={handleInputChange}
-          label="Company affiliates"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="shareAffiliates"
+            name="shareAffiliates"
+            defaultChecked={formData.shareAffiliates}
+          />
+          <label htmlFor="shareAffiliates">Company affiliates</label>
+        </div>
         
-        <CustomCheckbox
-          id="shareLegal"
-          name="shareLegal"
-          checked={formData.shareLegal}
-          onChange={handleInputChange}
-          label="Legal compliance and law enforcement"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="shareLegal"
+            name="shareLegal"
+            defaultChecked={formData.shareLegal}
+          />
+          <label htmlFor="shareLegal">Legal compliance and law enforcement</label>
+        </div>
         
-        <CustomCheckbox
-          id="shareAcquisition"
-          name="shareAcquisition"
-          checked={formData.shareAcquisition}
-          onChange={handleInputChange}
-          label="Business transfers and acquisitions"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="shareAcquisition"
+            name="shareAcquisition"
+            defaultChecked={formData.shareAcquisition}
+          />
+          <label htmlFor="shareAcquisition">Business transfers and acquisitions</label>
+        </div>
       </div>
       
       <div className="section-title">User Rights (GDPR/CCPA)</div>
       
       <div className="checkbox-group">
-        <CustomCheckbox
-          id="rightAccess"
-          name="rightAccess"
-          checked={formData.rightAccess}
-          onChange={handleInputChange}
-          label="Right to access personal data"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="rightAccess"
+            name="rightAccess"
+            defaultChecked={formData.rightAccess}
+          />
+          <label htmlFor="rightAccess">Right to access personal data</label>
+        </div>
         
-        <CustomCheckbox
-          id="rightCorrect"
-          name="rightCorrect"
-          checked={formData.rightCorrect}
-          onChange={handleInputChange}
-          label="Right to correct inaccurate data"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="rightCorrect"
+            name="rightCorrect"
+            defaultChecked={formData.rightCorrect}
+          />
+          <label htmlFor="rightCorrect">Right to correct inaccurate data</label>
+        </div>
         
-        <CustomCheckbox
-          id="rightDelete"
-          name="rightDelete"
-          checked={formData.rightDelete}
-          onChange={handleInputChange}
-          label="Right to delete personal data"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="rightDelete"
+            name="rightDelete"
+            defaultChecked={formData.rightDelete}
+          />
+          <label htmlFor="rightDelete">Right to delete personal data</label>
+        </div>
         
-        <CustomCheckbox
-          id="rightPortability"
-          name="rightPortability"
-          checked={formData.rightPortability}
-          onChange={handleInputChange}
-          label="Right to data portability"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="rightPortability"
+            name="rightPortability"
+            defaultChecked={formData.rightPortability}
+          />
+          <label htmlFor="rightPortability">Right to data portability</label>
+        </div>
       </div>
     </div>
   );
@@ -1062,101 +1078,105 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="paymentModel">Business Model</label>
-          <CustomSelect
+          <select
             id="paymentModel"
             name="paymentModel"
-            value={formData.paymentModel}
-            onChange={handleInputChange}
+            defaultValue={formData.paymentModel}
           >
             <option value="free">Free service</option>
             <option value="freemium">Freemium (free + paid tiers)</option>
             <option value="subscription">Subscription only</option>
             <option value="usage">Usage-based pricing</option>
             <option value="hybrid">Hybrid subscription + usage</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="billingCycle">Billing Cycle</label>
-          <CustomSelect
+          <select
             id="billingCycle"
             name="billingCycle"
-            value={formData.billingCycle}
-            onChange={handleInputChange}
+            defaultValue={formData.billingCycle}
           >
             <option value="monthly">Monthly</option>
             <option value="quarterly">Quarterly</option>
             <option value="annual">Annual</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="autoRenewal">Auto-Renewal Policy</label>
-          <CustomSelect
+          <select
             id="autoRenewal"
             name="autoRenewal"
-            value={formData.autoRenewal}
-            onChange={handleInputChange}
+            defaultValue={formData.autoRenewal}
           >
             <option value="yes">Yes, with notification</option>
             <option value="opt-in">Opt-in only</option>
             <option value="no">No auto-renewal</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="refundPolicy">Refund Policy</label>
-          <CustomSelect
+          <select
             id="refundPolicy"
             name="refundPolicy"
-            value={formData.refundPolicy}
-            onChange={handleInputChange}
+            defaultValue={formData.refundPolicy}
           >
             <option value="none">No refunds</option>
             <option value="limited">Limited (case-by-case)</option>
             <option value="days-7">7-day refund period</option>
             <option value="days-14">14-day refund period</option>
             <option value="days-30">30-day refund period</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
       <div className="section-title">Accepted Payment Methods</div>
       
       <div className="checkbox-group">
-        <CustomCheckbox
-          id="acceptCreditCard"
-          name="acceptCreditCard"
-          checked={formData.acceptCreditCard}
-          onChange={handleInputChange}
-          label="Credit/Debit Cards"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="acceptCreditCard"
+            name="acceptCreditCard"
+            defaultChecked={formData.acceptCreditCard}
+          />
+          <label htmlFor="acceptCreditCard">Credit/Debit Cards</label>
+        </div>
         
-        <CustomCheckbox
-          id="acceptPayPal"
-          name="acceptPayPal"
-          checked={formData.acceptPayPal}
-          onChange={handleInputChange}
-          label="PayPal"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="acceptPayPal"
+            name="acceptPayPal"
+            defaultChecked={formData.acceptPayPal}
+          />
+          <label htmlFor="acceptPayPal">PayPal</label>
+        </div>
         
-        <CustomCheckbox
-          id="acceptCrypto"
-          name="acceptCrypto"
-          checked={formData.acceptCrypto}
-          onChange={handleInputChange}
-          label="Cryptocurrency"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="acceptCrypto"
+            name="acceptCrypto"
+            defaultChecked={formData.acceptCrypto}
+          />
+          <label htmlFor="acceptCrypto">Cryptocurrency</label>
+        </div>
         
-        <CustomCheckbox
-          id="acceptWire"
-          name="acceptWire"
-          checked={formData.acceptWire}
-          onChange={handleInputChange}
-          label="Wire Transfer"
-        />
+        <div className="checkbox-item">
+          <input
+            type="checkbox"
+            id="acceptWire"
+            name="acceptWire"
+            defaultChecked={formData.acceptWire}
+          />
+          <label htmlFor="acceptWire">Wire Transfer</label>
+        </div>
       </div>
     </div>
   );
@@ -1167,11 +1187,10 @@ Last Updated: ${effectiveDate}`;
       
       <div className="form-group">
         <label htmlFor="governingLaw">Governing Law State</label>
-        <CustomSelect
+        <select
           id="governingLaw"
           name="governingLaw"
-          value={formData.governingLaw}
-          onChange={handleInputChange}
+          defaultValue={formData.governingLaw}
         >
           <option value="California">California</option>
           <option value="New York">New York</option>
@@ -1183,7 +1202,7 @@ Last Updated: ${effectiveDate}`;
           <option value="Nevada">Nevada</option>
           <option value="Colorado">Colorado</option>
           <option value="Georgia">Georgia</option>
-        </CustomSelect>
+        </select>
       </div>
       
       <div className="section-title">Dispute Resolution</div>
@@ -1191,31 +1210,29 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="disputeResolution">Resolution Method</label>
-          <CustomSelect
+          <select
             id="disputeResolution"
             name="disputeResolution"
-            value={formData.disputeResolution}
-            onChange={handleInputChange}
+            defaultValue={formData.disputeResolution}
           >
             <option value="courts">Courts only</option>
             <option value="arbitration">Binding arbitration</option>
             <option value="mediation-first">Mediation first, then courts</option>
             <option value="mediation-arbitration">Mediation first, then arbitration</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="arbitrationProvider">Arbitration Provider</label>
-          <CustomSelect
+          <select
             id="arbitrationProvider"
             name="arbitrationProvider"
-            value={formData.arbitrationProvider}
-            onChange={handleInputChange}
+            defaultValue={formData.arbitrationProvider}
           >
             <option value="aaa">American Arbitration Association</option>
             <option value="jams">JAMS</option>
             <option value="icc">International Chamber of Commerce</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
       
@@ -1224,29 +1241,27 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="liabilityCap">Liability Cap</label>
-          <CustomSelect
+          <select
             id="liabilityCap"
             name="liabilityCap"
-            value={formData.liabilityCap}
-            onChange={handleInputChange}
+            defaultValue={formData.liabilityCap}
           >
             <option value="fees-paid">Fees paid in last 12 months</option>
             <option value="fees-total">Total fees paid</option>
             <option value="fixed-amount">Fixed amount</option>
             <option value="no-cap">No cap (maximum by law)</option>
-          </CustomSelect>
+          </select>
         </div>
         
         {formData.liabilityCap === 'fixed-amount' && (
           <div className="form-group">
             <label htmlFor="fixedLiabilityAmount">Fixed Amount ($)</label>
-            <CustomInput
+            <input
+              type="number"
               id="fixedLiabilityAmount"
               name="fixedLiabilityAmount"
-              value={formData.fixedLiabilityAmount}
-              onChange={handleInputChange}
+              defaultValue={formData.fixedLiabilityAmount}
               placeholder="1000"
-              type="number"
             />
           </div>
         )}
@@ -1255,33 +1270,32 @@ Last Updated: ${effectiveDate}`;
       <div className="form-row">
         <div className="form-group">
           <label htmlFor="classAction">Class Action Waiver</label>
-          <CustomSelect
+          <select
             id="classAction"
             name="classAction"
-            value={formData.classAction}
-            onChange={handleInputChange}
+            defaultValue={formData.classAction}
           >
             <option value="yes">Include class action waiver</option>
             <option value="no">Allow class actions</option>
-          </CustomSelect>
+          </select>
         </div>
         
         <div className="form-group">
           <label htmlFor="warrantyDisclaimer">Warranty Disclaimer</label>
-          <CustomSelect
+          <select
             id="warrantyDisclaimer"
             name="warrantyDisclaimer"
-            value={formData.warrantyDisclaimer}
-            onChange={handleInputChange}
+            defaultValue={formData.warrantyDisclaimer}
           >
             <option value="standard">Standard disclaimer (as-is)</option>
             <option value="limited">Limited warranty</option>
-          </CustomSelect>
+          </select>
         </div>
       </div>
     </div>
   );
-  // Payment Modal Component with Transaction ID bypass
+
+  // Payment Modal Component with simplified Transaction ID
   const PaymentModal = () => {
     if (!showPaymentModal) return null;
     
@@ -1334,14 +1348,13 @@ Last Updated: ${effectiveDate}`;
                 <>
                   <h2>Enter Transaction ID</h2>
                   <p style={{fontSize: '0.9em', color: '#666', marginBottom: '20px'}}>
-                    Enter your 17-character PayPal transaction ID:
+                    Enter your PayPal transaction ID:
                   </p>
                   <input
                     type="text"
                     value={transactionId}
                     onChange={(e) => setTransactionId(e.target.value.toUpperCase())}
-                    placeholder="e.g., 5TY05013RG002845M"
-                    maxLength={17}
+                    placeholder="Enter transaction ID"
                     style={{
                       width: '100%',
                       padding: '12px',
@@ -1353,9 +1366,6 @@ Last Updated: ${effectiveDate}`;
                       marginBottom: '20px'
                     }}
                   />
-                  <div style={{fontSize: '0.8em', color: '#666', marginBottom: '20px'}}>
-                    Transaction ID must be exactly 17 characters with uppercase letters and numbers only.
-                  </div>
                   
                   <div style={{display: 'flex', gap: '10px', justifyContent: 'center'}}>
                     <button 
@@ -1390,15 +1400,14 @@ Last Updated: ${effectiveDate}`;
       </div>
     );
   };
-
-  // Live Preview Component with scroll-to-view and highlighting
+  // Live Preview Component with proper scroll-to-view
   const LivePreview = () => {
-    // Memoize document text generation to prevent unnecessary recalculations
+    // Memoize document text generation
     const documentText = useMemo(() => {
       return generateDocumentText();
     }, [formData]);
     
-    // Optimize preview rendering with highlighting
+    // Optimize preview rendering with proper section IDs
     const previewHTML = useMemo(() => {
       return documentText
         .replace(/\n/g, '<br>')
@@ -1406,65 +1415,6 @@ Last Updated: ${effectiveDate}`;
         .replace(/^(\d+\.\s+[A-Z\s&]+)$/gm, '<h2 id="section-$1" style="color: #0069ff; margin-top: 24px; margin-bottom: 12px; border-bottom: 2px solid #0069ff; padding-bottom: 8px;">$1</h2>')
         .replace(/^(\d+\.\d+\s+[A-Za-z\s]+)\./gm, '<h3 id="subsection-$1" style="color: #333; margin-top: 18px; margin-bottom: 8px; font-weight: 600;">$1</h3>');
     }, [documentText]);
-    
-    // Scroll to highlighted section when lastChanged updates with highlighting
-    useEffect(() => {
-      if (lastChanged && previewRef.current) {
-        const timeout = setTimeout(() => {
-          // Remove previous highlights
-          const prevHighlighted = previewRef.current.querySelectorAll('.highlight-section');
-          prevHighlighted.forEach(el => el.classList.remove('highlight-section'));
-          
-          // Determine which section to highlight based on current tab and changed field
-          let sectionToHighlight = null;
-          
-          if (currentTab === 0 && (lastChanged.includes('company') || lastChanged.includes('platform') || lastChanged.includes('effective'))) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-1"]');
-          } else if (currentTab === 1 && (lastChanged.includes('platform') || lastChanged.includes('Function') || lastChanged.includes('data'))) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-1"]');
-          } else if (currentTab === 2 && (lastChanged.includes('minAge') || lastChanged.includes('account') || lastChanged.includes('prohibited'))) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-2"], h2[id*="section-3"]');
-          } else if (currentTab === 3 && lastChanged.includes('ip')) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-4"]');
-          } else if (currentTab === 4 && (lastChanged.includes('privacy') || lastChanged.includes('data'))) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-5"]');
-          } else if (currentTab === 5 && lastChanged.includes('payment')) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-6"]');
-          } else if (currentTab === 6 && (lastChanged.includes('governing') || lastChanged.includes('dispute') || lastChanged.includes('liability'))) {
-            sectionToHighlight = previewRef.current.querySelector('h2[id*="section-10"], h2[id*="section-9"]');
-          }
-          
-          // Highlight and scroll to the relevant section
-          if (sectionToHighlight) {
-            sectionToHighlight.classList.add('highlight-section');
-            
-            // Find the next few elements to highlight as well
-            let currentElement = sectionToHighlight.nextElementSibling;
-            let elementsHighlighted = 0;
-            while (currentElement && elementsHighlighted < 3 && !currentElement.tagName.match(/^H[12]$/)) {
-              currentElement.classList.add('highlight-section');
-              currentElement = currentElement.nextElementSibling;
-              elementsHighlighted++;
-            }
-            
-            // Scroll to the highlighted section
-            sectionToHighlight.scrollIntoView({ 
-              behavior: 'smooth', 
-              block: 'start',
-              inline: 'nearest'
-            });
-            
-            // Remove highlights after 3 seconds
-            setTimeout(() => {
-              const highlightedElements = previewRef.current.querySelectorAll('.highlight-section');
-              highlightedElements.forEach(el => el.classList.remove('highlight-section'));
-            }, 3000);
-          }
-        }, 200);
-        
-        return () => clearTimeout(timeout);
-      }
-    }, [lastChanged, currentTab]);
     
     return (
       <div className="preview-panel">
