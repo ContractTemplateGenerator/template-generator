@@ -58,7 +58,73 @@ const allCardsData = [
     gradient: 'from-orange-600 to-red-600',
     bgGradient: 'from-orange-50 to-red-50'
   },
-  // Other Blog Posts
+  // Popular Blog Posts and Generators
+  {
+    id: 'tax-calculator',
+    icon: '💰',
+    category: 'Tax Calculator',
+    categoryColor: 'from-green-500 to-emerald-600',
+    title: '1099 vs W-2 Tax Calculator',
+    description: 'Comprehensive comparison tool with FSA benefits, retirement planning, work schedule analysis, and detailed tax insights to help you make informed employment decisions.',
+    url: 'https://terms.law/2024/12/15/tax-burden-calculator-for-1099-vs-w-2-employees/',
+    gradient: 'from-green-600 to-emerald-600',
+    bgGradient: 'from-green-50 to-emerald-50'
+  },
+  {
+    id: 'sweepstakes-generator',
+    icon: '🎯',
+    category: 'Document Generator',
+    categoryColor: 'from-amber-500 to-orange-600',
+    title: 'Sweepstakes Rules vs. Lotteries: Legal Guide & Generator',
+    description: 'Navigate the thin line between legal sweepstakes and illegal lotteries with this comprehensive guide and generator for social media promotions and marketing campaigns.',
+    url: 'https://terms.law/2024/08/27/legal-guide-sweepstakes-lotteries-and-social-media-promotions/',
+    gradient: 'from-amber-600 to-orange-600',
+    bgGradient: 'from-amber-50 to-orange-50'
+  },
+  {
+    id: 'video-production',
+    icon: '🎬',
+    category: 'Document Generator',
+    categoryColor: 'from-purple-500 to-violet-600',
+    title: 'Video Production Agreement Generator & Guide',
+    description: 'Create comprehensive video production agreements, talent agreements, licensing agreements, and location releases with proper legal protection for all stakeholders.',
+    url: 'https://terms.law/2023/11/09/the-essential-guide-to-contracts-for-video-production/',
+    gradient: 'from-purple-600 to-violet-600',
+    bgGradient: 'from-purple-50 to-violet-50'
+  },
+  {
+    id: 'interior-design',
+    icon: '🏠',
+    category: 'Document Generator',
+    categoryColor: 'from-indigo-500 to-blue-600',
+    title: 'Interior Design Services Agreement Generator',
+    description: 'Professional template and generator for interior designers to create tailored service agreements with proper scope of work, fees, payment terms, and legal protections.',
+    url: 'https://terms.law/2024/02/02/drafting-interior-design-services-agreements-free-template/',
+    gradient: 'from-indigo-600 to-blue-600',
+    bgGradient: 'from-indigo-50 to-blue-50'
+  },
+  {
+    id: 'profit-share',
+    icon: '📈',
+    category: 'Document Generator',
+    categoryColor: 'from-emerald-500 to-teal-600',
+    title: 'Profit Share Investment Agreement Generator',
+    description: 'Create agreements outlining terms for investors to receive a percentage of company profits, including investment details, distribution terms, and exit conditions.',
+    url: 'https://terms.law/2023/07/10/profit-share-investment-agreements-guide-template/',
+    gradient: 'from-emerald-600 to-teal-600',
+    bgGradient: 'from-emerald-50 to-teal-50'
+  },
+  {
+    id: 'master-services',
+    icon: '📋',
+    category: 'Document Generator',
+    categoryColor: 'from-slate-500 to-gray-600',
+    title: 'Master Services Agreements & Statements of Work Generator',
+    description: 'Draft effective MSAs and SOWs defining long-term service relationships with key clauses for services, payment, confidentiality, and intellectual property.',
+    url: 'https://terms.law/2024/04/19/drafting-effective-master-services-agreements-and-statements-of-work-free-template/',
+    gradient: 'from-slate-600 to-gray-600',
+    bgGradient: 'from-slate-50 to-gray-50'
+  },
   {
     id: 'stripe-funds',
     icon: '💳',
@@ -71,48 +137,48 @@ const allCardsData = [
     bgGradient: 'from-green-50 to-emerald-50'
   },
   {
-    id: 'lawyers-ai',
-    icon: '⚖️',
-    category: 'Legal Tech',
-    categoryColor: 'from-indigo-500 to-blue-600',
-    title: 'Why Lawyers Haven\'t Embraced AI Yet: Evidence from Four Million Claude Conversations',
-    description: 'Despite the AI revolution sweeping across industries, the legal profession has been notably cautious in adoption. This article examines data from millions of AI interactions to understand the barriers, concerns, and opportunities for AI integration in legal practice.',
-    url: 'https://terms.law/2025/03/02/why-lawyers-havent-embraced-ai-yet-evidence-from-four-million-claude-conversations/',
-    gradient: 'from-indigo-600 to-blue-600',
-    bgGradient: 'from-indigo-50 to-blue-50'
+    id: 'dppa-guide',
+    icon: '🚗',
+    category: 'Privacy Law',
+    categoryColor: 'from-blue-500 to-indigo-600',
+    title: 'Drivers Privacy Protection Act (DPPA) – Comprehensive Overview (2025)',
+    description: 'Understand how the DPPA protects personal information in motor vehicle records, authorized disclosures, and compliance requirements for businesses accessing driver data.',
+    url: 'https://terms.law/2023/08/01/drivers-privacy-protection-act-dppa/',
+    gradient: 'from-blue-600 to-indigo-600',
+    bgGradient: 'from-blue-50 to-indigo-50'
   },
   {
-    id: 'corporate-transparency',
-    icon: '🏢',
-    category: 'Business Law',
-    categoryColor: 'from-slate-500 to-gray-600',
-    title: 'Corporate Transparency Act in Limbo: What Latest Court Rulings Mean for Your Business',
-    description: 'Recent federal court decisions have cast uncertainty on the Corporate Transparency Act implementation. This analysis breaks down the legal challenges to the Act, current compliance requirements, and practical next steps for business owners facing this regulatory uncertainty.',
-    url: 'https://terms.law/2025/02/20/corporate-transparency-act-in-limbo-what-latest-court-rulings-mean-for-your-business/',
-    gradient: 'from-slate-600 to-gray-600',
-    bgGradient: 'from-slate-50 to-gray-50'
-  },
-  {
-    id: 'commercial-tenants',
-    icon: '🏬',
-    category: 'Real Estate Law',
-    categoryColor: 'from-amber-500 to-orange-600',
-    title: 'Defending Commercial Tenants: Litigation Strategies That Win in California Courts',
-    description: 'Commercial tenants in California face unique challenges when disputes arise with landlords. This practical guide examines proven litigation strategies, recent case law developments, and procedural considerations that lead to favorable outcomes in commercial lease disputes.',
-    url: 'https://terms.law/2025/02/06/defending-commercial-tenants-litigation-strategies-that-win-in-california-courts/',
-    gradient: 'from-amber-600 to-orange-600',
-    bgGradient: 'from-amber-50 to-orange-50'
-  },
-  {
-    id: 'warranties',
-    icon: '📋',
-    category: 'Contract Law',
+    id: 'angel-investor',
+    icon: '👼',
+    category: 'Document Generator',
     categoryColor: 'from-rose-500 to-pink-600',
-    title: 'The Legal Limits of Disclaiming Warranties',
-    description: 'Many businesses rely on warranty disclaimers to limit liability, but these clauses have significant legal boundaries. This analysis examines when and how warranty disclaimers can be effectively used, state-specific limitations, and recent case law affecting their enforceability.',
-    url: 'https://terms.law/2025/01/15/the-legal-limits-of-disclaiming-warranties/',
+    title: 'Angel Investor Agreement Generator & Template',
+    description: 'Create tailored agreements for early-stage investments with essential details including company information, investment structure, and comprehensive investor rights.',
+    url: 'https://terms.law/2023/08/11/drafting-angel-investor-agreements-a-comprehensive-guide-free-template-included/',
     gradient: 'from-rose-600 to-pink-600',
     bgGradient: 'from-rose-50 to-pink-50'
+  },
+  {
+    id: 'fifty-shades-nda',
+    icon: '🔒',
+    category: 'Document Generator',
+    categoryColor: 'from-gray-500 to-slate-600',
+    title: 'From Fantasy to Legal Reality: The Fifty Shades Contract Phenomenon + NDA Generator',
+    description: 'Examine the legal realities of BDSM contracts, consent, and NDAs, clarifying misconceptions while providing properly structured confidentiality agreements for relationships.',
+    url: 'https://terms.law/2023/07/29/4644/',
+    gradient: 'from-gray-600 to-slate-600',
+    bgGradient: 'from-gray-50 to-slate-50'
+  },
+  {
+    id: 'saas-partnership',
+    icon: '🤝',
+    category: 'Document Generator',
+    categoryColor: 'from-cyan-500 to-blue-600',
+    title: 'SaaS Partnership Agreement: Generator & Free Template',
+    description: 'Comprehensive guide and generator for SaaS partnerships outlining purpose, scope, financial terms, decision-making, IP rights, and dispute resolution mechanisms.',
+    url: 'https://terms.law/2023/01/20/saas-partnership-agreement-essential-clauses-free-template/',
+    gradient: 'from-cyan-600 to-blue-600',
+    bgGradient: 'from-cyan-50 to-blue-50'
   },
   {
     id: 'russian-nda',
@@ -126,15 +192,15 @@ const allCardsData = [
     bgGradient: 'from-cyan-50 to-blue-50'
   },
   {
-    id: 'russian-business',
-    icon: '🇺🇸',
+    id: 'llc-nonresidents',
+    icon: '🏢',
     category: 'Международный Бизнес',
-    categoryColor: 'from-red-500 to-pink-600',
-    title: 'Ведение бизнеса в США для российских предпринимателей: юридические и налоговые аспекты',
-    description: 'Подробное руководство для российских предпринимателей по созданию и управлению бизнесом в Соединенных Штатах, включая вопросы регистрации компаний, банковских проблем, налогового соответствия и нормативных требований в текущей геополитической обстановке.',
-    url: 'https://terms.law/2025/01/20/usa-business-for-russians/',
-    gradient: 'from-red-600 to-pink-600',
-    bgGradient: 'from-red-50 to-pink-50'
+    categoryColor: 'from-blue-500 to-indigo-600',
+    title: 'Руководство по LLC в США для нерезидентов',
+    description: 'Полное руководство для иностранных предпринимателей по созданию LLC в США: преимущества американской юрисдикции, банковское дело, обработка платежей, налоговые аспекты и требования соответствия.',
+    url: 'https://terms.law/2023/01/30/llc-for-nonresidents/',
+    gradient: 'from-blue-600 to-indigo-600',
+    bgGradient: 'from-blue-50 to-indigo-50'
   }
 ];
 
