@@ -10,6 +10,8 @@ const AITermsGenerator = () => {
     websiteURL: '',
     contactEmail: '',
     jurisdiction: 'California',
+    supportEmail: '',
+    businessAddress: '',
     
     // AI Platform Details
     platformName: '',
@@ -17,11 +19,17 @@ const AITermsGenerator = () => {
     dataCollection: true,
     userContent: true,
     commercialUse: false,
+    dataRetention: '2',
+    apiAccess: false,
+    thirdPartyIntegrations: false,
     
     // Terms Configuration
     minAge: '18',
     termination: 'immediate',
-    governingLaw: 'California'
+    governingLaw: 'California',
+    disputeResolution: 'arbitration',
+    limitLiability: true,
+    warrantyDisclaimer: true
   });
 
   // Ref for preview scrolling
@@ -67,58 +75,116 @@ Last Updated: ${new Date().toLocaleDateString()}
 
 ACCEPTANCE OF TERMS
 
-These Terms of Use ("Terms") govern your use of ${formData.platformName || '[PLATFORM NAME]'}, an artificial intelligence platform (the "Service") operated by ${formData.companyName || '[COMPANY NAME]'} ("Company," "we," "us," or "our").
+These Terms of Use ("Terms") govern your use of ${formData.platformName || '[PLATFORM NAME]'}, an artificial intelligence platform (the "Service") operated by ${formData.companyName || '[COMPANY NAME]'} ("Company," "we," "us," or "our"), located at ${formData.businessAddress || '[BUSINESS ADDRESS]'}.
 
-By accessing or using our Service, you agree to be bound by these Terms. If you do not agree to these Terms, do not use the Service.
+By accessing or using our Service, you agree to be bound by these Terms. If you do not agree to these Terms, do not use the Service. Your continued use of the Service constitutes acceptance of any modifications to these Terms.
 
 1. DESCRIPTION OF SERVICE
 
-${formData.platformName || '[PLATFORM NAME]'} is an AI-powered ${formData.platformType} platform that provides users with artificial intelligence capabilities. The Service allows users to interact with AI models and receive automated responses.
+${formData.platformName || '[PLATFORM NAME]'} is an AI-powered ${formData.platformType} platform that provides users with advanced artificial intelligence capabilities. The Service allows users to interact with sophisticated AI models, receive automated responses, and access various AI-driven features designed to enhance productivity and user experience.
 
-2. USER ELIGIBILITY
+Our Service may include features such as natural language processing, content generation, data analysis, and other AI-powered functionalities. The specific features available may vary based on your subscription level and may be updated from time to time.
 
-You must be at least ${formData.minAge} years old to use this Service. By using the Service, you represent that you meet this age requirement.
+2. USER ELIGIBILITY AND REGISTRATION
 
-3. USER CONTENT AND DATA
+You must be at least ${formData.minAge} years old to use this Service. By using the Service, you represent and warrant that you meet this age requirement and have the legal capacity to enter into these Terms.
+
+If you are using the Service on behalf of an organization, you represent that you have the authority to bind that organization to these Terms.
+
+3. USER CONTENT AND DATA USAGE
 
 ${formData.userContent ? 
-`You retain ownership of any content you submit to the Service ("User Content"). By submitting User Content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, and display your content solely for the purpose of providing the Service.` : 
-`You retain full ownership and control over any content you submit to the Service.`}
+`You retain ownership of any content you submit to the Service ("User Content"). By submitting User Content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, adapt, publish, translate, and display your content solely for the purpose of providing and improving the Service.
+
+We may use your User Content to train and improve our AI models, subject to our data protection practices and applicable privacy laws.` : 
+`You retain full ownership and control over any content you submit to the Service. We do not use your content for training purposes or any other use beyond providing the immediate Service functionality.`}
 
 ${formData.dataCollection ? 
-`We may collect and process data about your interactions with the Service to improve functionality and user experience, subject to our Privacy Policy.` : 
-`We do not collect personal data about your interactions with the Service beyond what is necessary for basic functionality.`}
+`We collect and process data about your interactions with the Service, including usage patterns, performance metrics, and user preferences. This data is used to improve functionality, enhance user experience, and develop new features. All data collection is subject to our Privacy Policy and applicable data protection laws.
 
-4. ACCEPTABLE USE
+Data Retention: We retain your data for a period of ${formData.dataRetention} years from your last interaction with the Service, unless required by law to retain it longer or you request earlier deletion.` : 
+`We minimize data collection and do not retain personal data about your interactions with the Service beyond what is strictly necessary for basic functionality and security purposes.`}
 
-You agree not to:
-- Use the Service for any illegal or unauthorized purpose
-- Attempt to gain unauthorized access to the Service or its systems
-- Upload or transmit any harmful, offensive, or inappropriate content
-- Use the Service to generate content that violates third-party rights
-${formData.commercialUse ? '' : '- Use the Service for commercial purposes without explicit permission'}
+4. ACCEPTABLE USE POLICY
 
-5. INTELLECTUAL PROPERTY
+You agree to use the Service in compliance with all applicable laws and regulations. You agree not to:
 
-The Service and its underlying technology, including AI models and algorithms, are the intellectual property of ${formData.companyName || '[COMPANY NAME]'} and its licensors.
+• Use the Service for any illegal, harmful, or unauthorized purpose
+• Attempt to gain unauthorized access to the Service, other users' accounts, or our systems
+• Upload, transmit, or share any content that is harmful, offensive, defamatory, or violates third-party rights
+• Use the Service to generate content that promotes violence, hatred, or discrimination
+• Interfere with or disrupt the Service or servers connected to the Service
+• Use automated tools to access the Service except through approved APIs
+${formData.commercialUse ? '' : '• Use the Service for commercial purposes without explicit written permission'}
+• Reverse engineer, decompile, or attempt to extract the source code of the Service
+• Violate any applicable laws or regulations in connection with your use of the Service
 
-6. LIMITATION OF LIABILITY
+5. INTELLECTUAL PROPERTY RIGHTS
 
-TO THE MAXIMUM EXTENT PERMITTED BY LAW, ${(formData.companyName || '[COMPANY NAME]').toUpperCase()} SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATING TO YOUR USE OF THE SERVICE.
+The Service and its underlying technology, including but not limited to AI models, algorithms, software, designs, text, graphics, and logos, are the intellectual property of ${formData.companyName || '[COMPANY NAME]'} and its licensors, protected by copyright, trademark, and other intellectual property laws.
 
-7. TERMINATION
+You are granted a limited, non-exclusive, non-transferable license to use the Service solely for its intended purpose. This license does not grant you any ownership rights in the Service or its intellectual property.
 
-We may terminate or suspend your access to the Service ${formData.termination === 'immediate' ? 'immediately' : 'with prior notice'} if you violate these Terms.
+${formData.apiAccess ? 
+`API Access: If you have been granted access to our API, you must comply with our API Terms of Service and usage guidelines. API access may be subject to rate limits and additional restrictions.` : ''}
 
-8. GOVERNING LAW
+6. PRIVACY AND DATA PROTECTION
 
-These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of law principles.
+Your privacy is important to us. Our collection, use, and protection of your personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
 
-9. CONTACT INFORMATION
+${formData.thirdPartyIntegrations ? 
+`Third-Party Integrations: The Service may integrate with third-party services. Your use of such integrations is subject to the terms and privacy policies of those third parties.` : ''}
 
-If you have any questions about these Terms, please contact us at ${formData.contactEmail || '[CONTACT EMAIL]'}.
+7. DISCLAIMERS AND LIMITATION OF LIABILITY
 
-For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${formData.websiteURL || '[WEBSITE URL]'}.`;
+${formData.warrantyDisclaimer ? 
+`WARRANTY DISCLAIMER: THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+We do not warrant that the Service will be uninterrupted, error-free, or completely secure. AI-generated content may not always be accurate, appropriate, or reliable.` : ''}
+
+${formData.limitLiability ? 
+`LIMITATION OF LIABILITY: TO THE MAXIMUM EXTENT PERMITTED BY LAW, ${(formData.companyName || '[COMPANY NAME]').toUpperCase()} SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, OR USE, ARISING OUT OF OR RELATING TO YOUR USE OF THE SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+
+IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED THE AMOUNT PAID BY YOU FOR THE SERVICE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.` : ''}
+
+8. ACCOUNT TERMINATION AND SUSPENSION
+
+We may terminate or suspend your access to the Service ${formData.termination === 'immediate' ? 'immediately and without prior notice' : 'with reasonable prior notice'} if you violate these Terms, engage in prohibited activities, or for any other reason at our sole discretion.
+
+You may terminate your account at any time by contacting us at ${formData.supportEmail || formData.contactEmail || '[SUPPORT EMAIL]'}. Upon termination, your right to use the Service will cease immediately.
+
+9. DISPUTE RESOLUTION
+
+${formData.disputeResolution === 'arbitration' ? 
+`Any disputes arising from these Terms or your use of the Service will be resolved through binding arbitration rather than in court, except that either party may seek injunctive relief in court for intellectual property disputes.` : 
+`Any disputes arising from these Terms or your use of the Service will be resolved in the courts of ${formData.jurisdiction}, and you consent to the jurisdiction of such courts.`}
+
+10. MODIFICATIONS TO TERMS
+
+We reserve the right to modify these Terms at any time. We will notify users of material changes by posting the updated Terms on our website and updating the "Last Updated" date. Your continued use of the Service after any modifications constitutes acceptance of the updated Terms.
+
+11. GOVERNING LAW
+
+These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of law principles. Any legal action arising from these Terms shall be brought in the courts of ${formData.jurisdiction}.
+
+12. CONTACT INFORMATION
+
+If you have any questions about these Terms or need support, please contact us:
+
+Email: ${formData.contactEmail || '[CONTACT EMAIL]'}
+Support: ${formData.supportEmail || '[SUPPORT EMAIL]'}
+Website: ${formData.websiteURL || '[WEBSITE URL]'}
+Address: ${formData.businessAddress || '[BUSINESS ADDRESS]'}
+
+For more information about ${formData.companyName || '[COMPANY NAME]'} and our services, visit ${formData.websiteURL || '[WEBSITE URL]'}.
+
+13. SEVERABILITY
+
+If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect.
+
+14. ENTIRE AGREEMENT
+
+These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between you and ${formData.companyName || '[COMPANY NAME]'} regarding the Service and supersede all prior agreements and understandings.`;
   };
 
   // Get current document text
@@ -128,17 +194,17 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
   const getSectionToHighlight = () => {
     switch (currentTab) {
       case 0: // Company Info
-        if (['companyName', 'websiteURL', 'contactEmail', 'jurisdiction'].includes(lastChanged)) {
+        if (['companyName', 'websiteURL', 'contactEmail', 'jurisdiction', 'businessAddress', 'supportEmail'].includes(lastChanged)) {
           return 'company';
         }
         break;
       case 1: // Platform
-        if (['platformName', 'platformType', 'dataCollection', 'userContent', 'commercialUse'].includes(lastChanged)) {
+        if (['platformName', 'platformType', 'dataCollection', 'userContent', 'commercialUse', 'dataRetention', 'apiAccess', 'thirdPartyIntegrations'].includes(lastChanged)) {
           return 'platform';
         }
         break;
       case 2: // Terms
-        if (['minAge', 'termination', 'governingLaw'].includes(lastChanged)) {
+        if (['minAge', 'termination', 'governingLaw', 'disputeResolution', 'limitLiability', 'warrantyDisclaimer'].includes(lastChanged)) {
           return 'terms';
         }
         break;
@@ -197,7 +263,10 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
         );
         break;
       case 'jurisdiction':
-        // This affects the jurisdiction field
+        highlightedText = highlightedText.replace(
+          /Any legal action arising from these Terms shall be brought in the courts of .*/,
+          `Any legal action arising from these Terms shall be brought in the courts of <span class="highlighted-text">${formData.jurisdiction}</span>.`
+        );
         break;
       case 'contactEmail':
         if (formData.contactEmail) {
@@ -231,17 +300,54 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
           }
         );
         break;
+      case 'businessAddress':
+        if (formData.businessAddress) {
+          highlightedText = highlightedText.replace(
+            /located at .*/,
+            `located at <span class="highlighted-text">${formData.businessAddress}</span>.`
+          );
+          highlightedText = highlightedText.replace(
+            /Address: .*/,
+            `Address: <span class="highlighted-text">${formData.businessAddress}</span>`
+          );
+        }
+        break;
+      case 'supportEmail':
+        if (formData.supportEmail) {
+          highlightedText = highlightedText.replace(
+            new RegExp(formData.supportEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            `<span class="highlighted-text">${formData.supportEmail}</span>`
+          );
+        }
+        break;
+      case 'dataRetention':
+        highlightedText = highlightedText.replace(
+          /retain your data for a period of .* years/,
+          `retain your data for a period of <span class="highlighted-text">${formData.dataRetention}</span> years`
+        );
+        break;
+      case 'disputeResolution':
+        if (formData.disputeResolution === 'arbitration') {
+          highlightedText = highlightedText.replace(
+            /Any disputes arising from these Terms.*?intellectual property disputes\./s,
+            function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            }
+          );
+        } else {
+          highlightedText = highlightedText.replace(
+            /Any disputes arising from these Terms.*?jurisdiction of such courts\./s,
+            function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            }
+          );
+        }
+        break;
       case 'commercialUse':
         if (!formData.commercialUse) {
           highlightedText = highlightedText.replace(
-            /- Use the Service for commercial purposes without explicit permission/,
-            `<span class="highlighted-text">- Use the Service for commercial purposes without explicit permission</span>`
-          );
-        } else {
-          // Remove the commercial use restriction highlight when enabled
-          highlightedText = highlightedText.replace(
-            /- Use the Service for commercial purposes without explicit permission\n/,
-            ``
+            /• Use the Service for commercial purposes without explicit written permission/,
+            `<span class="highlighted-text">• Use the Service for commercial purposes without explicit written permission</span>`
           );
         }
         break;
@@ -339,7 +445,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
               <div>
                 <h3>Company Information</h3>
                 <div className="form-group">
-                  <label>Company Name *</label>
+                  <label>Company Name * <span className="tooltip" title="Legal name of your company that will appear in the terms">ℹ️</span></label>
                   <input
                     type="text"
                     name="companyName"
@@ -348,9 +454,19 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     placeholder="Enter your company name"
                   />
                 </div>
+                <div className="form-group">
+                  <label>Business Address <span className="tooltip" title="Physical business address for legal notices">ℹ️</span></label>
+                  <input
+                    type="text"
+                    name="businessAddress"
+                    value={formData.businessAddress}
+                    onChange={handleChange}
+                    placeholder="123 Main St, City, State 12345"
+                  />
+                </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Website URL</label>
+                    <label>Website URL <span className="tooltip" title="Your company's main website">ℹ️</span></label>
                     <input
                       type="url"
                       name="websiteURL"
@@ -360,7 +476,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     />
                   </div>
                   <div className="form-group">
-                    <label>Contact Email</label>
+                    <label>Contact Email <span className="tooltip" title="General contact email for legal inquiries">ℹ️</span></label>
                     <input
                       type="email"
                       name="contactEmail"
@@ -370,17 +486,29 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     />
                   </div>
                 </div>
-                <div className="form-group">
-                  <label>Jurisdiction</label>
-                  <select
-                    name="jurisdiction"
-                    value={formData.jurisdiction}
-                    onChange={handleChange}
-                  >
-                    {states.map(state => (
-                      <option key={state} value={state}>{state}</option>
-                    ))}
-                  </select>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Support Email <span className="tooltip" title="Email for customer support and technical issues">ℹ️</span></label>
+                    <input
+                      type="email"
+                      name="supportEmail"
+                      value={formData.supportEmail}
+                      onChange={handleChange}
+                      placeholder="support@yourcompany.com"
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Jurisdiction <span className="tooltip" title="State where legal disputes will be resolved">ℹ️</span></label>
+                    <select
+                      name="jurisdiction"
+                      value={formData.jurisdiction}
+                      onChange={handleChange}
+                    >
+                      {states.map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
             )}
@@ -389,7 +517,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
               <div>
                 <h3>AI Platform Details</h3>
                 <div className="form-group">
-                  <label>Platform Name *</label>
+                  <label>Platform Name * <span className="tooltip" title="The name of your AI platform or service">ℹ️</span></label>
                   <input
                     type="text"
                     name="platformName"
@@ -398,19 +526,37 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     placeholder="Enter your AI platform name"
                   />
                 </div>
-                <div className="form-group">
-                  <label>Platform Type</label>
-                  <select
-                    name="platformType"
-                    value={formData.platformType}
-                    onChange={handleChange}
-                  >
-                    <option value="chatbot">AI Chatbot</option>
-                    <option value="content generator">Content Generator</option>
-                    <option value="image generator">Image Generator</option>
-                    <option value="analytics platform">Analytics Platform</option>
-                    <option value="recommendation engine">Recommendation Engine</option>
-                  </select>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Platform Type <span className="tooltip" title="Primary function of your AI platform">ℹ️</span></label>
+                    <select
+                      name="platformType"
+                      value={formData.platformType}
+                      onChange={handleChange}
+                    >
+                      <option value="chatbot">AI Chatbot</option>
+                      <option value="content generator">Content Generator</option>
+                      <option value="image generator">Image Generator</option>
+                      <option value="analytics platform">Analytics Platform</option>
+                      <option value="recommendation engine">Recommendation Engine</option>
+                      <option value="voice assistant">Voice Assistant</option>
+                      <option value="translation service">Translation Service</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Data Retention (Years) <span className="tooltip" title="How long you retain user data">ℹ️</span></label>
+                    <select
+                      name="dataRetention"
+                      value={formData.dataRetention}
+                      onChange={handleChange}
+                    >
+                      <option value="1">1 Year</option>
+                      <option value="2">2 Years</option>
+                      <option value="3">3 Years</option>
+                      <option value="5">5 Years</option>
+                      <option value="7">7 Years</option>
+                    </select>
+                  </div>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -419,7 +565,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     checked={formData.dataCollection}
                     onChange={handleChange}
                   />
-                  <label>Platform collects user interaction data</label>
+                  <label>Platform collects user interaction data <span className="tooltip" title="Check if you collect analytics, usage patterns, etc.">ℹ️</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -428,7 +574,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     checked={formData.userContent}
                     onChange={handleChange}
                   />
-                  <label>Users can submit content to the platform</label>
+                  <label>Users can submit content to the platform <span className="tooltip" title="Check if users upload files, text, or other content">ℹ️</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -437,7 +583,25 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     checked={formData.commercialUse}
                     onChange={handleChange}
                   />
-                  <label>Allow commercial use of platform outputs</label>
+                  <label>Allow commercial use of platform outputs <span className="tooltip" title="Check if users can use AI outputs for business purposes">ℹ️</span></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="apiAccess"
+                    checked={formData.apiAccess}
+                    onChange={handleChange}
+                  />
+                  <label>Platform provides API access <span className="tooltip" title="Check if you offer programmatic access via API">ℹ️</span></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="thirdPartyIntegrations"
+                    checked={formData.thirdPartyIntegrations}
+                    onChange={handleChange}
+                  />
+                  <label>Third-party service integrations <span className="tooltip" title="Check if your platform integrates with external services">ℹ️</span></label>
                 </div>
               </div>
             )}
@@ -447,7 +611,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                 <h3>Terms Configuration</h3>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Minimum Age Requirement</label>
+                    <label>Minimum Age Requirement <span className="tooltip" title="Minimum age for users to access your platform">ℹ️</span></label>
                     <select
                       name="minAge"
                       value={formData.minAge}
@@ -459,7 +623,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Account Termination</label>
+                    <label>Account Termination <span className="tooltip" title="How quickly you can terminate user accounts">ℹ️</span></label>
                     <select
                       name="termination"
                       value={formData.termination}
@@ -470,17 +634,48 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     </select>
                   </div>
                 </div>
-                <div className="form-group">
-                  <label>Governing Law</label>
-                  <select
-                    name="governingLaw"
-                    value={formData.governingLaw}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Governing Law <span className="tooltip" title="State law that governs the terms of use">ℹ️</span></label>
+                    <select
+                      name="governingLaw"
+                      value={formData.governingLaw}
+                      onChange={handleChange}
+                    >
+                      {states.map(state => (
+                        <option key={state} value={state}>{state}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Dispute Resolution <span className="tooltip" title="How legal disputes will be resolved">ℹ️</span></label>
+                    <select
+                      name="disputeResolution"
+                      value={formData.disputeResolution}
+                      onChange={handleChange}
+                    >
+                      <option value="arbitration">Binding Arbitration</option>
+                      <option value="court">Court Litigation</option>
+                    </select>
+                  </div>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="limitLiability"
+                    checked={formData.limitLiability}
                     onChange={handleChange}
-                  >
-                    {states.map(state => (
-                      <option key={state} value={state}>{state}</option>
-                    ))}
-                  </select>
+                  />
+                  <label>Include liability limitations <span className="tooltip" title="Limit your company's financial liability for damages">ℹ️</span></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="warrantyDisclaimer"
+                    checked={formData.warrantyDisclaimer}
+                    onChange={handleChange}
+                  />
+                  <label>Include warranty disclaimers <span className="tooltip" title="Disclaim warranties and 'as-is' service provision">ℹ️</span></label>
                 </div>
               </div>
             )}
