@@ -21,11 +21,22 @@ const AITermsGenerator = () => {
     // Terms Configuration
     minAge: '18',
     termination: 'immediate',
-    governing_law: 'California'
+    governingLaw: 'California'
   });
 
   // Ref for preview scrolling
   const previewRef = useRef(null);
+
+  // US States list
+  const states = [
+    'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+    'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+    'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+    'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+    'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+    'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+    'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+  ];
 
   // Tab configuration
   const tabs = [
@@ -101,7 +112,7 @@ We may terminate or suspend your access to the Service ${formData.termination ==
 
 8. GOVERNING LAW
 
-These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governing_law}, without regard to its conflict of law principles.
+These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of law principles.
 
 9. CONTACT INFORMATION
 
@@ -127,7 +138,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
         }
         break;
       case 2: // Terms
-        if (['minAge', 'termination', 'governing_law'].includes(lastChanged)) {
+        if (['minAge', 'termination', 'governingLaw'].includes(lastChanged)) {
           return 'terms';
         }
         break;
@@ -138,26 +149,102 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
   // Create highlighted text
   const createHighlightedText = () => {
     const sectionToHighlight = getSectionToHighlight();
-    if (!sectionToHighlight) return documentText;
+    if (!sectionToHighlight || !lastChanged) return documentText;
     
     let highlightedText = documentText;
     
     // Highlight different sections based on what changed
-    if (sectionToHighlight === 'company' && lastChanged === 'companyName') {
-      highlightedText = highlightedText.replace(
-        new RegExp(`${formData.companyName || '\\[COMPANY NAME\\]'}`, 'g'),
-        `<span class="highlighted-text">${formData.companyName || '[COMPANY NAME]'}</span>`
-      );
-    } else if (sectionToHighlight === 'platform' && lastChanged === 'platformName') {
-      highlightedText = highlightedText.replace(
-        new RegExp(`${formData.platformName || '\\[PLATFORM NAME\\]'}`, 'g'),
-        `<span class="highlighted-text">${formData.platformName || '[PLATFORM NAME]'}</span>`
-      );
-    } else if (sectionToHighlight === 'terms' && lastChanged === 'minAge') {
-      highlightedText = highlightedText.replace(
-        new RegExp(`${formData.minAge}`, 'g'),
-        `<span class="highlighted-text">${formData.minAge}</span>`
-      );
+    switch (lastChanged) {
+      case 'companyName':
+        if (formData.companyName) {
+          highlightedText = highlightedText.replace(
+            new RegExp(formData.companyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            `<span class="highlighted-text">${formData.companyName}</span>`
+          );
+        }
+        break;
+      case 'platformName':
+        if (formData.platformName) {
+          highlightedText = highlightedText.replace(
+            new RegExp(formData.platformName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            `<span class="highlighted-text">${formData.platformName}</span>`
+          );
+        }
+        break;
+      case 'platformType':
+        highlightedText = highlightedText.replace(
+          /AI-powered .* platform/,
+          `AI-powered <span class="highlighted-text">${formData.platformType}</span> platform`
+        );
+        break;
+      case 'minAge':
+        highlightedText = highlightedText.replace(
+          new RegExp(`at least ${formData.minAge} years old`, 'g'),
+          `at least <span class="highlighted-text">${formData.minAge}</span> years old`
+        );
+        break;
+      case 'termination':
+        const terminationText = formData.termination === 'immediate' ? 'immediately' : 'with prior notice';
+        highlightedText = highlightedText.replace(
+          /terminate or suspend your access to the Service .*/,
+          `terminate or suspend your access to the Service <span class="highlighted-text">${terminationText}</span> if you violate these Terms.`
+        );
+        break;
+      case 'governingLaw':
+        highlightedText = highlightedText.replace(
+          new RegExp(`State of ${formData.governingLaw}`, 'g'),
+          `State of <span class="highlighted-text">${formData.governingLaw}</span>`
+        );
+        break;
+      case 'jurisdiction':
+        // This affects the jurisdiction field
+        break;
+      case 'contactEmail':
+        if (formData.contactEmail) {
+          highlightedText = highlightedText.replace(
+            new RegExp(formData.contactEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            `<span class="highlighted-text">${formData.contactEmail}</span>`
+          );
+        }
+        break;
+      case 'websiteURL':
+        if (formData.websiteURL) {
+          highlightedText = highlightedText.replace(
+            new RegExp(formData.websiteURL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+            `<span class="highlighted-text">${formData.websiteURL}</span>`
+          );
+        }
+        break;
+      case 'dataCollection':
+        highlightedText = highlightedText.replace(
+          /We may collect and process data.*?Privacy Policy\.|We do not collect personal data.*?basic functionality\./,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
+      case 'userContent':
+        highlightedText = highlightedText.replace(
+          /You retain ownership.*?providing the Service\.|You retain full ownership.*?submit to the Service\./,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
+      case 'commercialUse':
+        if (!formData.commercialUse) {
+          highlightedText = highlightedText.replace(
+            /- Use the Service for commercial purposes without explicit permission/,
+            `<span class="highlighted-text">- Use the Service for commercial purposes without explicit permission</span>`
+          );
+        } else {
+          // Remove the commercial use restriction highlight when enabled
+          highlightedText = highlightedText.replace(
+            /- Use the Service for commercial purposes without explicit permission\n/,
+            ``
+          );
+        }
+        break;
     }
     
     return highlightedText;
@@ -169,12 +256,26 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
   // Scroll to highlighted text
   useEffect(() => {
     if (previewRef.current && lastChanged) {
-      const highlightedElement = previewRef.current.querySelector('.highlighted-text');
-      if (highlightedElement) {
-        highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      // Small delay to ensure the DOM has updated
+      setTimeout(() => {
+        const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+        if (highlightedElement) {
+          highlightedElement.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center',
+            inline: 'nearest'
+          });
+        }
+      }, 100);
+      
+      // Clear the highlight after 3 seconds
+      const timer = setTimeout(() => {
+        setLastChanged(null);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
     }
-  }, [highlightedText]);
+  }, [highlightedText, lastChanged]);
 
   // Navigation functions
   const nextTab = () => {
@@ -276,10 +377,9 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                     value={formData.jurisdiction}
                     onChange={handleChange}
                   >
-                    <option value="California">California</option>
-                    <option value="New York">New York</option>
-                    <option value="Delaware">Delaware</option>
-                    <option value="Texas">Texas</option>
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -373,14 +473,13 @@ For more information about ${formData.companyName || '[COMPANY NAME]'}, visit ${
                 <div className="form-group">
                   <label>Governing Law</label>
                   <select
-                    name="governing_law"
-                    value={formData.governing_law}
+                    name="governingLaw"
+                    value={formData.governingLaw}
                     onChange={handleChange}
                   >
-                    <option value="California">California</option>
-                    <option value="New York">New York</option>
-                    <option value="Delaware">Delaware</option>
-                    <option value="Texas">Texas</option>
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
                   </select>
                 </div>
               </div>
