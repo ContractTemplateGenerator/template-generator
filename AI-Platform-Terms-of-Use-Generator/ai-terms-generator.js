@@ -29,7 +29,12 @@ const AITermsGenerator = () => {
     governingLaw: 'California',
     disputeResolution: 'arbitration',
     limitLiability: true,
-    warrantyDisclaimer: true
+    warrantyDisclaimer: true,
+    consequentialDamages: true,
+    indemnification: false,
+    liabilityCapAmount: '12months',
+    warrantyPeriod: 'none',
+    performanceWarranty: false
   });
 
   // Ref for preview scrolling
@@ -140,12 +145,17 @@ ${formData.thirdPartyIntegrations ?
 ${formData.warrantyDisclaimer ? 
 `WARRANTY DISCLAIMER: THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
 
-We do not warrant that the Service will be uninterrupted, error-free, or completely secure. AI-generated content may not always be accurate, appropriate, or reliable.` : ''}
+We do not warrant that the Service will be uninterrupted, error-free, or completely secure. AI-generated content may not always be accurate, appropriate, or reliable.${formData.warrantyPeriod !== 'none' ? ` Any warranties that cannot be disclaimed are limited to a period of ${formData.warrantyPeriod === '30days' ? 'thirty (30) days' : formData.warrantyPeriod === '90days' ? 'ninety (90) days' : 'one (1) year'} from the date of first use.` : ''}${formData.performanceWarranty ? ' We do not guarantee specific performance outcomes or results from using the Service.' : ''}` : 
+`We provide warranties and guarantees in accordance with applicable consumer protection laws.`}
 
 ${formData.limitLiability ? 
-`LIMITATION OF LIABILITY: TO THE MAXIMUM EXTENT PERMITTED BY LAW, ${(formData.companyName || '[COMPANY NAME]').toUpperCase()} SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, OR USE, ARISING OUT OF OR RELATING TO YOUR USE OF THE SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+`LIMITATION OF LIABILITY: TO THE MAXIMUM EXTENT PERMITTED BY LAW, ${(formData.companyName || '[COMPANY NAME]').toUpperCase()} SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL${formData.consequentialDamages ? ', CONSEQUENTIAL,' : ','} OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO LOSS OF PROFITS, DATA, OR USE, ARISING OUT OF OR RELATING TO YOUR USE OF THE SERVICE, EVEN IF WE HAVE BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
-IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED THE AMOUNT PAID BY YOU FOR THE SERVICE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM.` : ''}
+IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED ${formData.liabilityCapAmount === '12months' ? 'THE AMOUNT PAID BY YOU FOR THE SERVICE IN THE TWELVE (12) MONTHS PRECEDING THE CLAIM' : formData.liabilityCapAmount === '6months' ? 'THE AMOUNT PAID BY YOU FOR THE SERVICE IN THE SIX (6) MONTHS PRECEDING THE CLAIM' : formData.liabilityCapAmount === 'fixed100' ? 'ONE HUNDRED DOLLARS ($100)' : formData.liabilityCapAmount === 'fixed1000' ? 'ONE THOUSAND DOLLARS ($1,000)' : 'THE AMOUNT PAID BY YOU FOR THE SERVICE'}.` : 
+`Our liability for damages arising from your use of the Service shall be determined in accordance with applicable law.`}
+
+${formData.indemnification ? 
+`INDEMNIFICATION: You agree to indemnify, defend, and hold harmless ${formData.companyName || '[COMPANY NAME]'}, its officers, directors, employees, and agents from and against any claims, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising from your use of the Service, violation of these Terms, or infringement of any third-party rights.` : ''}
 
 8. ACCOUNT TERMINATION AND SUSPENSION
 
@@ -204,7 +214,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
         }
         break;
       case 2: // Terms
-        if (['minAge', 'termination', 'governingLaw', 'disputeResolution', 'limitLiability', 'warrantyDisclaimer'].includes(lastChanged)) {
+        if (['minAge', 'termination', 'governingLaw', 'disputeResolution', 'limitLiability', 'warrantyDisclaimer', 'consequentialDamages', 'indemnification', 'liabilityCapAmount', 'warrantyPeriod', 'performanceWarranty'].includes(lastChanged)) {
           return 'terms';
         }
         break;
@@ -351,6 +361,54 @@ These Terms, together with our Privacy Policy and any other policies referenced 
           );
         }
         break;
+      case 'apiAccess':
+      case 'thirdPartyIntegrations':
+        // These affect the content in different sections
+        if (lastChanged === 'apiAccess' && formData.apiAccess) {
+          highlightedText = highlightedText.replace(
+            /API Access: If you have been granted access.*?additional restrictions\./,
+            function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            }
+          );
+        } else if (lastChanged === 'thirdPartyIntegrations' && formData.thirdPartyIntegrations) {
+          highlightedText = highlightedText.replace(
+            /Third-Party Integrations: The Service may integrate.*?those third parties\./,
+            function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            }
+          );
+        }
+        break;
+      case 'limitLiability':
+      case 'consequentialDamages':
+      case 'liabilityCapAmount':
+      case 'indemnification':
+        highlightedText = highlightedText.replace(
+          /LIMITATION OF LIABILITY:.*?(?=8\. ACCOUNT TERMINATION|INDEMNIFICATION:|$)/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        if (formData.indemnification) {
+          highlightedText = highlightedText.replace(
+            /INDEMNIFICATION:.*?third-party rights\./,
+            function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            }
+          );
+        }
+        break;
+      case 'warrantyDisclaimer':
+      case 'warrantyPeriod':
+      case 'performanceWarranty':
+        highlightedText = highlightedText.replace(
+          /WARRANTY DISCLAIMER:.*?(?=LIMITATION OF LIABILITY:|$)/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
     }
     
     return highlightedText;
@@ -445,7 +503,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
               <div>
                 <h3>Company Information</h3>
                 <div className="form-group">
-                  <label>Company Name * <span className="tooltip" title="Legal name of your company that will appear in the terms">ℹ️</span></label>
+                  <label>Company Name * <span className="help-icon" title="Legal name of your company that will appear in the terms">❓</span></label>
                   <input
                     type="text"
                     name="companyName"
@@ -455,7 +513,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                   />
                 </div>
                 <div className="form-group">
-                  <label>Business Address <span className="tooltip" title="Physical business address for legal notices">ℹ️</span></label>
+                  <label>Business Address <span className="help-icon" title="Physical business address for legal notices">❓</span></label>
                   <input
                     type="text"
                     name="businessAddress"
@@ -466,7 +524,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Website URL <span className="tooltip" title="Your company's main website">ℹ️</span></label>
+                    <label>Website URL <span className="help-icon" title="Your company's main website">❓</span></label>
                     <input
                       type="url"
                       name="websiteURL"
@@ -476,7 +534,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     />
                   </div>
                   <div className="form-group">
-                    <label>Contact Email <span className="tooltip" title="General contact email for legal inquiries">ℹ️</span></label>
+                    <label>Contact Email <span className="help-icon" title="General contact email for legal inquiries">❓</span></label>
                     <input
                       type="email"
                       name="contactEmail"
@@ -488,7 +546,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Support Email <span className="tooltip" title="Email for customer support and technical issues">ℹ️</span></label>
+                    <label>Support Email <span className="help-icon" title="Email for customer support and technical issues">❓</span></label>
                     <input
                       type="email"
                       name="supportEmail"
@@ -498,7 +556,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     />
                   </div>
                   <div className="form-group">
-                    <label>Jurisdiction <span className="tooltip" title="State where legal disputes will be resolved">ℹ️</span></label>
+                    <label>Jurisdiction <span className="help-icon" title="State where legal disputes will be resolved">❓</span></label>
                     <select
                       name="jurisdiction"
                       value={formData.jurisdiction}
@@ -517,7 +575,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
               <div>
                 <h3>AI Platform Details</h3>
                 <div className="form-group">
-                  <label>Platform Name * <span className="tooltip" title="The name of your AI platform or service">ℹ️</span></label>
+                  <label>Platform Name * <span className="help-icon" title="The name of your AI platform or service">❓</span></label>
                   <input
                     type="text"
                     name="platformName"
@@ -528,7 +586,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Platform Type <span className="tooltip" title="Primary function of your AI platform">ℹ️</span></label>
+                    <label>Platform Type <span className="help-icon" title="Primary function of your AI platform">❓</span></label>
                     <select
                       name="platformType"
                       value={formData.platformType}
@@ -544,7 +602,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Data Retention (Years) <span className="tooltip" title="How long you retain user data">ℹ️</span></label>
+                    <label>Data Retention (Years) <span className="help-icon" title="How long you retain user data">❓</span></label>
                     <select
                       name="dataRetention"
                       value={formData.dataRetention}
@@ -565,7 +623,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.dataCollection}
                     onChange={handleChange}
                   />
-                  <label>Platform collects user interaction data <span className="tooltip" title="Check if you collect analytics, usage patterns, etc.">ℹ️</span></label>
+                  <label>Platform collects user interaction data <span className="help-icon" title="Check if you collect analytics, usage patterns, etc.">❓</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -574,7 +632,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.userContent}
                     onChange={handleChange}
                   />
-                  <label>Users can submit content to the platform <span className="tooltip" title="Check if users upload files, text, or other content">ℹ️</span></label>
+                  <label>Users can submit content to the platform <span className="help-icon" title="Check if users upload files, text, or other content">❓</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -583,7 +641,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.commercialUse}
                     onChange={handleChange}
                   />
-                  <label>Allow commercial use of platform outputs <span className="tooltip" title="Check if users can use AI outputs for business purposes">ℹ️</span></label>
+                  <label>Allow commercial use of platform outputs <span className="help-icon" title="Check if users can use AI outputs for business purposes">❓</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -592,7 +650,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.apiAccess}
                     onChange={handleChange}
                   />
-                  <label>Platform provides API access <span className="tooltip" title="Check if you offer programmatic access via API">ℹ️</span></label>
+                  <label>Platform provides API access <span className="help-icon" title="Check if you offer programmatic access via API">❓</span></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -601,7 +659,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.thirdPartyIntegrations}
                     onChange={handleChange}
                   />
-                  <label>Third-party service integrations <span className="tooltip" title="Check if your platform integrates with external services">ℹ️</span></label>
+                  <label>Third-party service integrations <span className="help-icon" title="Check if your platform integrates with external services">❓</span></label>
                 </div>
               </div>
             )}
@@ -611,7 +669,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 <h3>Terms Configuration</h3>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Minimum Age Requirement <span className="tooltip" title="Minimum age for users to access your platform">ℹ️</span></label>
+                    <label>Minimum Age Requirement <span className="help-icon" title="Minimum age for users to access your platform">❓</span></label>
                     <select
                       name="minAge"
                       value={formData.minAge}
@@ -623,7 +681,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Account Termination <span className="tooltip" title="How quickly you can terminate user accounts">ℹ️</span></label>
+                    <label>Account Termination <span className="help-icon" title="How quickly you can terminate user accounts">❓</span></label>
                     <select
                       name="termination"
                       value={formData.termination}
@@ -636,7 +694,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Governing Law <span className="tooltip" title="State law that governs the terms of use">ℹ️</span></label>
+                    <label>Governing Law <span className="help-icon" title="State law that governs the terms of use">❓</span></label>
                     <select
                       name="governingLaw"
                       value={formData.governingLaw}
@@ -648,7 +706,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Dispute Resolution <span className="tooltip" title="How legal disputes will be resolved">ℹ️</span></label>
+                    <label>Dispute Resolution <span className="help-icon" title="How legal disputes will be resolved">❓</span></label>
                     <select
                       name="disputeResolution"
                       value={formData.disputeResolution}
@@ -659,6 +717,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                 </div>
+                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Liability Protection</h4>
                 <div className="checkbox-group">
                   <input
                     type="checkbox"
@@ -666,8 +725,41 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.limitLiability}
                     onChange={handleChange}
                   />
-                  <label>Include liability limitations <span className="tooltip" title="Limit your company's financial liability for damages">ℹ️</span></label>
+                  <label>Include liability limitations <span className="help-icon" title="Limit your company's financial liability for damages - recommended for most businesses">❓</span></label>
                 </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="consequentialDamages"
+                    checked={formData.consequentialDamages}
+                    onChange={handleChange}
+                  />
+                  <label>Exclude consequential damages <span className="help-icon" title="Prevent liability for indirect damages like lost profits - highly recommended">❓</span></label>
+                </div>
+                <div className="form-group">
+                  <label>Liability Cap Amount <span className="help-icon" title="Maximum amount you'll pay in damages - limits your financial exposure">❓</span></label>
+                  <select
+                    name="liabilityCapAmount"
+                    value={formData.liabilityCapAmount}
+                    onChange={handleChange}
+                  >
+                    <option value="12months">Amount paid in last 12 months</option>
+                    <option value="6months">Amount paid in last 6 months</option>
+                    <option value="fixed100">Fixed $100 maximum</option>
+                    <option value="fixed1000">Fixed $1,000 maximum</option>
+                  </select>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="indemnification"
+                    checked={formData.indemnification}
+                    onChange={handleChange}
+                  />
+                  <label>Require user indemnification <span className="help-icon" title="Users must cover your legal costs if they cause problems - use carefully as it may deter users">❓</span></label>
+                </div>
+                
+                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Warranty Terms</h4>
                 <div className="checkbox-group">
                   <input
                     type="checkbox"
@@ -675,7 +767,29 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.warrantyDisclaimer}
                     onChange={handleChange}
                   />
-                  <label>Include warranty disclaimers <span className="tooltip" title="Disclaim warranties and 'as-is' service provision">ℹ️</span></label>
+                  <label>Include warranty disclaimers <span className="help-icon" title="Disclaim warranties and provide 'as-is' service - standard protection">❓</span></label>
+                </div>
+                <div className="form-group">
+                  <label>Limited Warranty Period <span className="help-icon" title="If any warranties cannot be disclaimed by law, limit them to this period">❓</span></label>
+                  <select
+                    name="warrantyPeriod"
+                    value={formData.warrantyPeriod}
+                    onChange={handleChange}
+                  >
+                    <option value="none">No warranty period (strongest protection)</option>
+                    <option value="30days">30 days limited warranty</option>
+                    <option value="90days">90 days limited warranty</option>
+                    <option value="1year">1 year limited warranty</option>
+                  </select>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="performanceWarranty"
+                    checked={formData.performanceWarranty}
+                    onChange={handleChange}
+                  />
+                  <label>Disclaim performance guarantees <span className="help-icon" title="Clarify that you don't guarantee specific results from AI - important for AI services">❓</span></label>
                 </div>
               </div>
             )}
