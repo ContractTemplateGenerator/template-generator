@@ -101,6 +101,16 @@ const AITermsGenerator = () => {
     performanceWarranty: "Clarify that you don't guarantee specific results from AI - important for AI services"
   };
 
+  // Help icon component with tooltip (like the working NDA generator)
+  const HelpIcon = ({ tooltip }) => (
+    <span className="help-icon">
+      ?
+      <span className="help-tooltip">
+        {tooltip}
+      </span>
+    </span>
+  );
+
   // Generate document text
   const generateDocument = () => {
     return `TERMS OF USE FOR ${formData.platformName || '[PLATFORM NAME]'}
