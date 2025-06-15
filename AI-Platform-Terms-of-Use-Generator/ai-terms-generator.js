@@ -4,7 +4,6 @@ const AITermsGenerator = () => {
   // State management
   const [currentTab, setCurrentTab] = useState(0);
   const [lastChanged, setLastChanged] = useState(null);
-  const [showHelp, setShowHelp] = useState({}); // Track which help tooltips are visible
   const [formData, setFormData] = useState({
     // Company Information
     companyName: '',
@@ -73,39 +72,34 @@ const AITermsGenerator = () => {
     }));
   };
 
-  // Toggle help text visibility
-  const toggleHelp = (fieldName) => {
-    setShowHelp(prev => ({
-      ...prev,
-      [fieldName]: !prev[fieldName]
-    }));
+  // Educational tooltips content
+  const tooltips = {
+    companyName: "Legal name of your company that will appear in the terms",
+    businessAddress: "Physical business address for legal notices",
+    websiteURL: "Your company's main website",
+    contactEmail: "General contact email for legal inquiries",
+    supportEmail: "Email for customer support and technical issues",
+    jurisdiction: "State where legal disputes will be resolved",
+    platformName: "The name of your AI platform or service",
+    platformType: "Primary function of your AI platform",
+    dataRetention: "How long you retain user data",
+    dataCollection: "Check if you collect analytics, usage patterns, etc.",
+    userContent: "Check if users upload files, text, or other content",
+    commercialUse: "Check if users can use AI outputs for business purposes",
+    apiAccess: "Check if you offer programmatic access via API",
+    thirdPartyIntegrations: "Check if your platform integrates with external services",
+    minAge: "Minimum age for users to access your platform",
+    termination: "How quickly you can terminate user accounts",
+    governingLaw: "State law that governs the terms of use",
+    disputeResolution: "How legal disputes will be resolved",
+    limitLiability: "Limit your company's financial liability for damages - recommended for most businesses",
+    consequentialDamages: "Prevent liability for indirect damages like lost profits - highly recommended",
+    liabilityCapAmount: "Maximum amount you'll pay in damages - limits your financial exposure",
+    indemnification: "Users must cover your legal costs if they cause problems - use carefully as it may deter users",
+    warrantyDisclaimer: "Disclaim warranties and provide 'as-is' service - standard protection",
+    warrantyPeriod: "If any warranties cannot be disclaimed by law, limit them to this period",
+    performanceWarranty: "Clarify that you don't guarantee specific results from AI - important for AI services"
   };
-
-  // Help component
-  const HelpIcon = ({ fieldName, helpText }) => (
-    <span className="help-container">
-      <span 
-        className="help-icon" 
-        onClick={() => toggleHelp(fieldName)}
-        role="button"
-        aria-label="Show help"
-      >
-        ❓
-      </span>
-      {showHelp[fieldName] && (
-        <div className="help-tooltip">
-          {helpText}
-          <button 
-            className="help-close" 
-            onClick={() => toggleHelp(fieldName)}
-            aria-label="Close help"
-          >
-            ×
-          </button>
-        </div>
-      )}
-    </span>
-  );
 
   // Generate document text
   const generateDocument = () => {
@@ -538,7 +532,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
               <div>
                 <h3>Company Information</h3>
                 <div className="form-group">
-                  <label>Company Name * <HelpIcon fieldName="companyName" helpText="Legal name of your company that will appear in the terms" /></label>
+                  <label>Company Name * <HelpIcon tooltip={tooltips.companyName} /></label>
                   <input
                     type="text"
                     name="companyName"
@@ -548,7 +542,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                   />
                 </div>
                 <div className="form-group">
-                  <label>Business Address <HelpIcon fieldName="businessAddress" helpText="Physical business address for legal notices" /></label>
+                  <label>Business Address <HelpIcon tooltip={tooltips.businessAddress} /></label>
                   <input
                     type="text"
                     name="businessAddress"
@@ -559,7 +553,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Website URL <HelpIcon fieldName="websiteURL" helpText="Your company's main website" /></label>
+                    <label>Website URL <HelpIcon tooltip={tooltips.websiteURL} /></label>
                     <input
                       type="url"
                       name="websiteURL"
@@ -569,7 +563,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     />
                   </div>
                   <div className="form-group">
-                    <label>Contact Email <HelpIcon fieldName="contactEmail" helpText="General contact email for legal inquiries" /></label>
+                    <label>Contact Email <HelpIcon tooltip={tooltips.contactEmail} /></label>
                     <input
                       type="email"
                       name="contactEmail"
@@ -581,7 +575,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Support Email <HelpIcon fieldName="supportEmail" helpText="Email for customer support and technical issues" /></label>
+                    <label>Support Email <HelpIcon tooltip={tooltips.supportEmail} /></label>
                     <input
                       type="email"
                       name="supportEmail"
@@ -591,7 +585,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     />
                   </div>
                   <div className="form-group">
-                    <label>Jurisdiction <HelpIcon fieldName="jurisdiction" helpText="State where legal disputes will be resolved" /></label>
+                    <label>Jurisdiction <HelpIcon tooltip={tooltips.jurisdiction} /></label>
                     <select
                       name="jurisdiction"
                       value={formData.jurisdiction}
@@ -610,7 +604,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
               <div>
                 <h3>AI Platform Details</h3>
                 <div className="form-group">
-                  <label>Platform Name * <HelpIcon fieldName="platformName" helpText="The name of your AI platform or service" /></label>
+                  <label>Platform Name * <HelpIcon tooltip={tooltips.platformName} /></label>
                   <input
                     type="text"
                     name="platformName"
@@ -621,7 +615,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Platform Type <HelpIcon fieldName="platformType" helpText="Primary function of your AI platform" /></label>
+                    <label>Platform Type <HelpIcon tooltip={tooltips.platformType} /></label>
                     <select
                       name="platformType"
                       value={formData.platformType}
@@ -637,7 +631,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Data Retention (Years) <HelpIcon fieldName="dataRetention" helpText="How long you retain user data" /></label>
+                    <label>Data Retention (Years) <HelpIcon tooltip={tooltips.dataRetention} /></label>
                     <select
                       name="dataRetention"
                       value={formData.dataRetention}
@@ -651,6 +645,25 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                 </div>
+                
+                {/* Platform Type Explanation */}
+                <div className="form-explanation">
+                  {formData.platformType === 'chatbot' && 
+                    'AI chatbots provide conversational interfaces for users. Consider strong disclaimers about AI accuracy and response quality.'}
+                  {formData.platformType === 'content generator' && 
+                    'Content generation platforms create text, images, or other media. Include clear terms about intellectual property ownership and commercial use.'}
+                  {formData.platformType === 'image generator' && 
+                    'Image generation platforms may face unique copyright and deepfake concerns. Consider additional restrictions on harmful content generation.'}
+                  {formData.platformType === 'analytics platform' && 
+                    'Analytics platforms process data to provide insights. Ensure robust data protection and privacy compliance terms.'}
+                  {formData.platformType === 'recommendation engine' && 
+                    'Recommendation systems influence user decisions. Consider disclaimers about algorithmic bias and decision accuracy.'}
+                  {formData.platformType === 'voice assistant' && 
+                    'Voice assistants process audio data. Include specific privacy protections for voice recordings and transcripts.'}
+                  {formData.platformType === 'translation service' && 
+                    'Translation services may handle sensitive documents. Add confidentiality protections and accuracy disclaimers.'}
+                </div>
+                
                 <div className="checkbox-group">
                   <input
                     type="checkbox"
@@ -658,7 +671,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.dataCollection}
                     onChange={handleChange}
                   />
-                  <label>Platform collects user interaction data <HelpIcon fieldName="dataCollection" helpText="Check if you collect analytics, usage patterns, etc." /></label>
+                  <label>Platform collects user interaction data <HelpIcon tooltip={tooltips.dataCollection} /></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -667,7 +680,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.userContent}
                     onChange={handleChange}
                   />
-                  <label>Users can submit content to the platform <HelpIcon fieldName="userContent" helpText="Check if users upload files, text, or other content" /></label>
+                  <label>Users can submit content to the platform <HelpIcon tooltip={tooltips.userContent} /></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -676,7 +689,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.commercialUse}
                     onChange={handleChange}
                   />
-                  <label>Allow commercial use of platform outputs <HelpIcon fieldName="commercialUse" helpText="Check if users can use AI outputs for business purposes" /></label>
+                  <label>Allow commercial use of platform outputs <HelpIcon tooltip={tooltips.commercialUse} /></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -685,7 +698,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.apiAccess}
                     onChange={handleChange}
                   />
-                  <label>Platform provides API access <HelpIcon fieldName="apiAccess" helpText="Check if you offer programmatic access via API" /></label>
+                  <label>Platform provides API access <HelpIcon tooltip={tooltips.apiAccess} /></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -694,7 +707,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.thirdPartyIntegrations}
                     onChange={handleChange}
                   />
-                  <label>Third-party service integrations <HelpIcon fieldName="thirdPartyIntegrations" helpText="Check if your platform integrates with external services" /></label>
+                  <label>Third-party service integrations <HelpIcon tooltip={tooltips.thirdPartyIntegrations} /></label>
                 </div>
               </div>
             )}
@@ -704,7 +717,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 <h3>Terms Configuration</h3>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Minimum Age Requirement <HelpIcon fieldName="minAge" helpText="Minimum age for users to access your platform" /></label>
+                    <label>Minimum Age Requirement <HelpIcon tooltip={tooltips.minAge} /></label>
                     <select
                       name="minAge"
                       value={formData.minAge}
@@ -716,7 +729,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Account Termination <HelpIcon fieldName="termination" helpText="How quickly you can terminate user accounts" /></label>
+                    <label>Account Termination <HelpIcon tooltip={tooltips.termination} /></label>
                     <select
                       name="termination"
                       value={formData.termination}
@@ -729,7 +742,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label>Governing Law <HelpIcon fieldName="governingLaw" helpText="State law that governs the terms of use" /></label>
+                    <label>Governing Law <HelpIcon tooltip={tooltips.governingLaw} /></label>
                     <select
                       name="governingLaw"
                       value={formData.governingLaw}
@@ -741,7 +754,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                   <div className="form-group">
-                    <label>Dispute Resolution <HelpIcon fieldName="disputeResolution" helpText="How legal disputes will be resolved" /></label>
+                    <label>Dispute Resolution <HelpIcon tooltip={tooltips.disputeResolution} /></label>
                     <select
                       name="disputeResolution"
                       value={formData.disputeResolution}
@@ -752,6 +765,15 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     </select>
                   </div>
                 </div>
+                
+                {/* Dispute Resolution Explanation */}
+                <div className="form-explanation">
+                  {formData.disputeResolution === 'arbitration' && 
+                    'Arbitration is typically faster and cheaper than court litigation, but limits appeal rights. Arbitrators\' decisions are usually final and binding.'}
+                  {formData.disputeResolution === 'court' && 
+                    'Court litigation provides full legal protections and appeal rights but can be more expensive and time-consuming than arbitration.'}
+                </div>
+                
                 <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Liability Protection</h4>
                 <div className="checkbox-group">
                   <input
@@ -760,7 +782,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.limitLiability}
                     onChange={handleChange}
                   />
-                  <label>Include liability limitations <HelpIcon fieldName="limitLiability" helpText="Limit your company's financial liability for damages - recommended for most businesses" /></label>
+                  <label>Include liability limitations <HelpIcon tooltip={tooltips.limitLiability} /></label>
                 </div>
                 <div className="checkbox-group">
                   <input
@@ -769,10 +791,10 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.consequentialDamages}
                     onChange={handleChange}
                   />
-                  <label>Exclude consequential damages <HelpIcon fieldName="consequentialDamages" helpText="Prevent liability for indirect damages like lost profits - highly recommended" /></label>
+                  <label>Exclude consequential damages <HelpIcon tooltip={tooltips.consequentialDamages} /></label>
                 </div>
                 <div className="form-group">
-                  <label>Liability Cap Amount <HelpIcon fieldName="liabilityCapAmount" helpText="Maximum amount you'll pay in damages - limits your financial exposure" /></label>
+                  <label>Liability Cap Amount <HelpIcon tooltip={tooltips.liabilityCapAmount} /></label>
                   <select
                     name="liabilityCapAmount"
                     value={formData.liabilityCapAmount}
@@ -791,7 +813,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.indemnification}
                     onChange={handleChange}
                   />
-                  <label>Require user indemnification <HelpIcon fieldName="indemnification" helpText="Users must cover your legal costs if they cause problems - use carefully as it may deter users" /></label>
+                  <label>Require user indemnification <HelpIcon tooltip={tooltips.indemnification} /></label>
                 </div>
                 
                 <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Warranty Terms</h4>
@@ -802,10 +824,10 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.warrantyDisclaimer}
                     onChange={handleChange}
                   />
-                  <label>Include warranty disclaimers <HelpIcon fieldName="warrantyDisclaimer" helpText="Disclaim warranties and provide 'as-is' service - standard protection" /></label>
+                  <label>Include warranty disclaimers <HelpIcon tooltip={tooltips.warrantyDisclaimer} /></label>
                 </div>
                 <div className="form-group">
-                  <label>Limited Warranty Period <HelpIcon fieldName="warrantyPeriod" helpText="If any warranties cannot be disclaimed by law, limit them to this period" /></label>
+                  <label>Limited Warranty Period <HelpIcon tooltip={tooltips.warrantyPeriod} /></label>
                   <select
                     name="warrantyPeriod"
                     value={formData.warrantyPeriod}
@@ -824,7 +846,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                     checked={formData.performanceWarranty}
                     onChange={handleChange}
                   />
-                  <label>Disclaim performance guarantees <HelpIcon fieldName="performanceWarranty" helpText="Clarify that you don't guarantee specific results from AI - important for AI services" /></label>
+                  <label>Disclaim performance guarantees <HelpIcon tooltip={tooltips.performanceWarranty} /></label>
                 </div>
               </div>
             )}
