@@ -1056,11 +1056,12 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
               Download
             </button>
 
-            <!-- Calendly link widget begin -->
-            <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-            <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
-            <a href="" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});return false;" className="nav-button consult-button">Consultation</a>
-            <!-- Calendly link widget end -->
+            <button 
+              onClick={() => window.open('https://terms.law/call/', '_blank')} 
+              className="nav-button consult-button"
+            >
+              Consultation
+            </button>
             
             <button onClick={nextTab} className="nav-button">
               Next
