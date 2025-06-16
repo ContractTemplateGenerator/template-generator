@@ -301,7 +301,7 @@ const AITermsGenerator = () => {
     // Mark as rendering to prevent duplicate attempts
     setPaypalButtonRendered(true);
     
-    paypalContainer.innerHTML = '<div style="text-align: center; padding: 10px; color: #666;">Loading PayPal...</div>';
+    paypalContainer.innerHTML = '';
     
     try {
       window.paypal.Buttons({
