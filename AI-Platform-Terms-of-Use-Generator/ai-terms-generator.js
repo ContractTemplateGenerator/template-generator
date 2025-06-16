@@ -116,30 +116,57 @@ const AITermsGenerator = () => {
 
   // Render PayPal button when paywall modal opens
   useEffect(() => {
-    if (showPaywall) {
-      // Reset button state when paywall opens
+    if (showPaywall && !paypalButtonRendered) {
+      console.log('Paywall opened, attempting to render PayPal button...');
+      
+      // Reset button state
       setPaypalButtonRendered(false);
+      
+      // Show fallback message after 5 seconds if buttons don't appear
+      const fallbackTimer = setTimeout(() => {
+        const fallbackElement = document.querySelector('.paypal-fallback');
+        if (fallbackElement && !paypalButtonRendered) {
+          fallbackElement.style.display = 'block';
+          console.log('Showing PayPal fallback message');
+        }
+      }, 5000);
       
       // Check if PayPal SDK is loaded
       if (window.paypal) {
-        console.log('PayPal SDK detected, rendering button...');
+        console.log('PayPal SDK detected immediately');
         setTimeout(() => {
           renderPayPalButton();
-        }, 300);
+        }, 500);
       } else {
         console.log('PayPal SDK not loaded yet, waiting...');
-        // Try again after a longer delay
-        setTimeout(() => {
+        // Try multiple times with increasing delays
+        let attempts = 0;
+        const checkPayPal = () => {
+          attempts++;
           if (window.paypal) {
-            console.log('PayPal SDK loaded after delay, rendering button...');
+            console.log(`PayPal SDK loaded after ${attempts} attempts`);
             renderPayPalButton();
+          } else if (attempts < 10) {
+            console.log(`PayPal SDK not ready, attempt ${attempts}/10`);
+            setTimeout(checkPayPal, 1000);
           } else {
-            console.log('PayPal SDK failed to load');
+            console.log('PayPal SDK failed to load after 10 attempts');
+            // Show fallback message immediately
+            const fallbackElement = document.querySelector('.paypal-fallback');
+            if (fallbackElement) {
+              fallbackElement.style.display = 'block';
+            }
           }
-        }, 1000);
+        };
+        setTimeout(checkPayPal, 1000);
       }
+      
+      // Cleanup function
+      return () => {
+        clearTimeout(fallbackTimer);
+      };
     }
-  }, [showPaywall]);
+  }, [showPaywall]); // Remove paypalButtonRendered from dependencies
 
   // Reset PayPal button when paywall closes
   useEffect(() => {
@@ -259,72 +286,74 @@ const AITermsGenerator = () => {
 
   // Render PayPal button
   const renderPayPalButton = () => {
-    if (paypalButtonRendered || !window.paypal) {
-      console.log('PayPal SDK not loaded or button already rendered');
+    if (paypalButtonRendered) {
+      console.log('PayPal button already rendered, skipping...');
+      return;
+    }
+
+    if (!window.paypal) {
+      console.log('PayPal SDK not available');
       return;
     }
     
     // Clear any existing button
     const paypalContainer = document.getElementById('paypal-button-container');
-    if (paypalContainer) {
-      paypalContainer.innerHTML = '';
-      console.log('PayPal container cleared, initializing button...');
-      
-      try {
-        window.paypal.Buttons({
-          style: {
-            color: 'blue',
-            shape: 'rect',
-            label: 'pay',
-            height: 40
-          },
-          createOrder: function(data, actions) {
-            console.log('PayPal createOrder called');
-            // Save form data before payment
-            localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
-            
-            return actions.order.create({
-              purchase_units: [{
-                amount: {
-                  value: '9.99',
-                  currency_code: 'USD'
-                },
-                description: 'AI Platform Terms of Use Generator - Full Access'
-              }]
-            });
-          },
-          onApprove: function(data, actions) {
-            console.log('PayPal payment approved, capturing...');
-            return actions.order.capture().then(function(details) {
-              console.log('PayPal payment captured successfully:', details);
-              handlePaymentSuccess(details, data);
-            });
-          },
-          onError: function(err) {
-            console.error('PayPal payment error:', err);
-            handlePaymentError(err);
-          },
-          onCancel: function(data) {
-            console.log('PayPal payment cancelled by user:', data);
-          }
-        }).render('#paypal-button-container').then(() => {
-          console.log('PayPal button rendered successfully');
-          setPaypalButtonRendered(true);
-        }).catch((error) => {
-          console.error('PayPal button render error:', error);
-          // Show manual entry as fallback
-          setShowManualEntry(true);
-          setShowPaywall(false);
-        });
-        
-      } catch (error) {
-        console.error('Error initializing PayPal button:', error);
-        // Show manual entry as fallback
-        setShowManualEntry(true);
-        setShowPaywall(false);
-      }
-    } else {
+    if (!paypalContainer) {
       console.error('PayPal container not found');
+      return;
+    }
+
+    console.log('Clearing PayPal container and initializing button...');
+    paypalContainer.innerHTML = '';
+    
+    try {
+      window.paypal.Buttons({
+        style: {
+          color: 'blue',
+          shape: 'rect',
+          label: 'pay',
+          height: 40
+        },
+        createOrder: function(data, actions) {
+          console.log('PayPal createOrder called');
+          // Save form data before payment
+          localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
+          
+          return actions.order.create({
+            purchase_units: [{
+              amount: {
+                value: '9.99',
+                currency_code: 'USD'
+              },
+              description: 'AI Platform Terms of Use Generator - Full Access'
+            }]
+          });
+        },
+        onApprove: function(data, actions) {
+          console.log('PayPal payment approved, capturing...');
+          return actions.order.capture().then(function(details) {
+            console.log('PayPal payment captured successfully:', details);
+            handlePaymentSuccess(details, data);
+          });
+        },
+        onError: function(err) {
+          console.error('PayPal payment error:', err);
+          handlePaymentError(err);
+        },
+        onCancel: function(data) {
+          console.log('PayPal payment cancelled by user:', data);
+        }
+      }).render('#paypal-button-container').then(() => {
+        console.log('PayPal button rendered successfully');
+        setPaypalButtonRendered(true);
+      }).catch((error) => {
+        console.error('PayPal button render failed:', error);
+        // Don't automatically show manual entry, let user click the fallback button
+      });
+        
+    } catch (error) {
+      console.error('Error initializing PayPal button:', error);
+      // Don't automatically show manual entry, let user click the fallback button
     }
   };
 
@@ -738,14 +767,11 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           
           <div className="paypal-payment-section">
             <div id="paypal-button-container" className="paypal-button-container">
-              {!window.paypal && (
-                <div className="paypal-loading">
-                  <p>Loading PayPal payment options...</p>
-                  <button onClick={showManualEntryForm} className="manual-entry-button">
-                    Payment not loading? Click here
-                  </button>
-                </div>
-              )}
+              {/* PayPal buttons will render here */}
+            </div>
+            {/* Show loading/fallback message if buttons don't appear */}
+            <div className="paypal-fallback" style={{display: 'none'}}>
+              <p>PayPal buttons not loading? Use the manual option below.</p>
             </div>
           </div>
 
