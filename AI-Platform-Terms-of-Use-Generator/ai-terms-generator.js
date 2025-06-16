@@ -184,17 +184,12 @@ const AITermsGenerator = () => {
     // Save current form data before redirecting to PayPal
     localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
     
-    // Create PayPal payment URL
-    const paypalUrl = `https://www.paypal.com/paypalme/sergeitokmakov/9.99USD`;
-    
-    // Open PayPal in new window
-    const paypalWindow = window.open(paypalUrl, '_blank', 'width=800,height=600');
-    
-    // Close the paywall modal
+    // Close the paywall modal and show the PayPal information
     setShowPaywall(false);
+    setShowManualEntry(true);
     
-    // Show message about returning to complete unlock
-    alert('Complete your PayPal payment and return to this page. If automatic unlock fails, use the "Already Paid?" option.');
+    // Show payment instructions
+    alert('Send $9.99 to PayPal ID: EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI\n\nThen enter your transaction ID below to unlock access.');
   };
 
   // Show manual entry option
@@ -613,7 +608,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           
           <div className="purchase-section">
             <button onClick={handlePayPalPurchase} className="purchase-button">
-              Pay $9.99 with PayPal
+              Get PayPal Payment Details - $9.99
             </button>
             
             <div className="payment-divider">
@@ -645,8 +640,13 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
     showManualEntry && (
       <div className="paywall-overlay">
         <div className="paywall-modal">
-          <h3>Enter Transaction ID</h3>
-          <p>Enter your PayPal transaction ID to unlock access:</p>
+          <h3>Complete Payment & Enter Transaction ID</h3>
+          <p>Send $9.99 to the PayPal ID below, then enter your transaction ID:</p>
+          
+          <div className="payment-info">
+            <p><strong>PayPal ID:</strong></p>
+            <p className="paypal-id">EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI</p>
+          </div>
           
           <div className="paypal-section">
             <label>PayPal Transaction ID:</label>
@@ -668,8 +668,8 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           </div>
           
           <div className="paypal-info">
-            <p><strong>Need Help?</strong> Your transaction ID can be found in your PayPal confirmation email or account history.</p>
-            <p><strong>Issues?</strong> Contact support at the email shown in your terms document.</p>
+            <p><strong>Payment Instructions:</strong> Copy the PayPal ID above and send $9.99 via PayPal.</p>
+            <p><strong>Transaction ID:</strong> After payment, find your transaction ID in PayPal confirmation email or account history.</p>
           </div>
         </div>
       </div>
