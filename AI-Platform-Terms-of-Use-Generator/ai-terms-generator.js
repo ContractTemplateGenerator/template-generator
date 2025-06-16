@@ -253,6 +253,16 @@ const AITermsGenerator = () => {
     }
   };
 
+  // Handle direct PayPal payment (backup method)
+  const handleDirectPayPalPayment = () => {
+    // Save form data before showing payment instructions
+    localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
+    
+    // Close paywall and show manual entry with payment instructions
+    setShowPaywall(false);
+    setShowManualEntry(true);
+  };
+
   // Show manual entry option
   const showManualEntryForm = () => {
     setShowManualEntry(true);
@@ -304,9 +314,14 @@ const AITermsGenerator = () => {
     }
 
     console.log('Clearing PayPal container and initializing button...');
+    console.log('Current domain:', window.location.hostname);
+    console.log('PayPal SDK version:', window.paypal.version);
+    
     paypalContainer.innerHTML = '';
     
     try {
+      console.log('Creating PayPal buttons...');
+      
       window.paypal.Buttons({
         style: {
           color: 'blue',
@@ -327,6 +342,12 @@ const AITermsGenerator = () => {
               },
               description: 'AI Platform Terms of Use Generator - Full Access'
             }]
+          }).then(orderID => {
+            console.log('PayPal order created:', orderID);
+            return orderID;
+          }).catch(error => {
+            console.error('PayPal order creation failed:', error);
+            throw error;
           });
         },
         onApprove: function(data, actions) {
@@ -344,16 +365,34 @@ const AITermsGenerator = () => {
           console.log('PayPal payment cancelled by user:', data);
         }
       }).render('#paypal-button-container').then(() => {
-        console.log('PayPal button rendered successfully');
+        console.log('PayPal button rendered successfully to DOM');
         setPaypalButtonRendered(true);
+        
+        // Hide fallback message since buttons loaded
+        const fallbackElement = document.querySelector('.paypal-fallback');
+        if (fallbackElement) {
+          fallbackElement.style.display = 'none';
+        }
       }).catch((error) => {
         console.error('PayPal button render failed:', error);
-        // Don't automatically show manual entry, let user click the fallback button
+        console.error('Error details:', error.message, error.stack);
+        
+        // Show fallback payment option
+        const fallbackElement = document.querySelector('.paypal-fallback');
+        if (fallbackElement) {
+          fallbackElement.style.display = 'block';
+        }
       });
         
     } catch (error) {
       console.error('Error initializing PayPal button:', error);
-      // Don't automatically show manual entry, let user click the fallback button
+      console.error('Error details:', error.message, error.stack);
+      
+      // Show fallback payment option
+      const fallbackElement = document.querySelector('.paypal-fallback');
+      if (fallbackElement) {
+        fallbackElement.style.display = 'block';
+      }
     }
   };
 
@@ -769,9 +808,31 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             <div id="paypal-button-container" className="paypal-button-container">
               {/* PayPal buttons will render here */}
             </div>
-            {/* Show loading/fallback message if buttons don't appear */}
+            {/* Show fallback payment option if buttons don't appear */}
             <div className="paypal-fallback" style={{display: 'none'}}>
-              <p>PayPal buttons not loading? Use the manual option below.</p>
+              <p><strong>PayPal buttons not loading?</strong></p>
+              <div className="paypal-form-fallback">
+                <p>Send $9.99 to PayPal account:</p>
+                <div className="paypal-id-display">sergeitokmakov@gmail.com</div>
+                <p style={{fontSize: '13px', margin: '10px 0', color: '#666'}}>
+                  Use "Friends & Family" or add reference: "AI Terms Generator"
+                </p>
+                <a 
+                  href="https://www.paypal.com/paypalme/sergeitokmakov/9.99" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="paypal-direct-link"
+                  onClick={() => {
+                    // Save form data before redirect
+                    localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
+                  }}
+                >
+                  Open PayPal to Send Payment
+                </a>
+              </div>
+              <p style={{fontSize: '12px', marginTop: '15px', color: '#666'}}>
+                After payment, return here and use "Already Paid?" option below with your transaction ID.
+              </p>
             </div>
           </div>
 
