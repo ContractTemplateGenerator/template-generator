@@ -117,56 +117,36 @@ const AITermsGenerator = () => {
   // Render PayPal button when paywall modal opens
   useEffect(() => {
     if (showPaywall && !paypalButtonRendered) {
-      console.log('Paywall opened, attempting to render PayPal button...');
+      console.log('Paywall opened, starting PayPal button process...');
       
-      // Reset button state
-      setPaypalButtonRendered(false);
-      
-      // Show fallback message after 5 seconds if buttons don't appear
-      const fallbackTimer = setTimeout(() => {
-        const fallbackElement = document.querySelector('.paypal-fallback');
-        if (fallbackElement && !paypalButtonRendered) {
-          fallbackElement.style.display = 'block';
-          console.log('Showing PayPal fallback message');
-        }
-      }, 5000);
-      
-      // Check if PayPal SDK is loaded
-      if (window.paypal) {
-        console.log('PayPal SDK detected immediately');
-        setTimeout(() => {
-          renderPayPalButton();
-        }, 500);
-      } else {
-        console.log('PayPal SDK not loaded yet, waiting...');
-        // Try multiple times with increasing delays
-        let attempts = 0;
-        const checkPayPal = () => {
-          attempts++;
-          if (window.paypal) {
-            console.log(`PayPal SDK loaded after ${attempts} attempts`);
-            renderPayPalButton();
-          } else if (attempts < 10) {
-            console.log(`PayPal SDK not ready, attempt ${attempts}/10`);
-            setTimeout(checkPayPal, 1000);
-          } else {
-            console.log('PayPal SDK failed to load after 10 attempts');
-            // Show fallback message immediately
-            const fallbackElement = document.querySelector('.paypal-fallback');
-            if (fallbackElement) {
-              fallbackElement.style.display = 'block';
-            }
-          }
-        };
-        setTimeout(checkPayPal, 1000);
+      // Show fallback immediately while trying to load PayPal
+      const fallbackElement = document.querySelector('.paypal-fallback');
+      if (fallbackElement) {
+        fallbackElement.style.display = 'block';
       }
       
-      // Cleanup function
-      return () => {
-        clearTimeout(fallbackTimer);
+      // Try to render PayPal button
+      const attemptPayPalRender = () => {
+        if (window.paypal) {
+          console.log('PayPal SDK available, attempting render...');
+          try {
+            renderPayPalButton();
+          } catch (error) {
+            console.error('PayPal render attempt failed:', error);
+          }
+        } else {
+          console.log('PayPal SDK not loaded');
+        }
       };
+
+      // Try immediately
+      attemptPayPalRender();
+      
+      // Also try after a delay
+      setTimeout(attemptPayPalRender, 1000);
+      setTimeout(attemptPayPalRender, 3000);
     }
-  }, [showPaywall]); // Remove paypalButtonRendered from dependencies
+  }, [showPaywall]);
 
   // Reset PayPal button when paywall closes
   useEffect(() => {
@@ -296,8 +276,10 @@ const AITermsGenerator = () => {
 
   // Render PayPal button
   const renderPayPalButton = () => {
+    console.log('renderPayPalButton called, paypalButtonRendered:', paypalButtonRendered);
+    
     if (paypalButtonRendered) {
-      console.log('PayPal button already rendered, skipping...');
+      console.log('Button already rendered, skipping');
       return;
     }
 
@@ -306,22 +288,22 @@ const AITermsGenerator = () => {
       return;
     }
     
-    // Clear any existing button
     const paypalContainer = document.getElementById('paypal-button-container');
     if (!paypalContainer) {
       console.error('PayPal container not found');
       return;
     }
 
-    console.log('Clearing PayPal container and initializing button...');
-    console.log('Current domain:', window.location.hostname);
-    console.log('PayPal SDK version:', window.paypal.version);
+    console.log('Rendering PayPal button...');
+    console.log('Domain:', window.location.hostname);
+    console.log('Protocol:', window.location.protocol);
     
-    paypalContainer.innerHTML = '';
+    // Mark as rendering to prevent duplicate attempts
+    setPaypalButtonRendered(true);
+    
+    paypalContainer.innerHTML = '<div style="text-align: center; padding: 10px; color: #666;">Loading PayPal...</div>';
     
     try {
-      console.log('Creating PayPal buttons...');
-      
       window.paypal.Buttons({
         style: {
           color: 'blue',
@@ -330,8 +312,7 @@ const AITermsGenerator = () => {
           height: 40
         },
         createOrder: function(data, actions) {
-          console.log('PayPal createOrder called');
-          // Save form data before payment
+          console.log('Creating PayPal order...');
           localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
           
           return actions.order.create({
@@ -342,42 +323,36 @@ const AITermsGenerator = () => {
               },
               description: 'AI Platform Terms of Use Generator - Full Access'
             }]
-          }).then(orderID => {
-            console.log('PayPal order created:', orderID);
-            return orderID;
-          }).catch(error => {
-            console.error('PayPal order creation failed:', error);
-            throw error;
           });
         },
         onApprove: function(data, actions) {
-          console.log('PayPal payment approved, capturing...');
+          console.log('Payment approved, capturing...');
           return actions.order.capture().then(function(details) {
-            console.log('PayPal payment captured successfully:', details);
             handlePaymentSuccess(details, data);
           });
         },
         onError: function(err) {
-          console.error('PayPal payment error:', err);
+          console.error('PayPal error:', err);
           handlePaymentError(err);
         },
         onCancel: function(data) {
-          console.log('PayPal payment cancelled by user:', data);
+          console.log('Payment cancelled');
         }
       }).render('#paypal-button-container').then(() => {
-        console.log('PayPal button rendered successfully to DOM');
-        setPaypalButtonRendered(true);
+        console.log('PayPal buttons rendered successfully!');
         
-        // Hide fallback message since buttons loaded
+        // Hide fallback since buttons worked
         const fallbackElement = document.querySelector('.paypal-fallback');
         if (fallbackElement) {
           fallbackElement.style.display = 'none';
         }
       }).catch((error) => {
-        console.error('PayPal button render failed:', error);
-        console.error('Error details:', error.message, error.stack);
+        console.error('PayPal render error:', error);
         
-        // Show fallback payment option
+        // Reset state and show fallback
+        setPaypalButtonRendered(false);
+        paypalContainer.innerHTML = '';
+        
         const fallbackElement = document.querySelector('.paypal-fallback');
         if (fallbackElement) {
           fallbackElement.style.display = 'block';
@@ -385,10 +360,12 @@ const AITermsGenerator = () => {
       });
         
     } catch (error) {
-      console.error('Error initializing PayPal button:', error);
-      console.error('Error details:', error.message, error.stack);
+      console.error('PayPal initialization error:', error);
       
-      // Show fallback payment option
+      // Reset state and show fallback
+      setPaypalButtonRendered(false);
+      paypalContainer.innerHTML = '';
+      
       const fallbackElement = document.querySelector('.paypal-fallback');
       if (fallbackElement) {
         fallbackElement.style.display = 'block';
@@ -808,17 +785,17 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             <div id="paypal-button-container" className="paypal-button-container">
               {/* PayPal buttons will render here */}
             </div>
-            {/* Show fallback payment option if buttons don't appear */}
-            <div className="paypal-fallback" style={{display: 'none'}}>
-              <p><strong>PayPal buttons not loading?</strong></p>
+            {/* Show fallback payment option immediately */}
+            <div className="paypal-fallback">
+              <p><strong>Payment Options:</strong></p>
               <div className="paypal-form-fallback">
                 <p>Send $9.99 to PayPal account:</p>
-                <div className="paypal-id-display">sergeitokmakov@gmail.com</div>
+                <div className="paypal-id-display">owner@terms.law</div>
                 <p style={{fontSize: '13px', margin: '10px 0', color: '#666'}}>
                   Use "Friends & Family" or add reference: "AI Terms Generator"
                 </p>
                 <a 
-                  href="https://www.paypal.com/paypalme/sergeitokmakov/9.99" 
+                  href="https://www.paypal.com/paypalme/termslawowner/9.99" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="paypal-direct-link"
@@ -827,7 +804,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                     localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
                   }}
                 >
-                  Open PayPal to Send Payment
+                  Pay via PayPal ($9.99)
                 </a>
               </div>
               <p style={{fontSize: '12px', marginTop: '15px', color: '#666'}}>
