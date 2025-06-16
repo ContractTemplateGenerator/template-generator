@@ -116,14 +116,28 @@ const AITermsGenerator = () => {
 
   // Render PayPal button when paywall modal opens
   useEffect(() => {
-    if (showPaywall && window.paypal && !paypalButtonRendered) {
+    if (showPaywall) {
       // Reset button state when paywall opens
       setPaypalButtonRendered(false);
       
-      // Small delay to ensure DOM is ready
-      setTimeout(() => {
-        renderPayPalButton();
-      }, 200);
+      // Check if PayPal SDK is loaded
+      if (window.paypal) {
+        console.log('PayPal SDK detected, rendering button...');
+        setTimeout(() => {
+          renderPayPalButton();
+        }, 300);
+      } else {
+        console.log('PayPal SDK not loaded yet, waiting...');
+        // Try again after a longer delay
+        setTimeout(() => {
+          if (window.paypal) {
+            console.log('PayPal SDK loaded after delay, rendering button...');
+            renderPayPalButton();
+          } else {
+            console.log('PayPal SDK failed to load');
+          }
+        }, 1000);
+      }
     }
   }, [showPaywall]);
 
@@ -254,43 +268,63 @@ const AITermsGenerator = () => {
     const paypalContainer = document.getElementById('paypal-button-container');
     if (paypalContainer) {
       paypalContainer.innerHTML = '';
+      console.log('PayPal container cleared, initializing button...');
       
       try {
         window.paypal.Buttons({
+          style: {
+            color: 'blue',
+            shape: 'rect',
+            label: 'pay',
+            height: 40
+          },
           createOrder: function(data, actions) {
+            console.log('PayPal createOrder called');
             // Save form data before payment
             localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
             
             return actions.order.create({
               purchase_units: [{
                 amount: {
-                  value: '9.99'
+                  value: '9.99',
+                  currency_code: 'USD'
                 },
                 description: 'AI Platform Terms of Use Generator - Full Access'
               }]
             });
           },
           onApprove: function(data, actions) {
+            console.log('PayPal payment approved, capturing...');
             return actions.order.capture().then(function(details) {
+              console.log('PayPal payment captured successfully:', details);
               handlePaymentSuccess(details, data);
             });
           },
           onError: function(err) {
+            console.error('PayPal payment error:', err);
             handlePaymentError(err);
           },
           onCancel: function(data) {
-            console.log('Payment cancelled by user');
+            console.log('PayPal payment cancelled by user:', data);
           }
-        }).render('#paypal-button-container');
+        }).render('#paypal-button-container').then(() => {
+          console.log('PayPal button rendered successfully');
+          setPaypalButtonRendered(true);
+        }).catch((error) => {
+          console.error('PayPal button render error:', error);
+          // Show manual entry as fallback
+          setShowManualEntry(true);
+          setShowPaywall(false);
+        });
         
-        setPaypalButtonRendered(true);
-        console.log('PayPal button rendered successfully');
       } catch (error) {
-        console.error('Error rendering PayPal button:', error);
+        console.error('Error initializing PayPal button:', error);
         // Show manual entry as fallback
         setShowManualEntry(true);
         setShowPaywall(false);
       }
+    } else {
+      console.error('PayPal container not found');
     }
   };
 
