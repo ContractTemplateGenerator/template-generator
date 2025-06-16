@@ -4,6 +4,9 @@ const AITermsGenerator = () => {
   // State management
   const [currentTab, setCurrentTab] = useState(0);
   const [lastChanged, setLastChanged] = useState(null);
+  const [isPaid, setIsPaid] = useState(false);
+  const [paypalId, setPaypalId] = useState('');
+  const [showPaywall, setShowPaywall] = useState(false);
   const [formData, setFormData] = useState({
     // Company Information
     companyName: '',
@@ -40,6 +43,8 @@ const AITermsGenerator = () => {
     aiAccuracyDisclaimer: true,
     biasDisclaimer: true,
     hallucincationWarning: true,
+    contentModerationDisclaimer: true,
+    modelVersionChanges: true,
     dataTrainingUse: true,
     trainingOptOut: false,
     modelImprovementUse: true,
@@ -116,12 +121,31 @@ const AITermsGenerator = () => {
     aiAccuracyDisclaimer: "Protect against liability for AI inaccuracies, errors, or misleading outputs",
     biasDisclaimer: "Disclaim responsibility for algorithmic bias or unfair AI decisions - highly recommended",
     hallucincationWarning: "Warn users that AI may generate false or nonsensical information - crucial for AI platforms",
+    contentModerationDisclaimer: "Disclaim responsibility for AI's ability to filter harmful content - important for safety",
+    modelVersionChanges: "Reserve right to update AI models which may change output quality or behavior",
     dataTrainingUse: "Allow use of user interactions to improve AI models - standard practice but consider user concerns",
     trainingOptOut: "Allow users to opt out of having their data used for training - increases user trust",
     modelImprovementUse: "Use aggregated data to improve AI performance and accuracy",
     commercialUseAI: "Allow users to use AI-generated content for business purposes",
     attributionRequired: "Require users to credit your AI platform when using generated content commercially",
     customPlatformType: "Describe your specific AI platform type if not listed in the dropdown options"
+  };
+
+  // PayPal validation function
+  const validatePayPalId = (id) => {
+    // Check if it's exactly 17 characters and alphanumeric
+    return /^[a-zA-Z0-9]{17}$/.test(id);
+  };
+
+  // Handle PayPal unlock
+  const handlePayPalUnlock = () => {
+    if (validatePayPalId(paypalId)) {
+      setIsPaid(true);
+      setShowPaywall(false);
+      alert('Access unlocked! You can now copy and download the terms.');
+    } else {
+      alert('Please enter a valid PayPal transaction ID to unlock access.');
+    }
   };
 
   // Help icon component with tooltip (like the working NDA generator)
@@ -136,32 +160,54 @@ const AITermsGenerator = () => {
 
   // Generate document text
   const generateDocument = () => {
+    // Generate AI disclaimers content for section 2
+    const generateAIDisclaimers = () => {
+      const disclaimers = [];
+      
+      if (formData.aiAccuracyDisclaimer) {
+        disclaimers.push('AI ACCURACY DISCLAIMER: Our AI models may produce inaccurate, incomplete, or misleading information. You should not rely solely on AI-generated content for important decisions, professional advice, or factual information without independent verification.');
+      }
+      
+      if (formData.biasDisclaimer) {
+        disclaimers.push('ALGORITHMIC BIAS NOTICE: AI systems may exhibit biases based on their training data. Our AI may produce outputs that reflect societal biases or may not be appropriate for all users or situations. We do not guarantee fair, unbiased, or culturally sensitive outputs.');
+      }
+      
+      if (formData.hallucincationWarning) {
+        disclaimers.push('HALLUCINATION WARNING: AI models may generate content that appears factual but is actually false, fabricated, or nonsensical. This is known as "AI hallucination." Always verify important information from authoritative sources.');
+      }
+      
+      if (formData.contentModerationDisclaimer) {
+        disclaimers.push('CONTENT MODERATION LIMITATIONS: While we implement safety measures, our AI may occasionally generate inappropriate, offensive, or harmful content. We do not guarantee that all outputs will be suitable for all audiences or contexts.');
+      }
+      
+      if (formData.modelVersionChanges) {
+        disclaimers.push('MODEL UPDATES: We reserve the right to update, modify, or replace our AI models at any time. These changes may affect the quality, accuracy, or style of AI outputs without prior notice.');
+      }
+      
+      if (disclaimers.length === 0) {
+        return 'Our AI system is designed to provide helpful and accurate information, but like all artificial intelligence systems, it has inherent limitations. Users should exercise appropriate judgment when using AI-generated content and verify important information from authoritative sources when making significant decisions.';
+      }
+      
+      return disclaimers.join('\n\n');
+    };
+
     return `TERMS OF USE FOR ${formData.platformName || '[PLATFORM NAME]'}
 
 Last Updated: ${new Date().toLocaleDateString()}
 
-ACCEPTANCE OF TERMS
+1. ACCEPTANCE OF TERMS
 
 These Terms of Use ("Terms") govern your use of ${formData.platformName || '[PLATFORM NAME]'}, an artificial intelligence platform (the "Service") operated by ${formData.companyName || '[COMPANY NAME]'} ("Company," "we," "us," or "our"), located at ${formData.businessAddress || '[BUSINESS ADDRESS]'}.
 
 By accessing or using our Service, you agree to be bound by these Terms. If you do not agree to these Terms, do not use the Service. Your continued use of the Service constitutes acceptance of any modifications to these Terms.
 
-1. DESCRIPTION OF SERVICE
+2. DESCRIPTION OF SERVICE AND AI LIMITATIONS
 
 ${formData.platformName || '[PLATFORM NAME]'} is an AI-powered ${formData.platformType === 'custom' ? (formData.customPlatformType || 'platform') : formData.platformType} that provides users with advanced artificial intelligence capabilities. The Service allows users to interact with sophisticated AI models, receive automated responses, and access various AI-driven features designed to enhance productivity and user experience.
 
 Our Service may include features such as natural language processing, content generation, data analysis, and other AI-powered functionalities. The specific features available may vary based on your subscription level and may be updated from time to time.
 
-2. AI MODEL LIMITATIONS AND DISCLAIMERS
-
-${formData.aiAccuracyDisclaimer ? 
-`AI ACCURACY DISCLAIMER: Our AI models may produce inaccurate, incomplete, or misleading information. You should not rely solely on AI-generated content for important decisions, professional advice, or factual information without independent verification.` : ''}
-
-${formData.biasDisclaimer ? 
-`ALGORITHMIC BIAS NOTICE: AI systems may exhibit biases based on their training data. Our AI may produce outputs that reflect societal biases or may not be appropriate for all users or situations. We do not guarantee fair, unbiased, or culturally sensitive outputs.` : ''}
-
-${formData.hallucincationWarning ? 
-`HALLUCINATION WARNING: AI models may generate content that appears factual but is actually false, fabricated, or nonsensical. This is known as "AI hallucination." Always verify important information from authoritative sources.` : ''}
+${generateAIDisclaimers()}
 
 3. USER ELIGIBILITY AND REGISTRATION
 
@@ -195,7 +241,7 @@ ${formData.dataCollection ?
 Data Retention: We retain your data for a period of ${formData.dataRetention} years from your last interaction with the Service, unless required by law to retain it longer or you request earlier deletion.` : 
 `We minimize data collection and do not retain personal data about your interactions with the Service beyond what is strictly necessary for basic functionality and security purposes.`}
 
-4. ACCEPTABLE USE POLICY
+6. ACCEPTABLE USE POLICY
 
 You agree to use the Service in compliance with all applicable laws and regulations. You agree not to:
 
@@ -209,7 +255,7 @@ ${formData.commercialUse ? '' : '• Use the Service for commercial purposes wit
 • Reverse engineer, decompile, or attempt to extract the source code of the Service
 • Violate any applicable laws or regulations in connection with your use of the Service
 
-5. INTELLECTUAL PROPERTY AND AI OUTPUT RIGHTS
+7. INTELLECTUAL PROPERTY AND AI OUTPUT RIGHTS
 
 The Service and its underlying technology, including but not limited to AI models, algorithms, software, designs, text, graphics, and logos, are the intellectual property of ${formData.companyName || '[COMPANY NAME]'} and its licensors, protected by copyright, trademark, and other intellectual property laws.
 
@@ -230,14 +276,14 @@ CONTENT RESPONSIBILITY: Regardless of ownership, you are responsible for ensurin
 ${formData.apiAccess ? 
 `API Access: If you have been granted access to our API, you must comply with our API Terms of Service and usage guidelines. API access may be subject to rate limits and additional restrictions.` : ''}
 
-6. PRIVACY AND DATA PROTECTION
+8. PRIVACY AND DATA PROTECTION
 
 Your privacy is important to us. Our collection, use, and protection of your personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
 
 ${formData.thirdPartyIntegrations ? 
 `Third-Party Integrations: The Service may integrate with third-party services. Your use of such integrations is subject to the terms and privacy policies of those third parties.` : ''}
 
-7. DISCLAIMERS AND LIMITATION OF LIABILITY
+9. DISCLAIMERS AND LIMITATION OF LIABILITY
 
 ${formData.warrantyDisclaimer ? 
 `WARRANTY DISCLAIMER: THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
@@ -254,68 +300,35 @@ IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED ${formData.l
 ${formData.indemnification ? 
 `INDEMNIFICATION: You agree to indemnify, defend, and hold harmless ${formData.companyName || '[COMPANY NAME]'}, its officers, directors, employees, and agents from and against any claims, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising from your use of the Service, violation of these Terms, or infringement of any third-party rights.` : ''}
 
-8. ACCOUNT TERMINATION AND SUSPENSION
+10. ACCOUNT TERMINATION AND SUSPENSION
 
 We may terminate or suspend your access to the Service ${formData.termination === 'immediate' ? 'immediately and without prior notice' : 'with reasonable prior notice'} if you violate these Terms, engage in prohibited activities, or for any other reason at our sole discretion.
 
 You may terminate your account at any time by contacting us at ${formData.supportEmail || formData.contactEmail || '[SUPPORT EMAIL]'}. Upon termination, your right to use the Service will cease immediately.
 
-9. DISPUTE RESOLUTION
+11. DISPUTE RESOLUTION
 
 ${formData.disputeResolution === 'arbitration' ? 
 `Any disputes arising from these Terms or your use of the Service will be resolved through binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules. The arbitration will be conducted in ${formData.governingLaw}, and the arbitrator's decision will be final and binding. Either party may seek injunctive relief in court for intellectual property disputes or to enforce the arbitration agreement.` : 
 `Any disputes arising from these Terms or your use of the Service will be resolved in the courts of ${formData.governingLaw}, and you consent to the jurisdiction of such courts.`}
 
-10. MODIFICATIONS TO TERMS
+12. MODIFICATIONS TO TERMS
 
 We reserve the right to modify these Terms at any time. We will notify users of material changes by posting the updated Terms on our website and updating the "Last Updated" date. Your continued use of the Service after any modifications constitutes acceptance of the updated Terms.
 
-11. ${formData.disputeResolution === 'arbitration' ? 'GOVERNING LAW' : 'GOVERNING LAW AND JURISDICTION'}
+13. GOVERNING LAW
 
 These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of law principles.${formData.disputeResolution === 'court' ? ` Any legal action arising from these Terms shall be brought in the courts of ${formData.jurisdiction}.` : ''}
 
-12. AI MODEL LIMITATIONS AND DISCLAIMERS
+14. SEVERABILITY
 
-${formData.aiAccuracyDisclaimer ? 
-`AI ACCURACY DISCLAIMER: Our AI models may produce inaccurate, incomplete, or misleading information. You should not rely solely on AI-generated content for important decisions, professional advice, or factual information without independent verification.` : ''}
+If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect.
 
-${formData.biasDisclaimer ? 
-`ALGORITHMIC BIAS NOTICE: AI systems may exhibit biases based on their training data. Our AI may produce outputs that reflect societal biases or may not be appropriate for all users or situations. We do not guarantee fair, unbiased, or culturally sensitive outputs.` : ''}
+15. ENTIRE AGREEMENT
 
-${formData.hallucincationWarning ? 
-`HALLUCINATION WARNING: AI models may generate content that appears factual but is actually false, fabricated, or nonsensical. This is known as "AI hallucination." Always verify important information from authoritative sources.` : ''}
+These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between you and ${formData.companyName || '[COMPANY NAME]'} regarding the Service and supersede all prior agreements and understandings.
 
-13. DATA TRAINING AND MODEL IMPROVEMENT
-
-${formData.dataTrainingUse ? 
-`We may use your interactions with the Service, including your inputs and our AI responses, to train and improve our AI models. This helps us enhance accuracy, reduce bias, and develop new features.` : 
-`We do not use your individual interactions with the Service to train our AI models.`}
-
-${formData.trainingOptOut ? 
-`OPT-OUT OPTION: You may opt out of having your data used for model training by contacting us at ${formData.supportEmail || formData.contactEmail || '[SUPPORT EMAIL]'}. Opting out will not affect your ability to use the Service.` : ''}
-
-${formData.modelImprovementUse ? 
-`We may use aggregated, anonymized usage data to improve our AI models' performance, safety, and reliability. This data cannot be used to identify individual users.` : ''}
-
-14. AI OUTPUT OWNERSHIP AND USAGE RIGHTS
-
-${formData.aiOutputOwnership === 'user' ? 
-`You own the content generated by our AI in response to your inputs ("AI Output"), subject to the terms below.` : 
-formData.aiOutputOwnership === 'shared' ? 
-`Ownership of AI Output is shared between you and our platform. You have rights to use the content, but we retain certain rights for platform operation and improvement.` : 
-`We retain ownership of all AI Output generated by our platform. You are granted a license to use AI Output subject to these Terms.`}
-
-${formData.commercialUseAI ? 
-`COMMERCIAL USE: You may use AI Output for commercial purposes, including in products, services, or content you create or distribute.` : 
-`PERSONAL USE ONLY: AI Output may only be used for personal, non-commercial purposes unless you obtain explicit written permission from us.`}
-
-${formData.attributionRequired ? 
-`ATTRIBUTION REQUIREMENT: When using AI Output commercially or publicly, you must include attribution crediting our AI platform as the source of the generated content.` : 
-`No attribution is required when using AI Output, though attribution is appreciated.`}
-
-CONTENT RESPONSIBILITY: Regardless of ownership, you are responsible for ensuring that your use of AI Output complies with all applicable laws and does not infringe third-party rights.
-
-15. CONTACT INFORMATION
+16. CONTACT INFORMATION
 
 If you have any questions about these Terms or need support, please contact us:
 
@@ -324,15 +337,7 @@ Support: ${formData.supportEmail || '[SUPPORT EMAIL]'}
 Website: ${formData.websiteURL || '[WEBSITE URL]'}
 Address: ${formData.businessAddress || '[BUSINESS ADDRESS]'}
 
-For more information about ${formData.companyName || '[COMPANY NAME]'} and our services, visit ${formData.websiteURL || '[WEBSITE URL]'}.
-
-16. SEVERABILITY
-
-If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect.
-
-17. ENTIRE AGREEMENT
-
-These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between you and ${formData.companyName || '[COMPANY NAME]'} regarding the Service and supersede all prior agreements and understandings.`;
+For more information about ${formData.companyName || '[COMPANY NAME]'} and our services, visit ${formData.websiteURL || '[WEBSITE URL]'}.`;
   };
 
   // Get current document text
@@ -357,7 +362,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
         }
         break;
       case 3: // AI-Specific
-        if (['aiAccuracyDisclaimer', 'biasDisclaimer', 'hallucincationWarning', 'dataTrainingUse', 'trainingOptOut', 'modelImprovementUse', 'aiOutputOwnership', 'commercialUseAI', 'attributionRequired'].includes(lastChanged)) {
+        if (['aiAccuracyDisclaimer', 'biasDisclaimer', 'hallucincationWarning', 'contentModerationDisclaimer', 'modelVersionChanges', 'dataTrainingUse', 'trainingOptOut', 'modelImprovementUse', 'commercialUseAI', 'attributionRequired'].includes(lastChanged)) {
           return 'ai-specific';
         }
         break;
@@ -392,8 +397,8 @@ These Terms, together with our Privacy Policy and any other policies referenced 
         break;
       case 'platformType':
         highlightedText = highlightedText.replace(
-          /AI-powered .* platform/,
-          `AI-powered <span class="highlighted-text">${formData.platformType}</span> platform`
+          /AI-powered .* that provides/,
+          `AI-powered <span class="highlighted-text">${formData.platformType === 'custom' ? (formData.customPlatformType || 'platform') : formData.platformType}</span> that provides`
         );
         break;
       case 'minAge':
@@ -403,7 +408,7 @@ These Terms, together with our Privacy Policy and any other policies referenced 
         );
         break;
       case 'termination':
-        const terminationText = formData.termination === 'immediate' ? 'immediately' : 'with prior notice';
+        const terminationText = formData.termination === 'immediate' ? 'immediately and without prior notice' : 'with reasonable prior notice';
         highlightedText = highlightedText.replace(
           /terminate or suspend your access to the Service .*/,
           `terminate or suspend your access to the Service <span class="highlighted-text">${terminationText}</span> if you violate these Terms.`
@@ -413,12 +418,6 @@ These Terms, together with our Privacy Policy and any other policies referenced 
         highlightedText = highlightedText.replace(
           new RegExp(`State of ${formData.governingLaw}`, 'g'),
           `State of <span class="highlighted-text">${formData.governingLaw}</span>`
-        );
-        break;
-      case 'jurisdiction':
-        highlightedText = highlightedText.replace(
-          /Any legal action arising from these Terms shall be brought in the courts of .*/,
-          `Any legal action arising from these Terms shall be brought in the courts of <span class="highlighted-text">${formData.jurisdiction}</span>.`
         );
         break;
       case 'contactEmail':
@@ -436,22 +435,6 @@ These Terms, together with our Privacy Policy and any other policies referenced 
             `<span class="highlighted-text">${formData.websiteURL}</span>`
           );
         }
-        break;
-      case 'dataCollection':
-        highlightedText = highlightedText.replace(
-          /We may collect and process data.*?Privacy Policy\.|We do not collect personal data.*?basic functionality\./,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
-        break;
-      case 'userContent':
-        highlightedText = highlightedText.replace(
-          /You retain ownership.*?providing the Service\.|You retain full ownership.*?submit to the Service\./,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
         break;
       case 'businessAddress':
         if (formData.businessAddress) {
@@ -479,104 +462,14 @@ These Terms, together with our Privacy Policy and any other policies referenced 
           `retain your data for a period of <span class="highlighted-text">${formData.dataRetention}</span> years`
         );
         break;
-      case 'disputeResolution':
-        if (formData.disputeResolution === 'arbitration') {
-          highlightedText = highlightedText.replace(
-            /Any disputes arising from these Terms.*?intellectual property disputes\./s,
-            function(match) {
-              return `<span class="highlighted-text">${match}</span>`;
-            }
-          );
-        } else {
-          highlightedText = highlightedText.replace(
-            /Any disputes arising from these Terms.*?jurisdiction of such courts\./s,
-            function(match) {
-              return `<span class="highlighted-text">${match}</span>`;
-            }
-          );
-        }
-        break;
-      case 'commercialUse':
-        if (!formData.commercialUse) {
-          highlightedText = highlightedText.replace(
-            /• Use the Service for commercial purposes without explicit written permission/,
-            `<span class="highlighted-text">• Use the Service for commercial purposes without explicit written permission</span>`
-          );
-        }
-        break;
-      case 'apiAccess':
-      case 'thirdPartyIntegrations':
-        // These affect the content in different sections
-        if (lastChanged === 'apiAccess' && formData.apiAccess) {
-          highlightedText = highlightedText.replace(
-            /API Access: If you have been granted access.*?additional restrictions\./,
-            function(match) {
-              return `<span class="highlighted-text">${match}</span>`;
-            }
-          );
-        } else if (lastChanged === 'thirdPartyIntegrations' && formData.thirdPartyIntegrations) {
-          highlightedText = highlightedText.replace(
-            /Third-Party Integrations: The Service may integrate.*?those third parties\./,
-            function(match) {
-              return `<span class="highlighted-text">${match}</span>`;
-            }
-          );
-        }
-        break;
-      case 'limitLiability':
-      case 'consequentialDamages':
-      case 'liabilityCapAmount':
-      case 'indemnification':
-        highlightedText = highlightedText.replace(
-          /LIMITATION OF LIABILITY:.*?(?=8\. ACCOUNT TERMINATION|INDEMNIFICATION:|$)/s,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
-        if (formData.indemnification) {
-          highlightedText = highlightedText.replace(
-            /INDEMNIFICATION:.*?third-party rights\./,
-            function(match) {
-              return `<span class="highlighted-text">${match}</span>`;
-            }
-          );
-        }
-        break;
-      case 'warrantyDisclaimer':
-      case 'warrantyPeriod':
-      case 'performanceWarranty':
-        highlightedText = highlightedText.replace(
-          /WARRANTY DISCLAIMER:.*?(?=LIMITATION OF LIABILITY:|$)/s,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
-        break;
       case 'aiAccuracyDisclaimer':
       case 'biasDisclaimer':
       case 'hallucincationWarning':
+      case 'contentModerationDisclaimer':
+      case 'modelVersionChanges':
+        // Highlight the entire AI limitations section when any disclaimer changes
         highlightedText = highlightedText.replace(
-          /12\. AI MODEL LIMITATIONS AND DISCLAIMERS.*?(?=13\. DATA TRAINING|$)/s,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
-        break;
-      case 'dataTrainingUse':
-      case 'trainingOptOut':
-      case 'modelImprovementUse':
-        highlightedText = highlightedText.replace(
-          /13\. DATA TRAINING AND MODEL IMPROVEMENT.*?(?=14\. AI OUTPUT|$)/s,
-          function(match) {
-            return `<span class="highlighted-text">${match}</span>`;
-          }
-        );
-        break;
-      case 'aiOutputOwnership':
-      case 'commercialUseAI':
-      case 'attributionRequired':
-        highlightedText = highlightedText.replace(
-          /14\. AI OUTPUT OWNERSHIP AND USAGE RIGHTS.*?(?=15\. CONTACT|$)/s,
+          /(Our Service may include features.*?(?=3\. USER ELIGIBILITY))/s,
           function(match) {
             return `<span class="highlighted-text">${match}</span>`;
           }
@@ -629,6 +522,10 @@ These Terms, together with our Privacy Policy and any other policies referenced 
 
   // Copy to clipboard
   const copyToClipboard = () => {
+    if (!isPaid) {
+      setShowPaywall(true);
+      return;
+    }
     navigator.clipboard.writeText(documentText).then(() => {
       alert('Terms of Use copied to clipboard!');
     });
@@ -636,6 +533,10 @@ These Terms, together with our Privacy Policy and any other policies referenced 
 
   // Download as Word
   const downloadAsWord = () => {
+    if (!isPaid) {
+      setShowPaywall(true);
+      return;
+    }
     try {
       window.generateWordDoc(documentText, {
         documentTitle: "AI Platform Terms of Use",
@@ -646,6 +547,40 @@ These Terms, together with our Privacy Policy and any other policies referenced 
       alert("Error generating Word document. Please try again or use the copy option.");
     }
   };
+
+  // PayPal Paywall Modal
+  const PaywallModal = () => (
+    showPaywall && (
+      <div className="paywall-overlay">
+        <div className="paywall-modal">
+          <h3>Unlock Full Access - $9.99</h3>
+          <p>Get instant access to copy and download your custom AI Platform Terms of Use.</p>
+          <div className="paypal-section">
+            <label>Enter your PayPal transaction ID:</label>
+            <input
+              type="text"
+              value={paypalId}
+              onChange={(e) => setPaypalId(e.target.value)}
+              placeholder="Transaction ID"
+              maxLength="17"
+            />
+            <div className="paywall-buttons">
+              <button onClick={handlePayPalUnlock} className="unlock-button">
+                Unlock Access
+              </button>
+              <button onClick={() => setShowPaywall(false)} className="cancel-button">
+                Cancel
+              </button>
+            </div>
+          </div>
+          <div className="paypal-info">
+            <p><strong>PayPal ID:</strong> EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI</p>
+            <p>Send $9.99 to the PayPal ID above, then enter your transaction ID to unlock.</p>
+          </div>
+        </div>
+      </div>
+    )
+  );
 
   return (
     <div className="container">
@@ -1029,6 +964,24 @@ These Terms, together with our Privacy Policy and any other policies referenced 
                   />
                   <label>Include AI hallucination warning <HelpIcon tooltip={tooltips.hallucincationWarning} /></label>
                 </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="contentModerationDisclaimer"
+                    checked={formData.contentModerationDisclaimer}
+                    onChange={handleChange}
+                  />
+                  <label>Include content moderation limitations <HelpIcon tooltip={tooltips.contentModerationDisclaimer} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="modelVersionChanges"
+                    checked={formData.modelVersionChanges}
+                    onChange={handleChange}
+                  />
+                  <label>Reserve right to update AI models <HelpIcon tooltip={tooltips.modelVersionChanges} /></label>
+                </div>
                 
                 <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Data Training Rights</h4>
                 <div className="checkbox-group">
@@ -1102,6 +1055,12 @@ These Terms, together with our Privacy Policy and any other policies referenced 
               <i data-feather="download"></i>
               Download
             </button>
+
+            <!-- Calendly link widget begin -->
+            <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+            <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+            <a href="" onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'});return false;" className="nav-button consult-button">Consultation</a>
+            <!-- Calendly link widget end -->
             
             <button onClick={nextTab} className="nav-button">
               Next
@@ -1123,6 +1082,9 @@ These Terms, together with our Privacy Policy and any other policies referenced 
           </div>
         </div>
       </div>
+
+      {/* PayPal Paywall Modal */}
+      <PaywallModal />
     </div>
   );
 };
