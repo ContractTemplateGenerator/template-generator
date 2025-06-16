@@ -424,29 +424,6 @@ const InteriorDesignAgreementGenerator = () => {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     };
 
-    // PayPal payment handling
-    const handlePayment = () => {
-        if (typeof paypal !== 'undefined') {
-            return paypal.Buttons({
-                createOrder: (data, actions) => {
-                    return actions.order.create({
-                        purchase_units: [{
-                            amount: { value: '14.95' }
-                        }]
-                    });
-                },
-                onApprove: (data, actions) => {
-                    return actions.order.capture().then(() => {
-                        setIsPaid(true);
-                        setShowPaywall(false);
-                        localStorage.setItem('interiorDesignPaid', 'true');
-                        saveFormData(formData);
-                    });
-                }
-            }).render('#paypal-button-container');
-        }
-    };
-
 
 
     // Validate PayPal ID format
@@ -1004,7 +981,8 @@ Date: ____________________________        Date: ____________________________`;
         };
         
         if (showPaywall && !isPaid) {
-            setTimeout(initPayPal, 1000);
+            // Add small delay to ensure DOM is ready
+            setTimeout(initPayPal, 100);
         }
     }, [showPaywall, isPaid]);
 
