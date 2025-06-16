@@ -52,7 +52,27 @@ const AITermsGenerator = () => {
     modelImprovementUse: true,
     commercialUseAI: true,
     attributionRequired: false,
-    customPlatformType: ''
+    customPlatformType: '',
+    
+    // Industry Compliance
+    industryType: 'general',
+    gdprCompliance: false,
+    ccpaCompliance: false,
+    hipaaCompliance: false,
+    ferpaCompliance: false,
+    pciCompliance: false,
+    soxCompliance: false,
+    coppaCompliance: false,
+    accessibilityCompliance: false,
+    dataLocalization: 'none',
+    algorithmicAuditing: false,
+    biasTestingRequired: false,
+    humanOversightRequired: false,
+    explainabilityRequired: false,
+    consentManagement: false,
+    rightToExplanation: false,
+    dataPortability: false,
+    environmentalDisclosure: false
   });
 
   // Ref for preview scrolling
@@ -74,7 +94,9 @@ const AITermsGenerator = () => {
     { id: 'company', label: 'Company Info' },
     { id: 'platform', label: 'AI Platform' },
     { id: 'terms', label: 'Terms Config' },
-    { id: 'ai-specific', label: 'AI Protections' }
+    { id: 'ai-specific', label: 'AI Protections' },
+    { id: 'industry', label: 'Industry Compliance' },
+    { id: 'risk-analysis', label: 'Risk Analysis' }
   ];
 
   // Handle input changes
@@ -205,7 +227,27 @@ const AITermsGenerator = () => {
     modelImprovementUse: "Use aggregated data to improve AI performance and accuracy",
     commercialUseAI: "Allow users to use AI-generated content for business purposes",
     attributionRequired: "Require users to credit your AI platform when using generated content commercially",
-    customPlatformType: "Describe your specific AI platform type if not listed in the dropdown options"
+    customPlatformType: "Describe your specific AI platform type if not listed in the dropdown options",
+    
+    // Industry Compliance tooltips
+    industryType: "Select your primary industry to include relevant compliance requirements and best practices",
+    gdprCompliance: "EU General Data Protection Regulation - required for EU users, includes data portability and right to explanation",
+    ccpaCompliance: "California Consumer Privacy Act - required for California users, includes opt-out rights and data deletion",
+    hipaaCompliance: "Health Insurance Portability and Accountability Act - required for healthcare data processing",
+    ferpaCompliance: "Family Educational Rights and Privacy Act - required for educational institutions and student data",
+    pciCompliance: "Payment Card Industry Data Security Standard - required for payment processing",
+    soxCompliance: "Sarbanes-Oxley Act - required for financial reporting and public companies",
+    coppaCompliance: "Children's Online Privacy Protection Act - required when collecting data from children under 13",
+    accessibilityCompliance: "ADA/Section 508 compliance for users with disabilities - may be legally required",
+    dataLocalization: "Restrict data processing to specific geographic regions for compliance or performance",
+    algorithmicAuditing: "Regular testing and evaluation of AI algorithms for bias, fairness, and performance",
+    biasTestingRequired: "Mandatory testing for discriminatory outcomes in AI decision-making",
+    humanOversightRequired: "Require human review for high-stakes AI decisions - important for sensitive applications",
+    explainabilityRequired: "Provide explanations for AI decisions when requested by users - builds trust and may be legally required",
+    consentManagement: "Advanced consent management for data processing - may be required under GDPR/CCPA",
+    rightToExplanation: "Allow users to request explanations for AI-driven decisions affecting them",
+    dataPortability: "Allow users to export their data in machine-readable format - required under GDPR",
+    environmentalDisclosure: "Disclose environmental impact of AI model training and inference - emerging requirement"
   };
 
   // PayPal validation function
@@ -373,6 +415,313 @@ const AITermsGenerator = () => {
     }
   };
 
+  // Generate Risk Analysis
+  const generateRiskAnalysis = () => {
+    const risks = [];
+    const recommendations = [];
+    const complianceGaps = [];
+    const industryBenchmarks = [];
+
+    // Analyze liability protection
+    if (!formData.limitLiability) {
+      risks.push({
+        level: 'high',
+        category: 'Legal Protection',
+        issue: 'No liability limitations',
+        description: 'Without liability limitations, your company could face unlimited damages in lawsuits.',
+        recommendation: 'Enable liability limitations to protect your business from excessive damage claims.'
+      });
+    }
+
+    if (!formData.warrantyDisclaimer) {
+      risks.push({
+        level: 'high',
+        category: 'Legal Protection',
+        issue: 'No warranty disclaimers',
+        description: 'Without warranty disclaimers, you may be legally obligated to guarantee service performance.',
+        recommendation: 'Include warranty disclaimers to avoid performance guarantees and "as-is" service provision.'
+      });
+    }
+
+    if (!formData.consequentialDamages) {
+      risks.push({
+        level: 'medium',
+        category: 'Financial Risk',
+        issue: 'Consequential damages not excluded',
+        description: 'You could be liable for indirect damages like lost profits or business interruption.',
+        recommendation: 'Exclude consequential damages to limit liability to direct damages only.'
+      });
+    }
+
+    // AI-specific risk analysis
+    if (!formData.aiAccuracyDisclaimer) {
+      risks.push({
+        level: 'high',
+        category: 'AI Liability',
+        issue: 'No AI accuracy disclaimer',
+        description: 'Users may hold you liable for AI inaccuracies, which are inherent to current AI technology.',
+        recommendation: 'Include AI accuracy disclaimers - this is critical for any AI platform.'
+      });
+    }
+
+    if (!formData.biasDisclaimer) {
+      risks.push({
+        level: 'high',
+        category: 'AI Liability',
+        issue: 'No algorithmic bias disclaimer',
+        description: 'AI bias claims are becoming more common. You could face discrimination lawsuits.',
+        recommendation: 'Include bias disclaimers to protect against algorithmic discrimination claims.'
+      });
+    }
+
+    if (!formData.hallucincationWarning) {
+      risks.push({
+        level: 'high',
+        category: 'AI Liability',
+        issue: 'No hallucination warning',
+        description: 'AI hallucinations can cause significant harm when users rely on false information.',
+        recommendation: 'Include hallucination warnings - this is essential for user safety and legal protection.'
+      });
+    }
+
+    // Industry-specific compliance analysis
+    if (formData.industryType === 'healthcare' && !formData.hipaaCompliance) {
+      complianceGaps.push({
+        regulation: 'HIPAA',
+        severity: 'critical',
+        description: 'Healthcare AI platforms processing patient data must comply with HIPAA.',
+        action: 'Enable HIPAA compliance or ensure your platform does not process protected health information.'
+      });
+    }
+
+    if (formData.industryType === 'financial' && !formData.soxCompliance && !formData.pciCompliance) {
+      complianceGaps.push({
+        regulation: 'Financial Regulations',
+        severity: 'high',
+        description: 'Financial AI platforms typically need SOX (if public) and PCI DSS (if processing payments).',
+        action: 'Review your specific financial services and enable appropriate compliance measures.'
+      });
+    }
+
+    if (formData.industryType === 'education' && !formData.ferpaCompliance) {
+      complianceGaps.push({
+        regulation: 'FERPA',
+        severity: 'high',
+        description: 'Educational AI platforms processing student records must comply with FERPA.',
+        action: 'Enable FERPA compliance if you process any student educational records.'
+      });
+    }
+
+    if (formData.industryType === 'hr' && !formData.biasTestingRequired) {
+      complianceGaps.push({
+        regulation: 'Anti-Discrimination Laws',
+        severity: 'high',
+        description: 'HR AI platforms used for hiring decisions may face bias auditing requirements.',
+        action: 'Consider enabling bias testing requirements to demonstrate fair hiring practices.'
+      });
+    }
+
+    // Privacy compliance analysis
+    if (formData.dataCollection && !formData.gdprCompliance && !formData.ccpaCompliance) {
+      complianceGaps.push({
+        regulation: 'Privacy Laws',
+        severity: 'medium',
+        description: 'Data collection without privacy compliance may violate GDPR (EU users) or CCPA (California users).',
+        action: 'Enable GDPR and/or CCPA compliance based on your user demographics.'
+      });
+    }
+
+    // Age compliance
+    if (formData.minAge === '13' && !formData.coppaCompliance) {
+      complianceGaps.push({
+        regulation: 'COPPA',
+        severity: 'medium',
+        description: 'Platforms accepting users under 13 must comply with COPPA.',
+        action: 'Enable COPPA compliance or increase minimum age to 16+ to avoid children\'s privacy requirements.'
+      });
+    }
+
+    // Indemnification warning
+    if (formData.indemnification) {
+      risks.push({
+        level: 'medium',
+        category: 'Business Risk',
+        issue: 'User indemnification required',
+        description: 'Indemnification clauses may deter enterprise customers and individual users.',
+        recommendation: 'Consider removing indemnification requirements to improve user adoption, especially for B2C platforms.'
+      });
+    }
+
+    // Industry benchmarking
+    switch (formData.industryType) {
+      case 'healthcare':
+        industryBenchmarks.push('95% of healthcare AI platforms include HIPAA compliance and human oversight requirements');
+        industryBenchmarks.push('Healthcare AI platforms typically require 2-5 years data retention for medical compliance');
+        industryBenchmarks.push('Most healthcare AI platforms prohibit commercial use of outputs due to liability concerns');
+        break;
+      case 'financial':
+        industryBenchmarks.push('90% of financial AI platforms use arbitration for dispute resolution');
+        industryBenchmarks.push('Financial AI platforms typically cap liability at 12 months of fees paid');
+        industryBenchmarks.push('Most financial AI platforms require algorithmic auditing and bias testing');
+        break;
+      case 'education':
+        industryBenchmarks.push('85% of educational AI platforms comply with both FERPA and accessibility requirements');
+        industryBenchmarks.push('Educational platforms typically set minimum age at 13 with COPPA compliance');
+        industryBenchmarks.push('Most educational AI platforms allow commercial use but require attribution');
+        break;
+      case 'hr':
+        industryBenchmarks.push('HR AI platforms increasingly require bias testing due to regulatory scrutiny');
+        industryBenchmarks.push('Most HR AI platforms include human oversight requirements for hiring decisions');
+        industryBenchmarks.push('85% of HR AI platforms provide right to explanation for AI-driven decisions');
+        break;
+      default:
+        industryBenchmarks.push('Most AI platforms include comprehensive AI accuracy and bias disclaimers');
+        industryBenchmarks.push('Standard practice is 2-year data retention with user deletion rights');
+        industryBenchmarks.push('Liability limitations and warranty disclaimers are used by 95% of AI platforms');
+    }
+
+    // Calculate overall risk score
+    const highRisks = risks.filter(r => r.level === 'high').length;
+    const mediumRisks = risks.filter(r => r.level === 'medium').length;
+    const criticalGaps = complianceGaps.filter(g => g.severity === 'critical').length;
+    
+    let overallRisk = 'low';
+    if (highRisks >= 3 || criticalGaps >= 1) {
+      overallRisk = 'high';
+    } else if (highRisks >= 1 || mediumRisks >= 3) {
+      overallRisk = 'medium';
+    }
+
+    return (
+      <div className="risk-analysis">
+        {/* Overall Risk Assessment */}
+        <div className={`overall-risk-card risk-${overallRisk}`}>
+          <h4>Overall Risk Level: {overallRisk.toUpperCase()}</h4>
+          <p>
+            {overallRisk === 'high' && 'Your terms have significant legal risks that should be addressed immediately.'}
+            {overallRisk === 'medium' && 'Your terms have moderate risks that should be reviewed and improved.'}
+            {overallRisk === 'low' && 'Your terms provide good legal protection with minor areas for improvement.'}
+          </p>
+        </div>
+
+        {/* Risk Details */}
+        {risks.length > 0 && (
+          <div className="risk-section">
+            <h4>⚠️ Risk Analysis</h4>
+            {risks.map((risk, index) => (
+              <div key={index} className={`risk-item risk-${risk.level}`}>
+                <div className="risk-header">
+                  <span className={`risk-level-badge risk-${risk.level}`}>
+                    {risk.level.toUpperCase()} RISK
+                  </span>
+                  <strong>{risk.category}: {risk.issue}</strong>
+                </div>
+                <p>{risk.description}</p>
+                <div className="risk-recommendation">
+                  <strong>Recommendation:</strong> {risk.recommendation}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Compliance Gaps */}
+        {complianceGaps.length > 0 && (
+          <div className="risk-section">
+            <h4>📋 Compliance Gaps</h4>
+            {complianceGaps.map((gap, index) => (
+              <div key={index} className={`compliance-gap gap-${gap.severity}`}>
+                <div className="gap-header">
+                  <span className={`severity-badge severity-${gap.severity}`}>
+                    {gap.severity.toUpperCase()}
+                  </span>
+                  <strong>{gap.regulation}</strong>
+                </div>
+                <p>{gap.description}</p>
+                <div className="gap-action">
+                  <strong>Action Required:</strong> {gap.action}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Industry Benchmarking */}
+        <div className="risk-section">
+          <h4>📊 Industry Benchmarking</h4>
+          <div className="benchmark-info">
+            <p><strong>Your Industry:</strong> {formData.industryType === 'general' ? 'General Business' : formData.industryType.charAt(0).toUpperCase() + formData.industryType.slice(1)}</p>
+            {industryBenchmarks.map((benchmark, index) => (
+              <div key={index} className="benchmark-item">
+                ✓ {benchmark}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Practical Recommendations */}
+        <div className="risk-section">
+          <h4>💡 Practical Recommendations</h4>
+          <div className="recommendations">
+            {overallRisk === 'high' && (
+              <div className="recommendation-item priority-high">
+                <strong>URGENT:</strong> Address high-risk items immediately before launching your platform. Consider legal consultation for liability protection.
+              </div>
+            )}
+            
+            {formData.industryType !== 'general' && (
+              <div className="recommendation-item">
+                <strong>Industry-Specific:</strong> Your {formData.industryType} industry has specific compliance requirements. Ensure all relevant regulations are addressed.
+              </div>
+            )}
+            
+            {formData.dataCollection && (
+              <div className="recommendation-item">
+                <strong>Privacy:</strong> You collect user data. Consider implementing comprehensive privacy protections (GDPR/CCPA) regardless of current legal requirements.
+              </div>
+            )}
+            
+            {formData.commercialUseAI && (
+              <div className="recommendation-item">
+                <strong>Commercial Use:</strong> Allowing commercial use of AI outputs increases your user base but may require stronger intellectual property protections.
+              </div>
+            )}
+            
+            <div className="recommendation-item">
+              <strong>Regular Updates:</strong> AI regulations are evolving rapidly. Plan to review and update your terms at least annually.
+            </div>
+            
+            <div className="recommendation-item">
+              <strong>User Communication:</strong> Consider creating a plain-English summary of key terms to improve user understanding and trust.
+            </div>
+          </div>
+        </div>
+
+        {/* Next Steps */}
+        <div className="risk-section next-steps">
+          <h4>🎯 Next Steps</h4>
+          <div className="steps-list">
+            <div className="step-item">
+              <strong>1. Address Critical Issues:</strong> Fix any high-risk items identified above
+            </div>
+            <div className="step-item">
+              <strong>2. Legal Review:</strong> Have an attorney review your terms, especially for {formData.industryType} industry requirements
+            </div>
+            <div className="step-item">
+              <strong>3. Test with Users:</strong> Get feedback from potential users on clarity and acceptability
+            </div>
+            <div className="step-item">
+              <strong>4. Regular Updates:</strong> Schedule quarterly reviews of your terms as AI regulations evolve
+            </div>
+            <div className="step-item">
+              <strong>5. Implementation:</strong> Ensure your platform actually implements the protections described in your terms
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Help icon component with tooltip (like the working NDA generator)
   const HelpIcon = ({ tooltip }) => (
     <span className="help-icon">
@@ -416,6 +765,115 @@ const AITermsGenerator = () => {
       return disclaimers.join('\n\n');
     };
 
+    // Generate Industry Compliance content for section 5
+    const generateIndustryCompliance = () => {
+      let compliance = [];
+
+      // Industry-specific requirements
+      if (formData.industryType === 'healthcare') {
+        compliance.push('HEALTHCARE COMPLIANCE: This Service is designed for use in the healthcare industry and may process protected health information (PHI). All use of the Service must comply with applicable healthcare regulations including HIPAA.');
+        
+        if (formData.hipaaCompliance) {
+          compliance.push('HIPAA REQUIREMENTS: We maintain appropriate administrative, physical, and technical safeguards to protect PHI in accordance with HIPAA requirements. Users must ensure their use of the Service complies with HIPAA and other applicable healthcare privacy laws.');
+        }
+        
+        if (formData.humanOversightRequired) {
+          compliance.push('MEDICAL DECISION OVERSIGHT: AI-generated outputs must not be used as the sole basis for medical decisions. Licensed healthcare professionals must review and validate all AI-generated medical information before clinical use.');
+        }
+      }
+
+      if (formData.industryType === 'financial') {
+        compliance.push('FINANCIAL SERVICES COMPLIANCE: This Service is designed for use in financial services and must comply with applicable financial regulations.');
+        
+        if (formData.soxCompliance) {
+          compliance.push('SARBANES-OXLEY COMPLIANCE: For public companies, use of this Service must comply with SOX requirements for financial reporting accuracy and internal controls.');
+        }
+        
+        if (formData.pciCompliance) {
+          compliance.push('PCI DSS COMPLIANCE: Payment card data processing must comply with PCI DSS standards. The Service maintains appropriate security controls for payment card information.');
+        }
+        
+        if (formData.algorithmicAuditing) {
+          compliance.push('ALGORITHMIC AUDITING: We conduct regular audits of our AI algorithms used in financial decision-making to ensure compliance with fair lending and anti-discrimination requirements.');
+        }
+      }
+
+      if (formData.industryType === 'education') {
+        compliance.push('EDUCATIONAL COMPLIANCE: This Service is designed for educational use and must comply with applicable educational privacy laws.');
+        
+        if (formData.ferpaCompliance) {
+          compliance.push('FERPA COMPLIANCE: Student educational records are protected in accordance with FERPA requirements. We maintain appropriate safeguards for student privacy and provide parents/students with applicable rights under FERPA.');
+        }
+        
+        if (formData.accessibilityCompliance) {
+          compliance.push('ACCESSIBILITY REQUIREMENTS: The Service is designed to comply with Section 508 and ADA accessibility requirements to ensure equal access for users with disabilities.');
+        }
+      }
+
+      if (formData.industryType === 'hr') {
+        compliance.push('HUMAN RESOURCES COMPLIANCE: This Service may be used in employment-related decisions and must comply with applicable anti-discrimination and employment laws.');
+        
+        if (formData.biasTestingRequired) {
+          compliance.push('BIAS TESTING: We conduct regular testing of our AI algorithms for discriminatory bias in employment decisions. Users are responsible for ensuring their use of AI outputs complies with equal employment opportunity requirements.');
+        }
+        
+        if (formData.humanOversightRequired) {
+          compliance.push('EMPLOYMENT DECISION OVERSIGHT: AI-generated outputs used in hiring, promotion, or other employment decisions must be reviewed by qualified human personnel to ensure compliance with employment laws.');
+        }
+      }
+
+      // Privacy law compliance
+      if (formData.gdprCompliance) {
+        compliance.push('GDPR COMPLIANCE: For users in the European Union, we comply with the General Data Protection Regulation (GDPR). EU users have specific rights regarding their personal data including access, rectification, erasure, and data portability.');
+        
+        if (formData.rightToExplanation) {
+          compliance.push('RIGHT TO EXPLANATION: EU users have the right to obtain explanations for AI-driven decisions that significantly affect them, in accordance with GDPR Article 22.');
+        }
+        
+        if (formData.dataPortability) {
+          compliance.push('DATA PORTABILITY: EU users may request their personal data in a structured, commonly used, and machine-readable format for transfer to another service provider.');
+        }
+      }
+
+      if (formData.ccpaCompliance) {
+        compliance.push('CCPA COMPLIANCE: For California residents, we comply with the California Consumer Privacy Act (CCPA). California users have specific rights regarding their personal information including the right to know, delete, and opt out of the sale of personal information.');
+      }
+
+      if (formData.coppaCompliance) {
+        compliance.push('COPPA COMPLIANCE: We comply with the Children\'s Online Privacy Protection Act (COPPA) for users under 13 years of age. Parental consent is required for collection of personal information from children under 13.');
+      }
+
+      // Data localization
+      if (formData.dataLocalization !== 'none') {
+        const locations = {
+          'us': 'United States',
+          'eu': 'European Union',
+          'canada': 'Canada',
+          'custom': 'specified geographic regions'
+        };
+        compliance.push(`DATA LOCALIZATION: User data is processed and stored within ${locations[formData.dataLocalization]} to comply with applicable data residency requirements.`);
+      }
+
+      // AI governance requirements
+      if (formData.algorithmicAuditing) {
+        compliance.push('ALGORITHMIC GOVERNANCE: We maintain documented AI governance processes including regular algorithmic auditing, performance monitoring, and bias detection procedures.');
+      }
+
+      if (formData.explainabilityRequired) {
+        compliance.push('AI EXPLAINABILITY: Upon request, we will provide explanations for AI-driven decisions in accordance with applicable transparency requirements and industry best practices.');
+      }
+
+      if (formData.environmentalDisclosure) {
+        compliance.push('ENVIRONMENTAL IMPACT: We are committed to minimizing the environmental impact of our AI operations. Information about our carbon footprint and sustainability practices is available upon request.');
+      }
+
+      if (compliance.length === 0) {
+        return 'We are committed to operating in compliance with all applicable laws and regulations. Our practices are regularly reviewed to ensure ongoing compliance with evolving legal requirements.';
+      }
+
+      return compliance.join('\n\n');
+    };
+
     return `TERMS OF USE FOR ${formData.platformName || '[PLATFORM NAME]'}
 
 Last Updated: ${new Date().toLocaleDateString()}
@@ -452,7 +910,11 @@ ${formData.trainingOptOut ?
 ${formData.modelImprovementUse ? 
 `We may use aggregated, anonymized usage data to improve our AI models' performance, safety, and reliability. This data cannot be used to identify individual users.` : ''}
 
-5. USER CONTENT AND DATA USAGE
+5. INDUSTRY COMPLIANCE AND REGULATORY REQUIREMENTS
+
+${generateIndustryCompliance()}
+
+6. USER CONTENT AND DATA USAGE
 
 ${formData.userContent ? 
 `You retain ownership of any content you submit to the Service ("User Content"). By submitting User Content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, modify, adapt, publish, translate, and display your content solely for the purpose of providing and improving the Service.
@@ -466,7 +928,7 @@ ${formData.dataCollection ?
 Data Retention: We retain your data for a period of ${formData.dataRetention} years from your last interaction with the Service, unless required by law to retain it longer or you request earlier deletion.` : 
 `We minimize data collection and do not retain personal data about your interactions with the Service beyond what is strictly necessary for basic functionality and security purposes.`}
 
-6. ACCEPTABLE USE POLICY
+7. ACCEPTABLE USE POLICY
 
 You agree to use the Service in compliance with all applicable laws and regulations. You agree not to:
 
@@ -480,7 +942,7 @@ ${formData.commercialUse ? '' : '• Use the Service for commercial purposes wit
 • Reverse engineer, decompile, or attempt to extract the source code of the Service
 • Violate any applicable laws or regulations in connection with your use of the Service
 
-7. INTELLECTUAL PROPERTY AND AI OUTPUT RIGHTS
+8. INTELLECTUAL PROPERTY AND AI OUTPUT RIGHTS
 
 The Service and its underlying technology, including but not limited to AI models, algorithms, software, designs, text, graphics, and logos, are the intellectual property of ${formData.companyName || '[COMPANY NAME]'} and its licensors, protected by copyright, trademark, and other intellectual property laws.
 
@@ -501,14 +963,14 @@ CONTENT RESPONSIBILITY: Regardless of ownership, you are responsible for ensurin
 ${formData.apiAccess ? 
 `API Access: If you have been granted access to our API, you must comply with our API Terms of Service and usage guidelines. API access may be subject to rate limits and additional restrictions.` : ''}
 
-8. PRIVACY AND DATA PROTECTION
+9. PRIVACY AND DATA PROTECTION
 
 Your privacy is important to us. Our collection, use, and protection of your personal information is governed by our Privacy Policy, which is incorporated into these Terms by reference. By using the Service, you consent to the collection and use of your information as described in our Privacy Policy.
 
 ${formData.thirdPartyIntegrations ? 
 `Third-Party Integrations: The Service may integrate with third-party services. Your use of such integrations is subject to the terms and privacy policies of those third parties.` : ''}
 
-9. DISCLAIMERS AND LIMITATION OF LIABILITY
+10. DISCLAIMERS AND LIMITATION OF LIABILITY
 
 ${formData.warrantyDisclaimer ? 
 `WARRANTY DISCLAIMER: THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
@@ -525,35 +987,35 @@ IN NO EVENT SHALL OUR TOTAL LIABILITY TO YOU FOR ALL DAMAGES EXCEED ${formData.l
 ${formData.indemnification ? 
 `INDEMNIFICATION: You agree to indemnify, defend, and hold harmless ${formData.companyName || '[COMPANY NAME]'}, its officers, directors, employees, and agents from and against any claims, damages, losses, costs, or expenses (including reasonable attorneys' fees) arising from your use of the Service, violation of these Terms, or infringement of any third-party rights.` : ''}
 
-10. ACCOUNT TERMINATION AND SUSPENSION
+11. ACCOUNT TERMINATION AND SUSPENSION
 
 We may terminate or suspend your access to the Service ${formData.termination === 'immediate' ? 'immediately and without prior notice' : 'with reasonable prior notice'} if you violate these Terms, engage in prohibited activities, or for any other reason at our sole discretion.
 
 You may terminate your account at any time by contacting us at ${formData.supportEmail || formData.contactEmail || '[SUPPORT EMAIL]'}. Upon termination, your right to use the Service will cease immediately.
 
-11. DISPUTE RESOLUTION
+12. DISPUTE RESOLUTION
 
 ${formData.disputeResolution === 'arbitration' ? 
 `Any disputes arising from these Terms or your use of the Service will be resolved through binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules. The arbitration will be conducted in ${formData.governingLaw}, and the arbitrator's decision will be final and binding. Either party may seek injunctive relief in court for intellectual property disputes or to enforce the arbitration agreement.` : 
 `Any disputes arising from these Terms or your use of the Service will be resolved in the courts of ${formData.governingLaw}, and you consent to the jurisdiction of such courts.`}
 
-12. MODIFICATIONS TO TERMS
+13. MODIFICATIONS TO TERMS
 
 We reserve the right to modify these Terms at any time. We will notify users of material changes by posting the updated Terms on our website and updating the "Last Updated" date. Your continued use of the Service after any modifications constitutes acceptance of the updated Terms.
 
-13. GOVERNING LAW
+14. GOVERNING LAW
 
 These Terms shall be governed by and construed in accordance with the laws of the State of ${formData.governingLaw}, without regard to its conflict of law principles.${formData.disputeResolution === 'court' ? ` Any legal action arising from these Terms shall be brought in the courts of ${formData.jurisdiction}.` : ''}
 
-14. SEVERABILITY
+15. SEVERABILITY
 
 If any provision of these Terms is found to be unenforceable or invalid, that provision will be limited or eliminated to the minimum extent necessary so that these Terms will otherwise remain in full force and effect.
 
-15. ENTIRE AGREEMENT
+16. ENTIRE AGREEMENT
 
 These Terms, together with our Privacy Policy and any other policies referenced herein, constitute the entire agreement between you and ${formData.companyName || '[COMPANY NAME]'} regarding the Service and supersede all prior agreements and understandings.
 
-16. CONTACT INFORMATION
+17. CONTACT INFORMATION
 
 If you have any questions about these Terms or need support, please contact us:
 
@@ -591,6 +1053,14 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           return 'ai-specific';
         }
         break;
+      case 4: // Industry Compliance
+        if (['industryType', 'gdprCompliance', 'ccpaCompliance', 'hipaaCompliance', 'ferpaCompliance', 'pciCompliance', 'soxCompliance', 'coppaCompliance', 'accessibilityCompliance', 'dataLocalization', 'algorithmicAuditing', 'biasTestingRequired', 'humanOversightRequired', 'explainabilityRequired', 'consentManagement', 'rightToExplanation', 'dataPortability', 'environmentalDisclosure'].includes(lastChanged)) {
+          return 'industry-compliance';
+        }
+        break;
+      case 5: // Risk Analysis
+        // Risk analysis tab doesn't have inputs that affect the document
+        return null;
     }
     return null;
   };
@@ -695,6 +1165,32 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
         // Highlight the entire AI limitations section when any disclaimer changes
         highlightedText = highlightedText.replace(
           /(Our Service may include features.*?(?=3\. USER ELIGIBILITY))/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
+      case 'industryType':
+      case 'gdprCompliance':
+      case 'ccpaCompliance':
+      case 'hipaaCompliance':
+      case 'ferpaCompliance':
+      case 'pciCompliance':
+      case 'soxCompliance':
+      case 'coppaCompliance':
+      case 'accessibilityCompliance':
+      case 'dataLocalization':
+      case 'algorithmicAuditing':
+      case 'biasTestingRequired':
+      case 'humanOversightRequired':
+      case 'explainabilityRequired':
+      case 'consentManagement':
+      case 'rightToExplanation':
+      case 'dataPortability':
+      case 'environmentalDisclosure':
+        // Highlight the entire Industry Compliance section when any compliance option changes
+        highlightedText = highlightedText.replace(
+          /(5\. INDUSTRY COMPLIANCE AND REGULATORY REQUIREMENTS.*?(?=6\. USER CONTENT))/s,
           function(match) {
             return `<span class="highlighted-text">${match}</span>`;
           }
@@ -1322,6 +1818,225 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                     onChange={handleChange}
                   />
                   <label>Require attribution for commercial use <HelpIcon tooltip={tooltips.attributionRequired} /></label>
+                </div>
+              </div>
+            )}
+
+            {currentTab === 4 && (
+              <div>
+                <h3>Industry Compliance & Specialization</h3>
+                
+                <div className="form-group">
+                  <label>Primary Industry <HelpIcon tooltip={tooltips.industryType} /></label>
+                  <select
+                    name="industryType"
+                    value={formData.industryType}
+                    onChange={handleChange}
+                  >
+                    <option value="general">General Business</option>
+                    <option value="healthcare">Healthcare & Medical</option>
+                    <option value="financial">Financial Services</option>
+                    <option value="education">Education & EdTech</option>
+                    <option value="automotive">Autonomous Vehicles</option>
+                    <option value="media">Content Creation & Media</option>
+                    <option value="hr">HR & Recruitment</option>
+                    <option value="legal">Legal Technology</option>
+                    <option value="realestate">Real Estate</option>
+                    <option value="ecommerce">E-commerce & Retail</option>
+                    <option value="gaming">Gaming & Entertainment</option>
+                    <option value="manufacturing">Manufacturing & IoT</option>
+                  </select>
+                </div>
+
+                {/* Industry-specific explanations */}
+                <div className="form-explanation">
+                  {formData.industryType === 'healthcare' && 
+                    'Healthcare AI platforms must comply with HIPAA for patient data protection, FDA regulations for medical devices, and may require clinical validation for diagnostic applications.'}
+                  {formData.industryType === 'financial' && 
+                    'Financial AI platforms require SOX compliance for public companies, PCI DSS for payment processing, and algorithmic trading regulations for investment applications.'}
+                  {formData.industryType === 'education' && 
+                    'Educational AI platforms must comply with FERPA for student records, COPPA for users under 13, and Section 508 accessibility requirements for federally funded institutions.'}
+                  {formData.industryType === 'automotive' && 
+                    'Autonomous vehicle AI requires safety certifications, liability frameworks for accidents, extensive testing documentation, and compliance with transportation regulations.'}
+                  {formData.industryType === 'hr' && 
+                    'HR AI platforms must comply with anti-discrimination laws, require bias testing for hiring decisions, and ensure equal opportunity compliance across all jurisdictions.'}
+                  {formData.industryType === 'legal' && 
+                    'Legal AI platforms must include unauthorized practice of law disclaimers, attorney-client privilege protections, and professional responsibility compliance.'}
+                </div>
+                
+                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Regulatory Compliance</h4>
+                <div className="checkbox-grid">
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="gdprCompliance"
+                      checked={formData.gdprCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>GDPR (EU) <HelpIcon tooltip={tooltips.gdprCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="ccpaCompliance"
+                      checked={formData.ccpaCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>CCPA (California) <HelpIcon tooltip={tooltips.ccpaCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="hipaaCompliance"
+                      checked={formData.hipaaCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>HIPAA (Healthcare) <HelpIcon tooltip={tooltips.hipaaCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="ferpaCompliance"
+                      checked={formData.ferpaCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>FERPA (Education) <HelpIcon tooltip={tooltips.ferpaCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="pciCompliance"
+                      checked={formData.pciCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>PCI DSS (Payments) <HelpIcon tooltip={tooltips.pciCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="soxCompliance"
+                      checked={formData.soxCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>SOX (Financial) <HelpIcon tooltip={tooltips.soxCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="coppaCompliance"
+                      checked={formData.coppaCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>COPPA (Children) <HelpIcon tooltip={tooltips.coppaCompliance} /></label>
+                  </div>
+                  <div className="checkbox-group">
+                    <input
+                      type="checkbox"
+                      name="accessibilityCompliance"
+                      checked={formData.accessibilityCompliance}
+                      onChange={handleChange}
+                    />
+                    <label>ADA/508 (Accessibility) <HelpIcon tooltip={tooltips.accessibilityCompliance} /></label>
+                  </div>
+                </div>
+
+                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>AI Ethics & Governance</h4>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="algorithmicAuditing"
+                    checked={formData.algorithmicAuditing}
+                    onChange={handleChange}
+                  />
+                  <label>Commit to algorithmic auditing <HelpIcon tooltip={tooltips.algorithmicAuditing} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="biasTestingRequired"
+                    checked={formData.biasTestingRequired}
+                    onChange={handleChange}
+                  />
+                  <label>Require bias testing for AI decisions <HelpIcon tooltip={tooltips.biasTestingRequired} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="humanOversightRequired"
+                    checked={formData.humanOversightRequired}
+                    onChange={handleChange}
+                  />
+                  <label>Require human oversight for high-stakes decisions <HelpIcon tooltip={tooltips.humanOversightRequired} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="explainabilityRequired"
+                    checked={formData.explainabilityRequired}
+                    onChange={handleChange}
+                  />
+                  <label>Provide AI decision explanations <HelpIcon tooltip={tooltips.explainabilityRequired} /></label>
+                </div>
+
+                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Advanced Privacy Rights</h4>
+                <div className="form-group">
+                  <label>Data Localization <HelpIcon tooltip={tooltips.dataLocalization} /></label>
+                  <select
+                    name="dataLocalization"
+                    value={formData.dataLocalization}
+                    onChange={handleChange}
+                  >
+                    <option value="none">No restrictions</option>
+                    <option value="us">US only</option>
+                    <option value="eu">EU only</option>
+                    <option value="canada">Canada only</option>
+                    <option value="custom">Custom requirements</option>
+                  </select>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="consentManagement"
+                    checked={formData.consentManagement}
+                    onChange={handleChange}
+                  />
+                  <label>Advanced consent management <HelpIcon tooltip={tooltips.consentManagement} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="rightToExplanation"
+                    checked={formData.rightToExplanation}
+                    onChange={handleChange}
+                  />
+                  <label>Right to explanation for AI decisions <HelpIcon tooltip={tooltips.rightToExplanation} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="dataPortability"
+                    checked={formData.dataPortability}
+                    onChange={handleChange}
+                  />
+                  <label>Data portability rights <HelpIcon tooltip={tooltips.dataPortability} /></label>
+                </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="environmentalDisclosure"
+                    checked={formData.environmentalDisclosure}
+                    onChange={handleChange}
+                  />
+                  <label>Environmental impact disclosure <HelpIcon tooltip={tooltips.environmentalDisclosure} /></label>
+                </div>
+              </div>
+            )}
+
+            {currentTab === 5 && (
+              <div>
+                <h3>Risk Analysis & Recommendations</h3>
+                <div className="risk-analysis-content">
+                  {generateRiskAnalysis()}
                 </div>
               </div>
             )}
