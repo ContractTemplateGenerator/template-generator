@@ -5,9 +5,8 @@ const AITermsGenerator = () => {
   const [currentTab, setCurrentTab] = useState(0);
   const [lastChanged, setLastChanged] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
-  const [paypalId, setPaypalId] = useState('');
   const [showPaywall, setShowPaywall] = useState(false);
-  const [showManualEntry, setShowManualEntry] = useState(false);
+  const [paypalButtonRendered, setPaypalButtonRendered] = useState(false);
   const [formData, setFormData] = useState({
     // Company Information
     companyName: '',
@@ -94,7 +93,7 @@ const AITermsGenerator = () => {
     localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
   };
 
-  // Load saved form data on component mount
+  // Load saved form data and check payment status on component mount
   useEffect(() => {
     const savedFormData = localStorage.getItem('aiTermsFormData');
     if (savedFormData) {
@@ -105,13 +104,30 @@ const AITermsGenerator = () => {
         console.error('Error loading saved form data:', error);
       }
     }
+
+    // Check if user has already paid
+    const isPaidStatus = localStorage.getItem('aiTermsPaid');
+    if (isPaidStatus === 'true') {
+      setIsPaid(true);
+    }
   }, []);
+
+  // Render PayPal button when paywall modal opens
+  useEffect(() => {
+    if (showPaywall && window.paypal && !paypalButtonRendered) {
+      // Small delay to ensure DOM is ready
+      setTimeout(() => {
+        renderPayPalButton();
+      }, 100);
+    }
+  }, [showPaywall, paypalButtonRendered]);
 
   // Check for payment completion on page load
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.get('payment') === 'success') {
       setIsPaid(true);
+      localStorage.setItem('aiTermsPaid', 'true');
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
@@ -159,43 +175,75 @@ const AITermsGenerator = () => {
     customPlatformType: "Describe your specific AI platform type if not listed in the dropdown options"
   };
 
-  // PayPal validation function
+  // PayPal validation function (keep for backup manual entry if needed)
   const validatePayPalId = (id) => {
     // Check if it's exactly 17 characters and alphanumeric
     return /^[a-zA-Z0-9]{17}$/.test(id);
   };
 
-  // Handle PayPal unlock
-  const handlePayPalUnlock = () => {
-    if (validatePayPalId(paypalId)) {
-      setIsPaid(true);
-      setShowPaywall(false);
-      setShowManualEntry(false);
-      // Clear the manual entry ID
-      setPaypalId('');
-      alert('Access unlocked! You can now copy and download the terms.');
-    } else {
-      alert('Please enter a valid PayPal transaction ID to unlock access.');
+  // Handle successful PayPal payment
+  const handlePaymentSuccess = (details, data) => {
+    console.log('Payment completed successfully!', details);
+    
+    // Set payment status
+    setIsPaid(true);
+    setShowPaywall(false);
+    
+    // Store payment success in localStorage for persistence
+    localStorage.setItem('aiTermsPaid', 'true');
+    localStorage.setItem('aiTermsPaymentDetails', JSON.stringify({
+      transactionId: details.id,
+      payerEmail: details.payer.email_address,
+      timestamp: new Date().toISOString()
+    }));
+    
+    alert('Payment successful! You now have full access to copy and download your terms.');
+  };
+
+  // Handle PayPal payment error
+  const handlePaymentError = (err) => {
+    console.error('PayPal payment error:', err);
+    alert('Payment failed. Please try again or contact support.');
+  };
+
+  // Render PayPal button
+  const renderPayPalButton = () => {
+    if (paypalButtonRendered || !window.paypal) return;
+    
+    // Clear any existing button
+    const paypalContainer = document.getElementById('paypal-button-container');
+    if (paypalContainer) {
+      paypalContainer.innerHTML = '';
     }
-  };
-
-  // Handle PayPal purchase
-  const handlePayPalPurchase = () => {
-    // Save current form data before redirecting to PayPal
-    localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
     
-    // Close the paywall modal and show the PayPal information
-    setShowPaywall(false);
-    setShowManualEntry(true);
+    window.paypal.Buttons({
+      createOrder: function(data, actions) {
+        // Save form data before payment
+        localStorage.setItem('aiTermsFormData', JSON.stringify(formData));
+        
+        return actions.order.create({
+          purchase_units: [{
+            amount: {
+              value: '9.99'
+            },
+            description: 'AI Platform Terms of Use Generator - Full Access'
+          }]
+        });
+      },
+      onApprove: function(data, actions) {
+        return actions.order.capture().then(function(details) {
+          handlePaymentSuccess(details, data);
+        });
+      },
+      onError: function(err) {
+        handlePaymentError(err);
+      },
+      onCancel: function(data) {
+        console.log('Payment cancelled by user');
+      }
+    }).render('#paypal-button-container');
     
-    // Show payment instructions
-    alert('Send $9.99 to PayPal ID: EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI\n\nThen enter your transaction ID below to unlock access.');
-  };
-
-  // Show manual entry option
-  const showManualEntryForm = () => {
-    setShowManualEntry(true);
-    setShowPaywall(false);
+    setPaypalButtonRendered(true);
   };
 
   // Help icon component with tooltip (like the working NDA generator)
@@ -606,70 +654,20 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           <h3>Unlock Full Access - $9.99</h3>
           <p>Get instant access to copy and download your custom AI Platform Terms of Use.</p>
           
-          <div className="purchase-section">
-            <button onClick={handlePayPalPurchase} className="purchase-button">
-              Get PayPal Payment Details - $9.99
-            </button>
-            
-            <div className="payment-divider">
-              <span>or</span>
-            </div>
-            
-            <button onClick={showManualEntryForm} className="manual-entry-button">
-              Already Paid? Enter Transaction ID
-            </button>
-            
-            <div className="paywall-buttons">
-              <button onClick={() => setShowPaywall(false)} className="cancel-button">
-                Cancel
-              </button>
-            </div>
+          <div className="paypal-payment-section">
+            <div id="paypal-button-container" className="paypal-button-container"></div>
           </div>
           
           <div className="payment-info">
-            <p><strong>Secure Payment:</strong> Your payment is processed by PayPal. No credit card information is stored on our servers.</p>
-            <p><strong>Instant Access:</strong> Once payment is complete, you'll be able to copy and download your terms immediately.</p>
-          </div>
-        </div>
-      </div>
-    )
-  );
-
-  // Manual Entry Modal
-  const ManualEntryModal = () => (
-    showManualEntry && (
-      <div className="paywall-overlay">
-        <div className="paywall-modal">
-          <h3>Complete Payment & Enter Transaction ID</h3>
-          <p>Send $9.99 to the PayPal ID below, then enter your transaction ID:</p>
-          
-          <div className="payment-info">
-            <p><strong>PayPal ID:</strong></p>
-            <p className="paypal-id">EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI</p>
+            <p><strong>Secure Payment:</strong> Your payment is processed securely by PayPal.</p>
+            <p><strong>Instant Access:</strong> Once payment is complete, you'll immediately be able to copy and download your terms.</p>
+            <p><strong>Form Data Saved:</strong> Your current form inputs are automatically saved and will be preserved after payment.</p>
           </div>
           
-          <div className="paypal-section">
-            <label>PayPal Transaction ID:</label>
-            <input
-              type="text"
-              value={paypalId}
-              onChange={(e) => setPaypalId(e.target.value)}
-              placeholder="17-character transaction ID"
-              maxLength="17"
-            />
-            <div className="paywall-buttons">
-              <button onClick={handlePayPalUnlock} className="unlock-button">
-                Unlock Access
-              </button>
-              <button onClick={() => {setShowManualEntry(false); setShowPaywall(true);}} className="cancel-button">
-                Back to Payment
-              </button>
-            </div>
-          </div>
-          
-          <div className="paypal-info">
-            <p><strong>Payment Instructions:</strong> Copy the PayPal ID above and send $9.99 via PayPal.</p>
-            <p><strong>Transaction ID:</strong> After payment, find your transaction ID in PayPal confirmation email or account history.</p>
+          <div className="paywall-buttons">
+            <button onClick={() => setShowPaywall(false)} className="cancel-button">
+              Cancel
+            </button>
           </div>
         </div>
       </div>
@@ -1180,9 +1178,6 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
 
       {/* PayPal Paywall Modal */}
       <PaywallModal />
-      
-      {/* Manual Entry Modal */}
-      <ManualEntryModal />
     </div>
   );
 };
