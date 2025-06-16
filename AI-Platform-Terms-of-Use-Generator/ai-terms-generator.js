@@ -494,12 +494,23 @@ const AITermsGenerator = () => {
       });
     }
 
-    if (formData.industryType === 'financial' && !formData.soxCompliance && !formData.pciCompliance) {
+    if (formData.industryType === 'financial') {
+      if (!formData.soxCompliance && !formData.pciCompliance) {
+        complianceGaps.push({
+          regulation: 'Financial Regulations',
+          severity: 'high',
+          description: 'Financial AI platforms typically need SOX (if public) and PCI DSS (if processing payments).',
+          action: 'Review your specific financial services and enable appropriate compliance measures.'
+        });
+      }
+    }
+
+    if ((formData.industryType === 'financial' || formData.industryType === 'ecommerce') && !formData.pciCompliance) {
       complianceGaps.push({
-        regulation: 'Financial Regulations',
+        regulation: 'PCI DSS',
         severity: 'high',
-        description: 'Financial AI platforms typically need SOX (if public) and PCI DSS (if processing payments).',
-        action: 'Review your specific financial services and enable appropriate compliance measures.'
+        description: 'Platforms processing payment card information must comply with PCI DSS.',
+        action: 'Enable PCI DSS compliance if you process any payment card data.'
       });
     }
 
@@ -796,6 +807,10 @@ const AITermsGenerator = () => {
         if (formData.algorithmicAuditing) {
           compliance.push('ALGORITHMIC AUDITING: We conduct regular audits of our AI algorithms used in financial decision-making to ensure compliance with fair lending and anti-discrimination requirements.');
         }
+      }
+
+      if (formData.industryType === 'ecommerce' && formData.pciCompliance) {
+        compliance.push('PCI DSS COMPLIANCE: Payment card data processing must comply with PCI DSS standards. The Service maintains appropriate security controls for payment card information.');
       }
 
       if (formData.industryType === 'education') {
@@ -1865,6 +1880,8 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                 </div>
                 
                 <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Regulatory Compliance</h4>
+                
+                {/* Always show these general compliance options */}
                 <div className="checkbox-grid">
                   <div className="checkbox-group">
                     <input
@@ -1884,42 +1901,105 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                     />
                     <label>CCPA (California) <HelpIcon tooltip={tooltips.ccpaCompliance} /></label>
                   </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      name="hipaaCompliance"
-                      checked={formData.hipaaCompliance}
-                      onChange={handleChange}
-                    />
-                    <label>HIPAA (Healthcare) <HelpIcon tooltip={tooltips.hipaaCompliance} /></label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      name="ferpaCompliance"
-                      checked={formData.ferpaCompliance}
-                      onChange={handleChange}
-                    />
-                    <label>FERPA (Education) <HelpIcon tooltip={tooltips.ferpaCompliance} /></label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      name="pciCompliance"
-                      checked={formData.pciCompliance}
-                      onChange={handleChange}
-                    />
-                    <label>PCI DSS (Payments) <HelpIcon tooltip={tooltips.pciCompliance} /></label>
-                  </div>
-                  <div className="checkbox-group">
-                    <input
-                      type="checkbox"
-                      name="soxCompliance"
-                      checked={formData.soxCompliance}
-                      onChange={handleChange}
-                    />
-                    <label>SOX (Financial) <HelpIcon tooltip={tooltips.soxCompliance} /></label>
-                  </div>
+                  
+                  {/* Industry-specific compliance options */}
+                  {(formData.industryType === 'healthcare') && (
+                    <div className="checkbox-group industry-recommended">
+                      <input
+                        type="checkbox"
+                        name="hipaaCompliance"
+                        checked={formData.hipaaCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>HIPAA (Healthcare) <span className="recommended-badge">RECOMMENDED</span> <HelpIcon tooltip={tooltips.hipaaCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {(formData.industryType === 'education') && (
+                    <div className="checkbox-group industry-recommended">
+                      <input
+                        type="checkbox"
+                        name="ferpaCompliance"
+                        checked={formData.ferpaCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>FERPA (Education) <span className="recommended-badge">RECOMMENDED</span> <HelpIcon tooltip={tooltips.ferpaCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {(formData.industryType === 'financial' || formData.industryType === 'ecommerce') && (
+                    <div className="checkbox-group industry-recommended">
+                      <input
+                        type="checkbox"
+                        name="pciCompliance"
+                        checked={formData.pciCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>PCI DSS (Payments) <span className="recommended-badge">RECOMMENDED</span> <HelpIcon tooltip={tooltips.pciCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {(formData.industryType === 'financial') && (
+                    <div className="checkbox-group industry-recommended">
+                      <input
+                        type="checkbox"
+                        name="soxCompliance"
+                        checked={formData.soxCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>SOX (Financial) <span className="recommended-badge">RECOMMENDED</span> <HelpIcon tooltip={tooltips.soxCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {/* Show these as optional for other industries */}
+                  {formData.industryType !== 'healthcare' && (
+                    <div className="checkbox-group">
+                      <input
+                        type="checkbox"
+                        name="hipaaCompliance"
+                        checked={formData.hipaaCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>HIPAA (Healthcare) <HelpIcon tooltip={tooltips.hipaaCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {formData.industryType !== 'education' && (
+                    <div className="checkbox-group">
+                      <input
+                        type="checkbox"
+                        name="ferpaCompliance"
+                        checked={formData.ferpaCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>FERPA (Education) <HelpIcon tooltip={tooltips.ferpaCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {formData.industryType !== 'financial' && formData.industryType !== 'ecommerce' && (
+                    <div className="checkbox-group">
+                      <input
+                        type="checkbox"
+                        name="pciCompliance"
+                        checked={formData.pciCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>PCI DSS (Payments) <HelpIcon tooltip={tooltips.pciCompliance} /></label>
+                    </div>
+                  )}
+                  
+                  {formData.industryType !== 'financial' && (
+                    <div className="checkbox-group">
+                      <input
+                        type="checkbox"
+                        name="soxCompliance"
+                        checked={formData.soxCompliance}
+                        onChange={handleChange}
+                      />
+                      <label>SOX (Financial) <HelpIcon tooltip={tooltips.soxCompliance} /></label>
+                    </div>
+                  )}
+                  
                   <div className="checkbox-group">
                     <input
                       type="checkbox"
