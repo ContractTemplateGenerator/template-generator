@@ -686,7 +686,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 const arbitrationDemand = generateArbitrationDemand();
                 
                 // Add proper page break formatting for MS Word
-                finalDocumentText = demandLetter + '\f' + arbitrationDemand;
+                finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
                 documentTitle = "Stripe Demand Letter with Arbitration Demand";
                 fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
             } else {
@@ -762,10 +762,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 if (lastChanged === 'includeArbitrationDraft') {
                     return formData.includeArbitrationDraft ? 'arbitration-section' : 'demand-letter-section';
                 }
-                if (['expeditedProcedures', 'claimPunitiveDamages', 'includeAttorneyFees', 'includeInterestOnFunds', 'injunctiveRelief'].includes(lastChanged)) {
+                if (['expeditedProcedures', 'claimPunitiveDamages', 'injunctiveRelief'].includes(lastChanged)) {
                     return 'arbitration-options';
                 }
-                if (['arbitrationVenue', 'hearingPreference', 'specificDamagesAmount', 'additionalClaims'].includes(lastChanged)) {
+                if (['arbitrationVenue', 'hearingPreference', 'specificDamagesAmount', 'additionalClaims', 'includeAttorneyFees', 'includeInterestOnFunds'].includes(lastChanged)) {
                     return 'arbitration-config';
                 }
                 return null;
@@ -794,7 +794,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'demand-letter-section': /^[^\n]+\n[^\n]+\n[^\n]+.*?(?=ARBITRATION DEMAND \(ATTACHMENT\)|$)/s,
             'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=$)/s,
             'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES|ARBITRATION VENUE)/s,
-            'arbitration-config': /(?:RELIEF SOUGHT|Award damages for|Award restitution|Award reasonable attorney fees).*?(?=AMOUNT IN CONTROVERSY|$)/s
+            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY|ADMINISTRATIVE INFORMATION|$)/s
         };
         
         if (sections[sectionToHighlight]) {
