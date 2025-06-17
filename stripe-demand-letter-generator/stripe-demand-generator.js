@@ -1949,80 +1949,43 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             React.createElement('p', { key: 'text' }, 'This analysis is for educational purposes only and does not constitute legal advice. Consult with a qualified attorney for professional legal guidance specific to your situation.')
                         ]),
                         
-                        (() => {
-                            const assessment = getRiskAssessment();
-                            const complexity = analyzeCaseComplexity();
-                            const evidenceStrategy = getEvidenceStrategy();
-                            
-                            return React.createElement('div', { key: 'assessment' }, [
-                                React.createElement('div', { key: 'score-card', className: `risk-card ${assessment.riskClass}` }, [
-                                    React.createElement('h3', { key: 'h3' }, `${assessment.riskLevel} (Score: ${assessment.score}/100)`),
-                                    React.createElement('ul', { key: 'factors' }, 
-                                        assessment.factors.map((factor, index) => 
-                                            React.createElement('li', { key: index }, factor)
-                                        )
-                                    )
-                                ]),
-                                
-                                React.createElement('div', { key: 'strategy-card', className: 'risk-card risk-strong' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Strategic Recommendations'),
-                                    React.createElement('ul', { key: 'recs' }, 
-                                        assessment.recommendations.map((rec, index) => 
-                                            React.createElement('li', { key: index }, rec)
-                                        )
-                                    )
-                                ]),
-                                
-                                evidenceStrategy.length > 0 && React.createElement('div', { key: 'evidence-card', className: 'risk-card risk-moderate' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Evidence Hierarchy - Priority Order'),
-                                    React.createElement('div', { key: 'evidence-list' },
-                                        evidenceStrategy.map((item, index) => 
-                                            React.createElement('div', { key: index, className: 'evidence-item', style: { marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' } }, [
-                                                React.createElement('strong', { key: 'priority' }, `Priority ${item.priority}: ${item.evidence}`),
-                                                React.createElement('div', { key: 'impact', style: { color: '#28a745', fontSize: '14px' } }, `Impact: ${item.impact}`),
-                                                React.createElement('div', { key: 'action', style: { color: '#6c757d', fontSize: '14px' } }, `Action: ${item.action}`)
-                                            ])
-                                        )
-                                    )
-                                ]),
-                                
-                                React.createElement('div', { key: 'complexity-card', className: `risk-card ${complexity.isComplex ? 'risk-moderate' : 'risk-strong'}` }, [
-                                    React.createElement('h3', { key: 'h3' }, `Case Complexity: ${complexity.isComplex ? 'Complex' : 'Straightforward'}`),
-                                    React.createElement('ul', { key: 'complexity-factors' }, 
-                                        complexity.complexityFactors.map((factor, index) => 
-                                            React.createElement('li', { key: index }, factor)
-                                        )
-                                    )
+                        React.createElement('div', { key: 'assessment' }, [
+                            React.createElement('div', { key: 'score-card', className: 'risk-card risk-strong' }, [
+                                React.createElement('h3', { key: 'h3' }, 'Case Assessment'),
+                                React.createElement('ul', { key: 'factors' }, [
+                                    React.createElement('li', { key: '1' }, 'Assessment based on your inputs in previous tabs'),
+                                    React.createElement('li', { key: '2' }, 'Review your evidence and documentation'),
+                                    React.createElement('li', { key: '3' }, 'Consider consulting with legal counsel for case evaluation')
                                 ])
-                            ]);
-                        })(),
+                            ]),
+                            
+                            React.createElement('div', { key: 'strategy-card', className: 'risk-card risk-moderate' }, [
+                                React.createElement('h3', { key: 'h3' }, 'Strategic Recommendations'),
+                                React.createElement('ul', { key: 'recs' }, [
+                                    React.createElement('li', { key: '1' }, 'Document all communications with Stripe'),
+                                    React.createElement('li', { key: '2' }, 'Gather evidence of compliance and low dispute rates'),
+                                    React.createElement('li', { key: '3' }, 'Prepare for 30-day arbitration notice period'),
+                                    React.createElement('li', { key: '4' }, 'Consider settlement discussions during notice period')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { key: 'complexity-card', className: 'risk-card risk-strong' }, [
+                                React.createElement('h3', { key: 'h3' }, 'Case Preparation'),
+                                React.createElement('ul', { key: 'complexity-factors' }, [
+                                    React.createElement('li', { key: '1' }, 'Compile chronological timeline of events'),
+                                    React.createElement('li', { key: '2' }, 'Organize all email communications'),
+                                    React.createElement('li', { key: '3' }, 'Prepare financial impact documentation'),
+                                    React.createElement('li', { key: '4' }, 'Review contract terms and compliance history')
+                                ])
+                            ])
+                        ]),
                         
                         React.createElement('div', { key: 'timeline', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
                             React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
-                            (() => {
-                                const fees = calculateAAAfees();
-                                const complexity = analyzeCaseComplexity();
-                                return [
-                                    React.createElement('p', { key: 'fees' }, [
-                                        React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '),
-                                        `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
-                                        fees.expedited ? ' (Expedited procedures available)' : ''
-                                    ]),
-                                    React.createElement('p', { key: 'timeline' }, [
-                                        React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
-                                        complexity.timeline
-                                    ]),
-                                    React.createElement('p', { key: 'procedures' }, [
-                                        React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
-                                        complexity.procedures
-                                    ]),
-                                    fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
-                                        React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
-                                        'Claims under $25K qualify for streamlined, document-only procedures that are faster and cheaper.'
-                                    ])
-                                ];
-                            })()
+                            React.createElement('p', { key: 'fees' }, React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '), 'Based on claim amount - see arbitration tab for details'),
+                            React.createElement('p', { key: 'timeline' }, React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), '4-12 months depending on complexity'),
+                            React.createElement('p', { key: 'procedures' }, React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 'Document submission and possible hearing')
                         ])
                     ]),
                     
