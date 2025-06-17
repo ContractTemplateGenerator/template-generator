@@ -87,6 +87,17 @@ const StripeDemandGenerator = () => {
         processingHistory: '',
         historicalDisputeRate: '',
         
+        // NEW Account Establishment Fields
+        accountStartDate: '', // Optional - when account was first opened
+        yearsWithStripe: '', // Calculated or manual input
+        totalVolumeProcessed: '', // Optional - lifetime processing volume
+        previousAccountIssues: false, // Checkbox - any prior account issues
+        industryCompliance: false, // Checkbox - industry-specific compliance (PCI, etc.)
+        repeatCustomerBase: false, // Checkbox - established repeat customers
+        businessLicenses: false, // Checkbox - proper business licensing
+        professionalReferences: false, // Checkbox - bank/business references available
+        refundRate: '', // NEW - refund rate percentage
+        
         // Tab 2: Stripe's Stated Reasons (from article analysis)
         highRisk: false,
         elevatedDispute: false,
@@ -100,9 +111,9 @@ const StripeDemandGenerator = () => {
         retroactiveRisk: false,
         communicationBlackout: false,
         chargebackLoop: false,
-        specificViolationsIdentified: false, // New field
-        customReason: false,
+        customReason: false, // Moved above specificViolationsIdentified
         customReasonText: '',
+        specificViolationsIdentified: false, // Now at bottom
         
         // Tab 4: Supporting Evidence
         lowChargebacks: false,
@@ -113,14 +124,6 @@ const StripeDemandGenerator = () => {
         businessDamages: false,
         customEvidence: false,
         customEvidenceText: '',
-        
-        // Tab 5: Risk Assessment Recommendations (checkboxes)
-        gatherMoreEvidence: false,
-        consultAttorney: false,
-        documentCommunications: false,
-        prepareForArbitration: false,
-        considerSettlement: false,
-        strengthenCase: false,
         
         // Tab 5: Legal Strategy & Timeline
         responseDeadline: 14,
@@ -136,6 +139,7 @@ const StripeDemandGenerator = () => {
         { id: 'evidence', label: 'Evidence' },
         { id: 'assessment', label: 'Risk Assessment' }
     ];
+    
     // Handle input changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -225,10 +229,130 @@ const StripeDemandGenerator = () => {
         };
     };
 
+    // Get Account Establishment Benefits
+    const getAccountEstablishmentBenefits = () => {
+        const benefits = [];
+        
+        // Account age benefits
+        if (formData.accountStartDate) {
+            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
+            if (accountAge > 2) {
+                benefits.push(`${formData.companyName || '[COMPANY NAME]'} has maintained this Stripe account for over ${Math.floor(accountAge)} years with ${formData.previousAccountIssues ? 'minimal' : 'no'} prior violations`);
+            }
+        }
+        
+        // Volume benefits
+        if (formData.totalVolumeProcessed) {
+            benefits.push(`Having processed over $${formData.totalVolumeProcessed} through Stripe demonstrates established business relationship`);
+        }
+        
+        // Clean history
+        if (!formData.previousAccountIssues) {
+            benefits.push('This account has no history of policy violations or compliance issues');
+        }
+        
+        // Industry compliance
+        if (formData.industryCompliance) {
+            benefits.push('Regulated business compliance reduces perceived risk');
+        }
+        
+        // Business establishment
+        if (formData.businessLicenses && formData.professionalReferences) {
+            benefits.push('Proper business licensing and professional references demonstrate legitimacy');
+        }
+        
+        return benefits;
+    };
+
+    // Evidence Hierarchy System
+    const getEvidenceStrategy = () => {
+        const recommendations = [];
+        
+        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
+            recommendations.push({
+                priority: 1,
+                evidence: "Email/communication showing Stripe's specific promise to release funds by " + formData.promisedReleaseDate,
+                impact: "Creates ironclad breach of contract claim",
+                action: "Screenshot with full headers, save original email with metadata"
+            });
+        }
+        
+        if (formData.lowChargebacks && formData.historicalDisputeRate) {
+            recommendations.push({
+                priority: 2, 
+                evidence: `Stripe dashboard screenshot showing dispute rate of ${formData.historicalDisputeRate}% (below 0.75% threshold)`,
+                impact: "Destroys Stripe's 'high risk' justification",
+                action: "Monthly statements for past 12 months, comparison to industry averages"
+            });
+        }
+        
+        if (formData.shiftingDeadlines || formData.shiftingTimelines) {
+            recommendations.push({
+                priority: 3,
+                evidence: "Email chain showing pattern of extending promised release dates",
+                impact: "Demonstrates bad faith and establishes promissory estoppel claim",
+                action: "Compile chronological timeline with all date changes documented"
+            });
+        }
+        
+        if (formData.communicationBlackout) {
+            recommendations.push({
+                priority: 4,
+                evidence: "Documentation of unresponsive support after fund hold began",
+                impact: "Supports breach of implied covenant of good faith",
+                action: "Screenshot support tickets, email timestamps, response delays"
+            });
+        }
+        
+        if (formData.businessDamages) {
+            recommendations.push({
+                priority: 5,
+                evidence: "Specific monetary damages from inability to fulfill orders",
+                impact: "Quantifies actual harm for damages calculation",
+                action: "Invoice lost sales, emergency financing costs, vendor payment delays"
+            });
+        }
+        
+        return recommendations.sort((a, b) => a.priority - b.priority);
+    };
+
+    // Professional Legal Strategy Generator
+    const getDynamicLegalStrategy = () => {
+        const strategies = [];
+        
+        // Promissory estoppel strategy
+        if (formData.shiftingTimelines && formData.promisedReleaseDate) {
+            strategies.push("Focus on promissory estoppel claim - Stripe's broken promises create additional liability beyond contract breach");
+        }
+        
+        // Due process strategy
+        if (formData.communicationBlackout && formData.accountReview) {
+            strategies.push("Emphasize due process violations - Stripe's communication blackout during 'review' violates implied covenant");
+        }
+        
+        // Causation paradox strategy
+        if (formData.chargebackLoop && formData.lowChargebacks) {
+            strategies.push("Highlight the causation paradox - Stripe created the problem they claim justifies withholding");
+        }
+        
+        // Bad faith conduct strategy
+        if (formData.retroactiveRisk && formData.fullDisclosure) {
+            strategies.push("Retroactive risk designation after full disclosure constitutes bad faith conduct");
+        }
+        
+        // Established relationship strategy
+        if (formData.accountStartDate && formData.totalVolumeProcessed) {
+            strategies.push("Leverage established relationship - long processing history creates reasonable expectations");
+        }
+        
+        return strategies;
+    };
+
     // Generate the demand letter document
     const generateDemandLetter = () => {
         const dates = calculateDates();
         const { claims, violations } = getAutoSelectedClaims();
+        const establishmentBenefits = getAccountEstablishmentBenefits();
         
         // Build reasons list from article categories
         const reasons = [];
@@ -255,15 +379,6 @@ const StripeDemandGenerator = () => {
         if (formData.shiftingDeadlines) evidence.push('documentation of Stripe\'s shifting payout deadlines');
         if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
         if (formData.customEvidence && formData.customEvidenceText) evidence.push(formData.customEvidenceText);
-
-        // Build recommendation actions from checkboxes
-        const recommendationActions = [];
-        if (formData.gatherMoreEvidence) recommendationActions.push('provide additional documentation of business compliance');
-        if (formData.consultAttorney) recommendationActions.push('legal consultation regarding arbitration strategy');
-        if (formData.documentCommunications) recommendationActions.push('comprehensive documentation of all Stripe communications');
-        if (formData.prepareForArbitration) recommendationActions.push('preparation for AAA arbitration proceedings');
-        if (formData.considerSettlement) recommendationActions.push('consideration of settlement discussions during 30-day notice period');
-        if (formData.strengthenCase) recommendationActions.push('additional case strengthening measures');
 
         const daysSinceTermination = formData.terminationDate ? 
             Math.ceil((new Date() - new Date(formData.terminationDate)) / (1000 * 60 * 60 * 24)) : null;
@@ -297,7 +412,9 @@ I am writing regarding Stripe's continued withholding of $${formData.withheldAmo
 
 FACTUAL BACKGROUND
 
-${formData.terminationDate ? 
+${establishmentBenefits.length > 0 ? 
+    establishmentBenefits.join('. ') + '. ' : ''
+}${formData.terminationDate ? 
     `On ${formData.terminationDate}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement' : ''}.` :
     `Stripe initiated a hold on my merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement or providing clear justification for the withholding' : ''}.`
 } ${formData.promisedReleaseDate ? `At the time, Stripe promised to release the withheld funds by ${formData.promisedReleaseDate}.` : ''}
@@ -330,12 +447,6 @@ SUPPORTING EVIDENCE
 ${evidence.length > 0 ? `Our position is supported by the following evidence:
 ${evidence.map(item => `- ${item}`).join('\n')}` : 'We have documented evidence supporting our position, including our clean processing history and Stripe\'s failure to provide specific justification for the continued hold.'}
 
-${recommendationActions.length > 0 ? `
-RECOMMENDED ACTIONS
-
-Based on this analysis, we are prepared to take the following additional steps to strengthen our position:
-${recommendationActions.map(action => `- ${action}`).join('\n')}` : ''}
-
 DEMAND FOR RESOLUTION
 
 To resolve this matter without proceeding to arbitration, I demand the following:
@@ -355,6 +466,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
         return letter;
     };
+    
     // Get current document text
     const documentText = generateDemandLetter();
 
@@ -406,17 +518,23 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         setCurrentTab(index);
     };
 
-    // Highlighting functionality - More granular highlighting
+    // FIXED: Highlighting functionality for ALL Tab 1 inputs
     const getSectionToHighlight = () => {
         if (!lastChanged) return null;
         
         switch (currentTab) {
-            case 0: // Account Details
+            case 0: // Account Details - ALL INPUTS NOW TRIGGER HIGHLIGHTING
                 if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
                     return 'header-info';
                 }
-                if (['terminationDate', 'promisedReleaseDate'].includes(lastChanged)) {
-                    return 'background-dates';
+                if (['email', 'phone', 'address', 'city', 'state', 'zipCode'].includes(lastChanged)) {
+                    return 'contact-info';
+                }
+                if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory', 'historicalDisputeRate'].includes(lastChanged)) {
+                    return 'background-section';
+                }
+                if (['accountStartDate', 'yearsWithStripe', 'totalVolumeProcessed', 'previousAccountIssues', 'industryCompliance', 'repeatCustomerBase', 'businessLicenses', 'professionalReferences', 'refundRate'].includes(lastChanged)) {
+                    return 'establishment-section';
                 }
                 return null;
             case 1: // Stripe's Reasons
@@ -427,11 +545,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             case 3: // Evidence
                 if (lastChanged && formData[lastChanged]) {
                     return 'evidence-section';
-                }
-                return null;
-            case 4: // Risk Assessment
-                if (lastChanged && ['gatherMoreEvidence', 'consultAttorney', 'documentCommunications', 'prepareForArbitration'].includes(lastChanged)) {
-                    return 'recommended-actions';
                 }
                 return null;
             default:
@@ -448,11 +561,12 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         
         // Define more specific regex patterns for granular highlighting
         const sections = {
-            'header-info': /Re:.*?Amount at Issue: \$\[AMOUNT\]/s,
-            'background-dates': /On \[DATE\].*?(?=\n\n[A-Z])/s,
+            'header-info': /Re:.*?Amount at Issue: \$[^\n]*/s,
+            'contact-info': /^[^\n]+\n[^\n]+\n[^\n]+\n[^\n]+\n[^\n]+/,
+            'background-section': /FACTUAL BACKGROUND.*?(?=LEGAL CLAIMS)/s,
+            'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
-            'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION|RECOMMENDED ACTIONS)/s,
-            'recommended-actions': /RECOMMENDED ACTIONS.*?(?=DEMAND FOR RESOLUTION)/s
+            'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -474,123 +588,190 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 }
             }, 100);
             
-            // Clear highlighting after 8 seconds (longer duration)
+            // Clear highlighting after 8 seconds
             setTimeout(() => setLastChanged(null), 8000);
         }
     }, [lastChanged]);
 
     const highlightedText = createHighlightedText();
 
-    // Risk Assessment (Fixed to 0-100 scale)
+    // UPGRADED: Attorney-Level Risk Assessment
     const getRiskAssessment = () => {
         let score = 30; // Base score
         let factors = [];
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
         
-        // Positive factors (add points)
+        // Strong evidence factors
+        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
+            score += 25;
+            factors.push('✅ STRONGEST EVIDENCE: Broken promise creates ironclad breach of contract claim. Focus your demand on promissory estoppel liability.');
+        }
+        
         if (formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1.0) {
             score += 20;
-            factors.push('✅ Low historical dispute rate strengthens your position significantly');
+            factors.push(`✅ STRONG DEFENSE: Your ${formData.historicalDisputeRate}% dispute rate destroys Stripe's "high risk" justification. Demand Stripe provide industry comparisons.`);
         }
         
         if (formData.lowChargebacks && formData.compliantPractices) {
             score += 15;
-            factors.push('✅ Documented compliance history supports good faith claims');
-        }
-        
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            score += 25;
-            factors.push('✅ Missed promised release date creates strong breach of contract claim');
+            factors.push('✅ COMPLIANCE DOCUMENTATION: Clean processing history supports good faith claims. Obtain 12-month chargeback statements for evidence package.');
         }
         
         if (formData.shiftingDeadlines || formData.shiftingTimelines) {
             score += 15;
-            factors.push('✅ Pattern of shifting deadlines supports bad faith argument');
-        }
-        
-        if (formData.withheldAmount && parseFloat(formData.withheldAmount.replace(/[^\d.]/g, '')) < 25000) {
-            score += 10;
-            factors.push('✅ Amount qualifies for AAA expedited procedures (lower cost)');
+            factors.push('✅ BAD FAITH PATTERN: Shifting deadlines support promissory estoppel and bad faith claims. Compile chronological timeline of all date changes.');
         }
         
         if (formData.communicationBlackout) {
             score += 10;
-            factors.push('✅ Communication blackout supports bad faith claims');
+            factors.push('✅ DUE PROCESS VIOLATION: Communication blackout violates implied covenant. Document all unresponsive support interactions.');
         }
         
-        if (formData.processingHistory && formData.processingHistory.includes('year')) {
-            score += 10;
-            factors.push('✅ Long processing history shows established relationship');
+        // Account establishment benefits
+        if (formData.accountStartDate) {
+            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
+            if (accountAge > 2) {
+                score += 12;
+                factors.push(`✅ ESTABLISHED RELATIONSHIP: ${Math.floor(accountAge)}-year account history creates reasonable expectations. Emphasize relationship longevity in demand.`);
+            } else if (accountAge < 0.5) {
+                score -= 8;
+                factors.push(`⚠️ NEW ACCOUNT: ${Math.floor(accountAge * 12)}-month processing history may support Stripe's risk concerns. Focus on compliance documentation instead.`);
+            }
         }
         
-        // Negative factors (reduce points but keep minimum 5)
+        if (formData.totalVolumeProcessed && parseFloat(formData.totalVolumeProcessed.replace(/[^\d.]/g, '')) > 100000) {
+            score += 8;
+            factors.push(`✅ VOLUME HISTORY: $${formData.totalVolumeProcessed} processing volume demonstrates established business. Include lifetime processing statements.`);
+        }
+        
+        // Risk reduction factors
+        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
+            score -= 12;
+            factors.push(`⚠️ HIGH REFUNDS: ${formData.refundRate}% refund rate may indicate business model disputes. Prepare explanation of refund policy and customer satisfaction measures.`);
+        }
+        
         if (formData.highRisk && !formData.lowChargebacks) {
             score -= 15;
-            factors.push('⚠️ High-risk designation without counter-evidence weakens position');
+            factors.push('⚠️ WEAK COUNTER-EVIDENCE: High-risk designation without documented low chargebacks. Obtain dispute rate evidence immediately.');
         }
         
         if (!formData.processingHistory || formData.processingHistory.includes('month')) {
             score -= 10;
-            factors.push('⚠️ Short processing history may support Stripe\'s risk concerns');
+            factors.push('⚠️ LIMITED HISTORY: Short processing history strengthens Stripe\'s risk arguments. Focus on compliance and disclosure arguments.');
         }
         
-        // Check if user has selected any Stripe reasons
-        const selectedReasons = [
-            formData.highRisk, formData.elevatedDispute, formData.policyViolation,
-            formData.riskAssessment, formData.chargebackLiability, formData.accountReview,
-            formData.businessModelIssue, formData.indefiniteHold, formData.shiftingTimelines,
-            formData.retroactiveRisk, formData.communicationBlackout, formData.chargebackLoop,
-            formData.customReason
-        ].some(reason => reason);
-        
-        if (!selectedReasons) {
-            score -= 10;
-            factors.push('⚠️ No specific Stripe reasons identified weakens response strategy');
-        }
-        
+        // Evidence gaps
         if (!formData.terminationDate && !formData.promisedReleaseDate) {
             score -= 8;
-            factors.push('⚠️ Lack of specific dates makes timeline arguments more difficult');
+            factors.push('⚠️ TIMING WEAKNESS: No specific dates weaken timeline arguments. Document when hold began and any verbal promises.');
+        }
+        
+        // Expedited procedures benefit
+        if (amount < 25000) {
+            score += 5;
+            factors.push(`✅ COST ADVANTAGE: $${amount.toLocaleString()} qualifies for AAA expedited procedures. Lower fees and faster resolution (60-90 days).`);
         }
         
         // Ensure score stays within 0-100 range
         score = Math.max(5, Math.min(100, score));
         
-        // Determine risk level and recommendations
+        // SPECIFIC ATTORNEY-LEVEL RECOMMENDATIONS
         let riskLevel, riskClass, recommendations;
         
         if (score >= 70) {
             riskLevel = 'Strong Case';
             riskClass = 'risk-strong';
-            recommendations = [
-                'High probability of successful fund recovery',
-                'Send demand letter immediately',
-                'Prepare for expedited arbitration if under $25K',
-                'Document all future Stripe communications',
-                'Consider filing within 30-day window if no response'
-            ];
+            recommendations = getStrongCaseStrategy();
         } else if (score >= 45) {
             riskLevel = 'Moderate Case';
             riskClass = 'risk-moderate';
-            recommendations = [
-                'Reasonable chance of recovery with proper strategy',
-                'Strengthen evidence before sending demand letter',
-                'Consider attorney consultation for arbitration strategy',
-                'Prepare for standard arbitration timeline (6-12 months)',
-                'Focus on Stripe\'s procedural failures in arguments'
-            ];
+            recommendations = getModerateCaseStrategy();
         } else {
             riskLevel = 'Challenging Case';
             riskClass = 'risk-weak';
-            recommendations = [
-                'Difficult case but still winnable with right approach',
-                'Strongly recommend attorney representation',
-                'Focus heavily on Stripe\'s bad faith conduct',
-                'Prepare comprehensive evidence package',
-                'Consider all procedural arguments available'
-            ];
+            recommendations = getChallengingCaseStrategy();
         }
         
         return { riskLevel, riskClass, factors, recommendations, score };
+    };
+
+    // SPECIFIC CASE STRATEGIES
+    const getStrongCaseStrategy = () => {
+        const strategies = [];
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        
+        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
+            strategies.push(`Your broken promise evidence creates a compelling breach of contract claim. Focus your demand on Section 5.4 violations and promissory estoppel liability.`);
+        }
+        
+        strategies.push(`Timeline: File within 30 days of this letter for maximum pressure. AAA fees: $${amount < 25000 ? '1,775' : amount < 75000 ? '1,775' : '3,400'} vs. potential recovery of $${formData.withheldAmount || '[AMOUNT]'}.`);
+        
+        if (amount < 25000) {
+            strategies.push(`EXPEDITED ADVANTAGE: Your claim qualifies for streamlined AAA procedures. Document-only resolution likely (60-90 days vs. 6-12 months standard).`);
+        }
+        
+        const dynamicStrategies = getDynamicLegalStrategy();
+        strategies.push(...dynamicStrategies);
+        
+        return strategies;
+    };
+
+    const getModerateCaseStrategy = () => {
+        const strategies = [];
+        const evidenceGaps = [];
+        
+        if (!formData.promisedReleaseDate) {
+            evidenceGaps.push('Document any verbal promises or timeline commitments');
+        }
+        
+        if (!formData.historicalDisputeRate) {
+            evidenceGaps.push('Obtain 12-month chargeback rate statements from Stripe dashboard');
+        }
+        
+        if (!formData.shiftingDeadlines && formData.shiftingTimelines) {
+            evidenceGaps.push('Compile email chain showing pattern of extending deadlines');
+        }
+        
+        strategies.push(`Your case hinges on ${evidenceGaps.length > 0 ? evidenceGaps[0] : 'strengthening procedural arguments'}. Strengthen by: 1) ${evidenceGaps[0] || 'Focus on bad faith conduct'}, 2) ${evidenceGaps[1] || 'Document communication failures'}, 3) ${evidenceGaps[2] || 'Gather industry compliance evidence'}.`);
+        
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        strategies.push(`Cost-benefit: AAA fees $${amount < 25000 ? '1,775' : amount < 75000 ? '1,775' : '3,400'} vs. potential recovery $${formData.withheldAmount || '[AMOUNT]'}. Standard timeline: 6-12 months.`);
+        
+        strategies.push('Focus on Stripe\'s procedural failures rather than business model disputes. Emphasize good faith reliance on established relationship.');
+        
+        return strategies;
+    };
+
+    const getChallengingCaseStrategy = () => {
+        const strategies = [];
+        const obstacles = [];
+        
+        if (formData.highRisk && !formData.lowChargebacks) {
+            obstacles.push('High-risk designation without counter-evidence');
+        }
+        
+        if (!formData.processingHistory || formData.processingHistory.includes('month')) {
+            obstacles.push('Limited processing history supports Stripe\'s position');
+        }
+        
+        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
+            obstacles.push('High refund rate may indicate business model issues');
+        }
+        
+        strategies.push(`Primary obstacles: ${obstacles.join(', ')}. Required evidence: 1) ${getHighestPriorityEvidence()}, 2) Industry compliance documentation, 3) Customer satisfaction metrics.`);
+        
+        strategies.push('Alternative approach: Focus heavily on Stripe\'s procedural failures and communication blackouts rather than business model disputes.');
+        
+        strategies.push('Consider settlement discussions during 30-day notice period. Document preparation for arbitration while exploring resolution.');
+        
+        return strategies;
+    };
+
+    const getHighestPriorityEvidence = () => {
+        if (formData.promisedReleaseDate) return 'Email proof of broken promise';
+        if (formData.communicationBlackout) return 'Documentation of unresponsive support';
+        if (formData.shiftingTimelines) return 'Timeline of shifting deadlines';
+        return 'Stripe dashboard showing actual dispute metrics';
     };
 
     // Calculate AAA filing fees based on actual 2025 fee schedule
@@ -640,7 +821,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         }
     };
 
-    // Analyze case complexity
+    // IMPROVED: Analyze case complexity with refund rates and account age
     const analyzeCaseComplexity = () => {
         let complexityScore = 0;
         const complexityFactors = [];
@@ -656,6 +837,20 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             complexityFactors.push('✅ Clean payment history reduces complexity');
         }
         
+        // Account establishment reduces complexity
+        if (formData.accountStartDate) {
+            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
+            if (accountAge > 2) {
+                complexityScore -= 1;
+                complexityFactors.push('✅ Long-standing relationship supports good faith arguments');
+            }
+        }
+        
+        if (formData.industryCompliance) {
+            complexityScore -= 1;
+            complexityFactors.push('✅ Regulated business compliance reduces perceived risk');
+        }
+        
         // Complex factors (increase complexity)
         if (formData.chargebackLoop) {
             complexityScore += 3;
@@ -665,6 +860,21 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         if (formData.businessModelIssue) {
             complexityScore += 2;
             complexityFactors.push('⚠️ Business model disputes require extensive documentation');
+        }
+        
+        // NEW: High refund rate increases complexity
+        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
+            complexityScore += 2;
+            complexityFactors.push('⚠️ Pattern of refund requests may indicate business model disputes');
+        }
+        
+        // NEW: New account increases complexity
+        if (formData.accountStartDate) {
+            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
+            if (accountAge < 0.5) {
+                complexityScore += 1;
+                complexityFactors.push('⚠️ Limited processing history weakens relationship argument');
+            }
         }
         
         if (!formData.terminationDate && !formData.promisedReleaseDate) {
@@ -710,6 +920,24 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         
         return { isComplex, timeline, procedures, complexityFactors, complexityScore };
     };
+    
+    // Helper function to create tooltip
+    const createTooltip = (text) => {
+        return React.createElement('span', { 
+            key: 'tooltip',
+            className: 'hint-tooltip' 
+        }, [
+            React.createElement('span', { 
+                key: 'icon',
+                className: 'tooltip-icon' 
+            }, '?'),
+            React.createElement('span', { 
+                key: 'text',
+                className: 'tooltip-text' 
+            }, text)
+        ]);
+    };
+
     // Render function
     return React.createElement('div', { className: 'app-container' }, [
         React.createElement('div', { key: 'header', className: 'header' }, [
@@ -733,7 +961,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 
                 // Form Content
                 React.createElement('div', { key: 'content', className: 'form-content' }, [
-                    // Tab 1: Account Details
+                    // Tab 1: Account Details (ENHANCED with Account Establishment Fields)
                     currentTab === 0 && React.createElement('div', { key: 'tab1' }, [
                         React.createElement('h2', { key: 'h2' }, 'Account & Situation Details'),
                         React.createElement('p', { key: 'p' }, 'Provide your business information and Stripe account details.'),
@@ -887,12 +1115,182 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             ])
                         ]),
                         
+                        React.createElement('div', { key: 'row6', className: 'form-row' }, [
+                            React.createElement('div', { key: 'business', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Business Type'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'businessType',
+                                    value: formData.businessType,
+                                    onChange: handleChange,
+                                    placeholder: 'e.g., SaaS, E-commerce, Consulting'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'processing', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Processing History'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'processingHistory',
+                                    value: formData.processingHistory,
+                                    onChange: handleChange,
+                                    placeholder: '2 years, 6 months, etc.'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'row7', className: 'form-row' }, [
+                            React.createElement('div', { key: 'dispute', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Historical Dispute Rate (%)'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'historicalDisputeRate',
+                                    value: formData.historicalDisputeRate,
+                                    onChange: handleChange,
+                                    placeholder: '0.5'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'refund', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Refund Rate (%)'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'refundRate',
+                                    value: formData.refundRate,
+                                    onChange: handleChange,
+                                    placeholder: '5.0'
+                                })
+                            ])
+                        ]),
+                        
+                        // NEW Account Establishment Section
+                        React.createElement('h3', { key: 'establishment-title', style: { marginTop: '30px', color: '#2c3e50' } }, 'Account Establishment (Optional - Strengthens Case)'),
+                        
+                        React.createElement('div', { key: 'row8', className: 'form-row' }, [
+                            React.createElement('div', { key: 'start-date', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Account Start Date'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'date',
+                                    name: 'accountStartDate',
+                                    value: formData.accountStartDate,
+                                    onChange: handleChange
+                                })
+                            ]),
+                            React.createElement('div', { key: 'volume', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Total Volume Processed'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'totalVolumeProcessed',
+                                    value: formData.totalVolumeProcessed,
+                                    onChange: handleChange,
+                                    placeholder: '500,000'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'establishment-checkboxes', className: 'checkbox-grid' }, [
+                            React.createElement('div', { 
+                                key: 'prev-issues',
+                                className: `checkbox-item ${formData.previousAccountIssues ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'previousAccountIssues', type: 'checkbox', checked: !formData.previousAccountIssues }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'previousAccountIssues',
+                                    checked: formData.previousAccountIssues,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Prior Account Issues'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Check if account had previous violations or compliance issues.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'compliance',
+                                className: `checkbox-item ${formData.industryCompliance ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'industryCompliance', type: 'checkbox', checked: !formData.industryCompliance }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'industryCompliance',
+                                    checked: formData.industryCompliance,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Industry Compliance'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'PCI DSS, SOC compliance, or other industry-specific certifications.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'customers',
+                                className: `checkbox-item ${formData.repeatCustomerBase ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'repeatCustomerBase', type: 'checkbox', checked: !formData.repeatCustomerBase }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'repeatCustomerBase',
+                                    checked: formData.repeatCustomerBase,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Repeat Customer Base'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Established repeat customers demonstrating business legitimacy.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'licenses',
+                                className: `checkbox-item ${formData.businessLicenses ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'businessLicenses', type: 'checkbox', checked: !formData.businessLicenses }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'businessLicenses',
+                                    checked: formData.businessLicenses,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Business Licenses'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Proper business licensing and registration.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'references',
+                                className: `checkbox-item ${formData.professionalReferences ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'professionalReferences', type: 'checkbox', checked: !formData.professionalReferences }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'professionalReferences',
+                                    checked: formData.professionalReferences,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Professional References'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Bank references, business partner references available.')
+                                ])
+                            ])
+                        ]),
+                        
                         React.createElement('div', { key: 'tip', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Important Note'),
-                            React.createElement('p', { key: 'text' }, 'Only fill in "Account Termination Date" if Stripe actually terminated your account. Many merchants have funds held without termination.')
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Account Establishment Benefits'),
+                            React.createElement('p', { key: 'text' }, 'These optional fields strengthen your case by demonstrating established business legitimacy and long-term relationship with Stripe. Longer account history and higher processing volumes significantly improve legal position.')
                         ])
                     ]),
-                    // Tab 2: Stripe's Stated Reasons (Updated with all article reasons)
+                    
+                    // Tab 2: Stripe's Stated Reasons (REORGANIZED - Custom Reason moved above Specific Violations)
                     currentTab === 1 && React.createElement('div', { key: 'tab2' }, [
                         React.createElement('h2', { key: 'h2' }, 'Stripe\'s Stated Reasons'),
                         React.createElement('p', { key: 'p' }, 'Select the reasons Stripe has given for withholding your funds. Based on the most common patterns from merchant complaints.'),
@@ -1024,6 +1422,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 ])
                             ]),
                             
+                            // MOVED: Custom Reason now above Specific Violations
                             React.createElement('div', { 
                                 key: 'custom',
                                 className: `checkbox-item ${formData.customReason ? 'selected' : ''}`,
@@ -1061,6 +1460,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             ])
                         ]),
                         
+                        // Custom reason text appears immediately after Custom Reason checkbox
                         formData.customReason && React.createElement('div', { key: 'custom-text', className: 'form-group' }, [
                             React.createElement('label', { key: 'label' }, 'Describe Stripe\'s Reason'),
                             React.createElement('textarea', {
@@ -1073,6 +1473,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             })
                         ])
                     ]),
+                    
                     // Tab 3: SSA Violations with Explanations
                     currentTab === 2 && React.createElement('div', { key: 'tab3' }, [
                         React.createElement('h2', { key: 'h2' }, 'SSA Violations (Auto-Selected)'),
@@ -1245,20 +1646,45 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             })
                         ])
                     ]),
-                    // Tab 5: Risk Assessment with Actionable Recommendations
+                    
+                    // Tab 5: UPGRADED Attorney-Level Risk Assessment (REMOVED generic action checkboxes)
                     currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Risk Assessment & Strategy'),
-                        React.createElement('p', { key: 'p' }, 'Analysis of your case strength and recommended actions:'),
+                        React.createElement('h2', { key: 'h2' }, 'Attorney-Level Case Analysis'),
+                        React.createElement('p', { key: 'p' }, 'Professional assessment of your case strength and strategic recommendations:'),
                         
                         (() => {
                             const assessment = getRiskAssessment();
                             const complexity = analyzeCaseComplexity();
+                            const evidenceStrategy = getEvidenceStrategy();
+                            
                             return React.createElement('div', { key: 'assessment' }, [
                                 React.createElement('div', { key: 'score-card', className: `risk-card ${assessment.riskClass}` }, [
                                     React.createElement('h3', { key: 'h3' }, `${assessment.riskLevel} (Score: ${assessment.score}/100)`),
                                     React.createElement('ul', { key: 'factors' }, 
                                         assessment.factors.map((factor, index) => 
                                             React.createElement('li', { key: index }, factor)
+                                        )
+                                    )
+                                ]),
+                                
+                                React.createElement('div', { key: 'strategy-card', className: 'risk-card risk-strong' }, [
+                                    React.createElement('h3', { key: 'h3' }, 'Strategic Recommendations'),
+                                    React.createElement('ul', { key: 'recs' }, 
+                                        assessment.recommendations.map((rec, index) => 
+                                            React.createElement('li', { key: index }, rec)
+                                        )
+                                    )
+                                ]),
+                                
+                                evidenceStrategy.length > 0 && React.createElement('div', { key: 'evidence-card', className: 'risk-card risk-moderate' }, [
+                                    React.createElement('h3', { key: 'h3' }, 'Evidence Hierarchy - Priority Order'),
+                                    React.createElement('div', { key: 'evidence-list' },
+                                        evidenceStrategy.map((item, index) => 
+                                            React.createElement('div', { key: index, className: 'evidence-item', style: { marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' } }, [
+                                                React.createElement('strong', { key: 'priority' }, `Priority ${item.priority}: ${item.evidence}`),
+                                                React.createElement('div', { key: 'impact', style: { color: '#28a745', fontSize: '14px' } }, `Impact: ${item.impact}`),
+                                                React.createElement('div', { key: 'action', style: { color: '#6c757d', fontSize: '14px' } }, `Action: ${item.action}`)
+                                            ])
                                         )
                                     )
                                 ]),
@@ -1270,92 +1696,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                             React.createElement('li', { key: index }, factor)
                                         )
                                     )
-                                ]),
-                                
-                                React.createElement('div', { key: 'recommendations', className: 'risk-card risk-strong' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Recommended Strategy'),
-                                    React.createElement('ul', { key: 'recs' }, 
-                                        assessment.recommendations.map((rec, index) => 
-                                            React.createElement('li', { key: index }, rec)
-                                        )
-                                    )
-                                ]),
-                                
-                                React.createElement('div', { key: 'actions', className: 'form-group' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Check Actions to Include in Demand Letter:'),
-                                    React.createElement('div', { key: 'action-checkboxes', className: 'checkbox-grid' }, [
-                                        React.createElement('div', { 
-                                            key: 'gather',
-                                            className: `checkbox-item ${formData.gatherMoreEvidence ? 'selected' : ''}`,
-                                            onClick: () => handleChange({ target: { name: 'gatherMoreEvidence', type: 'checkbox', checked: !formData.gatherMoreEvidence }})
-                                        }, [
-                                            React.createElement('input', {
-                                                key: 'input',
-                                                type: 'checkbox',
-                                                name: 'gatherMoreEvidence',
-                                                checked: formData.gatherMoreEvidence,
-                                                onChange: handleChange
-                                            }),
-                                            React.createElement('div', { key: 'content' }, [
-                                                React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Gather Additional Evidence'),
-                                                React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Commit to providing additional documentation of business compliance.')
-                                            ])
-                                        ]),
-                                        
-                                        React.createElement('div', { 
-                                            key: 'consult',
-                                            className: `checkbox-item ${formData.consultAttorney ? 'selected' : ''}`,
-                                            onClick: () => handleChange({ target: { name: 'consultAttorney', type: 'checkbox', checked: !formData.consultAttorney }})
-                                        }, [
-                                            React.createElement('input', {
-                                                key: 'input',
-                                                type: 'checkbox',
-                                                name: 'consultAttorney',
-                                                checked: formData.consultAttorney,
-                                                onChange: handleChange
-                                            }),
-                                            React.createElement('div', { key: 'content' }, [
-                                                React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Legal Consultation'),
-                                                React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Mention legal consultation regarding arbitration strategy.')
-                                            ])
-                                        ]),
-                                        
-                                        React.createElement('div', { 
-                                            key: 'document',
-                                            className: `checkbox-item ${formData.documentCommunications ? 'selected' : ''}`,
-                                            onClick: () => handleChange({ target: { name: 'documentCommunications', type: 'checkbox', checked: !formData.documentCommunications }})
-                                        }, [
-                                            React.createElement('input', {
-                                                key: 'input',
-                                                type: 'checkbox',
-                                                name: 'documentCommunications',
-                                                checked: formData.documentCommunications,
-                                                onChange: handleChange
-                                            }),
-                                            React.createElement('div', { key: 'content' }, [
-                                                React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Document Communications'),
-                                                React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Comprehensive documentation of all Stripe communications.')
-                                            ])
-                                        ]),
-                                        
-                                        React.createElement('div', { 
-                                            key: 'prepare',
-                                            className: `checkbox-item ${formData.prepareForArbitration ? 'selected' : ''}`,
-                                            onClick: () => handleChange({ target: { name: 'prepareForArbitration', type: 'checkbox', checked: !formData.prepareForArbitration }})
-                                        }, [
-                                            React.createElement('input', {
-                                                key: 'input',
-                                                type: 'checkbox',
-                                                name: 'prepareForArbitration',
-                                                checked: formData.prepareForArbitration,
-                                                onChange: handleChange
-                                            }),
-                                            React.createElement('div', { key: 'content' }, [
-                                                React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Prepare for Arbitration'),
-                                                React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Active preparation for AAA arbitration proceedings.')
-                                            ])
-                                        ])
-                                    ])
                                 ])
                             ]);
                         })(),
@@ -1465,19 +1805,3 @@ try {
     console.error('Error rendering component:', error);
     document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
 }
-    // Helper function to create tooltip
-    const createTooltip = (text) => {
-        return React.createElement('span', { 
-            key: 'tooltip',
-            className: 'hint-tooltip' 
-        }, [
-            React.createElement('span', { 
-                key: 'icon',
-                className: 'tooltip-icon' 
-            }, '?'),
-            React.createElement('span', { 
-                key: 'text',
-                className: 'tooltip-text' 
-            }, text)
-        ]);
-    };
