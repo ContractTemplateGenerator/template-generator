@@ -13,7 +13,7 @@ window.generateWordDoc = function(documentText, formData) {
 <style>
   body {
     font-family: Times, "Times New Roman", serif;
-    font-size: 12pt;
+    font-size: 11pt;
     line-height: 1.5;
     margin: 0;
   }

@@ -788,8 +788,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
             'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
-            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=AMERICAN ARBITRATION ASSOCIATION|$)/s,
-            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?ARBITRATION VENUE:/s,
+            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=AMERICAN ARBITRATION ASSOCIATION)/s,
+            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES)/s,
             'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY)/s
         };
         
@@ -1007,7 +1007,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 initial: 950,
                 final: 825,
                 total: 1775,
-                expedited: amount < 25000,
+                expedited: true, // Available for claims under $75,000
                 schedule: 'Standard'
             };
         } else if (amount < 150000) {
@@ -1034,11 +1034,27 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 expedited: false,
                 schedule: 'Standard'
             };
-        } else {
+        } else if (amount < 1000000) {
             return {
                 initial: 5650,
                 final: 7025,
                 total: 12675,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        } else if (amount < 10000000) {
+            return {
+                initial: 7925,
+                final: 8725,
+                total: 16650,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        } else {
+            return {
+                initial: 11325,
+                final: 14150,
+                total: 25475, // Base amount - additional fees may apply for amounts above $10M
                 expedited: false,
                 schedule: 'Standard'
             };
@@ -2188,6 +2204,34 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         React.createElement('div', { key: 'strategy-tip', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'Strategic Timing'),
                             React.createElement('p', { key: 'text' }, 'Including the arbitration demand often leads to faster settlements during the 30-day notice period - many companies prefer to resolve rather than face formal arbitration proceedings. However, you must be prepared to actually file if Stripe doesn\'t respond appropriately.')
+                        ]),
+                        
+                        React.createElement('div', { key: 'timeline', className: 'tip-box info' }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
+                            React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
+                            (() => {
+                                const fees = calculateAAAfees();
+                                const complexity = analyzeCaseComplexity();
+                                return [
+                                    React.createElement('p', { key: 'fees' }, [
+                                        React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '),
+                                        `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
+                                        fees.expedited ? ' (Expedited procedures available)' : ''
+                                    ]),
+                                    React.createElement('p', { key: 'timeline' }, [
+                                        React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
+                                        complexity.timeline
+                                    ]),
+                                    React.createElement('p', { key: 'procedures' }, [
+                                        React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
+                                        complexity.procedures
+                                    ]),
+                                    fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
+                                        React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
+                                        'Claims under $25K qualify for streamlined, document-only procedures that are faster and cheaper.'
+                                    ])
+                                ];
+                            })()
                         ])
                     ]),
                     
@@ -2246,35 +2290,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     )
                                 ])
                             ]);
-                        })(),
-                        
-                        React.createElement('div', { key: 'timeline', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
-                            React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
-                            (() => {
-                                const fees = calculateAAAfees();
-                                const complexity = analyzeCaseComplexity();
-                                return [
-                                    React.createElement('p', { key: 'fees' }, [
-                                        React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '),
-                                        `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
-                                        fees.expedited ? ' (Expedited procedures available)' : ''
-                                    ]),
-                                    React.createElement('p', { key: 'timeline' }, [
-                                        React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
-                                        complexity.timeline
-                                    ]),
-                                    React.createElement('p', { key: 'procedures' }, [
-                                        React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
-                                        complexity.procedures
-                                    ]),
-                                    fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
-                                        React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
-                                        'Claims under $25K qualify for streamlined, document-only procedures that are faster and cheaper.'
-                                    ])
-                                ];
-                            })()
-                        ])
+                        })()
                     ])
                 ]),
                 
