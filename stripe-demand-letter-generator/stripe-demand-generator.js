@@ -2026,24 +2026,22 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Filing Document (SUPER SIMPLIFIED FOR TESTING)
+                    // Tab 6: Arbitration Filing Document (ULTRA MINIMAL - EXACTLY LIKE WORKING TABS)
                     currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
                         React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
-                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand.'),
+                        React.createElement('p', { key: 'p' }, 'Generate arbitration demand document.'),
                         
-                        React.createElement('div', { key: 'simple-option', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Attach to Demand Letter as Exhibit A'),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'checkbox',
-                                name: 'includeArbitrationDraft',
-                                checked: formData.includeArbitrationDraft,
-                                onChange: handleChange
-                            })
-                        ]),
-                        
-                        React.createElement('div', { key: 'simple-info', className: 'tip-box info' }, [
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs.')
+                        React.createElement('div', { key: 'row1', className: 'form-row' }, [
+                            React.createElement('div', { key: 'attach', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Include as Exhibit A'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'includeArbitrationDraft',
+                                    checked: formData.includeArbitrationDraft,
+                                    onChange: handleChange
+                                })
+                            ])
                         ])
                     ])
                 ]),
