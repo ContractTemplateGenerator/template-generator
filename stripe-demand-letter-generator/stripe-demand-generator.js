@@ -100,6 +100,7 @@ const StripeDemandGenerator = () => {
         retroactiveRisk: false,
         communicationBlackout: false,
         chargebackLoop: false,
+        specificViolationsIdentified: false, // New field
         customReason: false,
         customReasonText: '',
         
@@ -154,19 +155,23 @@ const StripeDemandGenerator = () => {
         const claims = [
             {
                 name: 'Breach of Contract',
-                explanation: 'Stripe failed to follow SSA provisions regarding fund processing and release timelines. This is your strongest claim when Stripe doesn\'t follow their own contract terms.'
+                explanation: 'This is your primary claim when Stripe fails to follow their own contract terms regarding fund processing, release timelines, or promised actions.',
+                tooltip: 'Stripe failed to follow SSA provisions regarding fund processing and release timelines. This is your strongest claim when Stripe doesn\'t follow their own contract terms.'
             },
             {
                 name: 'Conversion (wrongful retention of funds)',
-                explanation: 'Wrongful retention of your property (the withheld funds) beyond reasonable business necessity. This treats your funds as stolen property.'
+                explanation: 'This treats your withheld funds as stolen property. It\'s powerful because it can lead to punitive damages in egregious cases.',
+                tooltip: 'Wrongful retention of your property (the withheld funds) beyond reasonable business necessity. This treats your funds as stolen property.'
             },
             {
                 name: 'Breach of Implied Covenant of Good Faith and Fair Dealing',
-                explanation: 'Even when contracts give discretion, it must be exercised reasonably. This prevents Stripe from using their power arbitrarily.'
+                explanation: 'This prevents Stripe from exercising their discretionary powers arbitrarily or in bad faith, even when their contract gives them broad authority.',
+                tooltip: 'Even when contracts give discretion, it must be exercised reasonably. This prevents Stripe from using their power arbitrarily.'
             },
             {
                 name: 'Violation of California Business & Professions Code § 17200',
-                explanation: 'California\'s Unfair Competition Law prohibits unfair business practices. This allows recovery of profits Stripe earned from wrongfully holding your funds.'
+                explanation: 'California\'s "Unfair Competition Law" allows you to recover profits Stripe earned from improperly holding your funds, including interest earned.',
+                tooltip: 'California\'s Unfair Competition Law prohibits unfair business practices. This allows recovery of profits Stripe earned from wrongfully holding your funds.'
             }
         ];
         
@@ -293,8 +298,8 @@ I am writing regarding Stripe's continued withholding of $${formData.withheldAmo
 FACTUAL BACKGROUND
 
 ${formData.terminationDate ? 
-    `On ${formData.terminationDate}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without identifying any specific violations of your Services Agreement.` :
-    `Stripe initiated a hold on my merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without identifying any specific violations of your Services Agreement or providing clear justification for the withholding.`
+    `On ${formData.terminationDate}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement' : ''}.` :
+    `Stripe initiated a hold on my merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement or providing clear justification for the withholding' : ''}.`
 } ${formData.promisedReleaseDate ? `At the time, Stripe promised to release the withheld funds by ${formData.promisedReleaseDate}.` : ''}
 
 ${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.
@@ -339,7 +344,7 @@ To resolve this matter without proceeding to arbitration, I demand the following
 2. Accounting of any interest earned on these funds while held by Stripe
 3. Written confirmation of the release timeline
 
-If I do not receive a satisfactory response by ${dates.responseDate}, I will proceed with filing an arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
+If I do not receive a satisfactory response by ${dates.responseDate}, I intend to file an arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
 
 I look forward to your prompt attention to this matter.
 
@@ -401,25 +406,32 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         setCurrentTab(index);
     };
 
-    // Highlighting functionality
+    // Highlighting functionality - More granular highlighting
     const getSectionToHighlight = () => {
+        if (!lastChanged) return null;
+        
         switch (currentTab) {
             case 0: // Account Details
                 if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
-                    return 'header';
+                    return 'header-info';
                 }
                 if (['terminationDate', 'promisedReleaseDate'].includes(lastChanged)) {
-                    return 'background';
+                    return 'background-dates';
                 }
                 return null;
             case 1: // Stripe's Reasons
                 if (lastChanged && formData[lastChanged]) {
-                    return 'background';
+                    return 'stripe-reasons';
                 }
                 return null;
             case 3: // Evidence
                 if (lastChanged && formData[lastChanged]) {
-                    return 'evidence';
+                    return 'evidence-section';
+                }
+                return null;
+            case 4: // Risk Assessment
+                if (lastChanged && ['gatherMoreEvidence', 'consultAttorney', 'documentCommunications', 'prepareForArbitration'].includes(lastChanged)) {
+                    return 'recommended-actions';
                 }
                 return null;
             default:
@@ -427,18 +439,20 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         }
     };
 
-    // Create highlighted version of the text
+    // Create highlighted version of the text - More specific targeting
     const createHighlightedText = () => {
         const sectionToHighlight = getSectionToHighlight();
         if (!sectionToHighlight) return documentText;
         
         let highlightedText = documentText;
         
-        // Define regex patterns for different sections
+        // Define more specific regex patterns for granular highlighting
         const sections = {
-            header: /Re:.*?\n\nTo Whom It May Concern:/s,
-            background: /FACTUAL BACKGROUND.*?(?=LEGAL CLAIMS)/s,
-            evidence: /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION|RECOMMENDED ACTIONS)/s
+            'header-info': /Re:.*?Amount at Issue: \$\[AMOUNT\]/s,
+            'background-dates': /On \[DATE\].*?(?=\n\n[A-Z])/s,
+            'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
+            'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION|RECOMMENDED ACTIONS)/s,
+            'recommended-actions': /RECOMMENDED ACTIONS.*?(?=DEMAND FOR RESOLUTION)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -460,8 +474,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 }
             }, 100);
             
-            // Clear highlighting after 3 seconds
-            setTimeout(() => setLastChanged(null), 3000);
+            // Clear highlighting after 8 seconds (longer duration)
+            setTimeout(() => setLastChanged(null), 8000);
         }
     }, [lastChanged]);
 
@@ -579,21 +593,122 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         return { riskLevel, riskClass, factors, recommendations, score };
     };
 
-    // Helper function to create tooltip
-    const createTooltip = (text) => {
-        return React.createElement('span', { 
-            key: 'tooltip',
-            className: 'hint-tooltip' 
-        }, [
-            React.createElement('span', { 
-                key: 'icon',
-                className: 'tooltip-icon' 
-            }, '?'),
-            React.createElement('span', { 
-                key: 'text',
-                className: 'tooltip-text' 
-            }, text)
-        ]);
+    // Calculate AAA filing fees based on actual 2025 fee schedule
+    const calculateAAAfees = () => {
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        
+        if (amount < 75000) {
+            return {
+                initial: 950,
+                final: 825,
+                total: 1775,
+                expedited: amount < 25000,
+                schedule: 'Standard'
+            };
+        } else if (amount < 150000) {
+            return {
+                initial: 1975,
+                final: 1425,
+                total: 3400,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        } else if (amount < 300000) {
+            return {
+                initial: 2975,
+                final: 2275,
+                total: 5250,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        } else if (amount < 500000) {
+            return {
+                initial: 4525,
+                final: 3975,
+                total: 8500,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        } else {
+            return {
+                initial: 5650,
+                final: 7025,
+                total: 12675,
+                expedited: false,
+                schedule: 'Standard'
+            };
+        }
+    };
+
+    // Analyze case complexity
+    const analyzeCaseComplexity = () => {
+        let complexityScore = 0;
+        const complexityFactors = [];
+        
+        // Simple factors (reduce complexity)
+        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
+            complexityScore -= 2;
+            complexityFactors.push('✅ Clear broken promise simplifies case');
+        }
+        
+        if (formData.lowChargebacks) {
+            complexityScore -= 1;
+            complexityFactors.push('✅ Clean payment history reduces complexity');
+        }
+        
+        // Complex factors (increase complexity)
+        if (formData.chargebackLoop) {
+            complexityScore += 3;
+            complexityFactors.push('⚠️ Chargeback loops create complex factual disputes');
+        }
+        
+        if (formData.businessModelIssue) {
+            complexityScore += 2;
+            complexityFactors.push('⚠️ Business model disputes require extensive documentation');
+        }
+        
+        if (!formData.terminationDate && !formData.promisedReleaseDate) {
+            complexityScore += 2;
+            complexityFactors.push('⚠️ Lack of clear timelines complicates legal arguments');
+        }
+        
+        const selectedReasons = [
+            formData.highRisk, formData.elevatedDispute, formData.policyViolation,
+            formData.riskAssessment, formData.chargebackLiability, formData.accountReview,
+            formData.businessModelIssue, formData.indefiniteHold, formData.shiftingTimelines,
+            formData.retroactiveRisk, formData.communicationBlackout, formData.chargebackLoop
+        ].filter(Boolean).length;
+        
+        if (selectedReasons > 4) {
+            complexityScore += 1;
+            complexityFactors.push('⚠️ Multiple Stripe reasons require comprehensive response');
+        }
+        
+        // Amount-based complexity
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        if (amount > 100000) {
+            complexityScore += 1;
+            complexityFactors.push('⚠️ High-value disputes often involve more extensive proceedings');
+        }
+        
+        // Determine complexity level
+        let isComplex, timeline, procedures;
+        
+        if (complexityScore <= -1) {
+            isComplex = false;
+            timeline = amount < 25000 ? '60-90 days (expedited)' : '4-6 months (standard)';
+            procedures = 'Likely document-only resolution';
+        } else if (complexityScore <= 2) {
+            isComplex = false;
+            timeline = amount < 25000 ? '90-120 days' : '6-9 months';
+            procedures = 'May require hearing but straightforward';
+        } else {
+            isComplex = true;
+            timeline = '9-18 months';
+            procedures = 'Likely requires extensive discovery and hearings';
+        }
+        
+        return { isComplex, timeline, procedures, complexityFactors, complexityScore };
     };
     // Render function
     return React.createElement('div', { className: 'app-container' }, [
@@ -925,6 +1040,24 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Other Reason'),
                                     React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Stripe provided a different reason not listed above.')
                                 ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'specific-violations',
+                                className: `checkbox-item ${formData.specificViolationsIdentified ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'specificViolationsIdentified', type: 'checkbox', checked: !formData.specificViolationsIdentified }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'specificViolationsIdentified',
+                                    checked: formData.specificViolationsIdentified,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Stripe Identified Specific Violations'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Check this if Stripe actually provided specific policy violations or SSA breaches (rather than vague "risk" language).')
+                                ])
                             ])
                         ]),
                         
@@ -950,7 +1083,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 React.createElement('div', { key: index, className: 'legal-claim' }, [
                                     React.createElement('h4', { key: 'title' }, [
                                         claim.name,
-                                        createTooltip(claim.explanation)
+                                        createTooltip(claim.tooltip)
                                     ]),
                                     React.createElement('p', { key: 'desc' }, claim.explanation)
                                 ])
@@ -1119,11 +1252,21 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         
                         (() => {
                             const assessment = getRiskAssessment();
+                            const complexity = analyzeCaseComplexity();
                             return React.createElement('div', { key: 'assessment' }, [
                                 React.createElement('div', { key: 'score-card', className: `risk-card ${assessment.riskClass}` }, [
                                     React.createElement('h3', { key: 'h3' }, `${assessment.riskLevel} (Score: ${assessment.score}/100)`),
                                     React.createElement('ul', { key: 'factors' }, 
                                         assessment.factors.map((factor, index) => 
+                                            React.createElement('li', { key: index }, factor)
+                                        )
+                                    )
+                                ]),
+                                
+                                React.createElement('div', { key: 'complexity-card', className: `risk-card ${complexity.isComplex ? 'risk-moderate' : 'risk-strong'}` }, [
+                                    React.createElement('h3', { key: 'h3' }, `Case Complexity: ${complexity.isComplex ? 'Complex' : 'Straightforward'}`),
+                                    React.createElement('ul', { key: 'complexity-factors' }, 
+                                        complexity.complexityFactors.map((factor, index) => 
                                             React.createElement('li', { key: index }, factor)
                                         )
                                     )
@@ -1218,10 +1361,31 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         })(),
                         
                         React.createElement('div', { key: 'timeline', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs'),
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
                             React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
-                            React.createElement('p', { key: 'fees' }, React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '), formData.withheldAmount && parseFloat(formData.withheldAmount.replace(/[^\d.]/g, '')) < 25000 ? 'Under $2,000 for expedited procedures' : '$2,900+ for standard procedures'),
-                            React.createElement('p', { key: 'timeline' }, React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), '60-90 days for expedited cases, 6-12 months for complex cases')
+                            (() => {
+                                const fees = calculateAAAfees();
+                                const complexity = analyzeCaseComplexity();
+                                return [
+                                    React.createElement('p', { key: 'fees' }, [
+                                        React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '),
+                                        `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
+                                        fees.expedited ? ' (Expedited procedures available)' : ''
+                                    ]),
+                                    React.createElement('p', { key: 'timeline' }, [
+                                        React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
+                                        complexity.timeline
+                                    ]),
+                                    React.createElement('p', { key: 'procedures' }, [
+                                        React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
+                                        complexity.procedures
+                                    ]),
+                                    fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
+                                        React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
+                                        'Claims under $25K qualify for streamlined, document-only procedures that are faster and cheaper.'
+                                    ])
+                                ];
+                            })()
                         ])
                     ])
                 ]),
@@ -1301,3 +1465,19 @@ try {
     console.error('Error rendering component:', error);
     document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
 }
+    // Helper function to create tooltip
+    const createTooltip = (text) => {
+        return React.createElement('span', { 
+            key: 'tooltip',
+            className: 'hint-tooltip' 
+        }, [
+            React.createElement('span', { 
+                key: 'icon',
+                className: 'tooltip-icon' 
+            }, '?'),
+            React.createElement('span', { 
+                key: 'text',
+                className: 'tooltip-text' 
+            }, text)
+        ]);
+    };
