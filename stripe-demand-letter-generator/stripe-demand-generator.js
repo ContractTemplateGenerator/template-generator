@@ -2026,67 +2026,24 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Filing Document (FULLY SIMPLIFIED)
+                    // Tab 6: Arbitration Filing Document (SUPER SIMPLIFIED FOR TESTING)
                     currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
                         React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
-                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand and optionally attach it to your demand letter.'),
+                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand.'),
                         
-                        React.createElement('div', { key: 'attachment-toggle', className: 'tip-box' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Attachment Options'),
-                            React.createElement('div', { 
-                                key: 'include-arb',
-                                className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'includeArbitrationDraft',
-                                    checked: formData.includeArbitrationDraft,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Attach to Demand Letter as Exhibit A'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Include this arbitration demand with your demand letter to demonstrate preparedness.')
-                                ])
-                            ])
+                        React.createElement('div', { key: 'simple-option', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Attach to Demand Letter as Exhibit A'),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: 'checkbox',
+                                name: 'includeArbitrationDraft',
+                                checked: formData.includeArbitrationDraft,
+                                onChange: handleChange
+                            })
                         ]),
                         
-                        React.createElement('div', { key: 'info-card', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'About This Document'),
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules.')
-                        ]),
-                        
-                        React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
-                            React.createElement('h3', { key: 'h3' }, 'Filing Information'),
-                            React.createElement('p', { key: 'fees' }, 'AAA Filing Fees: See calculator based on your claim amount'),
-                            React.createElement('p', { key: 'location' }, 'Hearing Location: Los Angeles, CA or Virtual')
-                        ]),
-                        
-                        React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
-                            React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
-                            React.createElement('ul', { key: 'claims-list' }, [
-                                React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
-                                React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
-                                React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
-                                React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
-                            ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
-                            React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
-                            React.createElement('ol', { key: 'steps' }, [
-                                React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
-                                React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
-                                React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
-                                React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
-                                React.createElement('li', { key: '5' }, 'Prepare for case management conference')
-                            ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'disclaimer', className: 'tip-box warning' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, '⚠️ Legal Disclaimer'),
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand template is for educational purposes only. While designed to include necessary legal elements, you should have any arbitration filing reviewed by qualified legal counsel before submission.')
+                        React.createElement('div', { key: 'simple-info', className: 'tip-box info' }, [
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs.')
                         ])
                     ])
                 ]),
