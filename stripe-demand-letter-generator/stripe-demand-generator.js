@@ -137,8 +137,7 @@ const StripeDemandGenerator = () => {
         { id: 'reasons', label: 'Stripe\'s Reasons' },
         { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
-        { id: 'assessment', label: 'Risk Assessment' },
-        { id: 'arbitration', label: 'Arbitration Filing' }
+        { id: 'assessment', label: 'Risk Assessment' }
     ];
     
     // Handle input changes
@@ -635,22 +634,15 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         return letter;
     };
     
-    // Get current document text - switch based on tab
-    const documentText = currentTab === 5 ? generateArbitrationDemand() : generateDemandLetter();
+    // Get current document text - show arbitration demand if checkbox is checked
+    const documentText = formData.includeArbitrationDraft ? "Arb demand" : generateDemandLetter();
 
     // Copy to clipboard function
     const copyToClipboard = () => {
         let finalDocumentText = documentText;
         
-        // If on demand letter tab and arb demand attachment is enabled, combine both documents
-        if (currentTab !== 5 && formData.includeArbitrationDraft) {
-            const arbDemand = generateArbitrationDemand();
-            finalDocumentText = documentText + '\n\n' + '='.repeat(50) + '\nEXHIBIT A\nDRAFT ARBITRATION DEMAND\n' + '='.repeat(50) + '\n\n' + arbDemand;
-        }
-        
         navigator.clipboard.writeText(finalDocumentText).then(() => {
-            const docType = currentTab === 5 ? 'Arbitration demand' : 
-                           (formData.includeArbitrationDraft && currentTab !== 5 ? 'Demand letter with arbitration demand attachment' : 'Demand letter');
+            const docType = formData.includeArbitrationDraft ? 'Arbitration demand' : 'Demand letter';
             alert(`${docType} copied to clipboard!`);
         }).catch(err => {
             console.error('Failed to copy: ', err);
@@ -671,15 +663,9 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             
             let finalDocumentText = documentText;
             
-            // If on demand letter tab and arb demand attachment is enabled, combine both documents
-            if (currentTab !== 5 && formData.includeArbitrationDraft) {
-                const arbDemand = generateArbitrationDemand();
-                finalDocumentText = documentText + '\f\n\nEXHIBIT A\nDRAFT ARBITRATION DEMAND\n\n' + arbDemand;
-            }
-            
             window.generateWordDoc(finalDocumentText, {
-                documentTitle: currentTab === 5 ? "AAA Arbitration Demand" : "Stripe Demand Letter" + (formData.includeArbitrationDraft && currentTab !== 5 ? " with Arbitration Demand" : ""),
-                fileName: `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-${currentTab === 5 ? 'Arbitration-Demand' : 'Demand-Letter'}${formData.includeArbitrationDraft && currentTab !== 5 ? '-with-Exhibit-A' : ''}`
+                documentTitle: formData.includeArbitrationDraft ? "AAA Arbitration Demand" : "Stripe Demand Letter",
+                fileName: `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-${formData.includeArbitrationDraft ? 'Arbitration-Demand' : 'Demand-Letter'}`
             });
         } catch (error) {
             console.error("Error in downloadAsWord:", error);
@@ -734,16 +720,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 }
                 return null;
             case 4: // Risk Assessment tab
-                return null;
-            case 5: // Arbitration Filing tab
-                if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
-                    return 'arb-header-info';
-                }
-                if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory'].includes(lastChanged)) {
-                    return 'arb-background';
-                }
                 if (lastChanged === 'includeArbitrationDraft') {
-                    return 'attachment-section';
+                    return 'arb-test-section';
                 }
                 return null;
             default:
@@ -766,10 +744,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
             'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
-            'attachment-section': /Attached hereto as Exhibit A.*?legal remedies\./s,
-            // Arbitration demand sections
-            'arb-header-info': /Case Title:.*?EXPEDITED PROCEDURES REQUESTED: [^\n]*/s,
-            'arb-background': /NATURE OF DISPUTE.*?(?=STATEMENT OF CLAIMS)/s
+            'arb-test-section': /Arb demand/
         };
         
         if (sections[sectionToHighlight]) {
@@ -2023,11 +1998,19 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     ])
                                 ];
                             })()
+                        ]),
+                        
+                        React.createElement('div', { key: 'arb-test', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Generate Arbitration Demand (Test)'),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: 'checkbox',
+                                name: 'includeArbitrationDraft',
+                                checked: formData.includeArbitrationDraft,
+                                onChange: handleChange
+                            })
                         ])
-                    ]),
-                    
-                    // Tab 6: Arbitration Filing Document (ABSOLUTE SIMPLEST)
-                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, 'This is Tab 6 - Arbitration Filing Document')
+                    ])
                 ]),
                 
                 // Navigation Buttons
@@ -2078,8 +2061,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                     React.createElement('div', { key: 'header', className: 'preview-header' }, [
                         React.createElement('h2', { key: 'title' }, 'Live Preview'),
                         React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 
-                            currentTab === 5 ? 'Your AAA arbitration demand' : 
-                            `Your demand letter with 30-day arbitration notice${formData.includeArbitrationDraft ? ' + Exhibit A (arbitration demand)' : ''}`
+                            formData.includeArbitrationDraft ? 'Your AAA arbitration demand' : 
+                            'Your demand letter with 30-day arbitration notice'
                         )
                     ]),
                     React.createElement('div', { 
