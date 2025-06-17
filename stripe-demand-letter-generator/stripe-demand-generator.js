@@ -127,8 +127,18 @@ const StripeDemandGenerator = () => {
         
         // Tab 5: Legal Strategy & Timeline
         responseDeadline: 14,
-        includeArbitrationDraft: false, // NEW - toggle to include arb demand attachment
-        expeditedProcedures: false
+        
+        // NEW Tab 5: Arbitration Demand Options
+        includeArbitrationDraft: false, // Moved from previous tab 
+        expeditedProcedures: true, // Default to true for most cases
+        claimPunitiveDamages: false,
+        includeAttorneyFees: true, // Default to true since California allows it
+        includeInterestOnFunds: true, // Default to true - always claim this
+        specificDamagesAmount: '', // Additional damages beyond withheld amount
+        injunctiveRelief: false, // Demand immediate fund release
+        additionalClaims: '', // Custom additional claims
+        arbitrationVenue: 'Los Angeles', // Default venue
+        hearingPreference: 'document-only' // Default for efficiency
     });
 
     // Tab configuration
@@ -137,6 +147,7 @@ const StripeDemandGenerator = () => {
         { id: 'reasons', label: 'Stripe\'s Reasons' },
         { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
+        { id: 'arbitration', label: 'Arbitration Demand' },
         { id: 'assessment', label: 'Risk Assessment' }
     ];
     
@@ -348,10 +359,34 @@ const StripeDemandGenerator = () => {
         return strategies;
     };
 
-    // Generate the arbitration demand document (SIMPLIFIED TO PREVENT ERRORS)
+    // Generate the arbitration demand document (ENHANCED - longer and more customizable)
     const generateArbitrationDemand = () => {
         try {
             const dates = calculateDates();
+            const { claims, violations } = getAutoSelectedClaims();
+            const establishmentBenefits = getAccountEstablishmentBenefits();
+            
+            // Calculate total damages
+            const withheldAmount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+            const additionalDamages = formData.specificDamagesAmount ? 
+                parseFloat(formData.specificDamagesAmount.replace(/[^\d.]/g, '')) : 0;
+            const totalAmount = withheldAmount + additionalDamages;
+            
+            // Build factual background
+            const reasons = [];
+            if (formData.highRisk) reasons.push('designated as "high risk" without specific evidence');
+            if (formData.elevatedDispute) reasons.push('claimed elevated dispute rate without providing actual metrics');
+            if (formData.policyViolation) reasons.push('alleged policy violations without identifying specific violations');
+            if (formData.riskAssessment) reasons.push('ongoing risk assessment without timeline or completion criteria');
+            if (formData.chargebackLiability) reasons.push('ongoing chargeback liability concerns beyond reasonable windows');
+            if (formData.accountReview) reasons.push('account review in progress without specific timeline');
+            if (formData.businessModelIssue) reasons.push('retroactive business model concerns despite initial approval');
+            if (formData.indefiniteHold) reasons.push('indefinite fund holding without clear resolution criteria');
+            if (formData.shiftingTimelines) reasons.push('continuously shifting payout timelines without explanation');
+            if (formData.retroactiveRisk) reasons.push('retroactive risk designation after processing payments');
+            if (formData.communicationBlackout) reasons.push('communication blackout and unresponsive support');
+            if (formData.chargebackLoop) reasons.push('creating chargeback loops that worsen dispute metrics');
+            if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
             
             let demand = `AMERICAN ARBITRATION ASSOCIATION
 COMMERCIAL ARBITRATION RULES
@@ -373,7 +408,12 @@ FROM: ${formData.contactName || '[CONTACT NAME]'}
 
 DATE: ${dates.letterDate}
 
-EXPEDITED PROCEDURES REQUESTED: YES
+EXPEDITED PROCEDURES REQUESTED: ${formData.expeditedProcedures ? 'YES' : 'NO'}
+
+HEARING PREFERENCE: ${formData.hearingPreference === 'document-only' ? 'DOCUMENTS ONLY' : 
+                        formData.hearingPreference === 'telephone' ? 'TELEPHONE HEARING' : 'IN-PERSON HEARING'}
+
+ARBITRATION VENUE: ${formData.arbitrationVenue}
 
 PARTIES
 
@@ -390,27 +430,80 @@ RESPONDENTS:
 
 NATURE OF DISPUTE
 
-This dispute arises from Respondents' breach of the Stripe Services Agreement and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant.
+This dispute arises from Respondents' systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondents' actions.` : ''} 
+
+This case represents a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
+
+FACTUAL BACKGROUND
+
+${establishmentBenefits.length > 0 ? 
+    establishmentBenefits.join('. ') + '. ' : ''
+}${formData.terminationDate ? 
+    `On ${formData.terminationDate}, Respondents abruptly terminated Claimant's merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement' : ''}.` :
+    `Respondents initiated an indefinite hold on Claimant's merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement or providing clear justification for the withholding' : ''}.`
+} ${formData.promisedReleaseDate ? `At the time, Respondents promised to release the withheld funds by ${formData.promisedReleaseDate}, a promise they have since broken.` : ''}
+
+Prior to this action, Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.${formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1 ? ` This dispute rate is well below the industry standard of 0.75%, yet Respondents continue to characterize Claimant as "high risk."` : ''}
+
+${formData.shiftingTimelines || formData.shiftingDeadlines ? 
+    'Since the initial fund hold, Respondents have engaged in a pattern of extending promised release dates without justification, creating what can only be characterized as an indefinite withholding scheme.' : ''}
+
+${formData.communicationBlackout ? 
+    'Following the fund hold, Respondents\' support became unresponsive, providing only canned responses or complete silence to legitimate inquiries about fund release timelines and justifications.' : ''}
+
+${formData.chargebackLoop ? 
+    'Perversely, Respondents\' withholding of funds has prevented Claimant from fulfilling customer orders, directly causing the very customer disputes that Respondents now cite as justification for continued withholding.' : ''}
+
+The total amount unlawfully withheld is $${totalAmount.toLocaleString()}, consisting of $${withheldAmount.toLocaleString()} in customer payments${additionalDamages > 0 ? ` and $${additionalDamages.toLocaleString()} in additional business damages including ${formData.specificDamagesAmount ? 'emergency financing costs, lost sales, and other consequential damages' : 'business losses'}` : ''}.
 
 STATEMENT OF CLAIMS
 
 COUNT I: BREACH OF CONTRACT
 
-Claimant and Respondents entered into the Stripe Services Agreement, whereby Respondents agreed to process payment transactions and release funds according to the terms specified therein.
+Claimant and Respondents entered into the Stripe Services Agreement, whereby Respondents agreed to process payment transactions and release funds according to specified terms and timelines. The SSA does not grant Respondents unlimited discretion to withhold merchant funds indefinitely based on subjective "risk" assessments.
 
-Respondents have materially breached the SSA by withholding funds for an unreasonable period without contractual authority.
+Respondents have materially breached the SSA by:
+a) Withholding funds for an unreasonable period without contractual authority;
+b) Failing to provide specific justification for fund withholding as required by good faith performance;
+c) ${formData.promisedReleaseDate ? `Breaking their specific promise to release funds by ${formData.promisedReleaseDate};` : 'Continuously extending promised release dates without reasonable justification;'}
+d) Applying retroactive "risk" designations to previously approved business models;
+e) ${formData.communicationBlackout ? 'Failing to maintain reasonable communication regarding fund status and release timelines.' : 'Exercising discretionary powers in bad faith and without reasonable basis.'}
 
 COUNT II: CONVERSION
 
-The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided.
+The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided. Respondents have wrongfully exercised dominion over these funds beyond any reasonable period necessary for legitimate risk management.
+
+Conversion is established by Respondents' intentional exercise of dominion or control over Claimant's property in a manner inconsistent with Claimant's rights. ${formData.promisedReleaseDate ? `Respondents' broken promise to release funds by ${formData.promisedReleaseDate} demonstrates intentional interference with Claimant's property rights.` : 'Respondents\' indefinite withholding without clear resolution criteria constitutes intentional deprivation of Claimant\'s property.'}
 
 COUNT III: BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING
 
-Respondents have violated this covenant by exercising their discretionary powers under the SSA arbitrarily and without reasonable basis.
+Every contract contains an implied covenant that neither party will act to frustrate the other party's right to receive the benefits of the agreement. Respondents have violated this covenant by:
+
+a) Exercising their discretionary powers under the SSA arbitrarily and capriciously;
+b) Applying subjective "risk" criteria without providing objective standards or evidence;
+c) Creating shifting and unreasonable timelines for fund release;
+d) ${formData.retroactiveRisk ? 'Retroactively applying risk designations to previously approved business operations;' : 'Withholding funds based on vague and unsubstantiated concerns;'}
+e) ${formData.communicationBlackout ? 'Implementing a communication blackout that prevents reasonable dispute resolution.' : 'Failing to act reasonably in the exercise of contractual discretion.'}
 
 COUNT IV: VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200
 
-Respondents' systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice.
+California's Unfair Competition Law prohibits unfair, unlawful, or fraudulent business practices. Respondents' systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice that:
+
+a) Violates public policy favoring prompt payment of earned compensation;
+b) Creates an imbalance in contractual relationships through arbitrary exercise of power;
+c) Damages competition by forcing merchants to seek alternative payment processors;
+d) ${formData.includeInterestOnFunds ? 'Unjustly enriches Respondents through interest earned on improperly withheld funds;' : 'Provides Respondents with an unfair advantage over competitors;'}
+e) Lacks reasonable business justification proportionate to claimed risks.
+
+${formData.claimPunitiveDamages ? `
+COUNT V: PUNITIVE DAMAGES
+
+Respondents' conduct was willful, malicious, and conducted with conscious disregard for Claimant's rights. ${formData.promisedReleaseDate ? `The breaking of specific promises regarding fund release timelines` : 'The indefinite withholding of funds without justification'} demonstrates malice warranting punitive damages to deter similar conduct.` : ''}
+
+${formData.additionalClaims ? `
+ADDITIONAL CLAIMS
+
+${formData.additionalClaims}` : ''}
 
 RELIEF SOUGHT
 
@@ -418,12 +511,27 @@ WHEREFORE, Claimant respectfully requests that this Tribunal:
 
 A. Award damages for breach of contract in an amount to be proven at hearing, but not less than $${formData.withheldAmount || '[AMOUNT]'};
 B. Award damages for conversion in an amount to be proven at hearing;
-C. Order immediate release of all withheld funds;
-D. Award restitution of any interest or profits earned on withheld funds;
-E. Award costs and expenses of this arbitration;
-F. Award such other relief as the Tribunal deems just and proper.
+C. ${formData.injunctiveRelief ? 'Order immediate release of all withheld funds pending arbitration;' : 'Order immediate release of all withheld funds;'}
+D. ${formData.includeInterestOnFunds ? 'Award restitution of any interest or profits earned on withheld funds;' : 'Award consequential damages for business harm;'}
+E. ${formData.includeAttorneyFees ? 'Award reasonable attorney fees and costs of this arbitration;' : 'Award costs and expenses of this arbitration;'}
+F. ${formData.claimPunitiveDamages ? 'Award punitive damages for willful and malicious conduct;' : ''}
+${additionalDamages > 0 ? `G. Award additional damages of $${additionalDamages.toLocaleString()} for business losses and consequential harm;` : ''}
+H. Award such other relief as the Tribunal deems just and proper.
 
-AMOUNT IN CONTROVERSY: $${formData.withheldAmount || '[AMOUNT]'}
+AMOUNT IN CONTROVERSY: $${totalAmount.toLocaleString()}
+
+FILING FEE COMPUTATION: Based on AAA Commercial Arbitration Rules Fee Schedule
+
+ADMINISTRATIVE INFORMATION
+
+1. This matter is subject to arbitration under Section 13 of the Stripe Services Agreement.
+2. ${formData.expeditedProcedures ? 'Expedited procedures are requested pursuant to AAA Rule E-1.' : 'Standard procedures apply under AAA Commercial Rules.'}
+3. ${formData.hearingPreference === 'document-only' ? 'Claimant requests resolution based on documents submitted, without hearing.' : formData.hearingPreference === 'telephone' ? 'Claimant requests resolution via telephone hearing.' : 'Claimant requests in-person hearing.'}
+4. Preferred arbitration venue: ${formData.arbitrationVenue}
+
+CERTIFICATION
+
+I certify that a copy of this demand has been served on Respondents by certified mail and email to their registered agent and legal department at complaints@stripe.com.
 
 ${formData.contactName || '[CONTACT NAME]'}
 ${formData.companyName || '[COMPANY NAME]'}
@@ -560,15 +668,35 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         return letter;
     };
     
-    // Get current document text - show arbitration demand if checkbox is checked
-    const documentText = formData.includeArbitrationDraft ? generateArbitrationDemand() : generateDemandLetter();
+    // Get current document text - show combined document when arbitration is enabled
+    const documentText = (() => {
+        if (formData.includeArbitrationDraft) {
+            // Show combined document like what will be downloaded
+            const demandLetter = generateDemandLetter();
+            const arbitrationDemand = generateArbitrationDemand();
+            return demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
+        } else {
+            return generateDemandLetter();
+        }
+    })();
 
     // Copy to clipboard function
     const copyToClipboard = () => {
-        let finalDocumentText = documentText;
+        let finalDocumentText;
+        
+        if (formData.includeArbitrationDraft) {
+            // Create combined document: demand letter + separator + arbitration demand
+            const demandLetter = generateDemandLetter();
+            const arbitrationDemand = generateArbitrationDemand();
+            
+            // Combine with clear separation for clipboard
+            finalDocumentText = demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
+        } else {
+            finalDocumentText = generateDemandLetter();
+        }
         
         navigator.clipboard.writeText(finalDocumentText).then(() => {
-            const docType = formData.includeArbitrationDraft ? 'Arbitration demand' : 'Demand letter';
+            const docType = formData.includeArbitrationDraft ? 'Combined demand letter and arbitration demand' : 'Demand letter';
             alert(`${docType} copied to clipboard!`);
         }).catch(err => {
             console.error('Failed to copy: ', err);
@@ -581,17 +709,35 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         try {
             console.log("Download MS Word button clicked");
             
-            if (!documentText) {
+            let finalDocumentText;
+            let documentTitle;
+            let fileName;
+            
+            if (formData.includeArbitrationDraft) {
+                // Create combined document: demand letter + page break + arbitration demand
+                const demandLetter = generateDemandLetter();
+                const arbitrationDemand = generateArbitrationDemand();
+                
+                // Combine with form feed character (\f) for page break
+                finalDocumentText = demandLetter + '\f' + arbitrationDemand;
+                documentTitle = "Stripe Demand Letter with Arbitration Demand";
+                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
+            } else {
+                // Single demand letter only
+                finalDocumentText = generateDemandLetter();
+                documentTitle = "Stripe Demand Letter";
+                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`;
+            }
+            
+            if (!finalDocumentText) {
                 console.error("Document text is empty");
                 alert("Cannot generate document - text is empty. Please check the form data.");
                 return;
             }
             
-            let finalDocumentText = documentText;
-            
             window.generateWordDoc(finalDocumentText, {
-                documentTitle: formData.includeArbitrationDraft ? "AAA Arbitration Demand" : "Stripe Demand Letter",
-                fileName: `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-${formData.includeArbitrationDraft ? 'Arbitration-Demand' : 'Demand-Letter'}`
+                documentTitle: documentTitle,
+                fileName: fileName
             });
         } catch (error) {
             console.error("Error in downloadAsWord:", error);
@@ -645,11 +791,19 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                     return 'evidence-section';
                 }
                 return null;
-            case 4: // Risk Assessment tab
+            case 4: // Arbitration Demand tab (NEW)
                 if (lastChanged === 'includeArbitrationDraft') {
-                    return 'arb-test-section';
+                    return 'arbitration-section';
+                }
+                if (['expeditedProcedures', 'claimPunitiveDamages', 'includeAttorneyFees', 'includeInterestOnFunds', 'injunctiveRelief'].includes(lastChanged)) {
+                    return 'arbitration-options';
+                }
+                if (['arbitrationVenue', 'hearingPreference', 'specificDamagesAmount', 'additionalClaims'].includes(lastChanged)) {
+                    return 'arbitration-config';
                 }
                 return null;
+            case 5: // Risk Assessment tab (moved from 4 to 5)
+                return null; // No highlighting needed for this tab
             default:
                 return null;
         }
@@ -670,7 +824,9 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
             'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
-            'arb-test-section': /Arb demand/
+            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=AMERICAN ARBITRATION ASSOCIATION|$)/s,
+            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?ARBITRATION VENUE:/s,
+            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -1841,8 +1997,191 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 5: Risk Assessment (REMOVED "Attorney-Level" language)
+                    // Tab 5: Arbitration Demand Options (NEW TAB)
                     currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Arbitration Demand Configuration'),
+                        React.createElement('p', { key: 'p' }, 'Configure your arbitration demand options. When enabled, the download will include both your demand letter and a draft arbitration demand in a single MS Word document.'),
+                        
+                        React.createElement('div', { key: 'enable-checkbox', className: 'checkbox-grid' }, [
+                            React.createElement('div', { 
+                                key: 'enable-arb',
+                                className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'includeArbitrationDraft',
+                                    checked: formData.includeArbitrationDraft,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Arbitration Demand'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Generate a comprehensive AAA arbitration demand to attach to your letter. Shows Stripe you\'re fully prepared to proceed.')
+                                ])
+                            ])
+                        ]),
+                        
+                        formData.includeArbitrationDraft && React.createElement('div', { key: 'arb-options' }, [
+                            React.createElement('h3', { key: 'h3', style: { marginTop: '30px', color: '#2c3e50' } }, 'Arbitration Configuration'),
+                            
+                            React.createElement('div', { key: 'row1', className: 'form-row' }, [
+                                React.createElement('div', { key: 'venue', className: 'form-group' }, [
+                                    React.createElement('label', { key: 'label' }, 'Arbitration Venue'),
+                                    React.createElement('select', {
+                                        key: 'select',
+                                        name: 'arbitrationVenue',
+                                        value: formData.arbitrationVenue,
+                                        onChange: handleChange
+                                    }, [
+                                        React.createElement('option', { key: 'la', value: 'Los Angeles' }, 'Los Angeles, CA'),
+                                        React.createElement('option', { key: 'sf', value: 'San Francisco' }, 'San Francisco, CA'),
+                                        React.createElement('option', { key: 'ny', value: 'New York' }, 'New York, NY'),
+                                        React.createElement('option', { key: 'chicago', value: 'Chicago' }, 'Chicago, IL'),
+                                        React.createElement('option', { key: 'atlanta', value: 'Atlanta' }, 'Atlanta, GA'),
+                                        React.createElement('option', { key: 'dallas', value: 'Dallas' }, 'Dallas, TX')
+                                    ])
+                                ]),
+                                React.createElement('div', { key: 'hearing', className: 'form-group' }, [
+                                    React.createElement('label', { key: 'label' }, 'Hearing Preference'),
+                                    React.createElement('select', {
+                                        key: 'select',
+                                        name: 'hearingPreference',
+                                        value: formData.hearingPreference,
+                                        onChange: handleChange
+                                    }, [
+                                        React.createElement('option', { key: 'docs', value: 'document-only' }, 'Document-Only (Faster)'),
+                                        React.createElement('option', { key: 'phone', value: 'telephone' }, 'Telephone Hearing'),
+                                        React.createElement('option', { key: 'person', value: 'in-person' }, 'In-Person Hearing')
+                                    ])
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { key: 'damages-section', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Additional Damages Beyond Withheld Amount (Optional)'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'specificDamagesAmount',
+                                    value: formData.specificDamagesAmount,
+                                    onChange: handleChange,
+                                    placeholder: 'e.g., 5000 (for business losses, emergency financing costs)'
+                                })
+                            ]),
+                            
+                            React.createElement('div', { key: 'claims-checkboxes', className: 'checkbox-grid' }, [
+                                React.createElement('div', { 
+                                    key: 'expedited',
+                                    className: `checkbox-item ${formData.expeditedProcedures ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'expeditedProcedures', type: 'checkbox', checked: !formData.expeditedProcedures }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'expeditedProcedures',
+                                        checked: formData.expeditedProcedures,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Request Expedited Procedures'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Faster resolution (60-90 days), lower costs. Available for claims under $75K.')
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { 
+                                    key: 'interest',
+                                    className: `checkbox-item ${formData.includeInterestOnFunds ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'includeInterestOnFunds', type: 'checkbox', checked: !formData.includeInterestOnFunds }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'includeInterestOnFunds',
+                                        checked: formData.includeInterestOnFunds,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Claim Interest/Profits on Withheld Funds'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Demand any interest or profits Stripe earned while holding your money.')
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { 
+                                    key: 'attorney-fees',
+                                    className: `checkbox-item ${formData.includeAttorneyFees ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'includeAttorneyFees', type: 'checkbox', checked: !formData.includeAttorneyFees }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'includeAttorneyFees',
+                                        checked: formData.includeAttorneyFees,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Claim Attorney Fees and Costs'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'California law allows recovery of arbitration costs in unfair business practice cases.')
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { 
+                                    key: 'injunctive',
+                                    className: `checkbox-item ${formData.injunctiveRelief ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'injunctiveRelief', type: 'checkbox', checked: !formData.injunctiveRelief }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'injunctiveRelief',
+                                        checked: formData.injunctiveRelief,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Request Immediate Fund Release'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Seek injunctive relief for immediate release of funds pending arbitration.')
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { 
+                                    key: 'punitive',
+                                    className: `checkbox-item ${formData.claimPunitiveDamages ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'claimPunitiveDamages', type: 'checkbox', checked: !formData.claimPunitiveDamages }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'claimPunitiveDamages',
+                                        checked: formData.claimPunitiveDamages,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Punitive Damages'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Available for conversion claims in cases of willful or malicious conduct.')
+                                    ])
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { key: 'additional-claims', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Additional Claims or Special Circumstances (Optional)'),
+                                React.createElement('textarea', {
+                                    key: 'textarea',
+                                    name: 'additionalClaims',
+                                    value: formData.additionalClaims,
+                                    onChange: handleChange,
+                                    placeholder: 'Describe any special circumstances or additional legal claims specific to your case...',
+                                    rows: 3
+                                })
+                            ]),
+                            
+                            React.createElement('div', { key: 'tip', className: 'tip-box info' }, [
+                                React.createElement('div', { key: 'title', className: 'tip-title' }, 'Strategic Note'),
+                                React.createElement('p', { key: 'text' }, 'Including a detailed arbitration demand shows Stripe you\'re serious and fully prepared. This often leads to faster settlements during the 30-day notice period before you actually need to file.')
+                            ])
+                        ])
+                    ]),
+                    
+                    // Tab 6: Risk Assessment (REMOVED "Attorney-Level" language)
+                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
                         React.createElement('h2', { key: 'h2' }, 'Case Analysis & Strategy'),
                         React.createElement('p', { key: 'p' }, 'Educational assessment of case factors and strategic considerations:'),
                         React.createElement('div', { key: 'disclaimer', className: 'tip-box warning', style: { marginBottom: '20px' } }, [
@@ -1924,17 +2263,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     ])
                                 ];
                             })()
-                        ]),
-                        
-                        React.createElement('div', { key: 'arb-test', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Generate Arbitration Demand (Test)'),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'checkbox',
-                                name: 'includeArbitrationDraft',
-                                checked: formData.includeArbitrationDraft,
-                                onChange: handleChange
-                            })
                         ])
                     ])
                 ]),
