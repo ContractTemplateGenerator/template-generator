@@ -2026,19 +2026,17 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Filing Document (SIMPLIFIED STRUCTURE)
+                    // Tab 6: Arbitration Filing Document (FULLY SIMPLIFIED)
                     currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
                         React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
                         React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand and optionally attach it to your demand letter.'),
                         
-                        // Toggle at top of this tab
                         React.createElement('div', { key: 'attachment-toggle', className: 'tip-box' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'Attachment Options'),
                             React.createElement('div', { 
                                 key: 'include-arb',
                                 className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }}),
-                                style: { marginTop: '15px', marginBottom: '0' }
+                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }})
                             }, [
                                 React.createElement('input', {
                                     key: 'input',
@@ -2049,47 +2047,22 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 }),
                                 React.createElement('div', { key: 'content' }, [
                                     React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Attach to Demand Letter as Exhibit A'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Include this arbitration demand with your demand letter to demonstrate preparedness and increase settlement pressure.')
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Include this arbitration demand with your demand letter to demonstrate preparedness.')
                                 ])
                             ])
                         ]),
                         
                         React.createElement('div', { key: 'info-card', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'About This Document'),
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules.'),
-                            React.createElement('p', { 
-                                key: 'attachment-note', 
-                                style: { marginTop: '10px', fontWeight: '500' } 
-                            }, formData.includeArbitrationDraft ? 
-                                '✅ This arbitration demand will be included as Exhibit A with your demand letter.' :
-                                '💡 Tip: Check the box above to attach this to your demand letter for maximum impact.'
-                            )
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules.')
                         ]),
                         
-                        // Simplified filing information section
                         React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
                             React.createElement('h3', { key: 'h3' }, 'Filing Information'),
-                            React.createElement('p', { key: 'fees' }, (() => {
-                                const fees = calculateAAAfees();
-                                return [
-                                    React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
-                                    `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
-                                ];
-                            })()),
-                            (() => {
-                                const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-                                return amount < 25000 ? React.createElement('p', { key: 'expedited' }, [
-                                    React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
-                                    'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
-                                ]) : null;
-                            })(),
-                            React.createElement('p', { key: 'location' }, [
-                                React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
-                                'Los Angeles, CA or Virtual (as specified in demand)'
-                            ])
+                            React.createElement('p', { key: 'fees' }, 'AAA Filing Fees: See calculator based on your claim amount'),
+                            React.createElement('p', { key: 'location' }, 'Hearing Location: Los Angeles, CA or Virtual')
                         ]),
                         
-                        // Legal claims section
                         React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
                             React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
                             React.createElement('ul', { key: 'claims-list' }, [
@@ -2100,7 +2073,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             ])
                         ]),
                         
-                        // Next steps section
                         React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
                             React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
                             React.createElement('ol', { key: 'steps' }, [
