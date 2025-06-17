@@ -111,7 +111,7 @@ const StripeDemandGenerator = () => {
         retroactiveRisk: false,
         communicationBlackout: false,
         chargebackLoop: false,
-        customReason: false, // Moved above specificViolationsIdentified
+        customReason: false, // Moved after all main reasons
         customReasonText: '',
         specificViolationsIdentified: false, // Now at bottom
         
@@ -915,7 +915,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         } else {
             isComplex = true;
             timeline = '9-18 months';
-            procedures = 'Likely requires extensive discovery and hearings';
+            procedures = 'Likely requires telephone hearings and limited document production (AAA rules restrict discovery)';
         }
         
         return { isComplex, timeline, procedures, complexityFactors, complexityScore };
@@ -1422,7 +1422,97 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 ])
                             ]),
                             
-                            // MOVED: Custom Reason now above Specific Violations
+                            React.createElement('div', { 
+                                key: 'review',
+                                className: `checkbox-item ${formData.accountReview ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'accountReview', type: 'checkbox', checked: !formData.accountReview }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'accountReview',
+                                    checked: formData.accountReview,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Account Review in Progress'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Ongoing account review without specific timeline or completion criteria.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'business-model',
+                                className: `checkbox-item ${formData.businessModelIssue ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'businessModelIssue', type: 'checkbox', checked: !formData.businessModelIssue }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'businessModelIssue',
+                                    checked: formData.businessModelIssue,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Retroactive Business Model Concerns'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Business model concerns raised after initial approval and processing history.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'retroactive',
+                                className: `checkbox-item ${formData.retroactiveRisk ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'retroactiveRisk', type: 'checkbox', checked: !formData.retroactiveRisk }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'retroactiveRisk',
+                                    checked: formData.retroactiveRisk,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Retroactive Risk Designation'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Risk designation applied retroactively after processing payments for extended period.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'liability',
+                                className: `checkbox-item ${formData.chargebackLiability ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'chargebackLiability', type: 'checkbox', checked: !formData.chargebackLiability }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'chargebackLiability',
+                                    checked: formData.chargebackLiability,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Ongoing Chargeback Liability'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Chargeback liability concerns extending beyond reasonable dispute resolution windows.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'risk-assessment',
+                                className: `checkbox-item ${formData.riskAssessment ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'riskAssessment', type: 'checkbox', checked: !formData.riskAssessment }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'riskAssessment',
+                                    checked: formData.riskAssessment,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Ongoing Risk Assessment'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Ongoing risk assessment without timeline, completion criteria, or clear resolution path.')
+                                ])
+                            ]),
+                            
+                            // MOVED: Custom Reason now after all main reasons but before Specific Violations
                             React.createElement('div', { 
                                 key: 'custom',
                                 className: `checkbox-item ${formData.customReason ? 'selected' : ''}`,
