@@ -137,8 +137,7 @@ const StripeDemandGenerator = () => {
         { id: 'reasons', label: 'Stripe\'s Reasons' },
         { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
-        { id: 'assessment', label: 'Risk Assessment' },
-        { id: 'arbitration', label: 'Arbitration Demand' }
+        { id: 'assessment', label: 'Risk Assessment' }
     ];
     
     // Handle input changes
