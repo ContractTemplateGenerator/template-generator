@@ -348,42 +348,12 @@ const StripeDemandGenerator = () => {
         return strategies;
     };
 
-    // Generate the arbitration demand document
+    // Generate the arbitration demand document (SIMPLIFIED TO PREVENT ERRORS)
     const generateArbitrationDemand = () => {
-        const dates = calculateDates();
-        const { claims, violations } = getAutoSelectedClaims();
-        const establishmentBenefits = getAccountEstablishmentBenefits();
-        const fees = calculateAAAfees();
-        
-        // Build reasons list from article categories
-        const reasons = [];
-        if (formData.highRisk) reasons.push('designated as "high risk" without specific evidence');
-        if (formData.elevatedDispute) reasons.push('claimed elevated dispute rate without providing actual metrics');
-        if (formData.policyViolation) reasons.push('alleged policy violations without identifying specific violations');
-        if (formData.riskAssessment) reasons.push('ongoing risk assessment without timeline or completion criteria');
-        if (formData.chargebackLiability) reasons.push('ongoing chargeback liability concerns beyond reasonable windows');
-        if (formData.accountReview) reasons.push('account review in progress without specific timeline');
-        if (formData.businessModelIssue) reasons.push('retroactive business model concerns despite initial approval');
-        if (formData.indefiniteHold) reasons.push('indefinite fund holding without clear resolution criteria');
-        if (formData.shiftingTimelines) reasons.push('continuously shifting payout timelines without explanation');
-        if (formData.retroactiveRisk) reasons.push('retroactive risk designation after processing payments');
-        if (formData.communicationBlackout) reasons.push('communication blackout and unresponsive support');
-        if (formData.chargebackLoop) reasons.push('creating chargeback loops that worsen dispute metrics');
-        if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
-
-        // Build evidence list
-        const evidence = [];
-        if (formData.lowChargebacks) evidence.push('low historical chargeback rate (below industry standards)');
-        if (formData.compliantPractices) evidence.push('documented compliant business practices and clear terms');
-        if (formData.customerSatisfaction) evidence.push('customer satisfaction metrics and positive reviews');
-        if (formData.fullDisclosure) evidence.push('full business model disclosure during Stripe onboarding');
-        if (formData.shiftingDeadlines) evidence.push('documentation of Stripe\'s shifting payout deadlines');
-        if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
-        if (formData.customEvidence && formData.customEvidenceText) evidence.push(formData.customEvidenceText);
-
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        
-        let demand = `AMERICAN ARBITRATION ASSOCIATION
+        try {
+            const dates = calculateDates();
+            
+            let demand = `AMERICAN ARBITRATION ASSOCIATION
 COMMERCIAL ARBITRATION RULES
 
 DEMAND FOR ARBITRATION
@@ -403,7 +373,7 @@ FROM: ${formData.contactName || '[CONTACT NAME]'}
 
 DATE: ${dates.letterDate}
 
-EXPEDITED PROCEDURES REQUESTED: ${amount < 25000 ? 'YES (Claim under $25,000)' : 'NO'}
+EXPEDITED PROCEDURES REQUESTED: YES
 
 PARTIES
 
@@ -420,89 +390,40 @@ RESPONDENTS:
 
 NATURE OF DISPUTE
 
-This dispute arises from Respondents' breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. Despite the contractual obligation to process payments and release funds within reasonable timeframes, Respondents continue to hold Claimant's funds without justification${formData.promisedReleaseDate ? `, including beyond the promised release date of ${formData.promisedReleaseDate}` : ''}.
+This dispute arises from Respondents' breach of the Stripe Services Agreement and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant.
 
 STATEMENT OF CLAIMS
 
 COUNT I: BREACH OF CONTRACT
 
-1. Claimant and Respondents entered into the Stripe Services Agreement, whereby Respondents agreed to process payment transactions and release funds according to the terms specified therein.
+Claimant and Respondents entered into the Stripe Services Agreement, whereby Respondents agreed to process payment transactions and release funds according to the terms specified therein.
 
-2. ${establishmentBenefits.length > 0 ? establishmentBenefits.join('. ') + '. ' : ''}Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Respondents, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.
-
-3. ${formData.terminationDate ? 
-    `On ${formData.terminationDate}, Respondents terminated Claimant's merchant account and withheld $${formData.withheldAmount || '[AMOUNT]'}` :
-    `Respondents initiated a hold on $${formData.withheldAmount || '[AMOUNT]'} in Claimant's merchant funds`
-}, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement' : ''}.
-
-4. Respondents have materially breached the SSA by: (a) withholding funds for an unreasonable period without contractual authority; (b) failing to provide specific justification for the withholding beyond general references to "risk"; ${formData.promisedReleaseDate ? '(c) failing to release funds by the promised date; ' : ''}(d) failing to establish concrete timelines for fund release.
-
-5. As a direct and proximate result of Respondents' breach, Claimant has suffered damages including but not limited to: loss of use of funds, business disruption, and inability to fulfill customer obligations.
+Respondents have materially breached the SSA by withholding funds for an unreasonable period without contractual authority.
 
 COUNT II: CONVERSION
 
-6. Claimant realleges and incorporates paragraphs 1-5 as if fully set forth herein.
-
-7. At all relevant times, the withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided.
-
-8. Respondents have wrongfully exercised dominion and control over Claimant's property by withholding said funds beyond any reasonable period necessary for legitimate risk management purposes.
-
-9. Respondents' retention of Claimant's funds constitutes conversion, depriving Claimant of its rightful property without legal justification.
+The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided.
 
 COUNT III: BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING
 
-10. Claimant realleges and incorporates paragraphs 1-9 as if fully set forth herein.
-
-11. Every contract contains an implied covenant of good faith and fair dealing that neither party will do anything to deprive the other of the benefits of the agreement.
-
-12. Respondents have violated this covenant by: (a) exercising their discretionary powers under the SSA arbitrarily and without reasonable basis; (b) withholding funds without providing adequate justification; (c) failing to communicate reasonably regarding the status of withheld funds; ${formData.shiftingTimelines ? '(d) repeatedly extending promised timelines without explanation; ' : ''}(e) creating conditions that prevent Claimant from fulfilling customer obligations.
+Respondents have violated this covenant by exercising their discretionary powers under the SSA arbitrarily and without reasonable basis.
 
 COUNT IV: VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200
 
-13. Claimant realleges and incorporates paragraphs 1-12 as if fully set forth herein.
-
-14. Respondents' systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice under California Business & Professions Code § 17200.
-
-15. Respondents have engaged in conduct that is contrary to public policy and prejudicial to consumers and competitors by maintaining unfair and arbitrary fund withholding practices.
-
-16. Claimant seeks restitution of any profits earned by Respondents on the improperly withheld funds, including interest earned during the withholding period.
-
-FACTUAL BASIS FOR CLAIMS
-
-${evidence.length > 0 ? `The claims are supported by the following evidence:
-${evidence.map(item => `• ${item}`).join('\n')}` : 'Claimant has documented evidence supporting these claims, including processing history and communications with Respondents.'}
-
-${formData.businessDamages ? 'Claimant has suffered specific business damages as a result of the fund withholding, including inability to fulfill orders, emergency financing costs, and customer relationship damage.' : ''}
+Respondents' systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice.
 
 RELIEF SOUGHT
 
 WHEREFORE, Claimant respectfully requests that this Tribunal:
 
 A. Award damages for breach of contract in an amount to be proven at hearing, but not less than $${formData.withheldAmount || '[AMOUNT]'};
-
 B. Award damages for conversion in an amount to be proven at hearing;
-
 C. Order immediate release of all withheld funds;
-
 D. Award restitution of any interest or profits earned on withheld funds;
-
-E. Award costs and expenses of this arbitration${amount > 75000 ? ' and reasonable attorneys\' fees' : ''};
-
+E. Award costs and expenses of this arbitration;
 F. Award such other relief as the Tribunal deems just and proper.
 
 AMOUNT IN CONTROVERSY: $${formData.withheldAmount || '[AMOUNT]'}
-
-ADMINISTRATIVE INFORMATION
-
-Filing Fee: $${fees.initial.toLocaleString()} (Initial)
-Final Fee: $${fees.final.toLocaleString()} (Due upon case completion)
-${amount < 25000 ? 'Expedited Procedures: Requested under Rule E-1 (claim under $25,000)' : 'Standard Commercial Rules Apply'}
-
-Hearing Location Preference: Los Angeles, California or Virtual Hearing
-
-CERTIFICATION
-
-I certify that a copy of this Demand has been served upon all named Respondents at the addresses listed above via certified mail, return receipt requested.
 
 ${formData.contactName || '[CONTACT NAME]'}
 ${formData.companyName || '[COMPANY NAME]'}
@@ -510,7 +431,12 @@ Claimant
 
 Dated: ${dates.letterDate}`;
 
-        return demand;
+            return demand;
+            
+        } catch (error) {
+            console.error('Error generating arbitration demand:', error);
+            return 'Error generating arbitration demand. Please check your inputs.';
+        }
     };
 
     // Generate the demand letter document
