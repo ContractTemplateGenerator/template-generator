@@ -635,7 +635,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     };
     
     // Get current document text - show arbitration demand if checkbox is checked
-    const documentText = formData.includeArbitrationDraft ? "Arb demand" : generateDemandLetter();
+    const documentText = formData.includeArbitrationDraft ? generateArbitrationDemand() : generateDemandLetter();
 
     // Copy to clipboard function
     const copyToClipboard = () => {
