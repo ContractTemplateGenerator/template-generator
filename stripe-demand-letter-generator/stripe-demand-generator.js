@@ -31,8 +31,7 @@ const StripeDemandGenerator = () => {
         promisedReleaseDate: '',
         businessType: '',
         processingHistory: '',
-        historicalDisputeRate: '',
-        
+        historicalDisputeRate: '',        
         // Tab 2: Stripe's Stated Reasons
         highRisk: false,
         elevatedDispute: false,
@@ -43,9 +42,6 @@ const StripeDemandGenerator = () => {
         businessModelIssue: false,
         customReason: false,
         customReasonText: '',
-        
-        // Tab 3: SSA Violations (auto-selected based on situation)
-        // These will be calculated automatically
         
         // Tab 4: Supporting Evidence
         lowChargebacks: false,
@@ -69,6 +65,7 @@ const StripeDemandGenerator = () => {
         { id: 'evidence', label: 'Evidence' },
         { id: 'assessment', label: 'Risk Assessment' }
     ];
+
     // Handle input changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -92,8 +89,6 @@ const StripeDemandGenerator = () => {
         claims.push('Breach of Contract');
         claims.push('Conversion (wrongful retention of funds)');
         claims.push('Breach of Implied Covenant of Good Faith and Fair Dealing');
-        
-        // Add CA Business & Professions Code claim for unfair practices
         claims.push('Violation of California Business & Professions Code § 17200');
         
         // Determine specific SSA violations
@@ -139,6 +134,7 @@ const StripeDemandGenerator = () => {
             })
         };
     };
+
     // Generate the demand letter document
     const generateDemandLetter = () => {
         const dates = calculateDates();
@@ -164,11 +160,11 @@ const StripeDemandGenerator = () => {
         if (formData.shiftingDeadlines) evidence.push('documentation of shifting payout deadlines');
         if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
 
-        return `${formData.companyName}
-${formData.address}
-${formData.city}, ${formData.state} ${formData.zipCode}
-${formData.phone}
-${formData.email}
+        return `${formData.companyName || '[COMPANY NAME]'}
+${formData.address || '[ADDRESS]'}
+${formData.city || '[CITY]'}, ${formData.state} ${formData.zipCode || '[ZIP]'}
+${formData.phone || '[PHONE]'}
+${formData.email || '[EMAIL]'}
 
 ${dates.letterDate}
 
@@ -180,32 +176,27 @@ Stripe, Inc.
 354 Oyster Point Boulevard
 South San Francisco, CA 94080
 
-Re: ${formData.companyName} - Demand for Release of Withheld Funds
-    Account ID: ${formData.stripeAccountId}
-    Amount at Issue: $${formData.withheldAmount}
+Re: ${formData.companyName || '[COMPANY NAME]'} - Demand for Release of Withheld Funds
+    Account ID: ${formData.stripeAccountId || '[ACCOUNT ID]'}
+    Amount at Issue: $${formData.withheldAmount || '[AMOUNT]'}
 
 To Whom It May Concern:
 
 This letter serves as formal notice pursuant to Section 13.3(a) of the Stripe Services Agreement ("SSA") of my intent to commence arbitration proceedings against Stripe, Inc. and Stripe Payments Company. I intend to file the attached arbitration demand with the American Arbitration Association on ${dates.arbitrationDate} unless this matter is resolved before that date.
 
-I am writing regarding Stripe's continued withholding of $${formData.withheldAmount} in customer payments belonging to ${formData.companyName}. Despite ${formData.promisedReleaseDate ? `your promise to release funds by ${formData.promisedReleaseDate}` : 'the passage of significant time since account termination'}, your company continues to hold these funds without providing any reasonable timeline for release.
+I am writing regarding Stripe's continued withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to ${formData.companyName || '[COMPANY NAME]'}. Despite ${formData.promisedReleaseDate ? `your promise to release funds by ${formData.promisedReleaseDate}` : 'the passage of significant time since account termination'}, your company continues to hold these funds without providing any reasonable timeline for release.
 
 FACTUAL BACKGROUND
 
 On ${formData.terminationDate || '[DATE]'}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without identifying any specific violations of your Services Agreement. ${formData.promisedReleaseDate ? `At the time, Stripe promised to release the withheld funds by ${formData.promisedReleaseDate}.` : ''}
 
-${formData.companyName} operated as a ${formData.businessType} business for ${formData.processingHistory} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.`;
-    };
-        // Continue the demand letter
-        let letter = generateDemandLetter();
-        
-        letter += `
+${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[DURATION]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.
 
 In the ${Math.ceil((new Date() - new Date(formData.terminationDate || new Date())) / (1000 * 60 * 60 * 24)) || '[NUMBER]'} days since termination, Stripe has failed to:
 - Provide specific justification for the continued withholding beyond general references to "risk"
 - Establish any concrete timeline for releasing the held funds
 - Identify any specific Service Agreement violations that would justify indefinite withholding
-${violations.length > 0 ? `- ${violations.join('\n- ')}` : ''}
+${violations.length > 0 ? violations.map(v => `- ${v}`).join('\n') : ''}
 
 LEGAL CLAIMS
 
@@ -213,7 +204,7 @@ Stripe's actions constitute multiple breaches of the SSA, including but not limi
 
 1. BREACH OF CONTRACT: Stripe has materially breached the SSA by withholding funds for an unreasonable period without contractual authority and by failing to process promised payment releases within stated timeframes.
 
-2. CONVERSION: Stripe has wrongfully exercised dominion over $${formData.withheldAmount} belonging to ${formData.companyName}, depriving us of our rightful property beyond any reasonable period necessary for risk management.
+2. CONVERSION: Stripe has wrongfully exercised dominion over $${formData.withheldAmount || '[AMOUNT]'} belonging to ${formData.companyName || '[COMPANY NAME]'}, depriving us of our rightful property beyond any reasonable period necessary for risk management.
 
 3. BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING: Even where the SSA grants Stripe discretion, it must be exercised in good faith. Stripe's arbitrary withholding of funds without substantial justification violates this fundamental contractual obligation.
 
@@ -228,21 +219,20 @@ DEMAND FOR RESOLUTION
 
 To resolve this matter without proceeding to arbitration, I demand the following:
 
-1. Immediate release of the $${formData.withheldAmount} in withheld funds
+1. Immediate release of the $${formData.withheldAmount || '[AMOUNT]'} in withheld funds
 2. Accounting of any interest earned on these funds while held by Stripe
 3. Written confirmation of the release timeline
 
-If I do not receive a satisfactory response by ${calculateDates().responseDate}, I will proceed with filing the attached arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
+If I do not receive a satisfactory response by ${dates.responseDate}, I will proceed with filing the attached arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
 
 I look forward to your prompt attention to this matter.
 
 Sincerely,
 
-${formData.contactName}
-${formData.companyName}
+${formData.contactName || '[CONTACT NAME]'}
+${formData.companyName || '[COMPANY NAME]'}
 
 ${formData.includeArbitrationDraft ? '\nEnclosure: Draft Arbitration Demand' : ''}`;
-        return letter;
     };
 
     // Get current document text
@@ -295,6 +285,7 @@ ${formData.includeArbitrationDraft ? '\nEnclosure: Draft Arbitration Demand' : '
     const goToTab = (index) => {
         setCurrentTab(index);
     };
+
     // Highlighting functionality
     const getSectionToHighlight = () => {
         switch (currentTab) {
@@ -360,6 +351,7 @@ ${formData.includeArbitrationDraft ? '\nEnclosure: Draft Arbitration Demand' : '
     }, [lastChanged]);
 
     const highlightedText = createHighlightedText();
+
     // Risk Assessment
     const getRiskAssessment = () => {
         let score = 0;
@@ -436,670 +428,231 @@ ${formData.includeArbitrationDraft ? '\nEnclosure: Draft Arbitration Demand' : '
         
         return { riskLevel, riskClass, factors, recommendations, score };
     };
+
     // Render function
     return (
-        <div className="app-container">
-            <div className="header">
-                <h1>Stripe Demand Letter Generator</h1>
-                <p>Generate a professional demand letter with 30-day arbitration notice</p>
-            </div>
+        React.createElement('div', { className: 'app-container' },
+            React.createElement('div', { className: 'header' },
+                React.createElement('h1', null, 'Stripe Demand Letter Generator'),
+                React.createElement('p', null, 'Generate a professional demand letter with 30-day arbitration notice')
+            ),
             
-            <div className="main-content">
-                <div className="form-panel">
-                    {/* Tab Navigation */}
-                    <div className="tab-navigation">
-                        {tabs.map((tab, index) => (
-                            <button
-                                key={tab.id}
-                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
-                                onClick={() => goToTab(index)}
-                            >
-                                {index + 1}. {tab.label}
-                            </button>
-                        ))}
-                    </div>
+            React.createElement('div', { className: 'main-content' },
+                React.createElement('div', { className: 'form-panel' },
+                    // Tab Navigation
+                    React.createElement('div', { className: 'tab-navigation' },
+                        tabs.map((tab, index) => 
+                            React.createElement('button', {
+                                key: tab.id,
+                                className: `tab-button ${currentTab === index ? 'active' : ''}`,
+                                onClick: () => goToTab(index)
+                            }, `${index + 1}. ${tab.label}`)
+                        )
+                    ),
                     
-                    {/* Form Content */}
-                    <div className="form-content">
-                        {/* Tab 1: Account & Situation Details */}
-                        {currentTab === 0 && (
-                            <div>
-                                <h2>Account & Situation Details</h2>
-                                <p>Provide your business information and Stripe account details.</p>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Company Name *</label>
-                                        <input
-                                            type="text"
-                                            name="companyName"
-                                            value={formData.companyName}
-                                            onChange={handleChange}
-                                            placeholder="Your Business Name"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Contact Person *</label>
-                                        <input
-                                            type="text"
-                                            name="contactName"
-                                            value={formData.contactName}
-                                            onChange={handleChange}
-                                            placeholder="Your Name"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Email Address *</label>
-                                        <input
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            placeholder="your@email.com"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Phone Number</label>
-                                        <input
-                                            type="tel"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                            placeholder="(555) 123-4567"
-                                        />
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <label>Business Address *</label>
-                                    <input
-                                        type="text"
-                                        name="address"
-                                        value={formData.address}
-                                        onChange={handleChange}
-                                        placeholder="Street Address"
-                                        required
-                                    />
-                                </div>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>City *</label>
-                                        <input
-                                            type="text"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                            placeholder="City"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>State</label>
-                                        <select
-                                            name="state"
-                                            value={formData.state}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="CA">California</option>
-                                            <option value="NY">New York</option>
-                                            <option value="TX">Texas</option>
-                                            <option value="FL">Florida</option>
-                                            <option value="IL">Illinois</option>
-                                            <option value="WA">Washington</option>
-                                            <option value="Other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>ZIP Code</label>
-                                        <input
-                                            type="text"
-                                            name="zipCode"
-                                            value={formData.zipCode}
-                                            onChange={handleChange}
-                                            placeholder="12345"
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="tip-box info">
-                                    <div className="tip-title">
-                                        <Icon name="info" />
-                                        Stripe Account Information
-                                    </div>
-                                    <p>This information is crucial for identifying your specific account and establishing the timeline for legal action.</p>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Stripe Account ID *</label>
-                                        <input
-                                            type="text"
-                                            name="stripeAccountId"
-                                            value={formData.stripeAccountId}
-                                            onChange={handleChange}
-                                            placeholder="acct_1234567890"
-                                            required
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Amount Withheld *</label>
-                                        <input
-                                            type="text"
-                                            name="withheldAmount"
-                                            value={formData.withheldAmount}
-                                            onChange={handleChange}
-                                            placeholder="25,000"
-                                            required
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Account Termination Date</label>
-                                        <input
-                                            type="date"
-                                            name="terminationDate"
-                                            value={formData.terminationDate}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Promised Release Date (if any)</label>
-                                        <input
-                                            type="date"
-                                            name="promisedReleaseDate"
-                                            value={formData.promisedReleaseDate}
-                                            onChange={handleChange}
-                                        />
-                                    </div>
-                                </div>
-                                
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Business Type</label>
-                                        <select
-                                            name="businessType"
-                                            value={formData.businessType}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Select Business Type</option>
-                                            <option value="e-commerce">E-commerce</option>
-                                            <option value="SaaS">Software as a Service</option>
-                                            <option value="consulting">Consulting</option>
-                                            <option value="digital services">Digital Services</option>
-                                            <option value="subscription">Subscription Service</option>
-                                            <option value="marketplace">Marketplace</option>
-                                            <option value="other">Other</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Processing History with Stripe</label>
-                                        <select
-                                            name="processingHistory"
-                                            value={formData.processingHistory}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="">Select Duration</option>
-                                            <option value="less than 6 months">Less than 6 months</option>
-                                            <option value="6 months to 1 year">6 months to 1 year</option>
-                                            <option value="1-2 years">1-2 years</option>
-                                            <option value="2-3 years">2-3 years</option>
-                                            <option value="over 3 years">Over 3 years</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <label>Historical Dispute Rate (if known)</label>
-                                    <input
-                                        type="text"
-                                        name="historicalDisputeRate"
-                                        value={formData.historicalDisputeRate}
-                                        onChange={handleChange}
-                                        placeholder="0.5% (leave blank if unknown)"
-                                    />
-                                </div>
-                            </div>
-                        )}
+                    // Form Content
+                    React.createElement('div', { className: 'form-content' },
+                        // Tab 1: Account & Situation Details
+                        currentTab === 0 && React.createElement('div', null,
+                            React.createElement('h2', null, 'Account & Situation Details'),
+                            React.createElement('p', null, 'Provide your business information and Stripe account details.'),
+                            
+                            React.createElement('div', { className: 'form-row' },
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Company Name *'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        name: 'companyName',
+                                        value: formData.companyName,
+                                        onChange: handleChange,
+                                        placeholder: 'Your Business Name',
+                                        required: true
+                                    })
+                                ),
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Contact Person *'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        name: 'contactName',
+                                        value: formData.contactName,
+                                        onChange: handleChange,
+                                        placeholder: 'Your Name',
+                                        required: true
+                                    })
+                                )
+                            ),
+                            
+                            React.createElement('div', { className: 'form-row' },
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Stripe Account ID *'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        name: 'stripeAccountId',
+                                        value: formData.stripeAccountId,
+                                        onChange: handleChange,
+                                        placeholder: 'acct_1234567890',
+                                        required: true
+                                    })
+                                ),
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Amount Withheld *'),
+                                    React.createElement('input', {
+                                        type: 'text',
+                                        name: 'withheldAmount',
+                                        value: formData.withheldAmount,
+                                        onChange: handleChange,
+                                        placeholder: '25,000',
+                                        required: true
+                                    })
+                                )
+                            ),
+                            
+                            React.createElement('div', { className: 'form-row' },
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Account Termination Date'),
+                                    React.createElement('input', {
+                                        type: 'date',
+                                        name: 'terminationDate',
+                                        value: formData.terminationDate,
+                                        onChange: handleChange
+                                    })
+                                ),
+                                React.createElement('div', { className: 'form-group' },
+                                    React.createElement('label', null, 'Promised Release Date (if any)'),
+                                    React.createElement('input', {
+                                        type: 'date',
+                                        name: 'promisedReleaseDate',
+                                        value: formData.promisedReleaseDate,
+                                        onChange: handleChange
+                                    })
+                                )
+                            )
+                        ),
                         
-                        {/* Tab 2: Stripe's Stated Reasons */}
-                        {currentTab === 1 && (
-                            <div>
-                                <h2>Stripe's Stated Reasons</h2>
-                                <p>Select the reasons Stripe has given for withholding your funds. The generator will create specific responses to each.</p>
-                                
-                                <div className="checkbox-grid">
-                                    <div className={`checkbox-item ${formData.highRisk ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="highRisk"
-                                            checked={formData.highRisk}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">"High Risk" Business Designation</div>
-                                            <div className="checkbox-description">
-                                                Stripe labeled your business as high risk without providing specific evidence or metrics to support this determination.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.elevatedDispute ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="elevatedDispute"
-                                            checked={formData.elevatedDispute}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Elevated Dispute Rate</div>
-                                            <div className="checkbox-description">
-                                                Claimed your chargeback or dispute rate was too high, possibly without providing actual numbers or industry comparisons.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.policyViolation ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="policyViolation"
-                                            checked={formData.policyViolation}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Policy Violation (Unspecified)</div>
-                                            <div className="checkbox-description">
-                                                Referenced policy violations but failed to identify specific policies or provide concrete examples of violations.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={`checkbox-item ${formData.riskAssessment ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="riskAssessment"
-                                            checked={formData.riskAssessment}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Ongoing Risk Assessment</div>
-                                            <div className="checkbox-description">
-                                                Claimed they are conducting a risk assessment but provided no timeline or criteria for completion.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.chargebackLiability ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="chargebackLiability"
-                                            checked={formData.chargebackLiability}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Chargeback Liability Concerns</div>
-                                            <div className="checkbox-description">
-                                                Holding funds to cover potential future chargebacks, even beyond reasonable chargeback windows (typically 120 days).
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.accountReview ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="accountReview"
-                                            checked={formData.accountReview}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Account Review in Progress</div>
-                                            <div className="checkbox-description">
-                                                Said your account is under review but hasn't provided timeline, specific issues being reviewed, or resolution criteria.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.businessModelIssue ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="businessModelIssue"
-                                            checked={formData.businessModelIssue}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Business Model Not Supported</div>
-                                            <div className="checkbox-description">
-                                                Retroactively decided your business model isn't supported, despite initially approving your account.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={`checkbox-item ${formData.customReason ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="customReason"
-                                            checked={formData.customReason}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Custom Reason</div>
-                                            <div className="checkbox-description">
-                                                Stripe provided a different reason not listed above.
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                {formData.customReason && (
-                                    <div className="form-group">
-                                        <label>Describe the Custom Reason</label>
-                                        <textarea
-                                            name="customReasonText"
-                                            value={formData.customReasonText}
-                                            onChange={handleChange}
-                                            placeholder="Describe Stripe's specific reason for withholding your funds..."
-                                            rows="3"
-                                        />
-                                    </div>
-                                )}
-                                
-                                <div className="tip-box warning">
-                                    <div className="tip-title">
-                                        <Icon name="alert-triangle" />
-                                        Strategy Note
-                                    </div>
-                                    <p>The generator will create specific legal arguments countering each reason you select. Don't worry about the legal language - that's handled automatically.</p>
-                                </div>
-                            </div>
-                        )}
+                        // Simplified display for other tabs
+                        currentTab === 1 && React.createElement('div', null,
+                            React.createElement('h2', null, 'Stripe\'s Stated Reasons'),
+                            React.createElement('p', null, 'Check the reasons Stripe gave for withholding your funds:'),
+                            React.createElement('label', null,
+                                React.createElement('input', {
+                                    type: 'checkbox',
+                                    name: 'highRisk',
+                                    checked: formData.highRisk,
+                                    onChange: handleChange
+                                }),
+                                ' "High Risk" Business Designation'
+                            )
+                        ),
                         
-                        {/* Tab 3: SSA Violations (Auto-Calculated) */}
-                        {currentTab === 2 && (
-                            <div>
-                                <h2>Stripe Services Agreement Violations</h2>
-                                <p>Based on your situation, these SSA violations will be automatically included in your demand letter:</p>
-                                
-                                <div className="tip-box info">
-                                    <div className="tip-title">
-                                        <Icon name="info" />
-                                        Automatic Legal Claims
-                                    </div>
-                                    <p>The generator automatically selects the most effective legal claims based on your specific situation. You don't need to choose these yourself.</p>
-                                </div>
-                                <div className="risk-card risk-strong">
-                                    <h3>Included Legal Claims</h3>
-                                    <ul>
-                                        <li><strong>Breach of Contract:</strong> Stripe failed to follow SSA provisions regarding fund processing and release timelines</li>
-                                        <li><strong>Conversion:</strong> Wrongful retention of your property (the withheld funds) beyond reasonable business necessity</li>
-                                        <li><strong>Breach of Implied Covenant of Good Faith:</strong> Stripe must exercise contractual discretion reasonably and in good faith</li>
-                                        <li><strong>CA Business & Professions Code § 17200:</strong> Systematic fund withholding without clear authority constitutes unfair business practice</li>
-                                    </ul>
-                                </div>
-                                
-                                {getAutoSelectedClaims().violations.length > 0 && (
-                                    <div className="risk-card risk-moderate">
-                                        <h3>Specific SSA Violations Based on Your Situation</h3>
-                                        <ul>
-                                            {getAutoSelectedClaims().violations.map((violation, index) => (
-                                                <li key={index}>{violation}</li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                )}
-                                
-                                <div className="tip-box info">
-                                    <div className="tip-title">
-                                        <Icon name="shield" />
-                                        Important Note
-                                    </div>
-                                    <p>Consequential damages are specifically excluded by Stripe's Terms of Service, so this generator focuses on direct damages and restitution claims that are legally viable.</p>
-                                </div>
-                            </div>
-                        )}
+                        currentTab === 2 && React.createElement('div', null,
+                            React.createElement('h2', null, 'Legal Claims (Auto-Selected)'),
+                            React.createElement('p', null, 'These claims will be automatically included in your letter:'),
+                            React.createElement('ul', null,
+                                React.createElement('li', null, 'Breach of Contract'),
+                                React.createElement('li', null, 'Conversion (wrongful retention)'),
+                                React.createElement('li', null, 'Breach of Implied Covenant of Good Faith'),
+                                React.createElement('li', null, 'CA Business & Professions Code § 17200')
+                            )
+                        ),
                         
-                        {/* Tab 4: Supporting Evidence */}
-                        {currentTab === 3 && (
-                            <div>
-                                <h2>Supporting Evidence</h2>
-                                <p>Select the evidence you have to support your position. This strengthens your legal claims.</p>
-                                
-                                <div className="checkbox-grid">
-                                    <div className={`checkbox-item ${formData.lowChargebacks ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="lowChargebacks"
-                                            checked={formData.lowChargebacks}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Low Historical Chargeback Rate</div>
-                                            <div className="checkbox-description">
-                                                You can document that your chargeback rate was below industry standards (typically under 0.75%).
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={`checkbox-item ${formData.compliantPractices ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="compliantPractices"
-                                            checked={formData.compliantPractices}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Documented Compliant Business Practices</div>
-                                            <div className="checkbox-description">
-                                                You have documentation showing compliance with payment processing standards, clear terms of service, proper product descriptions, etc.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.customerSatisfaction ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="customerSatisfaction"
-                                            checked={formData.customerSatisfaction}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Customer Satisfaction Evidence</div>
-                                            <div className="checkbox-description">
-                                                You have positive reviews, testimonials, or low complaint rates that demonstrate customer satisfaction with your business.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.fullDisclosure ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="fullDisclosure"
-                                            checked={formData.fullDisclosure}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Full Business Model Disclosure</div>
-                                            <div className="checkbox-description">
-                                                You fully disclosed your business model and practices during Stripe's onboarding process, making their retroactive concerns unjustified.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div className={`checkbox-item ${formData.shiftingDeadlines ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="shiftingDeadlines"
-                                            checked={formData.shiftingDeadlines}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Documentation of Shifting Payout Deadlines</div>
-                                            <div className="checkbox-description">
-                                                You have emails or communications showing Stripe repeatedly extending promised payout dates without justification.
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div className={`checkbox-item ${formData.businessDamages ? 'selected' : ''}`}>
-                                        <input
-                                            type="checkbox"
-                                            name="businessDamages"
-                                            checked={formData.businessDamages}
-                                            onChange={handleChange}
-                                        />
-                                        <div>
-                                            <div className="checkbox-label">Documented Business Damages</div>
-                                            <div className="checkbox-description">
-                                                You can show specific business harm caused by the fund withholding (inability to fulfill orders, lost suppliers, emergency financing costs, etc.).
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div className="tip-box info">
-                                    <div className="tip-title">
-                                        <Icon name="file-text" />
-                                        Evidence Tips
-                                    </div>
-                                    <p>The more evidence you can select, the stronger your demand letter will be. Each type of evidence will be woven into specific legal arguments automatically.</p>
-                                </div>
-                            </div>
-                        )}
+                        currentTab === 3 && React.createElement('div', null,
+                            React.createElement('h2', null, 'Supporting Evidence'),
+                            React.createElement('label', null,
+                                React.createElement('input', {
+                                    type: 'checkbox',
+                                    name: 'lowChargebacks',
+                                    checked: formData.lowChargebacks,
+                                    onChange: handleChange
+                                }),
+                                ' Low Historical Chargeback Rate'
+                            )
+                        ),
                         
-                        {/* Tab 5: Risk Assessment */}
-                        {currentTab === 4 && (
-                            <div>
-                                <h2>Risk Assessment & Strategy</h2>
-                                <p>Based on your inputs, here's an analysis of your case strength and recommended approach:</p>
-                                
-                                {(() => {
-                                    const assessment = getRiskAssessment();
-                                    return (
-                                        <div>
-                                            <div className={`risk-card ${assessment.riskClass}`}>
-                                                <h3>{assessment.riskLevel} (Score: {assessment.score}/100)</h3>
-                                                <p>Based on the information provided, your case has the following characteristics:</p>
-                                                <ul className="risk-recommendations">
-                                                    {assessment.factors.map((factor, index) => (
-                                                        <li key={index}>{factor}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                            
-                                            <div className="risk-card risk-strong">
-                                                <h3>Recommended Strategy</h3>
-                                                <ul className="risk-recommendations">
-                                                    {assessment.recommendations.map((rec, index) => (
-                                                        <li key={index}>{rec}</li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    );
-                                })()}
-                                
-                                <div className="tip-box info">
-                                    <div className="tip-title">
-                                        <Icon name="calendar" />
-                                        Timeline & Costs
-                                    </div>
-                                    <p><strong>30-Day Notice Period:</strong> Required before filing arbitration (automatically calculated in your letter)</p>
-                                    <p><strong>AAA Filing Fees:</strong> ${formData.withheldAmount && parseFloat(formData.withheldAmount.replace(/[^\d.]/g, '')) < 25000 ? 'Under $2,000 for expedited procedures' : '$2,900+ for standard procedures'}</p>
-                                    <p><strong>Expected Timeline:</strong> 60-90 days for expedited cases, 6-12 months for complex cases</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
+                        currentTab === 4 && React.createElement('div', null,
+                            React.createElement('h2', null, 'Risk Assessment'),
+                            React.createElement('div', { className: `risk-card ${getRiskAssessment().riskClass}` },
+                                React.createElement('h3', null, `${getRiskAssessment().riskLevel} (Score: ${getRiskAssessment().score}/100)`),
+                                React.createElement('p', null, 'Based on your inputs, this is your case assessment.')
+                            )
+                        )
+                    ),
                     
-                    {/* Navigation Buttons */}
-                    <div className="navigation-buttons">
-                        <button
-                            onClick={prevTab}
-                            className={`nav-button ${currentTab === 0 ? 'disabled' : ''}`}
-                            disabled={currentTab === 0}
-                        >
-                            <Icon name="chevron-left" />
-                            Previous
-                        </button>
+                    // Navigation Buttons
+                    React.createElement('div', { className: 'navigation-buttons' },
+                        React.createElement('button', {
+                            onClick: prevTab,
+                            className: `nav-button ${currentTab === 0 ? 'disabled' : ''}`,
+                            disabled: currentTab === 0
+                        }, 'Previous'),
                         
-                        <div style={{ display: 'flex', gap: '10px' }}>
-                            <button
-                                onClick={copyToClipboard}
-                                className="nav-button"
-                                style={{
+                        React.createElement('div', { style: { display: 'flex', gap: '10px' } },
+                            React.createElement('button', {
+                                onClick: copyToClipboard,
+                                className: 'nav-button',
+                                style: {
                                     backgroundColor: "#4f46e5", 
                                     color: "white",
                                     border: "none"
-                                }}
-                            >
-                                <Icon name="copy" />
-                                Copy to Clipboard
-                            </button>
+                                }
+                            }, 'Copy to Clipboard'),
                             
-                            <button
-                                onClick={downloadAsWord}
-                                className="nav-button"
-                                style={{
+                            React.createElement('button', {
+                                onClick: downloadAsWord,
+                                className: 'nav-button',
+                                style: {
                                     backgroundColor: "#2563eb", 
                                     color: "white",
                                     border: "none"
-                                }}
-                            >
-                                <Icon name="file-text" />
-                                Download MS Word
-                            </button>
+                                }
+                            }, 'Download MS Word'),
                             
-                            <button
-                                onClick={() => {
-                                    window.open('', '_blank').document.write(`
-                                        <html>
-                                            <head><title>Stripe Demand Letter</title></head>
-                                            <body style="font-family: Times, serif; padding: 40px; white-space: pre-wrap;">${documentText}</body>
-                                        </html>
-                                    `);
-                                }}
-                                className="consultation-button"
-                                style={{
+                            React.createElement('button', {
+                                onClick: () => {
+                                    if (typeof Calendly !== 'undefined' && Calendly.initPopupWidget) {
+                                        Calendly.initPopupWidget({
+                                            url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
+                                        });
+                                    } else {
+                                        window.open('https://terms.law/call/', '_blank');
+                                    }
+                                },
+                                className: 'consultation-button',
+                                style: {
                                     backgroundColor: "#28a745", 
                                     color: "white",
                                     border: "none"
-                                }}
-                            >
-                                <Icon name="calendar" />
-                                Schedule Consultation
-                            </button>
-                        </div>
+                                }
+                            }, 'Schedule Consultation')
+                        ),
                         
-                        <button
-                            onClick={nextTab}
-                            className={`nav-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`}
-                            disabled={currentTab === tabs.length - 1}
-                        >
-                            Next
-                            <Icon name="chevron-right" />
-                        </button>
-                    </div>
-                </div>
-                {/* Preview Panel */}
-                <div className="preview-panel">
-                    <div className="preview-content">
-                        <div className="preview-header">
-                            <h2>Live Preview</h2>
-                            <p className="preview-text">Your demand letter with 30-day arbitration notice</p>
-                        </div>
-                        <div ref={previewRef} className="document-preview">
-                            <div 
-                                dangerouslySetInnerHTML={{ 
-                                    __html: highlightedText.replace(/\n/g, '<br>') 
-                                }}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                        React.createElement('button', {
+                            onClick: nextTab,
+                            className: `nav-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
+                            disabled: currentTab === tabs.length - 1
+                        }, 'Next')
+                    )
+                ),
+                
+                // Preview Panel
+                React.createElement('div', { className: 'preview-panel' },
+                    React.createElement('div', { className: 'preview-content' },
+                        React.createElement('div', { className: 'preview-header' },
+                            React.createElement('h2', null, 'Live Preview'),
+                            React.createElement('p', { className: 'preview-text' }, 'Your demand letter with 30-day arbitration notice')
+                        ),
+                        React.createElement('div', { 
+                            ref: previewRef, 
+                            className: 'document-preview',
+                            dangerouslySetInnerHTML: { 
+                                __html: highlightedText.replace(/\n/g, '<br>') 
+                            }
+                        })
+                    )
+                )
+            )
+        )
     );
 };
 
 // Render the component
-ReactDOM.render(<StripeDemandGenerator />, document.getElementById('root'));
+ReactDOM.render(React.createElement(StripeDemandGenerator), document.getElementById('root'));
