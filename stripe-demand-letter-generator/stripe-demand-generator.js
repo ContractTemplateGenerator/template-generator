@@ -127,7 +127,7 @@ const StripeDemandGenerator = () => {
         
         // Tab 5: Legal Strategy & Timeline
         responseDeadline: 14,
-        includeArbitrationDraft: true,
+        includeArbitrationDraft: false, // NEW - toggle to include arb demand attachment
         expeditedProcedures: false
     });
 
@@ -137,7 +137,8 @@ const StripeDemandGenerator = () => {
         { id: 'reasons', label: 'Stripe\'s Reasons' },
         { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
-        { id: 'assessment', label: 'Risk Assessment' }
+        { id: 'assessment', label: 'Risk Assessment' },
+        { id: 'arbdemand', label: 'Arb Demand' }
     ];
     
     // Handle input changes
@@ -348,6 +349,171 @@ const StripeDemandGenerator = () => {
         return strategies;
     };
 
+    // Generate the arbitration demand document
+    const generateArbitrationDemand = () => {
+        const dates = calculateDates();
+        const { claims, violations } = getAutoSelectedClaims();
+        const establishmentBenefits = getAccountEstablishmentBenefits();
+        const fees = calculateAAAfees();
+        
+        // Build reasons list from article categories
+        const reasons = [];
+        if (formData.highRisk) reasons.push('designated as "high risk" without specific evidence');
+        if (formData.elevatedDispute) reasons.push('claimed elevated dispute rate without providing actual metrics');
+        if (formData.policyViolation) reasons.push('alleged policy violations without identifying specific violations');
+        if (formData.riskAssessment) reasons.push('ongoing risk assessment without timeline or completion criteria');
+        if (formData.chargebackLiability) reasons.push('ongoing chargeback liability concerns beyond reasonable windows');
+        if (formData.accountReview) reasons.push('account review in progress without specific timeline');
+        if (formData.businessModelIssue) reasons.push('retroactive business model concerns despite initial approval');
+        if (formData.indefiniteHold) reasons.push('indefinite fund holding without clear resolution criteria');
+        if (formData.shiftingTimelines) reasons.push('continuously shifting payout timelines without explanation');
+        if (formData.retroactiveRisk) reasons.push('retroactive risk designation after processing payments');
+        if (formData.communicationBlackout) reasons.push('communication blackout and unresponsive support');
+        if (formData.chargebackLoop) reasons.push('creating chargeback loops that worsen dispute metrics');
+        if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
+
+        // Build evidence list
+        const evidence = [];
+        if (formData.lowChargebacks) evidence.push('low historical chargeback rate (below industry standards)');
+        if (formData.compliantPractices) evidence.push('documented compliant business practices and clear terms');
+        if (formData.customerSatisfaction) evidence.push('customer satisfaction metrics and positive reviews');
+        if (formData.fullDisclosure) evidence.push('full business model disclosure during Stripe onboarding');
+        if (formData.shiftingDeadlines) evidence.push('documentation of Stripe\'s shifting payout deadlines');
+        if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
+        if (formData.customEvidence && formData.customEvidenceText) evidence.push(formData.customEvidenceText);
+
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        
+        let demand = `AMERICAN ARBITRATION ASSOCIATION
+COMMERCIAL ARBITRATION RULES
+
+DEMAND FOR ARBITRATION
+
+Case Title: ${formData.companyName || '[COMPANY NAME]'} v. Stripe, Inc. and Stripe Payments Company
+
+TO: American Arbitration Association
+     1633 Broadway, 10th Floor
+     New York, NY 10019
+
+FROM: ${formData.contactName || '[CONTACT NAME]'}
+      ${formData.companyName || '[COMPANY NAME]'}
+      ${formData.address || '[ADDRESS]'}
+      ${formData.city || '[CITY]'}, ${formData.state} ${formData.zipCode || '[ZIP]'}
+      ${formData.phone || '[PHONE]'}
+      ${formData.email || '[EMAIL]'}
+
+DATE: ${dates.letterDate}
+
+EXPEDITED PROCEDURES REQUESTED: ${amount < 25000 ? 'YES (Claim under $25,000)' : 'NO'}
+
+PARTIES
+
+CLAIMANT: ${formData.companyName || '[COMPANY NAME]'}, a ${formData.state} business entity
+
+RESPONDENTS: 
+1. Stripe, Inc., a Delaware corporation
+   354 Oyster Point Boulevard
+   South San Francisco, CA 94080
+
+2. Stripe Payments Company, a Delaware corporation
+   354 Oyster Point Boulevard  
+   South San Francisco, CA 94080
+
+NATURE OF DISPUTE
+
+This dispute arises from Respondents' breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. Despite the contractual obligation to process payments and release funds within reasonable timeframes, Respondents continue to hold Claimant's funds without justification${formData.promisedReleaseDate ? `, including beyond the promised release date of ${formData.promisedReleaseDate}` : ''}.
+
+STATEMENT OF CLAIMS
+
+COUNT I: BREACH OF CONTRACT
+
+1. Claimant and Respondents entered into the Stripe Services Agreement, whereby Respondents agreed to process payment transactions and release funds according to the terms specified therein.
+
+2. ${establishmentBenefits.length > 0 ? establishmentBenefits.join('. ') + '. ' : ''}Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Respondents, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.
+
+3. ${formData.terminationDate ? 
+    `On ${formData.terminationDate}, Respondents terminated Claimant's merchant account and withheld $${formData.withheldAmount || '[AMOUNT]'}` :
+    `Respondents initiated a hold on $${formData.withheldAmount || '[AMOUNT]'} in Claimant's merchant funds`
+}, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement' : ''}.
+
+4. Respondents have materially breached the SSA by: (a) withholding funds for an unreasonable period without contractual authority; (b) failing to provide specific justification for the withholding beyond general references to "risk"; ${formData.promisedReleaseDate ? '(c) failing to release funds by the promised date; ' : ''}(d) failing to establish concrete timelines for fund release.
+
+5. As a direct and proximate result of Respondents' breach, Claimant has suffered damages including but not limited to: loss of use of funds, business disruption, and inability to fulfill customer obligations.
+
+COUNT II: CONVERSION
+
+6. Claimant realleges and incorporates paragraphs 1-5 as if fully set forth herein.
+
+7. At all relevant times, the withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided.
+
+8. Respondents have wrongfully exercised dominion and control over Claimant's property by withholding said funds beyond any reasonable period necessary for legitimate risk management purposes.
+
+9. Respondents' retention of Claimant's funds constitutes conversion, depriving Claimant of its rightful property without legal justification.
+
+COUNT III: BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING
+
+10. Claimant realleges and incorporates paragraphs 1-9 as if fully set forth herein.
+
+11. Every contract contains an implied covenant of good faith and fair dealing that neither party will do anything to deprive the other of the benefits of the agreement.
+
+12. Respondents have violated this covenant by: (a) exercising their discretionary powers under the SSA arbitrarily and without reasonable basis; (b) withholding funds without providing adequate justification; (c) failing to communicate reasonably regarding the status of withheld funds; ${formData.shiftingTimelines ? '(d) repeatedly extending promised timelines without explanation; ' : ''}(e) creating conditions that prevent Claimant from fulfilling customer obligations.
+
+COUNT IV: VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200
+
+13. Claimant realleges and incorporates paragraphs 1-12 as if fully set forth herein.
+
+14. Respondents' systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice under California Business & Professions Code § 17200.
+
+15. Respondents have engaged in conduct that is contrary to public policy and prejudicial to consumers and competitors by maintaining unfair and arbitrary fund withholding practices.
+
+16. Claimant seeks restitution of any profits earned by Respondents on the improperly withheld funds, including interest earned during the withholding period.
+
+FACTUAL BASIS FOR CLAIMS
+
+${evidence.length > 0 ? `The claims are supported by the following evidence:
+${evidence.map(item => `• ${item}`).join('\n')}` : 'Claimant has documented evidence supporting these claims, including processing history and communications with Respondents.'}
+
+${formData.businessDamages ? 'Claimant has suffered specific business damages as a result of the fund withholding, including inability to fulfill orders, emergency financing costs, and customer relationship damage.' : ''}
+
+RELIEF SOUGHT
+
+WHEREFORE, Claimant respectfully requests that this Tribunal:
+
+A. Award damages for breach of contract in an amount to be proven at hearing, but not less than $${formData.withheldAmount || '[AMOUNT]'};
+
+B. Award damages for conversion in an amount to be proven at hearing;
+
+C. Order immediate release of all withheld funds;
+
+D. Award restitution of any interest or profits earned on withheld funds;
+
+E. Award costs and expenses of this arbitration${amount > 75000 ? ' and reasonable attorneys\' fees' : ''};
+
+F. Award such other relief as the Tribunal deems just and proper.
+
+AMOUNT IN CONTROVERSY: $${formData.withheldAmount || '[AMOUNT]'}
+
+ADMINISTRATIVE INFORMATION
+
+Filing Fee: $${fees.initial.toLocaleString()} (Initial)
+Final Fee: $${fees.final.toLocaleString()} (Due upon case completion)
+${amount < 25000 ? 'Expedited Procedures: Requested under Rule E-1 (claim under $25,000)' : 'Standard Commercial Rules Apply'}
+
+Hearing Location Preference: Los Angeles, California or Virtual Hearing
+
+CERTIFICATION
+
+I certify that a copy of this Demand has been served upon all named Respondents at the addresses listed above via certified mail, return receipt requested.
+
+${formData.contactName || '[CONTACT NAME]'}
+${formData.companyName || '[COMPANY NAME]'}
+Claimant
+
+Dated: ${dates.letterDate}`;
+
+        return demand;
+    };
+
     // Generate the demand letter document
     const generateDemandLetter = () => {
         const dates = calculateDates();
@@ -457,6 +623,8 @@ To resolve this matter without proceeding to arbitration, I demand the following
 
 If I do not receive a satisfactory response by ${dates.responseDate}, I intend to file an arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
 
+${formData.includeArbitrationDraft ? 'Attached hereto as Exhibit A is a draft arbitration demand that will be filed with the American Arbitration Association if this matter is not resolved within the specified timeframe. This attachment demonstrates the seriousness of this matter and my preparedness to pursue all available legal remedies.' : ''}
+
 I look forward to your prompt attention to this matter.
 
 Sincerely,
@@ -467,13 +635,23 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         return letter;
     };
     
-    // Get current document text
-    const documentText = generateDemandLetter();
+    // Get current document text - switch based on tab
+    const documentText = currentTab === 5 ? generateArbitrationDemand() : generateDemandLetter();
 
     // Copy to clipboard function
     const copyToClipboard = () => {
-        navigator.clipboard.writeText(documentText).then(() => {
-            alert('Demand letter copied to clipboard!');
+        let finalDocumentText = documentText;
+        
+        // If on demand letter tab and arb demand attachment is enabled, combine both documents
+        if (currentTab !== 5 && formData.includeArbitrationDraft) {
+            const arbDemand = generateArbitrationDemand();
+            finalDocumentText = documentText + '\n\n' + '='.repeat(50) + '\nEXHIBIT A\nDRAFT ARBITRATION DEMAND\n' + '='.repeat(50) + '\n\n' + arbDemand;
+        }
+        
+        navigator.clipboard.writeText(finalDocumentText).then(() => {
+            const docType = currentTab === 5 ? 'Arbitration demand' : 
+                           (formData.includeArbitrationDraft && currentTab !== 5 ? 'Demand letter with arbitration demand attachment' : 'Demand letter');
+            alert(`${docType} copied to clipboard!`);
         }).catch(err => {
             console.error('Failed to copy: ', err);
             alert('Failed to copy to clipboard. Please try selecting and copying manually.');
@@ -491,9 +669,17 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 return;
             }
             
-            window.generateWordDoc(documentText, {
-                documentTitle: "Stripe Demand Letter",
-                fileName: `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`
+            let finalDocumentText = documentText;
+            
+            // If on demand letter tab and arb demand attachment is enabled, combine both documents
+            if (currentTab !== 5 && formData.includeArbitrationDraft) {
+                const arbDemand = generateArbitrationDemand();
+                finalDocumentText = documentText + '\f\n\nEXHIBIT A\nDRAFT ARBITRATION DEMAND\n\n' + arbDemand;
+            }
+            
+            window.generateWordDoc(finalDocumentText, {
+                documentTitle: currentTab === 5 ? "AAA Arbitration Demand" : "Stripe Demand Letter" + (formData.includeArbitrationDraft && currentTab !== 5 ? " with Arbitration Demand" : ""),
+                fileName: `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-${currentTab === 5 ? 'Arbitration-Demand' : 'Demand-Letter'}${formData.includeArbitrationDraft && currentTab !== 5 ? '-with-Exhibit-A' : ''}`
             });
         } catch (error) {
             console.error("Error in downloadAsWord:", error);
@@ -547,6 +733,19 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                     return 'evidence-section';
                 }
                 return null;
+            case 4: // Risk Assessment tab
+                if (lastChanged === 'includeArbitrationDraft') {
+                    return 'attachment-section';
+                }
+                return null;
+            case 5: // Arbitration Demand - different sections
+                if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
+                    return 'arb-header-info';
+                }
+                if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory'].includes(lastChanged)) {
+                    return 'arb-background';
+                }
+                return null;
             default:
                 return null;
         }
@@ -566,7 +765,11 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'background-section': /FACTUAL BACKGROUND.*?(?=LEGAL CLAIMS)/s,
             'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
-            'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s
+            'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
+            'attachment-section': /Attached hereto as Exhibit A.*?legal remedies\./s,
+            // Arbitration demand sections
+            'arb-header-info': /Case Title:.*?EXPEDITED PROCEDURES REQUESTED: [^\n]*/s,
+            'arb-background': /NATURE OF DISPUTE.*?(?=STATEMENT OF CLAIMS)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -1737,10 +1940,14 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 5: UPGRADED Attorney-Level Risk Assessment (REMOVED generic action checkboxes)
+                    // Tab 5: Risk Assessment (REMOVED "Attorney-Level" language)
                     currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Attorney-Level Case Analysis'),
-                        React.createElement('p', { key: 'p' }, 'Professional assessment of your case strength and strategic recommendations:'),
+                        React.createElement('h2', { key: 'h2' }, 'Case Analysis & Strategy'),
+                        React.createElement('p', { key: 'p' }, 'Educational assessment of case factors and strategic considerations:'),
+                        React.createElement('div', { key: 'disclaimer', className: 'tip-box warning', style: { marginBottom: '20px' } }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, '⚠️ Important Disclaimer'),
+                            React.createElement('p', { key: 'text' }, 'This analysis is for educational purposes only and does not constitute legal advice. Consult with a qualified attorney for professional legal guidance specific to your situation.')
+                        ]),
                         
                         (() => {
                             const assessment = getRiskAssessment();
@@ -1816,6 +2023,95 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     ])
                                 ];
                             })()
+                        ]),
+                        
+                        React.createElement('div', { key: 'attachment-option', className: 'tip-box' }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Demand Letter Options'),
+                            React.createElement('div', { key: 'toggle-container', style: { marginTop: '15px' } }, [
+                                React.createElement('div', { 
+                                    key: 'include-arb',
+                                    className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }}),
+                                    style: { marginBottom: '0' }
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'includeArbitrationDraft',
+                                        checked: formData.includeArbitrationDraft,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Draft Arbitration Demand'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Attach the arbitration demand as Exhibit A to demonstrate preparedness and increase pressure for resolution.')
+                                    ])
+                                ])
+                            ])
+                        ])
+                    ]),
+                    
+                    // Tab 6: Arbitration Demand Generator
+                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Arbitration Demand Generator'),
+                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand based on your information from the previous tabs.'),
+                        
+                        React.createElement('div', { key: 'info-card', className: 'tip-box info' }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'About This Document'),
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules and is designed to survive initial procedural challenges.'),
+                            React.createElement('p', { key: 'attachment-note', style: { marginTop: '10px', fontWeight: '500' } }, 
+                                formData.includeArbitrationDraft ? 
+                                '✅ This arbitration demand will be included as Exhibit A with your demand letter.' :
+                                '💡 Tip: You can attach this to your demand letter by checking "Include Draft Arbitration Demand" in the Risk Assessment tab.'
+                            )
+                        ]),
+                        
+                        (() => {
+                            const fees = calculateAAAfees();
+                            const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+                            
+                            return React.createElement('div', { key: 'arb-details' }, [
+                                React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
+                                    React.createElement('h3', { key: 'h3' }, 'Filing Information'),
+                                    React.createElement('p', { key: 'fees' }, [
+                                        React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
+                                        `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
+                                    ]),
+                                    amount < 25000 && React.createElement('p', { key: 'expedited' }, [
+                                        React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
+                                        'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
+                                    ]),
+                                    React.createElement('p', { key: 'location' }, [
+                                        React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
+                                        'Los Angeles, CA or Virtual (as specified in demand)'
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
+                                    React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
+                                    React.createElement('ul', { key: 'claims-list' }, [
+                                        React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
+                                        React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
+                                        React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
+                                        React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
+                                    ])
+                                ]),
+                                
+                                React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
+                                    React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
+                                    React.createElement('ol', { key: 'steps' }, [
+                                        React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
+                                        React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
+                                        React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
+                                        React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
+                                        React.createElement('li', { key: '5' }, 'Prepare for case management conference')
+                                    ])
+                                ])
+                            ]);
+                        })(),
+                        
+                        React.createElement('div', { key: 'disclaimer', className: 'tip-box warning' }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, '⚠️ Legal Disclaimer'),
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand template is for educational purposes only. While designed to include necessary legal elements, you should have any arbitration filing reviewed by qualified legal counsel before submission. Filing requirements and strategies may vary based on specific case facts.')
                         ])
                     ])
                 ]),
@@ -1867,7 +2163,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 React.createElement('div', { key: 'content', className: 'preview-content' }, [
                     React.createElement('div', { key: 'header', className: 'preview-header' }, [
                         React.createElement('h2', { key: 'title' }, 'Live Preview'),
-                        React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 'Your demand letter with 30-day arbitration notice')
+                        React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 
+                            currentTab === 5 ? 'Your AAA arbitration demand' : 
+                            `Your demand letter with 30-day arbitration notice${formData.includeArbitrationDraft ? ' + Exhibit A (arbitration demand)' : ''}`
+                        )
                     ]),
                     React.createElement('div', { 
                         key: 'document',
