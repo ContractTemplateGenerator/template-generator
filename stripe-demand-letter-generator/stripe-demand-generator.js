@@ -638,6 +638,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             // Show combined document like what will be downloaded
             const demandLetter = generateDemandLetter();
             const arbitrationDemand = generateArbitrationDemand();
+            // For live preview, use visible separator since form feed won't display
             return demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
         } else {
             return generateDemandLetter();
@@ -683,7 +684,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 const arbitrationDemand = generateArbitrationDemand();
                 
                 // Add proper page break formatting for MS Word
-                finalDocumentText = demandLetter + '\n\n\f\n\n' + arbitrationDemand;
+                finalDocumentText = demandLetter + '\f' + arbitrationDemand;
                 documentTitle = "Stripe Demand Letter with Arbitration Demand";
                 fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
             } else {
@@ -757,7 +758,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 return null;
             case 4: // Arbitration Demand tab (NEW)
                 if (lastChanged === 'includeArbitrationDraft') {
-                    return 'arbitration-section';
+                    return formData.includeArbitrationDraft ? 'arbitration-section' : 'demand-letter-section';
                 }
                 if (['expeditedProcedures', 'claimPunitiveDamages', 'includeAttorneyFees', 'includeInterestOnFunds', 'injunctiveRelief'].includes(lastChanged)) {
                     return 'arbitration-options';
@@ -788,9 +789,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
             'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
-            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=AMERICAN ARBITRATION ASSOCIATION)/s,
-            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES)/s,
-            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY)/s
+            'demand-letter-section': /^[^\n]+\n[^\n]+\n[^\n]+.*?(?=ARBITRATION DEMAND \(ATTACHMENT\)|$)/s,
+            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=$)/s,
+            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES|ARBITRATION VENUE)/s,
+            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY|$)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -2109,40 +2111,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             ])
                         ]),
                         
-                        // AAA Filing Fees Section (moved from other tab)
-                        React.createElement('div', { key: 'fees-section', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, '2025 AAA Filing Fees & Timeline'),
-                            (() => {
-                                const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-                                const additionalDamages = formData.specificDamagesAmount ? 
-                                    parseFloat(formData.specificDamagesAmount.replace(/[^\d.]/g, '')) : 0;
-                                const totalAmount = amount + additionalDamages;
-                                
-                                return [
-                                    React.createElement('p', { key: 'total' }, [
-                                        React.createElement('strong', { key: 'total-label' }, 'Total Claim Amount: '),
-                                        `$${totalAmount.toLocaleString()}`
-                                    ]),
-                                    React.createElement('p', { key: 'fees' }, [
-                                        React.createElement('strong', { key: 'fees-label' }, 'Estimated AAA Costs: '),
-                                        `$500+ initial filing fee + proceed fee + final fee = $1,500-$3,000 range`
-                                    ]),
-                                    React.createElement('p', { key: 'arbitrator' }, [
-                                        React.createElement('strong', { key: 'arb-label' }, 'Arbitrator Fees: '),
-                                        '$300/hour (you pay unless Stripe agrees to split)'
-                                    ]),
-                                    React.createElement('p', { key: 'timeline' }, [
-                                        React.createElement('strong', { key: 'time-label' }, 'Timeline: '),
-                                        formData.expeditedProcedures ? '60-90 days (expedited)' : '6-12 months (standard)'
-                                    ]),
-                                    totalAmount < 25000 && React.createElement('p', { key: 'expedited-tip' }, [
-                                        React.createElement('strong', { key: 'exp-label' }, '💡 Tip: '), 
-                                        'Your claim qualifies for expedited procedures - faster and often cheaper resolution.'
-                                    ])
-                                ];
-                            })()
-                        ]),
-                        
                         // How to Send Section
                         React.createElement('div', { key: 'sending-section', className: 'tip-box warning' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'How to Send Your Demand Letter'),
@@ -2164,42 +2132,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 React.createElement('p', { key: 'step3-text', style: { marginLeft: '20px' } }, 'Save certified mail receipt, delivery confirmation, and email confirmation. You\'ll need these for arbitration filing.')
                             ])
                         ]),
-                        
-                        // Case Analysis (moved from Risk Assessment tab)
-                        (() => {
-                            const assessment = getRiskAssessment();
-                            const complexity = analyzeCaseComplexity();
-                            const evidenceStrategy = getEvidenceStrategy();
-                            
-                            return React.createElement('div', { key: 'analysis-section' }, [
-                                React.createElement('h3', { key: 'analysis-title', style: { marginTop: '30px', color: '#2c3e50' } }, 'Case Strength Analysis'),
-                                React.createElement('div', { key: 'disclaimer', className: 'tip-box warning', style: { marginBottom: '20px' } }, [
-                                    React.createElement('div', { key: 'disclaimer-title', className: 'tip-title' }, '⚠️ Educational Analysis Only'),
-                                    React.createElement('p', { key: 'disclaimer-text' }, 'This analysis is for educational purposes and does not constitute legal advice. Consult a qualified attorney for professional guidance.')
-                                ]),
-                                
-                                React.createElement('div', { key: 'score-card', className: `risk-card ${assessment.riskClass}` }, [
-                                    React.createElement('h4', { key: 'h4' }, `Case Strength: ${assessment.riskLevel} (${assessment.score}/100)`),
-                                    React.createElement('ul', { key: 'factors', style: { fontSize: '14px' } }, 
-                                        assessment.factors.slice(0, 3).map((factor, index) => 
-                                            React.createElement('li', { key: index }, factor)
-                                        )
-                                    )
-                                ]),
-                                
-                                evidenceStrategy.length > 0 && React.createElement('div', { key: 'evidence-priorities', className: 'risk-card risk-moderate' }, [
-                                    React.createElement('h4', { key: 'h4' }, 'Evidence Priorities'),
-                                    React.createElement('div', { key: 'evidence-list' },
-                                        evidenceStrategy.slice(0, 2).map((item, index) => 
-                                            React.createElement('div', { key: index, style: { marginBottom: '10px', fontSize: '14px' } }, [
-                                                React.createElement('strong', { key: 'priority' }, `${item.priority}. ${item.evidence}`),
-                                                React.createElement('div', { key: 'impact', style: { color: '#28a745' } }, item.impact)
-                                            ])
-                                        )
-                                    )
-                                ])
-                            ]);
-                        })(),
                         
                         React.createElement('div', { key: 'strategy-tip', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'Strategic Timing'),
