@@ -519,7 +519,16 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             factors.push('⚠️ Short processing history may support Stripe\'s risk concerns');
         }
         
-        if (reasons.length === 0) {
+        // Check if user has selected any Stripe reasons
+        const selectedReasons = [
+            formData.highRisk, formData.elevatedDispute, formData.policyViolation,
+            formData.riskAssessment, formData.chargebackLiability, formData.accountReview,
+            formData.businessModelIssue, formData.indefiniteHold, formData.shiftingTimelines,
+            formData.retroactiveRisk, formData.communicationBlackout, formData.chargebackLoop,
+            formData.customReason
+        ].some(reason => reason);
+        
+        if (!selectedReasons) {
             score -= 10;
             factors.push('⚠️ No specific Stripe reasons identified weakens response strategy');
         }
