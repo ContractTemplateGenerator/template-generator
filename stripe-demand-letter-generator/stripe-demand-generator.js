@@ -2057,57 +2057,59 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         React.createElement('div', { key: 'info-card', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'About This Document'),
                             React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules.'),
-                            React.createElement('p', { key: 'attachment-note', style: { marginTop: '10px', fontWeight: '500' } }, 
-                                formData.includeArbitrationDraft ? 
+                            React.createElement('p', { 
+                                key: 'attachment-note', 
+                                style: { marginTop: '10px', fontWeight: '500' } 
+                            }, formData.includeArbitrationDraft ? 
                                 '✅ This arbitration demand will be included as Exhibit A with your demand letter.' :
                                 '💡 Tip: Check the box above to attach this to your demand letter for maximum impact.'
                             )
                         ]),
                         
-                        React.createElement('div', { key: 'arb-details' }, [
-                            (() => {
+                        // Simplified filing information section
+                        React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
+                            React.createElement('h3', { key: 'h3' }, 'Filing Information'),
+                            React.createElement('p', { key: 'fees' }, (() => {
                                 const fees = calculateAAAfees();
-                                const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-                                
                                 return [
-                                    React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
-                                        React.createElement('h3', { key: 'h3' }, 'Filing Information'),
-                                        React.createElement('p', { key: 'fees' }, [
-                                            React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
-                                            `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
-                                        ]),
-                                        amount < 25000 && React.createElement('p', { key: 'expedited' }, [
-                                            React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
-                                            'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
-                                        ]),
-                                        React.createElement('p', { key: 'location' }, [
-                                            React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
-                                            'Los Angeles, CA or Virtual (as specified in demand)'
-                                        ])
-                                    ]),
-                                    
-                                    React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
-                                        React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
-                                        React.createElement('ul', { key: 'claims-list' }, [
-                                            React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
-                                            React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
-                                            React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
-                                            React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
-                                        ])
-                                    ]),
-                                    
-                                    React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
-                                        React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
-                                        React.createElement('ol', { key: 'steps' }, [
-                                            React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
-                                            React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
-                                            React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
-                                            React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
-                                            React.createElement('li', { key: '5' }, 'Prepare for case management conference')
-                                        ])
-                                    ])
+                                    React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
+                                    `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
                                 ];
-                            })()
+                            })()),
+                            (() => {
+                                const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+                                return amount < 25000 ? React.createElement('p', { key: 'expedited' }, [
+                                    React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
+                                    'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
+                                ]) : null;
+                            })(),
+                            React.createElement('p', { key: 'location' }, [
+                                React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
+                                'Los Angeles, CA or Virtual (as specified in demand)'
+                            ])
+                        ]),
+                        
+                        // Legal claims section
+                        React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
+                            React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
+                            React.createElement('ul', { key: 'claims-list' }, [
+                                React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
+                                React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
+                                React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
+                                React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
+                            ])
+                        ]),
+                        
+                        // Next steps section
+                        React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
+                            React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
+                            React.createElement('ol', { key: 'steps' }, [
+                                React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
+                                React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
+                                React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
+                                React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
+                                React.createElement('li', { key: '5' }, 'Prepare for case management conference')
+                            ])
                         ]),
                         
                         React.createElement('div', { key: 'disclaimer', className: 'tip-box warning' }, [
