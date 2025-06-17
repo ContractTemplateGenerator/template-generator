@@ -2026,24 +2026,26 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Filing Document (ULTRA MINIMAL - EXACTLY LIKE WORKING TABS)
-                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
-                        React.createElement('p', { key: 'p' }, 'Generate arbitration demand document.'),
-                        
-                        React.createElement('div', { key: 'row1', className: 'form-row' }, [
-                            React.createElement('div', { key: 'attach', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Include as Exhibit A'),
+                    // Tab 6: Arbitration Filing Document (WITH DEBUG LOGGING)
+                    currentTab === 5 && (() => {
+                        console.log('Rendering Tab 6, currentTab:', currentTab);
+                        console.log('formData.includeArbitrationDraft:', formData.includeArbitrationDraft);
+                        return React.createElement('div', { key: 'tab6' }, [
+                            React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
+                            React.createElement('p', { key: 'p' }, 'This tab is working!'),
+                            
+                            React.createElement('div', { key: 'checkbox-test' }, [
+                                React.createElement('label', { key: 'label' }, 'Test Checkbox: '),
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
                                     name: 'includeArbitrationDraft',
-                                    checked: formData.includeArbitrationDraft,
+                                    checked: formData.includeArbitrationDraft || false,
                                     onChange: handleChange
                                 })
                             ])
-                        ])
-                    ])
+                        ]);
+                    })()
                 ]),
                 
                 // Navigation Buttons
