@@ -138,7 +138,7 @@ const StripeDemandGenerator = () => {
         { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
         { id: 'assessment', label: 'Risk Assessment' },
-        { id: 'arbdemand', label: 'Arb Demand' }
+        { id: 'arbitration', label: 'Arbitration Filing' }
     ];
     
     // Handle input changes
@@ -734,16 +734,16 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 }
                 return null;
             case 4: // Risk Assessment tab
-                if (lastChanged === 'includeArbitrationDraft') {
-                    return 'attachment-section';
-                }
                 return null;
-            case 5: // Arbitration Demand - different sections
+            case 5: // Arbitration Filing tab
                 if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
                     return 'arb-header-info';
                 }
                 if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory'].includes(lastChanged)) {
                     return 'arb-background';
+                }
+                if (lastChanged === 'includeArbitrationDraft') {
+                    return 'attachment-section';
                 }
                 return null;
             default:
@@ -2023,95 +2023,96 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     ])
                                 ];
                             })()
-                        ]),
-                        
-                        React.createElement('div', { key: 'attachment-option', className: 'tip-box' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Demand Letter Options'),
-                            React.createElement('div', { key: 'toggle-container', style: { marginTop: '15px' } }, [
-                                React.createElement('div', { 
-                                    key: 'include-arb',
-                                    className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
-                                    onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }}),
-                                    style: { marginBottom: '0' }
-                                }, [
-                                    React.createElement('input', {
-                                        key: 'input',
-                                        type: 'checkbox',
-                                        name: 'includeArbitrationDraft',
-                                        checked: formData.includeArbitrationDraft,
-                                        onChange: handleChange
-                                    }),
-                                    React.createElement('div', { key: 'content' }, [
-                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Draft Arbitration Demand'),
-                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Attach the arbitration demand as Exhibit A to demonstrate preparedness and increase pressure for resolution.')
-                                    ])
-                                ])
-                            ])
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Demand Generator
+                    // Tab 6: Arbitration Filing Document (SIMPLIFIED STRUCTURE)
                     currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Arbitration Demand Generator'),
-                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand based on your information from the previous tabs.'),
+                        React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
+                        React.createElement('p', { key: 'p' }, 'Generate a complete AAA arbitration demand and optionally attach it to your demand letter.'),
+                        
+                        // Toggle at top of this tab
+                        React.createElement('div', { key: 'attachment-toggle', className: 'tip-box' }, [
+                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Attachment Options'),
+                            React.createElement('div', { 
+                                key: 'include-arb',
+                                className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }}),
+                                style: { marginTop: '15px', marginBottom: '0' }
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'includeArbitrationDraft',
+                                    checked: formData.includeArbitrationDraft,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Attach to Demand Letter as Exhibit A'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Include this arbitration demand with your demand letter to demonstrate preparedness and increase settlement pressure.')
+                                ])
+                            ])
+                        ]),
                         
                         React.createElement('div', { key: 'info-card', className: 'tip-box info' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'About This Document'),
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules and is designed to survive initial procedural challenges.'),
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand is automatically generated from your inputs in the previous tabs. It includes all necessary elements required by AAA Commercial Rules.'),
                             React.createElement('p', { key: 'attachment-note', style: { marginTop: '10px', fontWeight: '500' } }, 
                                 formData.includeArbitrationDraft ? 
                                 '✅ This arbitration demand will be included as Exhibit A with your demand letter.' :
-                                '💡 Tip: You can attach this to your demand letter by checking "Include Draft Arbitration Demand" in the Risk Assessment tab.'
+                                '💡 Tip: Check the box above to attach this to your demand letter for maximum impact.'
                             )
                         ]),
                         
-                        (() => {
-                            const fees = calculateAAAfees();
-                            const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-                            
-                            return React.createElement('div', { key: 'arb-details' }, [
-                                React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Filing Information'),
-                                    React.createElement('p', { key: 'fees' }, [
-                                        React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
-                                        `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
-                                    ]),
-                                    amount < 25000 && React.createElement('p', { key: 'expedited' }, [
-                                        React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
-                                        'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
-                                    ]),
-                                    React.createElement('p', { key: 'location' }, [
-                                        React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
-                                        'Los Angeles, CA or Virtual (as specified in demand)'
-                                    ])
-                                ]),
+                        React.createElement('div', { key: 'arb-details' }, [
+                            (() => {
+                                const fees = calculateAAAfees();
+                                const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
                                 
-                                React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
-                                    React.createElement('ul', { key: 'claims-list' }, [
-                                        React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
-                                        React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
-                                        React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
-                                        React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
+                                return [
+                                    React.createElement('div', { key: 'filing-info', className: 'risk-card risk-strong' }, [
+                                        React.createElement('h3', { key: 'h3' }, 'Filing Information'),
+                                        React.createElement('p', { key: 'fees' }, [
+                                            React.createElement('strong', { key: 'label' }, 'AAA Filing Fees: '),
+                                            `$${fees.initial.toLocaleString()} initial fee + $${fees.final.toLocaleString()} final fee = $${fees.total.toLocaleString()} total`
+                                        ]),
+                                        amount < 25000 && React.createElement('p', { key: 'expedited' }, [
+                                            React.createElement('strong', { key: 'label' }, 'Expedited Procedures: '),
+                                            'Your claim qualifies for expedited procedures (faster resolution, lower costs)'
+                                        ]),
+                                        React.createElement('p', { key: 'location' }, [
+                                            React.createElement('strong', { key: 'label' }, 'Hearing Location: '),
+                                            'Los Angeles, CA or Virtual (as specified in demand)'
+                                        ])
+                                    ]),
+                                    
+                                    React.createElement('div', { key: 'claims-info', className: 'risk-card risk-moderate' }, [
+                                        React.createElement('h3', { key: 'h3' }, 'Legal Claims Included'),
+                                        React.createElement('ul', { key: 'claims-list' }, [
+                                            React.createElement('li', { key: '1' }, 'Breach of Contract (primary claim)'),
+                                            React.createElement('li', { key: '2' }, 'Conversion (wrongful retention of funds)'),
+                                            React.createElement('li', { key: '3' }, 'Breach of Implied Covenant of Good Faith'),
+                                            React.createElement('li', { key: '4' }, 'Violation of CA Business & Professions Code § 17200')
+                                        ])
+                                    ]),
+                                    
+                                    React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
+                                        React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
+                                        React.createElement('ol', { key: 'steps' }, [
+                                            React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
+                                            React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
+                                            React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
+                                            React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
+                                            React.createElement('li', { key: '5' }, 'Prepare for case management conference')
+                                        ])
                                     ])
-                                ]),
-                                
-                                React.createElement('div', { key: 'next-steps', className: 'risk-card risk-strong' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Next Steps After Generation'),
-                                    React.createElement('ol', { key: 'steps' }, [
-                                        React.createElement('li', { key: '1' }, 'Review the generated arbitration demand carefully'),
-                                        React.createElement('li', { key: '2' }, 'Make any necessary customizations for your specific case'),
-                                        React.createElement('li', { key: '3' }, 'File with AAA along with the filing fee'),
-                                        React.createElement('li', { key: '4' }, 'Serve copies on Stripe, Inc. and Stripe Payments Company'),
-                                        React.createElement('li', { key: '5' }, 'Prepare for case management conference')
-                                    ])
-                                ])
-                            ]);
-                        })(),
+                                ];
+                            })()
+                        ]),
                         
                         React.createElement('div', { key: 'disclaimer', className: 'tip-box warning' }, [
                             React.createElement('div', { key: 'title', className: 'tip-title' }, '⚠️ Legal Disclaimer'),
-                            React.createElement('p', { key: 'text' }, 'This arbitration demand template is for educational purposes only. While designed to include necessary legal elements, you should have any arbitration filing reviewed by qualified legal counsel before submission. Filing requirements and strategies may vary based on specific case facts.')
+                            React.createElement('p', { key: 'text' }, 'This arbitration demand template is for educational purposes only. While designed to include necessary legal elements, you should have any arbitration filing reviewed by qualified legal counsel before submission.')
                         ])
                     ])
                 ]),
