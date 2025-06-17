@@ -2026,26 +2026,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         ])
                     ]),
                     
-                    // Tab 6: Arbitration Filing Document (WITH DEBUG LOGGING)
-                    currentTab === 5 && (() => {
-                        console.log('Rendering Tab 6, currentTab:', currentTab);
-                        console.log('formData.includeArbitrationDraft:', formData.includeArbitrationDraft);
-                        return React.createElement('div', { key: 'tab6' }, [
-                            React.createElement('h2', { key: 'h2' }, 'Arbitration Filing Document'),
-                            React.createElement('p', { key: 'p' }, 'This tab is working!'),
-                            
-                            React.createElement('div', { key: 'checkbox-test' }, [
-                                React.createElement('label', { key: 'label' }, 'Test Checkbox: '),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'includeArbitrationDraft',
-                                    checked: formData.includeArbitrationDraft || false,
-                                    onChange: handleChange
-                                })
-                            ])
-                        ]);
-                    })()
+                    // Tab 6: Arbitration Filing Document (ABSOLUTE SIMPLEST)
+                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, 'This is Tab 6 - Arbitration Filing Document')
                 ]),
                 
                 // Navigation Buttons
