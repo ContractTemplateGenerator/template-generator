@@ -419,6 +419,8 @@ NATURE OF DISPUTE
 
 This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
 
+This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
+
 This case involves a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
 
 FACTUAL BACKGROUND
@@ -792,7 +794,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             'demand-letter-section': /^[^\n]+\n[^\n]+\n[^\n]+.*?(?=ARBITRATION DEMAND \(ATTACHMENT\)|$)/s,
             'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=$)/s,
             'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES|ARBITRATION VENUE)/s,
-            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY|$)/s
+            'arbitration-config': /(?:RELIEF SOUGHT|Award damages for|Award restitution|Award reasonable attorney fees).*?(?=AMOUNT IN CONTROVERSY|$)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -2150,6 +2152,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                         `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
                                         fees.expedited ? ' (Expedited procedures available)' : ''
                                     ]),
+                                    React.createElement('p', { key: 'fee-explanation', style: { fontSize: '14px', color: '#6c757d', marginLeft: '10px' } }, [
+                                        React.createElement('strong', { key: 'who-pays' }, 'Who Pays: '), 
+                                        'You (claimant) pay both fees upfront when filing. Initial fee ($', fees.initial.toLocaleString(), ') is due with your arbitration demand. Final fee ($', fees.final.toLocaleString(), ') is due when hearings are scheduled. However, you can request fee reallocation in your arbitration demand, and the arbitrator can order Stripe to reimburse you for these costs if you prevail.'
+                                    ]),
                                     React.createElement('p', { key: 'timeline' }, [
                                         React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
                                         complexity.timeline
@@ -2158,9 +2164,13 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                         React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
                                         complexity.procedures
                                     ]),
+                                    React.createElement('p', { key: 'arbitrator-costs', style: { fontSize: '14px', color: '#6c757d' } }, [
+                                        React.createElement('strong', { key: 'arb-label' }, 'Arbitrator Compensation: '), 
+                                        'Typically $300-600/hour, split equally between parties unless your arbitration clause or arbitrator rules otherwise. Can also be reallocated by the arbitrator.'
+                                    ]),
                                     fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
                                         React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
-                                        'Claims under $25K qualify for streamlined, document-only procedures that are faster and cheaper.'
+                                        'Claims under $75K qualify for expedited procedures - faster resolution and same AAA fees.'
                                     ])
                                 ];
                             })()

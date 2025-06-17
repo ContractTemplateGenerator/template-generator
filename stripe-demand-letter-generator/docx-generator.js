@@ -113,8 +113,8 @@ window.generateWordDoc = function(documentText, formData) {
     
     // Add appendix on a new page if applicable
     if (appendixText) {
-      // Add page break
-      htmlContent += '<div class="page-break"></div>';
+      // Add page break with proper styling
+      htmlContent += '<div style="page-break-before: always;"></div>';
       
       // Process appendix text with same formatting rules
       const appendixHtml = appendixText
