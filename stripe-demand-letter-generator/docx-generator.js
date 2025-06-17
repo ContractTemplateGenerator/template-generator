@@ -15,8 +15,7 @@ window.generateWordDoc = function(documentText, formData) {
     font-family: Times, "Times New Roman", serif;
     font-size: 12pt;
     line-height: 1.5;
-    margin: 0;
-    padding: 0;
+    margin: 1in;
   }
   h1 {
     text-align: center;
@@ -29,10 +28,15 @@ window.generateWordDoc = function(documentText, formData) {
     margin-top: 14pt;
     margin-bottom: 10pt;
     font-weight: bold;
+    text-align: left;
   }
   p {
     margin-bottom: 10pt;
-    text-align: justify;
+    text-align: left;
+  }
+  .center {
+    text-align: center;
+    font-weight: bold;
   }
   .letterhead {
     text-align: center;
@@ -73,14 +77,30 @@ window.generateWordDoc = function(documentText, formData) {
         para = para.trim();
         if (!para) return '';
         
-        // Handle different formatting
+        // Center AAA titles and major section headers
+        if (para.includes('AMERICAN ARBITRATION ASSOCIATION') || 
+            para.includes('COMMERCIAL ARBITRATION RULES') ||
+            para.includes('DEMAND FOR ARBITRATION') ||
+            para === 'PARTIES' ||
+            para === 'NATURE OF DISPUTE' ||
+            para === 'STATEMENT OF CLAIMS' ||
+            para === 'RELIEF SOUGHT' ||
+            para === 'FACTUAL BASIS FOR CLAIMS' ||
+            para === 'ADMINISTRATIVE INFORMATION' ||
+            para === 'CERTIFICATION') {
+          return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
+        }
+        
+        // Handle other special formatting
         if (para.includes('VIA CERTIFIED MAIL')) {
           return `<p style="font-weight: bold;">${para.replace(/\n/g, '<br>')}</p>`;
         }
         if (para.startsWith('Re:')) {
           return `<p style="font-weight: bold;">${para.replace(/\n/g, '<br>')}</p>`;
         }
-        if (para.includes('Sincerely,') || para.includes('Respectfully submitted,')) {
+        if (para.includes('Sincerely,') || para.includes('Respectfully submitted,') || 
+            (para.includes('Claimant') && para.includes('Dated:')) ||
+            para.includes('[CONTACT NAME]')) {
           return `<div class="signature-block"><p>${para.replace(/\n/g, '<br>')}</p></div>`;
         }
         
@@ -96,10 +116,36 @@ window.generateWordDoc = function(documentText, formData) {
       // Add page break
       htmlContent += '<div class="page-break"></div>';
       
-      // Process appendix text
+      // Process appendix text with same formatting rules
       const appendixHtml = appendixText
         .split('\n\n')
-        .map(para => para.trim() ? `<p>${para.replace(/\n/g, '<br>')}</p>` : '')
+        .map(para => {
+          para = para.trim();
+          if (!para) return '';
+          
+          // Center AAA titles and major section headers
+          if (para.includes('AMERICAN ARBITRATION ASSOCIATION') || 
+              para.includes('COMMERCIAL ARBITRATION RULES') ||
+              para.includes('DEMAND FOR ARBITRATION') ||
+              para === 'PARTIES' ||
+              para === 'NATURE OF DISPUTE' ||
+              para === 'STATEMENT OF CLAIMS' ||
+              para === 'RELIEF SOUGHT' ||
+              para === 'FACTUAL BASIS FOR CLAIMS' ||
+              para === 'ADMINISTRATIVE INFORMATION' ||
+              para === 'CERTIFICATION') {
+            return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
+          }
+          
+          // Handle signature blocks
+          if (para.includes('Sincerely,') || para.includes('Respectfully submitted,') || 
+              (para.includes('Claimant') && para.includes('Dated:')) ||
+              para.includes('[CONTACT NAME]')) {
+            return `<div class="signature-block"><p>${para.replace(/\n/g, '<br>')}</p></div>`;
+          }
+          
+          return `<p>${para.replace(/\n/g, '<br>')}</p>`;
+        })
         .join('');
       
       // Add appendix to HTML content
