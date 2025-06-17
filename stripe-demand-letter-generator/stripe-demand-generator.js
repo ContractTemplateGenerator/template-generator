@@ -31,7 +31,8 @@ const StripeDemandGenerator = () => {
         promisedReleaseDate: '',
         businessType: '',
         processingHistory: '',
-        historicalDisputeRate: '',        
+        historicalDisputeRate: '',
+        
         // Tab 2: Stripe's Stated Reasons
         highRisk: false,
         elevatedDispute: false,
@@ -160,6 +161,9 @@ const StripeDemandGenerator = () => {
         if (formData.shiftingDeadlines) evidence.push('documentation of shifting payout deadlines');
         if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
 
+        const daysSinceTermination = formData.terminationDate ? 
+            Math.ceil((new Date() - new Date(formData.terminationDate)) / (1000 * 60 * 60 * 24)) : '[NUMBER]';
+
         return `${formData.companyName || '[COMPANY NAME]'}
 ${formData.address || '[ADDRESS]'}
 ${formData.city || '[CITY]'}, ${formData.state} ${formData.zipCode || '[ZIP]'}
@@ -190,9 +194,9 @@ FACTUAL BACKGROUND
 
 On ${formData.terminationDate || '[DATE]'}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without identifying any specific violations of your Services Agreement. ${formData.promisedReleaseDate ? `At the time, Stripe promised to release the withheld funds by ${formData.promisedReleaseDate}.` : ''}
 
-${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[DURATION]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.
+${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.
 
-In the ${Math.ceil((new Date() - new Date(formData.terminationDate || new Date())) / (1000 * 60 * 60 * 24)) || '[NUMBER]'} days since termination, Stripe has failed to:
+In the ${daysSinceTermination} days since termination, Stripe has failed to:
 - Provide specific justification for the continued withholding beyond general references to "risk"
 - Establish any concrete timeline for releasing the held funds
 - Identify any specific Service Agreement violations that would justify indefinite withholding
@@ -428,231 +432,361 @@ ${formData.includeArbitrationDraft ? '\nEnclosure: Draft Arbitration Demand' : '
         
         return { riskLevel, riskClass, factors, recommendations, score };
     };
-
     // Render function
-    return (
-        React.createElement('div', { className: 'app-container' },
-            React.createElement('div', { className: 'header' },
-                React.createElement('h1', null, 'Stripe Demand Letter Generator'),
-                React.createElement('p', null, 'Generate a professional demand letter with 30-day arbitration notice')
-            ),
-            
-            React.createElement('div', { className: 'main-content' },
-                React.createElement('div', { className: 'form-panel' },
-                    // Tab Navigation
-                    React.createElement('div', { className: 'tab-navigation' },
-                        tabs.map((tab, index) => 
-                            React.createElement('button', {
-                                key: tab.id,
-                                className: `tab-button ${currentTab === index ? 'active' : ''}`,
-                                onClick: () => goToTab(index)
-                            }, `${index + 1}. ${tab.label}`)
-                        )
-                    ),
-                    
-                    // Form Content
-                    React.createElement('div', { className: 'form-content' },
-                        // Tab 1: Account & Situation Details
-                        currentTab === 0 && React.createElement('div', null,
-                            React.createElement('h2', null, 'Account & Situation Details'),
-                            React.createElement('p', null, 'Provide your business information and Stripe account details.'),
-                            
-                            React.createElement('div', { className: 'form-row' },
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Company Name *'),
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        name: 'companyName',
-                                        value: formData.companyName,
-                                        onChange: handleChange,
-                                        placeholder: 'Your Business Name',
-                                        required: true
-                                    })
-                                ),
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Contact Person *'),
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        name: 'contactName',
-                                        value: formData.contactName,
-                                        onChange: handleChange,
-                                        placeholder: 'Your Name',
-                                        required: true
-                                    })
-                                )
-                            ),
-                            
-                            React.createElement('div', { className: 'form-row' },
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Stripe Account ID *'),
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        name: 'stripeAccountId',
-                                        value: formData.stripeAccountId,
-                                        onChange: handleChange,
-                                        placeholder: 'acct_1234567890',
-                                        required: true
-                                    })
-                                ),
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Amount Withheld *'),
-                                    React.createElement('input', {
-                                        type: 'text',
-                                        name: 'withheldAmount',
-                                        value: formData.withheldAmount,
-                                        onChange: handleChange,
-                                        placeholder: '25,000',
-                                        required: true
-                                    })
-                                )
-                            ),
-                            
-                            React.createElement('div', { className: 'form-row' },
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Account Termination Date'),
-                                    React.createElement('input', {
-                                        type: 'date',
-                                        name: 'terminationDate',
-                                        value: formData.terminationDate,
-                                        onChange: handleChange
-                                    })
-                                ),
-                                React.createElement('div', { className: 'form-group' },
-                                    React.createElement('label', null, 'Promised Release Date (if any)'),
-                                    React.createElement('input', {
-                                        type: 'date',
-                                        name: 'promisedReleaseDate',
-                                        value: formData.promisedReleaseDate,
-                                        onChange: handleChange
-                                    })
-                                )
-                            )
-                        ),
+    return React.createElement('div', { className: 'app-container' }, [
+        React.createElement('div', { key: 'header', className: 'header' }, [
+            React.createElement('h1', { key: 'title' }, 'Stripe Demand Letter Generator'),
+            React.createElement('p', { key: 'subtitle' }, 'Generate a professional demand letter with 30-day arbitration notice')
+        ]),
+        
+        React.createElement('div', { key: 'main', className: 'main-content' }, [
+            // Form Panel
+            React.createElement('div', { key: 'form', className: 'form-panel' }, [
+                // Tab Navigation
+                React.createElement('div', { key: 'tabs', className: 'tab-navigation' },
+                    tabs.map((tab, index) => 
+                        React.createElement('button', {
+                            key: tab.id,
+                            className: `tab-button ${currentTab === index ? 'active' : ''}`,
+                            onClick: () => goToTab(index)
+                        }, `${index + 1}. ${tab.label}`)
+                    )
+                ),
+                
+                // Form Content
+                React.createElement('div', { key: 'content', className: 'form-content' }, [
+                    // Tab 1: Account Details
+                    currentTab === 0 && React.createElement('div', { key: 'tab1' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Account & Situation Details'),
+                        React.createElement('p', { key: 'p' }, 'Provide your business information and Stripe account details.'),
                         
-                        // Simplified display for other tabs
-                        currentTab === 1 && React.createElement('div', null,
-                            React.createElement('h2', null, 'Stripe\'s Stated Reasons'),
-                            React.createElement('p', null, 'Check the reasons Stripe gave for withholding your funds:'),
-                            React.createElement('label', null,
+                        React.createElement('div', { key: 'row1', className: 'form-row' }, [
+                            React.createElement('div', { key: 'company', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Company Name *'),
                                 React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'companyName',
+                                    value: formData.companyName,
+                                    onChange: handleChange,
+                                    placeholder: 'Your Business Name'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'contact', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Contact Person *'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'contactName',
+                                    value: formData.contactName,
+                                    onChange: handleChange,
+                                    placeholder: 'Your Name'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'row2', className: 'form-row' }, [
+                            React.createElement('div', { key: 'email', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Email Address *'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'email',
+                                    name: 'email',
+                                    value: formData.email,
+                                    onChange: handleChange,
+                                    placeholder: 'your@email.com'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'phone', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Phone Number'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'tel',
+                                    name: 'phone',
+                                    value: formData.phone,
+                                    onChange: handleChange,
+                                    placeholder: '(555) 123-4567'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'address', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Business Address *'),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: 'text',
+                                name: 'address',
+                                value: formData.address,
+                                onChange: handleChange,
+                                placeholder: 'Street Address'
+                            })
+                        ]),
+                        
+                        React.createElement('div', { key: 'row3', className: 'form-row' }, [
+                            React.createElement('div', { key: 'city', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'City *'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'city',
+                                    value: formData.city,
+                                    onChange: handleChange,
+                                    placeholder: 'City'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'state', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'State'),
+                                React.createElement('select', {
+                                    key: 'select',
+                                    name: 'state',
+                                    value: formData.state,
+                                    onChange: handleChange
+                                }, [
+                                    React.createElement('option', { key: 'ca', value: 'CA' }, 'California'),
+                                    React.createElement('option', { key: 'ny', value: 'NY' }, 'New York'),
+                                    React.createElement('option', { key: 'tx', value: 'TX' }, 'Texas'),
+                                    React.createElement('option', { key: 'fl', value: 'FL' }, 'Florida'),
+                                    React.createElement('option', { key: 'other', value: 'Other' }, 'Other')
+                                ])
+                            ]),
+                            React.createElement('div', { key: 'zip', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'ZIP Code'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'zipCode',
+                                    value: formData.zipCode,
+                                    onChange: handleChange,
+                                    placeholder: '12345'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'row4', className: 'form-row' }, [
+                            React.createElement('div', { key: 'account', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Stripe Account ID *'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'stripeAccountId',
+                                    value: formData.stripeAccountId,
+                                    onChange: handleChange,
+                                    placeholder: 'acct_1234567890'
+                                })
+                            ]),
+                            React.createElement('div', { key: 'amount', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Amount Withheld *'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    name: 'withheldAmount',
+                                    value: formData.withheldAmount,
+                                    onChange: handleChange,
+                                    placeholder: '25,000'
+                                })
+                            ])
+                        ]),
+                        
+                        React.createElement('div', { key: 'row5', className: 'form-row' }, [
+                            React.createElement('div', { key: 'term', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Account Termination Date'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'date',
+                                    name: 'terminationDate',
+                                    value: formData.terminationDate,
+                                    onChange: handleChange
+                                })
+                            ]),
+                            React.createElement('div', { key: 'promised', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Promised Release Date (if any)'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'date',
+                                    name: 'promisedReleaseDate',
+                                    value: formData.promisedReleaseDate,
+                                    onChange: handleChange
+                                })
+                            ])
+                        ])
+                    ]),
+                    
+                    // Tab 2: Stripe's Reasons
+                    currentTab === 1 && React.createElement('div', { key: 'tab2' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Stripe\'s Stated Reasons'),
+                        React.createElement('p', { key: 'p' }, 'Select the reasons Stripe has given for withholding your funds.'),
+                        
+                        React.createElement('div', { key: 'checkboxes', className: 'checkbox-grid' }, [
+                            React.createElement('div', { 
+                                key: 'highrisk',
+                                className: `checkbox-item ${formData.highRisk ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'highRisk', type: 'checkbox', checked: !formData.highRisk }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
                                     type: 'checkbox',
                                     name: 'highRisk',
                                     checked: formData.highRisk,
                                     onChange: handleChange
                                 }),
-                                ' "High Risk" Business Designation'
-                            )
-                        ),
-                        
-                        currentTab === 2 && React.createElement('div', null,
-                            React.createElement('h2', null, 'Legal Claims (Auto-Selected)'),
-                            React.createElement('p', null, 'These claims will be automatically included in your letter:'),
-                            React.createElement('ul', null,
-                                React.createElement('li', null, 'Breach of Contract'),
-                                React.createElement('li', null, 'Conversion (wrongful retention)'),
-                                React.createElement('li', null, 'Breach of Implied Covenant of Good Faith'),
-                                React.createElement('li', null, 'CA Business & Professions Code § 17200')
-                            )
-                        ),
-                        
-                        currentTab === 3 && React.createElement('div', null,
-                            React.createElement('h2', null, 'Supporting Evidence'),
-                            React.createElement('label', null,
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, '"High Risk" Business Designation'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Stripe labeled your business as high risk without providing specific evidence.')
+                                ])
+                            ]),
+                            
+                            React.createElement('div', { 
+                                key: 'dispute',
+                                className: `checkbox-item ${formData.elevatedDispute ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'elevatedDispute', type: 'checkbox', checked: !formData.elevatedDispute }})
+                            }, [
                                 React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'elevatedDispute',
+                                    checked: formData.elevatedDispute,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Elevated Dispute Rate'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Claimed your chargeback rate was too high without providing actual numbers.')
+                                ])
+                            ])
+                        ])
+                    ]),
+                    
+                    // Tab 3: SSA Violations
+                    currentTab === 2 && React.createElement('div', { key: 'tab3' }, [
+                        React.createElement('h2', { key: 'h2' }, 'SSA Violations (Auto-Selected)'),
+                        React.createElement('p', { key: 'p' }, 'These legal claims will be automatically included:'),
+                        
+                        React.createElement('div', { key: 'claims', className: 'risk-card risk-strong' }, [
+                            React.createElement('h3', { key: 'h3' }, 'Legal Claims'),
+                            React.createElement('ul', { key: 'ul' }, 
+                                getAutoSelectedClaims().claims.map((claim, index) => 
+                                    React.createElement('li', { key: index }, claim)
+                                )
+                            )
+                        ])
+                    ]),
+                    
+                    // Tab 4: Evidence  
+                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Supporting Evidence'),
+                        React.createElement('p', { key: 'p' }, 'Select evidence you have to support your position.'),
+                        
+                        React.createElement('div', { key: 'checkboxes', className: 'checkbox-grid' }, [
+                            React.createElement('div', { 
+                                key: 'lowcb',
+                                className: `checkbox-item ${formData.lowChargebacks ? 'selected' : ''}`,
+                                onClick: () => handleChange({ target: { name: 'lowChargebacks', type: 'checkbox', checked: !formData.lowChargebacks }})
+                            }, [
+                                React.createElement('input', {
+                                    key: 'input',
                                     type: 'checkbox',
                                     name: 'lowChargebacks',
                                     checked: formData.lowChargebacks,
                                     onChange: handleChange
                                 }),
-                                ' Low Historical Chargeback Rate'
-                            )
-                        ),
-                        
-                        currentTab === 4 && React.createElement('div', null,
-                            React.createElement('h2', null, 'Risk Assessment'),
-                            React.createElement('div', { className: `risk-card ${getRiskAssessment().riskClass}` },
-                                React.createElement('h3', null, `${getRiskAssessment().riskLevel} (Score: ${getRiskAssessment().score}/100)`),
-                                React.createElement('p', null, 'Based on your inputs, this is your case assessment.')
-                            )
-                        )
-                    ),
+                                React.createElement('div', { key: 'content' }, [
+                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Low Historical Chargeback Rate'),
+                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'You can document chargeback rate below 0.75%.')
+                                ])
+                            ])
+                        ])
+                    ]),
                     
-                    // Navigation Buttons
-                    React.createElement('div', { className: 'navigation-buttons' },
-                        React.createElement('button', {
-                            onClick: prevTab,
-                            className: `nav-button ${currentTab === 0 ? 'disabled' : ''}`,
-                            disabled: currentTab === 0
-                        }, 'Previous'),
+                    // Tab 5: Risk Assessment
+                    currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Risk Assessment'),
+                        React.createElement('p', { key: 'p' }, 'Analysis of your case strength:'),
                         
-                        React.createElement('div', { style: { display: 'flex', gap: '10px' } },
-                            React.createElement('button', {
-                                onClick: copyToClipboard,
-                                className: 'nav-button',
-                                style: {
-                                    backgroundColor: "#4f46e5", 
-                                    color: "white",
-                                    border: "none"
-                                }
-                            }, 'Copy to Clipboard'),
-                            
-                            React.createElement('button', {
-                                onClick: downloadAsWord,
-                                className: 'nav-button',
-                                style: {
-                                    backgroundColor: "#2563eb", 
-                                    color: "white",
-                                    border: "none"
-                                }
-                            }, 'Download MS Word'),
-                            
-                            React.createElement('button', {
-                                onClick: () => {
-                                    if (typeof Calendly !== 'undefined' && Calendly.initPopupWidget) {
-                                        Calendly.initPopupWidget({
-                                            url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-                                        });
-                                    } else {
-                                        window.open('https://terms.law/call/', '_blank');
-                                    }
-                                },
-                                className: 'consultation-button',
-                                style: {
-                                    backgroundColor: "#28a745", 
-                                    color: "white",
-                                    border: "none"
-                                }
-                            }, 'Schedule Consultation')
-                        ),
-                        
-                        React.createElement('button', {
-                            onClick: nextTab,
-                            className: `nav-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
-                            disabled: currentTab === tabs.length - 1
-                        }, 'Next')
-                    )
-                ),
+                        (() => {
+                            const assessment = getRiskAssessment();
+                            return React.createElement('div', { key: 'assessment', className: `risk-card ${assessment.riskClass}` }, [
+                                React.createElement('h3', { key: 'h3' }, `${assessment.riskLevel} (Score: ${assessment.score}/100)`),
+                                React.createElement('ul', { key: 'factors' }, 
+                                    assessment.factors.map((factor, index) => 
+                                        React.createElement('li', { key: index }, factor)
+                                    )
+                                )
+                            ]);
+                        })()
+                    ])
+                ]),
                 
-                // Preview Panel
-                React.createElement('div', { className: 'preview-panel' },
-                    React.createElement('div', { className: 'preview-content' },
-                        React.createElement('div', { className: 'preview-header' },
-                            React.createElement('h2', null, 'Live Preview'),
-                            React.createElement('p', { className: 'preview-text' }, 'Your demand letter with 30-day arbitration notice')
-                        ),
-                        React.createElement('div', { 
-                            ref: previewRef, 
-                            className: 'document-preview',
-                            dangerouslySetInnerHTML: { 
-                                __html: highlightedText.replace(/\n/g, '<br>') 
-                            }
-                        })
-                    )
-                )
-            )
-        )
-    );
+                // Navigation Buttons
+                React.createElement('div', { key: 'nav', className: 'navigation-buttons' }, [
+                    React.createElement('button', {
+                        key: 'prev',
+                        onClick: prevTab,
+                        className: `nav-button ${currentTab === 0 ? 'disabled' : ''}`,
+                        disabled: currentTab === 0
+                    }, 'Previous'),
+                    
+                    React.createElement('div', { key: 'middle', style: { display: 'flex', gap: '10px' } }, [
+                        React.createElement('button', {
+                            key: 'copy',
+                            onClick: copyToClipboard,
+                            className: 'nav-button',
+                            style: { backgroundColor: "#4f46e5", color: "white", border: "none" }
+                        }, 'Copy to Clipboard'),
+                        
+                        React.createElement('button', {
+                            key: 'download',
+                            onClick: downloadAsWord,
+                            className: 'nav-button',
+                            style: { backgroundColor: "#2563eb", color: "white", border: "none" }
+                        }, 'Download MS Word'),
+                        
+                        React.createElement('a', {
+                            key: 'consult',
+                            href: 'https://terms.law/call/',
+                            target: '_blank',
+                            className: 'nav-button consultation-button',
+                            style: { backgroundColor: "#28a745", color: "white", border: "none", textDecoration: 'none' }
+                        }, 'Schedule Consultation')
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'next',
+                        onClick: nextTab,
+                        className: `nav-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
+                        disabled: currentTab === tabs.length - 1
+                    }, 'Next')
+                ])
+            ]),
+            
+            // Preview Panel
+            React.createElement('div', { key: 'preview', className: 'preview-panel' }, [
+                React.createElement('div', { key: 'content', className: 'preview-content' }, [
+                    React.createElement('div', { key: 'header', className: 'preview-header' }, [
+                        React.createElement('h2', { key: 'title' }, 'Live Preview'),
+                        React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 'Your demand letter with 30-day arbitration notice')
+                    ]),
+                    React.createElement('div', { 
+                        key: 'document',
+                        ref: previewRef,
+                        className: 'document-preview',
+                        dangerouslySetInnerHTML: { 
+                            __html: highlightedText.replace(/\n/g, '<br>') 
+                        }
+                    })
+                ])
+            ])
+        ])
+    ]);
 };
 
 // Render the component
-ReactDOM.render(React.createElement(StripeDemandGenerator), document.getElementById('root'));
+console.log('Starting to render StripeDemandGenerator...');
+console.log('React available:', typeof React);
+console.log('ReactDOM available:', typeof ReactDOM);
+
+try {
+    ReactDOM.render(React.createElement(StripeDemandGenerator), document.getElementById('root'));
+    console.log('Component rendered successfully');
+} catch (error) {
+    console.error('Error rendering component:', error);
+    document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
+}
