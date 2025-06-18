@@ -385,19 +385,27 @@ const StripeDemandGenerator = () => {
             if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
             
             let demand = `AMERICAN ARBITRATION ASSOCIATION
-COMMERCIAL ARBITRATION RULES
+San Francisco, California
 
 DEMAND FOR ARBITRATION
 
-${formData.expeditedProcedures ? 'EXPEDITED PROCEDURES REQUESTED: YES' : ''}
-
-${formData.companyName || '[COMPANY NAME]'}
+${formData.companyName || '[COMPANY NAME]'}                        AAA Case No. ___________
 v.
 Stripe, Inc.
 
-1. This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
+TO THE HONORABLE ARBITRATOR:
 
-2. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
+PARTIES
+
+Claimant: ${formData.companyName || '[COMPANY NAME]'}
+
+Respondent: Stripe, Inc., a Delaware corporation
+
+JURISDICTION AND VENUE
+
+1. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
+
+2. This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
 
 3. This case involves a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
 
@@ -984,65 +992,164 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         return 'Stripe dashboard showing actual dispute metrics';
     };
 
-    // Calculate AAA filing fees based on actual 2025 fee schedule
+    // Calculate AAA filing fees for both Standard and Flexible schedules (2025 fee schedule)
     const calculateAAAfees = () => {
         const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
         
+        let standardFees, flexibleFees;
+        
         if (amount < 75000) {
-            return {
+            standardFees = {
                 initial: 950,
                 final: 825,
                 total: 1775,
-                expedited: true, // Available for claims under $75,000
+                expedited: true,
                 schedule: 'Standard'
             };
+            // Flexible not available for claims under $75k
+            flexibleFees = null;
         } else if (amount < 150000) {
-            return {
+            standardFees = {
                 initial: 1975,
                 final: 1425,
                 total: 3400,
                 expedited: false,
                 schedule: 'Standard'
             };
+            flexibleFees = {
+                initial: 1875,
+                proceed: 1925,
+                final: 2275,
+                total: 6075,
+                expedited: false,
+                schedule: 'Flexible'
+            };
         } else if (amount < 300000) {
-            return {
+            standardFees = {
                 initial: 2975,
                 final: 2275,
                 total: 5250,
                 expedited: false,
                 schedule: 'Standard'
             };
+            flexibleFees = {
+                initial: 1875,
+                proceed: 1925,
+                final: 2275,
+                total: 6075,
+                expedited: false,
+                schedule: 'Flexible'
+            };
         } else if (amount < 500000) {
-            return {
+            standardFees = {
                 initial: 4525,
                 final: 3975,
                 total: 8500,
                 expedited: false,
                 schedule: 'Standard'
             };
+            flexibleFees = {
+                initial: 2275,
+                proceed: 3400,
+                final: 3975,
+                total: 9650,
+                expedited: false,
+                schedule: 'Flexible'
+            };
         } else if (amount < 1000000) {
-            return {
+            standardFees = {
                 initial: 5650,
                 final: 7025,
                 total: 12675,
                 expedited: false,
                 schedule: 'Standard'
             };
+            flexibleFees = {
+                initial: 2825,
+                proceed: 4875,
+                final: 7025,
+                total: 14725,
+                expedited: false,
+                schedule: 'Flexible'
+            };
         } else if (amount < 10000000) {
-            return {
+            standardFees = {
                 initial: 7925,
                 final: 8725,
                 total: 16650,
                 expedited: false,
                 schedule: 'Standard'
             };
+            flexibleFees = {
+                initial: 3975,
+                proceed: 6475,
+                final: 8725,
+                total: 19175,
+                expedited: false,
+                schedule: 'Flexible'
+            };
         } else {
-            return {
+            standardFees = {
                 initial: 11325,
                 final: 14150,
-                total: 25475, // Base amount - additional fees may apply for amounts above $10M
+                total: 25475,
                 expedited: false,
                 schedule: 'Standard'
+            };
+            flexibleFees = {
+                initial: 5650,
+                proceed: 10300,
+                final: 14150,
+                total: 30100,
+                expedited: false,
+                schedule: 'Flexible'
+            };
+        }
+        
+        return { standardFees, flexibleFees, amount };
+    };
+    
+    // Get fee schedule recommendation based on user's situation
+    const getFeeScheduleRecommendation = () => {
+        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        const { standardFees, flexibleFees } = calculateAAAfees();
+        
+        if (!flexibleFees) {
+            return {
+                recommended: 'standard',
+                reason: 'Flexible Fee Schedule is only available for claims $150,000 and above.'
+            };
+        }
+        
+        // Cash flow considerations
+        const hasLimitedCashFlow = amount < 50000 || formData.businessDamages;
+        
+        // Strong case factors
+        const hasStrongCase = formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date();
+        const hasGoodEvidence = formData.lowChargebacks && formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1;
+        
+        // Settlement likelihood
+        const likelyToSettle = hasStrongCase || hasGoodEvidence || (formData.shiftingTimelines && formData.communicationBlackout);
+        
+        if (hasLimitedCashFlow && likelyToSettle) {
+            return {
+                recommended: 'flexible',
+                reason: `Lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) makes sense given your situation. If case settles early, you save money despite higher total fees.`
+            };
+        } else if (hasStrongCase && !hasLimitedCashFlow) {
+            return {
+                recommended: 'standard',
+                reason: `Your strong evidence suggests the case will proceed to hearing. Standard schedule saves $${(flexibleFees.total - standardFees.total).toLocaleString()} in total fees.`
+            };
+        } else if (amount > 100000) {
+            return {
+                recommended: 'standard',
+                reason: `For higher-value claims, the Standard schedule typically provides better value and shows commitment to pursuing the case.`
+            };
+        } else {
+            return {
+                recommended: 'flexible',
+                reason: `Flexible schedule provides cash flow advantages with lower initial filing fee. You can reassess your strategy during the 90-day proceed fee period.`
             };
         }
     };
@@ -2126,36 +2233,114 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
                             React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
                             (() => {
-                                const fees = calculateAAAfees();
+                                const { standardFees, flexibleFees, amount } = calculateAAAfees();
+                                const recommendation = getFeeScheduleRecommendation();
                                 const complexity = analyzeCaseComplexity();
-                                return [
-                                    React.createElement('p', { key: 'fees' }, [
-                                        React.createElement('strong', { key: 'fees-label' }, 'AAA Filing Fees: '),
-                                        `$${fees.initial.toLocaleString()} initial + $${fees.final.toLocaleString()} final = $${fees.total.toLocaleString()} total`,
-                                        fees.expedited ? ' (Expedited procedures available)' : ''
-                                    ]),
-                                    React.createElement('p', { key: 'fee-explanation', style: { fontSize: '14px', color: '#6c757d', marginLeft: '10px' } }, [
+                                
+                                const elements = [];
+                                
+                                // Fee Schedule Comparison
+                                elements.push(
+                                    React.createElement('div', { key: 'fee-comparison', style: { marginBottom: '20px' } }, [
+                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, 'AAA Fee Schedule Options'),
+                                        
+                                        // Standard Schedule
+                                        React.createElement('div', { key: 'standard-schedule', style: { 
+                                            border: recommendation.recommended === 'standard' ? '2px solid #28a745' : '1px solid #ddd',
+                                            borderRadius: '8px', 
+                                            padding: '15px', 
+                                            marginBottom: '15px',
+                                            backgroundColor: recommendation.recommended === 'standard' ? '#f8fff9' : '#f8f9fa'
+                                        } }, [
+                                            React.createElement('div', { key: 'standard-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
+                                                React.createElement('h5', { key: 'standard-title', style: { margin: 0, color: '#2c3e50' } }, [
+                                                    'Standard Fee Schedule',
+                                                    recommendation.recommended === 'standard' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                ]),
+                                                React.createElement('div', { key: 'standard-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${standardFees.total.toLocaleString()} Total`)
+                                            ]),
+                                            React.createElement('p', { key: 'standard-breakdown', style: { margin: '10px 0', fontSize: '14px' } }, [
+                                                `$${standardFees.initial.toLocaleString()} initial filing fee + $${standardFees.final.toLocaleString()} final fee`,
+                                                standardFees.expedited ? ' (Expedited procedures available)' : ''
+                                            ]),
+                                            React.createElement('p', { key: 'standard-explanation', style: { margin: 0, fontSize: '13px', color: '#6c757d' } }, 'Two-payment system: pay initial fee when filing, final fee when hearings are scheduled. Lower total cost if case proceeds to hearing.')
+                                        ]),
+                                        
+                                        // Flexible Schedule (if available)
+                                        flexibleFees && React.createElement('div', { key: 'flexible-schedule', style: { 
+                                            border: recommendation.recommended === 'flexible' ? '2px solid #28a745' : '1px solid #ddd',
+                                            borderRadius: '8px', 
+                                            padding: '15px', 
+                                            marginBottom: '15px',
+                                            backgroundColor: recommendation.recommended === 'flexible' ? '#f8fff9' : '#f8f9fa'
+                                        } }, [
+                                            React.createElement('div', { key: 'flexible-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
+                                                React.createElement('h5', { key: 'flexible-title', style: { margin: 0, color: '#2c3e50' } }, [
+                                                    'Flexible Fee Schedule',
+                                                    recommendation.recommended === 'flexible' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                ]),
+                                                React.createElement('div', { key: 'flexible-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${flexibleFees.total.toLocaleString()} Total`)
+                                            ]),
+                                            React.createElement('p', { key: 'flexible-breakdown', style: { margin: '10px 0', fontSize: '14px' } }, `$${flexibleFees.initial.toLocaleString()} initial + $${flexibleFees.proceed.toLocaleString()} proceed fee (due within 90 days) + $${flexibleFees.final.toLocaleString()} final fee`),
+                                            React.createElement('p', { key: 'flexible-explanation', style: { margin: 0, fontSize: '13px', color: '#6c757d' } }, 'Three-payment system: lower upfront cost, spread payments over time. Good for cash flow but higher total cost if case proceeds to hearing.')
+                                        ]),
+                                        
+                                        // Recommendation
+                                        React.createElement('div', { key: 'recommendation', style: { 
+                                            backgroundColor: '#e8f4fd', 
+                                            border: '1px solid #bee5eb', 
+                                            borderRadius: '6px', 
+                                            padding: '15px',
+                                            marginTop: '15px'
+                                        } }, [
+                                            React.createElement('h5', { key: 'rec-title', style: { margin: '0 0 10px 0', color: '#0c5460' } }, 'Our Recommendation:'),
+                                            React.createElement('p', { key: 'rec-text', style: { margin: 0, fontSize: '14px', color: '#0c5460' } }, recommendation.reason)
+                                        ])
+                                    ])
+                                );
+                                
+                                // Additional fee information
+                                elements.push(
+                                    React.createElement('p', { key: 'fee-explanation', style: { fontSize: '14px', color: '#6c757d', marginBottom: '15px' } }, [
                                         React.createElement('strong', { key: 'who-pays' }, 'Who Pays: '), 
-                                        'You (claimant) pay both fees upfront when filing. Initial fee ($', fees.initial.toLocaleString(), ') is due with your arbitration demand. Final fee ($', fees.final.toLocaleString(), ') is due when hearings are scheduled. However, you can request fee reallocation in your arbitration demand, and the arbitrator can order Stripe to reimburse you for these costs if you prevail.'
-                                    ]),
+                                        'You (claimant) pay administrative fees when filing. However, you can request fee reallocation in your arbitration demand, and the arbitrator can order Stripe to reimburse you for these costs if you prevail.'
+                                    ])
+                                );
+                                
+                                // Timeline and process info
+                                elements.push(
                                     React.createElement('p', { key: 'timeline' }, [
                                         React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
                                         complexity.timeline
-                                    ]),
+                                    ])
+                                );
+                                
+                                elements.push(
                                     React.createElement('p', { key: 'procedures' }, [
                                         React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
                                         complexity.procedures
-                                    ]),
+                                    ])
+                                );
+                                
+                                elements.push(
                                     React.createElement('p', { key: 'arbitrator-costs', style: { fontSize: '14px', color: '#6c757d' } }, [
                                         React.createElement('strong', { key: 'arb-label' }, 'Arbitrator Compensation: '), 
                                         'Typically $300-600/hour, split equally between parties unless your arbitration clause or arbitrator rules otherwise. Can also be reallocated by the arbitrator.'
-                                    ]),
-                                    fees.expedited && React.createElement('p', { key: 'expedited-tip' }, [
-                                        React.createElement('strong', { key: 'expedited-label' }, 'Expedited Tip: '), 
-                                        'Claims under $75K qualify for expedited procedures - faster resolution and same AAA fees.'
                                     ])
-                                ];
+                                );
+                                
+                                if (standardFees.expedited) {
+                                    elements.push(
+                                        React.createElement('p', { key: 'expedited-tip' }, [
+                                            React.createElement('strong', { key: 'expedited-label' }, 'Expedited Procedures Available: '), 
+                                            'Claims under $75K qualify for expedited procedures - faster resolution and same AAA fees.'
+                                        ])
+                                    );
+                                }
+                                
+                                return elements;
                             })()
+                        ])
                         ])
                     ]),
                     

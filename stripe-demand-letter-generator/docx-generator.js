@@ -82,6 +82,7 @@ window.generateWordDoc = function(documentText, formData) {
             para.includes('COMMERCIAL ARBITRATION RULES') ||
             para.includes('DEMAND FOR ARBITRATION') ||
             para === 'PARTIES' ||
+            para === 'JURISDICTION AND VENUE' ||
             para === 'NATURE OF DISPUTE' ||
             para === 'CAUSES OF ACTION' ||
             para === 'RELIEF SOUGHT' ||
@@ -90,7 +91,8 @@ window.generateWordDoc = function(documentText, formData) {
             para === 'CERTIFICATION' ||
             para === 'FACTUAL BACKGROUND' ||
             para.includes('CAUSE OF ACTION') ||
-            para.includes('ADDITIONAL CAUSES OF ACTION')) {
+            para.includes('ADDITIONAL CAUSES OF ACTION') ||
+            para.includes('TO THE HONORABLE ARBITRATOR')) {
           return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
         }
         
@@ -131,6 +133,7 @@ window.generateWordDoc = function(documentText, formData) {
               para.includes('COMMERCIAL ARBITRATION RULES') ||
               para.includes('DEMAND FOR ARBITRATION') ||
               para === 'PARTIES' ||
+              para === 'JURISDICTION AND VENUE' ||
               para === 'NATURE OF DISPUTE' ||
               para === 'CAUSES OF ACTION' ||
               para === 'RELIEF SOUGHT' ||
@@ -139,7 +142,8 @@ window.generateWordDoc = function(documentText, formData) {
               para === 'CERTIFICATION' ||
               para === 'FACTUAL BACKGROUND' ||
               para.includes('CAUSE OF ACTION') ||
-              para.includes('ADDITIONAL CAUSES OF ACTION')) {
+              para.includes('ADDITIONAL CAUSES OF ACTION') ||
+              para.includes('TO THE HONORABLE ARBITRATOR')) {
             return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
           }
           
