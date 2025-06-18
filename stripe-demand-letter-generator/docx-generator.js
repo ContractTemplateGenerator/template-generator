@@ -55,6 +55,29 @@ window.generateWordDoc = function(documentText, formData) {
   .page-break {
     page-break-before: always;
   }
+  .court-header {
+    display: table;
+    width: 100%;
+    margin-bottom: 20pt;
+  }
+  .parties-section {
+    display: table-cell;
+    width: 65%;
+    vertical-align: top;
+    border-right: 1px solid #000;
+    padding-right: 20pt;
+  }
+  .case-number-section {
+    display: table-cell;
+    width: 35%;
+    vertical-align: top;
+    padding-left: 20pt;
+    text-align: right;
+  }
+  .party-underline {
+    border-bottom: 1px solid #000;
+    padding-bottom: 5pt;
+  }
 </style>
 </head>
 <body>
@@ -76,6 +99,32 @@ window.generateWordDoc = function(documentText, formData) {
       .map(para => {
         para = para.trim();
         if (!para) return '';
+        
+        // Handle court-style party header with case number
+        if (para.includes('AAA Case No.') && para.includes('Claimant')) {
+          // Split the header into parties section and case number
+          const lines = para.split('\n');
+          let partiesLines = [];
+          let caseNumberLine = '';
+          
+          for (let line of lines) {
+            if (line.includes('AAA Case No.')) {
+              caseNumberLine = line.split('AAA Case No.')[1] || '___________';
+            } else if (line.trim()) {
+              partiesLines.push(line.trim());
+            }
+          }
+          
+          return `
+            <div class="court-header">
+              <div class="parties-section party-underline">
+                ${partiesLines.map(line => `<div>${line}</div>`).join('')}
+              </div>
+              <div class="case-number-section">
+                AAA Case No. ${caseNumberLine.trim()}
+              </div>
+            </div>`;
+        }
         
         // Center AAA titles and major section headers
         if (para.includes('AMERICAN ARBITRATION ASSOCIATION') || 
@@ -127,6 +176,32 @@ window.generateWordDoc = function(documentText, formData) {
         .map(para => {
           para = para.trim();
           if (!para) return '';
+          
+          // Handle court-style party header with case number in appendix
+          if (para.includes('AAA Case No.') && para.includes('Claimant')) {
+            // Split the header into parties section and case number
+            const lines = para.split('\n');
+            let partiesLines = [];
+            let caseNumberLine = '';
+            
+            for (let line of lines) {
+              if (line.includes('AAA Case No.')) {
+                caseNumberLine = line.split('AAA Case No.')[1] || '___________';
+              } else if (line.trim()) {
+                partiesLines.push(line.trim());
+              }
+            }
+            
+            return `
+              <div class="court-header">
+                <div class="parties-section party-underline">
+                  ${partiesLines.map(line => `<div>${line}</div>`).join('')}
+                </div>
+                <div class="case-number-section">
+                  AAA Case No. ${caseNumberLine.trim()}
+                </div>
+              </div>`;
+          }
           
           // Center AAA titles and major section headers
           if (para.includes('AMERICAN ARBITRATION ASSOCIATION') || 

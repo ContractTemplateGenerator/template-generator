@@ -389,17 +389,16 @@ San Francisco, California
 
 DEMAND FOR ARBITRATION
 
-${formData.companyName || '[COMPANY NAME]'}                        AAA Case No. ___________
+${formData.companyName || '[COMPANY NAME]'}                                          AAA Case No. ___________
+Claimant
+
 v.
+
 Stripe, Inc.
+Respondent
+_______________________________
 
 TO THE HONORABLE ARBITRATOR:
-
-PARTIES
-
-Claimant: ${formData.companyName || '[COMPANY NAME]'}
-
-Respondent: Stripe, Inc., a Delaware corporation
 
 JURISDICTION AND VENUE
 
