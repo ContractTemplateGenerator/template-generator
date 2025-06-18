@@ -1120,37 +1120,69 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             };
         }
         
-        // Cash flow considerations
-        const hasLimitedCashFlow = amount < 50000 || formData.businessDamages;
+        // Calculate holding period if termination date is provided
+        let holdingDays = 0;
+        let holdingPeriodText = '';
+        if (formData.terminationDate) {
+            const terminationDate = new Date(formData.terminationDate);
+            const today = new Date();
+            holdingDays = Math.floor((today - terminationDate) / (1000 * 60 * 60 * 24));
+            if (holdingDays > 0) {
+                holdingPeriodText = `${holdingDays} days`;
+            }
+        }
         
-        // Strong case factors
-        const hasStrongCase = formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date();
+        // Key factors for Flexible Fee consideration
+        const cashFlowAdvantage = amount < 50000 || formData.businessDamages;
+        const longHoldingPeriod = holdingDays > 180; // Past industry standard
+        const strongSettlementPressure = formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date();
+        const likelyQuickSettlement = strongSettlementPressure || (formData.shiftingTimelines && formData.communicationBlackout);
         const hasGoodEvidence = formData.lowChargebacks && formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1;
         
-        // Settlement likelihood
-        const likelyToSettle = hasStrongCase || hasGoodEvidence || (formData.shiftingTimelines && formData.communicationBlackout);
-        
-        if (hasLimitedCashFlow && likelyToSettle) {
+        // Flexible Fee is advantageous when:
+        if (longHoldingPeriod && (likelyQuickSettlement || strongSettlementPressure)) {
             return {
                 recommended: 'flexible',
-                reason: `Lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) makes sense given your situation. If case settles early, you save money despite higher total fees.`
-            };
-        } else if (hasStrongCase && !hasLimitedCashFlow) {
-            return {
-                recommended: 'standard',
-                reason: `Your strong evidence suggests the case will proceed to hearing. Standard schedule saves $${(flexibleFees.total - standardFees.total).toLocaleString()} in total fees.`
-            };
-        } else if (amount > 100000) {
-            return {
-                recommended: 'standard',
-                reason: `For higher-value claims, the Standard schedule typically provides better value and shows commitment to pursuing the case.`
-            };
-        } else {
-            return {
-                recommended: 'flexible',
-                reason: `Flexible schedule provides cash flow advantages with lower initial filing fee. You can reassess your strategy during the 90-day proceed fee period.`
+                reason: `I recommend Flexible Fee Schedule. With funds held for ${holdingPeriodText} (beyond the 180-day industry standard maximum), Stripe faces increased settlement pressure. The lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) makes strategic sense since cases with extended holding periods often settle before the 90-day proceed fee is due.`
             };
         }
+        
+        if (cashFlowAdvantage && likelyQuickSettlement && !longHoldingPeriod) {
+            return {
+                recommended: 'flexible',
+                reason: `I recommend Flexible Fee Schedule. The lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) preserves cash flow, and your strong case factors suggest early settlement is likely, minimizing total fee exposure.`
+            };
+        }
+        
+        // Early settlement scenarios where Flexible saves money
+        if (strongSettlementPressure && formData.shiftingTimelines) {
+            return {
+                recommended: 'flexible',
+                reason: `I recommend Flexible Fee Schedule. Stripe's broken promises and shifting timelines create strong settlement pressure. If settlement occurs within 90 days (common in such cases), you'll pay only $${flexibleFees.initial.toLocaleString()} instead of $${standardFees.initial.toLocaleString()}.`
+            };
+        }
+        
+        // Standard Fee for strong cases proceeding to hearing
+        if (hasGoodEvidence && amount > 100000 && !longHoldingPeriod) {
+            return {
+                recommended: 'standard',
+                reason: `I recommend Standard Fee Schedule. Your strong evidence and higher claim amount suggest the case will proceed to hearing, where Standard saves $${(flexibleFees.total - standardFees.total).toLocaleString()} in total fees and demonstrates commitment to pursuing full resolution.`
+            };
+        }
+        
+        // Default to Standard for most cases
+        if (amount > 75000 && !cashFlowAdvantage) {
+            return {
+                recommended: 'standard',
+                reason: `I recommend Standard Fee Schedule. For higher-value claims with adequate cash flow, Standard provides better value if the case proceeds beyond initial settlement discussions.`
+            };
+        }
+        
+        // Flexible as fallback for smaller claims or cash flow issues
+        return {
+            recommended: 'flexible',
+            reason: `I recommend Flexible Fee Schedule. The lower initial filing fee ($${flexibleFees.initial.toLocaleString()}) provides cash flow advantages and allows you to reassess strategy during the 90-day proceed fee period based on Stripe's response.`
+        };
     };
 
     // IMPROVED: Analyze case complexity with refund rates and account age
@@ -2292,8 +2324,25 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                             padding: '15px',
                                             marginTop: '15px'
                                         } }, [
-                                            React.createElement('h5', { key: 'rec-title', style: { margin: '0 0 10px 0', color: '#0c5460' } }, 'Our Recommendation:'),
+                                            React.createElement('h5', { key: 'rec-title', style: { margin: '0 0 10px 0', color: '#0c5460' } }, 'My Recommendation:'),
                                             React.createElement('p', { key: 'rec-text', style: { margin: 0, fontSize: '14px', color: '#0c5460' } }, recommendation.reason)
+                                        ]),
+                                        
+                                        // Strategic considerations for Flexible Fee (only show if eligible)
+                                        flexibleFees && React.createElement('div', { key: 'strategic-considerations', style: { 
+                                            backgroundColor: '#fff3cd', 
+                                            border: '1px solid #ffeeba', 
+                                            borderRadius: '6px', 
+                                            padding: '15px',
+                                            marginTop: '15px'
+                                        } }, [
+                                            React.createElement('h5', { key: 'strategic-title', style: { margin: '0 0 10px 0', color: '#856404' } }, 'When Flexible Fee Schedule Can Be Advantageous:'),
+                                            React.createElement('ul', { key: 'strategic-list', style: { margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#856404' } }, [
+                                                React.createElement('li', { key: 'holding-period' }, React.createElement('strong', {}, 'Extended Holding Periods: '), 'If Stripe has held your funds beyond 180 days (industry standard maximum), they face increased settlement pressure knowing their position weakens over time.'),
+                                                React.createElement('li', { key: 'cash-flow' }, React.createElement('strong', {}, 'Cash Flow Management: '), 'Lower upfront cost preserves working capital for business operations while the case proceeds.'),
+                                                React.createElement('li', { key: 'early-settlement' }, React.createElement('strong', {}, 'Early Settlement Likelihood: '), 'When Stripe has made broken promises or shown shifting timelines, early settlement during the 90-day proceed fee period is common.'),
+                                                React.createElement('li', { key: 'strategic-timing' }, React.createElement('strong', {}, 'Strategic Reassessment: '), 'The 90-day proceed fee period allows you to evaluate Stripe\'s response and adjust strategy before committing to full hearing costs.')
+                                            ])
                                         ])
                                     ])
                                 );
@@ -2425,12 +2474,18 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             style: { backgroundColor: "#2563eb", color: "white", border: "none" }
                         }, 'Download MS Word'),
                         
-                        React.createElement('a', {
+                        React.createElement('button', {
                             key: 'consult',
-                            href: 'https://terms.law/call/',
-                            target: '_blank',
+                            onClick: () => {
+                                if (window.Calendly) {
+                                    window.Calendly.initPopupWidget({
+                                        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
+                                    });
+                                }
+                                return false;
+                            },
                             className: 'nav-button consultation-button',
-                            style: { backgroundColor: "#28a745", color: "white", border: "none", textDecoration: 'none' }
+                            style: { backgroundColor: "#28a745", color: "white", border: "none" }
                         }, 'Schedule Consultation')
                     ]),
                     
