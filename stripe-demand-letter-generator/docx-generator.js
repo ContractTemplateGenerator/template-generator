@@ -83,11 +83,14 @@ window.generateWordDoc = function(documentText, formData) {
             para.includes('DEMAND FOR ARBITRATION') ||
             para === 'PARTIES' ||
             para === 'NATURE OF DISPUTE' ||
-            para === 'STATEMENT OF CLAIMS' ||
+            para === 'CAUSES OF ACTION' ||
             para === 'RELIEF SOUGHT' ||
             para === 'FACTUAL BASIS FOR CLAIMS' ||
             para === 'ADMINISTRATIVE INFORMATION' ||
-            para === 'CERTIFICATION') {
+            para === 'CERTIFICATION' ||
+            para === 'FACTUAL BACKGROUND' ||
+            para.includes('CAUSE OF ACTION') ||
+            para.includes('ADDITIONAL CAUSES OF ACTION')) {
           return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
         }
         
@@ -129,11 +132,14 @@ window.generateWordDoc = function(documentText, formData) {
               para.includes('DEMAND FOR ARBITRATION') ||
               para === 'PARTIES' ||
               para === 'NATURE OF DISPUTE' ||
-              para === 'STATEMENT OF CLAIMS' ||
+              para === 'CAUSES OF ACTION' ||
               para === 'RELIEF SOUGHT' ||
               para === 'FACTUAL BASIS FOR CLAIMS' ||
               para === 'ADMINISTRATIVE INFORMATION' ||
-              para === 'CERTIFICATION') {
+              para === 'CERTIFICATION' ||
+              para === 'FACTUAL BACKGROUND' ||
+              para.includes('CAUSE OF ACTION') ||
+              para.includes('ADDITIONAL CAUSES OF ACTION')) {
             return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
           }
           

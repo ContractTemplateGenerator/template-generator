@@ -389,82 +389,63 @@ COMMERCIAL ARBITRATION RULES
 
 DEMAND FOR ARBITRATION
 
-TO: American Arbitration Association
-     1633 Broadway, 10th Floor
-     New York, NY 10019
-
-FROM: ${formData.contactName || '[CONTACT NAME]'}
-      ${formData.companyName || '[COMPANY NAME]'}
-      ${formData.address || '[ADDRESS]'}
-      ${formData.city || '[CITY]'}, ${formData.state} ${formData.zipCode || '[ZIP]'}
-      ${formData.phone || '[PHONE]'}
-      ${formData.email || '[EMAIL]'}
-
-DATE: _________________
-
-ARBITRATION AGREEMENT: This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides for binding arbitration in San Francisco, California before a single arbitrator under AAA Commercial Arbitration Rules.
-
 ${formData.expeditedProcedures ? 'EXPEDITED PROCEDURES REQUESTED: YES' : ''}
 
-PARTIES
+${formData.companyName || '[COMPANY NAME]'}
+v.
+Stripe, Inc.
 
-CLAIMANT: ${formData.companyName || '[COMPANY NAME]'}, a ${formData.state} business entity
+1. This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
 
-RESPONDENT: 
-Stripe, Inc., a Delaware corporation
-354 Oyster Point Boulevard
-South San Francisco, CA 94080
+2. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
 
-NATURE OF DISPUTE
-
-This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
-
-This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
-
-This case involves a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
+3. This case involves a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
 
 FACTUAL BACKGROUND
 
-${establishmentBenefits.length > 0 ? 
+4. ${establishmentBenefits.length > 0 ? 
     establishmentBenefits.join('. ') + '. ' : ''
 }${formData.terminationDate ? 
     `On ${formData.terminationDate}, Respondent abruptly terminated Claimant's merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement' : ''}.` :
     `Respondent initiated an indefinite hold on Claimant's merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement or providing clear justification for the withholding' : ''}.`
 } ${formData.promisedReleaseDate ? `At the time, Respondent promised to release the withheld funds by ${formData.promisedReleaseDate}, a promise it has since broken.` : ''}
 
-Prior to this action, Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.${formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1 ? ` This dispute rate is well below the industry standard of 0.75%, yet Respondent continues to characterize Claimant as "high risk."` : ''}
+5. Prior to this action, Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.${formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1 ? ` This dispute rate is well below the industry standard of 0.75%, yet Respondent continues to characterize Claimant as "high risk."` : ''}
 
 ${formData.shiftingTimelines || formData.shiftingDeadlines ? 
-    'Since the initial fund hold, Respondent has engaged in a pattern of extending promised release dates without justification, creating what can only be characterized as an indefinite withholding scheme.' : ''}
+    '6. Since the initial fund hold, Respondent has engaged in a pattern of extending promised release dates without justification, creating what can only be characterized as an indefinite withholding scheme.' : ''}
 
 ${formData.communicationBlackout ? 
-    'Following the fund hold, Respondent\'s support became unresponsive, providing only canned responses or complete silence to legitimate inquiries about fund release timelines and justifications.' : ''}
+    '7. Following the fund hold, Respondent\'s support became unresponsive, providing only canned responses or complete silence to legitimate inquiries about fund release timelines and justifications.' : ''}
 
 ${formData.chargebackLoop ? 
-    'Perversely, Respondent\'s withholding of funds has prevented Claimant from fulfilling customer orders, directly causing the very customer disputes that Respondent now cites as justification for continued withholding.' : ''}
+    '8. Perversely, Respondent\'s withholding of funds has prevented Claimant from fulfilling customer orders, directly causing the very customer disputes that Respondent now cites as justification for continued withholding.' : ''}
 
-STATEMENT OF CLAIMS
+CAUSES OF ACTION
 
-COUNT I: BREACH OF CONTRACT
+FIRST CAUSE OF ACTION
+(Breach of Contract)
 
-Claimant and Respondent entered into the Stripe Services Agreement, whereby Respondent agreed to process payment transactions and release funds according to specified terms and timelines. The SSA does not grant Respondent unlimited discretion to withhold merchant funds indefinitely based on subjective "risk" assessments.
+9. Claimant and Respondent entered into the Stripe Services Agreement, whereby Respondent agreed to process payment transactions and release funds according to specified terms and timelines. The SSA does not grant Respondent unlimited discretion to withhold merchant funds indefinitely based on subjective "risk" assessments.
 
-Respondent has materially breached the SSA by:
+10. Respondent has materially breached the SSA by:
 a) Withholding funds for an unreasonable period without contractual authority;
 b) Failing to provide specific justification for fund withholding as required by good faith performance;
 c) ${formData.promisedReleaseDate ? `Breaking its specific promise to release funds by ${formData.promisedReleaseDate};` : 'Continuously extending promised release dates without reasonable justification;'}
 d) Applying retroactive "risk" designations to previously approved business models;
 e) ${formData.communicationBlackout ? 'Failing to maintain reasonable communication regarding fund status and release timelines.' : 'Exercising discretionary powers in bad faith and without reasonable basis.'}
 
-COUNT II: CONVERSION
+SECOND CAUSE OF ACTION
+(Conversion)
 
-The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided. Respondent has wrongfully exercised dominion over these funds beyond any reasonable period necessary for legitimate risk management.
+11. The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided. Respondent has wrongfully exercised dominion over these funds beyond any reasonable period necessary for legitimate risk management.
 
-Conversion is established by Respondent's intentional exercise of dominion or control over Claimant's property in a manner inconsistent with Claimant's rights. ${formData.promisedReleaseDate ? `Respondent's broken promise to release funds by ${formData.promisedReleaseDate} demonstrates intentional interference with Claimant's property rights.` : 'Respondent\'s indefinite withholding without clear resolution criteria constitutes intentional deprivation of Claimant\'s property.'}
+12. Conversion is established by Respondent's intentional exercise of dominion or control over Claimant's property in a manner inconsistent with Claimant's rights. ${formData.promisedReleaseDate ? `Respondent's broken promise to release funds by ${formData.promisedReleaseDate} demonstrates intentional interference with Claimant's property rights.` : 'Respondent\'s indefinite withholding without clear resolution criteria constitutes intentional deprivation of Claimant\'s property.'}
 
-COUNT III: BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING
+THIRD CAUSE OF ACTION
+(Breach of Implied Covenant of Good Faith and Fair Dealing)
 
-Every contract contains an implied covenant that neither party will act to frustrate the other party's right to receive the benefits of the agreement. Respondent has violated this covenant by:
+13. Every contract contains an implied covenant that neither party will act to frustrate the other party's right to receive the benefits of the agreement. Respondent has violated this covenant by:
 
 a) Exercising its discretionary powers under the SSA arbitrarily and capriciously;
 b) Applying subjective "risk" criteria without providing objective standards or evidence;
@@ -472,9 +453,10 @@ c) Creating shifting and unreasonable timelines for fund release;
 d) ${formData.retroactiveRisk ? 'Retroactively applying risk designations to previously approved business operations;' : 'Withholding funds based on vague and unsubstantiated concerns;'}
 e) ${formData.communicationBlackout ? 'Implementing a communication blackout that prevents reasonable dispute resolution.' : 'Failing to act reasonably in the exercise of contractual discretion.'}
 
-COUNT IV: VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200
+FOURTH CAUSE OF ACTION
+(Violation of California Business & Professions Code § 17200)
 
-California's Unfair Competition Law prohibits unfair, unlawful, or fraudulent business practices. Respondent's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice that:
+14. California's Unfair Competition Law prohibits unfair, unlawful, or fraudulent business practices. Respondent's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice that:
 
 a) Violates public policy favoring prompt payment of earned compensation;
 b) Creates an imbalance in contractual relationships through arbitrary exercise of power;
@@ -483,9 +465,9 @@ d) ${formData.includeInterestOnFunds ? 'Unjustly enriches Respondent through int
 e) Lacks reasonable business justification proportionate to claimed risks.
 
 ${formData.additionalClaims ? `
-ADDITIONAL CLAIMS
+ADDITIONAL CAUSES OF ACTION
 
-${formData.additionalClaims}` : ''}
+15. ${formData.additionalClaims}` : ''}
 
 RELIEF SOUGHT
 
