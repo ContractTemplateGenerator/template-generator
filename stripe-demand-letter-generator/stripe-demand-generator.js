@@ -2341,7 +2341,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 return elements;
                             })()
                         ])
-                        ])
                     ]),
                     
                     // Tab 6: Risk Assessment (REMOVED "Attorney-Level" language)
