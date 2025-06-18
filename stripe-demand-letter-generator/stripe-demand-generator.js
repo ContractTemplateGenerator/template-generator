@@ -385,24 +385,24 @@ const StripeDemandGenerator = () => {
             if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
             
             let demand = `AMERICAN ARBITRATION ASSOCIATION
-San Francisco, California
+SAN FRANCISCO, CALIFORNIA
 
 DEMAND FOR ARBITRATION
 
 ${formData.companyName || '[COMPANY NAME]'}                                          AAA Case No. ___________
-Claimant
+               Claimant
 
 v.
 
 Stripe, Inc.
-Respondent
+               Respondent
 _______________________________
 
 TO THE HONORABLE ARBITRATOR:
 
 JURISDICTION AND VENUE
 
-1. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures."
+1. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures." The SSA further provides that all disputes "will be determined by binding arbitration in San Francisco, California before a single arbitrator."
 
 2. This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
 

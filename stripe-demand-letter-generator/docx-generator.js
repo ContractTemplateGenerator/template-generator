@@ -140,9 +140,13 @@ window.generateWordDoc = function(documentText, formData) {
             para === 'CERTIFICATION' ||
             para === 'FACTUAL BACKGROUND' ||
             para.includes('CAUSE OF ACTION') ||
-            para.includes('ADDITIONAL CAUSES OF ACTION') ||
-            para.includes('TO THE HONORABLE ARBITRATOR')) {
+            para.includes('ADDITIONAL CAUSES OF ACTION')) {
           return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
+        }
+        
+        // Keep "TO THE HONORABLE ARBITRATOR:" left-aligned
+        if (para.includes('TO THE HONORABLE ARBITRATOR')) {
+          return `<p style="font-weight: bold;">${para.replace(/\n/g, '<br>')}</p>`;
         }
         
         // Handle other special formatting
@@ -217,9 +221,13 @@ window.generateWordDoc = function(documentText, formData) {
               para === 'CERTIFICATION' ||
               para === 'FACTUAL BACKGROUND' ||
               para.includes('CAUSE OF ACTION') ||
-              para.includes('ADDITIONAL CAUSES OF ACTION') ||
-              para.includes('TO THE HONORABLE ARBITRATOR')) {
+              para.includes('ADDITIONAL CAUSES OF ACTION')) {
             return `<p class="center">${para.replace(/\n/g, '<br>')}</p>`;
+          }
+          
+          // Keep "TO THE HONORABLE ARBITRATOR:" left-aligned in appendix
+          if (para.includes('TO THE HONORABLE ARBITRATOR')) {
+            return `<p style="font-weight: bold;">${para.replace(/\n/g, '<br>')}</p>`;
           }
           
           // Handle signature blocks
