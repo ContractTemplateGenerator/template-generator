@@ -1722,6 +1722,8 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
 
   // Determine which section to highlight
   const getSectionToHighlight = () => {
+    if (!lastChanged) return null;
+    
     switch (currentTab) {
       case 0: // Company Info
         if (['companyName', 'websiteURL', 'contactEmail', 'jurisdiction', 'businessAddress', 'supportEmail'].includes(lastChanged)) {
@@ -1729,27 +1731,27 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
         }
         break;
       case 1: // Platform
-        if (['platformName', 'platformType', 'dataCollection', 'userContent', 'commercialUse', 'dataRetention', 'apiAccess', 'thirdPartyIntegrations'].includes(lastChanged)) {
+        if (['platformName', 'platformType', 'dataCollection', 'userContent', 'commercialUse', 'dataRetention', 'apiAccess', 'thirdPartyIntegrations', 'customPlatformType'].includes(lastChanged)) {
           return 'platform';
         }
         break;
       case 2: // Payment
-        if (['includePaymentTerms', 'billingCycle', 'latePaymentInterest', 'refundPolicy', 'autoRenewalNotice'].includes(lastChanged)) {
+        if (['includePaymentTerms', 'billingCycle', 'latePaymentInterest', 'refundPolicy', 'autoRenewalNotice', 'latePaymentGracePeriod', 'priceChangeNotice', 'suspensionForNonPayment', 'subscriptionTiers', 'customRefundPolicy'].includes(lastChanged)) {
           return 'payment';
         }
         break;
       case 3: // Support
-        if (['supportLevel', 'supportHours', 'uptimeCommitment', 'serviceLevelCredits'].includes(lastChanged)) {
+        if (['supportLevel', 'supportHours', 'uptimeCommitment', 'serviceLevelCredits', 'supportResponseTime', 'supportChannels', 'uptimePercentage', 'escalationProcedures', 'maintenanceWindows'].includes(lastChanged)) {
           return 'support';
         }
         break;
       case 4: // Legal
-        if (['forceMarjeure', 'exportControlCompliance', 'electronicSignatures', 'auditRights'].includes(lastChanged)) {
+        if (['forceMarjeure', 'exportControlCompliance', 'electronicSignatures', 'auditRights', 'dataProcessingAgreement', 'professionalServices', 'thirdPartyAPIs', 'thirdPartyLiability', 'thirdPartyAvailability', 'thirdPartyData', 'pluginSupport'].includes(lastChanged)) {
           return 'legal';
         }
         break;
       case 5: // Compliance
-        if (['euAIActCompliance', 'californiaBotDisclosure', 'aiRiskClassification', 'transparencyObligations'].includes(lastChanged)) {
+        if (['euAIActCompliance', 'californiaBotDisclosure', 'aiRiskClassification', 'transparencyObligations', 'fundamentalRightsAssessment', 'aiLiteracyProvisions', 'conformityAssessment', 'deepfakeLabeling', 'aiTransparencyNotices', 'syntheticMediaWarnings', 'trainDataOptOut', 'dataRetentionSchedule', 'crossBorderTransfers', 'dataSubjectRights', 'modelTrainingTransparency', 'catastrophicRiskAssessment', 'modelPerformanceDegradation', 'automatedDecisionOptOut', 'aiContentWatermarking', 'copyrightInfringementPrevention'].includes(lastChanged)) {
           return 'compliance';
         }
         break;
@@ -1764,7 +1766,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
         }
         break;
       case 8: // Industry Compliance
-        if (['industryType', 'gdprCompliance', 'ccpaCompliance', 'hipaaCompliance', 'ferpaCompliance', 'pciCompliance', 'soxCompliance', 'coppaCompliance', 'accessibilityCompliance', 'dataLocalization', 'algorithmicAuditing', 'biasTestingRequired', 'humanOversightRequired', 'explainabilityRequired', 'consentManagement', 'rightToExplanation', 'dataPortability', 'environmentalDisclosure'].includes(lastChanged)) {
+        if (['industryType', 'gdprCompliance', 'ccpaCompliance', 'hipaaCompliance', 'ferpaCompliance', 'pciCompliance', 'soxCompliance', 'coppaCompliance', 'accessibilityCompliance', 'dataLocalization', 'algorithmicAuditing', 'biasTestingRequired', 'humanOversightRequired', 'explainabilityRequired', 'consentManagement', 'dataPortability', 'environmentalDisclosure'].includes(lastChanged)) {
           return 'industry-compliance';
         }
         break;
@@ -1801,6 +1803,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
         }
         break;
       case 'platformType':
+      case 'customPlatformType':
         highlightedText = highlightedText.replace(
           /AI-powered .* that provides/,
           `AI-powered <span class="highlighted-text">${formData.platformType === 'custom' ? (formData.customPlatformType || 'platform') : formData.platformType}</span> that provides`
@@ -1867,14 +1870,34 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
           `retain your data for a period of <span class="highlighted-text">${formData.dataRetention}</span> years`
         );
         break;
+      // Checkbox highlighting for Platform tab
+      case 'dataCollection':
+      case 'userContent':  
+      case 'commercialUse':
+      case 'apiAccess':
+      case 'thirdPartyIntegrations':
+        // Highlight the USER CONTENT AND DATA USAGE section for platform-related checkboxes
+        highlightedText = highlightedText.replace(
+          /(USER CONTENT AND DATA USAGE.*?(?=ACCEPTABLE USE|INTELLECTUAL PROPERTY))/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
       // ENHANCED: Payment and billing highlighting
       case 'includePaymentTerms':
       case 'billingCycle':
       case 'latePaymentInterest':
       case 'refundPolicy':
+      case 'autoRenewalNotice':
+      case 'latePaymentGracePeriod':
+      case 'priceChangeNotice':
+      case 'suspensionForNonPayment':
+      case 'subscriptionTiers':
+      case 'customRefundPolicy':
         if (formData.includePaymentTerms) {
           highlightedText = highlightedText.replace(
-            /(SUBSCRIPTION PLANS, PAYMENT, AND BILLING.*?(?=DATA TRAINING))/s,
+            /(SUBSCRIPTION PLANS, PAYMENT, AND BILLING.*?(?=DATA TRAINING|USER ELIGIBILITY|CUSTOMER SUPPORT))/s,
             function(match) {
               return `<span class="highlighted-text">${match}</span>`;
             }
@@ -1883,41 +1906,107 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
         break;
       // ENHANCED: Support section highlighting
       case 'supportLevel':
+      case 'supportHours':
+      case 'supportResponseTime':
+      case 'supportChannels':
       case 'uptimeCommitment':
+      case 'uptimePercentage':
       case 'serviceLevelCredits':
+      case 'escalationProcedures':
+      case 'maintenanceWindows':
         if (formData.supportLevel !== 'none') {
           highlightedText = highlightedText.replace(
-            /(CUSTOMER SUPPORT.*?(?=DATA TRAINING|USER ELIGIBILITY))/s,
+            /(CUSTOMER SUPPORT.*?(?=DATA TRAINING|USER ELIGIBILITY|INDUSTRY COMPLIANCE))/s,
             function(match) {
               return `<span class="highlighted-text">${match}</span>`;
             }
           );
         }
         break;
-      // ENHANCED: AI compliance highlighting  
-      case 'euAIActCompliance':
-      case 'californiaBotDisclosure':
-      case 'aiRiskClassification':
+      // ENHANCED: Legal protections highlighting
+      case 'forceMarjeure':
+      case 'exportControlCompliance':
+      case 'electronicSignatures':
+      case 'auditRights':
+      case 'dataProcessingAgreement':
+      case 'professionalServices':
+      case 'thirdPartyAPIs':
+      case 'thirdPartyLiability':
+      case 'thirdPartyAvailability':
+      case 'thirdPartyData':
+      case 'pluginSupport':
+        // Highlight any legal protections sections that exist
         highlightedText = highlightedText.replace(
-          /(EU AI ACT COMPLIANCE.*?(?=INDUSTRY COMPLIANCE)|CALIFORNIA AI LAW COMPLIANCE.*?(?=INDUSTRY COMPLIANCE))/s,
+          /(FORCE MAJEURE.*?(?=DISCLAIMERS)|EXPORT CONTROL.*?(?=DISCLAIMERS)|ELECTRONIC COMMUNICATIONS.*?(?=DISCLAIMERS)|AUDIT RIGHTS.*?(?=DISCLAIMERS)|DATA PROCESSING AGREEMENT.*?(?=DISCLAIMERS)|THIRD-PARTY INTEGRATIONS.*?(?=INTELLECTUAL PROPERTY|DISCLAIMERS))/s,
           function(match) {
             return `<span class="highlighted-text">${match}</span>`;
           }
         );
         break;
+      // ENHANCED: AI compliance highlighting  
+      case 'euAIActCompliance':
+      case 'aiRiskClassification':
+      case 'transparencyObligations':
+      case 'fundamentalRightsAssessment':
+      case 'aiLiteracyProvisions':
+      case 'conformityAssessment':
+      case 'californiaBotDisclosure':
+      case 'deepfakeLabeling':
+      case 'aiTransparencyNotices':
+      case 'syntheticMediaWarnings':
+      case 'trainDataOptOut':
+      case 'dataRetentionSchedule':
+      case 'crossBorderTransfers':
+      case 'dataSubjectRights':
+      case 'modelTrainingTransparency':
+      case 'catastrophicRiskAssessment':
+      case 'modelPerformanceDegradation':
+      case 'automatedDecisionOptOut':
+      case 'aiContentWatermarking':
+      case 'copyrightInfringementPrevention':
+        highlightedText = highlightedText.replace(
+          /(EU AI ACT COMPLIANCE.*?(?=INDUSTRY COMPLIANCE)|CALIFORNIA AI LAW COMPLIANCE.*?(?=INDUSTRY COMPLIANCE)|DATA TRAINING AND MODEL IMPROVEMENT.*?(?=INDUSTRY COMPLIANCE))/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
+      // AI-specific disclaimers highlighting
       case 'aiAccuracyDisclaimer':
       case 'biasDisclaimer':
       case 'hallucincationWarning':
       case 'contentModerationDisclaimer':
       case 'modelVersionChanges':
+      case 'dataTrainingUse':
+      case 'trainingOptOut':
+      case 'modelImprovementUse':
+      case 'commercialUseAI':
+      case 'attributionRequired':
         // Highlight the entire AI limitations section when any disclaimer changes
         highlightedText = highlightedText.replace(
-          /(Our Service may include features.*?(?=USER ELIGIBILITY))/s,
+          /(Our Service may include features.*?(?=USER ELIGIBILITY)|AI ACCURACY DISCLAIMER.*?(?=USER ELIGIBILITY)|ALGORITHMIC BIAS NOTICE.*?(?=USER ELIGIBILITY)|HALLUCINATION WARNING.*?(?=USER ELIGIBILITY))/s,
           function(match) {
             return `<span class="highlighted-text">${match}</span>`;
           }
         );
         break;
+      // Liability and warranty highlighting
+      case 'limitLiability':
+      case 'warrantyDisclaimer':
+      case 'consequentialDamages':
+      case 'indemnification':
+      case 'liabilityCapAmount':
+      case 'warrantyPeriod':
+      case 'performanceWarranty':
+        // Highlight the disclaimers and liability section
+        highlightedText = highlightedText.replace(
+          /(DISCLAIMERS AND LIMITATION OF LIABILITY.*?(?=ACCOUNT TERMINATION))/s,
+          function(match) {
+            return `<span class="highlighted-text">${match}</span>`;
+          }
+        );
+        break;
+      // Industry compliance highlighting
       case 'industryType':
       case 'gdprCompliance':
       case 'ccpaCompliance':
@@ -1943,6 +2032,30 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             return `<span class="highlighted-text">${match}</span>`;
           }
         );
+        break;
+      default:
+        // For any unhandled checkboxes, try to find the relevant section
+        // This provides a fallback highlighting mechanism
+        if (sectionToHighlight && lastChanged) {
+          const sectionPatterns = {
+            company: /(These Terms of Use.*?governed by these Terms|Last Updated.*?acceptance of any modifications)/s,
+            platform: /(DESCRIPTION OF SERVICE.*?(?=USER ELIGIBILITY))/s,
+            payment: /(SUBSCRIPTION PLANS.*?(?=DATA TRAINING|CUSTOMER SUPPORT))/s,
+            support: /(CUSTOMER SUPPORT.*?(?=DATA TRAINING|INDUSTRY COMPLIANCE))/s,
+            legal: /(FORCE MAJEURE.*?(?=DISCLAIMERS)|THIRD-PARTY.*?(?=DISCLAIMERS))/s,
+            compliance: /(EU AI ACT.*?(?=INDUSTRY COMPLIANCE)|CALIFORNIA AI LAW.*?(?=INDUSTRY COMPLIANCE)|DATA TRAINING.*?(?=INDUSTRY COMPLIANCE))/s,
+            terms: /(DISCLAIMERS AND LIMITATION.*?(?=ACCOUNT TERMINATION))/s,
+            'ai-specific': /(Our Service may include features.*?(?=USER ELIGIBILITY))/s,
+            'industry-compliance': /(INDUSTRY COMPLIANCE.*?(?=USER CONTENT))/s
+          };
+          
+          const pattern = sectionPatterns[sectionToHighlight];
+          if (pattern) {
+            highlightedText = highlightedText.replace(pattern, function(match) {
+              return `<span class="highlighted-text">${match}</span>`;
+            });
+          }
+        }
         break;
     }
     
@@ -2514,10 +2627,14 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                             checked={formData.supportChannels.includes('email')}
                             onChange={(e) => {
                               const { value, checked } = e.target;
+                              // Record what field was changed for highlighting
+                              setLastChanged('supportChannels');
                               const updatedChannels = checked
                                 ? [...formData.supportChannels, value]
                                 : formData.supportChannels.filter(channel => channel !== value);
-                              setFormData({...formData, supportChannels: updatedChannels});
+                              const newFormData = {...formData, supportChannels: updatedChannels};
+                              setFormData(newFormData);
+                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
                             }}
                           />
                           <label>Email Support</label>
@@ -2530,10 +2647,14 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                             checked={formData.supportChannels.includes('chat')}
                             onChange={(e) => {
                               const { value, checked } = e.target;
+                              // Record what field was changed for highlighting
+                              setLastChanged('supportChannels');
                               const updatedChannels = checked
                                 ? [...formData.supportChannels, value]
                                 : formData.supportChannels.filter(channel => channel !== value);
-                              setFormData({...formData, supportChannels: updatedChannels});
+                              const newFormData = {...formData, supportChannels: updatedChannels};
+                              setFormData(newFormData);
+                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
                             }}
                           />
                           <label>Live Chat</label>
@@ -2546,10 +2667,14 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                             checked={formData.supportChannels.includes('phone')}
                             onChange={(e) => {
                               const { value, checked } = e.target;
+                              // Record what field was changed for highlighting
+                              setLastChanged('supportChannels');
                               const updatedChannels = checked
                                 ? [...formData.supportChannels, value]
                                 : formData.supportChannels.filter(channel => channel !== value);
-                              setFormData({...formData, supportChannels: updatedChannels});
+                              const newFormData = {...formData, supportChannels: updatedChannels};
+                              setFormData(newFormData);
+                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
                             }}
                           />
                           <label>Phone Support</label>
