@@ -2759,6 +2759,8 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             {currentTab === 4 && (
               <div>
                 <h3>Advanced Legal Protections</h3>
+                <p>This tab is now working! Let me add back the content...</p>
+                
                 <h4 style={{marginTop: '20px', marginBottom: '15px', color: '#2c3e50'}}>Risk Management</h4>
                 <div className="checkbox-group">
                   <input
