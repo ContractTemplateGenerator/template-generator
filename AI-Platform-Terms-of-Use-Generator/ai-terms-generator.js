@@ -388,9 +388,20 @@ const AITermsGenerator = () => {
 
   // PayPal validation function
   const validatePayPalId = (id) => {
-    // Check for the specific valid transaction ID
-    const validTransactionId = 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI';
-    return id && id.trim() === validTransactionId;
+    // Check for 17-character alphanumeric string with only CAPITAL letters
+    if (!id || id.trim().length !== 17) {
+      return false;
+    }
+    
+    const trimmedId = id.trim();
+    
+    // Must contain only capital letters and numbers
+    const hasOnlyCapitalLettersAndNumbers = /^[A-Z0-9]+$/.test(trimmedId);
+    
+    // Must contain at least one capital letter (not all numbers)
+    const hasAtLeastOneCapitalLetter = /[A-Z]/.test(trimmedId);
+    
+    return hasOnlyCapitalLettersAndNumbers && hasAtLeastOneCapitalLetter;
   };
 
   // Handle manual PayPal unlock
