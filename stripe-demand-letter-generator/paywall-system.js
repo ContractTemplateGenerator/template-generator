@@ -2,12 +2,12 @@
 // Integrates with existing generator to require payment before copy/download access
 
 const PaywallSystem = (() => {
-    // PayPal Configuration - Updated to match AI Terms Generator
+    // PayPal Configuration - Updated pricing and credentials
     const PAYPAL_CONFIG = {
         clientId: 'ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx',
         secretKey: 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI',
         currency: 'USD',
-        amount: '47.00', // Price for the demand letter generator
+        amount: '19.95', // Updated price for the demand letter generator
         description: 'Stripe Demand Letter Generator - Professional Legal Document'
     };
 
@@ -165,10 +165,17 @@ const PaywallSystem = (() => {
                         <div class="paywall-payment">
                             <p><strong>Secure Payment via PayPal:</strong></p>
                             <div id="paypal-button-container"></div>
-                        </div>
-                        <div class="paywall-guarantee">
-                            <p>🛡️ <strong>30-Day Money-Back Guarantee</strong></p>
-                            <p>Not satisfied? Get a full refund within 30 days.</p>
+                            <div class="paywall-manual-entry">
+                                <p style="margin: 15px 0 10px; font-size: 14px; color: #6c757d; text-align: center;">
+                                    Already paid? Enter your PayPal transaction ID:
+                                </p>
+                                <input type="text" id="manual-paypal-id" placeholder="Enter PayPal transaction ID" 
+                                       style="width: 100%; padding: 10px; border: 1px solid #ced4da; border-radius: 4px; margin-bottom: 10px; font-size: 14px;">
+                                <button onclick="PaywallSystem.validateManualPayPalId()" 
+                                        style="width: 100%; padding: 10px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
+                                    Verify & Unlock Access
+                                </button>
+                            </div>
                         </div>
                         <div class="paywall-security">
                             <p>🔒 Secure payment processing by PayPal • No subscription • One-time purchase</p>
@@ -314,21 +321,26 @@ const PaywallSystem = (() => {
                 #paypal-button-container {
                     min-height: 50px;
                 }
-                .paywall-guarantee {
-                    background: #d4edda;
-                    border: 1px solid #c3e6cb;
+                .paywall-manual-entry {
+                    background: #f8f9fa;
+                    border: 1px solid #e9ecef;
                     border-radius: 6px;
                     padding: 15px;
-                    margin: 20px 0;
+                    margin: 15px 0;
                     text-align: center;
                 }
-                .paywall-guarantee p {
-                    margin: 0;
-                    color: #155724;
-                    font-size: 14px;
+                .paywall-manual-entry input {
+                    font-family: inherit;
+                    transition: border-color 0.3s, box-shadow 0.3s;
                 }
-                .paywall-guarantee p:first-child {
-                    margin-bottom: 5px;
+                .paywall-manual-entry input:focus {
+                    border-color: #007bff;
+                    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+                    outline: none;
+                }
+                .paywall-manual-entry button:hover {
+                    background: #0056b3;
+                    transform: translateY(-1px);
                 }
                 .paywall-security {
                     text-align: center;
@@ -373,6 +385,45 @@ const PaywallSystem = (() => {
         const modal = document.getElementById('paywall-modal');
         if (modal) {
             modal.remove();
+        }
+    };
+
+    // Manual PayPal ID validation for backup access
+    const validateManualPayPalId = () => {
+        const input = document.getElementById('manual-paypal-id');
+        if (!input) return;
+        
+        const paypalId = input.value.trim();
+        
+        // Basic PayPal transaction ID validation
+        // PayPal transaction IDs are typically 17 characters, alphanumeric
+        if (paypalId.length >= 10 && /^[A-Z0-9]+$/i.test(paypalId)) {
+            // Update payment status
+            paymentStatus = {
+                isPaid: true,
+                transactionId: paypalId,
+                paymentDate: new Date().toISOString(),
+                sessionActive: true,
+                manualEntry: true
+            };
+
+            // Close modal and trigger success
+            const modal = document.getElementById('paywall-modal');
+            if (modal) {
+                modal.remove();
+            }
+
+            // Show success message
+            alert('Access unlocked! You can now copy and download your demand letter.');
+            
+            // Trigger any pending callbacks
+            if (window.manualUnlockCallback) {
+                window.manualUnlockCallback();
+                window.manualUnlockCallback = null;
+            }
+        } else {
+            alert('Please enter a valid PayPal transaction ID. Transaction IDs are typically 10+ characters and contain only letters and numbers.');
+            input.focus();
         }
     };
 
@@ -507,6 +558,7 @@ const PaywallSystem = (() => {
         initializePayPal,
         createPaywallModal,
         closePaywallModal,
+        validateManualPayPalId,
         hasAccess,
         backupFormData,
         restoreFormData,

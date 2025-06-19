@@ -669,6 +669,18 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         if (!PaywallSystem.hasAccess()) {
             PaywallSystem.backupFormData(formData);
             PaywallSystem.showAccessDenied('copy');
+            
+            // Set up manual unlock callback
+            window.manualUnlockCallback = () => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                performCopyToClipboard();
+            };
+            
             PaywallSystem.createPaywallModal((order) => {
                 // Payment successful, restore form data and enable features
                 const restoredData = PaywallSystem.restoreFormData();
@@ -716,6 +728,18 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         if (!PaywallSystem.hasAccess()) {
             PaywallSystem.backupFormData(formData);
             PaywallSystem.showAccessDenied('download');
+            
+            // Set up manual unlock callback
+            window.manualUnlockCallback = () => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                performDownloadAsWord();
+            };
+            
             PaywallSystem.createPaywallModal((order) => {
                 // Payment successful, restore form data and enable features
                 const restoredData = PaywallSystem.restoreFormData();
