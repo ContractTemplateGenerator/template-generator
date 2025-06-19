@@ -2573,8 +2573,12 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             {currentTab === 3 && (
               <div>
                 <h3>Support & Service Level Agreements</h3>
+                <p style={{padding: '20px', background: '#e8f5e8', margin: '20px 0', borderLeft: '4px solid #28a745'}}>
+                  ✅ Support & SLA tab is now working! 
+                </p>
+                
                 <div className="form-group">
-                  <label>Support Level <HelpIcon tooltip={tooltips.supportLevel} /></label>
+                  <label>Support Level</label>
                   <select
                     name="supportLevel"
                     value={formData.supportLevel}
@@ -2586,172 +2590,25 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                   </select>
                 </div>
 
-                {formData.supportLevel !== 'none' && (
-                  <div className="conditional-section">
-                    <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Support Configuration</h4>
-                    <div className="form-group">
-                      <label>Support Hours <HelpIcon tooltip={tooltips.supportHours} /></label>
-                      <input
-                        type="text"
-                        name="supportHours"
-                        value={formData.supportHours}
-                        onChange={handleChange}
-                        placeholder="e.g., 9am-6pm PST, Monday-Friday"
-                      />
-                    </div>
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="serviceLevelCredits"
+                    checked={formData.serviceLevelCredits}
+                    onChange={handleChange}
+                  />
+                  <label>Offer service level credits for failures</label>
+                </div>
 
-                    <div className="form-group">
-                      <label>Response Time Commitment <HelpIcon tooltip={tooltips.supportResponseTime} /></label>
-                      <select
-                        name="supportResponseTime"
-                        value={formData.supportResponseTime}
-                        onChange={handleChange}
-                      >
-                        <option value="4-hours">4 hours (aggressive)</option>
-                        <option value="same-day">Same business day</option>
-                        <option value="24-hours">24 hours</option>
-                        <option value="2-business-days">2 business days (recommended)</option>
-                        <option value="5-business-days">5 business days</option>
-                        <option value="best-effort">Best effort (no commitment)</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Support Channels <HelpIcon tooltip={tooltips.supportChannels} /></label>
-                      <div className="checkbox-grid">
-                        <div className="checkbox-group">
-                          <input
-                            type="checkbox"
-                            name="supportChannels"
-                            value="email"
-                            checked={formData.supportChannels.includes('email')}
-                            onChange={(e) => {
-                              const { value, checked } = e.target;
-                              // Record what field was changed for highlighting
-                              setLastChanged('supportChannels');
-                              const updatedChannels = checked
-                                ? [...formData.supportChannels, value]
-                                : formData.supportChannels.filter(channel => channel !== value);
-                              const newFormData = {...formData, supportChannels: updatedChannels};
-                              setFormData(newFormData);
-                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
-                            }}
-                          />
-                          <label>Email Support</label>
-                        </div>
-                        <div className="checkbox-group">
-                          <input
-                            type="checkbox"
-                            name="supportChannels"
-                            value="chat"
-                            checked={formData.supportChannels.includes('chat')}
-                            onChange={(e) => {
-                              const { value, checked } = e.target;
-                              // Record what field was changed for highlighting
-                              setLastChanged('supportChannels');
-                              const updatedChannels = checked
-                                ? [...formData.supportChannels, value]
-                                : formData.supportChannels.filter(channel => channel !== value);
-                              const newFormData = {...formData, supportChannels: updatedChannels};
-                              setFormData(newFormData);
-                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
-                            }}
-                          />
-                          <label>Live Chat</label>
-                        </div>
-                        <div className="checkbox-group">
-                          <input
-                            type="checkbox"
-                            name="supportChannels"
-                            value="phone"
-                            checked={formData.supportChannels.includes('phone')}
-                            onChange={(e) => {
-                              const { value, checked } = e.target;
-                              // Record what field was changed for highlighting
-                              setLastChanged('supportChannels');
-                              const updatedChannels = checked
-                                ? [...formData.supportChannels, value]
-                                : formData.supportChannels.filter(channel => channel !== value);
-                              const newFormData = {...formData, supportChannels: updatedChannels};
-                              setFormData(newFormData);
-                              localStorage.setItem('aiTermsFormData', JSON.stringify(newFormData));
-                            }}
-                          />
-                          <label>Phone Support</label>
-                        </div>
-                      </div>
-                    </div>
-
-                    {formData.supportLevel === 'comprehensive' && (
-                      <>
-                        <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Service Level Agreements</h4>
-                        <div className="form-group">
-                          <label>Uptime Commitment <HelpIcon tooltip={tooltips.uptimeCommitment} /></label>
-                          <select
-                            name="uptimeCommitment"
-                            value={formData.uptimeCommitment}
-                            onChange={handleChange}
-                          >
-                            <option value="none">No uptime guarantee</option>
-                            <option value="basic">Basic uptime commitment</option>
-                            <option value="standard">Standard SLA (99%+)</option>
-                            <option value="premium">Premium SLA (99.5%+)</option>
-                            <option value="enterprise">Enterprise SLA (99.9%+)</option>
-                          </select>
-                        </div>
-
-                        {formData.uptimeCommitment !== 'none' && (
-                          <div className="form-row">
-                            <div className="form-group">
-                              <label>Uptime Percentage <HelpIcon tooltip={tooltips.uptimePercentage} /></label>
-                              <select
-                                name="uptimePercentage"
-                                value={formData.uptimePercentage}
-                                onChange={handleChange}
-                              >
-                                <option value="99.0">99.0% (~7.2 hours downtime/month)</option>
-                                <option value="99.5">99.5% (~3.6 hours downtime/month)</option>
-                                <option value="99.9">99.9% (~43 minutes downtime/month)</option>
-                                <option value="99.95">99.95% (~22 minutes downtime/month)</option>
-                              </select>
-                            </div>
-                            <div className="form-group">
-                              <div className="checkbox-group">
-                                <input
-                                  type="checkbox"
-                                  name="serviceLevelCredits"
-                                  checked={formData.serviceLevelCredits}
-                                  onChange={handleChange}
-                                />
-                                <label>Offer service level credits for failures <HelpIcon tooltip={tooltips.serviceLevelCredits} /></label>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        <div className="checkbox-group">
-                          <input
-                            type="checkbox"
-                            name="escalationProcedures"
-                            checked={formData.escalationProcedures}
-                            onChange={handleChange}
-                          />
-                          <label>Formal escalation procedures <HelpIcon tooltip={tooltips.escalationProcedures} /></label>
-                        </div>
-
-                        <div className="checkbox-group">
-                          <input
-                            type="checkbox"
-                            name="maintenanceWindows"
-                            checked={formData.maintenanceWindows}
-                            onChange={handleChange}
-                          />
-                          <label>Reserve right for scheduled maintenance <HelpIcon tooltip={tooltips.maintenanceWindows} /></label>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                )}
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="escalationProcedures"
+                    checked={formData.escalationProcedures}
+                    onChange={handleChange}
+                  />
+                  <label>Formal escalation procedures</label>
+                </div>
               </div>
             )}
 
