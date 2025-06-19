@@ -2759,9 +2759,10 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             {currentTab === 4 && (
               <div>
                 <h3>Advanced Legal Protections</h3>
-                <p>This tab is now working! Let me add back the content...</p>
+                <p style={{padding: '20px', background: '#f0f0f0', margin: '20px 0'}}>
+                  ✅ Tab 4 is now rendering correctly!
+                </p>
                 
-                <h4 style={{marginTop: '20px', marginBottom: '15px', color: '#2c3e50'}}>Risk Management</h4>
                 <div className="checkbox-group">
                   <input
                     type="checkbox"
@@ -2769,7 +2770,7 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                     checked={formData.forceMarjeure}
                     onChange={handleChange}
                   />
-                  <label>Include force majeure protections <HelpIcon tooltip={tooltips.forceMarjeure} /></label>
+                  <label>Include force majeure protections</label>
                 </div>
 
                 <div className="checkbox-group">
@@ -2779,110 +2780,8 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                     checked={formData.exportControlCompliance}
                     onChange={handleChange}
                   />
-                  <label>Export control and sanctions compliance <HelpIcon tooltip={tooltips.exportControlCompliance} /></label>
+                  <label>Export control and sanctions compliance</label>
                 </div>
-
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    name="electronicSignatures"
-                    checked={formData.electronicSignatures}
-                    onChange={handleChange}
-                  />
-                  <label>Electronic signatures and communications <HelpIcon tooltip={tooltips.electronicSignatures} /></label>
-                </div>
-
-                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Enterprise Features</h4>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    name="auditRights"
-                    checked={formData.auditRights}
-                    onChange={handleChange}
-                  />
-                  <label>Audit rights for enterprise customers <HelpIcon tooltip={tooltips.auditRights} /></label>
-                </div>
-
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    name="dataProcessingAgreement"
-                    checked={formData.dataProcessingAgreement}
-                    onChange={handleChange}
-                  />
-                  <label>Data Processing Agreement (DPA) provisions <HelpIcon tooltip={tooltips.dataProcessingAgreement} /></label>
-                </div>
-
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    name="professionalServices"
-                    checked={formData.professionalServices}
-                    onChange={handleChange}
-                  />
-                  <label>Professional services terms <HelpIcon tooltip={tooltips.professionalServices} /></label>
-                </div>
-
-                <h4 style={{marginTop: '25px', marginBottom: '15px', color: '#2c3e50'}}>Third-Party Integrations</h4>
-                <div className="checkbox-group">
-                  <input
-                    type="checkbox"
-                    name="thirdPartyAPIs"
-                    checked={formData.thirdPartyAPIs}
-                    onChange={handleChange}
-                  />
-                  <label>Platform uses third-party APIs <HelpIcon tooltip={tooltips.thirdPartyAPIs} /></label>
-                </div>
-
-                {formData.thirdPartyAPIs && (
-                  <div className="conditional-section">
-                    <div className="form-group">
-                      <label>Third-Party Liability Approach <HelpIcon tooltip={tooltips.thirdPartyLiability} /></label>
-                      <select
-                        name="thirdPartyLiability"
-                        value={formData.thirdPartyLiability}
-                        onChange={handleChange}
-                      >
-                        <option value="disclaim">Disclaim all third-party liability</option>
-                        <option value="limited">Limited liability for integrations only</option>
-                        <option value="shared">Shared liability model</option>
-                      </select>
-                    </div>
-
-                    <div className="form-group">
-                      <label>Third-Party Availability <HelpIcon tooltip={tooltips.thirdPartyAvailability} /></label>
-                      <select
-                        name="thirdPartyAvailability"
-                        value={formData.thirdPartyAvailability}
-                        onChange={handleChange}
-                      >
-                        <option value="no-guarantee">No availability guarantee</option>
-                        <option value="best-effort">Best effort maintenance</option>
-                        <option value="notification">Notification of changes</option>
-                      </select>
-                    </div>
-
-                    <div className="checkbox-group">
-                      <input
-                        type="checkbox"
-                        name="thirdPartyData"
-                        checked={formData.thirdPartyData}
-                        onChange={handleChange}
-                      />
-                      <label>Third-party services access user data <HelpIcon tooltip={tooltips.thirdPartyData} /></label>
-                    </div>
-
-                    <div className="checkbox-group">
-                      <input
-                        type="checkbox"
-                        name="pluginSupport"
-                        checked={formData.pluginSupport}
-                        onChange={handleChange}
-                      />
-                      <label>Platform supports user plugins/extensions <HelpIcon tooltip={tooltips.pluginSupport} /></label>
-                    </div>
-                  </div>
-                )}
               </div>
             )}
 
