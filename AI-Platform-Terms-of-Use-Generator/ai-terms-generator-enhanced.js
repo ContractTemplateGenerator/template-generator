@@ -388,8 +388,9 @@ const AITermsGenerator = () => {
 
   // PayPal validation function
   const validatePayPalId = (id) => {
-    // Basic validation - just check if something was entered
-    return id && id.trim().length > 5;
+    // Check for the specific valid transaction ID
+    const validTransactionId = 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI';
+    return id && id.trim() === validTransactionId;
   };
 
   // Handle manual PayPal unlock
@@ -2573,9 +2574,6 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             {currentTab === 3 && (
               <div>
                 <h3>Support & Service Level Agreements</h3>
-                <p style={{padding: '20px', background: '#e8f5e8', margin: '20px 0', borderLeft: '4px solid #28a745'}}>
-                  ✅ Support & SLA tab is now working! 
-                </p>
                 
                 <div className="form-group">
                   <label>Support Level</label>
@@ -2609,6 +2607,16 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
                   />
                   <label>Formal escalation procedures</label>
                 </div>
+
+                <div className="checkbox-group">
+                  <input
+                    type="checkbox"
+                    name="maintenanceWindows"
+                    checked={formData.maintenanceWindows}
+                    onChange={handleChange}
+                  />
+                  <label>Reserve right for scheduled maintenance</label>
+                </div>
               </div>
             )}
 
@@ -2616,9 +2624,6 @@ For more information about ${formData.companyName || '[COMPANY NAME]'} and our s
             {currentTab === 4 && (
               <div>
                 <h3>Advanced Legal Protections</h3>
-                <p style={{padding: '20px', background: '#f0f0f0', margin: '20px 0'}}>
-                  ✅ Tab 4 is now rendering correctly!
-                </p>
                 
                 <div className="checkbox-group">
                   <input
