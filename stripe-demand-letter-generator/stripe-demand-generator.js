@@ -66,6 +66,8 @@ const StripeDemandGenerator = () => {
     // State management
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
+    const [isPaid, setIsPaid] = useState(false);
+    const [showPaywall, setShowPaywall] = useState(false);
     const previewRef = useRef(null);
     
     // Form data state
@@ -136,6 +138,31 @@ const StripeDemandGenerator = () => {
         specificDamagesAmount: '', // Additional damages beyond withheld amount
         additionalClaims: '' // Custom additional claims
     });
+
+    // Initialize paywall system and check payment status
+    useEffect(() => {
+        // Initialize PayPal SDK
+        if (window.PaywallSystem) {
+            window.PaywallSystem.initializePayPal().catch(console.error);
+            
+            // Check if user has access (paid in current session)
+            if (window.PaywallSystem.hasAccess()) {
+                setIsPaid(true);
+            } else {
+                // Make preview non-copyable until payment
+                setTimeout(() => {
+                    window.PaywallSystem.makePreviewNonCopyable();
+                }, 100);
+            }
+        }
+    }, []);
+
+    // Effect to manage preview interaction based on payment status
+    useEffect(() => {
+        if (isPaid && window.PaywallSystem) {
+            window.PaywallSystem.enablePreviewInteraction();
+        }
+    }, [isPaid]);
 
     // Tab configuration
     const tabs = [
@@ -636,8 +663,31 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         }
     })();
 
-    // Copy to clipboard function
+    // Copy to clipboard function with paywall check
     const copyToClipboard = () => {
+        // Check if user has paid
+        if (!PaywallSystem.hasAccess()) {
+            PaywallSystem.backupFormData(formData);
+            PaywallSystem.showAccessDenied('copy');
+            PaywallSystem.createPaywallModal((order) => {
+                // Payment successful, restore form data and enable features
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                // Auto-copy after successful payment
+                performCopyToClipboard();
+            });
+            return;
+        }
+        
+        performCopyToClipboard();
+    };
+
+    // Actual copy function (separated for reuse after payment)
+    const performCopyToClipboard = () => {
         let finalDocumentText;
         
         if (formData.includeArbitrationDraft) {
@@ -662,6 +712,29 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
     // Download as Word document
     const downloadAsWord = () => {
+        // Check if user has paid
+        if (!PaywallSystem.hasAccess()) {
+            PaywallSystem.backupFormData(formData);
+            PaywallSystem.showAccessDenied('download');
+            PaywallSystem.createPaywallModal((order) => {
+                // Payment successful, restore form data and enable features
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                // Auto-download after successful payment
+                performDownloadAsWord();
+            });
+            return;
+        }
+        
+        performDownloadAsWord();
+    };
+
+    // Actual download function (separated for reuse after payment)
+    const performDownloadAsWord = () => {
         try {
             console.log("Download MS Word button clicked");
             
@@ -696,7 +769,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 fileName: fileName
             });
         } catch (error) {
-            console.error("Error in downloadAsWord:", error);
+            console.error("Error in performDownloadAsWord:", error);
             alert("Error generating Word document. Please try again or use the copy option.");
         }
     };
@@ -2463,16 +2536,26 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         React.createElement('button', {
                             key: 'copy',
                             onClick: copyToClipboard,
-                            className: 'nav-button',
-                            style: { backgroundColor: "#4f46e5", color: "white", border: "none" }
-                        }, 'Copy to Clipboard'),
+                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
+                            style: { 
+                                backgroundColor: isPaid ? "#4f46e5" : "#6c757d", 
+                                color: "white", 
+                                border: "none",
+                                opacity: isPaid ? 1 : 0.7
+                            }
+                        }, isPaid ? 'Copy to Clipboard' : '🔒 Copy to Clipboard'),
                         
                         React.createElement('button', {
                             key: 'download',
                             onClick: downloadAsWord,
-                            className: 'nav-button',
-                            style: { backgroundColor: "#2563eb", color: "white", border: "none" }
-                        }, 'Download MS Word'),
+                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
+                            style: { 
+                                backgroundColor: isPaid ? "#2563eb" : "#6c757d", 
+                                color: "white", 
+                                border: "none",
+                                opacity: isPaid ? 1 : 0.7
+                            }
+                        }, isPaid ? 'Download MS Word' : '🔒 Download MS Word'),
                         
                         React.createElement('button', {
                             key: 'consult',
