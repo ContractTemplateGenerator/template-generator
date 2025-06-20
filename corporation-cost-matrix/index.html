@@ -5,36 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corporation Cost Matrix - 50 State Comparison | terms.law</title>
     <meta name="description" content="Interactive comparison of corporation formation and ongoing costs across all 50 US states. Find the most cost-effective state for your business incorporation.">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <style>
-        :root {
-            --primary-color: #3498db;
-            --secondary-color: #2980b9;
-            --light-color: #ecf0f1;
-            --dark-color: #2c3e50;
-            --success-color: #27ae60;
-            --warning-color: #f39c12;
-            --danger-color: #e74c3c;
-            --gray-light: #f8f9fa;
-            --gray-medium: #ddd;
-            --gray-dark: #7f8c8d;
-            --orange-color: #f39c12;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             padding: 20px;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             background-color: #f5f5f5;
         }
@@ -43,16 +23,16 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
-            width: 100%;
-        }        .controls {
+        }
+
+        .controls {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            background-color: var(--gray-light);
+            background-color: #f8f9fa;
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            width: 100%;
         }
 
         .control-group {
@@ -70,201 +50,107 @@
 
         select, input {
             padding: 8px 12px;
-            border: 1px solid var(--gray-medium);
+            border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
-            width: 100%;
         }
 
         button {
             padding: 8px 15px;
-            background-color: var(--primary-color);
+            background-color: #3498db;
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.2s;
-            min-width: 150px;
         }
 
         button:hover {
-            background-color: var(--secondary-color);
-        }
-
-        button:disabled {
-            background-color: var(--gray-dark);
-            cursor: not-allowed;
+            background-color: #2980b9;
         }
 
         .export-btn {
-            background-color: var(--success-color);
+            background-color: #27ae60;
         }
 
         .export-btn:hover {
             background-color: #219653;
         }
 
-        .reset-btn {
-            background-color: var(--gray-dark);
-        }
-
-        .reset-btn:hover {
-            background-color: #636e72;
-        }
-
-        .compare-btn {
-            background-color: var(--orange-color);
-        }
-
-        .compare-btn:hover:not(:disabled) {
-            background-color: #d68910;
-        }        .table-container {
+        .table-container {
             overflow-x: auto;
-            width: 100%;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            border-radius: 8px;
             background-color: white;
-        }
-
-        .table-sticky-header {
-            overflow: auto;
-            max-height: 600px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .corp-cost-table {
             width: 100%;
             border-collapse: collapse;
             font-size: 14px;
-            background-color: white;
-            table-layout: fixed;
         }
 
         .corp-cost-table th {
-            background-color: var(--dark-color);
+            background-color: #2c3e50;
             color: white;
             padding: 12px 8px;
             text-align: left;
+            cursor: pointer;
             position: sticky;
             top: 0;
-            z-index: 10;
-            cursor: pointer;
-            white-space: nowrap;
-            overflow: visible;
-            font-size: 13px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }        .corp-cost-table th:hover {
+        }
+
+        .corp-cost-table th:hover {
             background-color: #34495e;
         }
 
         .corp-cost-table td {
             padding: 10px 8px;
-            border-bottom: 1px solid var(--gray-medium);
-            border-right: 1px solid var(--gray-medium);
+            border-bottom: 1px solid #ddd;
         }
 
         .corp-cost-table tr:hover {
             background-color: #f5f5f5;
         }
 
-        /* Column widths */
-        .checkbox-col { width: 50px; text-align: center; }
-        .state-col { width: 15%; }
-        .fee-col { width: 12%; }
-        .notes-col { width: 20%; }
-        .tax-col { width: 15%; }
+        .formation-low { color: #27ae60; font-weight: 600; }
+        .formation-medium { color: #f39c12; font-weight: 600; }
+        .formation-high { color: #e74c3c; font-weight: 600; }
 
-        /* Cost color coding */
-        .formation-low { color: var(--success-color); font-weight: 600; }
-        .formation-medium { color: var(--warning-color); font-weight: 600; }
-        .formation-high { color: var(--danger-color); font-weight: 600; }
-
-        .amendment-low { color: var(--success-color); font-weight: 600; }
-        .amendment-medium { color: var(--warning-color); font-weight: 600; }
-        .amendment-high { color: var(--danger-color); font-weight: 600; }        .total-low { background-color: rgba(39, 174, 96, 0.1); font-weight: 600; }
+        .total-low { background-color: rgba(39, 174, 96, 0.1); font-weight: 600; }
         .total-medium { background-color: rgba(243, 156, 18, 0.1); font-weight: 600; }
         .total-high { background-color: rgba(231, 76, 60, 0.1); font-weight: 600; }
         .total-veryhigh { background-color: rgba(192, 57, 43, 0.2); font-weight: 600; }
 
-        /* Tooltip styling */
-        .tooltip-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .info-icon {
-            color: var(--primary-color);
-            cursor: help;
-            margin-left: 4px;
-            font-size: 14px;
-        }
-
-        .tooltip {
-            visibility: hidden;
-            width: 280px;
-            background-color: rgba(0, 0, 0, 0.9);
-            color: #fff;
-            text-align: left;
-            border-radius: 6px;
-            padding: 12px;
-            position: absolute;
-            z-index: 1000;
-            bottom: 125%;
-            left: 50%;
-            transform: translateX(-50%);
-            opacity: 0;
-            transition: opacity 0.3s;
-            font-size: 13px;
-            line-height: 1.4;
-        }        .tooltip::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
-            border-color: rgba(0, 0, 0, 0.9) transparent transparent transparent;
-        }
-
-        .tooltip-container:hover .tooltip {
-            visibility: visible;
-            opacity: 1;
-        }
-
         .updated-indicator {
             background-color: #e8f5e8;
             color: #2d5a2d;
-            padding: 4px 8px;
-            border-radius: 4px;
+            padding: 2px 6px;
+            border-radius: 3px;
             font-size: 11px;
             font-weight: 600;
             margin-left: 8px;
         }
 
-        .corrected-data {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 2px 6px;
-            margin: 2px 0;
-        }
-
         .disclaimer {
             font-size: 12px;
-            color: var(--gray-dark);
+            color: #7f8c8d;
             margin-top: 20px;
             text-align: center;
-            background-color: var(--gray-light);
+            background-color: #f8f9fa;
             padding: 15px;
             border-radius: 6px;
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>    <script type="text/babel">
-        const { useState, useMemo, useCallback } = React;
+    <div id="root"></div>
 
-        // Corporation data with 2025 corrections
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        // Simple corporation data for testing
         const corporationData = [
             {
                 id: 1,
@@ -272,11 +158,9 @@
                 incorporationFee: 52,
                 amendmentFee: 25,
                 reportFee: "$0 (None)",
-                reportFrequency: "none",
-                franchiseTax: "None for small corp",
+                franchiseTax: "None",
                 fiveYearTotal: 77,
-                notes: "CONFIRMED: No annual reports required for domestic corporations. Franchise tax only for large capital.",
-                tooltip: "One of the few states with truly no ongoing reporting requirements for small corporations."
+                notes: "No annual reports required for domestic corporations."
             },
             {
                 id: 2,
@@ -284,11 +168,9 @@
                 incorporationFee: 100,
                 amendmentFee: 30,
                 reportFee: "$0 (Annual – No Fee)",
-                reportFrequency: "annual",
                 franchiseTax: "None",
                 fiveYearTotal: 130,
-                notes: "Annual reports required but with no filing fee. Very low ongoing costs.",
-                tooltip: "Annual report required but completely free to file."
+                notes: "Annual reports required but with no filing fee."
             },
             {
                 id: 3,
@@ -296,130 +178,41 @@
                 incorporationFee: 99,
                 amendmentFee: 50,
                 reportFee: "$0 (None)",
-                reportFrequency: "none",
                 franchiseTax: "None",
                 fiveYearTotal: 149,
-                notes: "No annual reports or ongoing fees after formation. Commercial Activity Tax only for businesses >$150K receipts.",
-                tooltip: "CORRECTED: Incorporation fee is $99, not $125. Still no annual reports required.",
+                notes: "No annual reports or ongoing fees after formation.",
                 updated: true
-            }            {
+            },
+            {
                 id: 4,
-                state: "Nebraska",
-                incorporationFee: 65,
-                amendmentFee: 25,
-                reportFee: "$26 (Biennial)",
-                reportFrequency: "biennial",
-                franchiseTax: "None",
-                fiveYearTotal: 168,
-                notes: "Low costs with biennial reporting."
-            },
-            {
-                id: 5,
-                state: "Colorado",
-                incorporationFee: 50,
-                amendmentFee: 25,
-                reportFee: "$10 (Annual)",
-                reportFrequency: "annual",
-                franchiseTax: "None",
-                fiveYearTotal: 175,
-                notes: "Very low annual fees."
-            },
-            {
-                id: 6,
-                state: "Kentucky",
-                incorporationFee: 55,
-                amendmentFee: 25,
-                reportFee: "$15 (Annual)",
-                reportFrequency: "annual",
-                franchiseTax: "None",
-                fiveYearTotal: 175,
-                notes: "Consistently low fees."
-            },
-            {
-                id: 7,
-                state: "Indiana",
-                incorporationFee: 90,
-                amendmentFee: 30,
-                reportFee: "$30 (Biennial)",
-                reportFrequency: "biennial",
-                franchiseTax: "None",
-                fiveYearTotal: 180,
-                notes: "Biennial reporting keeps costs down."
-            }            {
-                id: 8,
                 state: "California",
                 incorporationFee: 100,
                 amendmentFee: 30,
                 reportFee: "$25 (Annual)",
-                reportFrequency: "annual",
                 franchiseTax: "Franchise Tax: $800 per year",
                 fiveYearTotal: 4255,
-                notes: "Moderate filing fee but $800 annual franchise tax makes it most expensive over time.",
-                tooltip: "Hefty $800/year franchise tax regardless of income or revenue."
+                notes: "$800 annual franchise tax makes it most expensive."
             },
             {
-                id: 9,
+                id: 5,
                 state: "Delaware",
                 incorporationFee: 140,
                 amendmentFee: 194,
                 reportFee: "$50 (Annual)",
-                reportFrequency: "annual",
                 franchiseTax: "Franchise Tax: $175 min/year",
                 fiveYearTotal: 1359,
-                notes: "Premier legal jurisdiction with specialized Court of Chancery. Higher costs for legal advantages.",
-                tooltip: "Renowned for established business law and corporate legal protections."
-            },
-            {
-                id: 10,
-                state: "Nevada",
-                incorporationFee: 725,
-                amendmentFee: 175,
-                reportFee: "$650 (Annual)",
-                reportFrequency: "annual",
-                franchiseTax: "No state income/franchise tax",
-                fiveYearTotal: 4800,
-                notes: "Very high annual fees. $650 includes List ($150) + State Business License ($500).",
-                tooltip: "Extremely high ongoing costs despite no state income tax."
+                notes: "Premier legal jurisdiction with Court of Chancery."
             }
-        ];        function App() {
+        ];
+
+        function App() {
             const [searchTerm, setSearchTerm] = useState('');
-            const [costFilter, setCostFilter] = useState('all');
-            const [reportFilter, setReportFilter] = useState('all');
             const [sortConfig, setSortConfig] = useState({ key: 'fiveYearTotal', direction: 'ascending' });
 
             const filteredAndSortedData = useMemo(() => {
-                let filtered = corporationData.filter(corp => {
-                    const matchesSearch = corp.state.toLowerCase().includes(searchTerm.toLowerCase());
-                    
-                    let matchesCost = true;
-                    if (costFilter !== 'all') {
-                        const cost = corp.fiveYearTotal;
-                        switch (costFilter) {
-                            case '0-300':
-                                matchesCost = cost <= 300;
-                                break;
-                            case '301-600':
-                                matchesCost = cost > 300 && cost <= 600;
-                                break;
-                            case '601-1000':
-                                matchesCost = cost > 600 && cost <= 1000;
-                                break;
-                            case '1001-2000':
-                                matchesCost = cost > 1000 && cost <= 2000;
-                                break;
-                            case '2001+':
-                                matchesCost = cost > 2000;
-                                break;
-                        }
-                    }
-                    
-                    let matchesFreq = true;
-                    if (reportFilter !== 'all') {
-                        matchesFreq = corp.reportFrequency === reportFilter;
-                    }
-                    
-                    return matchesSearch && matchesCost && matchesFreq;
-                });
+                let filtered = corporationData.filter(corp => 
+                    corp.state.toLowerCase().includes(searchTerm.toLowerCase())
+                );
 
                 if (sortConfig.key) {
                     filtered.sort((a, b) => {
@@ -440,23 +233,21 @@
                 }
 
                 return filtered;
-            }, [searchTerm, costFilter, reportFilter, sortConfig]);            const handleSort = useCallback((key) => {
+            }, [searchTerm, sortConfig]);
+
+            const handleSort = (key) => {
                 setSortConfig(prevConfig => ({
                     key,
                     direction: prevConfig.key === key && prevConfig.direction === 'ascending' ? 'descending' : 'ascending'
                 }));
-            }, []);
+            };
 
-            const getCostClass = useCallback((value, type) => {
+            const getCostClass = (value, type) => {
                 switch (type) {
                     case 'formation':
                         if (value <= 100) return 'formation-low';
                         if (value <= 200) return 'formation-medium';
                         return 'formation-high';
-                    case 'amendment':
-                        if (value <= 30) return 'amendment-low';
-                        if (value <= 70) return 'amendment-medium';
-                        return 'amendment-high';
                     case 'total':
                         if (value <= 350) return 'total-low';
                         if (value <= 700) return 'total-medium';
@@ -465,9 +256,9 @@
                     default:
                         return '';
                 }
-            }, []);
+            };
 
-            const exportCSV = useCallback(() => {
+            const exportCSV = () => {
                 const headers = ['State', 'Incorporation Fee', 'Amendment Fee', 'Report Fee', 'Franchise Tax', '5-Year Total', 'Notes'];
                 const csvContent = [
                     headers.join(','),
@@ -489,8 +280,12 @@
                 a.download = 'Corporation_Cost_Matrix_2025.csv';
                 a.click();
                 window.URL.revokeObjectURL(url);
-            }, [filteredAndSortedData]);            return (
+            };
+
+            return (
                 <div className="dashboard">
+                    <h1>Corporation Cost Matrix - State Comparison 2025</h1>
+                    
                     <div className="controls">
                         <div className="control-group">
                             <label htmlFor="search">Search State:</label>
@@ -504,114 +299,72 @@
                         </div>
                         
                         <div className="control-group">
-                            <label htmlFor="cost-filter">5-Year Cost Range:</label>
-                            <select
-                                id="cost-filter"
-                                value={costFilter}
-                                onChange={(e) => setCostFilter(e.target.value)}
-                            >
-                                <option value="all">All Cost Ranges</option>
-                                <option value="0-300">$0 - $300</option>
-                                <option value="301-600">$301 - $600</option>
-                                <option value="601-1000">$601 - $1000</option>
-                                <option value="1001-2000">$1001 - $2000</option>
-                                <option value="2001+">$2001+</option>
-                            </select>
-                        </div>
-                        
-                        <div className="control-group">
-                            <label htmlFor="report-filter">Report Frequency:</label>
-                            <select
-                                id="report-filter"
-                                value={reportFilter}
-                                onChange={(e) => setReportFilter(e.target.value)}
-                            >
-                                <option value="all">All Frequencies</option>
-                                <option value="none">None</option>
-                                <option value="annual">Annual</option>
-                                <option value="biennial">Biennial</option>
-                            </select>
-                        </div>
-                        
-                        <div className="button-container">
                             <button className="export-btn" onClick={exportCSV}>
-                                EXPORT CSV
+                                Export CSV
                             </button>
                         </div>
-                    </div>                    <div className="table-container">
-                        <div className="table-sticky-header">
-                            <table className="corp-cost-table">
-                                <thead>
-                                    <tr>
-                                        <th className="state-col sortable" onClick={() => handleSort('state')}>
-                                            State {sortConfig.key === 'state' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="fee-col sortable" onClick={() => handleSort('incorporationFee')}>
-                                            Incorporation Fee {sortConfig.key === 'incorporationFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="fee-col sortable" onClick={() => handleSort('amendmentFee')}>
-                                            Amendment Fee {sortConfig.key === 'amendmentFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="fee-col sortable" onClick={() => handleSort('reportFee')}>
-                                            Report Fee {sortConfig.key === 'reportFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="tax-col sortable" onClick={() => handleSort('franchiseTax')}>
-                                            Franchise Tax {sortConfig.key === 'franchiseTax' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="fee-col sortable" onClick={() => handleSort('fiveYearTotal')}>
-                                            5‑Year Total {sortConfig.key === 'fiveYearTotal' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                        </th>
-                                        <th className="notes-col">Notes</th>
+                    </div>
+
+                    <div className="table-container">
+                        <table className="corp-cost-table">
+                            <thead>
+                                <tr>
+                                    <th onClick={() => handleSort('state')}>
+                                        State {sortConfig.key === 'state' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                    </th>
+                                    <th onClick={() => handleSort('incorporationFee')}>
+                                        Incorporation Fee {sortConfig.key === 'incorporationFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                    </th>
+                                    <th onClick={() => handleSort('amendmentFee')}>
+                                        Amendment Fee {sortConfig.key === 'amendmentFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                    </th>
+                                    <th onClick={() => handleSort('reportFee')}>
+                                        Report Fee
+                                    </th>
+                                    <th onClick={() => handleSort('franchiseTax')}>
+                                        Franchise Tax
+                                    </th>
+                                    <th onClick={() => handleSort('fiveYearTotal')}>
+                                        5‑Year Total {sortConfig.key === 'fiveYearTotal' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
+                                    </th>
+                                    <th>Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredAndSortedData.map((corp) => (
+                                    <tr key={corp.id}>
+                                        <td>
+                                            {corp.state}
+                                            {corp.updated && <span className="updated-indicator">UPDATED</span>}
+                                        </td>
+                                        <td className={getCostClass(corp.incorporationFee, 'formation')}>
+                                            ${corp.incorporationFee}
+                                        </td>
+                                        <td className={getCostClass(corp.amendmentFee, 'formation')}>
+                                            ${corp.amendmentFee}
+                                        </td>
+                                        <td>{corp.reportFee}</td>
+                                        <td>{corp.franchiseTax}</td>
+                                        <td className={getCostClass(corp.fiveYearTotal, 'total')}>
+                                            ${corp.fiveYearTotal.toLocaleString()}
+                                        </td>
+                                        <td>{corp.notes}</td>
                                     </tr>
-                                </thead>
-                                <tbody>
-                                    {filteredAndSortedData.map((corp) => (
-                                        <tr key={corp.id}>
-                                            <td className="state-col">
-                                                {corp.state}
-                                                {corp.updated && <span className="updated-indicator">UPDATED</span>}
-                                                {corp.tooltip && (
-                                                    <div className="tooltip-container">
-                                                        <span className="info-icon">ⓘ</span>
-                                                        <div className="tooltip">{corp.tooltip}</div>
-                                                    </div>
-                                                )}
-                                            </td>
-                                            <td className={getCostClass(corp.incorporationFee, 'formation')}>
-                                                ${corp.incorporationFee}
-                                            </td>
-                                            <td className={getCostClass(corp.amendmentFee, 'amendment')}>
-                                                ${corp.amendmentFee}
-                                            </td>
-                                            <td>{corp.reportFee}</td>
-                                            <td>{corp.franchiseTax}</td>
-                                            <td className={getCostClass(corp.fiveYearTotal, 'total')}>
-                                                ${corp.fiveYearTotal.toLocaleString()}
-                                            </td>
-                                            <td className="notes-col">
-                                                <div className={corp.updated ? 'corrected-data' : ''}>
-                                                    {corp.notes}
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>                    <div className="disclaimer">
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div className="disclaimer">
                         <strong>Data Updated for 2025:</strong> All information verified from official state websites as of January 2025. 
-                        Key corrections include: Mississippi annual reports, Missouri corporation reports, Ohio fees, Pennsylvania's new annual requirement, 
-                        and Oklahoma's confirmed no-report status. The 5-Year Total assumes one amendment filing and all applicable annual/biennial reports and taxes for five years. 
-                        Always verify current requirements with official state websites as fees and deadlines may change.
+                        The 5-Year Total assumes one amendment filing and all applicable annual/biennial reports and taxes for five years.
                     </div>
                 </div>
             );
         }
 
-        // Render the app
-        const container = document.getElementById('root');
-        const root = ReactDOM.createRoot(container);
-        root.render(<App />);
+        // Use legacy ReactDOM.render for better compatibility
+        ReactDOM.render(<App />, document.getElementById('root'));
     </script>
 </body>
 </html>
