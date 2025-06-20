@@ -445,6 +445,10 @@
                 annualFranchiseFee: 100,
                 dissolutionFee: 100,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 6.5,
+                smallBusinessThreshold: 25000,
+                minimumTax: 100,
+                noTaxThreshold: 0,
                 notes: "Business Privilege Tax $100 minimum. No annual reports since 2024."
             },
             {
@@ -459,6 +463,10 @@
                 annualFranchiseFee: 0,
                 dissolutionFee: 25,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 9.4,
+                smallBusinessThreshold: 50000,
+                minimumTax: 0,
+                noTaxThreshold: 0,
                 notes: "Biennial reports every 2 years by Jan 2."
             },
             {
@@ -501,6 +509,10 @@
                 annualFranchiseFee: 800,
                 dissolutionFee: 0,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 8.84,
+                smallBusinessThreshold: 1000000,
+                minimumTax: 800,
+                noTaxThreshold: 0,
                 notes: "$800 annual franchise tax - highest in nation. Free dissolution."
             },
             {
@@ -543,6 +555,10 @@
                 annualFranchiseFee: 175,
                 dissolutionFee: 204,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 8.7,
+                smallBusinessThreshold: 20000000,
+                minimumTax: 175,
+                noTaxThreshold: 0,
                 notes: "Premier legal jurisdiction. Franchise tax minimum $175, can be much higher."
             },
             {
@@ -557,6 +573,10 @@
                 annualFranchiseFee: 0,
                 dissolutionFee: 35,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 5.5,
+                smallBusinessThreshold: 50000,
+                minimumTax: 0,
+                noTaxThreshold: 50000,
                 notes: "High annual report fees. $400 late penalty if missed."
             },
             {
@@ -1005,6 +1025,10 @@
                 annualFranchiseFee: 0,
                 dissolutionFee: 40,
                 onlineAmendments: true,
+                corporateIncomeTaxRate: 0,
+                smallBusinessThreshold: 1230000,
+                minimumTax: 0,
+                noTaxThreshold: 1230000,
                 notes: "No SOS annual reports. Franchise tax only if revenue >$1.23M."
             },
             {
@@ -1118,9 +1142,11 @@
             const [searchTerm, setSearchTerm] = useState('');
             const [costFilter, setCostFilter] = useState('all');
             const [reportFilter, setReportFilter] = useState('all');
+            const [revenueFilter, setRevenueFilter] = useState('all');
             const [sortConfig, setSortConfig] = useState({ key: 'hassleScore', direction: 'descending' });
             const [selectedStates, setSelectedStates] = useState(new Set());
             const [showComparison, setShowComparison] = useState(false);
+            const [showHeatMap, setShowHeatMap] = useState(false);
 
             const filteredAndSortedData = useMemo(() => {
                 let filtered = corporationData.filter(corp => {
@@ -1157,7 +1183,19 @@
                         }
                     }
                     
-                    return matchesSearch && matchesCost && matchesFreq;
+                    let matchesRevenue = true;
+                    if (revenueFilter !== 'all') {
+                        const revenue = parseInt(revenueFilter);
+                        if (corp.noTaxThreshold && revenue <= corp.noTaxThreshold) {
+                            matchesRevenue = true; // No corporate income tax
+                        } else if (corp.smallBusinessThreshold && revenue <= corp.smallBusinessThreshold) {
+                            matchesRevenue = true; // Reduced rates or benefits
+                        } else {
+                            matchesRevenue = true; // Standard rates apply
+                        }
+                    }
+                    
+                    return matchesSearch && matchesCost && matchesFreq && matchesRevenue;
                 });
 
                 if (sortConfig.key) {
@@ -1207,8 +1245,10 @@
                 setSearchTerm('');
                 setCostFilter('all');
                 setReportFilter('all');
+                setRevenueFilter('all');
                 setSelectedStates(new Set());
                 setShowComparison(false);
+                setShowHeatMap(false);
             }, []);
 
             const exportCSV = useCallback(() => {
@@ -1234,6 +1274,59 @@
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = 'Corporation_Cost_Matrix_2025.csv';
+                a.click();
+                window.URL.revokeObjectURL(url);
+            }, [filteredAndSortedData]);
+
+            const exportExcel = useCallback(() => {
+                const excelData = filteredAndSortedData.map(corp => {
+                    const revenue = 100000; // Default revenue for calculations
+                    const estimatedTax = revenue > (corp.noTaxThreshold || 0) ? 
+                        Math.max((revenue * (corp.corporateIncomeTaxRate || 0) / 100), corp.minimumTax || 0) : 0;
+                    
+                    return [
+                        corp.state,
+                        corp.incorporationFee,
+                        corp.amendmentFee,
+                        corp.annualReportFee,
+                        corp.reportFrequency,
+                        corp.filingDeadline || 'N/A',
+                        corp.corporateIncomeTaxRate || 0,
+                        corp.smallBusinessThreshold || 0,
+                        corp.noTaxThreshold || 0,
+                        corp.minimumTax || 0,
+                        `=MAX((100000*G${2})/100,J${2})`, // Tax calculation formula
+                        corp.annualFranchiseFee,
+                        corp.dissolutionFee,
+                        `=B${2}+(C${2}*2)+(D${2}*5)+((L${2}+K${2})*5)+M${2}`, // 5-year total formula
+                        corp.hassleScore,
+                        corp.notes
+                    ];
+                });
+
+                const headers = [
+                    'State', 'Inc Fee', 'Amendment Fee', 'Report Fee', 'Frequency', 'Deadline',
+                    'Corp Tax Rate %', 'Small Biz Threshold', 'No Tax Threshold', 'Min Tax',
+                    'Est Tax (100K Revenue)', 'Annual Franchise Fee', 'Dissolution Fee',
+                    '5-Year Total with Tax', 'Hassle Score', 'Notes'
+                ];
+
+                const csvContent = [
+                    headers.join(','),
+                    ...excelData.map((row, index) => row.map((cell, cellIndex) => 
+                        cellIndex >= 10 && cellIndex <= 13 && typeof cell === 'string' && cell.startsWith('=') 
+                            ? cell.replace(/\$\{2\}/g, index + 2) // Replace row references
+                            : typeof cell === 'string' && cell.includes(',') 
+                                ? `"${cell.replace(/"/g, '""')}"` 
+                                : cell
+                    ).join(','))
+                ].join('\n');
+
+                const blob = new Blob([csvContent], { type: 'text/csv' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'Corporation_Cost_Matrix_2025_with_Formulas.csv';
                 a.click();
                 window.URL.revokeObjectURL(url);
             }, [filteredAndSortedData]);
@@ -1323,6 +1416,24 @@
                             )
                         ),
                         
+                        React.createElement('div', { className: 'control-group' },
+                            React.createElement('label', { htmlFor: 'revenue-filter' }, 'Expected Annual Revenue:'),
+                            React.createElement('select', {
+                                id: 'revenue-filter',
+                                value: revenueFilter,
+                                onChange: (e) => setRevenueFilter(e.target.value)
+                            },
+                                React.createElement('option', { value: 'all' }, 'All Revenue Ranges'),
+                                React.createElement('option', { value: '25000' }, 'Under $25K'),
+                                React.createElement('option', { value: '50000' }, 'Under $50K'),
+                                React.createElement('option', { value: '100000' }, 'Under $100K'),
+                                React.createElement('option', { value: '500000' }, 'Under $500K'),
+                                React.createElement('option', { value: '1000000' }, 'Under $1M'),
+                                React.createElement('option', { value: '5000000' }, 'Under $5M'),
+                                React.createElement('option', { value: '10000000' }, '$10M+')
+                            )
+                        ),
+                        
                         React.createElement('div', { className: 'button-container' },
                             React.createElement('button', {
                                 className: 'compare-btn',
@@ -1336,7 +1447,15 @@
                             React.createElement('button', {
                                 className: 'export-btn',
                                 onClick: exportCSV
-                            }, 'EXPORT CSV')
+                            }, 'EXPORT CSV'),
+                            React.createElement('button', {
+                                className: 'export-btn',
+                                onClick: exportExcel
+                            }, 'EXPORT EXCEL'),
+                            React.createElement('button', {
+                                className: 'compare-btn',
+                                onClick: () => setShowHeatMap(!showHeatMap)
+                            }, showHeatMap ? 'HIDE HEAT MAP' : 'SHOW HEAT MAP')
                         )
                     ),
 
@@ -1455,6 +1574,11 @@
                         onClose: () => setShowComparison(false)
                     }),
 
+                    showHeatMap && React.createElement(HeatMapView, {
+                        data: filteredAndSortedData,
+                        onClose: () => setShowHeatMap(false)
+                    }),
+
                     React.createElement('div', { className: 'disclaimer' },
                         React.createElement('strong', {}, 'Data Updated for 2025:'),
                         ' All information verified from official state websites as of January 2025. ',
@@ -1465,6 +1589,97 @@
                 )
             );
         }
+
+        function HeatMapView({ data, onClose }) {
+            const maxTotal = Math.max(...data.map(corp => corp.fiveYearTotal));
+            const minTotal = Math.min(...data.map(corp => corp.fiveYearTotal));
+            
+            const getColorIntensity = (total) => {
+                const intensity = (total - minTotal) / (maxTotal - minTotal);
+                return `rgba(231, 76, 60, ${0.2 + (intensity * 0.6)})`;
+            };
+
+            const stateAbbreviations = {
+                'Alabama': 'AL', 'Alaska': 'AK', 'Arizona': 'AZ', 'Arkansas': 'AR', 'California': 'CA',
+                'Colorado': 'CO', 'Connecticut': 'CT', 'Delaware': 'DE', 'Florida': 'FL', 'Georgia': 'GA',
+                'Hawaii': 'HI', 'Idaho': 'ID', 'Illinois': 'IL', 'Indiana': 'IN', 'Iowa': 'IA',
+                'Kansas': 'KS', 'Kentucky': 'KY', 'Louisiana': 'LA', 'Maine': 'ME', 'Maryland': 'MD',
+                'Massachusetts': 'MA', 'Michigan': 'MI', 'Minnesota': 'MN', 'Mississippi': 'MS', 'Missouri': 'MO',
+                'Montana': 'MT', 'Nebraska': 'NE', 'Nevada': 'NV', 'New Hampshire': 'NH', 'New Jersey': 'NJ',
+                'New Mexico': 'NM', 'New York': 'NY', 'North Carolina': 'NC', 'North Dakota': 'ND', 'Ohio': 'OH',
+                'Oklahoma': 'OK', 'Oregon': 'OR', 'Pennsylvania': 'PA', 'Rhode Island': 'RI', 'South Carolina': 'SC',
+                'South Dakota': 'SD', 'Tennessee': 'TN', 'Texas': 'TX', 'Utah': 'UT', 'Vermont': 'VT',
+                'Virginia': 'VA', 'Washington': 'WA', 'West Virginia': 'WV', 'Wisconsin': 'WI', 'Wyoming': 'WY'
+            };
+
+            return React.createElement('div', { className: 'comparison-view' },
+                React.createElement('div', { className: 'comparison-header' },
+                    React.createElement('h2', {}, 'Cost Heat Map - 5-Year Total Costs'),
+                    React.createElement('button', {
+                        className: 'reset-btn',
+                        onClick: onClose
+                    }, 'CLOSE HEAT MAP')
+                ),
+                React.createElement('div', { 
+                    style: { 
+                        display: 'grid', 
+                        gridTemplateColumns: 'repeat(10, 1fr)', 
+                        gap: '10px', 
+                        padding: '20px',
+                        maxWidth: '800px',
+                        margin: '0 auto'
+                    } 
+                },
+                    data.map((corp) =>
+                        React.createElement('div', { 
+                            key: corp.id,
+                            style: {
+                                backgroundColor: getColorIntensity(corp.fiveYearTotal),
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                padding: '8px',
+                                textAlign: 'center',
+                                fontSize: '12px',
+                                fontWeight: 'bold',
+                                cursor: 'pointer',
+                                minHeight: '60px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                justifyContent: 'center'
+                            },
+                            title: `${corp.state}: $${corp.fiveYearTotal.toLocaleString()}`
+                        },
+                            React.createElement('div', {}, stateAbbreviations[corp.state] || corp.state.slice(0,2).toUpperCase()),
+                            React.createElement('div', { style: { fontSize: '10px', marginTop: '4px' } }, 
+                                `$${corp.fiveYearTotal.toLocaleString()}`
+                            )
+                        )
+                    )
+                ),
+                React.createElement('div', { 
+                    style: { 
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        alignItems: 'center', 
+                        gap: '10px', 
+                        marginTop: '20px',
+                        fontSize: '12px'
+                    } 
+                },
+                    React.createElement('span', {}, 'Low Cost'),
+                    React.createElement('div', { 
+                        style: { 
+                            width: '200px', 
+                            height: '20px', 
+                            background: 'linear-gradient(to right, rgba(231, 76, 60, 0.2), rgba(231, 76, 60, 0.8))',
+                            border: '1px solid #ddd'
+                        } 
+                    }),
+                    React.createElement('span', {}, 'High Cost')
+                )
+            );
+        }
+
         function ComparisonView({ states, onClose }) {
             return React.createElement('div', { className: 'comparison-view' },
                 React.createElement('div', { className: 'comparison-header' },
