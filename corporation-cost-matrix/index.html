@@ -364,26 +364,47 @@
         function calculateHassleScore(corp) {
             let score = 0;
             
-            // No annual reports = +30 points
-            if (corp.reportFrequency === 'none') score += 30;
+            // Reporting requirements scoring (enhanced to boost biennial and decennial)
+            if (corp.reportFrequency === 'none') {
+                score += 35; // Increased for no reports
+            } else if (corp.reportFrequency === 'decennial') {
+                score += 32; // Special boost for Pennsylvania
+            } else if (corp.reportFrequency === 'biennial') {
+                score += 25; // Significant boost for biennial (helps NY)
+            } else if (corp.reportFrequency === 'annual') {
+                score += 5; // Small points for annual
+            }
             
             // Low incorporation fee
-            if (corp.incorporationFee < 100) score += 20;
+            if (corp.incorporationFee < 75) score += 20;
+            else if (corp.incorporationFee < 125) score += 15;
             else if (corp.incorporationFee < 200) score += 10;
             
             // Low amendment fee
-            if (corp.amendmentFee < 30) score += 15;
-            else if (corp.amendmentFee < 70) score += 10;
+            if (corp.amendmentFee < 25) score += 15;
+            else if (corp.amendmentFee < 50) score += 12;
+            else if (corp.amendmentFee < 70) score += 8;
             
-            // Online amendments available (assuming most states have this)
-            if (corp.onlineAmendments) score += 10;
+            // Online amendments available
+            if (corp.onlineAmendments) score += 5;
             
-            // No franchise tax
-            if (corp.franchiseTaxType === 'none') score += 15;
+            // No franchise tax/annual fees
+            if (corp.franchiseTaxType === 'none' && corp.annualFranchiseFee === 0) {
+                score += 20; // Increased bonus for no annual taxes
+            } else if (corp.annualFranchiseFee <= 25) {
+                score += 10; // Low annual fee bonus
+            }
             
             // Low dissolution fee
-            if (corp.dissolutionFee < 50) score += 10;
-            else if (corp.dissolutionFee < 100) score += 5;
+            if (corp.dissolutionFee === 0) score += 8;
+            else if (corp.dissolutionFee < 30) score += 6;
+            else if (corp.dissolutionFee < 60) score += 4;
+            else if (corp.dissolutionFee < 100) score += 2;
+            
+            // Very low annual report fees bonus
+            if (corp.annualReportFee <= 15 && corp.reportFrequency !== 'none') {
+                score += 5; // Helps NY with $9 fee
+            }
             
             return Math.min(score, 100);
         }
@@ -398,7 +419,10 @@
                 reportFees = corp.annualReportFee * 5;
             } else if (corp.reportFrequency === 'biennial') {
                 reportFees = corp.annualReportFee * 2.5; // 2.5 reports over 5 years
+            } else if (corp.reportFrequency === 'decennial') {
+                reportFees = corp.annualReportFee * 0.5; // Half a report over 5 years
             }
+            // 'none' frequency = 0 report fees
             
             const franchiseFees = corp.annualFranchiseFee * 5;
             const dissolutionFee = corp.dissolutionFee;
