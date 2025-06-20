@@ -5,16 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Corporation Cost Matrix - 50 State Comparison | terms.law</title>
     <meta name="description" content="Interactive comparison of corporation formation and ongoing costs across all 50 US states. Find the most cost-effective state for your business incorporation.">
-    <script crossorigin src="https://unpkg.com/react@17/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
     <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --gray-light: #f8f9fa;
+            --gray-medium: #ddd;
+            --gray-dark: #7f8c8d;
+            --orange-color: #f39c12;
+            --best-business-color: #d4edda;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             padding: 20px;
-            max-width: 1200px;
+            max-width: 1600px;
             margin: 0 auto;
             background-color: #f5f5f5;
         }
@@ -23,16 +44,18 @@
             display: flex;
             flex-direction: column;
             gap: 20px;
+            width: 100%;
         }
 
         .controls {
             display: flex;
             flex-wrap: wrap;
             gap: 15px;
-            background-color: #f8f9fa;
+            background-color: var(--gray-light);
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            width: 100%;
         }
 
         .control-group {
@@ -50,97 +73,285 @@
 
         select, input {
             padding: 8px 12px;
-            border: 1px solid #ddd;
+            border: 1px solid var(--gray-medium);
             border-radius: 4px;
             font-size: 14px;
+            width: 100%;
         }
 
         button {
             padding: 8px 15px;
-            background-color: #3498db;
+            background-color: var(--primary-color);
             color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.2s;
+            min-width: 150px;
         }
 
         button:hover {
-            background-color: #2980b9;
+            background-color: var(--secondary-color);
+        }
+
+        button:disabled {
+            background-color: var(--gray-dark);
+            cursor: not-allowed;
         }
 
         .export-btn {
-            background-color: #27ae60;
+            background-color: var(--success-color);
         }
 
         .export-btn:hover {
             background-color: #219653;
         }
 
+        .reset-btn {
+            background-color: var(--gray-dark);
+        }
+
+        .reset-btn:hover {
+            background-color: #636e72;
+        }
+
+        .compare-btn {
+            background-color: var(--orange-color);
+        }
+
+        .compare-btn:hover:not(:disabled) {
+            background-color: #d68910;
+        }
+
         .table-container {
             overflow-x: auto;
-            background-color: white;
-            border-radius: 8px;
+            width: 100%;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            background-color: white;
+        }
+
+        .table-sticky-header {
+            overflow: auto;
+            max-height: 700px;
         }
 
         .corp-cost-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
+            font-size: 13px;
+            background-color: white;
+            table-layout: fixed;
+            min-width: 1400px;
         }
 
         .corp-cost-table th {
-            background-color: #2c3e50;
+            background-color: var(--dark-color);
             color: white;
-            padding: 12px 8px;
+            padding: 10px 6px;
             text-align: left;
-            cursor: pointer;
             position: sticky;
             top: 0;
+            z-index: 10;
+            cursor: pointer;
+            white-space: nowrap;
+            overflow: visible;
+            font-size: 12px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .corp-cost-table th:hover {
             background-color: #34495e;
         }
 
+        .corp-cost-table th.sortable:after {
+            content: '↕️';
+            margin-left: 4px;
+            opacity: 0.5;
+        }
+
         .corp-cost-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #ddd;
+            padding: 8px 6px;
+            border-bottom: 1px solid var(--gray-medium);
+            border-right: 1px solid var(--gray-medium);
+            vertical-align: top;
         }
 
         .corp-cost-table tr:hover {
             background-color: #f5f5f5;
         }
 
-        .formation-low { color: #27ae60; font-weight: 600; }
-        .formation-medium { color: #f39c12; font-weight: 600; }
-        .formation-high { color: #e74c3c; font-weight: 600; }
+        .best-for-business {
+            background-color: var(--best-business-color) !important;
+            font-weight: bold;
+        }
+
+        /* Column widths */
+        .checkbox-col { width: 40px; text-align: center; }
+        .state-col { width: 120px; }
+        .fee-col { width: 80px; text-align: right; }
+        .report-col { width: 90px; }
+        .frequency-col { width: 80px; }
+        .tax-col { width: 100px; }
+        .dissolution-col { width: 80px; text-align: right; }
+        .total-col { width: 90px; text-align: right; }
+        .score-col { width: 70px; text-align: center; }
+        .notes-col { width: 200px; }
+
+        /* State links */
+        .state-link {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .state-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Cost color coding */
+        .formation-low { color: var(--success-color); font-weight: 600; }
+        .formation-medium { color: var(--warning-color); font-weight: 600; }
+        .formation-high { color: var(--danger-color); font-weight: 600; }
+
+        .amendment-low { color: var(--success-color); font-weight: 600; }
+        .amendment-medium { color: var(--warning-color); font-weight: 600; }
+        .amendment-high { color: var(--danger-color); font-weight: 600; }
+
+        .dissolution-low { color: var(--success-color); font-weight: 600; }
+        .dissolution-medium { color: var(--warning-color); font-weight: 600; }
+        .dissolution-high { color: var(--danger-color); font-weight: 600; }
 
         .total-low { background-color: rgba(39, 174, 96, 0.1); font-weight: 600; }
         .total-medium { background-color: rgba(243, 156, 18, 0.1); font-weight: 600; }
         .total-high { background-color: rgba(231, 76, 60, 0.1); font-weight: 600; }
         .total-veryhigh { background-color: rgba(192, 57, 43, 0.2); font-weight: 600; }
 
-        .updated-indicator {
-            background-color: #e8f5e8;
-            color: #2d5a2d;
-            padding: 2px 6px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: 600;
-            margin-left: 8px;
+        /* Score color coding */
+        .score-excellent { background-color: rgba(39, 174, 96, 0.2); color: #27ae60; font-weight: bold; }
+        .score-good { background-color: rgba(52, 152, 219, 0.2); color: #3498db; font-weight: bold; }
+        .score-fair { background-color: rgba(243, 156, 18, 0.2); color: #f39c12; font-weight: bold; }
+        .score-poor { background-color: rgba(231, 76, 60, 0.2); color: #e74c3c; font-weight: bold; }
+
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .disclaimer {
             font-size: 12px;
-            color: #7f8c8d;
+            color: var(--gray-dark);
             margin-top: 20px;
             text-align: center;
-            background-color: #f8f9fa;
+            background-color: var(--gray-light);
             padding: 15px;
             border-radius: 6px;
+        }
+
+        /* Comparison view */
+        .comparison-view {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-top: 20px;
+            padding: 20px;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .comparison-header h2 {
+            font-size: 18px;
+            color: var(--dark-color);
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+        }
+
+        .comparison-item {
+            border: 1px solid var(--gray-medium);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .comparison-item-header {
+            background-color: var(--dark-color);
+            color: white;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .comparison-item-body {
+            padding: 15px;
+        }
+
+        .comparison-item-row {
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-item-row:last-child {
+            border-bottom: none;
+        }
+
+        .comparison-item-row strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+            color: var(--gray-dark);
+            font-weight: 600;
+        }
+
+        .comparison-item-row p {
+            margin: 0;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        /* Responsive design */
+        @media (max-width: 1200px) {
+            .corp-cost-table {
+                font-size: 11px;
+            }
+            
+            .corp-cost-table th,
+            .corp-cost-table td {
+                padding: 6px 4px;
+            }
+            
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .notes-col {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -148,71 +359,759 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const { useState, useMemo } = React;
+        const { useState, useMemo, useCallback } = React;
+        // Calculate hassle-free score (0-100 scale)
+        function calculateHassleScore(corp) {
+            let score = 0;
+            
+            // No annual reports = +30 points
+            if (corp.reportFrequency === 'none') score += 30;
+            
+            // Low incorporation fee
+            if (corp.incorporationFee < 100) score += 20;
+            else if (corp.incorporationFee < 200) score += 10;
+            
+            // Low amendment fee
+            if (corp.amendmentFee < 30) score += 15;
+            else if (corp.amendmentFee < 70) score += 10;
+            
+            // Online amendments available (assuming most states have this)
+            if (corp.onlineAmendments) score += 10;
+            
+            // No franchise tax
+            if (corp.franchiseTaxType === 'none') score += 15;
+            
+            // Low dissolution fee
+            if (corp.dissolutionFee < 50) score += 10;
+            else if (corp.dissolutionFee < 100) score += 5;
+            
+            return Math.min(score, 100);
+        }
 
-        // Simple corporation data for testing
-        const corporationData = [
+        // Calculate 5-year total cost
+        function calculate5YearTotal(corp) {
+            const incFee = corp.incorporationFee;
+            const amendmentFees = corp.amendmentFee * 2; // Assume 2 amendments over 5 years
+            
+            let reportFees = 0;
+            if (corp.reportFrequency === 'annual') {
+                reportFees = corp.annualReportFee * 5;
+            } else if (corp.reportFrequency === 'biennial') {
+                reportFees = corp.annualReportFee * 2.5; // 2.5 reports over 5 years
+            }
+            
+            const franchiseFees = corp.annualFranchiseFee * 5;
+            const dissolutionFee = corp.dissolutionFee;
+            
+            return incFee + amendmentFees + reportFees + franchiseFees + dissolutionFee;
+        }
+
+        // Updated corporation data with all 50 states
+        const rawCorporationData = [
             {
-                id: 1,
-                state: "Oklahoma",
-                incorporationFee: 52,
-                amendmentFee: 25,
-                reportFee: "$0 (None)",
-                franchiseTax: "None",
-                fiveYearTotal: 77,
-                notes: "No annual reports required for domestic corporations."
+                state: "Alabama",
+                sosUrl: "https://www.sos.alabama.gov/",
+                incorporationFee: 200,
+                amendmentFee: 100,
+                annualReportFee: 0,
+                reportFrequency: "none",
+                franchiseTaxType: "privilege tax",
+                annualFranchiseFee: 100,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "Business Privilege Tax $100 minimum. No annual reports since 2024."
             },
             {
-                id: 2,
-                state: "Idaho",
+                state: "Alaska",
+                sosUrl: "https://www.commerce.alaska.gov/web/cbpl/Corporations/",
+                incorporationFee: 250,
+                amendmentFee: 25,
+                annualReportFee: 100,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 25,
+                onlineAmendments: true,
+                notes: "Biennial reports every 2 years by Jan 2."
+            },
+            {
+                state: "Arizona",
+                sosUrl: "https://azcc.gov/",
+                incorporationFee: 60,
+                amendmentFee: 25,
+                annualReportFee: 45,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 25,
+                onlineAmendments: true,
+                notes: "Annual reports due on incorporation anniversary."
+            },
+            {
+                state: "Arkansas",
+                sosUrl: "https://www.sos.arkansas.gov/",
+                incorporationFee: 50,
+                amendmentFee: 50,
+                annualReportFee: 150,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 150,
+                dissolutionFee: 50,
+                onlineAmendments: true,
+                notes: "Annual franchise tax report required May 1."
+            },
+            {
+                state: "California",
+                sosUrl: "https://www.sos.ca.gov/",
                 incorporationFee: 100,
                 amendmentFee: 30,
-                reportFee: "$0 (Annual – No Fee)",
-                franchiseTax: "None",
-                fiveYearTotal: 130,
-                notes: "Annual reports required but with no filing fee."
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 800,
+                dissolutionFee: 0,
+                onlineAmendments: true,
+                notes: "$800 annual franchise tax - highest in nation. Free dissolution."
             },
             {
-                id: 3,
-                state: "Ohio", 
+                state: "Colorado",
+                sosUrl: "https://www.sos.state.co.us/",
+                incorporationFee: 50,
+                amendmentFee: 25,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 25,
+                onlineAmendments: true,
+                notes: "Periodic report fee increased to $25 in 2024."
+            }            {
+                state: "Connecticut",
+                sosUrl: "https://portal.ct.gov/SOTS/",
+                incorporationFee: 315,
+                amendmentFee: 140,
+                annualReportFee: 150,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 0,
+                onlineAmendments: true,
+                notes: "High formation fees but no franchise tax. Free dissolution."
+            },
+            {
+                state: "Delaware",
+                sosUrl: "https://corp.delaware.gov/",
+                incorporationFee: 109,
+                amendmentFee: 200,
+                annualReportFee: 50,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 175,
+                dissolutionFee: 204,
+                onlineAmendments: true,
+                notes: "Premier legal jurisdiction. Franchise tax minimum $175, can be much higher."
+            },
+            {
+                state: "Florida",
+                sosUrl: "https://dos.myflorida.com/sunbiz/",
+                incorporationFee: 70,
+                amendmentFee: 35,
+                annualReportFee: 150,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 35,
+                onlineAmendments: true,
+                notes: "High annual report fees. $400 late penalty if missed."
+            },
+            {
+                state: "Georgia",
+                sosUrl: "https://sos.ga.gov/",
+                incorporationFee: 100,
+                amendmentFee: 20,
+                annualReportFee: 50,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 0,
+                onlineAmendments: true,
+                notes: "Multi-year renewals available. Free dissolution."
+            },
+            {
+                state: "Hawaii",
+                sosUrl: "https://cca.hawaii.gov/breg/",
+                incorporationFee: 51,
+                amendmentFee: 25,
+                annualReportFee: 15,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 25,
+                onlineAmendments: true,
+                notes: "Very low ongoing costs. Online discount available."
+            },
+            {
+                state: "Idaho",
+                sosUrl: "https://sos.idaho.gov/",
+                incorporationFee: 100,
+                amendmentFee: 30,
+                annualReportFee: 0,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 30,
+                onlineAmendments: true,
+                notes: "Annual reports required but completely free to file."
+            },
+            {
+                state: "Illinois",
+                sosUrl: "https://www.cyberdriveillinois.com/",
+                incorporationFee: 150,
+                amendmentFee: 55,
+                annualReportFee: 75,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 25,
+                dissolutionFee: 10,
+                onlineAmendments: true,
+                notes: "Franchise tax being phased out by 2025."
+            },
+            {
+                state: "Indiana",
+                sosUrl: "https://www.in.gov/sos/",
+                incorporationFee: 91,
+                amendmentFee: 30,
+                annualReportFee: 32,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 30,
+                onlineAmendments: true,
+                notes: "Biennial reports every 2 years. Online filing available."
+            }            {
+                state: "Iowa",
+                sosUrl: "https://sos.iowa.gov/",
+                incorporationFee: 50,
+                amendmentFee: 50,
+                annualReportFee: 30,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 5,
+                onlineAmendments: true,
+                notes: "Biennial reports keep costs low. $30 online."
+            },
+            {
+                state: "Kansas",
+                sosUrl: "https://www.sos.ks.gov/",
+                incorporationFee: 90,
+                amendmentFee: 35,
+                annualReportFee: 50,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 35,
+                onlineAmendments: true,
+                notes: "Switched to biennial reporting in 2022."
+            },
+            {
+                state: "Kentucky",
+                sosUrl: "https://www.sos.ky.gov/",
+                incorporationFee: 100,
+                amendmentFee: 90,
+                annualReportFee: 15,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 90,
+                onlineAmendments: true,
+                notes: "Low annual report fees. One-time organization tax on capital."
+            },
+            {
+                state: "Louisiana",
+                sosUrl: "https://www.sos.la.gov/",
+                incorporationFee: 170,
+                amendmentFee: 80,
+                annualReportFee: 30,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 110,
+                dissolutionFee: 75,
+                onlineAmendments: true,
+                notes: "Franchise tax $110 minimum based on capital."
+            },
+            {
+                state: "Maine",
+                sosUrl: "https://www.maine.gov/sos/",
+                incorporationFee: 145,
+                amendmentFee: 50,
+                annualReportFee: 85,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 75,
+                onlineAmendments: true,
+                notes: "Reports due June 1. $50 late penalty."
+            },
+            {
+                state: "Maryland",
+                sosUrl: "https://dat.maryland.gov/",
+                incorporationFee: 145,
+                amendmentFee: 100,
+                annualReportFee: 300,
+                reportFrequency: "annual",
+                franchiseTaxType: "filing fee",
+                annualFranchiseFee: 300,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "$300 annual SDAT filing fee. Can be waived with retirement savings program."
+            },
+            {
+                state: "Massachusetts",
+                sosUrl: "https://www.sec.state.ma.us/",
+                incorporationFee: 275,
+                amendmentFee: 100,
+                annualReportFee: 125,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "High costs. Online filing discounts available."
+            },
+            {
+                state: "Michigan",
+                sosUrl: "https://www.michigan.gov/lara/",
+                incorporationFee: 50,
+                amendmentFee: 10,
+                annualReportFee: 0,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 10,
+                onlineAmendments: true,
+                notes: "No fee for timely annual reports (due May 15)."
+            }            {
+                state: "Minnesota",
+                sosUrl: "https://www.sos.state.mn.us/",
+                incorporationFee: 155,
+                amendmentFee: 35,
+                annualReportFee: 0,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 0,
+                onlineAmendments: true,
+                notes: "Free annual renewals for domestic corporations. Free dissolution."
+            },
+            {
+                state: "Mississippi",
+                sosUrl: "https://www.sos.ms.gov/",
+                incorporationFee: 52,
+                amendmentFee: 52,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 28,
+                onlineAmendments: true,
+                notes: "Annual reports required by April 15."
+            },
+            {
+                state: "Missouri",
+                sosUrl: "https://www.sos.mo.gov/",
+                incorporationFee: 60,
+                amendmentFee: 27,
+                annualReportFee: 20,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 52,
+                onlineAmendments: true,
+                notes: "Annual registration reports required."
+            },
+            {
+                state: "Montana",
+                sosUrl: "https://sosmt.gov/",
+                incorporationFee: 70,
+                amendmentFee: 15,
+                annualReportFee: 20,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 15,
+                onlineAmendments: true,
+                notes: "Very low fees. $35 if filed after April 15."
+            },
+            {
+                state: "Nebraska",
+                sosUrl: "https://www.sos.nebraska.gov/",
+                incorporationFee: 67,
+                amendmentFee: 32,
+                annualReportFee: 26,
+                reportFrequency: "biennial",
+                franchiseTaxType: "occupation tax",
+                annualFranchiseFee: 26,
+                dissolutionFee: 52,
+                onlineAmendments: true,
+                notes: "Biennial occupation tax based on capital."
+            },
+            {
+                state: "Nevada",
+                sosUrl: "https://www.nvsos.gov/",
+                incorporationFee: 75,
+                amendmentFee: 175,
+                annualReportFee: 150,
+                reportFrequency: "annual",
+                franchiseTaxType: "business license",
+                annualFranchiseFee: 500,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "No state income tax but high ongoing fees ($650/year total)."
+            },
+            {
+                state: "New Hampshire",
+                sosUrl: "https://www.sos.nh.gov/",
+                incorporationFee: 100,
+                amendmentFee: 35,
+                annualReportFee: 100,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 35,
+                onlineAmendments: true,
+                notes: "Reports due April 1. $50 late fee."
+            },
+            {
+                state: "New Jersey",
+                sosUrl: "https://www.nj.gov/treasury/revenue/",
+                incorporationFee: 130,
+                amendmentFee: 75,
+                annualReportFee: 75,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 120,
+                onlineAmendments: true,
+                notes: "Tax clearance required for dissolution."
+            }            {
+                state: "New Mexico",
+                sosUrl: "https://www.nmcpr.state.nm.us/",
+                incorporationFee: 100,
+                amendmentFee: 100,
+                annualReportFee: 25,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "Biennial reports reduce frequency."
+            },
+            {
+                state: "New York",
+                sosUrl: "https://www.dos.ny.gov/",
+                incorporationFee: 125,
+                amendmentFee: 60,
+                annualReportFee: 9,
+                reportFrequency: "biennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 60,
+                onlineAmendments: true,
+                notes: "Biennial statements every 2 years. Very low fee."
+            },
+            {
+                state: "North Carolina",
+                sosUrl: "https://www.sosnc.gov/",
+                incorporationFee: 127,
+                amendmentFee: 52,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 200,
+                dissolutionFee: 30,
+                onlineAmendments: true,
+                notes: "Franchise tax $200 minimum via Dept of Revenue."
+            },
+            {
+                state: "North Dakota",
+                sosUrl: "https://www.sos.nd.gov/",
+                incorporationFee: 100,
+                amendmentFee: 20,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 30,
+                onlineAmendments: true,
+                notes: "Due by Aug 1. $85 late penalty."
+            },
+            {
+                state: "Ohio",
+                sosUrl: "https://www.sos.state.oh.us/",
                 incorporationFee: 99,
                 amendmentFee: 50,
-                reportFee: "$0 (None)",
-                franchiseTax: "None",
-                fiveYearTotal: 149,
-                notes: "No annual reports or ongoing fees after formation.",
-                updated: true
+                annualReportFee: 0,
+                reportFrequency: "none",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 50,
+                onlineAmendments: true,
+                notes: "No annual reports required. Very maintenance-friendly."
             },
             {
-                id: 4,
-                state: "California",
+                state: "Oklahoma",
+                sosUrl: "https://www.sos.ok.gov/",
+                incorporationFee: 50,
+                amendmentFee: 50,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 25,
+                dissolutionFee: 50,
+                onlineAmendments: true,
+                notes: "Small capital pays $25 activity fee instead of franchise tax."
+            },
+            {
+                state: "Oregon",
+                sosUrl: "https://sos.oregon.gov/",
                 incorporationFee: 100,
-                amendmentFee: 30,
-                reportFee: "$25 (Annual)",
-                franchiseTax: "Franchise Tax: $800 per year",
-                fiveYearTotal: 4255,
-                notes: "$800 annual franchise tax makes it most expensive."
+                amendmentFee: 100,
+                annualReportFee: 100,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 100,
+                onlineAmendments: true,
+                notes: "Higher fees across all categories."
             },
             {
-                id: 5,
-                state: "Delaware",
-                incorporationFee: 140,
-                amendmentFee: 194,
-                reportFee: "$50 (Annual)",
-                franchiseTax: "Franchise Tax: $175 min/year",
-                fiveYearTotal: 1359,
-                notes: "Premier legal jurisdiction with Court of Chancery."
+                state: "Pennsylvania",
+                sosUrl: "https://www.dos.pa.gov/",
+                incorporationFee: 125,
+                amendmentFee: 70,
+                annualReportFee: 0,
+                reportFrequency: "decennial",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 70,
+                onlineAmendments: true,
+                notes: "No annual reports. Decennial reports every 10 years only if dormant."
+            }            {
+                state: "Rhode Island",
+                sosUrl: "https://www.sos.ri.gov/",
+                incorporationFee: 238,
+                amendmentFee: 50,
+                annualReportFee: 50,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 50,
+                onlineAmendments: true,
+                notes: "Reports due March 1. $25 late penalty."
+            },
+            {
+                state: "South Carolina",
+                sosUrl: "https://www.sos.sc.gov/",
+                incorporationFee: 235,
+                amendmentFee: 110,
+                annualReportFee: 0,
+                reportFrequency: "none",
+                franchiseTaxType: "license fee",
+                annualFranchiseFee: 25,
+                dissolutionFee: 10,
+                onlineAmendments: true,
+                notes: "No SOS annual reports. License fee paid with tax return."
+            },
+            {
+                state: "South Dakota",
+                sosUrl: "https://sdsos.gov/",
+                incorporationFee: 150,
+                amendmentFee: 60,
+                annualReportFee: 50,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 10,
+                onlineAmendments: true,
+                notes: "No state corporate income tax."
+            },
+            {
+                state: "Tennessee",
+                sosUrl: "https://www.tn.gov/sos/",
+                incorporationFee: 105,
+                amendmentFee: 20,
+                annualReportFee: 20,
+                reportFrequency: "annual",
+                franchiseTaxType: "franchise tax",
+                annualFranchiseFee: 100,
+                dissolutionFee: 40,
+                onlineAmendments: true,
+                notes: "Franchise tax $100 minimum plus 6.5% excise tax."
+            },
+            {
+                state: "Texas",
+                sosUrl: "https://www.sos.state.tx.us/",
+                incorporationFee: 300,
+                amendmentFee: 150,
+                annualReportFee: 0,
+                reportFrequency: "none",
+                franchiseTaxType: "margin tax",
+                annualFranchiseFee: 0,
+                dissolutionFee: 40,
+                onlineAmendments: true,
+                notes: "No SOS annual reports. Franchise tax only if revenue >$1.23M."
+            },
+            {
+                state: "Utah",
+                sosUrl: "https://corporations.utah.gov/",
+                incorporationFee: 76,
+                amendmentFee: 43,
+                annualReportFee: 20,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 6,
+                onlineAmendments: true,
+                notes: "Annual renewal $20. $10 late penalty."
+            },
+            {
+                state: "Vermont",
+                sosUrl: "https://www.sec.state.vt.us/",
+                incorporationFee: 125,
+                amendmentFee: 25,
+                annualReportFee: 45,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 20,
+                onlineAmendments: true,
+                notes: "Reports due March 15. $25 late fee."
+            },
+            {
+                state: "Virginia",
+                sosUrl: "https://www.scc.virginia.gov/",
+                incorporationFee: 77,
+                amendmentFee: 25,
+                annualReportFee: 100,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 20,
+                onlineAmendments: true,
+                notes: "Annual registration fee based on authorized shares."
+            }            {
+                state: "Washington",
+                sosUrl: "https://www.sos.wa.gov/",
+                incorporationFee: 180,
+                amendmentFee: 30,
+                annualReportFee: 60,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 0,
+                onlineAmendments: true,
+                notes: "No state income tax. Free dissolution."
+            },
+            {
+                state: "West Virginia",
+                sosUrl: "https://sos.wv.gov/",
+                incorporationFee: 100,
+                amendmentFee: 25,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 25,
+                onlineAmendments: true,
+                notes: "Reports due July 1. $50 late penalty."
+            },
+            {
+                state: "Wisconsin",
+                sosUrl: "https://www.wdfi.org/",
+                incorporationFee: 100,
+                amendmentFee: 40,
+                annualReportFee: 25,
+                reportFrequency: "annual",
+                franchiseTaxType: "none",
+                annualFranchiseFee: 0,
+                dissolutionFee: 20,
+                onlineAmendments: true,
+                notes: "$25 online vs $40 paper. Due by quarter of incorporation."
+            },
+            {
+                state: "Wyoming",
+                sosUrl: "https://sos.wyo.gov/",
+                incorporationFee: 102,
+                amendmentFee: 50,
+                annualReportFee: 60,
+                reportFrequency: "annual",
+                franchiseTaxType: "license tax",
+                annualFranchiseFee: 60,
+                dissolutionFee: 50,
+                onlineAmendments: true,
+                notes: "Asset-based license tax. No income or franchise tax."
             }
         ];
 
+        // Process data and calculate scores
+        const corporationData = rawCorporationData.map((corp, index) => {
+            const fiveYearTotal = calculate5YearTotal(corp);
+            const hassleScore = calculateHassleScore(corp);
+            
+            return {
+                ...corp,
+                id: index + 1,
+                fiveYearTotal,
+                hassleScore
+            };
+        });
+
         function App() {
             const [searchTerm, setSearchTerm] = useState('');
-            const [sortConfig, setSortConfig] = useState({ key: 'fiveYearTotal', direction: 'ascending' });
+            const [costFilter, setCostFilter] = useState('all');
+            const [reportFilter, setReportFilter] = useState('all');
+            const [sortConfig, setSortConfig] = useState({ key: 'hassleScore', direction: 'descending' });
+            const [selectedStates, setSelectedStates] = useState(new Set());
+            const [showComparison, setShowComparison] = useState(false);
 
             const filteredAndSortedData = useMemo(() => {
-                let filtered = corporationData.filter(corp => 
-                    corp.state.toLowerCase().includes(searchTerm.toLowerCase())
-                );
+                let filtered = corporationData.filter(corp => {
+                    const matchesSearch = corp.state.toLowerCase().includes(searchTerm.toLowerCase());
+                    
+                    let matchesCost = true;
+                    if (costFilter !== 'all') {
+                        const cost = corp.fiveYearTotal;
+                        switch (costFilter) {
+                            case '0-500':
+                                matchesCost = cost <= 500;
+                                break;
+                            case '501-1000':
+                                matchesCost = cost > 500 && cost <= 1000;
+                                break;
+                            case '1001-2000':
+                                matchesCost = cost > 1000 && cost <= 2000;
+                                break;
+                            case '2001-5000':
+                                matchesCost = cost > 2000 && cost <= 5000;
+                                break;
+                            case '5001+':
+                                matchesCost = cost > 5000;
+                                break;
+                        }
+                    }
+                    
+                    let matchesFreq = true;
+                    if (reportFilter !== 'all') {
+                        if (reportFilter === 'no-reports') {
+                            matchesFreq = corp.reportFrequency === 'none' || corp.reportFrequency === 'decennial';
+                        } else {
+                            matchesFreq = corp.reportFrequency === reportFilter;
+                        }
+                    }
+                    
+                    return matchesSearch && matchesCost && matchesFreq;
+                });
 
                 if (sortConfig.key) {
                     filtered.sort((a, b) => {
@@ -233,42 +1132,50 @@
                 }
 
                 return filtered;
-            }, [searchTerm, sortConfig]);
-
-            const handleSort = (key) => {
+            }, [searchTerm, costFilter, reportFilter, sortConfig]);            const handleSort = useCallback((key) => {
                 setSortConfig(prevConfig => ({
                     key,
                     direction: prevConfig.key === key && prevConfig.direction === 'ascending' ? 'descending' : 'ascending'
                 }));
-            };
+            }, []);
 
-            const getCostClass = (value, type) => {
-                switch (type) {
-                    case 'formation':
-                        if (value <= 100) return 'formation-low';
-                        if (value <= 200) return 'formation-medium';
-                        return 'formation-high';
-                    case 'total':
-                        if (value <= 350) return 'total-low';
-                        if (value <= 700) return 'total-medium';
-                        if (value <= 2000) return 'total-high';
-                        return 'total-veryhigh';
-                    default:
-                        return '';
-                }
-            };
+            const handleStateSelection = useCallback((stateId, isSelected) => {
+                setSelectedStates(prev => {
+                    const newSet = new Set(prev);
+                    if (isSelected && newSet.size < 5) {
+                        newSet.add(stateId);
+                    } else if (!isSelected) {
+                        newSet.delete(stateId);
+                    } else if (isSelected && newSet.size >= 5) {
+                        alert('You can only select up to 5 states for comparison.');
+                        return prev;
+                    }
+                    return newSet;
+                });
+            }, []);
 
-            const exportCSV = () => {
-                const headers = ['State', 'Incorporation Fee', 'Amendment Fee', 'Report Fee', 'Franchise Tax', '5-Year Total', 'Notes'];
+            const resetFilters = useCallback(() => {
+                setSearchTerm('');
+                setCostFilter('all');
+                setReportFilter('all');
+                setSelectedStates(new Set());
+                setShowComparison(false);
+            }, []);
+
+            const exportCSV = useCallback(() => {
+                const headers = ['State', 'Incorporation Fee', 'Amendment Fee', 'Annual Report Fee', 'Report Frequency', 'Franchise Tax/Annual Fee', 'Dissolution Fee', '5-Year Total', 'Hassle-Free Score', 'Notes'];
                 const csvContent = [
                     headers.join(','),
                     ...filteredAndSortedData.map(corp => [
                         corp.state,
                         `$${corp.incorporationFee}`,
                         `$${corp.amendmentFee}`,
-                        corp.reportFee,
-                        corp.franchiseTax,
+                        `$${corp.annualReportFee}`,
+                        corp.reportFrequency,
+                        corp.franchiseTaxType === 'none' ? 'None' : `$${corp.annualFranchiseFee}`,
+                        `$${corp.dissolutionFee}`,
                         `$${corp.fiveYearTotal.toLocaleString()}`,
+                        corp.hassleScore,
                         `"${corp.notes.replace(/"/g, '""')}"`
                     ].join(','))
                 ].join('\n');
@@ -280,91 +1187,294 @@
                 a.download = 'Corporation_Cost_Matrix_2025.csv';
                 a.click();
                 window.URL.revokeObjectURL(url);
-            };
+            }, [filteredAndSortedData]);
 
-            return (
-                <div className="dashboard">
-                    <h1>Corporation Cost Matrix - State Comparison 2025</h1>
-                    
-                    <div className="controls">
-                        <div className="control-group">
-                            <label htmlFor="search">Search State:</label>
-                            <input
-                                type="text"
-                                id="search"
-                                placeholder="State name..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
-                        </div>
+            const getCostClass = useCallback((value, type) => {
+                switch (type) {
+                    case 'formation':
+                        if (value <= 100) return 'formation-low';
+                        if (value <= 200) return 'formation-medium';
+                        return 'formation-high';
+                    case 'amendment':
+                        if (value <= 30) return 'amendment-low';
+                        if (value <= 70) return 'amendment-medium';
+                        return 'amendment-high';
+                    case 'dissolution':
+                        if (value <= 50) return 'dissolution-low';
+                        if (value <= 100) return 'dissolution-medium';
+                        return 'dissolution-high';
+                    case 'total':
+                        if (value <= 500) return 'total-low';
+                        if (value <= 1000) return 'total-medium';
+                        if (value <= 2500) return 'total-high';
+                        return 'total-veryhigh';
+                    default:
+                        return '';
+                }
+            }, []);
+
+            const getScoreClass = useCallback((score) => {
+                if (score >= 80) return 'score-excellent';
+                if (score >= 60) return 'score-good';
+                if (score >= 40) return 'score-fair';
+                return 'score-poor';
+            }, []);
+
+            const getSelectedStatesData = useCallback(() => {
+                return corporationData.filter(corp => selectedStates.has(corp.id));
+            }, [selectedStates]);
+
+            // Determine top 10 best for small business
+            const topTenStates = useMemo(() => {
+                const sorted = [...corporationData].sort((a, b) => b.hassleScore - a.hassleScore);
+                return new Set(sorted.slice(0, 10).map(corp => corp.id));
+            }, []);            return (
+                React.createElement('div', { className: 'dashboard' },
+                    React.createElement('div', { className: 'controls' },
+                        React.createElement('div', { className: 'control-group' },
+                            React.createElement('label', { htmlFor: 'search' }, 'Search State:'),
+                            React.createElement('input', {
+                                type: 'text',
+                                id: 'search',
+                                placeholder: 'State name...',
+                                value: searchTerm,
+                                onChange: (e) => setSearchTerm(e.target.value)
+                            })
+                        ),
                         
-                        <div className="control-group">
-                            <button className="export-btn" onClick={exportCSV}>
-                                Export CSV
-                            </button>
-                        </div>
-                    </div>
+                        React.createElement('div', { className: 'control-group' },
+                            React.createElement('label', { htmlFor: 'cost-filter' }, '5-Year Cost Range:'),
+                            React.createElement('select', {
+                                id: 'cost-filter',
+                                value: costFilter,
+                                onChange: (e) => setCostFilter(e.target.value)
+                            },
+                                React.createElement('option', { value: 'all' }, 'All Cost Ranges'),
+                                React.createElement('option', { value: '0-500' }, '$0 - $500'),
+                                React.createElement('option', { value: '501-1000' }, '$501 - $1,000'),
+                                React.createElement('option', { value: '1001-2000' }, '$1,001 - $2,000'),
+                                React.createElement('option', { value: '2001-5000' }, '$2,001 - $5,000'),
+                                React.createElement('option', { value: '5001+' }, '$5,001+')
+                            )
+                        ),
+                        
+                        React.createElement('div', { className: 'control-group' },
+                            React.createElement('label', { htmlFor: 'report-filter' }, 'Report Requirements:'),
+                            React.createElement('select', {
+                                id: 'report-filter',
+                                value: reportFilter,
+                                onChange: (e) => setReportFilter(e.target.value)
+                            },
+                                React.createElement('option', { value: 'all' }, 'All Requirements'),
+                                React.createElement('option', { value: 'no-reports' }, 'No Annual Reports'),
+                                React.createElement('option', { value: 'annual' }, 'Annual Reports'),
+                                React.createElement('option', { value: 'biennial' }, 'Biennial Reports')
+                            )
+                        ),
+                        
+                        React.createElement('div', { className: 'button-container' },
+                            React.createElement('button', {
+                                className: 'compare-btn',
+                                disabled: selectedStates.size === 0,
+                                onClick: () => setShowComparison(true)
+                            }, `COMPARE SELECTED (${selectedStates.size})`),
+                            React.createElement('button', {
+                                className: 'reset-btn',
+                                onClick: resetFilters
+                            }, 'RESET FILTERS'),
+                            React.createElement('button', {
+                                className: 'export-btn',
+                                onClick: exportCSV
+                            }, 'EXPORT CSV')
+                        )
+                    ),
 
-                    <div className="table-container">
-                        <table className="corp-cost-table">
-                            <thead>
-                                <tr>
-                                    <th onClick={() => handleSort('state')}>
-                                        State {sortConfig.key === 'state' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                    </th>
-                                    <th onClick={() => handleSort('incorporationFee')}>
-                                        Incorporation Fee {sortConfig.key === 'incorporationFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                    </th>
-                                    <th onClick={() => handleSort('amendmentFee')}>
-                                        Amendment Fee {sortConfig.key === 'amendmentFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                    </th>
-                                    <th onClick={() => handleSort('reportFee')}>
-                                        Report Fee
-                                    </th>
-                                    <th onClick={() => handleSort('franchiseTax')}>
-                                        Franchise Tax
-                                    </th>
-                                    <th onClick={() => handleSort('fiveYearTotal')}>
-                                        5‑Year Total {sortConfig.key === 'fiveYearTotal' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}
-                                    </th>
-                                    <th>Notes</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {filteredAndSortedData.map((corp) => (
-                                    <tr key={corp.id}>
-                                        <td>
-                                            {corp.state}
-                                            {corp.updated && <span className="updated-indicator">UPDATED</span>}
-                                        </td>
-                                        <td className={getCostClass(corp.incorporationFee, 'formation')}>
-                                            ${corp.incorporationFee}
-                                        </td>
-                                        <td className={getCostClass(corp.amendmentFee, 'formation')}>
-                                            ${corp.amendmentFee}
-                                        </td>
-                                        <td>{corp.reportFee}</td>
-                                        <td>{corp.franchiseTax}</td>
-                                        <td className={getCostClass(corp.fiveYearTotal, 'total')}>
-                                            ${corp.fiveYearTotal.toLocaleString()}
-                                        </td>
-                                        <td>{corp.notes}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
+                    React.createElement('div', { className: 'table-container' },
+                        React.createElement('div', { className: 'table-sticky-header' },
+                            React.createElement('table', { className: 'corp-cost-table' },
+                                React.createElement('thead', {},
+                                    React.createElement('tr', {},
+                                        React.createElement('th', { className: 'checkbox-col' },
+                                            React.createElement('input', {
+                                                type: 'checkbox',
+                                                checked: selectedStates.size > 0,
+                                                onChange: (e) => {
+                                                    if (e.target.checked) {
+                                                        const visibleStates = filteredAndSortedData.slice(0, 5).map(corp => corp.id);
+                                                        setSelectedStates(new Set(visibleStates));
+                                                    } else {
+                                                        setSelectedStates(new Set());
+                                                    }
+                                                }
+                                            })
+                                        ),                                        React.createElement('th', {
+                                            className: 'state-col sortable',
+                                            onClick: () => handleSort('state')
+                                        }, `State ${sortConfig.key === 'state' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'fee-col sortable',
+                                            onClick: () => handleSort('incorporationFee')
+                                        }, `Inc. Fee ${sortConfig.key === 'incorporationFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'fee-col sortable',
+                                            onClick: () => handleSort('amendmentFee')
+                                        }, `Amend. Fee ${sortConfig.key === 'amendmentFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'report-col sortable',
+                                            onClick: () => handleSort('annualReportFee')
+                                        }, `Report Fee ${sortConfig.key === 'annualReportFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'frequency-col sortable',
+                                            onClick: () => handleSort('reportFrequency')
+                                        }, `Frequency ${sortConfig.key === 'reportFrequency' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'tax-col sortable',
+                                            onClick: () => handleSort('annualFranchiseFee')
+                                        }, `Annual Tax/Fee ${sortConfig.key === 'annualFranchiseFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'dissolution-col sortable',
+                                            onClick: () => handleSort('dissolutionFee')
+                                        }, `Dissolution ${sortConfig.key === 'dissolutionFee' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'total-col sortable',
+                                            onClick: () => handleSort('fiveYearTotal')
+                                        }, `5-Year Total ${sortConfig.key === 'fiveYearTotal' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', {
+                                            className: 'score-col sortable',
+                                            onClick: () => handleSort('hassleScore')
+                                        }, `Score ${sortConfig.key === 'hassleScore' && (sortConfig.direction === 'ascending' ? '↑' : '↓')}`),
+                                        React.createElement('th', { className: 'notes-col' }, 'Notes')
+                                    )
+                                ),                                React.createElement('tbody', {},
+                                    filteredAndSortedData.map((corp) =>
+                                        React.createElement('tr', { 
+                                            key: corp.id,
+                                            className: topTenStates.has(corp.id) ? 'best-for-business' : ''
+                                        },
+                                            React.createElement('td', { className: 'checkbox-col' },
+                                                React.createElement('input', {
+                                                    type: 'checkbox',
+                                                    checked: selectedStates.has(corp.id),
+                                                    onChange: (e) => handleStateSelection(corp.id, e.target.checked)
+                                                })
+                                            ),
+                                            React.createElement('td', { className: 'state-col' },
+                                                React.createElement('a', {
+                                                    href: corp.sosUrl,
+                                                    target: '_blank',
+                                                    rel: 'noopener noreferrer',
+                                                    className: 'state-link'
+                                                }, corp.state),
+                                                topTenStates.has(corp.id) && React.createElement('span', {
+                                                    style: { fontSize: '10px', color: '#27ae60', fontWeight: 'bold', display: 'block' }
+                                                }, 'TOP 10')
+                                            ),
+                                            React.createElement('td', { className: getCostClass(corp.incorporationFee, 'formation') }, `$${corp.incorporationFee}`),
+                                            React.createElement('td', { className: getCostClass(corp.amendmentFee, 'amendment') }, `$${corp.amendmentFee}`),
+                                            React.createElement('td', {}, corp.annualReportFee === 0 ? 'Free' : `$${corp.annualReportFee}`),
+                                            React.createElement('td', {}, corp.reportFrequency.charAt(0).toUpperCase() + corp.reportFrequency.slice(1)),
+                                            React.createElement('td', {}, 
+                                                corp.franchiseTaxType === 'none' ? 'None' : 
+                                                corp.annualFranchiseFee === 0 ? corp.franchiseTaxType : `$${corp.annualFranchiseFee}`
+                                            ),
+                                            React.createElement('td', { className: getCostClass(corp.dissolutionFee, 'dissolution') }, 
+                                                corp.dissolutionFee === 0 ? 'Free' : `$${corp.dissolutionFee}`
+                                            ),
+                                            React.createElement('td', { className: getCostClass(corp.fiveYearTotal, 'total') }, 
+                                                `$${corp.fiveYearTotal.toLocaleString()}`
+                                            ),
+                                            React.createElement('td', { className: getScoreClass(corp.hassleScore) }, corp.hassleScore),
+                                            React.createElement('td', { className: 'notes-col' }, corp.notes)
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    ),
 
-                    <div className="disclaimer">
-                        <strong>Data Updated for 2025:</strong> All information verified from official state websites as of January 2025. 
-                        The 5-Year Total assumes one amendment filing and all applicable annual/biennial reports and taxes for five years.
-                    </div>
-                </div>
+                    showComparison && selectedStates.size > 0 && React.createElement(ComparisonView, {
+                        states: getSelectedStatesData(),
+                        onClose: () => setShowComparison(false)
+                    }),
+
+                    React.createElement('div', { className: 'disclaimer' },
+                        React.createElement('strong', {}, 'Data Updated for 2025:'),
+                        ' All information verified from official state websites as of January 2025. ',
+                        'The 5-Year Total includes incorporation fee + (2 amendment fees) + (5 years of reports/taxes) + dissolution fee. ',
+                        'Hassle-Free Score (0-100) prioritizes: no annual reports (+30), low fees, no franchise taxes. ',
+                        'Always verify current requirements with official state websites as fees and deadlines may change.'
+                    )
+                )
+            );
+        }
+        function ComparisonView({ states, onClose }) {
+            return React.createElement('div', { className: 'comparison-view' },
+                React.createElement('div', { className: 'comparison-header' },
+                    React.createElement('h2', {}, 'State Corporation Comparison'),
+                    React.createElement('button', {
+                        className: 'reset-btn',
+                        onClick: onClose
+                    }, 'CLOSE COMPARISON')
+                ),
+                React.createElement('div', { className: 'comparison-grid' },
+                    states.map((state) =>
+                        React.createElement('div', { key: state.id, className: 'comparison-item' },
+                            React.createElement('div', { className: 'comparison-item-header' },
+                                React.createElement('a', {
+                                    href: state.sosUrl,
+                                    target: '_blank',
+                                    rel: 'noopener noreferrer',
+                                    className: 'state-link',
+                                    style: { color: 'white', textDecoration: 'none' }
+                                }, state.state),
+                                React.createElement('div', { 
+                                    style: { fontSize: '14px', marginTop: '5px' } 
+                                }, `Hassle-Free Score: ${state.hassleScore}`)
+                            ),
+                            React.createElement('div', { className: 'comparison-item-body' },
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Incorporation Fee'),
+                                    React.createElement('p', {}, `$${state.incorporationFee}`)
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Amendment Fee'),
+                                    React.createElement('p', {}, `$${state.amendmentFee}`)
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Annual Report Fee'),
+                                    React.createElement('p', {}, state.annualReportFee === 0 ? 'Free' : `$${state.annualReportFee}`)
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Report Frequency'),
+                                    React.createElement('p', {}, state.reportFrequency.charAt(0).toUpperCase() + state.reportFrequency.slice(1))
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Annual Tax/Fee'),
+                                    React.createElement('p', {}, 
+                                        state.franchiseTaxType === 'none' ? 'None' : 
+                                        state.annualFranchiseFee === 0 ? state.franchiseTaxType : `$${state.annualFranchiseFee}`
+                                    )
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Dissolution Fee'),
+                                    React.createElement('p', {}, state.dissolutionFee === 0 ? 'Free' : `$${state.dissolutionFee}`)
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, '5-Year Total Cost'),
+                                    React.createElement('p', { style: { fontSize: '18px', fontWeight: 'bold' } }, `$${state.fiveYearTotal.toLocaleString()}`)
+                                ),
+                                React.createElement('div', { className: 'comparison-item-row' },
+                                    React.createElement('strong', {}, 'Special Notes'),
+                                    React.createElement('p', {}, state.notes)
+                                )
+                            )
+                        )
+                    )
+                )
             );
         }
 
-        // Use legacy ReactDOM.render for better compatibility
-        ReactDOM.render(<App />, document.getElementById('root'));
+        ReactDOM.render(React.createElement(App), document.getElementById('root'));
     </script>
 </body>
 </html>
