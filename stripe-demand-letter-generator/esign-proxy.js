@@ -4,7 +4,7 @@ const https = require('https');
 const url = require('url');
 
 // DocuSeal API configuration (free, open source, supports direct document upload)
-const DOCUSEAL_API_TOKEN = 'demo-token'; // Replace with real token from docuseal.com
+const DOCUSEAL_API_TOKEN = 'UH3xz4ng4L63JjTpqdLrR5aQ6PSbbUPFj5mGBbL12dU'; // Real DocuSeal API token
 const DOCUSEAL_API_URL = 'https://api.docuseal.com';
 
 const server = http.createServer((req, res) => {
@@ -87,9 +87,10 @@ ${documentContent}
     </div>
 </div>`;
 
-            // Make real API call to DocuSeal
-            makeDocuSealAPICall('/submissions/html', {
-                html: htmlWithSignatureFields,
+            // Use your existing DocuSeal template for now (we'll create custom documents later)
+            // Template ID 1264155 from your account
+            makeDocuSealAPICall('/submissions', {
+                template_id: 1264155,
                 submitters: [{
                     email: signerInfo.email || 'sergei.tokmakov@gmail.com',
                     name: signerInfo.name || 'Sergei Tokmakov'
@@ -150,7 +151,7 @@ function makeDocuSealAPICall(endpoint, data, callback) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + DOCUSEAL_API_TOKEN,
+            'X-Auth-Token': DOCUSEAL_API_TOKEN,
             'Content-Length': Buffer.byteLength(postData)
         }
     };
@@ -165,12 +166,14 @@ function makeDocuSealAPICall(endpoint, data, callback) {
         });
         
         res.on('end', () => {
+            console.log(`DocuSeal API raw response (${res.statusCode}):`, responseBody);
             try {
                 const result = JSON.parse(responseBody);
-                console.log(`DocuSeal API response (${res.statusCode}):`, result);
+                console.log(`DocuSeal API parsed response:`, result);
                 callback(res.statusCode >= 200 && res.statusCode < 300, { data: result });
             } catch (error) {
                 console.error('DocuSeal API JSON parse error:', error);
+                console.error('Raw response body:', responseBody);
                 callback(false, { error: 'Invalid JSON response', raw: responseBody });
             }
         });
