@@ -367,27 +367,66 @@ Dated: _________________`;
         } catch (error) {
             console.error('❌ eSignature error:', error);
             
-            // Fallback: Open eSignatures.com in new window with pre-filled form
-            const encodedTitle = encodeURIComponent(`Stripe Demand Letter - ${formData.companyName || formData.contactName}`);
-            const encodedContent = encodeURIComponent(generateDemandLetter());
-            const encodedEmail = encodeURIComponent(formData.email);
-            const encodedName = encodeURIComponent(formData.contactName || 'Document Signer');
+            // Fallback: Use CORS proxy to attempt API call
+            const corsProxy = 'https://api.allorigins.win/raw?url=';
+            const apiUrl = encodeURIComponent(`https://esignatures.com/api/contracts?token=${ESIGNATURES_API_TOKEN}`);
             
-            const fallbackUrl = `https://esignatures.com/new?` +
-                `title=${encodedTitle}&` +
-                `content=${encodedContent}&` +
-                `signer_email=${encodedEmail}&` +
-                `signer_name=${encodedName}&` +
-                `token=${ESIGNATURES_API_TOKEN}`;
+            const fallbackResponse = await fetch(`${corsProxy}${apiUrl}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    template: {
+                        title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                        content: generateDemandLetter()
+                    },
+                    signers: [{
+                        name: formData.contactName || 'Document Signer',
+                        email: formData.email
+                    }],
+                    embedded: false,
+                    redirect_url: window.location.href
+                })
+            });
             
-            console.log('Using fallback method - opening eSignatures.com...');
-            window.open(fallbackUrl, '_blank');
-            
-            return {
-                id: 'fallback_' + Date.now(),
-                signing_url: fallbackUrl,
-                status: 'fallback'
-            };
+            if (fallbackResponse.ok) {
+                const fallbackResult = await fallbackResponse.json();
+                console.log('✅ Fallback API success:', fallbackResult);
+                return {
+                    id: fallbackResult.id || 'fallback_' + Date.now(),
+                    signing_url: fallbackResult.signing_url || fallbackResult.url,
+                    status: 'api_success'
+                };
+            } else {
+                // Final fallback: Create a mailto link with the document
+                console.log('API calls failed, using mailto fallback...');
+                const subject = encodeURIComponent(`Electronic Signature Request - Stripe Demand Letter`);
+                const body = encodeURIComponent(`
+Please review and electronically sign the attached Stripe demand letter:
+
+${generateDemandLetter()}
+
+To proceed with electronic signature:
+1. Visit https://esignatures.com
+2. Create a new document
+3. Copy and paste the letter content above
+4. Add your signature
+5. Send the signed document
+
+Document Title: Stripe Demand Letter - ${formData.companyName || formData.contactName}
+Signer: ${formData.contactName || 'Document Signer'}
+Email: ${formData.email}
+                `);
+                
+                const mailtoUrl = `mailto:${formData.email}?subject=${subject}&body=${body}`;
+                
+                return {
+                    id: 'mailto_' + Date.now(),
+                    signing_url: mailtoUrl,
+                    status: 'mailto_fallback'
+                };
+            }
         }
     };
 
@@ -409,15 +448,19 @@ Dated: _________________`;
         try {
             const contract = await createESignatureContract(false);
             
-            if (contract.status === 'fallback') {
-                // Fallback method already opened new window
-                alert('✅ eSignature process initiated! Please complete signing in the new window.');
-            } else if (contract.signing_url) {
-                // Open signing URL in new window for real API response
+            if (contract.status === 'mailto_fallback') {
+                // Open mailto for email fallback
+                window.location.href = contract.signing_url;
+                alert('📧 Email fallback initiated! Please check your email client.');
+            } else if (contract.status === 'api_success' && contract.signing_url) {
+                // Open real eSignatures signing URL
                 window.open(contract.signing_url, '_blank', 'width=800,height=600');
                 alert('✅ eSignature process initiated! Please complete signing in the new window.');
+            } else if (contract.status === 'fallback') {
+                // Previous fallback logic
+                alert('✅ eSignature process initiated! Please complete signing in the new window.');
             } else {
-                throw new Error('No signing URL received');
+                throw new Error('No valid signing method available');
             }
         } catch (error) {
             alert('eSignature Error: ' + error.message);
@@ -440,18 +483,19 @@ Dated: _________________`;
         setIsESignatureLoading(true);
         setCurrentESignatureMode('email');
         
-        try {
-            const contract = await createESignatureContract(true);
-            
-            if (contract.status === 'fallback') {
-                // Fallback method already opened new window
-                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
-            } else if (contract.signing_url) {
-                // Open signing URL in new window for real API response
+            if (contract.status === 'mailto_fallback') {
+                // Open mailto for email fallback
+                window.location.href = contract.signing_url;
+                alert('📧 Email fallback initiated with notification! Please check your email client.');
+            } else if (contract.status === 'api_success' && contract.signing_url) {
+                // Open real eSignatures signing URL
                 window.open(contract.signing_url, '_blank', 'width=800,height=600');
                 alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
+            } else if (contract.status === 'fallback') {
+                // Previous fallback logic
+                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
             } else {
-                throw new Error('No signing URL received');
+                throw new Error('No valid signing method available');
             }
         } catch (error) {
             alert('eSignature Error: ' + error.message);
@@ -963,86 +1007,92 @@ Dated: _________________`;
                     ])
                 ]),
                 
-                // Navigation Buttons
+                // Navigation Buttons - Split into two rows for better visibility
                 React.createElement('div', { key: 'nav', className: 'navigation-buttons' }, [
-                    React.createElement('button', {
-                        key: 'prev',
-                        onClick: prevTab,
-                        className: `nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`,
-                        disabled: currentTab === 0
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'chevron-left', style: { marginRight: '0.25rem' }}),
-                        'Previous'
+                    // First row: Main actions
+                    React.createElement('div', { key: 'row1', className: 'nav-row' }, [
+                        React.createElement('button', {
+                            key: 'prev',
+                            onClick: prevTab,
+                            className: `nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`,
+                            disabled: currentTab === 0
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'chevron-left', style: { marginRight: '0.25rem' }}),
+                            'Previous'
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'copy',
+                            onClick: copyToClipboard,
+                            className: 'nav-button',
+                            style: { backgroundColor: '#4f46e5', color: 'white', border: 'none' }
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'copy', style: { marginRight: '0.25rem' }}),
+                            'Copy'
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'download',
+                            onClick: downloadAsWord,
+                            className: 'nav-button',
+                            style: { backgroundColor: '#2563eb', color: 'white', border: 'none' }
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'file-text', style: { marginRight: '0.25rem' }}),
+                            'Download'
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'next',
+                            onClick: nextTab,
+                            className: `nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
+                            disabled: currentTab === tabs.length - 1
+                        }, [
+                            'Next',
+                            React.createElement(Icon, { key: 'icon', name: 'chevron-right', style: { marginLeft: '0.25rem' }})
+                        ])
                     ]),
                     
-                    React.createElement('button', {
-                        key: 'copy',
-                        onClick: copyToClipboard,
-                        className: 'nav-button',
-                        style: { backgroundColor: '#4f46e5', color: 'white', border: 'none' }
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'copy', style: { marginRight: '0.25rem' }}),
-                        'Copy'
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'download',
-                        onClick: downloadAsWord,
-                        className: 'nav-button',
-                        style: { backgroundColor: '#2563eb', color: 'white', border: 'none' }
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'file-text', style: { marginRight: '0.25rem' }}),
-                        'Download'
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'esign',
-                        onClick: handleESignOnly,
-                        className: 'nav-button',
-                        style: { backgroundColor: '#059669', color: 'white', border: 'none' },
-                        disabled: isESignatureLoading
-                    }, [
-                        React.createElement(Icon, { 
-                            key: 'icon', 
-                            name: isESignatureLoading ? 'loader' : 'edit-3', 
-                            style: { marginRight: '0.25rem' }
-                        }),
-                        isESignatureLoading ? 'Loading...' : 'E-Sign'
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'esign-email',
-                        onClick: handleESignAndEmail,
-                        className: 'nav-button',
-                        style: { backgroundColor: '#dc2626', color: 'white', border: 'none' },
-                        disabled: isESignatureLoading
-                    }, [
-                        React.createElement(Icon, { 
-                            key: 'icon', 
-                            name: isESignatureLoading ? 'loader' : 'send', 
-                            style: { marginRight: '0.25rem' }
-                        }),
-                        isESignatureLoading ? 'Loading...' : 'E-Sign & Email'
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'consult',
-                        onClick: () => window.open('https://terms.law/call/', '_blank'),
-                        className: 'nav-button',
-                        style: { backgroundColor: '#f59e0b', color: 'white', border: 'none' }
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'calendar', style: { marginRight: '0.25rem' }}),
-                        'Consult'
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'next',
-                        onClick: nextTab,
-                        className: `nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
-                        disabled: currentTab === tabs.length - 1
-                    }, [
-                        'Next',
-                        React.createElement(Icon, { key: 'icon', name: 'chevron-right', style: { marginLeft: '0.25rem' }})
+                    // Second row: eSignature and consultation
+                    React.createElement('div', { key: 'row2', className: 'nav-row' }, [
+                        React.createElement('button', {
+                            key: 'esign',
+                            onClick: handleESignOnly,
+                            className: 'nav-button',
+                            style: { backgroundColor: '#059669', color: 'white', border: 'none', flex: '1' },
+                            disabled: isESignatureLoading
+                        }, [
+                            React.createElement(Icon, { 
+                                key: 'icon', 
+                                name: isESignatureLoading ? 'loader' : 'edit-3', 
+                                style: { marginRight: '0.25rem' }
+                            }),
+                            isESignatureLoading ? 'Loading...' : 'E-Sign Only'
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'esign-email',
+                            onClick: handleESignAndEmail,
+                            className: 'nav-button',
+                            style: { backgroundColor: '#dc2626', color: 'white', border: 'none', flex: '1' },
+                            disabled: isESignatureLoading
+                        }, [
+                            React.createElement(Icon, { 
+                                key: 'icon', 
+                                name: isESignatureLoading ? 'loader' : 'send', 
+                                style: { marginRight: '0.25rem' }
+                            }),
+                            isESignatureLoading ? 'Loading...' : 'E-Sign & Email'
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'consult',
+                            onClick: () => window.open('https://terms.law/call/', '_blank'),
+                            className: 'nav-button',
+                            style: { backgroundColor: '#f59e0b', color: 'white', border: 'none', flex: '1' }
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'calendar', style: { marginRight: '0.25rem' }}),
+                            'Consult'
+                        ])
                     ])
                 ])
             ]),
