@@ -722,42 +722,121 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 documentTitle = `Stripe Demand Letter - ${formData.companyName || 'Company'}`;
             }
 
-            // eSignatures.com API call
+            // eSignatures.com API call - using templates endpoint
             const apiData = {
                 test: "yes", // Use test mode for free trial account
-                title: documentTitle,
-                content: finalDocumentText,
+                template: {
+                    title: documentTitle,
+                    content: finalDocumentText,
+                    content_type: "text"
+                },
                 signers: [{
                     email: "sergei.tokmakov@gmail.com",
-                    name: "Sergei Tokmakov"
+                    name: "Sergei Tokmakov",
+                    role: "signer"
                 }]
             };
 
             console.log("Sending to eSignatures.com API:", apiData);
 
-            const response = await fetch('https://esignatures.com/api/contracts', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05'
-                },
-                body: JSON.stringify(apiData)
-            });
+            // Try direct API call first, then fallback to CORS proxy if needed
+            let response;
+            let apiUrl = 'https://esignatures.com/api/templates';
+            
+            try {
+                response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(apiData)
+                });
+            } catch (corsError) {
+                console.log("Direct API call failed, trying with CORS proxy...");
+                // Try with CORS proxy
+                response = await fetch('https://cors-anywhere.herokuapp.com/' + apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
+                        'Accept': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify(apiData)
+                });
+            }
 
-            const result = await response.json();
-            console.log("eSignatures.com response:", result);
+            let result = await response.json();
+            console.log("eSignatures.com templates response:", result);
 
-            if (response.ok && result.signing_url) {
+            // If templates fails, try contracts endpoint with different format
+            if (!response.ok) {
+                console.log("Templates endpoint failed, trying contracts endpoint...");
+                
+                const contractData = {
+                    test: "yes",
+                    title: documentTitle,
+                    document_content: finalDocumentText,
+                    signers: [{
+                        email: "sergei.tokmakov@gmail.com",
+                        name: "Sergei Tokmakov"
+                    }]
+                };
+
+                try {
+                    response = await fetch('https://esignatures.com/api/contracts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
+                            'Accept': 'application/json'
+                        },
+                        body: JSON.stringify(contractData)
+                    });
+                } catch (corsError2) {
+                    console.log("Direct contracts call failed, trying with CORS proxy...");
+                    response = await fetch('https://cors-anywhere.herokuapp.com/https://esignatures.com/api/contracts', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify(contractData)
+                    });
+                }
+
+                result = await response.json();
+                console.log("eSignatures.com contracts response:", result);
+            }
+
+            if (response.ok && (result.signing_url || result.sign_url || result.url)) {
                 // Open signing URL in new window
-                window.open(result.signing_url, '_blank');
+                const signingUrl = result.signing_url || result.sign_url || result.url;
+                window.open(signingUrl, '_blank');
                 alert("✅ eSignature opened! Complete signing in new window");
             } else {
-                throw new Error(result.error || result.message || 'Failed to create eSignature contract');
+                // Show detailed error information
+                const errorMsg = result.error || result.message || result.errors || 'Failed to create eSignature contract';
+                console.error("API Error Details:", result);
+                throw new Error(errorMsg);
             }
 
         } catch (error) {
             console.error("eSignature error:", error);
-            alert("Error preparing document for eSignature: " + error.message);
+            
+            // More specific error messages
+            let errorMessage = "Error preparing document for eSignature: ";
+            if (error.message === "Failed to fetch") {
+                errorMessage += "Network error - this might be due to CORS restrictions. API calls from browsers to eSignatures.com may be blocked. Consider using a server-side proxy.";
+            } else {
+                errorMessage += error.message;
+            }
+            
+            alert(errorMessage);
         } finally {
             setESignLoading(false);
         }
