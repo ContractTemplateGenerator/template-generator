@@ -71,11 +71,11 @@ const sendSignedDocumentToStripe = async (signedDocumentUrl, userEmail, userName
     try {
         const subject = encodeURIComponent(`Legal Demand Letter - ${userName}`);
         const body = encodeURIComponent(`
-Dear Stripe Legal Team,
+Dear terms.law Team,
 
 Please find attached the signed legal demand letter regarding payment processing issues.
 
-This document has been electronically signed and is legally binding.
+This document has been electronically signed and is legally binding for testing purposes.
 
 Document URL: ${signedDocumentUrl}
 
@@ -84,7 +84,7 @@ ${userName}
 ${userEmail}
         `);
         
-        const mailtoLink = `mailto:support@stripe.com?subject=${subject}&body=${body}&cc=${userEmail}`;
+        const mailtoLink = `mailto:owner@terms.law?subject=${subject}&body=${body}&cc=${userEmail}`;
         window.open(mailtoLink, '_blank');
         
         return true;
@@ -246,8 +246,15 @@ const StripeDemandGenerator = () => {
             window.PaywallSystem.initializePayPal().catch(console.error);
             
             // Check if user has access (paid in current session)
-            if (window.PaywallSystem.hasAccess()) {
+            const hasAccess = window.PaywallSystem.hasAccess();
+            console.log('Initializing paywall, hasAccess:', hasAccess);
+            
+            if (hasAccess) {
                 setIsPaid(true);
+                // Enable preview interaction immediately for paid users
+                setTimeout(() => {
+                    window.PaywallSystem.enablePreviewInteraction();
+                }, 100);
             } else {
                 // Make preview non-copyable until payment
                 setTimeout(() => {
@@ -766,7 +773,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     // Copy to clipboard function with paywall check
     // eSignature handler functions
     const handleESignOnly = async () => {
-        if (!PaywallSystem.hasAccess()) {
+        console.log('E-Sign Only clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', PaywallSystem.hasAccess());
+        if (!isPaid || !PaywallSystem.hasAccess()) {
             PaywallSystem.backupFormData(formData);
             PaywallSystem.showAccessDenied('esign');
             
@@ -796,7 +804,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     };
 
     const handleESignAndEmail = async () => {
-        if (!PaywallSystem.hasAccess()) {
+        console.log('E-Sign & Email clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', PaywallSystem.hasAccess());
+        if (!isPaid || !PaywallSystem.hasAccess()) {
             PaywallSystem.backupFormData(formData);
             PaywallSystem.showAccessDenied('esign');
             
@@ -826,6 +835,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     };
 
     const performESignature = async (emailToStripe) => {
+        console.log('performESignature called with emailToStripe:', emailToStripe);
         setIsESignatureLoading(true);
         setESignatureError(null);
         setCurrentESignatureMode(emailToStripe ? 'email' : 'sign');
@@ -2569,7 +2579,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                     'South San Francisco, CA 94080'
                                 ]),
                                 React.createElement('p', { key: 'step2' }, React.createElement('strong', { key: 'bold2' }, '2. Email Copy: ')),
-                                React.createElement('p', { key: 'step2-text', style: { marginLeft: '20px' } }, 'Also email to: support@stripe.com (Subject: "ATTN: Legal Department - Arbitration Notice")'),
+                                React.createElement('p', { key: 'step2-text', style: { marginLeft: '20px' } }, 'Also email to: owner@terms.law (Subject: "ATTN: Legal Department - Arbitration Notice - TESTING")'),
                                 React.createElement('p', { key: 'step3' }, React.createElement('strong', { key: 'bold3' }, '3. Keep Records: ')),
                                 React.createElement('p', { key: 'step3-text', style: { marginLeft: '20px' } }, 'Save certified mail receipt, delivery confirmation, and email confirmation. You\'ll need these for arbitration filing.')
                             ])
@@ -2828,7 +2838,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                                 border: "none",
                                 opacity: isPaid ? 1 : 0.7
                             }
-                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign & Email to Stripe' : '🔒 E-Sign & Email to Stripe')),
+                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign & Email Test' : '🔒 E-Sign & Email Test')),
                         
                         React.createElement('button', {
                             key: 'consult',

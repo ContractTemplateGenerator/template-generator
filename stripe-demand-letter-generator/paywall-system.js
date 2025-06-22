@@ -7,17 +7,46 @@ const PaywallSystem = (() => {
         clientId: 'ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx',
         secretKey: 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI',
         currency: 'USD',
-        amount: '19.95', // Updated price for the demand letter generator
+        amount: '29.95', // Updated price for the demand letter generator
         description: 'Stripe Demand Letter Generator - Professional Legal Document'
     };
 
-    // In-memory payment status tracking (no localStorage used per instructions)
-    let paymentStatus = {
-        isPaid: false,
-        transactionId: null,
-        paymentDate: null,
-        sessionActive: false
+    // Persistent payment status tracking using localStorage
+    const getPaymentStatus = () => {
+        try {
+            const stored = localStorage.getItem('stripeGeneratorPaymentStatus');
+            if (stored) {
+                const parsed = JSON.parse(stored);
+                // Check if payment is within 30 days
+                if (parsed.paymentDate) {
+                    const paymentDate = new Date(parsed.paymentDate);
+                    const now = new Date();
+                    const daysSincePayment = (now - paymentDate) / (1000 * 60 * 60 * 24);
+                    if (daysSincePayment < 30) {
+                        return { ...parsed, sessionActive: true };
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error reading payment status:', e);
+        }
+        return {
+            isPaid: false,
+            transactionId: null,
+            paymentDate: null,
+            sessionActive: false
+        };
     };
+
+    const savePaymentStatus = (status) => {
+        try {
+            localStorage.setItem('stripeGeneratorPaymentStatus', JSON.stringify(status));
+        } catch (e) {
+            console.error('Error saving payment status:', e);
+        }
+    };
+
+    let paymentStatus = getPaymentStatus();
 
     // In-memory form data backup to preserve user's work during payment
     let formDataBackup = null;
@@ -82,6 +111,7 @@ const PaywallSystem = (() => {
                         paymentDate: new Date().toISOString(),
                         sessionActive: true
                     };
+                    savePaymentStatus(paymentStatus);
 
                     // Call success callback
                     if (onSuccess) {
@@ -406,6 +436,7 @@ const PaywallSystem = (() => {
                 sessionActive: true,
                 manualEntry: true
             };
+            savePaymentStatus(paymentStatus);
 
             // Close modal and trigger success
             const modal = document.getElementById('paywall-modal');
