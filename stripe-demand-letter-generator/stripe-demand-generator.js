@@ -67,34 +67,6 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         
     } catch (error) {
         console.error('Error creating eSignature template:', error);
-        
-        // Enhanced CORS/Network error detection for fallback to demo mode
-        if (error.name === 'TypeError' || 
-            error.message.includes('fetch') || 
-            error.message.includes('CORS') ||
-            error.message.includes('Network') ||
-            error.message.includes('Failed to fetch')) {
-            
-            console.log('🔄 CORS/Network error detected, activating DEMO MODE...');
-            console.log('📱 eSignatures.com API attempted but fell back to demo mode (likely CORS restriction).');
-            
-            // Simulate API delay for realistic experience
-            await new Promise(resolve => setTimeout(resolve, 1200));
-            
-            // Return enhanced mock template response for demo
-            const mockTemplate = {
-                id: 'esig_template_' + Date.now(),
-                name: documentTitle,
-                status: 'created',
-                created_at: new Date().toISOString(),
-                _demo_mode: true,
-                demo_message: 'DEMO MODE ACTIVE - eSignature functionality is working! This would normally connect to eSignatures.com API.'
-            };
-            
-            console.log('✅ DEMO MODE: Mock template created successfully:', mockTemplate);
-            return mockTemplate;
-        }
-        
         throw error;
     }
 };
@@ -163,39 +135,6 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         
     } catch (error) {
         console.error('Error creating eSignature contract:', error);
-        
-        // Enhanced CORS/Network error detection for fallback to demo mode
-        if (error.name === 'TypeError' || 
-            error.message.includes('fetch') || 
-            error.message.includes('CORS') ||
-            error.message.includes('Network') ||
-            error.message.includes('Failed to fetch')) {
-            
-            console.log('🔄 CORS/Network error detected, activating CONTRACT DEMO MODE...');
-            
-            // Simulate API delay for realistic experience
-            await new Promise(resolve => setTimeout(resolve, 800));
-            
-            // Return enhanced mock contract response with eSignatures.com branding
-            const mockContract = {
-                id: 'esig_contract_' + Date.now(),
-                template_id: templateId,
-                status: 'pending',
-                signing_url: `https://app.esignatures.com/sign/demo_${Date.now()}?embedded=yes`,
-                signers: [{
-                    email: signerEmail,
-                    name: signerName,
-                    status: 'pending'
-                }],
-                created_at: new Date().toISOString(),
-                _demo_mode: true,
-                demo_message: 'Contract created in DEMO MODE - This would normally open the eSignatures.com signing interface.'
-            };
-            
-            console.log('✅ DEMO MODE: Mock contract created successfully:', mockContract);
-            return mockContract;
-        }
-        
         throw error;
     }
 };
