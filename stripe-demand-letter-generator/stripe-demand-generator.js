@@ -739,85 +739,47 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
             console.log("Sending to eSignatures.com API:", apiData);
 
-            // Try direct API call first, then fallback to CORS proxy if needed
-            let response;
-            let apiUrl = 'https://esignatures.com/api/templates';
+            // Try PHP proxy first, then fallback to demo mode
+            let response, result;
             
             try {
-                response = await fetch(apiUrl, {
+                // Use local PHP proxy to avoid CORS issues
+                response = await fetch('./esign-proxy.php', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify(apiData)
                 });
-            } catch (corsError) {
-                console.log("Direct API call failed, trying with CORS proxy...");
-                // Try with CORS proxy
-                response = await fetch('https://cors-anywhere.herokuapp.com/' + apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
-                        'Accept': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest'
-                    },
-                    body: JSON.stringify(apiData)
-                });
-            }
-
-            let result = await response.json();
-            console.log("eSignatures.com templates response:", result);
-
-            // If templates fails, try contracts endpoint with different format
-            if (!response.ok) {
-                console.log("Templates endpoint failed, trying contracts endpoint...");
-                
-                const contractData = {
-                    test: "yes",
-                    title: documentTitle,
-                    document_content: finalDocumentText,
-                    signers: [{
-                        email: "sergei.tokmakov@gmail.com",
-                        name: "Sergei Tokmakov"
-                    }]
-                };
-
-                try {
-                    response = await fetch('https://esignatures.com/api/contracts', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
-                            'Accept': 'application/json'
-                        },
-                        body: JSON.stringify(contractData)
-                    });
-                } catch (corsError2) {
-                    console.log("Direct contracts call failed, trying with CORS proxy...");
-                    response = await fetch('https://cors-anywhere.herokuapp.com/https://esignatures.com/api/contracts', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05',
-                            'Accept': 'application/json',
-                            'X-Requested-With': 'XMLHttpRequest'
-                        },
-                        body: JSON.stringify(contractData)
-                    });
-                }
 
                 result = await response.json();
-                console.log("eSignatures.com contracts response:", result);
+                console.log("eSignatures.com API response:", result);
+            } catch (proxyError) {
+                console.log("PHP proxy not available, using demo mode...");
+                
+                // Demo mode - simulate successful eSignature creation
+                result = {
+                    success: true,
+                    signing_url: "https://esignatures.com/demo-signing-page",
+                    contract_id: "demo-" + Date.now(),
+                    message: "Demo mode - would create real eSignature contract in production"
+                };
+                
+                response = { ok: true };
+                console.log("Demo mode response:", result);
             }
 
             if (response.ok && (result.signing_url || result.sign_url || result.url)) {
                 // Open signing URL in new window
                 const signingUrl = result.signing_url || result.sign_url || result.url;
                 window.open(signingUrl, '_blank');
-                alert("✅ eSignature opened! Complete signing in new window");
+                
+                // Show appropriate success message
+                if (result.contract_id && result.contract_id.startsWith('demo-')) {
+                    alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. To use real eSignatures, start a PHP server for API proxy.\n\nRun: php -S localhost:8000");
+                } else {
+                    alert("✅ eSignature opened! Complete signing in new window");
+                }
             } else {
                 // Show detailed error information
                 const errorMsg = result.error || result.message || result.errors || 'Failed to create eSignature contract';
