@@ -977,16 +977,25 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 throw new Error('Email is required for eSignature');
             }
             
-            let finalDocumentContent;
+            // For eSignature, ONLY send the demand letter for signing
+            // The arbitration demand (if any) is just a draft attachment and should NOT be signed
+            const demandLetterOnly = generateDemandLetter();
             const documentTitle = `Stripe Demand Letter - ${formData.companyName || formData.contactName}`;
             
-            if (formData.includeArbitrationDraft) {
-                const demandLetter = generateDemandLetter();
-                const arbitrationDemand = generateArbitrationDemand();
-                finalDocumentContent = `<div>${demandLetter}</div><div style="page-break-before: always;"><h2>ARBITRATION DEMAND (ATTACHMENT)</h2>${arbitrationDemand}</div>`;
-            } else {
-                finalDocumentContent = `<div>${generateDemandLetter()}</div>`;
-            }
+            // Add signature line at the end of the demand letter
+            const signatureSection = `
+
+
+Sincerely,
+
+
+_________________________________
+${formData.contactName || '[CONTACT NAME]'}
+${formData.companyName || '[COMPANY NAME]'}
+
+Date: ________________`;
+            
+            const finalDocumentContent = `<div>${demandLetterOnly}${signatureSection}</div>`;
             
             const template = await createESignatureTemplate(finalDocumentContent, documentTitle);
             const contract = await createESignatureContract(
@@ -1151,15 +1160,20 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             if (signedDocumentInfo) {
                 console.log("Downloading signed document version");
                 
-                // Create signed document content with signature information
+                // For signed documents, the demand letter is signed but arbitration demand is just attached as draft
+                const signedDemandLetter = generateDemandLetter();
+                
                 if (formData.includeArbitrationDraft) {
-                    const demandLetter = generateDemandLetter();
                     const arbitrationDemand = generateArbitrationDemand();
-                    finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
-                    documentTitle = "SIGNED Stripe Demand Letter with Arbitration Demand";
-                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Combined-Demand-Letter-and-Arbitration`;
+                    // Combine signed demand letter with unsigned arbitration draft
+                    finalDocumentText = signedDemandLetter + '\f\n\n' + 
+                        'ARBITRATION DEMAND (DRAFT ATTACHMENT - NOT SIGNED)\n' +
+                        'Note: Only the demand letter above has been electronically signed.\n\n' + 
+                        arbitrationDemand;
+                    documentTitle = "SIGNED Stripe Demand Letter with Arbitration Draft";
+                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Demand-Letter-with-Arbitration-Draft`;
                 } else {
-                    finalDocumentText = generateDemandLetter();
+                    finalDocumentText = signedDemandLetter;
                     documentTitle = "SIGNED Stripe Demand Letter";
                     fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Demand-Letter`;
                 }
@@ -1171,7 +1185,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 ELECTRONIC SIGNATURE VERIFICATION
 ═══════════════════════════════════════════════════════════════════
 
-This document has been electronically signed using eSignatures.com
+SIGNED DOCUMENT: Stripe Payment Processing Demand Letter
+${formData.includeArbitrationDraft ? 'NOTE: Only the demand letter above is electronically signed. Any arbitration demand attachment is a draft for reference only.' : ''}
 
 Signed by: ${signedDocumentInfo.signerName}
 Email: ${signedDocumentInfo.signerEmail}
@@ -1181,7 +1196,8 @@ Document Verification URL: ${signedDocumentInfo.url}
 ${signedDocumentInfo.emailedToOwner ? 'Email notification sent to: owner@terms.law' : ''}
 
 SIGNATURE VERIFICATION:
-• This electronic signature is legally binding under applicable electronic signature laws
+• This electronic signature applies ONLY to the demand letter portion of this document
+• The signature is legally binding under applicable electronic signature laws
 • The signed document can be verified at the URL above
 • A complete audit trail is maintained by eSignatures.com
 • This signature has the same legal effect as a handwritten signature
