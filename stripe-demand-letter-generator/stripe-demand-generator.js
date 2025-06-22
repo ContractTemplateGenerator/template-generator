@@ -64,10 +64,6 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         
         console.log('✅ Template created (fallback):', template);
         return template;
-        
-    } catch (error) {
-        console.error('Error creating eSignature template:', error);
-        throw error;
     }
 };
 
@@ -132,10 +128,6 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         
         console.log('✅ Contract created (fallback):', contract);
         return contract;
-        
-    } catch (error) {
-        console.error('Error creating eSignature contract:', error);
-        throw error;
     }
 };
 
