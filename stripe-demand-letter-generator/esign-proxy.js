@@ -2,6 +2,8 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
+const PDFDocument = require('pdfkit');
+const fs = require('fs');
 
 // DocuSeal API configuration (free, open source, supports direct document upload)
 const DOCUSEAL_API_TOKEN = 'UH3xz4ng4L63JjTpqdLrR5aQ6PSbbUPFj5mGBbL12dU'; // Real DocuSeal API token
@@ -87,35 +89,58 @@ ${documentContent}
     </div>
 </div>`;
 
-            // Use your existing DocuSeal template for now (we'll create custom documents later)
-            // Template ID 1264155 from your account
-            makeDocuSealAPICall('/submissions', {
-                template_id: 1264155,
-                submitters: [{
-                    email: signerInfo.email || 'sergei.tokmakov@gmail.com',
-                    name: signerInfo.name || 'Sergei Tokmakov'
-                }],
-                send_email: true,
-                completed_redirect_url: 'https://template.terms.law'
-            }, (success, result) => {
-                if (success && result.data) {
-                    console.log('DocuSeal API success:', result);
-                    const response = {
-                        status: "success",
-                        data: {
-                            contract_id: result.data.id || 'docuseal-' + Date.now(),
-                            contract_url: result.data.audit_log_url || result.data.url,
-                            signing_url: result.data.submitters?.[0]?.url || result.data.url,
-                            title: documentTitle,
-                            signers: data.signers || [],
-                            message: "Real eSignature document created"
+            // Generate PDF from demand letter content
+            generatePDFFromDemandLetter(documentTitle, documentContent, signerInfo, (pdfBase64) => {
+                if (pdfBase64) {
+                    // Send generated PDF to DocuSeal
+                    makeDocuSealAPICall('/submissions/pdf', {
+                        documents: [{
+                            name: documentTitle + '.pdf',
+                            file: pdfBase64
+                        }],
+                        submitters: [{
+                            email: signerInfo.email || 'sergei.tokmakov@gmail.com',
+                            name: signerInfo.name || 'Sergei Tokmakov'
+                        }],
+                        send_email: true,
+                        completed_redirect_url: 'https://template.terms.law'
+                    }, (success, result) => {
+                        if (success && result.data) {
+                            console.log('DocuSeal API success:', result);
+                            const response = {
+                                status: "success",
+                                data: {
+                                    contract_id: result.data.id || 'docuseal-' + Date.now(),
+                                    contract_url: result.data.audit_log_url || result.data.url,
+                                    signing_url: result.data.submitters?.[0]?.url || result.data.url,
+                                    title: documentTitle,
+                                    signers: data.signers || [],
+                                    message: "Real eSignature document created"
+                                }
+                            };
+                            res.writeHead(200);
+                            res.end(JSON.stringify(response));
+                        } else {
+                            console.log('DocuSeal API failed, using demo mode:', result);
+                            // Fallback to demo mode
+                            const demoResponse = {
+                                status: "success",
+                                data: {
+                                    contract_id: "demo-" + Date.now(),
+                                    contract_url: "https://demo.docuseal.com/demo-document",
+                                    signing_url: "https://demo.docuseal.com/demo-signing",
+                                    title: documentTitle,
+                                    signers: data.signers || [],
+                                    message: "Demo mode - DocuSeal API unavailable"
+                                }
+                            };
+                            res.writeHead(200);
+                            res.end(JSON.stringify(demoResponse));
                         }
-                    };
-                    res.writeHead(200);
-                    res.end(JSON.stringify(response));
+                    });
                 } else {
-                    console.log('DocuSeal API failed, using demo mode:', result);
-                    // Fallback to demo mode
+                    // PDF generation failed, fallback to demo mode
+                    console.log('PDF generation failed, using demo mode');
                     const demoResponse = {
                         status: "success",
                         data: {
@@ -124,7 +149,7 @@ ${documentContent}
                             signing_url: "https://demo.docuseal.com/demo-signing",
                             title: documentTitle,
                             signers: data.signers || [],
-                            message: "Demo mode - DocuSeal API unavailable"
+                            message: "Demo mode - PDF generation failed"
                         }
                     };
                     res.writeHead(200);
@@ -186,6 +211,64 @@ function makeDocuSealAPICall(endpoint, data, callback) {
 
     req.write(postData);
     req.end();
+}
+
+function generatePDFFromDemandLetter(title, content, signerInfo, callback) {
+    try {
+        console.log('Generating PDF from demand letter content...');
+        
+        // Create a new PDF document
+        const doc = new PDFDocument({ margin: 50 });
+        let buffers = [];
+        
+        // Collect PDF data into buffers
+        doc.on('data', buffers.push.bind(buffers));
+        doc.on('end', () => {
+            // Combine buffers and convert to base64
+            const pdfBuffer = Buffer.concat(buffers);
+            const pdfBase64 = pdfBuffer.toString('base64');
+            console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+            callback(pdfBase64);
+        });
+        
+        // Add title
+        doc.fontSize(16).font('Helvetica-Bold');
+        doc.text(title, { align: 'center' });
+        doc.moveDown(2);
+        
+        // Add document content
+        doc.fontSize(12).font('Helvetica');
+        doc.text(content, { align: 'left', lineGap: 5 });
+        doc.moveDown(3);
+        
+        // Add signature section
+        doc.fontSize(14).font('Helvetica-Bold');
+        doc.text('Electronic Signature Required', { align: 'center' });
+        doc.moveDown(1);
+        
+        doc.fontSize(11).font('Helvetica');
+        doc.text(`Signer: ${signerInfo.name || 'N/A'}`, { align: 'left' });
+        doc.text(`Email: ${signerInfo.email || 'N/A'}`, { align: 'left' });
+        doc.moveDown(1);
+        
+        // Signature line
+        doc.text('Signature: ________________________________', { align: 'left' });
+        doc.moveDown(0.5);
+        doc.text(`Date: ${new Date().toLocaleDateString()}`, { align: 'left' });
+        doc.moveDown(1);
+        
+        // Legal notice
+        doc.fontSize(10).font('Helvetica');
+        doc.text('By signing this document, you agree to its terms and conditions.', { align: 'left' });
+        doc.text('This electronic signature is legally binding.', { align: 'left' });
+        
+        // Finalize the PDF
+        doc.end();
+        
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        callback(null);
+    }
 }
 
 const PORT = 3001;
