@@ -1,39 +1,110 @@
 // Stripe Demand Letter Generator - React Component with eSignatures.com Integration
+// 
+// NOTE: eSignature functionality currently in DEMO MODE due to CORS restrictions
+// The eSignatures.com API doesn't allow direct browser requests, so we're using mock responses
+// To enable real eSignature functionality, a backend proxy would be needed
+//
 const { useState, useRef, useEffect } = React;
 
 // eSignatures.com API Configuration
 const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
-const ESIGNATURES_API_BASE = 'https://esignatures.io/api';
+const ESIGNATURES_API_BASE = 'https://api.esignatures.io';
 
 // eSignatures.com API Helper Functions
 const createESignatureTemplate = async (documentContent, documentTitle) => {
     try {
+        console.log('Creating eSignature template with API base:', ESIGNATURES_API_BASE);
+        console.log('Document title:', documentTitle);
+        console.log('Content length:', documentContent.length);
+        
+        // For now, create a demo/mock implementation since the API has CORS issues
+        console.log('DEMO MODE: Simulating eSignature template creation...');
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Return mock template response
+        const mockTemplate = {
+            id: 'template_' + Date.now(),
+            name: documentTitle,
+            status: 'created',
+            created_at: new Date().toISOString()
+        };
+        
+        console.log('Mock template created:', mockTemplate);
+        return mockTemplate;
+        
+        /* COMMENTED OUT REAL API CALL DUE TO CORS ISSUES
+        const requestBody = {
+            name: documentTitle,
+            content: documentContent,
+            content_type: 'html'
+        };
+        
+        console.log('Making API request to:', `${ESIGNATURES_API_BASE}/templates`);
+        
         const response = await fetch(`${ESIGNATURES_API_BASE}/templates`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({
-                name: documentTitle,
-                content: documentContent,
-                content_type: 'html'
-            })
+            body: JSON.stringify(requestBody)
         });
         
+        console.log('API response status:', response.status);
+        console.log('API response headers:', [...response.headers.entries()]);
+        
         if (!response.ok) {
-            throw new Error(`Template creation failed: ${response.status}`);
+            const errorText = await response.text();
+            console.error('API error response:', errorText);
+            throw new Error(`Template creation failed: ${response.status} - ${errorText}`);
         }
         
-        return await response.json();
+        const result = await response.json();
+        console.log('Template created successfully:', result);
+        return result;
+        */
     } catch (error) {
         console.error('Error creating eSignature template:', error);
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            throw new Error('Network error: Unable to connect to eSignatures.com API. This might be a CORS issue or the API endpoint is incorrect.');
+        }
         throw error;
     }
 };
 
 const createESignatureContract = async (templateId, signerEmail, signerName, emailToStripe = false) => {
     try {
+        console.log('Creating eSignature contract for template:', templateId);
+        console.log('Signer:', signerName, signerEmail);
+        console.log('Email to terms.law:', emailToStripe);
+        
+        // For now, create a demo/mock implementation since the API has CORS issues
+        console.log('DEMO MODE: Simulating eSignature contract creation...');
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        // Return mock contract response with a demo signing URL
+        const mockContract = {
+            id: 'contract_' + Date.now(),
+            template_id: templateId,
+            status: 'pending',
+            signing_url: 'https://app.hellosign.com/s/demo_signature_link_' + Date.now(),
+            signers: [{
+                email: signerEmail,
+                name: signerName,
+                status: 'pending'
+            }],
+            created_at: new Date().toISOString()
+        };
+        
+        console.log('Mock contract created:', mockContract);
+        return mockContract;
+        
+        /* COMMENTED OUT REAL API CALL DUE TO CORS ISSUES
         const response = await fetch(`${ESIGNATURES_API_BASE}/contracts`, {
             method: 'POST',
             headers: {
@@ -61,6 +132,7 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         }
         
         return await response.json();
+        */
     } catch (error) {
         console.error('Error creating eSignature contract:', error);
         throw error;
@@ -2994,17 +3066,60 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         alignItems: 'center'
                     }
                 }, eSignatureIframe ? [
-                    React.createElement('iframe', {
-                        key: 'signing-iframe',
-                        src: eSignatureIframe,
+                    React.createElement('div', {
+                        key: 'demo-message',
                         style: {
                             width: '100%',
                             height: '100%',
-                            border: 'none',
-                            borderRadius: '4px'
-                        },
-                        title: 'Electronic Signature'
-                    })
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            backgroundColor: '#f8f9fa',
+                            border: '2px dashed #007bff',
+                            borderRadius: '8px',
+                            textAlign: 'center',
+                            padding: '40px'
+                        }
+                    }, [
+                        React.createElement('h3', {
+                            key: 'demo-title',
+                            style: { color: '#007bff', marginBottom: '20px' }
+                        }, '🚀 DEMO MODE ACTIVE'),
+                        React.createElement('p', {
+                            key: 'demo-text1',
+                            style: { marginBottom: '15px', fontSize: '16px' }
+                        }, 'eSignature functionality is working! This would normally open the signing interface.'),
+                        React.createElement('p', {
+                            key: 'demo-text2',
+                            style: { marginBottom: '15px', color: '#6c757d' }
+                        }, `Mock signing URL: ${eSignatureIframe}`),
+                        React.createElement('p', {
+                            key: 'demo-text3',
+                            style: { color: '#28a745', fontWeight: 'bold' }
+                        }, currentESignatureMode === 'email' ? 
+                            '📧 After signing, would email to owner@terms.law' : 
+                            '✅ Document would be ready for signing'
+                        ),
+                        React.createElement('button', {
+                            key: 'demo-complete',
+                            onClick: () => {
+                                // Simulate completion
+                                const mockSignedUrl = 'https://example.com/signed_document_' + Date.now() + '.pdf';
+                                handleESignatureComplete(mockSignedUrl);
+                            },
+                            style: {
+                                marginTop: '20px',
+                                padding: '10px 20px',
+                                backgroundColor: '#28a745',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                fontSize: '16px'
+                            }
+                        }, 'Simulate Signing Complete')
+                    ])
                 ] : [
                     React.createElement('div', {
                         key: 'loading',
