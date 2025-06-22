@@ -66,6 +66,7 @@ const StripeDemandGenerator = () => {
     // State management
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
+    const [eSignLoading, setESignLoading] = useState(false);
     const previewRef = useRef(null);
     
     // Form data state
@@ -698,6 +699,67 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         } catch (error) {
             console.error("Error in downloadAsWord:", error);
             alert("Error generating Word document. Please try again or use the copy option.");
+        }
+    };
+
+    // eSignature document function
+    const eSignDocument = async () => {
+        try {
+            setESignLoading(true);
+            console.log("eSignature button clicked");
+            
+            let finalDocumentText;
+            let documentTitle;
+            
+            if (formData.includeArbitrationDraft) {
+                // Create combined document: demand letter + arbitration demand
+                const demandLetter = generateDemandLetter();
+                const arbitrationDemand = generateArbitrationDemand();
+                finalDocumentText = demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
+                documentTitle = `Stripe Demand Letter with Arbitration - ${formData.companyName || 'Company'}`;
+            } else {
+                finalDocumentText = generateDemandLetter();
+                documentTitle = `Stripe Demand Letter - ${formData.companyName || 'Company'}`;
+            }
+
+            // eSignatures.com API call
+            const apiData = {
+                test: "yes", // Use test mode for free trial account
+                title: documentTitle,
+                content: finalDocumentText,
+                signers: [{
+                    email: "sergei.tokmakov@gmail.com",
+                    name: "Sergei Tokmakov"
+                }]
+            };
+
+            console.log("Sending to eSignatures.com API:", apiData);
+
+            const response = await fetch('https://esignatures.com/api/contracts', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer 1807161e-d29d-4ace-9b87-864e25c70b05'
+                },
+                body: JSON.stringify(apiData)
+            });
+
+            const result = await response.json();
+            console.log("eSignatures.com response:", result);
+
+            if (response.ok && result.signing_url) {
+                // Open signing URL in new window
+                window.open(result.signing_url, '_blank');
+                alert("✅ eSignature opened! Complete signing in new window");
+            } else {
+                throw new Error(result.error || result.message || 'Failed to create eSignature contract');
+            }
+
+        } catch (error) {
+            console.error("eSignature error:", error);
+            alert("Error preparing document for eSignature: " + error.message);
+        } finally {
+            setESignLoading(false);
         }
     };
 
@@ -2473,6 +2535,14 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             className: 'nav-button',
                             style: { backgroundColor: "#2563eb", color: "white", border: "none" }
                         }, 'Download MS Word'),
+                        
+                        React.createElement('button', {
+                            key: 'esign',
+                            onClick: eSignDocument,
+                            className: 'nav-button',
+                            style: { backgroundColor: "#dc2626", color: "white", border: "none" },
+                            disabled: eSignLoading
+                        }, eSignLoading ? 'Processing...' : 'E-Sign'),
                         
                         React.createElement('button', {
                             key: 'consult',
