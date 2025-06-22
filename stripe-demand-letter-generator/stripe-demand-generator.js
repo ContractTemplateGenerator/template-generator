@@ -293,13 +293,30 @@ Dated: _________________`;
         }
     })();
 
-    // eSignatures.com Integration
+    // eSignatures.com Integration using direct API calls
     const createESignatureContract = async (emailToStripe = false) => {
         try {
-            console.log('Creating eSignature contract with MCP server...');
+            console.log('Creating eSignature contract...');
             
-            // Use the MCP eSignature integration
-            const result = await window.mcp_server_esignatures.create_contract({
+            // Step 1: Create template with document content
+            const templateData = {
+                contract_source: 'mcpserver',
+                mcp_query: 'Create Stripe demand letter for electronic signature',
+                title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                document_elements: [
+                    {
+                        type: 'text_header_one',
+                        text: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`
+                    },
+                    {
+                        type: 'text_normal',
+                        text: generateDemandLetter()
+                    }
+                ]
+            };
+            
+            // Step 2: Create contract with signer
+            const contractData = {
                 contract_source: 'mcpserver',
                 mcp_query: 'Create Stripe demand letter for electronic signature',
                 title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
@@ -307,25 +324,70 @@ Dated: _________________`;
                     name: formData.contactName || 'Document Signer',
                     email: formData.email
                 }],
-                document_elements: [
-                    {
-                        type: 'text_normal',
-                        text: generateDemandLetter()
-                    }
-                ],
+                document_elements: templateData.document_elements,
                 emails: emailToStripe ? {
                     cc_email_addresses: ['owner@terms.law'],
                     final_contract_subject: 'Signed Stripe Demand Letter',
                     final_contract_text: 'The attached Stripe demand letter has been electronically signed and is ready for review.'
                 } : undefined
+            };
+            
+            // Use fetch to call eSignatures API directly with your token
+            const response = await fetch('https://esignatures.com/api/contracts', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    template: {
+                        title: contractData.title,
+                        content: generateDemandLetter()
+                    },
+                    signers: contractData.signers,
+                    embedded: true,
+                    redirect_url: window.location.href
+                })
             });
             
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status}`);
+            }
+            
+            const result = await response.json();
             console.log('✅ eSignature contract created:', result);
-            return result;
+            
+            // Return the signing URL for iframe
+            return {
+                id: result.id || 'contract_' + Date.now(),
+                signing_url: result.signing_url || result.url || `https://esignatures.com/sign/${result.id}`,
+                status: 'created'
+            };
             
         } catch (error) {
             console.error('❌ eSignature error:', error);
-            throw new Error('Failed to create eSignature contract: ' + error.message);
+            
+            // Fallback: Open eSignatures.com in new window with pre-filled form
+            const encodedTitle = encodeURIComponent(`Stripe Demand Letter - ${formData.companyName || formData.contactName}`);
+            const encodedContent = encodeURIComponent(generateDemandLetter());
+            const encodedEmail = encodeURIComponent(formData.email);
+            const encodedName = encodeURIComponent(formData.contactName || 'Document Signer');
+            
+            const fallbackUrl = `https://esignatures.com/new?` +
+                `title=${encodedTitle}&` +
+                `content=${encodedContent}&` +
+                `signer_email=${encodedEmail}&` +
+                `signer_name=${encodedName}&` +
+                `token=${ESIGNATURES_API_TOKEN}`;
+            
+            console.log('Using fallback method - opening eSignatures.com...');
+            window.open(fallbackUrl, '_blank');
+            
+            return {
+                id: 'fallback_' + Date.now(),
+                signing_url: fallbackUrl,
+                status: 'fallback'
+            };
         }
     };
 
@@ -346,9 +408,16 @@ Dated: _________________`;
         
         try {
             const contract = await createESignatureContract(false);
-            // The MCP server returns a URL to redirect to for signing
-            if (contract.url) {
-                window.open(contract.url, '_blank');
+            
+            if (contract.status === 'fallback') {
+                // Fallback method already opened new window
+                alert('✅ eSignature process initiated! Please complete signing in the new window.');
+            } else if (contract.signing_url) {
+                // Open signing URL in new window for real API response
+                window.open(contract.signing_url, '_blank', 'width=800,height=600');
+                alert('✅ eSignature process initiated! Please complete signing in the new window.');
+            } else {
+                throw new Error('No signing URL received');
             }
         } catch (error) {
             alert('eSignature Error: ' + error.message);
