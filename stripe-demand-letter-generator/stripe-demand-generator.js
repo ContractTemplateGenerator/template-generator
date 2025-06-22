@@ -24,9 +24,13 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         const apiUrl = encodeURIComponent(`${ESIGNATURES_API_BASE}/templates?token=${ESIGNATURES_API_TOKEN}`);
         
         const requestBody = {
-            name: documentTitle,
-            content: documentContent,
-            content_type: 'html'
+            title: documentTitle,
+            document_elements: [
+                {
+                    type: "text_normal",
+                    text: documentContent
+                }
+            ]
         };
         
         console.log('Making API request to correct eSignatures.com endpoint...');
@@ -81,13 +85,15 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         const requestBody = {
             template_id: templateId,
             signers: [{
-                email: signerEmail,
                 name: signerName,
-                role: 'signer'
+                email: signerEmail
             }],
-            redirect_url: window.location.href,
-            email_notifications: emailToStripe ? ['owner@terms.law'] : [],
-            test: "yes"  // FREE TEST MODE - no charges for demo account
+            test: "yes",  // FREE TEST MODE - no charges for demo account
+            emails: emailToStripe ? {
+                cc_email_addresses: ['owner@terms.law'],
+                final_contract_subject: 'Signed Stripe Demand Letter',
+                final_contract_text: 'The attached Stripe demand letter has been electronically signed and is ready for review.'
+            } : undefined
         };
         
         console.log('Making contract API request...');
