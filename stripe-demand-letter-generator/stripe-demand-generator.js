@@ -483,6 +483,9 @@ Email: ${formData.email}
         setIsESignatureLoading(true);
         setCurrentESignatureMode('email');
         
+        try {
+            const contract = await createESignatureContract(true);
+            
             if (contract.status === 'mailto_fallback') {
                 // Open mailto for email fallback
                 window.location.href = contract.signing_url;
