@@ -16,13 +16,19 @@ The E-Sign button has been successfully added to the Stripe Demand Letter Genera
 ### Production Mode (Real API)
 To use real eSignatures.com API:
 
-1. **Start PHP Server:**
+1. **Start Node.js Proxy Server:**
    ```bash
    cd /path/to/stripe-demand-letter-generator
-   php -S localhost:8000
+   node esign-proxy.js
+   ```
+   (Server runs on localhost:3001)
+
+2. **Start HTTP Server:**
+   ```bash
+   python3 -m http.server 8000
    ```
 
-2. **Open in Browser:**
+3. **Open in Browser:**
    ```
    http://localhost:8000
    ```

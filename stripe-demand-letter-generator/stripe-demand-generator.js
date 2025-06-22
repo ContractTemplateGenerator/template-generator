@@ -739,12 +739,12 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
             console.log("Sending to eSignatures.com API:", apiData);
 
-            // Try PHP proxy first, then fallback to demo mode
+            // Try Node.js proxy first, then fallback to demo mode
             let response, result;
             
             try {
-                // Use local PHP proxy to avoid CORS issues
-                response = await fetch('./esign-proxy.php', {
+                // Use Node.js proxy server to avoid CORS issues
+                response = await fetch('http://localhost:3001/esign-proxy', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -754,8 +754,14 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
                 result = await response.json();
                 console.log("eSignatures.com API response:", result);
+                
+                // Check if we got a real API response (not demo)
+                if (response.ok && result && !result.contract_id?.startsWith('demo-')) {
+                    console.log("Real API response received");
+                }
+                
             } catch (proxyError) {
-                console.log("PHP proxy not available, using demo mode...");
+                console.log("Node.js proxy not available, using demo mode...", proxyError);
                 
                 // Demo mode - simulate successful eSignature creation
                 result = {
@@ -776,15 +782,27 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
-                    alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. To use real eSignatures, start a PHP server for API proxy.\n\nRun: php -S localhost:8000");
+                    alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
+                } else if (result.error_code === 'forbidden' || result.error_message) {
+                    // Handle API authentication errors
+                    alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
+                    // Open demo URL instead
+                    window.open("https://esignatures.com/demo-signing-page", '_blank');
+                    return; // Don't throw error, just show demo
                 } else {
                     alert("✅ eSignature opened! Complete signing in new window");
                 }
             } else {
-                // Show detailed error information
-                const errorMsg = result.error || result.message || result.errors || 'Failed to create eSignature contract';
-                console.error("API Error Details:", result);
-                throw new Error(errorMsg);
+                // Handle API errors more gracefully
+                if (result.error_code === 'forbidden' || result.error_message) {
+                    alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
+                    window.open("https://esignatures.com/demo-signing-page", '_blank');
+                    return; // Don't throw error, just show demo
+                } else {
+                    const errorMsg = result.error || result.message || result.errors || 'Failed to create eSignature contract';
+                    console.error("API Error Details:", result);
+                    throw new Error(errorMsg);
+                }
             }
 
         } catch (error) {
