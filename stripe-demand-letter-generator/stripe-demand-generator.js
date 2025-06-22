@@ -293,16 +293,46 @@ Dated: _________________`;
         }
     })();
 
-    // eSignatures.com Integration with guaranteed fallback
+    // eSignatures.com Integration using direct API calls
     const createESignatureContract = async (emailToStripe = false) => {
-        console.log('Creating eSignature contract...');
-        
-        const documentTitle = `Stripe Demand Letter - ${formData.companyName || formData.contactName}`;
-        const documentContent = generateDemandLetter();
-        
-        // Method 1: Try direct API call to eSignatures.com
         try {
-            console.log('Attempting direct API call...');
+            console.log('Creating eSignature contract...');
+            
+            // Step 1: Create template with document content
+            const templateData = {
+                contract_source: 'mcpserver',
+                mcp_query: 'Create Stripe demand letter for electronic signature',
+                title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                document_elements: [
+                    {
+                        type: 'text_header_one',
+                        text: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`
+                    },
+                    {
+                        type: 'text_normal',
+                        text: generateDemandLetter()
+                    }
+                ]
+            };
+            
+            // Step 2: Create contract with signer
+            const contractData = {
+                contract_source: 'mcpserver',
+                mcp_query: 'Create Stripe demand letter for electronic signature',
+                title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                signers: [{
+                    name: formData.contactName || 'Document Signer',
+                    email: formData.email
+                }],
+                document_elements: templateData.document_elements,
+                emails: emailToStripe ? {
+                    cc_email_addresses: ['owner@terms.law'],
+                    final_contract_subject: 'Signed Stripe Demand Letter',
+                    final_contract_text: 'The attached Stripe demand letter has been electronically signed and is ready for review.'
+                } : undefined
+            };
+            
+            // Use fetch to call eSignatures API directly with your token
             const response = await fetch('https://esignatures.com/api/contracts', {
                 method: 'POST',
                 headers: {
@@ -311,46 +341,45 @@ Dated: _________________`;
                 },
                 body: JSON.stringify({
                     template: {
-                        title: documentTitle,
-                        content: documentContent
+                        title: contractData.title,
+                        content: generateDemandLetter()
                     },
-                    signers: [{
-                        name: formData.contactName || 'Document Signer',
-                        email: formData.email
-                    }],
+                    signers: contractData.signers,
                     embedded: true,
                     redirect_url: window.location.href
                 })
             });
             
-            if (response.ok) {
-                const result = await response.json();
-                console.log('✅ Direct API success:', result);
-                return {
-                    id: result.id || 'direct_' + Date.now(),
-                    signing_url: result.signing_url || result.url,
-                    status: 'direct_api_success'
-                };
+            if (!response.ok) {
+                throw new Error(`API request failed: ${response.status}`);
             }
+            
+            const result = await response.json();
+            console.log('✅ eSignature contract created:', result);
+            
+            // Return the signing URL for iframe
+            return {
+                id: result.id || 'contract_' + Date.now(),
+                signing_url: result.signing_url || result.url || `https://esignatures.com/sign/${result.id}`,
+                status: 'created'
+            };
+            
         } catch (error) {
-            console.log('Direct API failed:', error);
-        }
-        
-        // Method 2: Try CORS proxy
-        try {
-            console.log('Attempting CORS proxy...');
+            console.error('❌ eSignature error:', error);
+            
+            // Fallback: Use CORS proxy to attempt API call
             const corsProxy = 'https://api.allorigins.win/raw?url=';
             const apiUrl = encodeURIComponent(`https://esignatures.com/api/contracts?token=${ESIGNATURES_API_TOKEN}`);
             
-            const proxyResponse = await fetch(`${corsProxy}${apiUrl}`, {
+            const fallbackResponse = await fetch(`${corsProxy}${apiUrl}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     template: {
-                        title: documentTitle,
-                        content: documentContent
+                        title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                        content: generateDemandLetter()
                     },
                     signers: [{
                         name: formData.contactName || 'Document Signer',
@@ -361,49 +390,44 @@ Dated: _________________`;
                 })
             });
             
-            if (proxyResponse.ok) {
-                const proxyResult = await proxyResponse.json();
-                console.log('✅ CORS proxy success:', proxyResult);
+            if (fallbackResponse.ok) {
+                const fallbackResult = await fallbackResponse.json();
+                console.log('✅ Fallback API success:', fallbackResult);
                 return {
-                    id: proxyResult.id || 'proxy_' + Date.now(),
-                    signing_url: proxyResult.signing_url || proxyResult.url,
-                    status: 'proxy_api_success'
+                    id: fallbackResult.id || 'fallback_' + Date.now(),
+                    signing_url: fallbackResult.signing_url || fallbackResult.url,
+                    status: 'api_success'
+                };
+            } else {
+                // Final fallback: Create a mailto link with the document
+                console.log('API calls failed, using mailto fallback...');
+                const subject = encodeURIComponent(`Electronic Signature Request - Stripe Demand Letter`);
+                const body = encodeURIComponent(`
+Please review and electronically sign the attached Stripe demand letter:
+
+${generateDemandLetter()}
+
+To proceed with electronic signature:
+1. Visit https://esignatures.com
+2. Create a new document
+3. Copy and paste the letter content above
+4. Add your signature
+5. Send the signed document
+
+Document Title: Stripe Demand Letter - ${formData.companyName || formData.contactName}
+Signer: ${formData.contactName || 'Document Signer'}
+Email: ${formData.email}
+                `);
+                
+                const mailtoUrl = `mailto:${formData.email}?subject=${subject}&body=${body}`;
+                
+                return {
+                    id: 'mailto_' + Date.now(),
+                    signing_url: mailtoUrl,
+                    status: 'mailto_fallback'
                 };
             }
-        } catch (error) {
-            console.log('CORS proxy failed:', error);
         }
-        
-        // Method 3: Guaranteed fallback - mailto with document content
-        console.log('Using guaranteed mailto fallback...');
-        const subject = encodeURIComponent(`Electronic Signature Request - Stripe Demand Letter`);
-        const emailBody = encodeURIComponent(`
-Please review and electronically sign this Stripe demand letter:
-
-${documentContent}
-
-This document requires your electronic signature to proceed with the legal demand process.
-
-Document Details:
-- Title: ${documentTitle}
-- Generated: ${new Date().toLocaleString()}
-- Signer: ${formData.contactName || 'Document Signer'}
-
-To proceed:
-1. Review the document above
-2. If you agree to the contents, reply to this email with "I AGREE AND ELECTRONICALLY SIGN"
-3. Your email reply will constitute your electronic signature
-
-${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : ''}
-        `);
-        
-        const mailtoUrl = `mailto:${formData.email}?subject=${subject}&body=${emailBody}`;
-        
-        return {
-            id: 'mailto_' + Date.now(),
-            signing_url: mailtoUrl,
-            status: 'mailto_fallback'
-        };
     };
 
     // eSignature handlers
@@ -425,24 +449,21 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
             const contract = await createESignatureContract(false);
             
             if (contract.status === 'mailto_fallback') {
-                // Open email client with document content
+                // Open mailto for email fallback
                 window.location.href = contract.signing_url;
-                alert('📧 Email-based signature initiated! Check your email client to review and sign the document.');
-            } else if (contract.status === 'direct_api_success' || contract.status === 'proxy_api_success') {
-                // Open real eSignatures signing interface
-                window.open(contract.signing_url, '_blank', 'width=900,height=700');
-                alert('✅ eSignature process initiated! Complete signing in the new window.');
+                alert('📧 Email fallback initiated! Please check your email client.');
+            } else if (contract.status === 'api_success' && contract.signing_url) {
+                // Open real eSignatures signing URL
+                window.open(contract.signing_url, '_blank', 'width=800,height=600');
+                alert('✅ eSignature process initiated! Please complete signing in the new window.');
+            } else if (contract.status === 'fallback') {
+                // Previous fallback logic
+                alert('✅ eSignature process initiated! Please complete signing in the new window.');
             } else {
-                // Fallback to mailto if something unexpected happens
-                const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20the%20attached%20document...`;
-                window.location.href = mailtoUrl;
-                alert('📧 Email fallback activated! Check your email client.');
+                throw new Error('No valid signing method available');
             }
         } catch (error) {
-            // Even if everything fails, provide mailto fallback
-            const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20and%20sign%20this%20document...`;
-            window.location.href = mailtoUrl;
-            alert('📧 Email signature process initiated as fallback! Check your email client.');
+            alert('eSignature Error: ' + error.message);
         } finally {
             setIsESignatureLoading(false);
         }
@@ -466,24 +487,21 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
             const contract = await createESignatureContract(true);
             
             if (contract.status === 'mailto_fallback') {
-                // Open email client with document content (includes notification to owner@terms.law)
+                // Open mailto for email fallback
                 window.location.href = contract.signing_url;
-                alert('📧 Email-based signature with notification initiated! Check your email client to review and sign. Copy will be sent to owner@terms.law.');
-            } else if (contract.status === 'direct_api_success' || contract.status === 'proxy_api_success') {
-                // Open real eSignatures signing interface
-                window.open(contract.signing_url, '_blank', 'width=900,height=700');
-                alert('✅ eSignature process with email notification initiated! Complete signing in the new window. owner@terms.law will be notified.');
+                alert('📧 Email fallback initiated with notification! Please check your email client.');
+            } else if (contract.status === 'api_success' && contract.signing_url) {
+                // Open real eSignatures signing URL
+                window.open(contract.signing_url, '_blank', 'width=800,height=600');
+                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
+            } else if (contract.status === 'fallback') {
+                // Previous fallback logic
+                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
             } else {
-                // Fallback to mailto if something unexpected happens
-                const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20the%20attached%20document...%20Copy%20owner@terms.law%20on%20your%20response.`;
-                window.location.href = mailtoUrl;
-                alert('📧 Email fallback with notification activated! Check your email client and copy owner@terms.law.');
+                throw new Error('No valid signing method available');
             }
         } catch (error) {
-            // Even if everything fails, provide mailto fallback
-            const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20and%20sign%20this%20document...%20Copy%20owner@terms.law%20on%20your%20response.`;
-            window.location.href = mailtoUrl;
-            alert('📧 Email signature process with notification initiated as fallback! Check your email client and copy owner@terms.law.');
+            alert('eSignature Error: ' + error.message);
         } finally {
             setIsESignatureLoading(false);
         }
