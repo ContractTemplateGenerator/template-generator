@@ -247,19 +247,24 @@ const StripeDemandGenerator = () => {
             
             // Check if user has access (paid in current session)
             const hasAccess = window.PaywallSystem.hasAccess();
-            console.log('Initializing paywall, hasAccess:', hasAccess);
+            const paymentStatus = window.PaywallSystem.getPaymentStatus();
+            console.log('Initializing paywall, hasAccess:', hasAccess, 'paymentStatus:', paymentStatus);
             
             if (hasAccess) {
+                console.log('User has access, setting isPaid to true');
                 setIsPaid(true);
                 // Enable preview interaction immediately for paid users
                 setTimeout(() => {
+                    console.log('Enabling preview interaction for paid user');
                     window.PaywallSystem.enablePreviewInteraction();
-                }, 100);
+                }, 200);
             } else {
+                console.log('User does not have access, making preview non-copyable');
+                setIsPaid(false);
                 // Make preview non-copyable until payment
                 setTimeout(() => {
                     window.PaywallSystem.makePreviewNonCopyable();
-                }, 100);
+                }, 200);
             }
         }
     }, []);
@@ -773,64 +778,70 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     // Copy to clipboard function with paywall check
     // eSignature handler functions
     const handleESignOnly = async () => {
-        console.log('E-Sign Only clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', PaywallSystem.hasAccess());
-        if (!isPaid || !PaywallSystem.hasAccess()) {
-            PaywallSystem.backupFormData(formData);
-            PaywallSystem.showAccessDenied('esign');
+        console.log('E-Sign Only clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', window.PaywallSystem ? window.PaywallSystem.hasAccess() : 'PaywallSystem not available');
+        
+        // Check if user has access using same logic as copy/download buttons
+        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.backupFormData(formData);
+            window.PaywallSystem.showAccessDenied('esign');
             
             window.manualUnlockCallback = () => {
-                const restoredData = PaywallSystem.restoreFormData();
+                const restoredData = window.PaywallSystem.restoreFormData();
                 if (restoredData) {
                     setFormData(restoredData);
                 }
                 setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
+                window.PaywallSystem.enablePreviewInteraction();
                 handleESignOnly();
             };
             
-            PaywallSystem.createPaywallModal((order) => {
-                const restoredData = PaywallSystem.restoreFormData();
+            window.PaywallSystem.createPaywallModal((order) => {
+                const restoredData = window.PaywallSystem.restoreFormData();
                 if (restoredData) {
                     setFormData(restoredData);
                 }
                 setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
+                window.PaywallSystem.enablePreviewInteraction();
                 handleESignOnly();
             });
             return;
         }
         
+        // User has access, proceed with eSignature
         await performESignature(false);
     };
 
     const handleESignAndEmail = async () => {
-        console.log('E-Sign & Email clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', PaywallSystem.hasAccess());
-        if (!isPaid || !PaywallSystem.hasAccess()) {
-            PaywallSystem.backupFormData(formData);
-            PaywallSystem.showAccessDenied('esign');
+        console.log('E-Sign & Email clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', window.PaywallSystem ? window.PaywallSystem.hasAccess() : 'PaywallSystem not available');
+        
+        // Check if user has access using same logic as copy/download buttons
+        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.backupFormData(formData);
+            window.PaywallSystem.showAccessDenied('esign');
             
             window.manualUnlockCallback = () => {
-                const restoredData = PaywallSystem.restoreFormData();
+                const restoredData = window.PaywallSystem.restoreFormData();
                 if (restoredData) {
                     setFormData(restoredData);
                 }
                 setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
+                window.PaywallSystem.enablePreviewInteraction();
                 handleESignAndEmail();
             };
             
-            PaywallSystem.createPaywallModal((order) => {
-                const restoredData = PaywallSystem.restoreFormData();
+            window.PaywallSystem.createPaywallModal((order) => {
+                const restoredData = window.PaywallSystem.restoreFormData();
                 if (restoredData) {
                     setFormData(restoredData);
                 }
                 setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
+                window.PaywallSystem.enablePreviewInteraction();
                 handleESignAndEmail();
             });
             return;
         }
         
+        // User has access, proceed with eSignature
         await performESignature(true);
     };
 
@@ -870,7 +881,9 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             
         } catch (error) {
             console.error('eSignature error:', error);
-            setESignatureError(error.message || 'Failed to create eSignature. Please try again.');
+            const errorMessage = error.message || 'Failed to create eSignature. Please try again.';
+            setESignatureError(errorMessage);
+            alert('eSignature Error: ' + errorMessage); // Show error to user immediately
         } finally {
             setIsESignatureLoading(false);
         }
@@ -2816,7 +2829,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         
                         React.createElement('button', {
                             key: 'esign-only',
-                            onClick: handleESignOnly,
+                            onClick: () => {
+                                console.log('eSign Only button clicked');
+                                handleESignOnly();
+                            },
                             disabled: isESignatureLoading,
                             className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
                             style: { 
@@ -2829,7 +2845,10 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         
                         React.createElement('button', {
                             key: 'esign-email',
-                            onClick: handleESignAndEmail,
+                            onClick: () => {
+                                console.log('eSign & Email button clicked');
+                                handleESignAndEmail();
+                            },
                             disabled: isESignatureLoading,
                             className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
                             style: { 

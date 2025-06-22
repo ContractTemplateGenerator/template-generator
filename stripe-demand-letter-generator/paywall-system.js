@@ -113,6 +113,9 @@ const PaywallSystem = (() => {
                     };
                     savePaymentStatus(paymentStatus);
 
+                    // Enable preview interaction immediately
+                    enablePreviewInteraction();
+
                     // Call success callback
                     if (onSuccess) {
                         onSuccess(order);
@@ -444,6 +447,9 @@ const PaywallSystem = (() => {
                 modal.remove();
             }
 
+            // Enable preview interaction immediately
+            enablePreviewInteraction();
+            
             // Show success message
             alert('Access unlocked! You can now copy and download your demand letter.');
             
@@ -571,17 +577,37 @@ const PaywallSystem = (() => {
 
     // Remove preview restrictions after payment
     const enablePreviewInteraction = () => {
+        console.log('enablePreviewInteraction called');
+        
+        // Remove restrictions from preview elements
         const previewElements = document.querySelectorAll('.document-preview, .preview-content');
         previewElements.forEach(element => {
-            element.style.cssText = element.style.cssText.replace(
-                /-webkit-user-select: none;|user-select: none;|-webkit-touch-callout: none;|-webkit-tap-highlight-color: transparent;|pointer-events: none;/g, 
-                ''
-            );
+            // Clear all the restricting styles
+            element.style.webkitUserSelect = '';
+            element.style.mozUserSelect = '';
+            element.style.msUserSelect = '';
+            element.style.userSelect = '';
+            element.style.webkitTouchCallout = '';
+            element.style.webkitTapHighlightColor = '';
+            element.style.pointerEvents = '';
         });
 
-        // Remove overlays
-        const overlays = document.querySelectorAll('.preview-content div[style*="position: absolute"]');
-        overlays.forEach(overlay => overlay.remove());
+        // Remove all overlays more aggressively
+        const allOverlays = document.querySelectorAll('div[style*="position: absolute"]');
+        allOverlays.forEach(overlay => {
+            // Check if this overlay looks like our paywall overlay
+            const style = overlay.style.cssText;
+            if (style.includes('cursor: not-allowed') || 
+                style.includes('z-index: 10') || 
+                style.includes('linear-gradient(45deg')) {
+                console.log('Removing paywall overlay');
+                overlay.remove();
+            }
+        });
+
+        // Also remove any elements with preview-overlay class
+        const classOverlays = document.querySelectorAll('.preview-overlay');
+        classOverlays.forEach(overlay => overlay.remove());
     };
 
     // Public API
