@@ -251,6 +251,7 @@ const StripeDemandGenerator = () => {
     const [eSignatureIframe, setESignatureIframe] = useState('');
     const [currentESignatureMode, setCurrentESignatureMode] = useState(null);
     const [isESignatureDemoMode, setIsESignatureDemoMode] = useState(false);
+    const [signedDocumentInfo, setSignedDocumentInfo] = useState(null); // Track signed document details
     
     // Form data state
     const [formData, setFormData] = useState({
@@ -979,6 +980,17 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 
     const handleESignatureComplete = async (signedDocumentUrl) => {
         try {
+            // Save signed document information
+            const signedInfo = {
+                url: signedDocumentUrl,
+                signedAt: new Date().toISOString(),
+                signerEmail: formData.email,
+                signerName: formData.contactName || 'Document Signer',
+                documentTitle: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                emailedToOwner: currentESignatureMode === 'email'
+            };
+            setSignedDocumentInfo(signedInfo);
+            
             if (currentESignatureMode === 'email') {
                 await sendSignedDocumentToStripe(signedDocumentUrl, formData.email, formData.contactName);
             }
@@ -1095,26 +1107,65 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     // Actual download function (separated for reuse after payment)
     const performDownloadAsWord = () => {
         try {
-            console.log("Download MS Word button clicked");
+            console.log("Download button clicked");
             
             let finalDocumentText;
             let documentTitle;
             let fileName;
             
-            if (formData.includeArbitrationDraft) {
-                // Create combined document: demand letter + page break + arbitration demand
-                const demandLetter = generateDemandLetter();
-                const arbitrationDemand = generateArbitrationDemand();
+            // Check if we have a signed document
+            if (signedDocumentInfo) {
+                console.log("Downloading signed document version");
                 
-                // Add proper page break formatting for MS Word
-                finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
-                documentTitle = "Stripe Demand Letter with Arbitration Demand";
-                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
+                // Create signed document content with signature information
+                if (formData.includeArbitrationDraft) {
+                    const demandLetter = generateDemandLetter();
+                    const arbitrationDemand = generateArbitrationDemand();
+                    finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
+                    documentTitle = "SIGNED Stripe Demand Letter with Arbitration Demand";
+                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Combined-Demand-Letter-and-Arbitration`;
+                } else {
+                    finalDocumentText = generateDemandLetter();
+                    documentTitle = "SIGNED Stripe Demand Letter";
+                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Demand-Letter`;
+                }
+                
+                // Add electronic signature information to the document
+                const signatureBlock = `
+
+═══════════════════════════════════════════════════════════════════
+ELECTRONIC SIGNATURE VERIFICATION
+═══════════════════════════════════════════════════════════════════
+
+This document has been electronically signed using eSignatures.com
+
+Signed by: ${signedDocumentInfo.signerName}
+Email: ${signedDocumentInfo.signerEmail}
+Date & Time: ${new Date(signedDocumentInfo.signedAt).toLocaleString()}
+Document ID: ${signedDocumentInfo.url}
+
+${signedDocumentInfo.emailedToOwner ? 'Email notification sent to: owner@terms.law' : ''}
+
+This electronic signature is legally binding and complies with applicable electronic signature laws.
+
+═══════════════════════════════════════════════════════════════════`;
+                
+                finalDocumentText += signatureBlock;
+                
             } else {
-                // Single demand letter only
-                finalDocumentText = generateDemandLetter();
-                documentTitle = "Stripe Demand Letter";
-                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`;
+                console.log("Downloading unsigned document version");
+                
+                if (formData.includeArbitrationDraft) {
+                    const demandLetter = generateDemandLetter();
+                    const arbitrationDemand = generateArbitrationDemand();
+                    finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
+                    documentTitle = "Stripe Demand Letter with Arbitration Demand";
+                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
+                } else {
+                    finalDocumentText = generateDemandLetter();
+                    documentTitle = "Stripe Demand Letter";
+                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`;
+                }
             }
             
             if (!finalDocumentText) {
@@ -1127,6 +1178,14 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 documentTitle: documentTitle,
                 fileName: fileName
             });
+            
+            // Show success message for signed documents
+            if (signedDocumentInfo) {
+                setTimeout(() => {
+                    alert('✅ Signed document downloaded successfully! The document includes electronic signature verification details.');
+                }, 500);
+            }
+            
         } catch (error) {
             console.error("Error in performDownloadAsWord:", error);
             alert("Error generating Word document. Please try again or use the copy option.");
@@ -2909,12 +2968,12 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             onClick: downloadAsWord,
                             className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
                             style: { 
-                                backgroundColor: isPaid ? "#2563eb" : "#6c757d", 
+                                backgroundColor: isPaid ? (signedDocumentInfo ? "#28a745" : "#2563eb") : "#6c757d", 
                                 color: "white", 
                                 border: "none",
                                 opacity: isPaid ? 1 : 0.7
                             }
-                        }, isPaid ? 'Download MS Word' : '🔒 Download MS Word'),
+                        }, isPaid ? (signedDocumentInfo ? '📝 Download Signed Document' : 'Download MS Word') : '🔒 Download MS Word'),
                         
                         React.createElement('button', {
                             key: 'esign-only',
@@ -2980,7 +3039,28 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 
                             formData.includeArbitrationDraft ? 'Your AAA arbitration demand' : 
                             'Your demand letter with 30-day arbitration notice'
-                        )
+                        ),
+                        // Show signed document status
+                        signedDocumentInfo && React.createElement('div', {
+                            key: 'signed-status',
+                            style: {
+                                backgroundColor: '#d4edda',
+                                color: '#155724',
+                                border: '1px solid #c3e6cb',
+                                borderRadius: '6px',
+                                padding: '12px',
+                                marginTop: '10px',
+                                fontSize: '14px',
+                                fontWeight: 'bold'
+                            }
+                        }, [
+                            React.createElement('span', { key: 'icon' }, '✅ '),
+                            `Document electronically signed by ${signedDocumentInfo.signerName} on ${new Date(signedDocumentInfo.signedAt).toLocaleDateString()}`,
+                            signedDocumentInfo.emailedToOwner && React.createElement('div', {
+                                key: 'email-status',
+                                style: { marginTop: '5px', fontWeight: 'normal' }
+                            }, '📧 Email notification sent to owner@terms.law')
+                        ])
                     ]),
                     React.createElement('div', { 
                         key: 'document',
