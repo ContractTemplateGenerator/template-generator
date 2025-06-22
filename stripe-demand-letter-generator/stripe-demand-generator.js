@@ -71,6 +71,9 @@ const StripeDemandGenerator = () => {
         customReason: false,
         customReasonText: '',
         
+        // SSA Violations
+        specificViolationsIdentified: false,
+        
         // Evidence
         lowChargebacks: false,
         compliantPractices: false,
@@ -97,12 +100,14 @@ const StripeDemandGenerator = () => {
         }
     }, []);
 
-    // Tab configuration
+    // Tab configuration - FIXED: All 6 tabs now visible
     const tabs = [
         { id: 'account', label: 'Account Details' },
         { id: 'reasons', label: 'Stripe\'s Reasons' },
+        { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
-        { id: 'strategy', label: 'Legal Strategy' }
+        { id: 'arbitration', label: 'Arbitration Demand' },
+        { id: 'assessment', label: 'Risk Assessment' }
     ];
     
     // Handle input changes with highlighting
@@ -293,52 +298,114 @@ Dated: _________________`;
         }
     })();
 
-    // eSignatures.com Integration with guaranteed fallback
+    // eSignatures.com Integration - FIXED using correct API format from documentation
     const createESignatureContract = async (emailToStripe = false) => {
-        console.log('Creating eSignature contract...');
+        console.log('Creating eSignature contract using correct API...');
         
         const documentTitle = `Stripe Demand Letter - ${formData.companyName || formData.contactName}`;
         const documentContent = generateDemandLetter();
         
-        // Method 1: Try direct API call to eSignatures.com
+        // Method 1: Create template first, then contract (per API docs)
         try {
-            console.log('Attempting direct API call...');
-            const response = await fetch('https://esignatures.com/api/contracts', {
+            console.log('Step 1: Creating template...');
+            
+            // Create template using correct API format
+            const templateResponse = await fetch(`https://esignatures.com/api/templates?token=${ESIGNATURES_API_TOKEN}`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    template: {
-                        title: documentTitle,
-                        content: documentContent
-                    },
-                    signers: [{
-                        name: formData.contactName || 'Document Signer',
-                        email: formData.email
-                    }],
-                    embedded: true,
-                    redirect_url: window.location.href
+                    title: documentTitle,
+                    document_elements: [
+                        {
+                            type: 'text_header_one',
+                            text: documentTitle
+                        },
+                        {
+                            type: 'text_normal',
+                            text: documentContent
+                        }
+                    ]
                 })
             });
             
-            if (response.ok) {
-                const result = await response.json();
-                console.log('✅ Direct API success:', result);
+            let templateId = null;
+            if (templateResponse.ok) {
+                const templateResult = await templateResponse.json();
+                templateId = templateResult.data[0].template_id;
+                console.log('✅ Template created:', templateId);
+            } else {
+                console.log('Template creation failed, using direct content approach');
+            }
+            
+            console.log('Step 2: Creating contract...');
+            
+            // Create contract using correct API format from documentation
+            const contractData = {
+                signers: [{
+                    name: formData.contactName || 'Document Signer',
+                    email: formData.email,
+                    signature_request_delivery_methods: []  // Prevent auto-send per docs
+                }],
+                test: "no"
+            };
+            
+            // Add template_id if we have it, otherwise use inline content
+            if (templateId) {
+                contractData.template_id = templateId;
+            } else {
+                contractData.title = documentTitle;
+                contractData.document_elements = [
+                    {
+                        type: 'text_header_one',
+                        text: documentTitle
+                    },
+                    {
+                        type: 'text_normal',
+                        text: documentContent
+                    }
+                ];
+            }
+            
+            // Add email notification if requested
+            if (emailToStripe) {
+                contractData.emails = {
+                    cc_email_addresses: ['owner@terms.law'],
+                    final_contract_subject: 'Signed Stripe Demand Letter',
+                    final_contract_text: 'The attached Stripe demand letter has been electronically signed and is ready for review.'
+                };
+            }
+            
+            const contractResponse = await fetch(`https://esignatures.com/api/contracts?token=${ESIGNATURES_API_TOKEN}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(contractData)
+            });
+            
+            if (contractResponse.ok) {
+                const contractResult = await contractResponse.json();
+                console.log('✅ Contract created successfully:', contractResult);
+                
+                // Extract sign_page_url from response per API docs
+                const signPageUrl = contractResult.data.contract.signers[0].sign_page_url;
+                
                 return {
-                    id: result.id || 'direct_' + Date.now(),
-                    signing_url: result.signing_url || result.url,
-                    status: 'direct_api_success'
+                    id: contractResult.data.contract.id,
+                    signing_url: signPageUrl,
+                    status: 'api_success'
                 };
             }
         } catch (error) {
             console.log('Direct API failed:', error);
         }
         
-        // Method 2: Try CORS proxy
+        // Method 2: Try CORS proxy with correct format
         try {
-            console.log('Attempting CORS proxy...');
+            console.log('Attempting CORS proxy with correct API format...');
+            
             const corsProxy = 'https://api.allorigins.win/raw?url=';
             const apiUrl = encodeURIComponent(`https://esignatures.com/api/contracts?token=${ESIGNATURES_API_TOKEN}`);
             
@@ -348,25 +415,35 @@ Dated: _________________`;
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    template: {
-                        title: documentTitle,
-                        content: documentContent
-                    },
+                    title: documentTitle,
                     signers: [{
                         name: formData.contactName || 'Document Signer',
-                        email: formData.email
+                        email: formData.email,
+                        signature_request_delivery_methods: []
                     }],
-                    embedded: false,
-                    redirect_url: window.location.href
+                    document_elements: [
+                        {
+                            type: 'text_header_one',
+                            text: documentTitle
+                        },
+                        {
+                            type: 'text_normal',
+                            text: documentContent
+                        }
+                    ],
+                    test: "no"
                 })
             });
             
             if (proxyResponse.ok) {
                 const proxyResult = await proxyResponse.json();
                 console.log('✅ CORS proxy success:', proxyResult);
+                
+                const signPageUrl = proxyResult.data.contract.signers[0].sign_page_url;
+                
                 return {
-                    id: proxyResult.id || 'proxy_' + Date.now(),
-                    signing_url: proxyResult.signing_url || proxyResult.url,
+                    id: proxyResult.data.contract.id,
+                    signing_url: signPageUrl,
                     status: 'proxy_api_success'
                 };
             }
@@ -374,7 +451,7 @@ Dated: _________________`;
             console.log('CORS proxy failed:', error);
         }
         
-        // Method 3: Guaranteed fallback - mailto with document content
+        // Method 3: Guaranteed mailto fallback
         console.log('Using guaranteed mailto fallback...');
         const subject = encodeURIComponent(`Electronic Signature Request - Stripe Demand Letter`);
         const emailBody = encodeURIComponent(`
@@ -428,10 +505,24 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
                 // Open email client with document content
                 window.location.href = contract.signing_url;
                 alert('📧 Email-based signature initiated! Check your email client to review and sign the document.');
-            } else if (contract.status === 'direct_api_success' || contract.status === 'proxy_api_success') {
-                // Open real eSignatures signing interface
-                window.open(contract.signing_url, '_blank', 'width=900,height=700');
-                alert('✅ eSignature process initiated! Complete signing in the new window.');
+            } else if (contract.status === 'api_success' || contract.status === 'proxy_api_success') {
+                // Open real eSignatures signing interface with embedded=yes parameter
+                const embeddedUrl = contract.signing_url + (contract.signing_url.includes('?') ? '&' : '?') + 'embedded=yes';
+                
+                // Create popup window for signing
+                const signingWindow = window.open(
+                    embeddedUrl,
+                    'eSignature',
+                    'width=900,height=700,scrollbars=yes,resizable=yes,status=yes,toolbar=no,menubar=no'
+                );
+                
+                if (signingWindow) {
+                    alert('✅ eSignature process initiated! Complete signing in the popup window.');
+                } else {
+                    // Popup blocked, try direct navigation
+                    window.open(embeddedUrl, '_blank');
+                    alert('✅ eSignature process initiated! Complete signing in the new tab.');
+                }
             } else {
                 // Fallback to mailto if something unexpected happens
                 const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20the%20attached%20document...`;
@@ -439,6 +530,7 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
                 alert('📧 Email fallback activated! Check your email client.');
             }
         } catch (error) {
+            console.error('eSignature error:', error);
             // Even if everything fails, provide mailto fallback
             const mailtoUrl = `mailto:${formData.email}?subject=Stripe%20Demand%20Letter%20Signature&body=Please%20review%20and%20sign%20this%20document...`;
             window.location.href = mailtoUrl;
@@ -903,8 +995,27 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
                         ])
                     ]),
                     
-                    // Tab 3: Evidence
+                    // Tab 3: SSA Violations
                     currentTab === 2 && React.createElement('div', { key: 'tab3' }, [
+                        React.createElement('h2', { key: 'h2' }, 'SSA Violations'),
+                        React.createElement('p', { key: 'p' }, 'Identify specific violations of the Stripe Services Agreement.'),
+                        
+                        React.createElement('div', { key: 'checkboxes', className: 'checkbox-grid' }, [
+                            React.createElement('label', { key: 'specificViolations', className: 'checkbox-label' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'checkbox',
+                                    name: 'specificViolationsIdentified',
+                                    checked: formData.specificViolationsIdentified,
+                                    onChange: handleChange
+                                }),
+                                React.createElement('span', { key: 'span' }, 'Specific violations identified')
+                            ])
+                        ])
+                    ]),
+                    
+                    // Tab 4: Evidence
+                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
                         React.createElement('h2', { key: 'h2' }, 'Supporting Evidence'),
                         React.createElement('p', { key: 'p' }, 'Select the evidence that supports your case.'),
                         
@@ -952,10 +1063,10 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
                         ])
                     ]),
                     
-                    // Tab 4: Legal Strategy
-                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Legal Strategy & Timeline'),
-                        React.createElement('p', { key: 'p' }, 'Configure your legal approach and deadlines.'),
+                    // Tab 5: Arbitration Demand
+                    currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Legal Strategy & Arbitration'),
+                        React.createElement('p', { key: 'p' }, 'Configure your legal approach and arbitration options.'),
                         
                         React.createElement('div', { key: 'row1', className: 'form-row' }, [
                             React.createElement('div', { key: 'deadline', className: 'form-group' }, [
@@ -988,6 +1099,18 @@ ${emailToStripe ? 'A copy will be sent to owner@terms.law for legal review.' : '
                             React.createElement('p', { key: 'help', className: 'help-text' }, 
                                 'Including the arbitration draft shows Stripe you are prepared to file if they don\'t respond.'
                             )
+                        ])
+                    ]),
+                    
+                    // Tab 6: Risk Assessment
+                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Risk Assessment'),
+                        React.createElement('p', { key: 'p' }, 'Review your case strength and legal strategy recommendations.'),
+                        
+                        React.createElement('div', { key: 'assessment', className: 'form-group' }, [
+                            React.createElement('div', { key: 'placeholder', style: { padding: '20px', backgroundColor: '#f8f9fa', borderRadius: '6px', textAlign: 'center' }}, [
+                                React.createElement('p', { key: 'text' }, 'Complete the previous tabs to see your personalized risk assessment and legal strategy recommendations.')
+                            ])
                         ])
                     ])
                 ]),
