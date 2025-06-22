@@ -442,9 +442,16 @@ Dated: _________________`;
         
         try {
             const contract = await createESignatureContract(true);
-            // The MCP server returns a URL to redirect to for signing
-            if (contract.url) {
-                window.open(contract.url, '_blank');
+            
+            if (contract.status === 'fallback') {
+                // Fallback method already opened new window
+                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
+            } else if (contract.signing_url) {
+                // Open signing URL in new window for real API response
+                window.open(contract.signing_url, '_blank', 'width=800,height=600');
+                alert('✅ eSignature process initiated with email notification! Please complete signing in the new window.');
+            } else {
+                throw new Error('No signing URL received');
             }
         } catch (error) {
             alert('eSignature Error: ' + error.message);
