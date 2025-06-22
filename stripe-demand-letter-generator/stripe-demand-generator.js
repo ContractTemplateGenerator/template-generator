@@ -86,7 +86,8 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
                 role: 'signer'
             }],
             redirect_url: window.location.href,
-            email_notifications: emailToStripe ? ['owner@terms.law'] : []
+            email_notifications: emailToStripe ? ['owner@terms.law'] : [],
+            test: "yes"  // FREE TEST MODE - no charges for demo account
         };
         
         console.log('Making contract API request...');
