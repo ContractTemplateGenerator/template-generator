@@ -91,7 +91,7 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
             id: contractId,
             template_id: templateId,
             status: 'pending',
-            signing_url: `https://app.esignatures.com/sign/${contractId}?embedded=yes&demo=true`,
+            signing_url: `https://demo.esignatures.com/sign/${contractId}?embedded=yes`,
             signers: [{
                 email: signerEmail,
                 name: signerName,
@@ -1137,16 +1137,21 @@ ${formData.companyName || '[COMPANY NAME]'}`;
 ELECTRONIC SIGNATURE VERIFICATION
 ═══════════════════════════════════════════════════════════════════
 
-This document has been electronically signed using eSignatures.com
+This document has been electronically signed using eSignatures.com Demo
 
 Signed by: ${signedDocumentInfo.signerName}
 Email: ${signedDocumentInfo.signerEmail}
 Date & Time: ${new Date(signedDocumentInfo.signedAt).toLocaleString()}
-Document ID: ${signedDocumentInfo.url}
+Demo Document ID: ${signedDocumentInfo.url}
 
-${signedDocumentInfo.emailedToOwner ? 'Email notification sent to: owner@terms.law' : ''}
+${signedDocumentInfo.emailedToOwner ? 'Email notification: Would be sent to owner@terms.law in production' : ''}
 
-This electronic signature is legally binding and complies with applicable electronic signature laws.
+DEMO MODE: This demonstrates electronic signature functionality.
+In production, this would include:
+• Real eSignatures.com document verification URL
+• Cryptographic signature validation
+• Legal audit trail and certificate of completion
+• Automatic email delivery with PDF attachment
 
 ═══════════════════════════════════════════════════════════════════`;
                 
@@ -3237,29 +3242,22 @@ This electronic signature is legally binding and complies with applicable electr
                                 );
                                 
                                 // Simulate completion with email trigger if needed
-                                const mockSignedUrl = 'https://app.esignatures.com/signed/demo_' + Date.now() + '.pdf';
+                                const mockSignedUrl = 'https://demo.esignatures.com/documents/signed_' + Date.now() + '.pdf';
                                 
                                 if (currentESignatureMode === 'email') {
-                                    // Trigger email to owner@terms.law
-                                    const subject = encodeURIComponent(`Signed Legal Demand Letter - ${formData.contactName || 'Document Signer'}`);
-                                    const body = encodeURIComponent(`
-Dear owner@terms.law,
-
-The attached Stripe demand letter has been electronically signed and is ready for your review.
-
-Signer: ${formData.contactName || 'Document Signer'}
-Email: ${formData.email}
-Document: Stripe Payment Processing Demand Letter
-Signed: ${new Date().toLocaleString()}
-
-This is a demo of the eSignatures.com integration. In production, the signed PDF would be automatically attached.
-
-Best regards,
-eSignatures.com Demo System`);
-                                    
-                                    // Open email client
+                                    // Show email demo instead of opening mailto
                                     setTimeout(() => {
-                                        window.open(`mailto:owner@terms.law?subject=${subject}&body=${body}`, '_blank');
+                                        alert(`📧 Email Demo: In production, this would automatically send an email to owner@terms.law with:
+
+Subject: Signed Legal Demand Letter - ${formData.contactName || 'Document Signer'}
+
+Content:
+• Signed PDF attachment
+• Signer details: ${formData.contactName || 'Document Signer'} (${formData.email})
+• Timestamp: ${new Date().toLocaleString()}
+• Legal verification information
+
+Note: Demo mode simulates this workflow without actually sending emails.`);
                                     }, 1000);
                                 }
                                 
