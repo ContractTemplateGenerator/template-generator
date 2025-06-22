@@ -69,8 +69,6 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
 
 const sendSignedDocumentToStripe = async (signedDocumentUrl, userEmail, userName) => {
     try {
-        // Note: This would typically be handled by a backend service
-        // For now, we'll create a mailto link as a fallback
         const subject = encodeURIComponent(`Legal Demand Letter - ${userName}`);
         const body = encodeURIComponent(`
 Dear Stripe Legal Team,
@@ -165,6 +163,13 @@ const StripeDemandGenerator = () => {
     const [showPaywall, setShowPaywall] = useState(false);
     const previewRef = useRef(null);
     
+    // eSignature state management
+    const [isESignatureLoading, setIsESignatureLoading] = useState(false);
+    const [eSignatureError, setESignatureError] = useState(null);
+    const [showESignatureModal, setShowESignatureModal] = useState(false);
+    const [eSignatureIframe, setESignatureIframe] = useState('');
+    const [currentESignatureMode, setCurrentESignatureMode] = useState(null);
+    
     // Form data state
     const [formData, setFormData] = useState({
         // Tab 1: Account & Situation Details
@@ -233,13 +238,6 @@ const StripeDemandGenerator = () => {
         specificDamagesAmount: '', // Additional damages beyond withheld amount
         additionalClaims: '' // Custom additional claims
     });
-
-    // eSignature state variables
-    const [isESignatureLoading, setIsESignatureLoading] = useState(false);
-    const [eSignatureError, setESignatureError] = useState(null);
-    const [showESignatureModal, setShowESignatureModal] = useState(false);
-    const [eSignatureIframe, setESignatureIframe] = useState(null);
-    const [currentESignatureMode, setCurrentESignatureMode] = useState(null); // 'sign-only' or 'sign-and-email'
 
     // Initialize paywall system and check payment status
     useEffect(() => {
@@ -766,6 +764,129 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     })();
 
     // Copy to clipboard function with paywall check
+    // eSignature handler functions
+    const handleESignOnly = async () => {
+        if (!PaywallSystem.hasAccess()) {
+            PaywallSystem.backupFormData(formData);
+            PaywallSystem.showAccessDenied('esign');
+            
+            window.manualUnlockCallback = () => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                handleESignOnly();
+            };
+            
+            PaywallSystem.createPaywallModal((order) => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                handleESignOnly();
+            });
+            return;
+        }
+        
+        await performESignature(false);
+    };
+
+    const handleESignAndEmail = async () => {
+        if (!PaywallSystem.hasAccess()) {
+            PaywallSystem.backupFormData(formData);
+            PaywallSystem.showAccessDenied('esign');
+            
+            window.manualUnlockCallback = () => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                handleESignAndEmail();
+            };
+            
+            PaywallSystem.createPaywallModal((order) => {
+                const restoredData = PaywallSystem.restoreFormData();
+                if (restoredData) {
+                    setFormData(restoredData);
+                }
+                setIsPaid(true);
+                PaywallSystem.enablePreviewInteraction();
+                handleESignAndEmail();
+            });
+            return;
+        }
+        
+        await performESignature(true);
+    };
+
+    const performESignature = async (emailToStripe) => {
+        setIsESignatureLoading(true);
+        setESignatureError(null);
+        setCurrentESignatureMode(emailToStripe ? 'email' : 'sign');
+        
+        try {
+            if (!formData.contactName || !formData.email) {
+                throw new Error('Contact name and email are required for eSignature');
+            }
+            
+            let finalDocumentContent;
+            const documentTitle = `Stripe Demand Letter - ${formData.companyName || formData.contactName}`;
+            
+            if (formData.includeArbitrationDraft) {
+                const demandLetter = generateDemandLetter();
+                const arbitrationDemand = generateArbitrationDemand();
+                finalDocumentContent = `<div>${demandLetter}</div><div style="page-break-before: always;"><h2>ARBITRATION DEMAND (ATTACHMENT)</h2>${arbitrationDemand}</div>`;
+            } else {
+                finalDocumentContent = `<div>${generateDemandLetter()}</div>`;
+            }
+            
+            const template = await createESignatureTemplate(finalDocumentContent, documentTitle);
+            const contract = await createESignatureContract(
+                template.id,
+                formData.email,
+                formData.contactName,
+                emailToStripe
+            );
+            
+            const embeddedUrl = `${contract.signing_url}?embedded=yes`;
+            setESignatureIframe(embeddedUrl);
+            setShowESignatureModal(true);
+            
+        } catch (error) {
+            console.error('eSignature error:', error);
+            setESignatureError(error.message || 'Failed to create eSignature. Please try again.');
+        } finally {
+            setIsESignatureLoading(false);
+        }
+    };
+
+    const handleESignatureComplete = async (signedDocumentUrl) => {
+        try {
+            if (currentESignatureMode === 'email') {
+                await sendSignedDocumentToStripe(signedDocumentUrl, formData.email, formData.contactName);
+            }
+            setShowESignatureModal(false);
+            setESignatureIframe('');
+            setCurrentESignatureMode(null);
+        } catch (error) {
+            console.error('Error completing eSignature:', error);
+            setESignatureError('Failed to process signed document. Please try again.');
+        }
+    };
+
+    const closeESignatureModal = () => {
+        setShowESignatureModal(false);
+        setESignatureIframe('');
+        setESignatureError(null);
+        setCurrentESignatureMode(null);
+    };
+
     const copyToClipboard = () => {
         // Check if user has paid
         if (!PaywallSystem.hasAccess()) {
@@ -1010,163 +1131,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
     }, [lastChanged]);
 
     const highlightedText = createHighlightedText();
-
-    // eSignature button handlers
-    const handleESignOnly = async () => {
-        if (!isPaid) {
-            if (window.PaywallSystem) {
-                window.PaywallSystem.showAccessDenied();
-            }
-            return;
-        }
-
-        if (!formData.contactName || !formData.email) {
-            alert('Please fill in your contact name and email address before proceeding with e-signature.');
-            return;
-        }
-
-        setIsESignatureLoading(true);
-        setESignatureError(null);
-        setCurrentESignatureMode('sign-only');
-
-        try {
-            const documentContent = documentText
-                .replace(/\n/g, '<br>')
-                .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-                + '<br><br><div style="border: 1px solid #000; padding: 10px; margin: 20px 0;"><strong>ELECTRONIC SIGNATURE BLOCK</strong><br><br>Signature: ___________________<br>Name: ' + formData.contactName + '<br>Date: ___________________<br>Email: ' + formData.email + '</div>';
-
-            const documentTitle = `Stripe Demand Letter - ${formData.companyName || 'Legal Document'}`;
-            
-            const template = await createESignatureTemplate(documentContent, documentTitle);
-            const contract = await createESignatureContract(
-                template.id, 
-                formData.email, 
-                formData.contactName,
-                false
-            );
-
-            // Create iframe for embedded signing
-            const iframeUrl = `${contract.signing_url}?embedded=yes`;
-            setESignatureIframe(iframeUrl);
-            setShowESignatureModal(true);
-            
-        } catch (error) {
-            console.error('E-signature error:', error);
-            setESignatureError('Failed to create e-signature document. Please try again or contact support.');
-        } finally {
-            setIsESignatureLoading(false);
-        }
-    };
-
-    const handleESignAndEmail = async () => {
-        if (!isPaid) {
-            if (window.PaywallSystem) {
-                window.PaywallSystem.showAccessDenied();
-            }
-            return;
-        }
-
-        if (!formData.contactName || !formData.email) {
-            alert('Please fill in your contact name and email address before proceeding with e-signature.');
-            return;
-        }
-
-        setIsESignatureLoading(true);
-        setESignatureError(null);
-        setCurrentESignatureMode('sign-and-email');
-
-        try {
-            const documentContent = documentText
-                .replace(/\n/g, '<br>')
-                .replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;')
-                + '<br><br><div style="border: 1px solid #000; padding: 10px; margin: 20px 0;"><strong>ELECTRONIC SIGNATURE BLOCK</strong><br><br>Signature: ___________________<br>Name: ' + formData.contactName + '<br>Date: ___________________<br>Email: ' + formData.email + '</div>';
-
-            const documentTitle = `Stripe Demand Letter - ${formData.companyName || 'Legal Document'}`;
-            
-            const template = await createESignatureTemplate(documentContent, documentTitle);
-            const contract = await createESignatureContract(
-                template.id, 
-                formData.email, 
-                formData.contactName,
-                true
-            );
-
-            // Create iframe for embedded signing
-            const iframeUrl = `${contract.signing_url}?embedded=yes`;
-            setESignatureIframe(iframeUrl);
-            setShowESignatureModal(true);
-            
-        } catch (error) {
-            console.error('E-signature error:', error);
-            setESignatureError('Failed to create e-signature document. Please try again or contact support.');
-        } finally {
-            setIsESignatureLoading(false);
-        }
-    };
-
-    const handleESignatureComplete = async (signedDocumentUrl) => {
-        try {
-            if (currentESignatureMode === 'sign-and-email') {
-                // Send to Stripe and CC user
-                await sendSignedDocumentToStripe(signedDocumentUrl, formData.email, formData.contactName);
-                alert('Document signed successfully! An email has been opened to send the signed document to Stripe. You will also receive a copy.');
-            } else {
-                // Sign only mode
-                alert('Document signed successfully! You will receive the signed PDF via email shortly.');
-            }
-            
-            setShowESignatureModal(false);
-            setESignatureIframe(null);
-            setCurrentESignatureMode(null);
-        } catch (error) {
-            console.error('Error handling signature completion:', error);
-            alert('Document was signed, but there was an error with the follow-up actions. Please check your email for the signed document.');
-        }
-    };
-
-    const closeESignatureModal = () => {
-        setShowESignatureModal(false);
-        setESignatureIframe(null);
-        setCurrentESignatureMode(null);
-        setESignatureError(null);
-    };
-
-    // Button handler functions (these seem to be defined in paywall-system.js)
-    const copyToClipboard = () => {
-        if (window.PaywallSystem) {
-            if (!window.PaywallSystem.hasAccess()) {
-                window.PaywallSystem.showAccessDenied();
-                return;
-            }
-        }
-        
-        // Copy functionality
-        navigator.clipboard.writeText(documentText).then(() => {
-            alert('Document copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy text: ', err);
-            alert('Failed to copy to clipboard. Please try again.');
-        });
-    };
-
-    const downloadAsWord = () => {
-        if (window.PaywallSystem) {
-            if (!window.PaywallSystem.hasAccess()) {
-                window.PaywallSystem.showAccessDenied();
-                return;
-            }
-        }
-        
-        // Download functionality using existing docx-generator
-        if (window.generateWordDoc) {
-            const filename = formData.includeArbitrationDraft 
-                ? `Stripe_Arbitration_Demand_${formData.companyName || 'Document'}.docx`
-                : `Stripe_Demand_Letter_${formData.companyName || 'Document'}.docx`;
-            window.generateWordDoc(documentText, filename);
-        } else {
-            alert('Word document generator not available. Please try refreshing the page.');
-        }
-    };
 
     // UPGRADED: Attorney-Level Risk Assessment
     const getRiskAssessment = () => {
@@ -2815,7 +2779,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         disabled: currentTab === 0
                     }, 'Previous'),
                     
-                    React.createElement('div', { key: 'middle', style: { display: 'flex', gap: '10px', flexWrap: 'wrap' } }, [
+                    React.createElement('div', { key: 'middle', style: { display: 'flex', gap: '10px' } }, [
                         React.createElement('button', {
                             key: 'copy',
                             onClick: copyToClipboard,
@@ -2844,27 +2808,27 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             key: 'esign-only',
                             onClick: handleESignOnly,
                             disabled: isESignatureLoading,
-                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
+                            className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
                             style: { 
-                                backgroundColor: isPaid ? "#dc2626" : "#6c757d", 
+                                backgroundColor: isPaid ? "#28a745" : "#6c757d", 
                                 color: "white", 
                                 border: "none",
                                 opacity: isPaid ? 1 : 0.7
                             }
-                        }, isPaid ? (isESignatureLoading ? '⏳ Processing...' : '✍️ E-Sign Only') : '🔒 E-Sign Only'),
+                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign Only' : '🔒 E-Sign Only')),
                         
                         React.createElement('button', {
                             key: 'esign-email',
                             onClick: handleESignAndEmail,
                             disabled: isESignatureLoading,
-                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
+                            className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
                             style: { 
-                                backgroundColor: isPaid ? "#ea580c" : "#6c757d", 
+                                backgroundColor: isPaid ? "#dc3545" : "#6c757d", 
                                 color: "white", 
                                 border: "none",
                                 opacity: isPaid ? 1 : 0.7
                             }
-                        }, isPaid ? (isESignatureLoading ? '⏳ Processing...' : '📧 E-Sign & Email to Stripe') : '🔒 E-Sign & Email to Stripe'),
+                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign & Email to Stripe' : '🔒 E-Sign & Email to Stripe')),
                         
                         React.createElement('button', {
                             key: 'consult',
@@ -2890,124 +2854,6 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 ])
             ]),
             
-            // eSignature Modal
-            showESignatureModal && React.createElement('div', { 
-                key: 'esignature-modal',
-                className: 'esignature-modal-overlay',
-                style: {
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    height: '100%',
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    zIndex: 10000,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
-                }
-            }, [
-                React.createElement('div', {
-                    key: 'modal-content',
-                    className: 'esignature-modal-content',
-                    style: {
-                        backgroundColor: 'white',
-                        borderRadius: '8px',
-                        padding: '20px',
-                        width: '90%',
-                        maxWidth: '1000px',
-                        height: '80%',
-                        position: 'relative',
-                        display: 'flex',
-                        flexDirection: 'column'
-                    }
-                }, [
-                    React.createElement('div', {
-                        key: 'modal-header',
-                        style: {
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginBottom: '20px',
-                            borderBottom: '1px solid #eee',
-                            paddingBottom: '15px'
-                        }
-                    }, [
-                        React.createElement('h2', { key: 'title' }, 
-                            currentESignatureMode === 'sign-and-email' 
-                                ? 'Sign Document & Email to Stripe' 
-                                : 'Sign Document Electronically'
-                        ),
-                        React.createElement('button', {
-                            key: 'close',
-                            onClick: closeESignatureModal,
-                            style: {
-                                background: 'none',
-                                border: 'none',
-                                fontSize: '24px',
-                                cursor: 'pointer',
-                                color: '#666'
-                            }
-                        }, '×')
-                    ]),
-                    
-                    eSignatureError && React.createElement('div', {
-                        key: 'error',
-                        style: {
-                            backgroundColor: '#fef2f2',
-                            border: '1px solid #fecaca',
-                            borderRadius: '4px',
-                            padding: '12px',
-                            marginBottom: '15px',
-                            color: '#b91c1c'
-                        }
-                    }, eSignatureError),
-                    
-                    React.createElement('div', {
-                        key: 'iframe-container',
-                        style: {
-                            flex: 1,
-                            border: '1px solid #ddd',
-                            borderRadius: '4px',
-                            overflow: 'hidden'
-                        }
-                    }, [
-                        eSignatureIframe && React.createElement('iframe', {
-                            key: 'iframe',
-                            src: eSignatureIframe,
-                            style: {
-                                width: '100%',
-                                height: '100%',
-                                border: 'none'
-                            },
-                            onLoad: () => {
-                                // Listen for eSignature completion messages
-                                window.addEventListener('message', (event) => {
-                                    if (event.data && event.data.type === 'esignature-complete') {
-                                        handleESignatureComplete(event.data.documentUrl);
-                                    }
-                                });
-                            }
-                        })
-                    ]),
-                    
-                    React.createElement('div', {
-                        key: 'modal-footer',
-                        style: {
-                            marginTop: '15px',
-                            padding: '15px 0',
-                            borderTop: '1px solid #eee',
-                            textAlign: 'center',
-                            fontSize: '14px',
-                            color: '#666'
-                        }
-                    }, currentESignatureMode === 'sign-and-email' 
-                        ? 'After signing, the document will be automatically emailed to Stripe with your email as the sender.'
-                        : 'After signing, you will receive the signed document via email.'
-                    )
-                ])
-            ]),
-            
             // Preview Panel
             React.createElement('div', { key: 'preview', className: 'preview-panel' }, [
                 React.createElement('div', { key: 'content', className: 'preview-content' }, [
@@ -3026,6 +2872,118 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                             __html: highlightedText.replace(/\n/g, '<br>') 
                         }
                     })
+                ])
+            ])
+        ]),
+        
+        // eSignature Modal
+        showESignatureModal && React.createElement('div', { 
+            key: 'esignature-modal',
+            className: 'esignature-modal-overlay',
+            style: {
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 10000,
+                backdropFilter: 'blur(4px)'
+            }
+        }, [
+            React.createElement('div', {
+                key: 'modal-content',
+                className: 'esignature-modal-content',
+                style: {
+                    backgroundColor: 'white',
+                    borderRadius: '12px',
+                    width: '90%',
+                    height: '80%',
+                    maxWidth: '1000px',
+                    maxHeight: '600px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+                }
+            }, [
+                React.createElement('div', {
+                    key: 'modal-header',
+                    style: {
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        padding: '20px',
+                        borderBottom: '1px solid #e9ecef',
+                        backgroundColor: '#f8f9fa',
+                        borderRadius: '12px 12px 0 0'
+                    }
+                }, [
+                    React.createElement('h3', { key: 'title' }, 
+                        currentESignatureMode === 'email' 
+                            ? 'E-Sign & Email to Stripe' 
+                            : 'Electronic Signature'
+                    ),
+                    React.createElement('button', {
+                        key: 'close',
+                        onClick: closeESignatureModal,
+                        style: {
+                            background: 'none',
+                            border: 'none',
+                            fontSize: '24px',
+                            cursor: 'pointer',
+                            padding: '5px',
+                            lineHeight: 1
+                        }
+                    }, '×')
+                ]),
+                
+                eSignatureError && React.createElement('div', {
+                    key: 'error',
+                    style: {
+                        backgroundColor: '#f8d7da',
+                        color: '#721c24',
+                        padding: '15px',
+                        margin: '10px',
+                        borderRadius: '4px',
+                        border: '1px solid #f5c6cb'
+                    }
+                }, [
+                    React.createElement('strong', { key: 'label' }, 'Error: '),
+                    eSignatureError
+                ]),
+                
+                React.createElement('div', {
+                    key: 'iframe-container',
+                    style: {
+                        flex: 1,
+                        padding: '20px',
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center'
+                    }
+                }, eSignatureIframe ? [
+                    React.createElement('iframe', {
+                        key: 'signing-iframe',
+                        src: eSignatureIframe,
+                        style: {
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            borderRadius: '4px'
+                        },
+                        title: 'Electronic Signature'
+                    })
+                ] : [
+                    React.createElement('div', {
+                        key: 'loading',
+                        style: {
+                            textAlign: 'center',
+                            color: '#6c757d'
+                        }
+                    }, 'Loading signature interface...')
                 ])
             ])
         ])
