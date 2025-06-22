@@ -3,15 +3,16 @@
 ## Current Status
 ✅ **eSignature button implemented and working!**
 
-The E-Sign button has been successfully added to the Stripe Demand Letter Generator with both production API integration and demo mode fallback.
+The E-Sign button creates a professional signing interface with your actual demand letter content. Users can sign the document directly without requiring pre-created templates.
 
 ## How It Works
 
-### Demo Mode (Current)
-- Click the **E-Sign** button
-- Opens demo eSignature page in new window
-- No PHP server required for testing
-- Shows: "🧪 Demo Mode: eSignature interface opened!"
+### Document Signing Mode (Current)
+- Click the **E-Sign** button  
+- Creates HTML document with your demand letter content
+- Opens professional signing interface in new window
+- Includes signature fields, date, and completion workflow
+- Shows: "📄 Document Ready for Signing!"
 
 ### Production Mode (Real API)
 To use real eSignatures.com API:
@@ -56,7 +57,8 @@ To use real eSignatures.com API:
 - Uses existing `generateDemandLetter()` function
 - Supports both single demand letter and combined arbitration
 - Dynamic titles: "Stripe Demand Letter - [Company Name]"
-- Proper content formatting for eSignature platform
+- Creates professional HTML signing interface with embedded content
+- No templates required - works with any demand letter content
 
 ### ✅ **Error Handling**
 - CORS error detection and messaging

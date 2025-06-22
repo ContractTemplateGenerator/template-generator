@@ -783,8 +783,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
-                } else if (result.data?.contract_id && result.data.contract_id.startsWith('esign-')) {
-                    alert("🔧 eSignatures.com API Connected!\n\nSimulated signing interface opened.\n\nNote: Real contracts require pre-created templates in your eSignatures.com account.\nContact eSignatures.com support to set up templates.");
+                } else if (result.data?.contract_id && result.data.contract_id.startsWith('contract-')) {
+                    alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nThe signer can now review and sign the document directly.");
                 } else if (result.error_code === 'forbidden' || result.error_message) {
                     // Handle API authentication errors
                     alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
