@@ -12,20 +12,45 @@ const { useState, useRef, useEffect } = React;
 const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
 const ESIGNATURES_API_BASE = 'https://api.esignatures.io';
 
-// eSignatures.com API Helper Functions
+// eSignatures.com API Helper Functions - Using Server-Side Proxy
 const createESignatureTemplate = async (documentContent, documentTitle) => {
     try {
-        console.log('Creating eSignature template with API base:', ESIGNATURES_API_BASE);
+        console.log('Creating eSignature template via server proxy');
         console.log('Document title:', documentTitle);
         console.log('Content length:', documentContent.length);
         
+        // First try server-side proxy to avoid CORS
+        const proxyResponse = await fetch('/api/esignature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'create_template',
+                data: {
+                    name: documentTitle,
+                    content: documentContent
+                }
+            })
+        });
+        
+        console.log('Proxy response status:', proxyResponse.status);
+        
+        if (proxyResponse.ok) {
+            const proxyResult = await proxyResponse.json();
+            if (proxyResult.success) {
+                console.log('✅ Template created successfully via proxy:', proxyResult.data);
+                return proxyResult.data;
+            }
+        }
+        
+        // If proxy fails, try direct API call as fallback
+        console.log('Proxy failed, trying direct API call...');
         const requestBody = {
             name: documentTitle,
             content: documentContent,
             content_type: 'html'
         };
-        
-        console.log('Making API request to:', `${ESIGNATURES_API_BASE}/templates`);
         
         const response = await fetch(`${ESIGNATURES_API_BASE}/templates`, {
             method: 'POST',
@@ -37,17 +62,14 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
             body: JSON.stringify(requestBody)
         });
         
-        console.log('API response status:', response.status);
-        console.log('API response headers:', [...response.headers.entries()]);
-        
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('API error response:', errorText);
+            console.error('Direct API error response:', errorText);
             throw new Error(`Template creation failed: ${response.status} - ${errorText}`);
         }
         
         const result = await response.json();
-        console.log('Template created successfully:', result);
+        console.log('Template created successfully via direct API:', result);
         return result;
         
     } catch (error) {
@@ -86,10 +108,41 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
 
 const createESignatureContract = async (templateId, signerEmail, signerName, emailToStripe = false) => {
     try {
-        console.log('Creating eSignature contract for template:', templateId);
+        console.log('Creating eSignature contract via server proxy');
+        console.log('Template ID:', templateId);
         console.log('Signer:', signerName, signerEmail);
         console.log('Email to terms.law:', emailToStripe);
         
+        // First try server-side proxy to avoid CORS
+        const proxyResponse = await fetch('/api/esignature', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                action: 'create_contract',
+                data: {
+                    template_id: templateId,
+                    signer_email: signerEmail,
+                    signer_name: signerName,
+                    redirect_url: window.location.href,
+                    email_to_stripe: emailToStripe
+                }
+            })
+        });
+        
+        console.log('Contract proxy response status:', proxyResponse.status);
+        
+        if (proxyResponse.ok) {
+            const proxyResult = await proxyResponse.json();
+            if (proxyResult.success) {
+                console.log('✅ Contract created successfully via proxy:', proxyResult.data);
+                return proxyResult.data;
+            }
+        }
+        
+        // If proxy fails, try direct API call as fallback
+        console.log('Proxy failed, trying direct API call...');
         const requestBody = {
             template_id: templateId,
             signers: [{
@@ -105,8 +158,6 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
             }
         };
         
-        console.log('Making contract API request to:', `${ESIGNATURES_API_BASE}/contracts`);
-        
         const response = await fetch(`${ESIGNATURES_API_BASE}/contracts`, {
             method: 'POST',
             headers: {
@@ -117,16 +168,14 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
             body: JSON.stringify(requestBody)
         });
         
-        console.log('Contract API response status:', response.status);
-        
         if (!response.ok) {
             const errorText = await response.text();
-            console.error('Contract API error response:', errorText);
+            console.error('Direct contract API error response:', errorText);
             throw new Error(`Contract creation failed: ${response.status} - ${errorText}`);
         }
         
         const result = await response.json();
-        console.log('Contract created successfully:', result);
+        console.log('Contract created successfully via direct API:', result);
         return result;
         
     } catch (error) {
