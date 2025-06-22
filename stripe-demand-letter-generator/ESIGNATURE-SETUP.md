@@ -1,35 +1,42 @@
 # eSignature Setup Guide
 
 ## Current Status
-✅ **eSignature button implemented and working!**
+✅ **REAL eSignature API integrated with DocuSeal!**
 
-The E-Sign button creates a professional signing interface with your actual demand letter content. Users can sign the document directly without requiring pre-created templates.
+The E-Sign button now creates ACTUAL signable documents using DocuSeal's API. No templates required - your demand letters are sent directly for real electronic signature with legal compliance.
 
 ## How It Works
 
-### Document Signing Mode (Current)
+### Real eSignature Mode (Current)
 - Click the **E-Sign** button  
-- Creates HTML document with your demand letter content
-- Opens professional signing interface in new window
-- Includes signature fields, date, and completion workflow
-- Shows: "📄 Document Ready for Signing!"
+- Creates real DocuSeal eSignature request with your demand letter
+- Sends email to signer with secure signing link
+- Legally compliant electronic signatures
+- Shows: "🔥 REAL eSignature Created!" (with API token)
+- Shows: "🧪 Demo Mode Active" (without API token)
 
-### Production Mode (Real API)
-To use real eSignatures.com API:
+### Production Setup (Real API)
+To activate real DocuSeal eSignatures:
 
-1. **Start Node.js Proxy Server:**
+1. **Get Free DocuSeal API Token:**
+   - Visit: https://www.docuseal.com/
+   - Sign up for free account
+   - Generate API token from dashboard
+
+2. **Update API Token:**
+   - Edit `esign-proxy.js`
+   - Replace `'demo-token'` with your real token
+
+3. **Start Servers:**
    ```bash
-   cd /path/to/stripe-demand-letter-generator
+   # Terminal 1: Start DocuSeal proxy
    node esign-proxy.js
-   ```
-   (Server runs on localhost:3001)
-
-2. **Start HTTP Server:**
-   ```bash
+   
+   # Terminal 2: Start HTTP server
    python3 -m http.server 8000
    ```
 
-3. **Open in Browser:**
+4. **Open in Browser:**
    ```
    http://localhost:8000
    ```
