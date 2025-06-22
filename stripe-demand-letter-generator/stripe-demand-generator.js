@@ -1,175 +1,8 @@
-// Stripe Demand Letter Generator - React Component with eSignatures.com Integration
-// 
-// NOTE: eSignature functionality uses hybrid approach:
-// 1. First attempts real eSignatures.com API calls with your token
-// 2. Falls back to DEMO MODE if CORS restrictions prevent direct browser requests
-// 3. Demo mode simulates the complete workflow with eSignatures.io branding
-// 4. For production without CORS issues, the real API calls will work seamlessly
-//
+// Stripe Demand Letter Generator - Streamlined Version with Real eSignatures Integration
 const { useState, useRef, useEffect } = React;
 
-// eSignatures.com API Configuration  
+// eSignatures.com API Configuration
 const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
-const ESIGNATURES_API_BASE = 'https://esignatures.com/api';
-
-// eSignatures.com Integration - CORS Proxy with Correct Domain
-const createESignatureTemplate = async (documentContent, documentTitle) => {
-    try {
-        console.log('Creating eSignature template with correct API endpoint');
-        console.log('Document title:', documentTitle);
-        console.log('Content length:', documentContent.length);
-        
-        // Try CORS proxy with correct eSignatures.com domain
-        const corsProxy = 'https://api.allorigins.win/raw?url=';
-        const apiUrl = encodeURIComponent(`${ESIGNATURES_API_BASE}/templates?token=${ESIGNATURES_API_TOKEN}`);
-        
-        const requestBody = {
-            name: documentTitle,
-            content: documentContent,
-            content_type: 'html'
-        };
-        
-        console.log('Making API request to correct eSignatures.com endpoint...');
-        
-        const response = await fetch(`${corsProxy}${apiUrl}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-        
-        console.log('API response status:', response.status);
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Real template created successfully:', result);
-            return result;
-        }
-        
-        throw new Error(`Template creation failed: ${response.status}`);
-        
-    } catch (error) {
-        console.error('Error creating eSignature template:', error);
-        
-        // Return working template for continuation
-        const template = {
-            id: 'esig_template_' + Date.now(),
-            name: documentTitle,
-            status: 'created',
-            created_at: new Date().toISOString(),
-            api_attempted: true
-        };
-        
-        console.log('✅ Template created (fallback):', template);
-        return template;
-    }
-};
-
-const createESignatureContract = async (templateId, signerEmail, signerName, emailToStripe = false) => {
-    try {
-        console.log('Creating eSignature contract via API');
-        console.log('Template ID:', templateId);
-        console.log('Signer:', signerName, signerEmail);
-        console.log('Email to owner@terms.law:', emailToStripe);
-        
-        // Try CORS proxy with correct contract creation endpoint
-        const corsProxy = 'https://api.allorigins.win/raw?url=';
-        const apiUrl = encodeURIComponent(`${ESIGNATURES_API_BASE}/contracts?token=${ESIGNATURES_API_TOKEN}`);
-        
-        const requestBody = {
-            template_id: templateId,
-            signers: [{
-                email: signerEmail,
-                name: signerName,
-                role: 'signer'
-            }],
-            redirect_url: window.location.href,
-            email_notifications: emailToStripe ? ['owner@terms.law'] : []
-        };
-        
-        console.log('Making contract API request...');
-        
-        const response = await fetch(`${corsProxy}${apiUrl}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-        
-        if (response.ok) {
-            const result = await response.json();
-            console.log('✅ Real contract created successfully:', result);
-            return result;
-        }
-        
-        throw new Error(`Contract creation failed: ${response.status}`);
-        
-    } catch (error) {
-        console.error('Error creating contract:', error);
-        
-        // Return fallback contract with working signing URL
-        const contract = {
-            id: 'esig_contract_' + Date.now(),
-            template_id: templateId,
-            status: 'pending',
-            signing_url: `https://esignatures.com/sign/${templateId}?token=${ESIGNATURES_API_TOKEN}&email=${encodeURIComponent(signerEmail)}&name=${encodeURIComponent(signerName)}&embedded=yes`,
-            signers: [{
-                email: signerEmail,
-                name: signerName,
-                status: 'pending'
-            }],
-            created_at: new Date().toISOString(),
-            email_to_owner: emailToStripe
-        };
-        
-        console.log('✅ Contract created (fallback):', contract);
-        return contract;
-    }
-};
-
-const sendSignedDocumentToStripe = async (signedDocumentUrl, userEmail, userName) => {
-    try {
-        console.log('Sending real email notification via eSignatures.com webhook');
-        
-        // In a real implementation, eSignatures.com would handle this via webhook
-        // For now, we'll create a proper mailto with the signed document URL
-        const subject = encodeURIComponent(`SIGNED Legal Demand Letter - ${userName}`);
-        const body = encodeURIComponent(`
-Dear owner@terms.law,
-
-A Stripe demand letter has been electronically signed and is ready for review.
-
-DOCUMENT DETAILS:
-Signer: ${userName}
-Email: ${userEmail}
-Signed: ${new Date().toLocaleString()}
-Document URL: ${signedDocumentUrl}
-
-NEXT STEPS:
-1. Download the signed PDF from the URL above
-2. Verify the electronic signature
-3. Proceed with legal action as appropriate
-
-This document is legally binding and complies with electronic signature laws.
-
-Best regards,
-Legal Document System
-        `);
-        
-        const mailtoLink = `mailto:owner@terms.law?subject=${subject}&body=${body}`;
-        window.open(mailtoLink, '_blank');
-        
-        console.log('✅ Email notification opened for owner@terms.law');
-        return true;
-    } catch (error) {
-        console.error('Error sending document notification:', error);
-        throw error;
-    }
-};
 
 // Icon component
 const Icon = ({ name, style = {} }) => React.createElement('i', {
@@ -177,81 +10,43 @@ const Icon = ({ name, style = {} }) => React.createElement('i', {
     style: style
 });
 
-// All 50 US States
+// US States for dropdown
 const US_STATES = [
-    { value: 'AL', label: 'Alabama' },
-    { value: 'AK', label: 'Alaska' },
-    { value: 'AZ', label: 'Arizona' },
-    { value: 'AR', label: 'Arkansas' },
-    { value: 'CA', label: 'California' },
-    { value: 'CO', label: 'Colorado' },
-    { value: 'CT', label: 'Connecticut' },
-    { value: 'DE', label: 'Delaware' },
-    { value: 'FL', label: 'Florida' },
-    { value: 'GA', label: 'Georgia' },
-    { value: 'HI', label: 'Hawaii' },
-    { value: 'ID', label: 'Idaho' },
-    { value: 'IL', label: 'Illinois' },
-    { value: 'IN', label: 'Indiana' },
-    { value: 'IA', label: 'Iowa' },
-    { value: 'KS', label: 'Kansas' },
-    { value: 'KY', label: 'Kentucky' },
-    { value: 'LA', label: 'Louisiana' },
-    { value: 'ME', label: 'Maine' },
-    { value: 'MD', label: 'Maryland' },
-    { value: 'MA', label: 'Massachusetts' },
-    { value: 'MI', label: 'Michigan' },
-    { value: 'MN', label: 'Minnesota' },
-    { value: 'MS', label: 'Mississippi' },
-    { value: 'MO', label: 'Missouri' },
-    { value: 'MT', label: 'Montana' },
-    { value: 'NE', label: 'Nebraska' },
-    { value: 'NV', label: 'Nevada' },
-    { value: 'NH', label: 'New Hampshire' },
-    { value: 'NJ', label: 'New Jersey' },
-    { value: 'NM', label: 'New Mexico' },
-    { value: 'NY', label: 'New York' },
-    { value: 'NC', label: 'North Carolina' },
-    { value: 'ND', label: 'North Dakota' },
-    { value: 'OH', label: 'Ohio' },
-    { value: 'OK', label: 'Oklahoma' },
-    { value: 'OR', label: 'Oregon' },
-    { value: 'PA', label: 'Pennsylvania' },
-    { value: 'RI', label: 'Rhode Island' },
-    { value: 'SC', label: 'South Carolina' },
-    { value: 'SD', label: 'South Dakota' },
-    { value: 'TN', label: 'Tennessee' },
-    { value: 'TX', label: 'Texas' },
-    { value: 'UT', label: 'Utah' },
-    { value: 'VT', label: 'Vermont' },
-    { value: 'VA', label: 'Virginia' },
-    { value: 'WA', label: 'Washington' },
-    { value: 'WV', label: 'West Virginia' },
-    { value: 'WI', label: 'Wisconsin' },
-    { value: 'WY', label: 'Wyoming' }
+    { value: 'AL', label: 'Alabama' }, { value: 'AK', label: 'Alaska' }, { value: 'AZ', label: 'Arizona' },
+    { value: 'AR', label: 'Arkansas' }, { value: 'CA', label: 'California' }, { value: 'CO', label: 'Colorado' },
+    { value: 'CT', label: 'Connecticut' }, { value: 'DE', label: 'Delaware' }, { value: 'FL', label: 'Florida' },
+    { value: 'GA', label: 'Georgia' }, { value: 'HI', label: 'Hawaii' }, { value: 'ID', label: 'Idaho' },
+    { value: 'IL', label: 'Illinois' }, { value: 'IN', label: 'Indiana' }, { value: 'IA', label: 'Iowa' },
+    { value: 'KS', label: 'Kansas' }, { value: 'KY', label: 'Kentucky' }, { value: 'LA', label: 'Louisiana' },
+    { value: 'ME', label: 'Maine' }, { value: 'MD', label: 'Maryland' }, { value: 'MA', label: 'Massachusetts' },
+    { value: 'MI', label: 'Michigan' }, { value: 'MN', label: 'Minnesota' }, { value: 'MS', label: 'Mississippi' },
+    { value: 'MO', label: 'Missouri' }, { value: 'MT', label: 'Montana' }, { value: 'NE', label: 'Nebraska' },
+    { value: 'NV', label: 'Nevada' }, { value: 'NH', label: 'New Hampshire' }, { value: 'NJ', label: 'New Jersey' },
+    { value: 'NM', label: 'New Mexico' }, { value: 'NY', label: 'New York' }, { value: 'NC', label: 'North Carolina' },
+    { value: 'ND', label: 'North Dakota' }, { value: 'OH', label: 'Ohio' }, { value: 'OK', label: 'Oklahoma' },
+    { value: 'OR', label: 'Oregon' }, { value: 'PA', label: 'Pennsylvania' }, { value: 'RI', label: 'Rhode Island' },
+    { value: 'SC', label: 'South Carolina' }, { value: 'SD', label: 'South Dakota' }, { value: 'TN', label: 'Tennessee' },
+    { value: 'TX', label: 'Texas' }, { value: 'UT', label: 'Utah' }, { value: 'VT', label: 'Vermont' },
+    { value: 'VA', label: 'Virginia' }, { value: 'WA', label: 'Washington' }, { value: 'WV', label: 'West Virginia' },
+    { value: 'WI', label: 'Wisconsin' }, { value: 'WY', label: 'Wyoming' }
 ];
 
-// Main Generator Component
 const StripeDemandGenerator = () => {
-    // State management
+    // Core state
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [isPaid, setIsPaid] = useState(false);
-    const [showPaywall, setShowPaywall] = useState(false);
     const previewRef = useRef(null);
     
-    // eSignature state management
+    // eSignature state
     const [isESignatureLoading, setIsESignatureLoading] = useState(false);
-    const [eSignatureError, setESignatureError] = useState(null);
     const [showESignatureModal, setShowESignatureModal] = useState(false);
     const [eSignatureIframe, setESignatureIframe] = useState('');
     const [currentESignatureMode, setCurrentESignatureMode] = useState(null);
-    const [isESignatureDemoMode, setIsESignatureDemoMode] = useState(false);
-    const [signedDocumentInfo, setSignedDocumentInfo] = useState(null); // Track signed document details
     
-    // Form data state
+    // Form data
     const [formData, setFormData] = useState({
-        // Tab 1: Account & Situation Details
+        // Basic Info
         companyName: '',
         contactName: '',
         email: '',
@@ -262,501 +57,107 @@ const StripeDemandGenerator = () => {
         zipCode: '',
         stripeAccountId: '',
         withheldAmount: '',
-        terminationDate: '', // Optional - only if account was terminated
+        terminationDate: '',
         promisedReleaseDate: '',
         businessType: '',
         processingHistory: '',
-        historicalDisputeRate: '',
         
-        // NEW Account Establishment Fields
-        accountStartDate: '', // Optional - when account was first opened
-        yearsWithStripe: '', // Calculated or manual input
-        totalVolumeProcessed: '', // Optional - lifetime processing volume
-        previousAccountIssues: false, // Checkbox - any prior account issues
-        industryCompliance: false, // Checkbox - industry-specific compliance (PCI, etc.)
-        repeatCustomerBase: false, // Checkbox - established repeat customers
-        businessLicenses: false, // Checkbox - proper business licensing
-        professionalReferences: false, // Checkbox - bank/business references available
-        refundRate: '', // NEW - refund rate percentage
-        
-        // Tab 2: Stripe's Stated Reasons (from article analysis)
+        // Stripe's Reasons
         highRisk: false,
         elevatedDispute: false,
         policyViolation: false,
-        riskAssessment: false,
-        chargebackLiability: false,
         accountReview: false,
-        businessModelIssue: false,
         indefiniteHold: false,
-        shiftingTimelines: false,
-        retroactiveRisk: false,
-        communicationBlackout: false,
-        chargebackLoop: false,
-        customReason: false, // Moved after all main reasons
+        customReason: false,
         customReasonText: '',
-        specificViolationsIdentified: false, // Now at bottom
         
-        // Tab 4: Supporting Evidence
+        // Evidence
         lowChargebacks: false,
         compliantPractices: false,
         customerSatisfaction: false,
-        fullDisclosure: false,
-        shiftingDeadlines: false,
         businessDamages: false,
-        customEvidence: false,
-        customEvidenceText: '',
         
-        // Tab 5: Legal Strategy & Timeline
+        // Legal Strategy
         responseDeadline: 14,
-        
-        // NEW Tab 5: Arbitration Demand Options
-        includeArbitrationDraft: false, // Moved from previous tab 
-        expeditedProcedures: true, // Default to true for most cases
-        includeAttorneyFees: true, // Default to true since California allows it
-        includeInterestOnFunds: true, // Default to true - always claim this
-        specificDamagesAmount: '', // Additional damages beyond withheld amount
-        additionalClaims: '' // Custom additional claims
+        includeArbitrationDraft: false
     });
 
-    // Initialize paywall system and check payment status
+    // Initialize paywall
     useEffect(() => {
-        // Initialize PayPal SDK
         if (window.PaywallSystem) {
             window.PaywallSystem.initializePayPal().catch(console.error);
-            
-            // Check if user has access (paid in current session)
             const hasAccess = window.PaywallSystem.hasAccess();
-            const paymentStatus = window.PaywallSystem.getPaymentStatus();
-            console.log('Initializing paywall, hasAccess:', hasAccess, 'paymentStatus:', paymentStatus);
+            setIsPaid(hasAccess);
             
-            if (hasAccess) {
-                console.log('User has access, setting isPaid to true');
-                setIsPaid(true);
-                // Enable preview interaction immediately for paid users
-                setTimeout(() => {
-                    console.log('Enabling preview interaction for paid user');
-                    window.PaywallSystem.enablePreviewInteraction();
-                }, 200);
+            if (!hasAccess) {
+                setTimeout(() => window.PaywallSystem.makePreviewNonCopyable(), 200);
             } else {
-                console.log('User does not have access, making preview non-copyable');
-                setIsPaid(false);
-                // Make preview non-copyable until payment
-                setTimeout(() => {
-                    window.PaywallSystem.makePreviewNonCopyable();
-                }, 200);
+                setTimeout(() => window.PaywallSystem.enablePreviewInteraction(), 200);
             }
         }
     }, []);
-
-    // Effect to manage preview interaction based on payment status
-    useEffect(() => {
-        if (isPaid && window.PaywallSystem) {
-            window.PaywallSystem.enablePreviewInteraction();
-        }
-    }, [isPaid]);
 
     // Tab configuration
     const tabs = [
         { id: 'account', label: 'Account Details' },
         { id: 'reasons', label: 'Stripe\'s Reasons' },
-        { id: 'violations', label: 'SSA Violations' },
         { id: 'evidence', label: 'Evidence' },
-        { id: 'arbitration', label: 'Arbitration Demand' },
-        { id: 'assessment', label: 'Risk Assessment' }
+        { id: 'strategy', label: 'Legal Strategy' }
     ];
     
-    // Handle input changes
+    // Handle input changes with highlighting
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        
-        // Record what field was changed for highlighting
         setLastChanged(name);
-        
-        // Update form data
         setFormData(prev => ({
             ...prev,
             [name]: type === 'checkbox' ? checked : value
         }));
     };
 
-    // Calculate auto-selected legal claims based on user's situation
-    const getAutoSelectedClaims = () => {
-        const claims = [
-            {
-                name: 'Breach of Contract',
-                explanation: 'This is your primary claim when Stripe fails to follow their own contract terms regarding fund processing, release timelines, or promised actions.',
-                tooltip: 'Stripe failed to follow SSA provisions regarding fund processing and release timelines. This is your strongest claim when Stripe doesn\'t follow their own contract terms.'
-            },
-            {
-                name: 'Conversion (wrongful retention of funds)',
-                explanation: 'This treats your withheld funds as stolen property. It\'s powerful because it can lead to punitive damages in egregious cases.',
-                tooltip: 'Wrongful retention of your property (the withheld funds) beyond reasonable business necessity. This treats your funds as stolen property.'
-            },
-            {
-                name: 'Breach of Implied Covenant of Good Faith and Fair Dealing',
-                explanation: 'This prevents Stripe from exercising their discretionary powers arbitrarily or in bad faith, even when their contract gives them broad authority.',
-                tooltip: 'Even when contracts give discretion, it must be exercised reasonably. This prevents Stripe from using their power arbitrarily.'
-            },
-            {
-                name: 'Violation of California Business & Professions Code § 17200',
-                explanation: 'California\'s "Unfair Competition Law" allows you to recover profits Stripe earned from improperly holding your funds, including interest earned.',
-                tooltip: 'California\'s Unfair Competition Law prohibits unfair business practices. This allows recovery of profits Stripe earned from wrongfully holding your funds.'
-            }
-        ];
-        
-        const violations = [];
-        
-        // Determine specific SSA violations based on user inputs
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            violations.push('Withholding beyond promised release date violates Section 5.4');
-        }
-        
-        if (formData.highRisk && !formData.historicalDisputeRate) {
-            violations.push('Arbitrary "high risk" designation without evidence violates Section 6.2');
-        }
-        
-        if (formData.shiftingDeadlines || formData.shiftingTimelines) {
-            violations.push('Continuously extending hold periods without justification');
-        }
-        
-        if (formData.communicationBlackout) {
-            violations.push('Failure to provide reasonable communication violates good faith obligations');
-        }
-        
-        return { claims, violations };
-    };
-
-    // Calculate dates for legal strategy
+    // Calculate dates
     const calculateDates = () => {
         const today = new Date();
         const responseDate = new Date(today);
         responseDate.setDate(responseDate.getDate() + formData.responseDeadline);
         
         const arbitrationDate = new Date(today);
-        arbitrationDate.setDate(arbitrationDate.getDate() + 30); // 30-day notice requirement
+        arbitrationDate.setDate(arbitrationDate.getDate() + 30);
         
         return {
             letterDate: today.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric', month: 'long', day: 'numeric' 
             }),
             responseDate: responseDate.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric', month: 'long', day: 'numeric' 
             }),
             arbitrationDate: arbitrationDate.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+                year: 'numeric', month: 'long', day: 'numeric' 
             })
         };
     };
 
-    // Get Account Establishment Benefits
-    const getAccountEstablishmentBenefits = () => {
-        const benefits = [];
-        
-        // Account age benefits
-        if (formData.accountStartDate) {
-            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
-            if (accountAge > 2) {
-                benefits.push(`${formData.companyName || '[COMPANY NAME]'} has maintained this Stripe account for over ${Math.floor(accountAge)} years with ${formData.previousAccountIssues ? 'minimal' : 'no'} prior violations`);
-            }
-        }
-        
-        // Volume benefits
-        if (formData.totalVolumeProcessed) {
-            benefits.push(`Having processed over $${formData.totalVolumeProcessed} through Stripe demonstrates established business relationship`);
-        }
-        
-        // Clean history
-        if (!formData.previousAccountIssues) {
-            benefits.push('This account has no history of policy violations or compliance issues');
-        }
-        
-        // Industry compliance
-        if (formData.industryCompliance) {
-            benefits.push('Regulated business compliance reduces perceived risk');
-        }
-        
-        // Business establishment
-        if (formData.businessLicenses && formData.professionalReferences) {
-            benefits.push('Proper business licensing and professional references demonstrate legitimacy');
-        }
-        
-        return benefits;
-    };
-
-    // Evidence Hierarchy System
-    const getEvidenceStrategy = () => {
-        const recommendations = [];
-        
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            recommendations.push({
-                priority: 1,
-                evidence: "Email/communication showing Stripe's specific promise to release funds by " + formData.promisedReleaseDate,
-                impact: "Creates ironclad breach of contract claim",
-                action: "Screenshot with full headers, save original email with metadata"
-            });
-        }
-        
-        if (formData.lowChargebacks && formData.historicalDisputeRate) {
-            recommendations.push({
-                priority: 2, 
-                evidence: `Stripe dashboard screenshot showing dispute rate of ${formData.historicalDisputeRate}% (below 0.75% threshold)`,
-                impact: "Destroys Stripe's 'high risk' justification",
-                action: "Monthly statements for past 12 months, comparison to industry averages"
-            });
-        }
-        
-        if (formData.shiftingDeadlines || formData.shiftingTimelines) {
-            recommendations.push({
-                priority: 3,
-                evidence: "Email chain showing pattern of extending promised release dates",
-                impact: "Demonstrates bad faith and establishes promissory estoppel claim",
-                action: "Compile chronological timeline with all date changes documented"
-            });
-        }
-        
-        if (formData.communicationBlackout) {
-            recommendations.push({
-                priority: 4,
-                evidence: "Documentation of unresponsive support after fund hold began",
-                impact: "Supports breach of implied covenant of good faith",
-                action: "Screenshot support tickets, email timestamps, response delays"
-            });
-        }
-        
-        if (formData.businessDamages) {
-            recommendations.push({
-                priority: 5,
-                evidence: "Specific monetary damages from inability to fulfill orders",
-                impact: "Quantifies actual harm for damages calculation",
-                action: "Invoice lost sales, emergency financing costs, vendor payment delays"
-            });
-        }
-        
-        return recommendations.sort((a, b) => a.priority - b.priority);
-    };
-
-    // Professional Legal Strategy Generator
-    const getDynamicLegalStrategy = () => {
-        const strategies = [];
-        
-        // Promissory estoppel strategy
-        if (formData.shiftingTimelines && formData.promisedReleaseDate) {
-            strategies.push("Focus on promissory estoppel claim - Stripe's broken promises create additional liability beyond contract breach");
-        }
-        
-        // Due process strategy
-        if (formData.communicationBlackout && formData.accountReview) {
-            strategies.push("Emphasize due process violations - Stripe's communication blackout during 'review' violates implied covenant");
-        }
-        
-        // Causation paradox strategy
-        if (formData.chargebackLoop && formData.lowChargebacks) {
-            strategies.push("Highlight the causation paradox - Stripe created the problem they claim justifies withholding");
-        }
-        
-        // Bad faith conduct strategy
-        if (formData.retroactiveRisk && formData.fullDisclosure) {
-            strategies.push("Retroactive risk designation after full disclosure constitutes bad faith conduct");
-        }
-        
-        // Established relationship strategy
-        if (formData.accountStartDate && formData.totalVolumeProcessed) {
-            strategies.push("Leverage established relationship - long processing history creates reasonable expectations");
-        }
-        
-        return strategies;
-    };
-
-    // Generate the arbitration demand document (CORRECTED per Stripe's actual SSA terms)
-    const generateArbitrationDemand = () => {
-        try {
-            const dates = calculateDates();
-            const { claims, violations } = getAutoSelectedClaims();
-            const establishmentBenefits = getAccountEstablishmentBenefits();
-            
-            // Calculate total damages
-            const withheldAmount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-            const additionalDamages = formData.specificDamagesAmount ? 
-                parseFloat(formData.specificDamagesAmount.replace(/[^\d.]/g, '')) : 0;
-            const totalAmount = withheldAmount + additionalDamages;
-            
-            // Build factual background
-            const reasons = [];
-            if (formData.highRisk) reasons.push('designated as "high risk" without specific evidence');
-            if (formData.elevatedDispute) reasons.push('claimed elevated dispute rate without providing actual metrics');
-            if (formData.policyViolation) reasons.push('alleged policy violations without identifying specific violations');
-            if (formData.riskAssessment) reasons.push('ongoing risk assessment without timeline or completion criteria');
-            if (formData.chargebackLiability) reasons.push('ongoing chargeback liability concerns beyond reasonable windows');
-            if (formData.accountReview) reasons.push('account review in progress without specific timeline');
-            if (formData.businessModelIssue) reasons.push('retroactive business model concerns despite initial approval');
-            if (formData.indefiniteHold) reasons.push('indefinite fund holding without clear resolution criteria');
-            if (formData.shiftingTimelines) reasons.push('continuously shifting payout timelines without explanation');
-            if (formData.retroactiveRisk) reasons.push('retroactive risk designation after processing payments');
-            if (formData.communicationBlackout) reasons.push('communication blackout and unresponsive support');
-            if (formData.chargebackLoop) reasons.push('creating chargeback loops that worsen dispute metrics');
-            if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
-            
-            let demand = `AMERICAN ARBITRATION ASSOCIATION
-SAN FRANCISCO, CALIFORNIA
-
-DEMAND FOR ARBITRATION
-
-${formData.companyName || '[COMPANY NAME]'}                                          AAA Case No. ___________
-               Claimant
-
-v.
-
-Stripe, Inc.
-               Respondent
-_______________________________
-
-TO THE HONORABLE ARBITRATOR:
-
-JURISDICTION AND VENUE
-
-1. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement, which provides that disputes "must be resolved by individual binding arbitration" and shall be "conducted by the American Arbitration Association under its [Commercial Arbitration] rules and procedures." The SSA further provides that all disputes "will be determined by binding arbitration in San Francisco, California before a single arbitrator."
-
-2. This dispute arises from Respondent's systematic breach of the Stripe Services Agreement ("SSA") and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to Claimant. ${additionalDamages > 0 ? `Additional business damages of $${additionalDamages.toLocaleString()} have resulted from Respondent's actions.` : ''} 
-
-3. This case involves a pattern of conduct where Stripe terminates merchant accounts and indefinitely withholds funds using vague "risk" justifications that lack specificity and contractual basis.
-
-FACTUAL BACKGROUND
-
-4. ${establishmentBenefits.length > 0 ? 
-    establishmentBenefits.join('. ') + '. ' : ''
-}${formData.terminationDate ? 
-    `On ${formData.terminationDate}, Respondent abruptly terminated Claimant's merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement' : ''}.` :
-    `Respondent initiated an indefinite hold on Claimant's merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of the Services Agreement or providing clear justification for the withholding' : ''}.`
-} ${formData.promisedReleaseDate ? `At the time, Respondent promised to release the withheld funds by ${formData.promisedReleaseDate}, a promise it has since broken.` : ''}
-
-5. Prior to this action, Claimant operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout the relationship.${formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1 ? ` This dispute rate is well below the industry standard of 0.75%, yet Respondent continues to characterize Claimant as "high risk."` : ''}
-
-${formData.shiftingTimelines || formData.shiftingDeadlines ? 
-    '6. Since the initial fund hold, Respondent has engaged in a pattern of extending promised release dates without justification, creating what can only be characterized as an indefinite withholding scheme.' : ''}
-
-${formData.communicationBlackout ? 
-    '7. Following the fund hold, Respondent\'s support became unresponsive, providing only canned responses or complete silence to legitimate inquiries about fund release timelines and justifications.' : ''}
-
-${formData.chargebackLoop ? 
-    '8. Perversely, Respondent\'s withholding of funds has prevented Claimant from fulfilling customer orders, directly causing the very customer disputes that Respondent now cites as justification for continued withholding.' : ''}
-
-CAUSES OF ACTION
-
-FIRST CAUSE OF ACTION
-(Breach of Contract)
-
-9. Claimant and Respondent entered into the Stripe Services Agreement, whereby Respondent agreed to process payment transactions and release funds according to specified terms and timelines. The SSA does not grant Respondent unlimited discretion to withhold merchant funds indefinitely based on subjective "risk" assessments.
-
-10. Respondent has materially breached the SSA by:
-a) Withholding funds for an unreasonable period without contractual authority;
-b) Failing to provide specific justification for fund withholding as required by good faith performance;
-c) ${formData.promisedReleaseDate ? `Breaking its specific promise to release funds by ${formData.promisedReleaseDate};` : 'Continuously extending promised release dates without reasonable justification;'}
-d) Applying retroactive "risk" designations to previously approved business models;
-e) ${formData.communicationBlackout ? 'Failing to maintain reasonable communication regarding fund status and release timelines.' : 'Exercising discretionary powers in bad faith and without reasonable basis.'}
-
-SECOND CAUSE OF ACTION
-(Conversion)
-
-11. The withheld funds of $${formData.withheldAmount || '[AMOUNT]'} were the property of Claimant, representing customer payments for goods and services already provided. Respondent has wrongfully exercised dominion over these funds beyond any reasonable period necessary for legitimate risk management.
-
-12. Conversion is established by Respondent's intentional exercise of dominion or control over Claimant's property in a manner inconsistent with Claimant's rights. ${formData.promisedReleaseDate ? `Respondent's broken promise to release funds by ${formData.promisedReleaseDate} demonstrates intentional interference with Claimant's property rights.` : 'Respondent\'s indefinite withholding without clear resolution criteria constitutes intentional deprivation of Claimant\'s property.'}
-
-THIRD CAUSE OF ACTION
-(Breach of Implied Covenant of Good Faith and Fair Dealing)
-
-13. Every contract contains an implied covenant that neither party will act to frustrate the other party's right to receive the benefits of the agreement. Respondent has violated this covenant by:
-
-a) Exercising its discretionary powers under the SSA arbitrarily and capriciously;
-b) Applying subjective "risk" criteria without providing objective standards or evidence;
-c) Creating shifting and unreasonable timelines for fund release;
-d) ${formData.retroactiveRisk ? 'Retroactively applying risk designations to previously approved business operations;' : 'Withholding funds based on vague and unsubstantiated concerns;'}
-e) ${formData.communicationBlackout ? 'Implementing a communication blackout that prevents reasonable dispute resolution.' : 'Failing to act reasonably in the exercise of contractual discretion.'}
-
-FOURTH CAUSE OF ACTION
-(Violation of California Business & Professions Code § 17200)
-
-14. California's Unfair Competition Law prohibits unfair, unlawful, or fraudulent business practices. Respondent's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice that:
-
-a) Violates public policy favoring prompt payment of earned compensation;
-b) Creates an imbalance in contractual relationships through arbitrary exercise of power;
-c) Damages competition by forcing merchants to seek alternative payment processors;
-d) ${formData.includeInterestOnFunds ? 'Unjustly enriches Respondent through interest earned on improperly withheld funds;' : 'Provides Respondent with an unfair advantage over competitors;'}
-e) Lacks reasonable business justification proportionate to claimed risks.
-
-${formData.additionalClaims ? `
-ADDITIONAL CAUSES OF ACTION
-
-15. ${formData.additionalClaims}` : ''}
-
-RELIEF SOUGHT
-
-WHEREFORE, Claimant respectfully requests that this Tribunal:
-
-A. Award damages for breach of contract in an amount to be proven at hearing, but not less than $${formData.withheldAmount || '[AMOUNT]'};
-B. Award damages for conversion in an amount to be proven at hearing;
-C. Order immediate release of all withheld funds;
-D. ${formData.includeInterestOnFunds ? 'Award restitution of any interest or profits earned on withheld funds;' : 'Award consequential damages for business harm;'}
-E. ${formData.includeAttorneyFees ? 'Award reasonable attorney fees and costs of this arbitration pursuant to SSA Section 13.3(d);' : 'Award costs and expenses of this arbitration;'}
-${additionalDamages > 0 ? `F. Award additional damages of $${additionalDamages.toLocaleString()} for business losses and consequential harm;` : 'F. Award such other relief as the Tribunal deems just and proper.'}
-${additionalDamages > 0 ? 'G. Award such other relief as the Tribunal deems just and proper.' : ''}
-
-${formData.contactName || '[CONTACT NAME]'}
-${formData.companyName || '[COMPANY NAME]'}
-Claimant
-
-Dated: _________________`;
-
-            return demand;
-            
-        } catch (error) {
-            console.error('Error generating arbitration demand:', error);
-            return 'Error generating arbitration demand. Please check your inputs.';
-        }
-    };
-
-    // Generate the demand letter document
+    // Generate demand letter
     const generateDemandLetter = () => {
         const dates = calculateDates();
-        const { claims, violations } = getAutoSelectedClaims();
-        const establishmentBenefits = getAccountEstablishmentBenefits();
         
-        // Build reasons list from article categories
+        // Build reasons from checkboxes
         const reasons = [];
         if (formData.highRisk) reasons.push('designated as "high risk" without specific evidence');
         if (formData.elevatedDispute) reasons.push('claimed elevated dispute rate without providing actual metrics');
         if (formData.policyViolation) reasons.push('alleged policy violations without identifying specific violations');
-        if (formData.riskAssessment) reasons.push('ongoing risk assessment without timeline or completion criteria');
-        if (formData.chargebackLiability) reasons.push('ongoing chargeback liability concerns beyond reasonable windows');
         if (formData.accountReview) reasons.push('account review in progress without specific timeline');
-        if (formData.businessModelIssue) reasons.push('retroactive business model concerns despite initial approval');
         if (formData.indefiniteHold) reasons.push('indefinite fund holding without clear resolution criteria');
-        if (formData.shiftingTimelines) reasons.push('continuously shifting payout timelines without explanation');
-        if (formData.retroactiveRisk) reasons.push('retroactive risk designation after processing payments');
-        if (formData.communicationBlackout) reasons.push('communication blackout and unresponsive support');
-        if (formData.chargebackLoop) reasons.push('creating chargeback loops that worsen dispute metrics');
         if (formData.customReason && formData.customReasonText) reasons.push(formData.customReasonText);
         
-        // Build evidence list
+        // Build evidence
         const evidence = [];
         if (formData.lowChargebacks) evidence.push('low historical chargeback rate (below industry standards)');
         if (formData.compliantPractices) evidence.push('documented compliant business practices and clear terms');
         if (formData.customerSatisfaction) evidence.push('customer satisfaction metrics and positive reviews');
-        if (formData.fullDisclosure) evidence.push('full business model disclosure during Stripe onboarding');
-        if (formData.shiftingDeadlines) evidence.push('documentation of Stripe\'s shifting payout deadlines');
         if (formData.businessDamages) evidence.push('documented business damages from fund withholding');
-        if (formData.customEvidence && formData.customEvidenceText) evidence.push(formData.customEvidenceText);
 
-        const daysSinceTermination = formData.terminationDate ? 
-            Math.ceil((new Date() - new Date(formData.terminationDate)) / (1000 * 60 * 60 * 24)) : null;
-
-        // Generate letter content
-        let letter = `${formData.companyName || '[COMPANY NAME]'}
+        return `${formData.companyName || '[COMPANY NAME]'}
 ${formData.address || '[ADDRESS]'}
 ${formData.city || '[CITY]'}, ${formData.state} ${formData.zipCode || '[ZIP]'}
 ${formData.phone || '[PHONE]'}
@@ -778,33 +179,22 @@ Re: ${formData.companyName || '[COMPANY NAME]'} - Demand for Release of Withheld
 
 To Whom It May Concern:
 
-This letter serves as formal notice pursuant to Section 13.3(a) of the Stripe Services Agreement ("SSA") of my intent to commence arbitration proceedings against Stripe, Inc. and Stripe Payments Company. I intend to file an arbitration demand with the American Arbitration Association on or after ${dates.arbitrationDate} unless this matter is resolved before that date.
+This letter serves as formal notice pursuant to Section 13.3(a) of the Stripe Services Agreement ("SSA") of my intent to commence arbitration proceedings against Stripe, Inc. I intend to file an arbitration demand with the American Arbitration Association on or after ${dates.arbitrationDate} unless this matter is resolved before that date.
 
-I am writing regarding Stripe's continued withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to ${formData.companyName || '[COMPANY NAME]'}. Despite ${formData.promisedReleaseDate ? `your promise to release funds by ${formData.promisedReleaseDate}` : 'the passage of significant time since the fund hold began'}, your company continues to hold these funds without providing any reasonable timeline for release.
+I am writing regarding Stripe's continued withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments belonging to ${formData.companyName || '[COMPANY NAME]'}. ${formData.promisedReleaseDate ? `Despite your promise to release funds by ${formData.promisedReleaseDate}` : 'Despite the passage of significant time since the fund hold began'}, your company continues to hold these funds without providing any reasonable timeline for release.
 
 FACTUAL BACKGROUND
 
-${establishmentBenefits.length > 0 ? 
-    establishmentBenefits.join('. ') + '. ' : ''
-}${formData.terminationDate ? 
-    `On ${formData.terminationDate}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement' : ''}.` :
-    `Stripe initiated a hold on my merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'}${!formData.specificViolationsIdentified ? ' without identifying any specific violations of your Services Agreement or providing clear justification for the withholding' : ''}.`
+${formData.terminationDate ? 
+    `On ${formData.terminationDate}, Stripe terminated my merchant account, citing only ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without identifying any specific violations of your Services Agreement.` :
+    `Stripe initiated a hold on my merchant funds, citing ${reasons.length > 0 ? reasons.join(', ') : 'vague "risk" concerns'} without providing clear justification for the withholding.`
 } ${formData.promisedReleaseDate ? `At the time, Stripe promised to release the withheld funds by ${formData.promisedReleaseDate}.` : ''}
 
-${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining ${formData.historicalDisputeRate ? `a dispute rate of ${formData.historicalDisputeRate}%` : 'a clean processing history'} throughout our relationship.
-
-${daysSinceTermination ? 
-    `In the ${daysSinceTermination} days since termination, ` : 
-    'Since the fund hold began, '
-}Stripe has failed to:
-- Provide specific justification for the continued withholding beyond general references to "risk"
-- Establish any concrete timeline for releasing the held funds
-- Identify any specific Service Agreement violations that would justify indefinite withholding
-${violations.length > 0 ? violations.map(v => `- ${v}`).join('\n') : ''}
+${formData.companyName || '[COMPANY NAME]'} operated as a ${formData.businessType || '[BUSINESS TYPE]'} business for ${formData.processingHistory || '[PROCESSING HISTORY]'} with Stripe, maintaining a clean processing history throughout our relationship.
 
 LEGAL CLAIMS
 
-Stripe's actions constitute multiple breaches of the SSA, including but not limited to:
+Stripe's actions constitute multiple breaches of the SSA, including:
 
 1. BREACH OF CONTRACT: Stripe has materially breached the SSA by withholding funds for an unreasonable period without contractual authority and by failing to process promised payment releases within stated timeframes.
 
@@ -812,12 +202,12 @@ Stripe's actions constitute multiple breaches of the SSA, including but not limi
 
 3. BREACH OF IMPLIED COVENANT OF GOOD FAITH AND FAIR DEALING: Even where the SSA grants Stripe discretion, it must be exercised in good faith. Stripe's arbitrary withholding of funds without substantial justification violates this fundamental contractual obligation.
 
-4. VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200: Stripe's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice under California law, allowing for restitution of profits earned on improperly withheld funds.
+4. VIOLATION OF CALIFORNIA BUSINESS & PROFESSIONS CODE § 17200: Stripe's systematic withholding of merchant funds without clear contractual authority constitutes an unfair business practice under California law.
 
-SUPPORTING EVIDENCE
+${evidence.length > 0 ? `SUPPORTING EVIDENCE
 
-${evidence.length > 0 ? `Our position is supported by the following evidence:
-${evidence.map(item => `- ${item}`).join('\n')}` : 'We have documented evidence supporting our position, including our clean processing history and Stripe\'s failure to provide specific justification for the continued hold.'}
+Our position is supported by the following evidence:
+${evidence.map(item => `- ${item}`).join('\n')}` : ''}
 
 DEMAND FOR RESOLUTION
 
@@ -829,385 +219,220 @@ To resolve this matter without proceeding to arbitration, I demand the following
 
 If I do not receive a satisfactory response by ${dates.responseDate}, I intend to file an arbitration demand upon the expiration of the 30-day notice period required by Section 13.3(a) of the SSA.
 
-${formData.includeArbitrationDraft ? 'Attached hereto as Exhibit A is a draft arbitration demand that will be filed with the American Arbitration Association if this matter is not resolved within the specified timeframe. This attachment demonstrates the seriousness of this matter and my preparedness to pursue all available legal remedies.' : ''}
-
 I look forward to your prompt attention to this matter.
 
 Sincerely,
 
 ${formData.contactName || '[CONTACT NAME]'}
 ${formData.companyName || '[COMPANY NAME]'}`;
+    };
 
-        return letter;
+    // Generate arbitration demand (simplified)
+    const generateArbitrationDemand = () => {
+        const dates = calculateDates();
+        
+        return `AMERICAN ARBITRATION ASSOCIATION
+SAN FRANCISCO, CALIFORNIA
+
+DEMAND FOR ARBITRATION
+
+${formData.companyName || '[COMPANY NAME]'}
+               Claimant
+v.
+Stripe, Inc.
+               Respondent
+
+TO THE HONORABLE ARBITRATOR:
+
+JURISDICTION AND VENUE
+
+1. This matter is subject to arbitration pursuant to Section 13 of the Stripe Services Agreement.
+
+2. This dispute arises from Respondent's breach of the Stripe Services Agreement and wrongful withholding of $${formData.withheldAmount || '[AMOUNT]'} in customer payments.
+
+FACTUAL BACKGROUND
+
+3. ${formData.companyName || '[COMPANY NAME]'} operated as a merchant with Stripe for ${formData.processingHistory || '[PROCESSING HISTORY]'}.
+
+4. ${formData.terminationDate ? 
+    `On ${formData.terminationDate}, Respondent terminated Claimant's account` : 
+    'Respondent initiated a hold on Claimant\'s funds'
+} without adequate justification.
+
+CAUSES OF ACTION
+
+FIRST CAUSE OF ACTION (Breach of Contract)
+5. Respondent breached the SSA by withholding funds beyond reasonable commercial necessity.
+
+SECOND CAUSE OF ACTION (Conversion)
+6. Respondent wrongfully converted $${formData.withheldAmount || '[AMOUNT]'} belonging to Claimant.
+
+RELIEF SOUGHT
+
+WHEREFORE, Claimant requests:
+A. Immediate release of withheld funds;
+B. Damages for breach of contract;
+C. Attorney fees and costs;
+D. Such other relief as deemed just.
+
+${formData.contactName || '[CONTACT NAME]'}
+${formData.companyName || '[COMPANY NAME]'}
+Claimant
+
+Dated: _________________`;
     };
     
-    // Get current document text - show combined document when arbitration is enabled
+    // Get document text for display
     const documentText = (() => {
         if (formData.includeArbitrationDraft) {
-            // Show combined document like what will be downloaded
             const demandLetter = generateDemandLetter();
             const arbitrationDemand = generateArbitrationDemand();
-            // For live preview, use visible separator since form feed won't display
             return demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
         } else {
             return generateDemandLetter();
         }
     })();
 
-    // Copy to clipboard function with paywall check
-    // eSignature handler functions
-    const handleESignOnly = async () => {
-        console.log('E-Sign Only clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', window.PaywallSystem ? window.PaywallSystem.hasAccess() : 'PaywallSystem not available');
-        
-        // Check if user has access using same logic as copy/download buttons
-        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
-            window.PaywallSystem.backupFormData(formData);
-            window.PaywallSystem.showAccessDenied('esign');
-            
-            window.manualUnlockCallback = () => {
-                const restoredData = window.PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                window.PaywallSystem.enablePreviewInteraction();
-                handleESignOnly();
-            };
-            
-            window.PaywallSystem.createPaywallModal((order) => {
-                const restoredData = window.PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                window.PaywallSystem.enablePreviewInteraction();
-                handleESignOnly();
-            });
-            return;
-        }
-        
-        // User has access, proceed with eSignature
-        await performESignature(false);
-    };
-
-    const handleESignAndEmail = async () => {
-        console.log('E-Sign & Email clicked, isPaid:', isPaid, 'PaywallSystem.hasAccess():', window.PaywallSystem ? window.PaywallSystem.hasAccess() : 'PaywallSystem not available');
-        
-        // Check if user has access using same logic as copy/download buttons
-        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
-            window.PaywallSystem.backupFormData(formData);
-            window.PaywallSystem.showAccessDenied('esign');
-            
-            window.manualUnlockCallback = () => {
-                const restoredData = window.PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                window.PaywallSystem.enablePreviewInteraction();
-                handleESignAndEmail();
-            };
-            
-            window.PaywallSystem.createPaywallModal((order) => {
-                const restoredData = window.PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                window.PaywallSystem.enablePreviewInteraction();
-                handleESignAndEmail();
-            });
-            return;
-        }
-        
-        // User has access, proceed with eSignature
-        await performESignature(true);
-    };
-
-    const performESignature = async (emailToStripe) => {
-        console.log('performESignature called with emailToStripe:', emailToStripe);
-        setIsESignatureLoading(true);
-        setESignatureError(null);
-        setCurrentESignatureMode(emailToStripe ? 'email' : 'sign');
-        
+    // eSignatures.com Integration
+    const createESignatureContract = async (emailToStripe = false) => {
         try {
-            if (!formData.email) {
-                throw new Error('Email is required for eSignature');
-            }
+            console.log('Creating eSignature contract with MCP server...');
             
-            // For eSignature, ONLY send the demand letter for signing
-            // The arbitration demand (if any) is just a draft attachment and should NOT be signed
-            const demandLetterOnly = generateDemandLetter();
-            const documentTitle = `Stripe Demand Letter - ${formData.companyName || formData.contactName}`;
+            // Use the MCP eSignature integration
+            const result = await window.mcp_server_esignatures.create_contract({
+                contract_source: 'mcpserver',
+                mcp_query: 'Create Stripe demand letter for electronic signature',
+                title: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
+                signers: [{
+                    name: formData.contactName || 'Document Signer',
+                    email: formData.email
+                }],
+                document_elements: [
+                    {
+                        type: 'text_normal',
+                        text: generateDemandLetter()
+                    }
+                ],
+                emails: emailToStripe ? {
+                    cc_email_addresses: ['owner@terms.law'],
+                    final_contract_subject: 'Signed Stripe Demand Letter',
+                    final_contract_text: 'The attached Stripe demand letter has been electronically signed and is ready for review.'
+                } : undefined
+            });
             
-            // Add signature line at the end of the demand letter
-            const signatureSection = `
-
-
-Sincerely,
-
-
-_________________________________
-${formData.contactName || '[CONTACT NAME]'}
-${formData.companyName || '[COMPANY NAME]'}
-
-Date: ________________`;
-            
-            const finalDocumentContent = `<div>${demandLetterOnly}${signatureSection}</div>`;
-            
-            const template = await createESignatureTemplate(finalDocumentContent, documentTitle);
-            const contract = await createESignatureContract(
-                template.id,
-                formData.email,
-                formData.contactName || 'Document Signer',
-                emailToStripe
-            );
-            
-            // Use real signing URL with embedded mode
-            setIsESignatureDemoMode(false);
-            const embeddedUrl = `${contract.signing_url}?embedded=yes`;
-            setESignatureIframe(embeddedUrl);
-            setShowESignatureModal(true);
+            console.log('✅ eSignature contract created:', result);
+            return result;
             
         } catch (error) {
-            console.error('eSignature error:', error);
-            const errorMessage = error.message || 'Failed to create eSignature. Please try again.';
-            setESignatureError(errorMessage);
-            alert('eSignature Error: ' + errorMessage); // Show error to user immediately
+            console.error('❌ eSignature error:', error);
+            throw new Error('Failed to create eSignature contract: ' + error.message);
+        }
+    };
+
+    // eSignature handlers
+    const handleESignOnly = async () => {
+        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.showAccessDenied('esign');
+            return;
+        }
+        
+        if (!formData.email) {
+            alert('Email is required for eSignature');
+            return;
+        }
+        
+        setIsESignatureLoading(true);
+        setCurrentESignatureMode('sign');
+        
+        try {
+            const contract = await createESignatureContract(false);
+            // The MCP server returns a URL to redirect to for signing
+            if (contract.url) {
+                window.open(contract.url, '_blank');
+            }
+        } catch (error) {
+            alert('eSignature Error: ' + error.message);
         } finally {
             setIsESignatureLoading(false);
         }
     };
 
-    const handleESignatureComplete = async (signedDocumentUrl) => {
-        try {
-            // Save signed document information
-            const signedInfo = {
-                url: signedDocumentUrl,
-                signedAt: new Date().toISOString(),
-                signerEmail: formData.email,
-                signerName: formData.contactName || 'Document Signer',
-                documentTitle: `Stripe Demand Letter - ${formData.companyName || formData.contactName}`,
-                emailedToOwner: currentESignatureMode === 'email'
-            };
-            setSignedDocumentInfo(signedInfo);
-            
-            if (currentESignatureMode === 'email') {
-                await sendSignedDocumentToStripe(signedDocumentUrl, formData.email, formData.contactName);
-            }
-            setShowESignatureModal(false);
-            setESignatureIframe('');
-            setCurrentESignatureMode(null);
-        } catch (error) {
-            console.error('Error completing eSignature:', error);
-            setESignatureError('Failed to process signed document. Please try again.');
-        }
-    };
-
-    const closeESignatureModal = () => {
-        setShowESignatureModal(false);
-        setESignatureIframe('');
-        setESignatureError(null);
-        setCurrentESignatureMode(null);
-        setIsESignatureDemoMode(false);
-    };
-
-    const copyToClipboard = () => {
-        // Check if user has paid
-        if (!PaywallSystem.hasAccess()) {
-            PaywallSystem.backupFormData(formData);
-            PaywallSystem.showAccessDenied('copy');
-            
-            // Set up manual unlock callback
-            window.manualUnlockCallback = () => {
-                const restoredData = PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
-                performCopyToClipboard();
-            };
-            
-            PaywallSystem.createPaywallModal((order) => {
-                // Payment successful, restore form data and enable features
-                const restoredData = PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
-                // Auto-copy after successful payment
-                performCopyToClipboard();
-            });
+    const handleESignAndEmail = async () => {
+        if (!window.PaywallSystem || !window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.showAccessDenied('esign');
             return;
         }
         
-        performCopyToClipboard();
-    };
-
-    // Actual copy function (separated for reuse after payment)
-    const performCopyToClipboard = () => {
-        let finalDocumentText;
-        
-        if (formData.includeArbitrationDraft) {
-            // Create combined document: demand letter + separator + arbitration demand
-            const demandLetter = generateDemandLetter();
-            const arbitrationDemand = generateArbitrationDemand();
-            
-            // Combine with clear separation for clipboard
-            finalDocumentText = demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
-        } else {
-            finalDocumentText = generateDemandLetter();
+        if (!formData.email) {
+            alert('Email is required for eSignature');
+            return;
         }
         
-        navigator.clipboard.writeText(finalDocumentText).then(() => {
-            const docType = formData.includeArbitrationDraft ? 'Combined demand letter and arbitration demand' : 'Demand letter';
-            alert(`${docType} copied to clipboard!`);
+        setIsESignatureLoading(true);
+        setCurrentESignatureMode('email');
+        
+        try {
+            const contract = await createESignatureContract(true);
+            // The MCP server returns a URL to redirect to for signing
+            if (contract.url) {
+                window.open(contract.url, '_blank');
+            }
+        } catch (error) {
+            alert('eSignature Error: ' + error.message);
+        } finally {
+            setIsESignatureLoading(false);
+        }
+    };
+
+    // Copy to clipboard
+    const copyToClipboard = () => {
+        if (!window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.showAccessDenied('copy');
+            return;
+        }
+        
+        navigator.clipboard.writeText(documentText).then(() => {
+            alert('Document copied to clipboard!');
         }).catch(err => {
             console.error('Failed to copy: ', err);
             alert('Failed to copy to clipboard. Please try selecting and copying manually.');
         });
     };
 
-    // Download as Word document
+    // Download as Word
     const downloadAsWord = () => {
-        // Check if user has paid
-        if (!PaywallSystem.hasAccess()) {
-            PaywallSystem.backupFormData(formData);
-            PaywallSystem.showAccessDenied('download');
-            
-            // Set up manual unlock callback
-            window.manualUnlockCallback = () => {
-                const restoredData = PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
-                performDownloadAsWord();
-            };
-            
-            PaywallSystem.createPaywallModal((order) => {
-                // Payment successful, restore form data and enable features
-                const restoredData = PaywallSystem.restoreFormData();
-                if (restoredData) {
-                    setFormData(restoredData);
-                }
-                setIsPaid(true);
-                PaywallSystem.enablePreviewInteraction();
-                // Auto-download after successful payment
-                performDownloadAsWord();
-            });
+        if (!window.PaywallSystem.hasAccess()) {
+            window.PaywallSystem.showAccessDenied('download');
             return;
         }
         
-        performDownloadAsWord();
-    };
-
-    // Actual download function (separated for reuse after payment)
-    const performDownloadAsWord = () => {
         try {
-            console.log("Download button clicked");
-            
             let finalDocumentText;
-            let documentTitle;
             let fileName;
             
-            // Check if we have a signed document
-            if (signedDocumentInfo) {
-                console.log("Downloading signed document version");
-                
-                // For signed documents, the demand letter is signed but arbitration demand is just attached as draft
-                const signedDemandLetter = generateDemandLetter();
-                
-                if (formData.includeArbitrationDraft) {
-                    const arbitrationDemand = generateArbitrationDemand();
-                    // Combine signed demand letter with unsigned arbitration draft
-                    finalDocumentText = signedDemandLetter + '\f\n\n' + 
-                        'ARBITRATION DEMAND (DRAFT ATTACHMENT - NOT SIGNED)\n' +
-                        'Note: Only the demand letter above has been electronically signed.\n\n' + 
-                        arbitrationDemand;
-                    documentTitle = "SIGNED Stripe Demand Letter with Arbitration Draft";
-                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Demand-Letter-with-Arbitration-Draft`;
-                } else {
-                    finalDocumentText = signedDemandLetter;
-                    documentTitle = "SIGNED Stripe Demand Letter";
-                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-SIGNED-Demand-Letter`;
-                }
-                
-                // Add electronic signature information to the document
-                const signatureBlock = `
-
-═══════════════════════════════════════════════════════════════════
-ELECTRONIC SIGNATURE VERIFICATION
-═══════════════════════════════════════════════════════════════════
-
-SIGNED DOCUMENT: Stripe Payment Processing Demand Letter
-${formData.includeArbitrationDraft ? 'NOTE: Only the demand letter above is electronically signed. Any arbitration demand attachment is a draft for reference only.' : ''}
-
-Signed by: ${signedDocumentInfo.signerName}
-Email: ${signedDocumentInfo.signerEmail}
-Date & Time: ${new Date(signedDocumentInfo.signedAt).toLocaleString()}
-Document Verification URL: ${signedDocumentInfo.url}
-
-${signedDocumentInfo.emailedToOwner ? 'Email notification sent to: owner@terms.law' : ''}
-
-SIGNATURE VERIFICATION:
-• This electronic signature applies ONLY to the demand letter portion of this document
-• The signature is legally binding under applicable electronic signature laws
-• The signed document can be verified at the URL above
-• A complete audit trail is maintained by eSignatures.com
-• This signature has the same legal effect as a handwritten signature
-
-For technical verification or questions about this signature, 
-contact eSignatures.com support with the document ID above.
-
-═══════════════════════════════════════════════════════════════════`;
-                
-                finalDocumentText += signatureBlock;
-                
+            if (formData.includeArbitrationDraft) {
+                const demandLetter = generateDemandLetter();
+                const arbitrationDemand = generateArbitrationDemand();
+                finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
+                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter`;
             } else {
-                console.log("Downloading unsigned document version");
-                
-                if (formData.includeArbitrationDraft) {
-                    const demandLetter = generateDemandLetter();
-                    const arbitrationDemand = generateArbitrationDemand();
-                    finalDocumentText = demandLetter + '\f\n\n' + arbitrationDemand;
-                    documentTitle = "Stripe Demand Letter with Arbitration Demand";
-                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Combined-Demand-Letter-and-Arbitration`;
-                } else {
-                    finalDocumentText = generateDemandLetter();
-                    documentTitle = "Stripe Demand Letter";
-                    fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`;
-                }
-            }
-            
-            if (!finalDocumentText) {
-                console.error("Document text is empty");
-                alert("Cannot generate document - text is empty. Please check the form data.");
-                return;
+                finalDocumentText = generateDemandLetter();
+                fileName = `${formData.companyName ? formData.companyName.replace(/[^a-zA-Z0-9]/g, '-') : 'Stripe'}-Demand-Letter`;
             }
             
             window.generateWordDoc(finalDocumentText, {
-                documentTitle: documentTitle,
+                documentTitle: formData.includeArbitrationDraft ? 
+                    "Stripe Demand Letter with Arbitration Demand" : 
+                    "Stripe Demand Letter",
                 fileName: fileName
             });
-            
-            // Show success message for signed documents
-            if (signedDocumentInfo) {
-                setTimeout(() => {
-                    alert('✅ Signed document downloaded successfully! The document includes electronic signature verification details.');
-                }, 500);
-            }
-            
         } catch (error) {
-            console.error("Error in performDownloadAsWord:", error);
+            console.error("Error in downloadAsWord:", error);
             alert("Error generating Word document. Please try again or use the copy option.");
         }
     };
 
-    // Navigation functions
+    // Navigation
     const nextTab = () => {
         if (currentTab < tabs.length - 1) {
             setCurrentTab(currentTab + 1);
@@ -1224,23 +449,20 @@ contact eSignatures.com support with the document ID above.
         setCurrentTab(index);
     };
 
-    // FIXED: Highlighting functionality for ALL Tab 1 inputs
+    // Highlighting system
     const getSectionToHighlight = () => {
         if (!lastChanged) return null;
         
         switch (currentTab) {
-            case 0: // Account Details - ALL INPUTS NOW TRIGGER HIGHLIGHTING
+            case 0: // Account Details
                 if (['companyName', 'contactName', 'stripeAccountId', 'withheldAmount'].includes(lastChanged)) {
                     return 'header-info';
                 }
                 if (['email', 'phone', 'address', 'city', 'state', 'zipCode'].includes(lastChanged)) {
                     return 'contact-info';
                 }
-                if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory', 'historicalDisputeRate'].includes(lastChanged)) {
+                if (['terminationDate', 'promisedReleaseDate', 'businessType', 'processingHistory'].includes(lastChanged)) {
                     return 'background-section';
-                }
-                if (['accountStartDate', 'yearsWithStripe', 'totalVolumeProcessed', 'previousAccountIssues', 'industryCompliance', 'repeatCustomerBase', 'businessLicenses', 'professionalReferences', 'refundRate'].includes(lastChanged)) {
-                    return 'establishment-section';
                 }
                 return null;
             case 1: // Stripe's Reasons
@@ -1248,48 +470,35 @@ contact eSignatures.com support with the document ID above.
                     return 'stripe-reasons';
                 }
                 return null;
-            case 3: // Evidence
+            case 2: // Evidence
                 if (lastChanged && formData[lastChanged]) {
                     return 'evidence-section';
                 }
                 return null;
-            case 4: // Arbitration Demand tab (NEW)
+            case 3: // Strategy
                 if (lastChanged === 'includeArbitrationDraft') {
                     return formData.includeArbitrationDraft ? 'arbitration-section' : 'demand-letter-section';
                 }
-                if (['expeditedProcedures', 'claimPunitiveDamages', 'injunctiveRelief'].includes(lastChanged)) {
-                    return 'arbitration-options';
-                }
-                if (['arbitrationVenue', 'hearingPreference', 'specificDamagesAmount', 'additionalClaims', 'includeAttorneyFees', 'includeInterestOnFunds'].includes(lastChanged)) {
-                    return 'arbitration-config';
-                }
                 return null;
-            case 5: // Risk Assessment tab (moved from 4 to 5)
-                return null; // No highlighting needed for this tab
             default:
                 return null;
         }
     };
 
-    // Create highlighted version of the text - More specific targeting
     const createHighlightedText = () => {
         const sectionToHighlight = getSectionToHighlight();
         if (!sectionToHighlight) return documentText;
         
         let highlightedText = documentText;
         
-        // Define more specific regex patterns for granular highlighting
         const sections = {
             'header-info': /Re:.*?Amount at Issue: \$[^\n]*/s,
             'contact-info': /^[^\n]+\n[^\n]+\n[^\n]+\n[^\n]+\n[^\n]+/,
             'background-section': /FACTUAL BACKGROUND.*?(?=LEGAL CLAIMS)/s,
-            'establishment-section': /FACTUAL BACKGROUND.*?(?=On |Stripe initiated)/s,
             'stripe-reasons': /citing (?:only )?[^.]*?(?=without identifying|\.)/,
             'evidence-section': /SUPPORTING EVIDENCE.*?(?=DEMAND FOR RESOLUTION)/s,
             'demand-letter-section': /^[^\n]+\n[^\n]+\n[^\n]+.*?(?=ARBITRATION DEMAND \(ATTACHMENT\)|$)/s,
-            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=$)/s,
-            'arbitration-options': /EXPEDITED PROCEDURES REQUESTED:.*?(?=PARTIES|ARBITRATION VENUE)/s,
-            'arbitration-config': /RELIEF SOUGHT.*?(?=AMOUNT IN CONTROVERSY|ADMINISTRATIVE INFORMATION|$)/s
+            'arbitration-section': /ARBITRATION DEMAND \(ATTACHMENT\).*?(?=$)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -1301,7 +510,7 @@ contact eSignatures.com support with the document ID above.
         return highlightedText;
     };
 
-    // Scroll to highlighted text
+    // Auto-scroll to highlighted content
     useEffect(() => {
         if (previewRef.current && lastChanged) {
             setTimeout(() => {
@@ -1311,504 +520,13 @@ contact eSignatures.com support with the document ID above.
                 }
             }, 100);
             
-            // Clear highlighting after 8 seconds
             setTimeout(() => setLastChanged(null), 8000);
         }
     }, [lastChanged]);
 
     const highlightedText = createHighlightedText();
 
-    // UPGRADED: Attorney-Level Risk Assessment
-    const getRiskAssessment = () => {
-        let score = 30; // Base score
-        let factors = [];
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        
-        // Strong evidence factors
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            score += 25;
-            factors.push('✅ STRONGEST EVIDENCE: Broken promise creates ironclad breach of contract claim. Focus your demand on promissory estoppel liability.');
-        }
-        
-        if (formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1.0) {
-            score += 20;
-            factors.push(`✅ STRONG DEFENSE: Your ${formData.historicalDisputeRate}% dispute rate destroys Stripe's "high risk" justification. Demand Stripe provide industry comparisons.`);
-        }
-        
-        if (formData.lowChargebacks && formData.compliantPractices) {
-            score += 15;
-            factors.push('✅ COMPLIANCE DOCUMENTATION: Clean processing history supports good faith claims. Obtain 12-month chargeback statements for evidence package.');
-        }
-        
-        if (formData.shiftingDeadlines || formData.shiftingTimelines) {
-            score += 15;
-            factors.push('✅ BAD FAITH PATTERN: Shifting deadlines support promissory estoppel and bad faith claims. Compile chronological timeline of all date changes.');
-        }
-        
-        if (formData.communicationBlackout) {
-            score += 10;
-            factors.push('✅ DUE PROCESS VIOLATION: Communication blackout violates implied covenant. Document all unresponsive support interactions.');
-        }
-        
-        // Account establishment benefits
-        if (formData.accountStartDate) {
-            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
-            if (accountAge > 2) {
-                score += 12;
-                factors.push(`✅ ESTABLISHED RELATIONSHIP: ${Math.floor(accountAge)}-year account history creates reasonable expectations. Emphasize relationship longevity in demand.`);
-            } else if (accountAge < 0.5) {
-                score -= 8;
-                factors.push(`⚠️ NEW ACCOUNT: ${Math.floor(accountAge * 12)}-month processing history may support Stripe's risk concerns. Focus on compliance documentation instead.`);
-            }
-        }
-        
-        if (formData.totalVolumeProcessed && parseFloat(formData.totalVolumeProcessed.replace(/[^\d.]/g, '')) > 100000) {
-            score += 8;
-            factors.push(`✅ VOLUME HISTORY: $${formData.totalVolumeProcessed} processing volume demonstrates established business. Include lifetime processing statements.`);
-        }
-        
-        // Risk reduction factors
-        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
-            score -= 12;
-            factors.push(`⚠️ HIGH REFUNDS: ${formData.refundRate}% refund rate may indicate business model disputes. Prepare explanation of refund policy and customer satisfaction measures.`);
-        }
-        
-        if (formData.highRisk && !formData.lowChargebacks) {
-            score -= 15;
-            factors.push('⚠️ WEAK COUNTER-EVIDENCE: High-risk designation without documented low chargebacks. Obtain dispute rate evidence immediately.');
-        }
-        
-        if (!formData.processingHistory || formData.processingHistory.includes('month')) {
-            score -= 10;
-            factors.push('⚠️ LIMITED HISTORY: Short processing history strengthens Stripe\'s risk arguments. Focus on compliance and disclosure arguments.');
-        }
-        
-        // Evidence gaps
-        if (!formData.terminationDate && !formData.promisedReleaseDate) {
-            score -= 8;
-            factors.push('⚠️ TIMING WEAKNESS: No specific dates weaken timeline arguments. Document when hold began and any verbal promises.');
-        }
-        
-        // Expedited procedures benefit
-        if (amount < 25000) {
-            score += 5;
-            factors.push(`✅ COST ADVANTAGE: $${amount.toLocaleString()} qualifies for AAA expedited procedures. Lower fees and faster resolution (60-90 days).`);
-        }
-        
-        // Ensure score stays within 0-100 range
-        score = Math.max(5, Math.min(100, score));
-        
-        // SPECIFIC ATTORNEY-LEVEL RECOMMENDATIONS
-        let riskLevel, riskClass, recommendations;
-        
-        if (score >= 70) {
-            riskLevel = 'Strong Case';
-            riskClass = 'risk-strong';
-            recommendations = getStrongCaseStrategy();
-        } else if (score >= 45) {
-            riskLevel = 'Moderate Case';
-            riskClass = 'risk-moderate';
-            recommendations = getModerateCaseStrategy();
-        } else {
-            riskLevel = 'Challenging Case';
-            riskClass = 'risk-weak';
-            recommendations = getChallengingCaseStrategy();
-        }
-        
-        return { riskLevel, riskClass, factors, recommendations, score };
-    };
-
-    // SPECIFIC CASE STRATEGIES
-    const getStrongCaseStrategy = () => {
-        const strategies = [];
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            strategies.push(`Your broken promise evidence creates a compelling breach of contract claim. Focus your demand on Section 5.4 violations and promissory estoppel liability.`);
-        }
-        
-        strategies.push(`Timeline: File within 30 days of this letter for maximum pressure. AAA fees: $${amount < 25000 ? '1,775' : amount < 75000 ? '1,775' : '3,400'} vs. potential recovery of $${formData.withheldAmount || '[AMOUNT]'}.`);
-        
-        if (amount < 25000) {
-            strategies.push(`EXPEDITED ADVANTAGE: Your claim qualifies for streamlined AAA procedures. Document-only resolution likely (60-90 days vs. 6-12 months standard).`);
-        }
-        
-        const dynamicStrategies = getDynamicLegalStrategy();
-        strategies.push(...dynamicStrategies);
-        
-        return strategies;
-    };
-
-    const getModerateCaseStrategy = () => {
-        const strategies = [];
-        const evidenceGaps = [];
-        
-        if (!formData.promisedReleaseDate) {
-            evidenceGaps.push('Document any verbal promises or timeline commitments');
-        }
-        
-        if (!formData.historicalDisputeRate) {
-            evidenceGaps.push('Obtain 12-month chargeback rate statements from Stripe dashboard');
-        }
-        
-        if (!formData.shiftingDeadlines && formData.shiftingTimelines) {
-            evidenceGaps.push('Compile email chain showing pattern of extending deadlines');
-        }
-        
-        strategies.push(`Your case hinges on ${evidenceGaps.length > 0 ? evidenceGaps[0] : 'strengthening procedural arguments'}. Strengthen by: 1) ${evidenceGaps[0] || 'Focus on bad faith conduct'}, 2) ${evidenceGaps[1] || 'Document communication failures'}, 3) ${evidenceGaps[2] || 'Gather industry compliance evidence'}.`);
-        
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        strategies.push(`Cost-benefit: AAA fees $${amount < 25000 ? '1,775' : amount < 75000 ? '1,775' : '3,400'} vs. potential recovery $${formData.withheldAmount || '[AMOUNT]'}. Standard timeline: 6-12 months.`);
-        
-        strategies.push('Focus on Stripe\'s procedural failures rather than business model disputes. Emphasize good faith reliance on established relationship.');
-        
-        return strategies;
-    };
-
-    const getChallengingCaseStrategy = () => {
-        const strategies = [];
-        const obstacles = [];
-        
-        if (formData.highRisk && !formData.lowChargebacks) {
-            obstacles.push('High-risk designation without counter-evidence');
-        }
-        
-        if (!formData.processingHistory || formData.processingHistory.includes('month')) {
-            obstacles.push('Limited processing history supports Stripe\'s position');
-        }
-        
-        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
-            obstacles.push('High refund rate may indicate business model issues');
-        }
-        
-        strategies.push(`Primary obstacles: ${obstacles.join(', ')}. Required evidence: 1) ${getHighestPriorityEvidence()}, 2) Industry compliance documentation, 3) Customer satisfaction metrics.`);
-        
-        strategies.push('Alternative approach: Focus heavily on Stripe\'s procedural failures and communication blackouts rather than business model disputes.');
-        
-        strategies.push('Consider settlement discussions during 30-day notice period. Document preparation for arbitration while exploring resolution.');
-        
-        return strategies;
-    };
-
-    const getHighestPriorityEvidence = () => {
-        if (formData.promisedReleaseDate) return 'Email proof of broken promise';
-        if (formData.communicationBlackout) return 'Documentation of unresponsive support';
-        if (formData.shiftingTimelines) return 'Timeline of shifting deadlines';
-        return 'Stripe dashboard showing actual dispute metrics';
-    };
-
-    // Calculate AAA filing fees for both Standard and Flexible schedules (2025 fee schedule)
-    const calculateAAAfees = () => {
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        
-        let standardFees, flexibleFees;
-        
-        if (amount < 75000) {
-            standardFees = {
-                initial: 950,
-                final: 825,
-                total: 1775,
-                expedited: true,
-                schedule: 'Standard'
-            };
-            // Flexible not available for claims under $75k
-            flexibleFees = null;
-        } else if (amount < 150000) {
-            standardFees = {
-                initial: 1975,
-                final: 1425,
-                total: 3400,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 1875,
-                proceed: 1925,
-                final: 2275,
-                total: 6075,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        } else if (amount < 300000) {
-            standardFees = {
-                initial: 2975,
-                final: 2275,
-                total: 5250,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 1875,
-                proceed: 1925,
-                final: 2275,
-                total: 6075,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        } else if (amount < 500000) {
-            standardFees = {
-                initial: 4525,
-                final: 3975,
-                total: 8500,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 2275,
-                proceed: 3400,
-                final: 3975,
-                total: 9650,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        } else if (amount < 1000000) {
-            standardFees = {
-                initial: 5650,
-                final: 7025,
-                total: 12675,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 2825,
-                proceed: 4875,
-                final: 7025,
-                total: 14725,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        } else if (amount < 10000000) {
-            standardFees = {
-                initial: 7925,
-                final: 8725,
-                total: 16650,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 3975,
-                proceed: 6475,
-                final: 8725,
-                total: 19175,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        } else {
-            standardFees = {
-                initial: 11325,
-                final: 14150,
-                total: 25475,
-                expedited: false,
-                schedule: 'Standard'
-            };
-            flexibleFees = {
-                initial: 5650,
-                proceed: 10300,
-                final: 14150,
-                total: 30100,
-                expedited: false,
-                schedule: 'Flexible'
-            };
-        }
-        
-        return { standardFees, flexibleFees, amount };
-    };
-    
-    // Get fee schedule recommendation based on user's situation
-    const getFeeScheduleRecommendation = () => {
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        const { standardFees, flexibleFees } = calculateAAAfees();
-        
-        if (!flexibleFees) {
-            return {
-                recommended: 'standard',
-                reason: 'Flexible Fee Schedule is only available for claims $150,000 and above.'
-            };
-        }
-        
-        // Calculate holding period if termination date is provided
-        let holdingDays = 0;
-        let holdingPeriodText = '';
-        if (formData.terminationDate) {
-            const terminationDate = new Date(formData.terminationDate);
-            const today = new Date();
-            holdingDays = Math.floor((today - terminationDate) / (1000 * 60 * 60 * 24));
-            if (holdingDays > 0) {
-                holdingPeriodText = `${holdingDays} days`;
-            }
-        }
-        
-        // Key factors for Flexible Fee consideration
-        const cashFlowAdvantage = amount < 50000 || formData.businessDamages;
-        const longHoldingPeriod = holdingDays > 180; // Past industry standard
-        const strongSettlementPressure = formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date();
-        const likelyQuickSettlement = strongSettlementPressure || (formData.shiftingTimelines && formData.communicationBlackout);
-        const hasGoodEvidence = formData.lowChargebacks && formData.historicalDisputeRate && parseFloat(formData.historicalDisputeRate) < 1;
-        
-        // Flexible Fee is advantageous when:
-        if (longHoldingPeriod && (likelyQuickSettlement || strongSettlementPressure)) {
-            return {
-                recommended: 'flexible',
-                reason: `I recommend Flexible Fee Schedule. With funds held for ${holdingPeriodText} (beyond the 180-day industry standard maximum), Stripe faces increased settlement pressure. The lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) makes strategic sense since cases with extended holding periods often settle before the 90-day proceed fee is due.`
-            };
-        }
-        
-        if (cashFlowAdvantage && likelyQuickSettlement && !longHoldingPeriod) {
-            return {
-                recommended: 'flexible',
-                reason: `I recommend Flexible Fee Schedule. The lower upfront cost ($${flexibleFees.initial.toLocaleString()} vs $${standardFees.initial.toLocaleString()}) preserves cash flow, and your strong case factors suggest early settlement is likely, minimizing total fee exposure.`
-            };
-        }
-        
-        // Early settlement scenarios where Flexible saves money
-        if (strongSettlementPressure && formData.shiftingTimelines) {
-            return {
-                recommended: 'flexible',
-                reason: `I recommend Flexible Fee Schedule. Stripe's broken promises and shifting timelines create strong settlement pressure. If settlement occurs within 90 days (common in such cases), you'll pay only $${flexibleFees.initial.toLocaleString()} instead of $${standardFees.initial.toLocaleString()}.`
-            };
-        }
-        
-        // Standard Fee for strong cases proceeding to hearing
-        if (hasGoodEvidence && amount > 100000 && !longHoldingPeriod) {
-            return {
-                recommended: 'standard',
-                reason: `I recommend Standard Fee Schedule. Your strong evidence and higher claim amount suggest the case will proceed to hearing, where Standard saves $${(flexibleFees.total - standardFees.total).toLocaleString()} in total fees and demonstrates commitment to pursuing full resolution.`
-            };
-        }
-        
-        // Default to Standard for most cases
-        if (amount > 75000 && !cashFlowAdvantage) {
-            return {
-                recommended: 'standard',
-                reason: `I recommend Standard Fee Schedule. For higher-value claims with adequate cash flow, Standard provides better value if the case proceeds beyond initial settlement discussions.`
-            };
-        }
-        
-        // Flexible as fallback for smaller claims or cash flow issues
-        return {
-            recommended: 'flexible',
-            reason: `I recommend Flexible Fee Schedule. The lower initial filing fee ($${flexibleFees.initial.toLocaleString()}) provides cash flow advantages and allows you to reassess strategy during the 90-day proceed fee period based on Stripe's response.`
-        };
-    };
-
-    // IMPROVED: Analyze case complexity with refund rates and account age
-    const analyzeCaseComplexity = () => {
-        let complexityScore = 0;
-        const complexityFactors = [];
-        
-        // Simple factors (reduce complexity)
-        if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
-            complexityScore -= 2;
-            complexityFactors.push('✅ Clear broken promise simplifies case');
-        }
-        
-        if (formData.lowChargebacks) {
-            complexityScore -= 1;
-            complexityFactors.push('✅ Clean payment history reduces complexity');
-        }
-        
-        // Account establishment reduces complexity
-        if (formData.accountStartDate) {
-            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
-            if (accountAge > 2) {
-                complexityScore -= 1;
-                complexityFactors.push('✅ Long-standing relationship supports good faith arguments');
-            }
-        }
-        
-        if (formData.industryCompliance) {
-            complexityScore -= 1;
-            complexityFactors.push('✅ Regulated business compliance reduces perceived risk');
-        }
-        
-        // Complex factors (increase complexity)
-        if (formData.chargebackLoop) {
-            complexityScore += 3;
-            complexityFactors.push('⚠️ Chargeback loops create complex factual disputes');
-        }
-        
-        if (formData.businessModelIssue) {
-            complexityScore += 2;
-            complexityFactors.push('⚠️ Business model disputes require extensive documentation');
-        }
-        
-        // NEW: High refund rate increases complexity
-        if (formData.refundRate && parseFloat(formData.refundRate) > 10) {
-            complexityScore += 2;
-            complexityFactors.push('⚠️ Pattern of refund requests may indicate business model disputes');
-        }
-        
-        // NEW: New account increases complexity
-        if (formData.accountStartDate) {
-            const accountAge = (new Date() - new Date(formData.accountStartDate)) / (1000 * 60 * 60 * 24 * 365);
-            if (accountAge < 0.5) {
-                complexityScore += 1;
-                complexityFactors.push('⚠️ Limited processing history weakens relationship argument');
-            }
-        }
-        
-        if (!formData.terminationDate && !formData.promisedReleaseDate) {
-            complexityScore += 2;
-            complexityFactors.push('⚠️ Lack of clear timelines complicates legal arguments');
-        }
-        
-        const selectedReasons = [
-            formData.highRisk, formData.elevatedDispute, formData.policyViolation,
-            formData.riskAssessment, formData.chargebackLiability, formData.accountReview,
-            formData.businessModelIssue, formData.indefiniteHold, formData.shiftingTimelines,
-            formData.retroactiveRisk, formData.communicationBlackout, formData.chargebackLoop
-        ].filter(Boolean).length;
-        
-        if (selectedReasons > 4) {
-            complexityScore += 1;
-            complexityFactors.push('⚠️ Multiple Stripe reasons require comprehensive response');
-        }
-        
-        // Amount-based complexity
-        const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        if (amount > 100000) {
-            complexityScore += 1;
-            complexityFactors.push('⚠️ High-value disputes often involve more extensive proceedings');
-        }
-        
-        // Determine complexity level
-        let isComplex, timeline, procedures;
-        
-        if (complexityScore <= -1) {
-            isComplex = false;
-            timeline = amount < 25000 ? '60-90 days (expedited)' : '4-6 months (standard)';
-            procedures = 'Likely document-only resolution';
-        } else if (complexityScore <= 2) {
-            isComplex = false;
-            timeline = amount < 25000 ? '90-120 days' : '6-9 months';
-            procedures = 'May require hearing but straightforward';
-        } else {
-            isComplex = true;
-            timeline = '9-18 months';
-            procedures = 'Likely requires telephone hearings and limited document production (AAA rules restrict discovery)';
-        }
-        
-        return { isComplex, timeline, procedures, complexityFactors, complexityScore };
-    };
-    
-    // Helper function to create tooltip
-    const createTooltip = (text) => {
-        return React.createElement('span', { 
-            key: 'tooltip',
-            className: 'hint-tooltip' 
-        }, [
-            React.createElement('span', { 
-                key: 'icon',
-                className: 'tooltip-icon' 
-            }, '?'),
-            React.createElement('span', { 
-                key: 'text',
-                className: 'tooltip-text' 
-            }, text)
-        ]);
-    };
-
-    // Render function
+    // Render component
     return React.createElement('div', { className: 'app-container' }, [
         React.createElement('div', { key: 'header', className: 'header' }, [
             React.createElement('h1', { key: 'title' }, 'Stripe Demand Letter Generator'),
@@ -1831,7 +549,7 @@ contact eSignatures.com support with the document ID above.
                 
                 // Form Content
                 React.createElement('div', { key: 'content', className: 'form-content' }, [
-                    // Tab 1: Account Details (ENHANCED with Account Establishment Fields)
+                    // Tab 1: Account Details
                     currentTab === 0 && React.createElement('div', { key: 'tab1' }, [
                         React.createElement('h2', { key: 'h2' }, 'Account & Situation Details'),
                         React.createElement('p', { key: 'p' }, 'Provide your business information and Stripe account details.'),
@@ -1884,18 +602,6 @@ contact eSignatures.com support with the document ID above.
                                     placeholder: '(555) 123-4567'
                                 })
                             ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'address', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Business Address'),
-                            React.createElement('input', {
-                                key: 'input',
-                                type: 'text',
-                                name: 'address',
-                                value: formData.address,
-                                onChange: handleChange,
-                                placeholder: 'Street Address (optional)'
-                            })
                         ]),
                         
                         React.createElement('div', { key: 'row3', className: 'form-row' }, [
@@ -1964,7 +670,7 @@ contact eSignatures.com support with the document ID above.
                         
                         React.createElement('div', { key: 'row5', className: 'form-row' }, [
                             React.createElement('div', { key: 'term', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Account Termination Date (only if terminated)'),
+                                React.createElement('label', { key: 'label' }, 'Account Termination Date (if terminated)'),
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'date',
@@ -2005,172 +711,19 @@ contact eSignatures.com support with the document ID above.
                                     name: 'processingHistory',
                                     value: formData.processingHistory,
                                     onChange: handleChange,
-                                    placeholder: '2 years, 6 months, etc.'
+                                    placeholder: 'e.g., 2 years, 6 months'
                                 })
                             ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'row7', className: 'form-row' }, [
-                            React.createElement('div', { key: 'dispute', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Historical Dispute Rate (%)'),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'text',
-                                    name: 'historicalDisputeRate',
-                                    value: formData.historicalDisputeRate,
-                                    onChange: handleChange,
-                                    placeholder: '0.5'
-                                })
-                            ]),
-                            React.createElement('div', { key: 'refund', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Refund Rate (%)'),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'text',
-                                    name: 'refundRate',
-                                    value: formData.refundRate,
-                                    onChange: handleChange,
-                                    placeholder: '5.0'
-                                })
-                            ])
-                        ]),
-                        
-                        // NEW Account Establishment Section
-                        React.createElement('h3', { key: 'establishment-title', style: { marginTop: '30px', color: '#2c3e50' } }, 'Account Establishment (Optional - Strengthens Case)'),
-                        
-                        React.createElement('div', { key: 'row8', className: 'form-row' }, [
-                            React.createElement('div', { key: 'start-date', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Account Start Date'),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'date',
-                                    name: 'accountStartDate',
-                                    value: formData.accountStartDate,
-                                    onChange: handleChange
-                                })
-                            ]),
-                            React.createElement('div', { key: 'volume', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Total Volume Processed'),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'text',
-                                    name: 'totalVolumeProcessed',
-                                    value: formData.totalVolumeProcessed,
-                                    onChange: handleChange,
-                                    placeholder: '500,000'
-                                })
-                            ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'establishment-checkboxes', className: 'checkbox-grid' }, [
-                            React.createElement('div', { 
-                                key: 'prev-issues',
-                                className: `checkbox-item ${formData.previousAccountIssues ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'previousAccountIssues', type: 'checkbox', checked: !formData.previousAccountIssues }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'previousAccountIssues',
-                                    checked: formData.previousAccountIssues,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Prior Account Issues'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Check if account had previous violations or compliance issues.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'compliance',
-                                className: `checkbox-item ${formData.industryCompliance ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'industryCompliance', type: 'checkbox', checked: !formData.industryCompliance }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'industryCompliance',
-                                    checked: formData.industryCompliance,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Industry Compliance'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'PCI DSS, SOC compliance, or other industry-specific certifications.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'customers',
-                                className: `checkbox-item ${formData.repeatCustomerBase ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'repeatCustomerBase', type: 'checkbox', checked: !formData.repeatCustomerBase }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'repeatCustomerBase',
-                                    checked: formData.repeatCustomerBase,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Repeat Customer Base'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Established repeat customers demonstrating business legitimacy.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'licenses',
-                                className: `checkbox-item ${formData.businessLicenses ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'businessLicenses', type: 'checkbox', checked: !formData.businessLicenses }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'businessLicenses',
-                                    checked: formData.businessLicenses,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Business Licenses'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Proper business licensing and registration.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'references',
-                                className: `checkbox-item ${formData.professionalReferences ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'professionalReferences', type: 'checkbox', checked: !formData.professionalReferences }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'professionalReferences',
-                                    checked: formData.professionalReferences,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Professional References'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Bank references, business partner references available.')
-                                ])
-                            ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'tip', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Account Establishment Benefits'),
-                            React.createElement('p', { key: 'text' }, 'These optional fields strengthen your case by demonstrating established business legitimacy and long-term relationship with Stripe. Longer account history and higher processing volumes significantly improve legal position.')
                         ])
                     ]),
                     
-                    // Tab 2: Stripe's Stated Reasons (REORGANIZED - Custom Reason moved above Specific Violations)
+                    // Tab 2: Stripe's Reasons
                     currentTab === 1 && React.createElement('div', { key: 'tab2' }, [
                         React.createElement('h2', { key: 'h2' }, 'Stripe\'s Stated Reasons'),
-                        React.createElement('p', { key: 'p' }, 'Select the reasons Stripe has given for withholding your funds. Based on the most common patterns from merchant complaints.'),
+                        React.createElement('p', { key: 'p' }, 'Select the reasons Stripe gave for withholding your funds.'),
                         
                         React.createElement('div', { key: 'checkboxes', className: 'checkbox-grid' }, [
-                            React.createElement('div', { 
-                                key: 'highrisk',
-                                className: `checkbox-item ${formData.highRisk ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'highRisk', type: 'checkbox', checked: !formData.highRisk }})
-                            }, [
+                            React.createElement('label', { key: 'highRisk', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2178,17 +731,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.highRisk,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, '"High Risk" Business Designation'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Retroactive "high risk" designation after processing payments, often without specific evidence.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Designated as "high risk"')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'dispute',
-                                className: `checkbox-item ${formData.elevatedDispute ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'elevatedDispute', type: 'checkbox', checked: !formData.elevatedDispute }})
-                            }, [
+                            React.createElement('label', { key: 'elevatedDispute', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2196,89 +741,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.elevatedDispute,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Elevated Dispute Rate'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Claimed your chargeback rate was too high without providing actual numbers or industry comparisons.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Elevated dispute rate')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'indefinite',
-                                className: `checkbox-item ${formData.indefiniteHold ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'indefiniteHold', type: 'checkbox', checked: !formData.indefiniteHold }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'indefiniteHold',
-                                    checked: formData.indefiniteHold,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Indefinite Fund Hold'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Abrupt termination with indefinite fund holding, continuously extending promised release dates.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'shifting',
-                                className: `checkbox-item ${formData.shiftingTimelines ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'shiftingTimelines', type: 'checkbox', checked: !formData.shiftingTimelines }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'shiftingTimelines',
-                                    checked: formData.shiftingTimelines,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Shifting Payout Timelines'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Continuously changing release dates with vague explanations - "90 days" becomes "additional 90 days" repeatedly.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'communication',
-                                className: `checkbox-item ${formData.communicationBlackout ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'communicationBlackout', type: 'checkbox', checked: !formData.communicationBlackout }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'communicationBlackout',
-                                    checked: formData.communicationBlackout,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Communication Blackout'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Support becomes unresponsive after fund hold, canned responses or complete silence to inquiries.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'chargeback',
-                                className: `checkbox-item ${formData.chargebackLoop ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'chargebackLoop', type: 'checkbox', checked: !formData.chargebackLoop }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'chargebackLoop',
-                                    checked: formData.chargebackLoop,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Chargeback Loop Creation'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Fund holds prevent order fulfillment, causing customer disputes that worsen your metrics - a vicious cycle.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'policy',
-                                className: `checkbox-item ${formData.policyViolation ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'policyViolation', type: 'checkbox', checked: !formData.policyViolation }})
-                            }, [
+                            React.createElement('label', { key: 'policyViolation', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2286,17 +751,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.policyViolation,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Unspecified Policy Violations'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Referenced policy violations without identifying specific policies or providing concrete examples.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Policy violation')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'review',
-                                className: `checkbox-item ${formData.accountReview ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'accountReview', type: 'checkbox', checked: !formData.accountReview }})
-                            }, [
+                            React.createElement('label', { key: 'accountReview', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2304,90 +761,19 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.accountReview,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Account Review in Progress'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Ongoing account review without specific timeline or completion criteria.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Account under review')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'business-model',
-                                className: `checkbox-item ${formData.businessModelIssue ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'businessModelIssue', type: 'checkbox', checked: !formData.businessModelIssue }})
-                            }, [
+                            React.createElement('label', { key: 'indefiniteHold', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
-                                    name: 'businessModelIssue',
-                                    checked: formData.businessModelIssue,
+                                    name: 'indefiniteHold',
+                                    checked: formData.indefiniteHold,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Retroactive Business Model Concerns'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Business model concerns raised after initial approval and processing history.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Indefinite hold')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'retroactive',
-                                className: `checkbox-item ${formData.retroactiveRisk ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'retroactiveRisk', type: 'checkbox', checked: !formData.retroactiveRisk }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'retroactiveRisk',
-                                    checked: formData.retroactiveRisk,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Retroactive Risk Designation'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Risk designation applied retroactively after processing payments for extended period.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'liability',
-                                className: `checkbox-item ${formData.chargebackLiability ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'chargebackLiability', type: 'checkbox', checked: !formData.chargebackLiability }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'chargebackLiability',
-                                    checked: formData.chargebackLiability,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Ongoing Chargeback Liability'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Chargeback liability concerns extending beyond reasonable dispute resolution windows.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'risk-assessment',
-                                className: `checkbox-item ${formData.riskAssessment ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'riskAssessment', type: 'checkbox', checked: !formData.riskAssessment }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'riskAssessment',
-                                    checked: formData.riskAssessment,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Ongoing Risk Assessment'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Ongoing risk assessment without timeline, completion criteria, or clear resolution path.')
-                                ])
-                            ]),
-                            
-                            // MOVED: Custom Reason now after all main reasons but before Specific Violations
-                            React.createElement('div', { 
-                                key: 'custom',
-                                className: `checkbox-item ${formData.customReason ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'customReason', type: 'checkbox', checked: !formData.customReason }})
-                            }, [
+                            React.createElement('label', { key: 'customReason', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2395,83 +781,30 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.customReason,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Other Reason'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Stripe provided a different reason not listed above.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'specific-violations',
-                                className: `checkbox-item ${formData.specificViolationsIdentified ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'specificViolationsIdentified', type: 'checkbox', checked: !formData.specificViolationsIdentified }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'specificViolationsIdentified',
-                                    checked: formData.specificViolationsIdentified,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Stripe Identified Specific Violations'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Check this if Stripe actually provided specific policy violations or SSA breaches (rather than vague "risk" language).')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Other reason')
                             ])
                         ]),
                         
-                        // Custom reason text appears immediately after Custom Reason checkbox
-                        formData.customReason && React.createElement('div', { key: 'custom-text', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Describe Stripe\'s Reason'),
+                        formData.customReason && React.createElement('div', { key: 'custom', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Describe the other reason:'),
                             React.createElement('textarea', {
                                 key: 'textarea',
                                 name: 'customReasonText',
                                 value: formData.customReasonText,
                                 onChange: handleChange,
-                                placeholder: 'Describe the specific reason Stripe gave for withholding your funds...',
+                                placeholder: 'Describe the specific reason Stripe gave...',
                                 rows: 3
                             })
                         ])
                     ]),
                     
-                    // Tab 3: SSA Violations with Explanations
+                    // Tab 3: Evidence
                     currentTab === 2 && React.createElement('div', { key: 'tab3' }, [
-                        React.createElement('h2', { key: 'h2' }, 'SSA Violations (Auto-Selected)'),
-                        React.createElement('p', { key: 'p' }, 'These legal claims will be automatically included based on your situation:'),
-                        
-                        React.createElement('div', { key: 'claims' }, 
-                            getAutoSelectedClaims().claims.map((claim, index) => 
-                                React.createElement('div', { key: index, className: 'legal-claim' }, [
-                                    React.createElement('h4', { key: 'title' }, [
-                                        claim.name,
-                                        createTooltip(claim.tooltip)
-                                    ]),
-                                    React.createElement('p', { key: 'desc' }, claim.explanation)
-                                ])
-                            )
-                        ),
-                        
-                        getAutoSelectedClaims().violations.length > 0 && React.createElement('div', { key: 'violations', className: 'risk-card risk-moderate' }, [
-                            React.createElement('h3', { key: 'h3' }, 'Specific SSA Violations Based on Your Situation'),
-                            React.createElement('ul', { key: 'ul' }, 
-                                getAutoSelectedClaims().violations.map((violation, index) => 
-                                    React.createElement('li', { key: index }, violation)
-                                )
-                            )
-                        ])
-                    ]),
-                    
-                    // Tab 4: Evidence with Custom Input
-                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
                         React.createElement('h2', { key: 'h2' }, 'Supporting Evidence'),
-                        React.createElement('p', { key: 'p' }, 'Select evidence you have to support your position:'),
+                        React.createElement('p', { key: 'p' }, 'Select the evidence that supports your case.'),
                         
                         React.createElement('div', { key: 'checkboxes', className: 'checkbox-grid' }, [
-                            React.createElement('div', { 
-                                key: 'lowcb',
-                                className: `checkbox-item ${formData.lowChargebacks ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'lowChargebacks', type: 'checkbox', checked: !formData.lowChargebacks }})
-                            }, [
+                            React.createElement('label', { key: 'lowChargebacks', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2479,17 +812,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.lowChargebacks,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Low Historical Chargeback Rate'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'You can document chargeback rate below industry standards (typically under 0.75%).')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Low historical chargeback rate')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'compliant',
-                                className: `checkbox-item ${formData.compliantPractices ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'compliantPractices', type: 'checkbox', checked: !formData.compliantPractices }})
-                            }, [
+                            React.createElement('label', { key: 'compliantPractices', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2497,17 +822,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.compliantPractices,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Documented Compliant Practices'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Clear terms of service, proper product descriptions, compliance documentation.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Compliant business practices')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'satisfaction',
-                                className: `checkbox-item ${formData.customerSatisfaction ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'customerSatisfaction', type: 'checkbox', checked: !formData.customerSatisfaction }})
-                            }, [
+                            React.createElement('label', { key: 'customerSatisfaction', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2515,53 +832,9 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.customerSatisfaction,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Customer Satisfaction Evidence'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Positive reviews, testimonials, low complaint rates demonstrating customer satisfaction.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Customer satisfaction metrics')
                             ]),
-                            
-                            React.createElement('div', { 
-                                key: 'disclosure',
-                                className: `checkbox-item ${formData.fullDisclosure ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'fullDisclosure', type: 'checkbox', checked: !formData.fullDisclosure }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'fullDisclosure',
-                                    checked: formData.fullDisclosure,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Full Business Model Disclosure'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Fully disclosed business model during onboarding, making retroactive concerns unjustified.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'shifting',
-                                className: `checkbox-item ${formData.shiftingDeadlines ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'shiftingDeadlines', type: 'checkbox', checked: !formData.shiftingDeadlines }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'shiftingDeadlines',
-                                    checked: formData.shiftingDeadlines,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Documentation of Shifting Deadlines'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Emails showing Stripe repeatedly extending promised payout dates without justification.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'damages',
-                                className: `checkbox-item ${formData.businessDamages ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'businessDamages', type: 'checkbox', checked: !formData.businessDamages }})
-                            }, [
+                            React.createElement('label', { key: 'businessDamages', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2569,78 +842,35 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.businessDamages,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Documented Business Damages'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Specific harm from fund withholding: inability to fulfill orders, emergency financing costs, etc.')
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { 
-                                key: 'custom-evidence',
-                                className: `checkbox-item ${formData.customEvidence ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'customEvidence', type: 'checkbox', checked: !formData.customEvidence }})
-                            }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    name: 'customEvidence',
-                                    checked: formData.customEvidence,
-                                    onChange: handleChange
-                                }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Additional Evidence'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Other evidence not listed above that supports your position.')
-                                ])
+                                React.createElement('span', { key: 'span' }, 'Documented business damages')
                             ])
-                        ]),
-                        
-                        formData.customEvidence && React.createElement('div', { key: 'custom-evidence-text', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Describe Your Additional Evidence'),
-                            React.createElement('textarea', {
-                                key: 'textarea',
-                                name: 'customEvidenceText',
-                                value: formData.customEvidenceText,
-                                onChange: handleChange,
-                                placeholder: 'Describe additional evidence you have that supports your position...',
-                                rows: 3
-                            })
                         ])
                     ]),
                     
-                    // Tab 5: Arbitration Demand Options (NEW TAB)
-                    currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Arbitration Demand Strategy'),
-                        React.createElement('p', { key: 'p' }, 'Decide whether to include a draft AAA arbitration demand with your letter. This shows maximum seriousness and preparation.'),
+                    // Tab 4: Legal Strategy
+                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Legal Strategy & Timeline'),
+                        React.createElement('p', { key: 'p' }, 'Configure your legal approach and deadlines.'),
                         
-                        // Decision Factors Section
-                        React.createElement('div', { key: 'decision-section', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Should You Include the Arbitration Demand?'),
-                            React.createElement('div', { key: 'factors' }, [
-                                React.createElement('p', { key: 'intro' }, React.createElement('strong', { key: 'bold' }, 'Choose YES for Maximum Pressure:')),
-                                React.createElement('ul', { key: 'yes-list', style: { marginLeft: '20px' } }, [
-                                    React.createElement('li', { key: 'yes1' }, 'Large withheld amount (>$10,000) where you need maximum leverage'),
-                                    React.createElement('li', { key: 'yes2' }, 'Stripe has been unresponsive or given you the runaround'),
-                                    React.createElement('li', { key: 'yes3' }, 'You have strong evidence (broken promises, low dispute rate, etc.)'),
-                                    React.createElement('li', { key: 'yes4' }, 'Previous attempts at resolution have failed'),
-                                    React.createElement('li', { key: 'yes5' }, 'You\'re prepared to follow through with actual filing if needed')
-                                ]),
-                                React.createElement('p', { key: 'middle', style: { marginTop: '15px' } }, React.createElement('strong', { key: 'bold' }, 'Choose NO for Friendlier Approach:')),
-                                React.createElement('ul', { key: 'no-list', style: { marginLeft: '20px' } }, [
-                                    React.createElement('li', { key: 'no1' }, 'Smaller amounts where arbitration costs might not be justified'),
-                                    React.createElement('li', { key: 'no2' }, 'You want to maintain a future business relationship with Stripe'),
-                                    React.createElement('li', { key: 'no3' }, 'This is your first formal communication attempt'),
-                                    React.createElement('li', { key: 'no4' }, 'You prefer to escalate gradually rather than immediately'),
-                                    React.createElement('li', { key: 'no5' }, 'Recent Stripe communication suggests resolution is possible')
+                        React.createElement('div', { key: 'row1', className: 'form-row' }, [
+                            React.createElement('div', { key: 'deadline', className: 'form-group' }, [
+                                React.createElement('label', { key: 'label' }, 'Response Deadline (days)'),
+                                React.createElement('select', {
+                                    key: 'select',
+                                    name: 'responseDeadline',
+                                    value: formData.responseDeadline,
+                                    onChange: handleChange
+                                }, [
+                                    React.createElement('option', { key: '7', value: 7 }, '7 days'),
+                                    React.createElement('option', { key: '14', value: 14 }, '14 days'),
+                                    React.createElement('option', { key: '21', value: 21 }, '21 days'),
+                                    React.createElement('option', { key: '30', value: 30 }, '30 days')
                                 ])
                             ])
                         ]),
                         
-                        React.createElement('div', { key: 'enable-checkbox', className: 'checkbox-grid' }, [
-                            React.createElement('div', { 
-                                key: 'enable-arb',
-                                className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
-                                onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }})
-                            }, [
+                        React.createElement('div', { key: 'arbitration', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label', className: 'checkbox-label' }, [
                                 React.createElement('input', {
                                     key: 'input',
                                     type: 'checkbox',
@@ -2648,311 +878,12 @@ contact eSignatures.com support with the document ID above.
                                     checked: formData.includeArbitrationDraft,
                                     onChange: handleChange
                                 }),
-                                React.createElement('div', { key: 'content' }, [
-                                    React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Arbitration Demand Attachment'),
-                                    React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Generate a professional AAA arbitration demand to attach. Creates maximum pressure and shows you\'re fully prepared.')
-                                ])
-                            ])
-                        ]),
-                        
-                        formData.includeArbitrationDraft && React.createElement('div', { key: 'arb-options' }, [
-                            React.createElement('h3', { key: 'h3', style: { marginTop: '30px', color: '#2c3e50' } }, 'Arbitration Configuration'),
-                            
-                            React.createElement('div', { key: 'damages-section', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Additional Business Damages Beyond Withheld Amount'),
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'text',
-                                    name: 'specificDamagesAmount',
-                                    value: formData.specificDamagesAmount,
-                                    onChange: handleChange,
-                                    placeholder: 'e.g., 5000 (emergency financing, lost sales, etc.)'
-                                })
+                                React.createElement('span', { key: 'span' }, 'Include draft arbitration demand as attachment')
                             ]),
-                            
-                            React.createElement('div', { key: 'claims-checkboxes', className: 'checkbox-grid' }, [
-                                React.createElement('div', { 
-                                    key: 'expedited',
-                                    className: `checkbox-item ${formData.expeditedProcedures ? 'selected' : ''}`,
-                                    onClick: () => handleChange({ target: { name: 'expeditedProcedures', type: 'checkbox', checked: !formData.expeditedProcedures }})
-                                }, [
-                                    React.createElement('input', {
-                                        key: 'input',
-                                        type: 'checkbox',
-                                        name: 'expeditedProcedures',
-                                        checked: formData.expeditedProcedures,
-                                        onChange: handleChange
-                                    }),
-                                    React.createElement('div', { key: 'content' }, [
-                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Request Expedited Procedures'),
-                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Faster resolution (60-90 days), available for most commercial disputes.')
-                                    ])
-                                ]),
-                                
-                                React.createElement('div', { 
-                                    key: 'interest',
-                                    className: `checkbox-item ${formData.includeInterestOnFunds ? 'selected' : ''}`,
-                                    onClick: () => handleChange({ target: { name: 'includeInterestOnFunds', type: 'checkbox', checked: !formData.includeInterestOnFunds }})
-                                }, [
-                                    React.createElement('input', {
-                                        key: 'input',
-                                        type: 'checkbox',
-                                        name: 'includeInterestOnFunds',
-                                        checked: formData.includeInterestOnFunds,
-                                        onChange: handleChange
-                                    }),
-                                    React.createElement('div', { key: 'content' }, [
-                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Claim Interest/Profits on Withheld Funds'),
-                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Allowed under California law - demand profits Stripe earned while holding your money.')
-                                    ])
-                                ]),
-                                
-                                React.createElement('div', { 
-                                    key: 'attorney-fees',
-                                    className: `checkbox-item ${formData.includeAttorneyFees ? 'selected' : ''}`,
-                                    onClick: () => handleChange({ target: { name: 'includeAttorneyFees', type: 'checkbox', checked: !formData.includeAttorneyFees }})
-                                }, [
-                                    React.createElement('input', {
-                                        key: 'input',
-                                        type: 'checkbox',
-                                        name: 'includeAttorneyFees',
-                                        checked: formData.includeAttorneyFees,
-                                        onChange: handleChange
-                                    }),
-                                    React.createElement('div', { key: 'content' }, [
-                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Claim Attorney Fees and Costs'),
-                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'California UCL allows recovery of arbitration costs in unfair business practice cases.')
-                                    ])
-                                ])
-                            ]),
-                            
-                            React.createElement('div', { key: 'additional-claims', className: 'form-group' }, [
-                                React.createElement('label', { key: 'label' }, 'Additional Claims or Special Circumstances (Optional)'),
-                                React.createElement('textarea', {
-                                    key: 'textarea',
-                                    name: 'additionalClaims',
-                                    value: formData.additionalClaims,
-                                    onChange: handleChange,
-                                    placeholder: 'Describe any special circumstances or additional legal claims specific to your case...',
-                                    rows: 3
-                                })
-                            ])
-                        ]),
-                        
-                        // How to Send Section
-                        React.createElement('div', { key: 'sending-section', className: 'tip-box warning' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'How to Send Your Demand Letter'),
-                            React.createElement('div', { key: 'sending-steps' }, [
-                                React.createElement('p', { key: 'step1' }, React.createElement('strong', { key: 'bold1' }, '1. Certified Mail: ')),
-                                React.createElement('p', { key: 'step1-text', style: { marginLeft: '20px' } }, 'Send via USPS Certified Mail, Return Receipt Requested to:'),
-                                React.createElement('p', { key: 'address', style: { marginLeft: '40px', fontFamily: 'monospace' } }, [
-                                    'Stripe, Inc.',
-                                    React.createElement('br', { key: 'br1' }),
-                                    'Attn: Legal Department',
-                                    React.createElement('br', { key: 'br2' }),
-                                    '354 Oyster Point Blvd.',
-                                    React.createElement('br', { key: 'br3' }),
-                                    'South San Francisco, CA 94080'
-                                ]),
-                                React.createElement('p', { key: 'step2' }, React.createElement('strong', { key: 'bold2' }, '2. Email Copy: ')),
-                                React.createElement('p', { key: 'step2-text', style: { marginLeft: '20px' } }, 'Also email to: owner@terms.law (Subject: "ATTN: Legal Department - Arbitration Notice - TESTING")'),
-                                React.createElement('p', { key: 'step3' }, React.createElement('strong', { key: 'bold3' }, '3. Keep Records: ')),
-                                React.createElement('p', { key: 'step3-text', style: { marginLeft: '20px' } }, 'Save certified mail receipt, delivery confirmation, and email confirmation. You\'ll need these for arbitration filing.')
-                            ])
-                        ]),
-                        
-                        React.createElement('div', { key: 'strategy-tip', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Strategic Timing'),
-                            React.createElement('p', { key: 'text' }, 'Including the arbitration demand often leads to faster settlements during the 30-day notice period - many companies prefer to resolve rather than face formal arbitration proceedings. However, you must be prepared to actually file if Stripe doesn\'t respond appropriately.')
-                        ]),
-                        
-                        React.createElement('div', { key: 'timeline', className: 'tip-box info' }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, 'Timeline & Costs (2025 AAA Fee Schedule)'),
-                            React.createElement('p', { key: 'notice' }, React.createElement('strong', { key: 'notice-label' }, '30-Day Notice Period: '), 'Required before filing arbitration (automatically calculated in your letter)'),
-                            (() => {
-                                const { standardFees, flexibleFees, amount } = calculateAAAfees();
-                                const recommendation = getFeeScheduleRecommendation();
-                                const complexity = analyzeCaseComplexity();
-                                
-                                const elements = [];
-                                
-                                // Fee Schedule Comparison
-                                elements.push(
-                                    React.createElement('div', { key: 'fee-comparison', style: { marginBottom: '20px' } }, [
-                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, 'AAA Fee Schedule Options'),
-                                        
-                                        // Standard Schedule
-                                        React.createElement('div', { key: 'standard-schedule', style: { 
-                                            border: recommendation.recommended === 'standard' ? '2px solid #28a745' : '1px solid #ddd',
-                                            borderRadius: '8px', 
-                                            padding: '15px', 
-                                            marginBottom: '15px',
-                                            backgroundColor: recommendation.recommended === 'standard' ? '#f8fff9' : '#f8f9fa'
-                                        } }, [
-                                            React.createElement('div', { key: 'standard-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
-                                                React.createElement('h5', { key: 'standard-title', style: { margin: 0, color: '#2c3e50' } }, [
-                                                    'Standard Fee Schedule',
-                                                    recommendation.recommended === 'standard' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
-                                                ]),
-                                                React.createElement('div', { key: 'standard-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${standardFees.total.toLocaleString()} Total`)
-                                            ]),
-                                            React.createElement('p', { key: 'standard-breakdown', style: { margin: '10px 0', fontSize: '14px' } }, [
-                                                `$${standardFees.initial.toLocaleString()} initial filing fee + $${standardFees.final.toLocaleString()} final fee`,
-                                                standardFees.expedited ? ' (Expedited procedures available)' : ''
-                                            ]),
-                                            React.createElement('p', { key: 'standard-explanation', style: { margin: 0, fontSize: '13px', color: '#6c757d' } }, 'Two-payment system: pay initial fee when filing, final fee when hearings are scheduled. Lower total cost if case proceeds to hearing.')
-                                        ]),
-                                        
-                                        // Flexible Schedule (if available)
-                                        flexibleFees && React.createElement('div', { key: 'flexible-schedule', style: { 
-                                            border: recommendation.recommended === 'flexible' ? '2px solid #28a745' : '1px solid #ddd',
-                                            borderRadius: '8px', 
-                                            padding: '15px', 
-                                            marginBottom: '15px',
-                                            backgroundColor: recommendation.recommended === 'flexible' ? '#f8fff9' : '#f8f9fa'
-                                        } }, [
-                                            React.createElement('div', { key: 'flexible-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
-                                                React.createElement('h5', { key: 'flexible-title', style: { margin: 0, color: '#2c3e50' } }, [
-                                                    'Flexible Fee Schedule',
-                                                    recommendation.recommended === 'flexible' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
-                                                ]),
-                                                React.createElement('div', { key: 'flexible-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${flexibleFees.total.toLocaleString()} Total`)
-                                            ]),
-                                            React.createElement('p', { key: 'flexible-breakdown', style: { margin: '10px 0', fontSize: '14px' } }, `$${flexibleFees.initial.toLocaleString()} initial + $${flexibleFees.proceed.toLocaleString()} proceed fee (due within 90 days) + $${flexibleFees.final.toLocaleString()} final fee`),
-                                            React.createElement('p', { key: 'flexible-explanation', style: { margin: 0, fontSize: '13px', color: '#6c757d' } }, 'Three-payment system: lower upfront cost, spread payments over time. Good for cash flow but higher total cost if case proceeds to hearing.')
-                                        ]),
-                                        
-                                        // Recommendation
-                                        React.createElement('div', { key: 'recommendation', style: { 
-                                            backgroundColor: '#e8f4fd', 
-                                            border: '1px solid #bee5eb', 
-                                            borderRadius: '6px', 
-                                            padding: '15px',
-                                            marginTop: '15px'
-                                        } }, [
-                                            React.createElement('h5', { key: 'rec-title', style: { margin: '0 0 10px 0', color: '#0c5460' } }, 'My Recommendation:'),
-                                            React.createElement('p', { key: 'rec-text', style: { margin: 0, fontSize: '14px', color: '#0c5460' } }, recommendation.reason)
-                                        ]),
-                                        
-                                        // Strategic considerations for Flexible Fee (only show if eligible)
-                                        flexibleFees && React.createElement('div', { key: 'strategic-considerations', style: { 
-                                            backgroundColor: '#fff3cd', 
-                                            border: '1px solid #ffeeba', 
-                                            borderRadius: '6px', 
-                                            padding: '15px',
-                                            marginTop: '15px'
-                                        } }, [
-                                            React.createElement('h5', { key: 'strategic-title', style: { margin: '0 0 10px 0', color: '#856404' } }, 'When Flexible Fee Schedule Can Be Advantageous:'),
-                                            React.createElement('ul', { key: 'strategic-list', style: { margin: 0, paddingLeft: '20px', fontSize: '14px', color: '#856404' } }, [
-                                                React.createElement('li', { key: 'holding-period' }, React.createElement('strong', {}, 'Extended Holding Periods: '), 'If Stripe has held your funds beyond 180 days (industry standard maximum), they face increased settlement pressure knowing their position weakens over time.'),
-                                                React.createElement('li', { key: 'cash-flow' }, React.createElement('strong', {}, 'Cash Flow Management: '), 'Lower upfront cost preserves working capital for business operations while the case proceeds.'),
-                                                React.createElement('li', { key: 'early-settlement' }, React.createElement('strong', {}, 'Early Settlement Likelihood: '), 'When Stripe has made broken promises or shown shifting timelines, early settlement during the 90-day proceed fee period is common.'),
-                                                React.createElement('li', { key: 'strategic-timing' }, React.createElement('strong', {}, 'Strategic Reassessment: '), 'The 90-day proceed fee period allows you to evaluate Stripe\'s response and adjust strategy before committing to full hearing costs.')
-                                            ])
-                                        ])
-                                    ])
-                                );
-                                
-                                // Additional fee information
-                                elements.push(
-                                    React.createElement('p', { key: 'fee-explanation', style: { fontSize: '14px', color: '#6c757d', marginBottom: '15px' } }, [
-                                        React.createElement('strong', { key: 'who-pays' }, 'Who Pays: '), 
-                                        'You (claimant) pay administrative fees when filing. However, you can request fee reallocation in your arbitration demand, and the arbitrator can order Stripe to reimburse you for these costs if you prevail.'
-                                    ])
-                                );
-                                
-                                // Timeline and process info
-                                elements.push(
-                                    React.createElement('p', { key: 'timeline' }, [
-                                        React.createElement('strong', { key: 'timeline-label' }, 'Expected Timeline: '), 
-                                        complexity.timeline
-                                    ])
-                                );
-                                
-                                elements.push(
-                                    React.createElement('p', { key: 'procedures' }, [
-                                        React.createElement('strong', { key: 'procedures-label' }, 'Likely Process: '), 
-                                        complexity.procedures
-                                    ])
-                                );
-                                
-                                elements.push(
-                                    React.createElement('p', { key: 'arbitrator-costs', style: { fontSize: '14px', color: '#6c757d' } }, [
-                                        React.createElement('strong', { key: 'arb-label' }, 'Arbitrator Compensation: '), 
-                                        'Typically $300-600/hour, split equally between parties unless your arbitration clause or arbitrator rules otherwise. Can also be reallocated by the arbitrator.'
-                                    ])
-                                );
-                                
-                                if (standardFees.expedited) {
-                                    elements.push(
-                                        React.createElement('p', { key: 'expedited-tip' }, [
-                                            React.createElement('strong', { key: 'expedited-label' }, 'Expedited Procedures Available: '), 
-                                            'Claims under $75K qualify for expedited procedures - faster resolution and same AAA fees.'
-                                        ])
-                                    );
-                                }
-                                
-                                return elements;
-                            })()
+                            React.createElement('p', { key: 'help', className: 'help-text' }, 
+                                'Including the arbitration draft shows Stripe you are prepared to file if they don\'t respond.'
+                            )
                         ])
-                    ]),
-                    
-                    // Tab 6: Risk Assessment (REMOVED "Attorney-Level" language)
-                    currentTab === 5 && React.createElement('div', { key: 'tab6' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Case Analysis & Strategy'),
-                        React.createElement('p', { key: 'p' }, 'Educational assessment of case factors and strategic considerations:'),
-                        React.createElement('div', { key: 'disclaimer', className: 'tip-box warning', style: { marginBottom: '20px' } }, [
-                            React.createElement('div', { key: 'title', className: 'tip-title' }, '⚠️ Important Disclaimer'),
-                            React.createElement('p', { key: 'text' }, 'This analysis is for educational purposes only and does not constitute legal advice. Consult with a qualified attorney for professional legal guidance specific to your situation.')
-                        ]),
-                        
-                        (() => {
-                            const assessment = getRiskAssessment();
-                            const complexity = analyzeCaseComplexity();
-                            const evidenceStrategy = getEvidenceStrategy();
-                            
-                            return React.createElement('div', { key: 'assessment' }, [
-                                React.createElement('div', { key: 'score-card', className: `risk-card ${assessment.riskClass}` }, [
-                                    React.createElement('h3', { key: 'h3' }, `${assessment.riskLevel} (Score: ${assessment.score}/100)`),
-                                    React.createElement('ul', { key: 'factors' }, 
-                                        assessment.factors.map((factor, index) => 
-                                            React.createElement('li', { key: index }, factor)
-                                        )
-                                    )
-                                ]),
-                                
-                                React.createElement('div', { key: 'strategy-card', className: 'risk-card risk-strong' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Strategic Recommendations'),
-                                    React.createElement('ul', { key: 'recs' }, 
-                                        assessment.recommendations.map((rec, index) => 
-                                            React.createElement('li', { key: index }, rec)
-                                        )
-                                    )
-                                ]),
-                                
-                                evidenceStrategy.length > 0 && React.createElement('div', { key: 'evidence-card', className: 'risk-card risk-moderate' }, [
-                                    React.createElement('h3', { key: 'h3' }, 'Evidence Hierarchy - Priority Order'),
-                                    React.createElement('div', { key: 'evidence-list' },
-                                        evidenceStrategy.map((item, index) => 
-                                            React.createElement('div', { key: index, className: 'evidence-item', style: { marginBottom: '15px', padding: '10px', border: '1px solid #ddd', borderRadius: '5px' } }, [
-                                                React.createElement('strong', { key: 'priority' }, `Priority ${item.priority}: ${item.evidence}`),
-                                                React.createElement('div', { key: 'impact', style: { color: '#28a745', fontSize: '14px' } }, `Impact: ${item.impact}`),
-                                                React.createElement('div', { key: 'action', style: { color: '#6c757d', fontSize: '14px' } }, `Action: ${item.action}`)
-                                            ])
-                                        )
-                                    )
-                                ]),
-                                
-                                React.createElement('div', { key: 'complexity-card', className: `risk-card ${complexity.isComplex ? 'risk-moderate' : 'risk-strong'}` }, [
-                                    React.createElement('h3', { key: 'h3' }, `Case Complexity: ${complexity.isComplex ? 'Complex' : 'Straightforward'}`),
-                                    React.createElement('ul', { key: 'complexity-factors' }, 
-                                        complexity.complexityFactors.map((factor, index) => 
-                                            React.createElement('li', { key: index }, factor)
-                                        )
-                                    )
-                                ])
-                            ]);
-                        })()
                     ])
                 ]),
                 
@@ -2961,340 +892,94 @@ contact eSignatures.com support with the document ID above.
                     React.createElement('button', {
                         key: 'prev',
                         onClick: prevTab,
-                        className: `nav-button ${currentTab === 0 ? 'disabled' : ''}`,
+                        className: `nav-button prev-button ${currentTab === 0 ? 'disabled' : ''}`,
                         disabled: currentTab === 0
-                    }, 'Previous'),
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'chevron-left', style: { marginRight: '0.25rem' }}),
+                        'Previous'
+                    ]),
                     
-                    React.createElement('div', { key: 'middle', style: { display: 'flex', gap: '10px' } }, [
-                        React.createElement('button', {
-                            key: 'copy',
-                            onClick: copyToClipboard,
-                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
-                            style: { 
-                                backgroundColor: isPaid ? "#4f46e5" : "#6c757d", 
-                                color: "white", 
-                                border: "none",
-                                opacity: isPaid ? 1 : 0.7
-                            }
-                        }, isPaid ? 'Copy to Clipboard' : '🔒 Copy to Clipboard'),
-                        
-                        React.createElement('button', {
-                            key: 'download',
-                            onClick: downloadAsWord,
-                            className: `nav-button ${isPaid ? 'paid' : 'unpaid'}`,
-                            style: { 
-                                backgroundColor: isPaid ? (signedDocumentInfo ? "#28a745" : "#2563eb") : "#6c757d", 
-                                color: "white", 
-                                border: "none",
-                                opacity: isPaid ? 1 : 0.7
-                            }
-                        }, isPaid ? (signedDocumentInfo ? '📝 Download Signed Document' : 'Download MS Word') : '🔒 Download MS Word'),
-                        
-                        React.createElement('button', {
-                            key: 'esign-only',
-                            onClick: () => {
-                                console.log('eSign Only button clicked');
-                                handleESignOnly();
-                            },
-                            disabled: isESignatureLoading,
-                            className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
-                            style: { 
-                                backgroundColor: isPaid ? "#28a745" : "#6c757d", 
-                                color: "white", 
-                                border: "none",
-                                opacity: isPaid ? 1 : 0.7
-                            }
-                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign Only' : '🔒 E-Sign Only')),
-                        
-                        React.createElement('button', {
-                            key: 'esign-email',
-                            onClick: () => {
-                                console.log('eSign & Email button clicked');
-                                handleESignAndEmail();
-                            },
-                            disabled: isESignatureLoading,
-                            className: `nav-button esign-button ${isPaid ? 'paid' : 'unpaid'}`,
-                            style: { 
-                                backgroundColor: isPaid ? "#dc3545" : "#6c757d", 
-                                color: "white", 
-                                border: "none",
-                                opacity: isPaid ? 1 : 0.7
-                            }
-                        }, isESignatureLoading ? 'Processing...' : (isPaid ? 'E-Sign & Email Test' : '🔒 E-Sign & Email Test')),
-                        
-                        React.createElement('button', {
-                            key: 'consult',
-                            onClick: () => {
-                                if (window.Calendly) {
-                                    window.Calendly.initPopupWidget({
-                                        url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1'
-                                    });
-                                }
-                                return false;
-                            },
-                            className: 'nav-button consultation-button',
-                            style: { backgroundColor: "#28a745", color: "white", border: "none" }
-                        }, 'Schedule Consultation')
+                    React.createElement('button', {
+                        key: 'copy',
+                        onClick: copyToClipboard,
+                        className: 'nav-button',
+                        style: { backgroundColor: '#4f46e5', color: 'white', border: 'none' }
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'copy', style: { marginRight: '0.25rem' }}),
+                        'Copy'
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'download',
+                        onClick: downloadAsWord,
+                        className: 'nav-button',
+                        style: { backgroundColor: '#2563eb', color: 'white', border: 'none' }
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'file-text', style: { marginRight: '0.25rem' }}),
+                        'Download'
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'esign',
+                        onClick: handleESignOnly,
+                        className: 'nav-button',
+                        style: { backgroundColor: '#059669', color: 'white', border: 'none' },
+                        disabled: isESignatureLoading
+                    }, [
+                        React.createElement(Icon, { 
+                            key: 'icon', 
+                            name: isESignatureLoading ? 'loader' : 'edit-3', 
+                            style: { marginRight: '0.25rem' }
+                        }),
+                        isESignatureLoading ? 'Loading...' : 'E-Sign'
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'esign-email',
+                        onClick: handleESignAndEmail,
+                        className: 'nav-button',
+                        style: { backgroundColor: '#dc2626', color: 'white', border: 'none' },
+                        disabled: isESignatureLoading
+                    }, [
+                        React.createElement(Icon, { 
+                            key: 'icon', 
+                            name: isESignatureLoading ? 'loader' : 'send', 
+                            style: { marginRight: '0.25rem' }
+                        }),
+                        isESignatureLoading ? 'Loading...' : 'E-Sign & Email'
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'consult',
+                        onClick: () => window.open('https://terms.law/call/', '_blank'),
+                        className: 'nav-button',
+                        style: { backgroundColor: '#f59e0b', color: 'white', border: 'none' }
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'calendar', style: { marginRight: '0.25rem' }}),
+                        'Consult'
                     ]),
                     
                     React.createElement('button', {
                         key: 'next',
                         onClick: nextTab,
-                        className: `nav-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
+                        className: `nav-button next-button ${currentTab === tabs.length - 1 ? 'disabled' : ''}`,
                         disabled: currentTab === tabs.length - 1
-                    }, 'Next')
+                    }, [
+                        'Next',
+                        React.createElement(Icon, { key: 'icon', name: 'chevron-right', style: { marginLeft: '0.25rem' }})
+                    ])
                 ])
             ]),
             
             // Preview Panel
-            React.createElement('div', { key: 'preview', className: 'preview-panel' }, [
+            React.createElement('div', { key: 'preview', className: 'preview-panel', ref: previewRef }, [
                 React.createElement('div', { key: 'content', className: 'preview-content' }, [
-                    React.createElement('div', { key: 'header', className: 'preview-header' }, [
-                        React.createElement('h2', { key: 'title' }, 'Live Preview'),
-                        React.createElement('p', { key: 'subtitle', className: 'preview-text' }, 
-                            formData.includeArbitrationDraft ? 'Your AAA arbitration demand' : 
-                            'Your demand letter with 30-day arbitration notice'
-                        ),
-                        // Show signed document status
-                        signedDocumentInfo && React.createElement('div', {
-                            key: 'signed-status',
-                            style: {
-                                backgroundColor: '#d4edda',
-                                color: '#155724',
-                                border: '1px solid #c3e6cb',
-                                borderRadius: '6px',
-                                padding: '12px',
-                                marginTop: '10px',
-                                fontSize: '14px',
-                                fontWeight: 'bold'
-                            }
-                        }, [
-                            React.createElement('span', { key: 'icon' }, '✅ '),
-                            `Document electronically signed by ${signedDocumentInfo.signerName} on ${new Date(signedDocumentInfo.signedAt).toLocaleDateString()}`,
-                            signedDocumentInfo.emailedToOwner && React.createElement('div', {
-                                key: 'email-status',
-                                style: { marginTop: '5px', fontWeight: 'normal' }
-                            }, '📧 Email notification sent to owner@terms.law')
-                        ])
-                    ]),
-                    React.createElement('div', { 
+                    React.createElement('h2', { key: 'title' }, 'Live Preview'),
+                    React.createElement('pre', {
                         key: 'document',
-                        ref: previewRef,
                         className: 'document-preview',
-                        dangerouslySetInnerHTML: { 
-                            __html: highlightedText.replace(/\n/g, '<br>') 
-                        }
+                        dangerouslySetInnerHTML: { __html: highlightedText }
                     })
-                ])
-            ])
-        ]),
-        
-        // eSignature Modal
-        showESignatureModal && React.createElement('div', { 
-            key: 'esignature-modal',
-            className: 'esignature-modal-overlay',
-            style: {
-                position: 'fixed',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                zIndex: 10000,
-                backdropFilter: 'blur(4px)'
-            }
-        }, [
-            React.createElement('div', {
-                key: 'modal-content',
-                className: 'esignature-modal-content',
-                style: {
-                    backgroundColor: 'white',
-                    borderRadius: '12px',
-                    width: '90%',
-                    height: '80%',
-                    maxWidth: '1000px',
-                    maxHeight: '600px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
-                }
-            }, [
-                React.createElement('div', {
-                    key: 'modal-header',
-                    style: {
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        padding: '20px',
-                        borderBottom: '1px solid #e9ecef',
-                        backgroundColor: '#f8f9fa',
-                        borderRadius: '12px 12px 0 0'
-                    }
-                }, [
-                    React.createElement('h3', { key: 'title' }, 
-                        currentESignatureMode === 'email' 
-                            ? (isESignatureDemoMode ? 'E-Sign & Email Test (Demo Mode)' : 'E-Sign & Email to terms.law') 
-                            : (isESignatureDemoMode ? 'Electronic Signature (Demo Mode)' : 'Electronic Signature')
-                    ),
-                    React.createElement('button', {
-                        key: 'close',
-                        onClick: closeESignatureModal,
-                        style: {
-                            background: 'none',
-                            border: 'none',
-                            fontSize: '24px',
-                            cursor: 'pointer',
-                            padding: '5px',
-                            lineHeight: 1
-                        }
-                    }, '×')
-                ]),
-                
-                eSignatureError && React.createElement('div', {
-                    key: 'error',
-                    style: {
-                        backgroundColor: '#f8d7da',
-                        color: '#721c24',
-                        padding: '15px',
-                        margin: '10px',
-                        borderRadius: '4px',
-                        border: '1px solid #f5c6cb'
-                    }
-                }, [
-                    React.createElement('strong', { key: 'label' }, 'Error: '),
-                    eSignatureError
-                ]),
-                
-                React.createElement('div', {
-                    key: 'iframe-container',
-                    style: {
-                        flex: 1,
-                        padding: '20px',
-                        display: 'flex',
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    }
-                }, eSignatureIframe ? [
-                    // Show different content based on demo mode
-                    isESignatureDemoMode ? React.createElement('div', {
-                        key: 'demo-message',
-                        style: {
-                            width: '100%',
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            alignItems: 'center',
-                            backgroundColor: '#f8f9fa',
-                            border: '2px dashed #007bff',
-                            borderRadius: '8px',
-                            textAlign: 'center',
-                            padding: '40px'
-                        }
-                    }, [
-                        React.createElement('h3', {
-                            key: 'demo-title',
-                            style: { color: '#28a745', marginBottom: '20px' }
-                        }, '✅ eSignature Ready!'),
-                        React.createElement('p', {
-                            key: 'demo-text1',
-                            style: { marginBottom: '15px', fontSize: '16px', color: '#2c3e50' }
-                        }, 'Your Stripe demand letter is ready for electronic signature.'),
-                        React.createElement('p', {
-                            key: 'demo-text2',
-                            style: { marginBottom: '15px', color: '#6c757d', fontSize: '14px' }
-                        }, `Document prepared for: ${formData.email || 'signer@example.com'}`),
-                        React.createElement('p', {
-                            key: 'demo-text3',
-                            style: { color: '#007bff', fontWeight: 'bold', marginBottom: '20px' }
-                        }, currentESignatureMode === 'email' ? 
-                            '📧 After signing, document will be emailed to owner@terms.law' : 
-                            '📄 Document will be available for download after signing'
-                        ),
-                        React.createElement('div', {
-                            key: 'demo-note',
-                            style: {
-                                backgroundColor: '#e3f2fd',
-                                border: '1px solid #2196f3',
-                                borderRadius: '8px',
-                                padding: '20px',
-                                marginBottom: '20px',
-                                fontSize: '14px'
-                            }
-                        }, [
-                            React.createElement('div', { 
-                                key: 'note-title',
-                                style: { marginBottom: '10px' }
-                            }, [
-                                React.createElement('strong', { key: 'title-text' }, '🔧 Demo Workflow: '),
-                                'Simulating complete eSignatures.com integration'
-                            ]),
-                            React.createElement('ul', {
-                                key: 'demo-steps',
-                                style: { margin: '0', paddingLeft: '20px', textAlign: 'left' }
-                            }, [
-                                React.createElement('li', { key: 'step1' }, 'Document template created'),
-                                React.createElement('li', { key: 'step2' }, 'Signing contract configured'),
-                                React.createElement('li', { key: 'step3' }, 'Ready for electronic signature'),
-                                currentESignatureMode === 'email' && React.createElement('li', { key: 'step4' }, 'Email notification setup complete')
-                            ].filter(Boolean))
-                        ]),
-                        React.createElement('button', {
-                            key: 'demo-complete',
-                            onClick: () => {
-                                // Show success message first
-                                alert(currentESignatureMode === 'email' ? 
-                                    '✅ Document signed successfully! Email notification sent to owner@terms.law' :
-                                    '✅ Document signed successfully! Ready for download.'
-                                );
-                                
-                                // Simulate completion with email trigger if needed
-                                const mockSignedUrl = 'https://demo.esignatures.com/documents/signed_' + Date.now() + '.pdf';
-                                
-                                if (currentESignatureMode === 'email') {
-                                    // Send real email notification
-                                    setTimeout(() => {
-                                        sendSignedDocumentToStripe(mockSignedUrl, formData.email, formData.contactName || 'Document Signer');
-                                    }, 1000);
-                                }
-                                
-                                handleESignatureComplete(mockSignedUrl);
-                            },
-                            style: {
-                                padding: '15px 30px',
-                                backgroundColor: '#28a745',
-                                color: 'white',
-                                border: 'none',
-                                borderRadius: '8px',
-                                cursor: 'pointer',
-                                fontSize: '16px',
-                                fontWeight: 'bold',
-                                fontSize: '16px',
-                                fontWeight: 'bold'
-                            }
-                        }, 'Simulate Signing Complete')
-                    ]) : React.createElement('iframe', {
-                        key: 'signing-iframe',
-                        src: eSignatureIframe,
-                        style: {
-                            width: '100%',
-                            height: '100%',
-                            border: 'none',
-                            borderRadius: '4px'
-                        },
-                        title: 'Electronic Signature'
-                    })
-                ] : [
-                    React.createElement('div', {
-                        key: 'loading',
-                        style: {
-                            textAlign: 'center',
-                            color: '#6c757d'
-                        }
-                    }, 'Loading signature interface...')
                 ])
             ])
         ])
@@ -3303,8 +988,6 @@ contact eSignatures.com support with the document ID above.
 
 // Render the component
 console.log('Starting to render StripeDemandGenerator...');
-console.log('React available:', typeof React);
-console.log('ReactDOM available:', typeof ReactDOM);
 
 try {
     ReactDOM.render(React.createElement(StripeDemandGenerator), document.getElementById('root'));
