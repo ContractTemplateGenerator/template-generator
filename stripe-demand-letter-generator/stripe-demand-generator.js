@@ -1,8 +1,10 @@
 // Stripe Demand Letter Generator - React Component with eSignatures.com Integration
 // 
-// NOTE: eSignature functionality currently in DEMO MODE due to CORS restrictions
-// The eSignatures.com API doesn't allow direct browser requests, so we're using mock responses
-// To enable real eSignature functionality, a backend proxy would be needed
+// NOTE: eSignature functionality uses hybrid approach:
+// 1. First attempts real eSignatures.com API calls with your token
+// 2. Falls back to DEMO MODE if CORS restrictions prevent direct browser requests
+// 3. Demo mode simulates the complete workflow with eSignatures.io branding
+// 4. For production without CORS issues, the real API calls will work seamlessly
 //
 const { useState, useRef, useEffect } = React;
 
@@ -17,24 +19,6 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         console.log('Document title:', documentTitle);
         console.log('Content length:', documentContent.length);
         
-        // For now, create a demo/mock implementation since the API has CORS issues
-        console.log('DEMO MODE: Simulating eSignature template creation...');
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        
-        // Return mock template response
-        const mockTemplate = {
-            id: 'template_' + Date.now(),
-            name: documentTitle,
-            status: 'created',
-            created_at: new Date().toISOString()
-        };
-        
-        console.log('Mock template created:', mockTemplate);
-        return mockTemplate;
-        
-        /* COMMENTED OUT REAL API CALL DUE TO CORS ISSUES
         const requestBody = {
             name: documentTitle,
             content: documentContent,
@@ -65,12 +49,30 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         const result = await response.json();
         console.log('Template created successfully:', result);
         return result;
-        */
+        
     } catch (error) {
         console.error('Error creating eSignature template:', error);
+        
+        // If it's a network/CORS error, fall back to demo mode
         if (error.name === 'TypeError' && error.message.includes('fetch')) {
-            throw new Error('Network error: Unable to connect to eSignatures.com API. This might be a CORS issue or the API endpoint is incorrect.');
+            console.log('Network error detected, falling back to DEMO MODE...');
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 800));
+            
+            // Return mock template response for demo
+            const mockTemplate = {
+                id: 'esig_template_' + Date.now(),
+                name: documentTitle,
+                status: 'created',
+                created_at: new Date().toISOString(),
+                _demo_mode: true
+            };
+            
+            console.log('DEMO MODE: Mock template created:', mockTemplate);
+            return mockTemplate;
         }
+        
         throw error;
     }
 };
@@ -81,60 +83,74 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         console.log('Signer:', signerName, signerEmail);
         console.log('Email to terms.law:', emailToStripe);
         
-        // For now, create a demo/mock implementation since the API has CORS issues
-        console.log('DEMO MODE: Simulating eSignature contract creation...');
-        
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Return mock contract response with a demo signing URL
-        const mockContract = {
-            id: 'contract_' + Date.now(),
+        const requestBody = {
             template_id: templateId,
-            status: 'pending',
-            signing_url: 'https://app.hellosign.com/s/demo_signature_link_' + Date.now(),
             signers: [{
                 email: signerEmail,
                 name: signerName,
-                status: 'pending'
+                redirect_url: window.location.href,
+                role: 'signer'
             }],
-            created_at: new Date().toISOString()
+            embedded: true,
+            custom_data: {
+                email_to_stripe: emailToStripe,
+                return_email: signerEmail
+            }
         };
         
-        console.log('Mock contract created:', mockContract);
-        return mockContract;
+        console.log('Making contract API request to:', `${ESIGNATURES_API_BASE}/contracts`);
         
-        /* COMMENTED OUT REAL API CALL DUE TO CORS ISSUES
         const response = await fetch(`${ESIGNATURES_API_BASE}/contracts`, {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
             },
-            body: JSON.stringify({
+            body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Contract API response status:', response.status);
+        
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Contract API error response:', errorText);
+            throw new Error(`Contract creation failed: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Contract created successfully:', result);
+        return result;
+        
+    } catch (error) {
+        console.error('Error creating eSignature contract:', error);
+        
+        // If it's a network/CORS error, fall back to demo mode
+        if (error.name === 'TypeError' && error.message.includes('fetch')) {
+            console.log('Network error detected, falling back to DEMO MODE...');
+            
+            // Simulate API delay
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
+            // Return mock contract response with eSignatures.io branding
+            const mockContract = {
+                id: 'esig_contract_' + Date.now(),
                 template_id: templateId,
+                status: 'pending',
+                signing_url: 'https://app.esignatures.io/sign/demo_' + Date.now(),
                 signers: [{
                     email: signerEmail,
                     name: signerName,
-                    redirect_url: window.location.href,
-                    role: 'signer'
+                    status: 'pending'
                 }],
-                embedded: true,
-                custom_data: {
-                    email_to_stripe: emailToStripe,
-                    return_email: signerEmail
-                }
-            })
-        });
-        
-        if (!response.ok) {
-            throw new Error(`Contract creation failed: ${response.status}`);
+                created_at: new Date().toISOString(),
+                _demo_mode: true
+            };
+            
+            console.log('DEMO MODE: Mock contract created:', mockContract);
+            return mockContract;
         }
         
-        return await response.json();
-        */
-    } catch (error) {
-        console.error('Error creating eSignature contract:', error);
         throw error;
     }
 };
@@ -241,6 +257,7 @@ const StripeDemandGenerator = () => {
     const [showESignatureModal, setShowESignatureModal] = useState(false);
     const [eSignatureIframe, setESignatureIframe] = useState('');
     const [currentESignatureMode, setCurrentESignatureMode] = useState(null);
+    const [isESignatureDemoMode, setIsESignatureDemoMode] = useState(false);
     
     // Form data state
     const [formData, setFormData] = useState({
@@ -947,7 +964,13 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 emailToStripe
             );
             
-            const embeddedUrl = `${contract.signing_url}?embedded=yes`;
+            // Check if we're in demo mode
+            const isDemoMode = template._demo_mode || contract._demo_mode;
+            setIsESignatureDemoMode(isDemoMode);
+            
+            const embeddedUrl = isDemoMode ? 
+                contract.signing_url : 
+                `${contract.signing_url}?embedded=yes`;
             setESignatureIframe(embeddedUrl);
             setShowESignatureModal(true);
             
@@ -980,6 +1003,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         setESignatureIframe('');
         setESignatureError(null);
         setCurrentESignatureMode(null);
+        setIsESignatureDemoMode(false);
     };
 
     const copyToClipboard = () => {
@@ -3024,8 +3048,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 }, [
                     React.createElement('h3', { key: 'title' }, 
                         currentESignatureMode === 'email' 
-                            ? 'E-Sign & Email to Stripe' 
-                            : 'Electronic Signature'
+                            ? (isESignatureDemoMode ? 'E-Sign & Email Test (Demo Mode)' : 'E-Sign & Email to terms.law') 
+                            : (isESignatureDemoMode ? 'Electronic Signature (Demo Mode)' : 'Electronic Signature')
                     ),
                     React.createElement('button', {
                         key: 'close',
@@ -3066,7 +3090,8 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         alignItems: 'center'
                     }
                 }, eSignatureIframe ? [
-                    React.createElement('div', {
+                    // Show different content based on demo mode
+                    isESignatureDemoMode ? React.createElement('div', {
                         key: 'demo-message',
                         style: {
                             width: '100%',
@@ -3089,37 +3114,61 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                         React.createElement('p', {
                             key: 'demo-text1',
                             style: { marginBottom: '15px', fontSize: '16px' }
-                        }, 'eSignature functionality is working! This would normally open the signing interface.'),
+                        }, 'eSignatures.com API attempted but fell back to demo mode (likely CORS restriction).'),
                         React.createElement('p', {
                             key: 'demo-text2',
-                            style: { marginBottom: '15px', color: '#6c757d' }
-                        }, `Mock signing URL: ${eSignatureIframe}`),
+                            style: { marginBottom: '15px', color: '#6c757d', fontSize: '14px' }
+                        }, `Demo signing URL: ${eSignatureIframe}`),
                         React.createElement('p', {
                             key: 'demo-text3',
-                            style: { color: '#28a745', fontWeight: 'bold' }
+                            style: { color: '#28a745', fontWeight: 'bold', marginBottom: '20px' }
                         }, currentESignatureMode === 'email' ? 
-                            '📧 After signing, would email to owner@terms.law' : 
-                            '✅ Document would be ready for signing'
+                            '📧 After signing, email would be sent to owner@terms.law' : 
+                            '✅ Document would be ready for download'
                         ),
+                        React.createElement('div', {
+                            key: 'demo-note',
+                            style: {
+                                backgroundColor: '#fff3cd',
+                                border: '1px solid #ffeaa7',
+                                borderRadius: '4px',
+                                padding: '15px',
+                                marginBottom: '20px',
+                                fontSize: '14px'
+                            }
+                        }, [
+                            React.createElement('strong', { key: 'note-title' }, 'Note: '),
+                            'For production use, implement a backend proxy to handle eSignatures.com API calls due to CORS restrictions.'
+                        ]),
                         React.createElement('button', {
                             key: 'demo-complete',
                             onClick: () => {
                                 // Simulate completion
-                                const mockSignedUrl = 'https://example.com/signed_document_' + Date.now() + '.pdf';
+                                const mockSignedUrl = 'https://app.esignatures.io/signed/demo_' + Date.now() + '.pdf';
                                 handleESignatureComplete(mockSignedUrl);
                             },
                             style: {
-                                marginTop: '20px',
-                                padding: '10px 20px',
+                                padding: '12px 24px',
                                 backgroundColor: '#28a745',
                                 color: 'white',
                                 border: 'none',
                                 borderRadius: '4px',
                                 cursor: 'pointer',
-                                fontSize: '16px'
+                                fontSize: '16px',
+                                fontWeight: 'bold'
                             }
                         }, 'Simulate Signing Complete')
-                    ])
+                    ]) : React.createElement('iframe', {
+                        key: 'signing-iframe',
+                        src: eSignatureIframe,
+                        style: {
+                            width: '100%',
+                            height: '100%',
+                            border: 'none',
+                            borderRadius: '4px'
+                        },
+                        title: 'Electronic Signature'
+                    })
                 ] : [
                     React.createElement('div', {
                         key: 'loading',
