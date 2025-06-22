@@ -19,58 +19,37 @@ const createESignatureTemplate = async (documentContent, documentTitle) => {
         console.log('Document title:', documentTitle);
         console.log('Content length:', documentContent.length);
         
-        // Try multiple CORS proxy options for real API calls
-        const corsProxies = [
-            'https://cors-anywhere.herokuapp.com/',
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
-        ];
+        // Use CORS proxy for real API calls
+        const corsProxy = 'https://api.allorigins.win/raw?url=';
+        const apiUrl = encodeURIComponent(`${ESIGNATURES_API_BASE}/templates`);
         
-        let lastError = null;
+        const requestBody = {
+            name: documentTitle,
+            content: documentContent,
+            content_type: 'html'
+        };
         
-        for (const proxy of corsProxies) {
-            try {
-                const apiUrl = proxy.includes('allorigins') ? 
-                    encodeURIComponent(`${ESIGNATURES_API_BASE}/templates`) :
-                    `${ESIGNATURES_API_BASE}/templates`;
+        console.log('Making real API request via CORS proxy...');
         
-                const requestBody = {
-                    name: documentTitle,
-                    content: documentContent,
-                    content_type: 'html'
-                };
-                
-                console.log(`Trying CORS proxy: ${proxy}`);
-                
-                const response = await fetch(`${proxy}${apiUrl}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                console.log(`Proxy ${proxy} response status:`, response.status);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Real template created successfully:', result);
-                    return result;
-                }
-                
-                throw new Error(`Template creation failed: ${response.status}`);
-                
-            } catch (error) {
-                console.log(`Proxy ${proxy} failed:`, error.message);
-                lastError = error;
-                continue;
-            }
+        const response = await fetch(`${corsProxy}${apiUrl}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Real API response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Template creation failed: ${response.status}`);
         }
         
-        // If all proxies failed, throw the last error
-        throw lastError;
+        const result = await response.json();
+        console.log('✅ Real template created successfully:', result);
+        return result;
         
     } catch (error) {
         console.error('Error creating eSignature template:', error);
@@ -113,68 +92,47 @@ const createESignatureContract = async (templateId, signerEmail, signerName, ema
         console.log('Signer:', signerName, signerEmail);
         console.log('Email to owner@terms.law:', emailToStripe);
         
-        // Try multiple CORS proxy options for real API calls
-        const corsProxies = [
-            'https://cors-anywhere.herokuapp.com/',
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
-        ];
+        // Use CORS proxy for real API calls
+        const corsProxy = 'https://api.allorigins.win/raw?url=';
+        const apiUrl = encodeURIComponent(`${ESIGNATURES_API_BASE}/contracts`);
         
-        let lastError = null;
-        
-        for (const proxy of corsProxies) {
-            try {
-                const apiUrl = proxy.includes('allorigins') ? 
-                    encodeURIComponent(`${ESIGNATURES_API_BASE}/contracts`) :
-                    `${ESIGNATURES_API_BASE}/contracts`;
-        
-                const requestBody = {
-                    template_id: templateId,
-                    signers: [{
-                        email: signerEmail,
-                        name: signerName,
-                        redirect_url: window.location.href,
-                        role: 'signer'
-                    }],
-                    embedded: true,
-                    custom_data: {
-                        email_to_stripe: emailToStripe,
-                        return_email: signerEmail,
-                        send_to_owner: emailToStripe ? 'owner@terms.law' : null
-                    }
-                };
-                
-                console.log(`Trying contract CORS proxy: ${proxy}`);
-                
-                const response = await fetch(`${proxy}${apiUrl}`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify(requestBody)
-                });
-                
-                console.log(`Contract proxy ${proxy} response status:`, response.status);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Real contract created successfully:', result);
-                    return result;
-                }
-                
-                throw new Error(`Contract creation failed: ${response.status}`);
-                
-            } catch (error) {
-                console.log(`Contract proxy ${proxy} failed:`, error.message);
-                lastError = error;
-                continue;
+        const requestBody = {
+            template_id: templateId,
+            signers: [{
+                email: signerEmail,
+                name: signerName,
+                redirect_url: window.location.href,
+                role: 'signer'
+            }],
+            embedded: true,
+            custom_data: {
+                email_to_stripe: emailToStripe,
+                return_email: signerEmail,
+                send_to_owner: emailToStripe ? 'owner@terms.law' : null
             }
+        };
+        
+        console.log('Making real contract API request via CORS proxy...');
+        
+        const response = await fetch(`${corsProxy}${apiUrl}`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${ESIGNATURES_API_TOKEN}`,
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(requestBody)
+        });
+        
+        console.log('Real contract API response status:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Contract creation failed: ${response.status}`);
         }
         
-        // If all proxies failed, throw the last error
-        throw lastError;
+        const result = await response.json();
+        console.log('✅ Real contract created successfully:', result);
+        return result;
         
     } catch (error) {
         console.error('Error creating eSignature contract:', error);
