@@ -111,49 +111,36 @@ ${documentContent}
                                 status: "success",
                                 data: {
                                     contract_id: result.data.id || 'docuseal-' + Date.now(),
-                                    contract_url: result.data.audit_log_url || result.data.url,
-                                    signing_url: result.data.submitters?.[0]?.url || result.data.url,
+                                    contract_url: result.data.audit_log_url || result.data.url || `https://app.docuseal.com/submissions/${result.data.id}`,
+                                    signing_url: result.data.submitters?.[0]?.url || result.data.url || `https://app.docuseal.com/s/${result.data.id}`,
                                     title: documentTitle,
                                     signers: data.signers || [],
                                     message: "Real eSignature document created"
                                 }
                             };
+                            console.log('Sending response:', response);
                             res.writeHead(200);
                             res.end(JSON.stringify(response));
                         } else {
-                            console.log('DocuSeal API failed, using demo mode:', result);
-                            // Fallback to demo mode
-                            const demoResponse = {
-                                status: "success",
-                                data: {
-                                    contract_id: "demo-" + Date.now(),
-                                    contract_url: "https://demo.docuseal.com/demo-document",
-                                    signing_url: "https://demo.docuseal.com/demo-signing",
-                                    title: documentTitle,
-                                    signers: data.signers || [],
-                                    message: "Demo mode - DocuSeal API unavailable"
-                                }
-                            };
-                            res.writeHead(200);
-                            res.end(JSON.stringify(demoResponse));
+                            console.error('DocuSeal API failed with details:', result);
+                            // Return the actual error instead of demo mode
+                            res.writeHead(400);
+                            res.end(JSON.stringify({ 
+                                status: "error", 
+                                error: result.error || 'DocuSeal API failed',
+                                details: result
+                            }));
                         }
                     });
                 } else {
-                    // PDF generation failed, fallback to demo mode
-                    console.log('PDF generation failed, using demo mode');
-                    const demoResponse = {
-                        status: "success",
-                        data: {
-                            contract_id: "demo-" + Date.now(),
-                            contract_url: "https://demo.docuseal.com/demo-document",
-                            signing_url: "https://demo.docuseal.com/demo-signing",
-                            title: documentTitle,
-                            signers: data.signers || [],
-                            message: "Demo mode - PDF generation failed"
-                        }
-                    };
-                    res.writeHead(200);
-                    res.end(JSON.stringify(demoResponse));
+                    // PDF generation failed
+                    console.error('PDF generation failed');
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ 
+                        status: "error", 
+                        error: 'PDF generation failed',
+                        details: 'generatePDFFromDemandLetter returned null'
+                    }));
                 }
             });
 
