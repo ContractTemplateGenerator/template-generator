@@ -78,6 +78,42 @@ const server = http.createServer((req, res) => {
             }
         });
         return;
+    } else if (req.method === 'POST' && req.url === '/upload-to-drive') {
+        // Handle manual Google Drive upload
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', async () => {
+            try {
+                const { contractId, pdfUrl, fileName } = JSON.parse(body);
+                
+                if (!pdfUrl) {
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ error: 'PDF URL is required' }));
+                    return;
+                }
+                
+                const driveResult = await downloadSignedPDFAndUploadToDrive(
+                    pdfUrl, 
+                    fileName || `Signed_Demand_Letter_${contractId}_${new Date().toISOString().split('T')[0]}.pdf`
+                );
+                
+                if (driveResult) {
+                    res.writeHead(200);
+                    res.end(JSON.stringify({ success: true, drive_data: driveResult }));
+                } else {
+                    res.writeHead(500);
+                    res.end(JSON.stringify({ success: false, error: 'Google Drive upload failed' }));
+                }
+                
+            } catch (error) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
+            }
+        });
+        return;
     } else {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Not found' }));
@@ -495,7 +531,20 @@ function createESignaturesContract(templateId, signerInfo, callback) {
         },
         // Override success page to redirect back to terms.law
         redirect_url: "http://localhost:8000/signing-complete.html",
-        declined_redirect_url: "http://localhost:8000/signing-declined.html"
+        declined_redirect_url: "http://localhost:8000/signing-declined.html",
+        // Enable Google Drive integration if available in eSignatures.com
+        integrations: {
+            google_drive: {
+                enabled: true,
+                auto_save: true,
+                folder_name: "Signed_Demand_Letters"
+            }
+        },
+        // Enable automatic cloud storage
+        cloud_storage: {
+            google_drive: true,
+            auto_upload: true
+        }
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
@@ -592,7 +641,27 @@ function checkContractStatus(contractId, callback) {
             if (status === 'signed' && pdfUrl) {
                 console.log('Document is signed, attempting Google Drive upload...');
                 const fileName = `Signed_Demand_Letter_${contractId}_${new Date().toISOString().split('T')[0]}.pdf`;
-                driveData = await downloadSignedPDFAndUploadToDrive(pdfUrl, fileName);
+                
+                // Try to get any existing Google Drive link from eSignatures.com first
+                let esignDriveData = null;
+                if (contract.google_drive_url || contract.drive_url || contract.integrations?.google_drive) {
+                    console.log('📁 eSignatures.com has Google Drive integration data');
+                    esignDriveData = {
+                        source: 'eSignatures.com',
+                        driveLink: contract.google_drive_url || contract.drive_url,
+                        integration: contract.integrations?.google_drive
+                    };
+                }
+                
+                // Upload to our own Google Drive as backup/alternative
+                const ourDriveData = await downloadSignedPDFAndUploadToDrive(pdfUrl, fileName);
+                
+                // Combine both sources
+                driveData = {
+                    esignatures_drive: esignDriveData,
+                    terms_law_drive: ourDriveData,
+                    primary_source: esignDriveData ? 'eSignatures.com' : (ourDriveData ? 'Terms.law' : null)
+                };
             }
             
             callback({

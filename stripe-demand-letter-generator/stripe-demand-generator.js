@@ -954,11 +954,33 @@ ${formData.companyName || ''}`;
                 function showSuccessResult(statusData, container) {
                     const overlayDiv = container.querySelector('div:first-child');
                     if (overlayDiv) {
-                        const googleDriveButton = statusData.google_drive ? `
-                            <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
-                                📁 View in Google Drive
-                            </button>
-                        ` : '';
+                        // Google Drive integration buttons
+                        let googleDriveButtons = '';
+                        if (statusData.google_drive) {
+                            if (statusData.google_drive.esignatures_drive && statusData.google_drive.esignatures_drive.driveLink) {
+                                googleDriveButtons += `
+                                    <button onclick="window.open('${statusData.google_drive.esignatures_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
+                                        📁 View in Drive (eSignatures)
+                                    </button>
+                                `;
+                            }
+                            if (statusData.google_drive.terms_law_drive && statusData.google_drive.terms_law_drive.driveLink) {
+                                googleDriveButtons += `
+                                    <button onclick="window.open('${statusData.google_drive.terms_law_drive.driveLink}', '_blank')" style="background: #34a853; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
+                                        📁 View Backup Drive
+                                    </button>
+                                `;
+                            }
+                        }
+                        
+                        // Manual upload to Drive button if not already uploaded
+                        if (!statusData.google_drive || !statusData.google_drive.terms_law_drive) {
+                            googleDriveButtons += `
+                                <button onclick="uploadToDrive('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #34a853; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
+                                    📁 Save to My Drive
+                                </button>
+                            `;
+                        }
                         
                         overlayDiv.innerHTML = `
                             <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 600px;">
@@ -973,7 +995,7 @@ ${formData.companyName || ''}`;
                                     <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
                                         📄 View Signed Document
                                     </button>
-                                    ${googleDriveButton}
+                                    ${googleDriveButtons}
                                 </div>
                                 
                                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
@@ -1103,6 +1125,18 @@ ${formData.companyName || ''}`;
                     button.style.background = '#dc2626';
                 }
                 
+                // Show helpful error message
+                let errorMessage = 'Failed to send email to Stripe';
+                if (result.details && result.details.includes('BadCredentials')) {
+                    errorMessage = 'Email authentication failed. Please check your Gmail App Password in .env file.';
+                } else if (result.details && result.details.includes('EAUTH')) {
+                    errorMessage = 'Email authentication error. Make sure you\'re using a Gmail App Password, not your regular password.';
+                } else if (result.error && result.error.includes('credentials')) {
+                    errorMessage = 'Email not configured. Please set up EMAIL_USER and EMAIL_PASS in .env file.';
+                }
+                
+                alert('❌ ' + errorMessage + '\n\nSee email-setup.md for configuration instructions.');
+                
                 setTimeout(() => {
                     if (button) {
                         button.innerHTML = '📧 Send to Stripe';
@@ -1128,8 +1162,54 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Make sendToStripe available globally
+    // Upload to Google Drive function
+    const uploadToDrive = async (contractId, pdfUrl) => {
+        try {
+            console.log('📁 Uploading to Google Drive...');
+            
+            const response = await fetch('http://localhost:3001/upload-to-drive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    contractId: contractId,
+                    pdfUrl: pdfUrl,
+                    fileName: `Signed_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.pdf`
+                })
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Google Drive upload successful!');
+                alert('✅ Document saved to Google Drive successfully!\n\nYou can view it at: ' + result.drive_data.driveLink);
+                
+                // Replace the upload button with a view button
+                const uploadBtn = event.target;
+                if (uploadBtn) {
+                    uploadBtn.innerHTML = '📁 View in Drive';
+                    uploadBtn.onclick = () => window.open(result.drive_data.driveLink, '_blank');
+                    uploadBtn.style.background = '#4285f4';
+                }
+            } else {
+                console.error('❌ Google Drive upload failed:', result.error);
+                let errorMessage = 'Failed to upload to Google Drive';
+                if (result.error && result.error.includes('credentials not configured')) {
+                    errorMessage = 'Google Drive not configured. Please set up Google Drive API credentials in .env file.';
+                }
+                alert('❌ ' + errorMessage + '\n\nSee google-drive-setup.md for configuration instructions.');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error uploading to Drive:', error);
+            alert('❌ Error uploading to Google Drive. Please check the console for details.');
+        }
+    };
+    
+    // Make functions available globally
     window.sendToStripe = sendToStripe;
+    window.uploadToDrive = uploadToDrive;
 
     // Navigation functions
     const nextTab = () => {

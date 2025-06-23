@@ -16,10 +16,33 @@ EMAIL_USER=your_email@gmail.com
 EMAIL_PASS=your_app_password
 ```
 
-### 2. Gmail App Password (Recommended)
-1. Enable 2-factor authentication on your Gmail account
-2. Generate an "App Password" for this application
-3. Use the app password as `EMAIL_PASS` (not your regular password)
+### 2. Gmail App Password Setup (Required)
+
+**IMPORTANT:** You must use an App Password, not your regular Gmail password.
+
+1. **Enable 2-Factor Authentication:**
+   - Go to [Google Account Settings](https://myaccount.google.com/)
+   - Click "Security" in the left sidebar
+   - Under "Signing in to Google", click "2-Step Verification"
+   - Follow the setup process
+
+2. **Generate App Password:**
+   - In the same Security section, click "App passwords"
+   - Select "Mail" as the app and "Other" as the device
+   - Name it "Stripe Demand Letter Generator"
+   - Copy the 16-character password (remove spaces)
+
+3. **Update Environment Variables:**
+   - Use your full Gmail address as `EMAIL_USER`
+   - Use the 16-character app password as `EMAIL_PASS`
+
+**Example .env configuration:**
+```bash
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your.email@gmail.com
+EMAIL_PASS=abcd efgh ijkl mnop  # (remove spaces when copying)
+```
 
 ### 3. How It Works
 
