@@ -732,7 +732,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 },
                 signers: [{
                     email: "sergei.tokmakov@gmail.com",
-                    name: "Sergei Tokmakov",
+                    name: formData.contactName || "Sergei Tokmakov",
                     role: "signer"
                 }]
             };
@@ -776,33 +776,65 @@ ${formData.companyName || '[COMPANY NAME]'}`;
             }
 
             if (response.ok && (result.signing_url || result.sign_url || result.url || result.data?.signing_url)) {
-                // Open signing URL in new window
+                // Embed signing URL directly in the page
                 const signingUrl = result.signing_url || result.sign_url || result.url || result.data?.signing_url;
-                window.open(signingUrl, '_blank');
+                const embeddedUrl = signingUrl + (signingUrl.includes('?') ? '&' : '?') + 'embedded=yes';
+                
+                // Create iframe container for embedded signing
+                const iframeContainer = document.createElement('div');
+                iframeContainer.innerHTML = `
+                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                            <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                            <iframe src="${embeddedUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
+                        </div>
+                    </div>
+                `;
+                document.body.appendChild(iframeContainer);
                 
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
-                    alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
+                    alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
                 } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nA signing link has been emailed to you.\n\nSign the document in the opened window.");
+                    alert("🔥 REAL eSignature Created!\n\nA signing link has been emailed to you.\n\nSign the document in the embedded interface below.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
-                    alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly.");
+                    alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode Active\n\nAPI unavailable - using demo mode.\n\nFor real signing, contact support for API setup.");
                 } else if (result.error_code === 'forbidden' || result.error_message) {
                     // Handle API authentication errors
                     alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
-                    // Open demo URL instead
-                    window.open("https://esignatures.com/demo-signing-page", '_blank');
+                    // Embed demo URL instead
+                    const demoUrl = "https://esignatures.com/demo-signing-page?embedded=yes";
+                    const iframeContainer = document.createElement('div');
+                    iframeContainer.innerHTML = `
+                        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                                <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                                <iframe src="${demoUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(iframeContainer);
                     return; // Don't throw error, just show demo
                 } else {
-                    alert("✅ eSignature opened! Complete signing in new window");
+                    alert("✅ eSignature ready! Complete signing in the embedded interface");
                 }
             } else {
                 // Handle API errors more gracefully
                 if (result.error_code === 'forbidden' || result.error_message) {
                     alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
-                    window.open("https://esignatures.com/demo-signing-page", '_blank');
+                    const demoUrl = "https://esignatures.com/demo-signing-page?embedded=yes";
+                    const iframeContainer = document.createElement('div');
+                    iframeContainer.innerHTML = `
+                        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                                <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                                <iframe src="${demoUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
+                            </div>
+                        </div>
+                    `;
+                    document.body.appendChild(iframeContainer);
                     return; // Don't throw error, just show demo
                 } else {
                     const errorMsg = result.error || result.message || result.errors || 'Failed to create eSignature contract';

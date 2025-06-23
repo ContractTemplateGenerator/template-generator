@@ -344,22 +344,8 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     // Convert content to document elements for eSignatures.com API
     const documentElements = [
         {
-            "type": "text_header_one",
-            "text": title
-        },
-        {
             "type": "text_normal", 
             "text": content
-        },
-        {
-            "type": "signer_field_text",
-            "text": "Full Name",
-            "signer_field_assigned_to": "first_signer"
-        },
-        {
-            "type": "signer_field_date",
-            "text": "Date Signed",
-            "signer_field_assigned_to": "first_signer"
         }
     ];
     
@@ -395,8 +381,9 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     const contractData = {
         template_id: templateId,
         test: "yes", // Use test mode for the paid account
+        signature_request_delivery_methods: [], // Prevent initial email/SMS for embedded signing
         signers: [{
-            name: signerInfo.name || "Sergei Tokmakov",
+            name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
         }]
     };
