@@ -134,6 +134,26 @@ const server = http.createServer((req, res) => {
             }
         });
         return;
+    } else if (req.method === 'POST' && req.url === '/send-custom-email') {
+        // Handle custom email preview interface
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', async () => {
+            try {
+                const data = JSON.parse(body);
+                sendCustomEmailWithPDF(data, (emailResult) => {
+                    res.writeHead(200);
+                    res.end(JSON.stringify(emailResult));
+                });
+            } catch (error) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
+            }
+        });
+        return;
     } else {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Not found' }));
@@ -1072,6 +1092,92 @@ This email was sent automatically from the Terms.law Demand Letter Generator.`;
     }
 }
 
+// Function to send custom email with PDF attachment from preview interface
+async function sendCustomEmailWithPDF(requestData, callback) {
+    try {
+        console.log('📧 Sending custom email with PDF attachment...');
+        const { contractId, pdfUrl, to, subject, body, companyName, fromEmail, senderName } = requestData;
+        
+        if (!pdfUrl) {
+            callback({ success: false, error: 'No PDF URL provided' });
+            return;
+        }
+        
+        if (!to || !subject || !body) {
+            callback({ success: false, error: 'Missing required email fields (to, subject, body)' });
+            return;
+        }
+        
+        // Download the signed PDF
+        const pdfBuffer = await new Promise((resolve, reject) => {
+            https.get(pdfUrl, (res) => {
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
+                    return;
+                }
+                const chunks = [];
+                res.on('data', (chunk) => chunks.push(chunk));
+                res.on('end', () => resolve(Buffer.concat(chunks)));
+                res.on('error', reject);
+            }).on('error', reject);
+        });
+        
+        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
+        
+        // Create filename with timestamp
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
+        
+        // Email configuration with custom content
+        const mailOptions = {
+            from: `"${senderName || 'Demand Letter Sender'}" <${EMAIL_USER}>`,
+            replyTo: fromEmail || EMAIL_USER,
+            to: to,
+            subject: subject,
+            text: body,
+            attachments: [
+                {
+                    filename: filename,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }
+            ]
+        };
+        
+        // Send the email
+        mailTransporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('❌ Custom email sending failed:', error);
+                callback({ 
+                    success: false, 
+                    error: 'Email sending failed', 
+                    details: error.message 
+                });
+            } else {
+                console.log('✅ Custom email sent successfully!');
+                console.log('Message ID:', info.messageId);
+                console.log('To:', to);
+                console.log('Subject:', subject);
+                callback({ 
+                    success: true, 
+                    messageId: info.messageId,
+                    to: to,
+                    subject: subject,
+                    message: 'Custom email sent successfully with PDF attachment'
+                });
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in sendCustomEmailWithPDF:', error);
+        callback({ 
+            success: false, 
+            error: 'Failed to send custom email', 
+            details: error.message 
+        });
+    }
+}
+
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
@@ -1079,6 +1185,7 @@ server.listen(PORT, () => {
     console.log('Use /contract-status/<contract_id> to check signing status');
     console.log('Use /send-to-stripe endpoint for manual email sending');
     console.log('Use /send-email-with-pdf endpoint for automatic email with PDF attachment');
+    console.log('Use /send-custom-email endpoint for custom email preview interface');
     console.log('Use /upload-to-drive endpoint for Google Drive uploads');
     console.log('Google Drive integration enabled');
     console.log('Email integration enabled');
