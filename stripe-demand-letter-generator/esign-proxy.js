@@ -76,7 +76,7 @@ const server = http.createServer((req, res) => {
                                     signing_url: contractResult.data.signing_url,
                                     title: documentTitle,
                                     signers: data.signers || [],
-                                    message: "Real eSignature document created with eSignatures.com"
+                                    message: "Real eSignature document created"
                                 }
                             };
                             console.log('SUCCESS: Sending eSignatures.com response:', JSON.stringify(response, null, 2));
@@ -352,7 +352,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
         },
         {
             "type": "text_header_two",
-            "text": "Electronic Signature Required"
+            "text": "Electronic Signature"
         },
         {
             "type": "text_normal",
