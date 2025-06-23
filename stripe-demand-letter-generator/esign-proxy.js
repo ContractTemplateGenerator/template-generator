@@ -63,11 +63,14 @@ const server = http.createServer((req, res) => {
                     createESignaturesContract(templateId, signerInfo, (contractResult) => {
                         console.log('Contract callback received:', JSON.stringify(contractResult, null, 2));
                         if (contractResult.success) {
+                            // Debug: log the exact contractResult structure
+                            console.log('Contract result data structure:', JSON.stringify(contractResult.data, null, 2));
+                            
                             const response = {
                                 status: "success",
                                 data: {
                                     contract_id: contractResult.data.contract_id,
-                                    contract_url: contractResult.data.contract_url,
+                                    contract_url: contractResult.data.contract_url, 
                                     signing_url: contractResult.data.signing_url,
                                     title: documentTitle,
                                     signers: data.signers || [],
