@@ -92,7 +92,7 @@ ${documentContent}
             // Generate PDF from demand letter content
             generatePDFFromDemandLetter(documentTitle, documentContent, signerInfo, (pdfBase64) => {
                 if (pdfBase64) {
-                    // Send generated PDF to DocuSeal
+                    // Send generated PDF to DocuSeal with explicit email settings
                     makeDocuSealAPICall('/submissions/pdf', {
                         documents: [{
                             name: documentTitle + '.pdf',
@@ -100,53 +100,55 @@ ${documentContent}
                         }],
                         submitters: [{
                             email: signerInfo.email || 'sergei.tokmakov@gmail.com',
-                            name: signerInfo.name || 'Sergei Tokmakov'
+                            name: signerInfo.name || 'Sergei Tokmakov',
+                            role: 'First Party'
                         }],
                         send_email: true,
-                        completed_redirect_url: 'https://template.terms.law'
+                        send_sms: false,
+                        completed_redirect_url: 'https://template.terms.law',
+                        submitters_order: 'preserved',
+                        message: 'Please sign this demand letter document electronically.'
                     }, (success, result) => {
-                        if (success && result.data) {
-                            console.log('DocuSeal API complete response:', JSON.stringify(result.data, null, 2));
-                            
-                            // Extract the correct signing URL from submitters (DocuSeal uses embed_src field)
-                            const signingUrl = result.data.submitters?.[0]?.embed_src || 
-                                              result.data.submitters?.[0]?.url || 
-                                              `https://docuseal.com/s/${result.data.submitters?.[0]?.slug}`;
-                            console.log('Extracted signing URL:', signingUrl);
-                            
-                            const response = {
-                                status: "success",
-                                data: {
-                                    contract_id: result.data.id || 'docuseal-' + Date.now(),
-                                    contract_url: result.data.audit_log_url || result.data.url,
-                                    signing_url: signingUrl,
-                                    title: documentTitle,
-                                    signers: data.signers || [],
-                                    message: "Real eSignature document created"
-                                }
-                            };
-                            console.log('Sending response with correct URL:', response);
-                            res.writeHead(200);
-                            res.end(JSON.stringify(response));
-                        } else {
-                            console.error('DocuSeal API failed with details:', result);
-                            // Return the actual error instead of demo mode
-                            res.writeHead(400);
-                            res.end(JSON.stringify({ 
-                                status: "error", 
-                                error: result.error || 'DocuSeal API failed',
-                                details: result
-                            }));
+                if (success && result.data) {
+                    console.log('DocuSeal API complete response:', JSON.stringify(result.data, null, 2));
+                    
+                    // Extract the correct signing URL from submitters (DocuSeal uses embed_src field)
+                    const signingUrl = result.data.submitters?.[0]?.embed_src || 
+                                      result.data.submitters?.[0]?.url || 
+                                      `https://docuseal.com/s/${result.data.submitters?.[0]?.slug}`;
+                    console.log('Extracted signing URL:', signingUrl);
+                    
+                    const response = {
+                        status: "success",
+                        data: {
+                            contract_id: result.data.id || 'docuseal-' + Date.now(),
+                            contract_url: result.data.audit_log_url || result.data.url,
+                            signing_url: signingUrl,
+                            title: documentTitle,
+                            signers: data.signers || [],
+                            message: "Real eSignature document created"
                         }
-                    });
+                    };
+                    console.log('Sending response with correct URL:', response);
+                    res.writeHead(200);
+                    res.end(JSON.stringify(response));
                 } else {
-                    // PDF generation failed
-                    console.error('PDF generation failed');
+                    console.error('DocuSeal API failed with details:', result);
+                    // Return the actual error instead of demo mode
                     res.writeHead(400);
                     res.end(JSON.stringify({ 
                         status: "error", 
-                        error: 'PDF generation failed',
-                        details: 'generatePDFFromDemandLetter returned null'
+                        error: result.error || 'DocuSeal API failed',
+                        details: result
+                    }));
+                }
+            });
+                } else {
+                    console.error('PDF generation failed');
+                    res.writeHead(500);
+                    res.end(JSON.stringify({ 
+                        status: "error", 
+                        error: 'PDF generation failed'
                     }));
                 }
             });
@@ -222,7 +224,14 @@ function generatePDFFromDemandLetter(title, content, signerInfo, callback) {
             const pdfBuffer = Buffer.concat(buffers);
             const pdfBase64 = pdfBuffer.toString('base64');
             console.log('PDF generated successfully, size:', pdfBuffer.length, 'bytes');
+            console.log('PDF base64 length:', pdfBase64.length);
+            console.log('PDF starts with:', pdfBase64.substring(0, 50));
             callback(pdfBase64);
+        });
+        
+        doc.on('error', (error) => {
+            console.error('PDF generation error:', error);
+            callback(null);
         });
         
         // Add title
