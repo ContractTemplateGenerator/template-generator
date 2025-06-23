@@ -43,9 +43,10 @@ const server = http.createServer((req, res) => {
 
             let documentContent = data.template?.content || '';
             
-            // Remove [CONTACT_NAME] placeholder from eSignature templates to avoid duplication
+            // Remove [CONTACT NAME] and [CONTACT_NAME] placeholders from eSignature templates
             // since the actual signer name will be in the signature field
-            documentContent = documentContent.replace(/\[CONTACT_NAME\]/g, '[SIGNER]');
+            documentContent = documentContent.replace(/\[CONTACT_NAME\]/g, '')
+                                           .replace(/\[CONTACT NAME\]/g, '');
             const documentTitle = data.template?.title || 'Document';
             const signerInfo = (data.signers && data.signers[0]) || { 
                 email: 'sergei.tokmakov@gmail.com', 
@@ -349,18 +350,6 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
         {
             "type": "text_normal", 
             "text": content
-        },
-        {
-            "type": "text_header_two",
-            "text": "Electronic Signature"
-        },
-        {
-            "type": "text_normal",
-            "text": `Signer: ${signerInfo.name || '[SIGNER_NAME]'}`
-        },
-        {
-            "type": "text_normal",
-            "text": `Email: ${signerInfo.email || '[SIGNER_EMAIL]'}`
         },
         {
             "type": "signer_field_text",
