@@ -783,8 +783,12 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
-                } else if (result.data?.contract_id && result.data?.message === "Real eSignature document created") {
-                    alert("🔥 REAL eSignature Created!\n\nYour demand letter has been sent to DocuSeal for signing.\n\nThe signer will receive an email with a secure signing link.\n\nYou can track the signing status in the opened window.");
+                } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
+                    if (result.data.message.includes("eSignatures.com")) {
+                        alert("🔥 REAL eSignature Created with eSignatures.com!\n\nYour demand letter has been sent for signing using your $50 paid account.\n\nThe signer will receive an email with a secure signing link.\n\nYou can track the signing status in the opened window.");
+                    } else {
+                        alert("🔥 REAL eSignature Created!\n\nYour demand letter has been sent to DocuSeal for signing.\n\nThe signer will receive an email with a secure signing link.\n\nYou can track the signing status in the opened window.");
+                    }
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nThe signer can now review and sign the document directly.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {

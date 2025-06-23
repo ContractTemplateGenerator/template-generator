@@ -41,7 +41,11 @@ const server = http.createServer((req, res) => {
             const data = JSON.parse(body);
             console.log('Parsed request data:', data);
 
-            const documentContent = data.template?.content || '';
+            let documentContent = data.template?.content || '';
+            
+            // Remove [CONTACT_NAME] placeholder from eSignature templates to avoid duplication
+            // since the actual signer name will be in the signature field
+            documentContent = documentContent.replace(/\[CONTACT_NAME\]/g, '[SIGNER]');
             const documentTitle = data.template?.title || 'Document';
             const signerInfo = (data.signers && data.signers[0]) || { 
                 email: 'sergei.tokmakov@gmail.com', 
@@ -402,6 +406,8 @@ function createESignaturesContract(templateId, signerInfo, callback) {
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
         }]
     };
+    
+    console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
     
     makeESignaturesAPICall('/contracts', contractData, (success, result) => {
         console.log('Contract creation response - success:', success, 'result:', JSON.stringify(result, null, 2));
