@@ -351,37 +351,55 @@ const ESIGNATURES_API_URL = 'https://esignatures.com/api';
 function createESignaturesTemplate(title, content, signerInfo, callback) {
     console.log('Creating eSignatures.com template...');
     
-    // Convert content to document elements with inline signature
-    // Split content at "Sincerely," to insert signature field there
-    const sincerelyIndex = content.indexOf("Sincerely,");
+    // Convert content to document elements with signature between demand letter and arbitration demand
+    // Look for the arbitration section separator
+    const arbitrationSeparator = '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80);
+    const arbitrationIndex = content.indexOf(arbitrationSeparator);
     let documentElements = [];
     
-    if (sincerelyIndex !== -1) {
-        // Content before "Sincerely,"
-        const beforeSincerely = content.substring(0, sincerelyIndex + "Sincerely,".length);
+    if (arbitrationIndex !== -1) {
+        // Split into demand letter part and arbitration part
+        const demandLetterPart = content.substring(0, arbitrationIndex);
+        const arbitrationPart = content.substring(arbitrationIndex);
+        
+        // Add demand letter (which ends with "Sincerely,")
         documentElements.push({
             "type": "text_normal",
-            "text": beforeSincerely
+            "text": demandLetterPart
         });
         
-        // eSignatures.com automatically manages signature placement - no need to add signature fields
+        // eSignatures.com will automatically place signature fields after "Sincerely,"
         
-        // Content after "Sincerely," (excluding signature/name parts)
-        const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
-        // Remove the manual signature lines (name and company) from the content
-        const cleanedAfter = afterSincerely.replace(/\n\n[^\n]+\n[^\n]+$/, '');
-        if (cleanedAfter.trim()) {
+        // Add arbitration demand as unsigned attachment  
+        documentElements.push({
+            "type": "text_normal",
+            "text": arbitrationPart
+        });
+    } else {
+        // No arbitration demand - just the demand letter with signature at "Sincerely,"
+        const sincerelyIndex = content.indexOf("Sincerely,");
+        if (sincerelyIndex !== -1) {
+            const beforeSincerely = content.substring(0, sincerelyIndex + "Sincerely,".length);
             documentElements.push({
                 "type": "text_normal",
-                "text": cleanedAfter
+                "text": beforeSincerely
+            });
+            
+            const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
+            const cleanedAfter = afterSincerely.replace(/\n\n[^\n]*\n[^\n]*$/, '');
+            if (cleanedAfter.trim()) {
+                documentElements.push({
+                    "type": "text_normal", 
+                    "text": cleanedAfter
+                });
+            }
+        } else {
+            // Fallback - just add content as is
+            documentElements.push({
+                "type": "text_normal",
+                "text": content
             });
         }
-    } else {
-        // Fallback if "Sincerely," not found - just add content as is
-        documentElements.push({
-            "type": "text_normal",
-            "text": content
-        });
     }
     
     const templateData = {

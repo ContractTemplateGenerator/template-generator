@@ -489,11 +489,7 @@ E. ${formData.includeAttorneyFees ? 'Award reasonable attorney fees and costs of
 ${additionalDamages > 0 ? `F. Award additional damages of $${additionalDamages.toLocaleString()} for business losses and consequential harm;` : 'F. Award such other relief as the Tribunal deems just and proper.'}
 ${additionalDamages > 0 ? 'G. Award such other relief as the Tribunal deems just and proper.' : ''}
 
-${formData.contactName || '[CONTACT NAME]'}
-${formData.companyName || ''}
-Claimant
-
-Dated: _________________`;
+[Draft - to be filed if resolution is not reached within 30 days]`;
 
             return demand;
             
