@@ -364,13 +364,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
             "text": beforeSincerely
         });
         
-        // Add handwritten signature field right after "Sincerely,"
-        documentElements.push({
-            "type": "signer_field_signature",
-            "text": "",
-            "signer_field_assigned_to": "first_signer",
-            "signer_field_required": "yes"
-        });
+        // eSignatures.com automatically manages signature placement - no need to add signature fields
         
         // Content after "Sincerely," (excluding signature/name parts)
         const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
