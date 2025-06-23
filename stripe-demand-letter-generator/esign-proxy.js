@@ -411,18 +411,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     const templateData = {
         title: "Demand Letter",
         document_elements: documentElements,
-        labels: ["first_signer"],
-        // Remove branding from templates
-        white_label: true,
-        hide_brand: true,
-        custom_branding: false,
-        watermark: false,
-        show_powered_by: false,
-        powered_by_link: false,
-        custom_header: "",
-        custom_footer: "",
-        hide_esignatures_branding: true,
-        remove_watermark: true
+        labels: ["first_signer"]
     };
     
     console.log('Template data being sent:', JSON.stringify(templateData, null, 2));
@@ -455,23 +444,17 @@ function createESignaturesContract(templateId, signerInfo, callback) {
             name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
         }],
-        // Try to customize signature appearance and remove branding
+        // Customize signature appearance  
         signature_request_subject: "Demand Letter Signature Request",
         signature_request_message: "Please review and sign this demand letter.",
         use_text_tags: false,
         hide_text_tags: true,
-        // Remove eSignatures.com branding
-        white_label: true,
-        hide_brand: true,
-        custom_branding: false,
-        watermark: false,
-        show_powered_by: false,
-        powered_by_link: false,
-        custom_header: "",
-        custom_footer: "",
-        // Remove any additional branding elements
-        hide_esignatures_branding: true,
-        remove_watermark: true
+        // Try supported branding options
+        custom_branding: {
+            company_name: "",
+            company_logo: "",
+            primary_color: "#ffffff"
+        }
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
