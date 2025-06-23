@@ -1,15 +1,33 @@
-// Node.js proxy server for eSignatures.com API with Google Drive integration
+// Node.js proxy server for eSignatures.com API with Google Drive integration and email
 const http = require('http');
 const https = require('https');
 const url = require('url');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
 // Google Drive API configuration
 const GOOGLE_DRIVE_API_KEY = process.env.GOOGLE_DRIVE_API_KEY || 'YOUR_GOOGLE_DRIVE_API_KEY';
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
 const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || 'YOUR_GOOGLE_REFRESH_TOKEN';
+
+// Email configuration
+const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
+const EMAIL_PORT = process.env.EMAIL_PORT || 587;
+const EMAIL_USER = process.env.EMAIL_USER || 'your_email@gmail.com';
+const EMAIL_PASS = process.env.EMAIL_PASS || 'your_app_password';
+
+// Create email transporter
+const mailTransporter = nodemailer.createTransport({
+    host: EMAIL_HOST,
+    port: EMAIL_PORT,
+    secure: false,
+    auth: {
+        user: EMAIL_USER,
+        pass: EMAIL_PASS
+    }
+});
 
 // DocuSeal API configuration (free, open source, supports direct document upload)
 const DOCUSEAL_API_TOKEN = 'UH3xz4ng4L63JjTpqdLrR5aQ6PSbbUPFj5mGBbL12dU'; // Real DocuSeal API token
@@ -38,6 +56,26 @@ const server = http.createServer((req, res) => {
         checkContractStatus(contractId, (statusResult) => {
             res.writeHead(200);
             res.end(JSON.stringify(statusResult));
+        });
+        return;
+    } else if (req.method === 'POST' && req.url === '/send-to-stripe') {
+        // Handle email sending to Stripe
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', () => {
+            try {
+                const data = JSON.parse(body);
+                sendSignedDocumentToStripe(data, (emailResult) => {
+                    res.writeHead(200);
+                    res.end(JSON.stringify(emailResult));
+                });
+            } catch (error) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
+            }
         });
         return;
     } else {
@@ -737,10 +775,110 @@ async function downloadSignedPDFAndUploadToDrive(pdfUrl, fileName) {
     }
 }
 
+// Function to send signed document to Stripe via email
+async function sendSignedDocumentToStripe(requestData, callback) {
+    try {
+        console.log('📧 Sending signed document to Stripe via email...');
+        const { contractId, pdfUrl, companyName, contactName, withheldAmount } = requestData;
+        
+        if (!pdfUrl) {
+            callback({ success: false, error: 'No PDF URL provided' });
+            return;
+        }
+        
+        // Download the signed PDF
+        const pdfBuffer = await new Promise((resolve, reject) => {
+            https.get(pdfUrl, (res) => {
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
+                    return;
+                }
+                const chunks = [];
+                res.on('data', (chunk) => chunks.push(chunk));
+                res.on('end', () => resolve(Buffer.concat(chunks)));
+                res.on('error', reject);
+            }).on('error', reject);
+        });
+        
+        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
+        
+        // Create filename with timestamp
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
+        
+        // Email content
+        const emailSubject = `FORMAL DEMAND LETTER - ${companyName || '[Company Name]'} - Withheld Funds $${withheldAmount || '[Amount]'}`;
+        
+        const emailBody = `Dear Stripe Legal Team,
+
+Please find attached the signed formal demand letter regarding withheld merchant funds for ${companyName || '[Company Name]'}.
+
+This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
+
+Key Details:
+- Company: ${companyName || '[Company Name]'}
+- Contact: ${contactName || '[Contact Name]'}
+- Withheld Amount: $${withheldAmount || '[Amount]'}
+- Document: Signed demand letter with arbitration notice
+
+This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
+
+Respectfully submitted,
+${contactName || '[Contact Name]'}
+${companyName || '[Company Name]'}`;
+
+        // Email configuration
+        const mailOptions = {
+            from: EMAIL_USER,
+            to: 'sergei.tokmakov@gmail.com', // Testing email - will change to Stripe later
+            cc: 'complaints@stripe.com', // Optional - remove for testing
+            subject: emailSubject,
+            text: emailBody,
+            attachments: [
+                {
+                    filename: filename,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }
+            ]
+        };
+        
+        // Send the email
+        mailTransporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('❌ Email sending failed:', error);
+                callback({ 
+                    success: false, 
+                    error: 'Email sending failed', 
+                    details: error.message 
+                });
+            } else {
+                console.log('✅ Email sent successfully to Stripe!');
+                console.log('Message ID:', info.messageId);
+                callback({ 
+                    success: true, 
+                    messageId: info.messageId,
+                    message: 'Signed demand letter sent to Stripe via email with PDF attachment'
+                });
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in sendSignedDocumentToStripe:', error);
+        callback({ 
+            success: false, 
+            error: 'Failed to send email', 
+            details: error.message 
+        });
+    }
+}
+
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
     console.log('Use /esign-proxy endpoint for API calls');
     console.log('Use /contract-status/<contract_id> to check signing status');
+    console.log('Use /send-to-stripe endpoint for email sending');
     console.log('Google Drive integration enabled');
+    console.log('Email integration enabled');
 });

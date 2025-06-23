@@ -889,7 +889,7 @@ ${formData.companyName || ''}`;
                                 const iframeDiv = iframeContainer.querySelector('div:first-child');
                                 if (iframeDiv) {
                                     const googleDriveButton = statusData.google_drive ? `
-                                        <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                                        <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
                                             📁 View in Google Drive
                                         </button>
                                     ` : '';
@@ -902,13 +902,18 @@ ${formData.companyName || ''}`;
                                                 </div>
                                                 <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
                                                 <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation has also been sent to you.</p>
-                                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">⚠️ Google Drive integration needs setup (see console)</p>'}
-                                                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                                        📄 View Signed Document
+                                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">💡 Set up Google Drive integration for automatic backup</p>'}
+                                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
+                                                        📄 View Document
                                                     </button>
                                                     ${googleDriveButton}
-                                                    <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                </div>
+                                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                                                    <button id="sendToStripeBtn" onclick="sendToStripe('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: bold;">
+                                                        📧 Send to Stripe
+                                                    </button>
+                                                    <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
                                                         Close
                                                     </button>
                                                 </div>
@@ -993,6 +998,89 @@ ${formData.companyName || ''}`;
             setESignLoading(false);
         }
     };
+
+    // Send signed document to Stripe via email
+    const sendToStripe = async (contractId, pdfUrl) => {
+        try {
+            console.log('📧 Sending document to Stripe...');
+            
+            // Disable button and show loading
+            const button = document.getElementById('sendToStripeBtn');
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '⏳ Sending...';
+                button.style.background = '#6c757d';
+            }
+            
+            const emailData = {
+                contractId: contractId,
+                pdfUrl: pdfUrl,
+                companyName: formData.companyName,
+                contactName: formData.contactName,
+                withheldAmount: formData.withheldAmount
+            };
+            
+            const response = await fetch('http://localhost:3001/send-to-stripe', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(emailData)
+            });
+            
+            const result = await response.json();
+            
+            if (result.success) {
+                console.log('✅ Email sent successfully!');
+                if (button) {
+                    button.innerHTML = '✅ Sent to Stripe!';
+                    button.style.background = '#28a745';
+                    button.disabled = true;
+                }
+                
+                // Show success message
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = '📧 Send to Stripe';
+                        button.style.background = '#28a745';
+                        button.disabled = false;
+                    }
+                }, 3000);
+                
+            } else {
+                console.error('❌ Email sending failed:', result.error);
+                if (button) {
+                    button.innerHTML = '❌ Send Failed';
+                    button.style.background = '#dc2626';
+                }
+                
+                setTimeout(() => {
+                    if (button) {
+                        button.innerHTML = '📧 Send to Stripe';
+                        button.style.background = '#28a745';
+                        button.disabled = false;
+                    }
+                }, 3000);
+            }
+            
+        } catch (error) {
+            console.error('❌ Error sending to Stripe:', error);
+            const button = document.getElementById('sendToStripeBtn');
+            if (button) {
+                button.innerHTML = '❌ Error';
+                button.style.background = '#dc2626';
+                
+                setTimeout(() => {
+                    button.innerHTML = '📧 Send to Stripe';
+                    button.style.background = '#28a745';
+                    button.disabled = false;
+                }, 3000);
+            }
+        }
+    };
+
+    // Make sendToStripe available globally
+    window.sendToStripe = sendToStripe;
 
     // Navigation functions
     const nextTab = () => {
