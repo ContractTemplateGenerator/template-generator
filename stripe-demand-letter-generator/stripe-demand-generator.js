@@ -1042,27 +1042,23 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Email to Stripe using mailto with prefilled content and automatic PDF download
+    // Email to Stripe using Gmail with enhanced PDF handling
     const emailToStripe = async (contractId, pdfUrl) => {
         try {
-            console.log('📧 Preparing email to Stripe...');
+            console.log('📧 Preparing Gmail with PDF for Stripe...');
             
-            // First, automatically download the PDF
             const fileName = `Signed_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.pdf`;
             
-            // Create a download link for the PDF
-            const downloadLink = document.createElement('a');
-            downloadLink.href = pdfUrl;
-            downloadLink.download = fileName;
-            downloadLink.style.display = 'none';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
+            // Download PDF and prepare for sharing
+            const response = await fetch(pdfUrl);
+            const pdfBlob = await response.blob();
             
-            // Create email subject
-            const subject = encodeURIComponent(`FORMAL DEMAND LETTER - ${formData.companyName || '[Company Name]'} - Withheld Funds $${formData.withheldAmount || '[Amount]'}`);
+            // Create a File object for better handling
+            const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
             
-            // Create email body
+            // Create email content
+            const subject = `FORMAL DEMAND LETTER - ${formData.companyName || '[Company Name]'} - Withheld Funds $${formData.withheldAmount || '[Amount]'}`;
+            
             const emailBody = `Dear Stripe Legal Team,
 
 Please find attached the signed formal demand letter regarding withheld merchant funds for ${formData.companyName || '[Company Name]'}.
@@ -1081,22 +1077,58 @@ Respectfully submitted,
 ${formData.contactName || '[Contact Name]'}
 ${formData.companyName || '[Company Name]'}`;
 
-            const encodedBody = encodeURIComponent(emailBody);
+            // Try Web Share API first (if supported)
+            if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
+                console.log('📱 Using Web Share API');
+                await navigator.share({
+                    title: subject,
+                    text: emailBody,
+                    files: [pdfFile]
+                });
+                return;
+            }
             
-            // Create mailto link
-            const mailtoLink = `mailto:complaints@stripe.com?subject=${subject}&body=${encodedBody}`;
+            // Create downloadable PDF
+            const url = URL.createObjectURL(pdfBlob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = fileName;
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
             
-            // Small delay to allow download to start, then open email
+            // Small delay then open Gmail
             setTimeout(() => {
-                window.open(mailtoLink, '_self');
+                const gmailUrl = `https://mail.google.com/mail/?view=cm&to=complaints@stripe.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
+                window.open(gmailUrl, '_blank');
                 
-                // Show instructions
-                alert(`✅ Email client opening!\n\n1. The signed PDF (${fileName}) should be downloading automatically\n2. Your email client will open with a pre-filled message to Stripe\n3. Attach the downloaded PDF file to the email before sending\n\nThe PDF has been saved to your Downloads folder.`);
-            }, 1000);
+                // Clean up
+                URL.revokeObjectURL(url);
+                
+                // Show improved instructions
+                const instructions = `✅ Gmail opening with prefilled message!
+
+📎 TO ATTACH THE PDF:
+1. The PDF "${fileName}" is downloading to your Downloads folder
+2. In Gmail, click the attachment button (📎)
+3. Select the downloaded PDF file
+4. Or drag & drop the PDF directly into the Gmail compose window
+
+💡 PRO TIP: Keep your Downloads folder open and drag the PDF directly into Gmail!`;
+                
+                alert(instructions);
+            }, 500);
             
         } catch (error) {
-            console.error('❌ Error preparing email:', error);
-            alert('❌ Error preparing email. You can manually:\n1. Download the PDF from the "View Signed Document" button\n2. Email complaints@stripe.com with the document attached');
+            console.error('❌ Error preparing Gmail:', error);
+            
+            // Fallback: Simple Gmail compose
+            const simpleSubject = `FORMAL DEMAND LETTER - ${formData.companyName || 'Company'}`;
+            const gmailUrl = `https://mail.google.com/mail/?view=cm&to=complaints@stripe.com&su=${encodeURIComponent(simpleSubject)}`;
+            window.open(gmailUrl, '_blank');
+            
+            alert('❌ Opening Gmail with basic compose. Please:\n1. Download the PDF using "View Signed Document"\n2. Manually compose your email\n3. Attach the PDF to your message');
         }
     };
 
