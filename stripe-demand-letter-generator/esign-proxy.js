@@ -23,8 +23,18 @@ const server = http.createServer((req, res) => {
         return;
     }
 
-    // Only handle POST requests to /esign-proxy
-    if (req.method !== 'POST' || req.url !== '/esign-proxy') {
+    // Handle both POST requests to /esign-proxy and GET requests to check contract status
+    if (req.method === 'POST' && req.url === '/esign-proxy') {
+        // Handle eSignature creation
+    } else if (req.method === 'GET' && req.url.startsWith('/contract-status/')) {
+        // Handle contract status checking
+        const contractId = req.url.split('/contract-status/')[1];
+        checkContractStatus(contractId, (statusResult) => {
+            res.writeHead(200);
+            res.end(JSON.stringify(statusResult));
+        });
+        return;
+    } else {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Not found' }));
         return;
@@ -341,16 +351,47 @@ const ESIGNATURES_API_URL = 'https://esignatures.com/api';
 function createESignaturesTemplate(title, content, signerInfo, callback) {
     console.log('Creating eSignatures.com template...');
     
-    // Convert content to document elements for eSignatures.com API
-    const documentElements = [
-        {
-            "type": "text_normal", 
-            "text": content
+    // Convert content to document elements with inline signature
+    // Split content at "Sincerely," to insert signature field there
+    const sincerelyIndex = content.indexOf("Sincerely,");
+    let documentElements = [];
+    
+    if (sincerelyIndex !== -1) {
+        // Content before "Sincerely,"
+        const beforeSincerely = content.substring(0, sincerelyIndex + "Sincerely,".length);
+        documentElements.push({
+            "type": "text_normal",
+            "text": beforeSincerely
+        });
+        
+        // Add handwritten signature field right after "Sincerely,"
+        documentElements.push({
+            "type": "signer_field_signature",
+            "text": "",
+            "signer_field_assigned_to": "first_signer",
+            "signer_field_required": "yes"
+        });
+        
+        // Content after "Sincerely," (excluding signature/name parts)
+        const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
+        // Remove the manual signature lines (name and company) from the content
+        const cleanedAfter = afterSincerely.replace(/\n\n[^\n]+\n[^\n]+$/, '');
+        if (cleanedAfter.trim()) {
+            documentElements.push({
+                "type": "text_normal",
+                "text": cleanedAfter
+            });
         }
-    ];
+    } else {
+        // Fallback if "Sincerely," not found - just add content as is
+        documentElements.push({
+            "type": "text_normal",
+            "text": content
+        });
+    }
     
     const templateData = {
-        title: title,
+        title: "Document for Electronic Signature",
         document_elements: documentElements,
         labels: ["first_signer"]
     };
@@ -415,19 +456,19 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     });
 }
 
-function makeESignaturesAPICall(endpoint, data, callback) {
-    const postData = JSON.stringify(data);
+function makeESignaturesAPICall(endpoint, data, callback, method = 'POST') {
+    const postData = method === 'POST' ? JSON.stringify(data) : '';
     const url = `${ESIGNATURES_API_URL}${endpoint}?token=${ESIGNATURES_API_TOKEN}`;
     
     const options = {
         hostname: 'esignatures.com',
         port: 443,
         path: `/api${endpoint}?token=${ESIGNATURES_API_TOKEN}`,
-        method: 'POST',
-        headers: {
+        method: method,
+        headers: method === 'POST' ? {
             'Content-Type': 'application/json',
             'Content-Length': Buffer.byteLength(postData)
-        }
+        } : {}
     };
 
     console.log(`Making eSignatures.com API call to ${endpoint}:`, options.path);
@@ -458,12 +499,44 @@ function makeESignaturesAPICall(endpoint, data, callback) {
         callback(false, { error: error.message });
     });
 
-    req.write(postData);
+    if (method === 'POST' && postData) {
+        req.write(postData);
+    }
     req.end();
+}
+
+// Function to check contract status and get signed document
+function checkContractStatus(contractId, callback) {
+    console.log('Checking contract status for:', contractId);
+    
+    makeESignaturesAPICall(`/contracts/${contractId}`, {}, (success, result) => {
+        console.log('Contract status response:', result);
+        
+        if (success && result.data && result.data.contract) {
+            const contract = result.data.contract;
+            const status = contract.status;
+            
+            callback({
+                success: true,
+                status: status,
+                contract_id: contractId,
+                signed: status === 'signed',
+                pdf_url: contract.contract_pdf_url || null,
+                signers: contract.signers || []
+            });
+        } else {
+            callback({
+                success: false,
+                error: 'Failed to retrieve contract status',
+                details: result
+            });
+        }
+    }, 'GET');
 }
 
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
     console.log('Use /esign-proxy endpoint for API calls');
+    console.log('Use /contract-status/<contract_id> to check signing status');
 });

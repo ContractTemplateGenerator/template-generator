@@ -702,6 +702,62 @@ ${formData.companyName || '[COMPANY NAME]'}`;
         }
     };
 
+    // Monitor contract completion and provide finalized document
+    const monitorContractCompletion = (contractId, iframeContainer) => {
+        let checkCount = 0;
+        const maxChecks = 60; // Check for 5 minutes (every 5 seconds)
+        
+        const checkStatus = async () => {
+            try {
+                const response = await fetch(`http://localhost:3001/contract-status/${contractId}`);
+                const status = await response.json();
+                
+                console.log('Contract status check:', status);
+                
+                if (status.success && status.signed && status.pdf_url) {
+                    // Document is signed! Provide download link
+                    const downloadButton = document.createElement('div');
+                    downloadButton.innerHTML = `
+                        <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10002; cursor: pointer;" onclick="window.open('${status.pdf_url}', '_blank')">
+                            ✅ Download Signed Document
+                        </div>
+                    `;
+                    document.body.appendChild(downloadButton);
+                    
+                    // Update the iframe close button to also remove the download button
+                    const closeButton = iframeContainer.querySelector('button');
+                    if (closeButton) {
+                        const originalClick = closeButton.onclick;
+                        closeButton.onclick = () => {
+                            originalClick();
+                            downloadButton.remove();
+                        };
+                    }
+                    
+                    // Show success notification
+                    alert("🎉 Document Signed Successfully!\n\nYour finalized document is ready for download. Click the green button to download it immediately.");
+                    return; // Stop checking
+                }
+                
+                checkCount++;
+                if (checkCount < maxChecks && (!status.success || !status.signed)) {
+                    // Continue checking every 5 seconds
+                    setTimeout(checkStatus, 5000);
+                }
+                
+            } catch (error) {
+                console.error('Error checking contract status:', error);
+                checkCount++;
+                if (checkCount < maxChecks) {
+                    setTimeout(checkStatus, 5000);
+                }
+            }
+        };
+        
+        // Start checking after 10 seconds (give user time to start signing)
+        setTimeout(checkStatus, 10000);
+    };
+
     // eSignature document function
     const eSignDocument = async () => {
         try {
@@ -792,11 +848,16 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 `;
                 document.body.appendChild(iframeContainer);
                 
+                // Start monitoring for completion and provide finalized document
+                if (result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    monitorContractCompletion(result.data.contract_id, iframeContainer);
+                }
+                
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
                 } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nA signing link has been emailed to you.\n\nSign the document in the embedded interface below.");
+                    alert("🔥 REAL eSignature Created!\n\nSign the document in the embedded interface that just opened.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
