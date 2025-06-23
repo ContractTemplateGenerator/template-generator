@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Signed Successfully</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .success-icon {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+        .message {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+        .actions {
+            margin-top: 30px;
+        }
+        .action-button {
+            background: #007cba;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .action-button:hover {
+            background: #005a8c;
+        }
+        .action-button.primary {
+            background: #28a745;
+        }
+        .action-button.primary:hover {
+            background: #1e7e34;
+        }
+        .action-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+        .pdf-viewer {
+            margin-top: 30px;
+            display: none;
+        }
+        .pdf-viewer iframe {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="success-icon">✅</div>
+        <h1>Document Signed Successfully!</h1>
+        <div class="message">
+            Your demand letter has been signed and is ready for submission to Stripe.
+        </div>
+        
+        <div class="actions">
+            <button class="action-button primary" id="sendToStripeBtn" onclick="sendToStripe()">
+                📧 Send to Stripe Now
+            </button>
+            <button class="action-button" id="viewPdfBtn" onclick="viewPdf()">
+                📄 View Signed PDF
+            </button>
+            <a href="/" class="action-button">🏠 Back to Generator</a>
+        </div>
+        
+        <div id="status" class="status"></div>
+        
+        <div class="pdf-viewer" id="pdfViewer">
+            <h3>Signed Document:</h3>
+            <iframe id="pdfFrame" src=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        let contractId = null;
+        let contractData = null;
+        
+        // Get contract ID from URL parameter
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            contractId = urlParams.get('contract_id') || getContractIdFromReferrer();
+            
+            if (contractId) {
+                console.log('Contract ID found:', contractId);
+                checkContractStatus();
+            } else {
+                showStatus('Error: No contract ID found. Please try signing again.', 'error');
+            }
+        });
+        
+        function getContractIdFromReferrer() {
+            // Try to extract contract ID from referrer URL
+            const referrer = document.referrer;
+            if (referrer && referrer.includes('esignatures.com/sign/')) {
+                const match = referrer.match(/esignatures\.com\/sign\/([^\/]+)/);
+                return match ? match[1] : null;
+            }
+            return null;
+        }
+        
+        async function checkContractStatus() {
+            try {
+                showStatus('Checking document status...', 'loading');
+                
+                const response = await fetch(`http://localhost:3001/contract-status/${contractId}`);
+                const data = await response.json();
+                
+                if (data.success && data.signed) {
+                    contractData = data;
+                    showStatus('✅ Document verified as signed and ready!', 'success');
+                    document.getElementById('sendToStripeBtn').disabled = false;
+                    document.getElementById('viewPdfBtn').disabled = false;
+                } else {
+                    showStatus('Document is not fully signed yet. Please wait a moment and refresh.', 'error');
+                }
+            } catch (error) {
+                console.error('Error checking status:', error);
+                showStatus('Error checking document status. Please try again.', 'error');
+            }
+        }
+        
+        async function sendToStripe() {
+            if (!contractData || !contractData.pdf_url) {
+                showStatus('Error: No signed document available to send.', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('sendToStripeBtn');
+            button.disabled = true;
+            button.textContent = '📧 Sending...';
+            
+            try {
+                showStatus('Sending signed document to Stripe...', 'loading');
+                
+                // You'll need to get form data from localStorage or prompt user
+                const formData = getFormDataFromStorage();
+                
+                const emailData = {
+                    contractId: contractId,
+                    pdfUrl: contractData.pdf_url,
+                    companyName: formData.companyName || 'Company',
+                    contactName: formData.contactName || 'Contact',
+                    withheldAmount: formData.withheldAmount || '0'
+                };
+                
+                const response = await fetch('http://localhost:3001/send-to-stripe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showStatus(`✅ Success! Signed demand letter sent to Stripe. Message ID: ${result.messageId}`, 'success');
+                    button.textContent = '✅ Sent to Stripe!';
+                } else {
+                    throw new Error(result.error || 'Failed to send email');
+                }
+                
+            } catch (error) {
+                console.error('Error sending to Stripe:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                button.disabled = false;
+                button.textContent = '📧 Send to Stripe Now';
+            }
+        }
+        
+        function viewPdf() {
+            if (!contractData || !contractData.pdf_url) {
+                showStatus('Error: No PDF available to view.', 'error');
+                return;
+            }
+            
+            const pdfViewer = document.getElementById('pdfViewer');
+            const pdfFrame = document.getElementById('pdfFrame');
+            
+            pdfFrame.src = contractData.pdf_url;
+            pdfViewer.style.display = 'block';
+            
+            // Scroll to PDF viewer
+            pdfViewer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function getFormDataFromStorage() {
+            // Try to get form data from localStorage (if stored during form submission)
+            try {
+                const stored = localStorage.getItem('demandLetterFormData');
+                return stored ? JSON.parse(stored) : {};
+            } catch (error) {
+                console.error('Error getting form data from storage:', error);
+                return {};
+            }
+        }
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Signed Document to Stripe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .send-button {
+            background: #007cba;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        .send-button:hover {
+            background: #005a8c;
+        }
+        .send-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 4px;
+            display: none;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.loading {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #b8daff;
+        }
+        .example {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Send Signed Document to Stripe</h1>
+        
+        <form id="sendForm">
+            <div class="form-group">
+                <label for="contractId">Contract ID from eSignatures.com URL:</label>
+                <input type="text" id="contractId" required>
+                <div class="help-text">
+                    Copy the contract ID from your eSignatures.com URL. For example:<br>
+                    <div class="example">https://esignatures.com/sign/0ffee3cd-217e-4145-94d5-d6ee1bd6f0c1/signed</div>
+                    The contract ID would be: <strong>0ffee3cd-217e-4145-94d5-d6ee1bd6f0c1</strong>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label for="companyName">Company Name:</label>
+                <input type="text" id="companyName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="contactName">Contact Name:</label>
+                <input type="text" id="contactName" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="withheldAmount">Withheld Amount (without $):</label>
+                <input type="text" id="withheldAmount" required placeholder="e.g. 15000">
+            </div>
+            
+            <button type="submit" class="send-button" id="sendButton">
+                Send Signed Document to Stripe
+            </button>
+        </form>
+        
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        document.getElementById('sendForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const contractId = document.getElementById('contractId').value.trim();
+            const companyName = document.getElementById('companyName').value.trim();
+            const contactName = document.getElementById('contactName').value.trim();
+            const withheldAmount = document.getElementById('withheldAmount').value.trim();
+            
+            if (!contractId || !companyName || !contactName || !withheldAmount) {
+                showStatus('Please fill in all fields', 'error');
+                return;
+            }
+            
+            const button = document.getElementById('sendButton');
+            button.disabled = true;
+            button.textContent = 'Checking document status...';
+            showStatus('Checking if document is signed and getting PDF URL...', 'loading');
+            
+            try {
+                // First, check contract status to get PDF URL
+                const statusResponse = await fetch(`http://localhost:3001/contract-status/${contractId}`);
+                const statusData = await statusResponse.json();
+                
+                if (!statusData.success) {
+                    throw new Error('Failed to get contract status: ' + (statusData.error || 'Unknown error'));
+                }
+                
+                if (!statusData.signed) {
+                    throw new Error('Document is not signed yet. Please complete signing first.');
+                }
+                
+                if (!statusData.pdf_url) {
+                    throw new Error('No PDF URL found for this contract');
+                }
+                
+                button.textContent = 'Sending email to Stripe...';
+                showStatus('Document is signed! Sending email to Stripe with PDF attachment...', 'loading');
+                
+                // Now send the email
+                const emailData = {
+                    contractId: contractId,
+                    pdfUrl: statusData.pdf_url,
+                    companyName: companyName,
+                    contactName: contactName,
+                    withheldAmount: withheldAmount
+                };
+                
+                const emailResponse = await fetch('http://localhost:3001/send-to-stripe', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(emailData)
+                });
+                
+                const emailResult = await emailResponse.json();
+                
+                if (emailResult.success) {
+                    showStatus(`✅ Success! Signed demand letter sent to Stripe via email. Message ID: ${emailResult.messageId}`, 'success');
+                    button.textContent = 'Email Sent Successfully!';
+                } else {
+                    throw new Error(emailResult.error || 'Failed to send email');
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus(`❌ Error: ${error.message}`, 'error');
+                button.disabled = false;
+                button.textContent = 'Send Signed Document to Stripe';
+            }
+        });
+        
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status ${type}`;
+            status.style.display = 'block';
+        }
+        
+        // Auto-fill contract ID from URL if provided as query parameter
+        window.addEventListener('load', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const contractId = urlParams.get('contract');
+            if (contractId) {
+                document.getElementById('contractId').value = contractId;
+            }
+        });
+    </script>
+</body>
+</html>

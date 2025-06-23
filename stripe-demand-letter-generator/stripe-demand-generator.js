@@ -782,6 +782,9 @@ ${formData.companyName || ''}`;
             setESignLoading(true);
             console.log("eSignature button clicked");
             
+            // Store form data in localStorage for success page access
+            localStorage.setItem('demandLetterFormData', JSON.stringify(formData));
+            
             let finalDocumentText;
             let documentTitle;
             

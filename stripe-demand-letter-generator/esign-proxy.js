@@ -492,7 +492,10 @@ function createESignaturesContract(templateId, signerInfo, callback) {
             company_name: "",
             company_logo: "",
             primary_color: "#ffffff"
-        }
+        },
+        // Override success page to redirect back to terms.law
+        redirect_url: "http://localhost:8000/signing-complete.html",
+        declined_redirect_url: "http://localhost:8000/signing-declined.html"
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
