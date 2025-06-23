@@ -437,7 +437,12 @@ function createESignaturesContract(templateId, signerInfo, callback) {
         signers: [{
             name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
-        }]
+        }],
+        // Try to customize signature appearance
+        signature_request_subject: "Demand Letter Signature Request",
+        signature_request_message: "Please review and sign this demand letter.",
+        use_text_tags: false,
+        hide_text_tags: true
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));

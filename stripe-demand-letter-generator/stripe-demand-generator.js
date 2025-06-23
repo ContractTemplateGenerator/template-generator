@@ -707,7 +707,9 @@ ${formData.companyName || ''}`;
     // Monitor contract completion and provide finalized document
     const monitorContractCompletion = (contractId, iframeContainer) => {
         let checkCount = 0;
-        const maxChecks = 60; // Check for 5 minutes (every 5 seconds)
+        let rapidCheckCount = 0;
+        const maxChecks = 120; // Check for 10 minutes total
+        const maxRapidChecks = 20; // First minute with 3-second intervals
         
         const checkStatus = async () => {
             try {
@@ -723,39 +725,44 @@ ${formData.companyName || ''}`;
                         iframeDiv.innerHTML = `
                             <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
                                 <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
-                                    ✅ Document Signed Successfully! Email sent to you.
+                                    ✅ Document Signed Successfully! Email also sent to you.
                                 </div>
                                 <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
                                 <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${status.pdf_url}', '_blank')">
-                                    📄 Download PDF
+                                    📄 Open in New Tab
                                 </div>
                                 <iframe src="${status.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
                             </div>
                         `;
                     }
                     
-                    // Show success notification
-                    alert("🎉 Document Signed Successfully!\n\nYour finalized document is now displayed below AND has been emailed to you.");
+                    // No alert popup - just automatic display
+                    console.log('🎉 Document signed and displayed automatically!');
                     return; // Stop checking
                 }
                 
                 checkCount++;
-                if (checkCount < maxChecks && (!status.success || !status.signed)) {
-                    // Continue checking every 5 seconds
-                    setTimeout(checkStatus, 5000);
+                
+                // Use rapid checking for first minute, then slower checks
+                if (rapidCheckCount < maxRapidChecks) {
+                    rapidCheckCount++;
+                    setTimeout(checkStatus, 3000); // Check every 3 seconds initially
+                } else if (checkCount < maxChecks && (!status.success || !status.signed)) {
+                    setTimeout(checkStatus, 8000); // Then every 8 seconds
                 }
                 
             } catch (error) {
                 console.error('Error checking contract status:', error);
                 checkCount++;
                 if (checkCount < maxChecks) {
-                    setTimeout(checkStatus, 5000);
+                    const interval = rapidCheckCount < maxRapidChecks ? 3000 : 8000;
+                    setTimeout(checkStatus, interval);
                 }
             }
         };
         
-        // Start checking after 10 seconds (give user time to start signing)
-        setTimeout(checkStatus, 10000);
+        // Start checking immediately, then every 3 seconds
+        setTimeout(checkStatus, 2000);
     };
 
     // eSignature document function
@@ -842,11 +849,38 @@ ${formData.companyName || ''}`;
                     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
                         <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
                             <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
-                            <iframe src="${embeddedUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
+                            <iframe id="signingIframe" src="${embeddedUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
                         </div>
                     </div>
                 `;
                 document.body.appendChild(iframeContainer);
+                
+                // Add iframe load detection to trigger faster checking when signing is complete
+                const iframe = iframeContainer.querySelector('#signingIframe');
+                if (iframe) {
+                    iframe.onload = () => {
+                        try {
+                            const iframeSrc = iframe.contentWindow?.location?.href || iframe.src;
+                            console.log('Iframe loaded:', iframeSrc);
+                            // If iframe shows the signed success page, trigger immediate status check
+                            if (iframeSrc && iframeSrc.includes('/signed')) {
+                                console.log('Detected signing completion - triggering immediate status check');
+                                // Trigger an immediate status check
+                                setTimeout(() => {
+                                    fetch(`http://localhost:3001/contract-status/${result.data.contract_id}`)
+                                        .then(response => response.json())
+                                        .then(status => {
+                                            console.log('Immediate status check result:', status);
+                                        })
+                                        .catch(error => console.error('Immediate status check error:', error));
+                                }, 1000);
+                            }
+                        } catch (error) {
+                            // Cross-origin restrictions - normal behavior
+                            console.log('Iframe load detected (cross-origin)');
+                        }
+                    };
+                }
                 
                 // Start monitoring for completion and provide finalized document
                 if (result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
