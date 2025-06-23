@@ -61,8 +61,10 @@ const server = http.createServer((req, res) => {
                     console.log('Template created successfully:', templateId);
                     // Use the template to create a contract
                     createESignaturesContract(templateId, signerInfo, (contractResult) => {
+                        console.log('*** CONTRACT CALLBACK EXECUTING ***');
                         console.log('Contract callback received:', JSON.stringify(contractResult, null, 2));
                         if (contractResult.success) {
+                            console.log('*** CONTRACT SUCCESS - BUILDING RESPONSE ***');
                             // Debug: log the exact contractResult structure
                             console.log('Contract result data structure:', JSON.stringify(contractResult.data, null, 2));
                             
