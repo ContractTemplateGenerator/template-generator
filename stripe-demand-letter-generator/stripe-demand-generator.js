@@ -971,7 +971,7 @@ ${formData.companyName || ''}`;
                                 </div>
                                 
                                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                                    <button onclick="openEmailPreview('${statusData.contract_id}', '${statusData.pdf_url}', window.currentFormData?.companyName, window.currentFormData?.contactName, window.currentFormData?.withheldAmount)" style="background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                                    <button onclick="openEmailPreview('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
                                         📧 Email to Stripe
                                     </button>
                                 </div>
@@ -1042,8 +1042,10 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Store form data globally so email functions can access it
-    window.currentFormData = formData;
+    // Store form data globally so email functions can access it (update on every render)
+    useEffect(() => {
+        window.currentFormData = formData;
+    }, [formData]);
 
     // Upload to Google Drive function
     const uploadToDrive = async (contractId, pdfUrl) => {
@@ -2958,223 +2960,11 @@ try {
     document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
 }
 
-// Global email preview functions for onclick handlers
-window.openEmailPreview = async (contractId, pdfUrl, companyName = '[Company Name]', contactName = '[Contact Name]', withheldAmount = '[Amount]') => {
-    try {
-        console.log('📧 Opening email preview interface...');
-        
-        // Create email preview overlay
-        const emailOverlay = document.createElement('div');
-        emailOverlay.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 999999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-        `;
-        
-        // Default email content
-        const defaultSubject = `FORMAL DEMAND LETTER - ${companyName} - Withheld Funds $${withheldAmount}`;
-        const defaultBody = `Dear Stripe Legal Team,
-
-Please find attached the signed formal demand letter regarding withheld merchant funds for ${companyName}.
-
-This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
-
-Key Details:
-- Company: ${companyName}
-- Contact: ${contactName}
-- Withheld Amount: $${withheldAmount}
-- Document: Signed demand letter with arbitration notice
-
-This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
-
-Respectfully submitted,
-${contactName}
-${companyName}`;
-
-        emailOverlay.innerHTML = `
-            <div style="background: white; border-radius: 12px; max-width: 800px; width: 90%; max-height: 90%; overflow-y: auto; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
-                <div style="padding: 20px; border-bottom: 1px solid #eee;">
-                    <h2 style="margin: 0; color: #333;">📧 Email Preview & Edit</h2>
-                    <p style="margin: 10px 0 0 0; color: #666;">Review and edit your email before sending</p>
-                </div>
-                
-                <div style="padding: 20px;">
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">To:</label>
-                        <input type="email" id="emailTo" value="sergei.tokmakov@gmail.com" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                        <small style="color: #666;">Currently set to your email for testing</small>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Subject:</label>
-                        <input type="text" id="emailSubject" value="${defaultSubject}" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px;">
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <label style="display: block; font-weight: bold; margin-bottom: 5px; color: #333;">Message:</label>
-                        <textarea id="emailBody" style="width: 100%; height: 300px; padding: 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 14px; font-family: monospace; line-height: 1.5; resize: vertical;">${defaultBody}</textarea>
-                    </div>
-                    
-                    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 6px; border-left: 4px solid #007cba;">
-                        <div style="display: flex; align-items: center; margin-bottom: 10px;">
-                            <span style="font-size: 20px; margin-right: 10px;">📎</span>
-                            <strong style="color: #333;">Attachment:</strong>
-                        </div>
-                        <div style="color: #666; font-size: 14px;">
-                            📄 Signed_Demand_Letter_${companyName}_${new Date().toISOString().split('T')[0]}.pdf
-                            <br>
-                            <small>✅ This PDF will be automatically attached when you send the email</small>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                        <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #6c757d; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
-                            Cancel
-                        </button>
-                        <button onclick="sendEmailFromPreview('${contractId}', '${pdfUrl}', '${companyName}', '${contactName}', '${withheldAmount}')" style="background: #28a745; color: white; padding: 12px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
-                            📧 Send Email
-                        </button>
-                    </div>
-                    
-                    <div id="emailSendStatus" style="margin-top: 15px; padding: 12px; border-radius: 6px; display: none;"></div>
-                </div>
-            </div>
-        `;
-        
-        document.body.appendChild(emailOverlay);
-        
-    } catch (error) {
-        console.error('❌ Error opening email preview:', error);
-        alert('❌ Error opening email preview interface. Please try again.');
-    }
+// Simple global functions for email preview
+window.openEmailPreview = function(contractId, pdfUrl) {
+    alert('Email preview will open here. Contract: ' + contractId);
 };
 
-window.sendEmailFromPreview = async (contractId, pdfUrl, companyName = 'Company', contactName = 'Contact', withheldAmount = '0') => {
-    try {
-        const button = event.target;
-        const originalText = button.innerHTML;
-        const statusDiv = document.getElementById('emailSendStatus');
-        
-        // Get form values
-        const to = document.getElementById('emailTo').value.trim();
-        const subject = document.getElementById('emailSubject').value.trim();
-        const body = document.getElementById('emailBody').value.trim();
-        
-        // Validate
-        if (!to || !subject || !body) {
-            statusDiv.innerHTML = '❌ Please fill in all fields';
-            statusDiv.style.background = '#f8d7da';
-            statusDiv.style.color = '#721c24';
-            statusDiv.style.display = 'block';
-            return;
-        }
-        
-        if (!to.includes('@') || !to.includes('.')) {
-            statusDiv.innerHTML = '❌ Please enter a valid email address';
-            statusDiv.style.background = '#f8d7da';
-            statusDiv.style.color = '#721c24';
-            statusDiv.style.display = 'block';
-            return;
-        }
-        
-        // Show sending state
-        button.disabled = true;
-        button.innerHTML = '📧 Sending...';
-        button.style.background = '#6c757d';
-        
-        statusDiv.innerHTML = '📧 Sending email with PDF attachment...';
-        statusDiv.style.background = '#d1ecf1';
-        statusDiv.style.color = '#0c5460';
-        statusDiv.style.display = 'block';
-        
-        // Prepare email data
-        const emailData = {
-            contractId: contractId,
-            pdfUrl: pdfUrl,
-            to: to,
-            subject: subject,
-            body: body,
-            companyName: companyName,
-            contactName: contactName,
-            withheldAmount: withheldAmount,
-            fromEmail: 'noreply@terms.law',
-            senderName: contactName
-        };
-        
-        // Send email
-        const response = await fetch('http://localhost:3001/send-custom-email', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(emailData)
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-            button.innerHTML = '✅ Email Sent!';
-            button.style.background = '#28a745';
-            
-            statusDiv.innerHTML = `✅ Email sent successfully!<br><small>Message ID: ${result.messageId || 'N/A'}<br>Sent to: ${to}</small>`;
-            statusDiv.style.background = '#d4edda';
-            statusDiv.style.color = '#155724';
-            
-            // Auto-close after 3 seconds
-            setTimeout(() => {
-                const overlay = button.closest('div[style*="position: fixed"]');
-                if (overlay) overlay.remove();
-            }, 3000);
-            
-        } else {
-            button.innerHTML = '❌ Send Failed';
-            button.style.background = '#dc2626';
-            
-            let errorMessage = 'Failed to send email';
-            if (result.details && result.details.includes('BadCredentials')) {
-                errorMessage = 'Email authentication failed. Check Gmail App Password setup.';
-            } else if (result.details && result.details.includes('EAUTH')) {
-                errorMessage = 'Email authentication error. Verify Gmail App Password.';
-            }
-            
-            statusDiv.innerHTML = `❌ ${errorMessage}<br><small>Run 'node check-config.js' to verify email setup</small>`;
-            statusDiv.style.background = '#f8d7da';
-            statusDiv.style.color = '#721c24';
-            
-            // Reset button after 3 seconds
-            setTimeout(() => {
-                button.innerHTML = originalText;
-                button.style.background = '#28a745';
-                button.disabled = false;
-            }, 3000);
-        }
-        
-    } catch (error) {
-        console.error('❌ Error sending email:', error);
-        
-        const button = event.target;
-        const statusDiv = document.getElementById('emailSendStatus');
-        
-        button.innerHTML = '❌ Error';
-        button.style.background = '#dc2626';
-        
-        statusDiv.innerHTML = '❌ Network error. Check that the proxy server is running.';
-        statusDiv.style.background = '#f8d7da';
-        statusDiv.style.color = '#721c24';
-        statusDiv.style.display = 'block';
-        
-        setTimeout(() => {
-            button.innerHTML = '📧 Send Email';
-            button.style.background = '#28a745';
-            button.disabled = false;
-        }, 3000);
-    }
+window.sendEmailFromPreview = function(contractId, pdfUrl) {
+    alert('Email would be sent here');
 };
