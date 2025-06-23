@@ -954,33 +954,7 @@ ${formData.companyName || ''}`;
                 function showSuccessResult(statusData, container) {
                     const overlayDiv = container.querySelector('div:first-child');
                     if (overlayDiv) {
-                        // Google Drive integration buttons
-                        let googleDriveButtons = '';
-                        if (statusData.google_drive) {
-                            if (statusData.google_drive.esignatures_drive && statusData.google_drive.esignatures_drive.driveLink) {
-                                googleDriveButtons += `
-                                    <button onclick="window.open('${statusData.google_drive.esignatures_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
-                                        📁 View in Drive (eSignatures)
-                                    </button>
-                                `;
-                            }
-                            if (statusData.google_drive.terms_law_drive && statusData.google_drive.terms_law_drive.driveLink) {
-                                googleDriveButtons += `
-                                    <button onclick="window.open('${statusData.google_drive.terms_law_drive.driveLink}', '_blank')" style="background: #34a853; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
-                                        📁 View Backup Drive
-                                    </button>
-                                `;
-                            }
-                        }
-                        
-                        // Manual upload to Drive button if not already uploaded
-                        if (!statusData.google_drive || !statusData.google_drive.terms_law_drive) {
-                            googleDriveButtons += `
-                                <button onclick="uploadToDrive('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #34a853; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; margin: 5px;">
-                                    📁 Save to My Drive
-                                </button>
-                            `;
-                        }
+                        // No Google Drive buttons as per user request
                         
                         overlayDiv.innerHTML = `
                             <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 600px;">
@@ -988,19 +962,17 @@ ${formData.companyName || ''}`;
                                     ✅ Document Signed Successfully!
                                 </div>
                                 <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your demand letter has been signed and is ready for submission.</p>
-                                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation has also been sent to you.</p>
-                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">💡 Set up Google Drive integration for automatic backup</p>'}
+                                <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Email confirmation has also been sent to you.</p>
                                 
                                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
                                     <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
                                         📄 View Signed Document
                                     </button>
-                                    ${googleDriveButtons}
                                 </div>
                                 
                                 <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                                    <button id="sendToStripeBtn" onclick="sendToStripe('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
-                                        📧 Send to Stripe Now
+                                    <button onclick="emailToStripe('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
+                                        📧 Email to Stripe
                                     </button>
                                 </div>
                                 
@@ -1070,95 +1042,61 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Send signed document to Stripe via email
-    const sendToStripe = async (contractId, pdfUrl) => {
+    // Email to Stripe using mailto with prefilled content and automatic PDF download
+    const emailToStripe = async (contractId, pdfUrl) => {
         try {
-            console.log('📧 Sending document to Stripe...');
+            console.log('📧 Preparing email to Stripe...');
             
-            // Disable button and show loading
-            const button = document.getElementById('sendToStripeBtn');
-            if (button) {
-                button.disabled = true;
-                button.innerHTML = '⏳ Sending...';
-                button.style.background = '#6c757d';
-            }
+            // First, automatically download the PDF
+            const fileName = `Signed_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.pdf`;
             
-            const emailData = {
-                contractId: contractId,
-                pdfUrl: pdfUrl,
-                companyName: formData.companyName,
-                contactName: formData.contactName,
-                withheldAmount: formData.withheldAmount
-            };
+            // Create a download link for the PDF
+            const downloadLink = document.createElement('a');
+            downloadLink.href = pdfUrl;
+            downloadLink.download = fileName;
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
             
-            const response = await fetch('http://localhost:3001/send-to-stripe', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(emailData)
-            });
+            // Create email subject
+            const subject = encodeURIComponent(`FORMAL DEMAND LETTER - ${formData.companyName || '[Company Name]'} - Withheld Funds $${formData.withheldAmount || '[Amount]'}`);
             
-            const result = await response.json();
+            // Create email body
+            const emailBody = `Dear Stripe Legal Team,
+
+Please find attached the signed formal demand letter regarding withheld merchant funds for ${formData.companyName || '[Company Name]'}.
+
+This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
+
+Key Details:
+- Company: ${formData.companyName || '[Company Name]'}
+- Contact: ${formData.contactName || '[Contact Name]'}
+- Withheld Amount: $${formData.withheldAmount || '[Amount]'}
+- Document: Signed demand letter with arbitration notice
+
+This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
+
+Respectfully submitted,
+${formData.contactName || '[Contact Name]'}
+${formData.companyName || '[Company Name]'}`;
+
+            const encodedBody = encodeURIComponent(emailBody);
             
-            if (result.success) {
-                console.log('✅ Email sent successfully!');
-                if (button) {
-                    button.innerHTML = '✅ Sent to Stripe!';
-                    button.style.background = '#28a745';
-                    button.disabled = true;
-                }
+            // Create mailto link
+            const mailtoLink = `mailto:complaints@stripe.com?subject=${subject}&body=${encodedBody}`;
+            
+            // Small delay to allow download to start, then open email
+            setTimeout(() => {
+                window.open(mailtoLink, '_self');
                 
-                // Show success message
-                setTimeout(() => {
-                    if (button) {
-                        button.innerHTML = '📧 Send to Stripe';
-                        button.style.background = '#28a745';
-                        button.disabled = false;
-                    }
-                }, 3000);
-                
-            } else {
-                console.error('❌ Email sending failed:', result.error);
-                if (button) {
-                    button.innerHTML = '❌ Send Failed';
-                    button.style.background = '#dc2626';
-                }
-                
-                // Show helpful error message
-                let errorMessage = 'Failed to send email to Stripe';
-                if (result.details && result.details.includes('BadCredentials')) {
-                    errorMessage = 'Email authentication failed. Please check your Gmail App Password in .env file.';
-                } else if (result.details && result.details.includes('EAUTH')) {
-                    errorMessage = 'Email authentication error. Make sure you\'re using a Gmail App Password, not your regular password.';
-                } else if (result.error && result.error.includes('credentials')) {
-                    errorMessage = 'Email not configured. Please set up EMAIL_USER and EMAIL_PASS in .env file.';
-                }
-                
-                alert('❌ ' + errorMessage + '\n\nSee email-setup.md for configuration instructions.');
-                
-                setTimeout(() => {
-                    if (button) {
-                        button.innerHTML = '📧 Send to Stripe';
-                        button.style.background = '#28a745';
-                        button.disabled = false;
-                    }
-                }, 3000);
-            }
+                // Show instructions
+                alert(`✅ Email client opening!\n\n1. The signed PDF (${fileName}) should be downloading automatically\n2. Your email client will open with a pre-filled message to Stripe\n3. Attach the downloaded PDF file to the email before sending\n\nThe PDF has been saved to your Downloads folder.`);
+            }, 1000);
             
         } catch (error) {
-            console.error('❌ Error sending to Stripe:', error);
-            const button = document.getElementById('sendToStripeBtn');
-            if (button) {
-                button.innerHTML = '❌ Error';
-                button.style.background = '#dc2626';
-                
-                setTimeout(() => {
-                    button.innerHTML = '📧 Send to Stripe';
-                    button.style.background = '#28a745';
-                    button.disabled = false;
-                }, 3000);
-            }
+            console.error('❌ Error preparing email:', error);
+            alert('❌ Error preparing email. You can manually:\n1. Download the PDF from the "View Signed Document" button\n2. Email complaints@stripe.com with the document attached');
         }
     };
 
@@ -1208,7 +1146,7 @@ ${formData.companyName || ''}`;
     };
     
     // Make functions available globally
-    window.sendToStripe = sendToStripe;
+    window.emailToStripe = emailToStripe;
     window.uploadToDrive = uploadToDrive;
 
     // Navigation functions
