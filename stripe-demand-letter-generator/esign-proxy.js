@@ -385,7 +385,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     }
     
     const templateData = {
-        title: "Document for Electronic Signature",
+        title: "",
         document_elements: documentElements,
         labels: ["first_signer"]
     };
@@ -416,7 +416,6 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     const contractData = {
         template_id: templateId,
         test: "yes", // Use test mode for the paid account
-        signature_request_delivery_methods: [], // Prevent initial email/SMS for embedded signing
         signers: [{
             name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"

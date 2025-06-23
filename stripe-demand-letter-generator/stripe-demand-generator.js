@@ -490,7 +490,7 @@ ${additionalDamages > 0 ? `F. Award additional damages of $${additionalDamages.t
 ${additionalDamages > 0 ? 'G. Award such other relief as the Tribunal deems just and proper.' : ''}
 
 ${formData.contactName || '[CONTACT NAME]'}
-${formData.companyName || '[COMPANY NAME]'}
+${formData.companyName || ''}
 Claimant
 
 Dated: _________________`;
@@ -619,7 +619,7 @@ I look forward to your prompt attention to this matter.
 Sincerely,
 
 ${formData.contactName || '[CONTACT NAME]'}
-${formData.companyName || '[COMPANY NAME]'}`;
+${formData.companyName || ''}`;
 
         return letter;
     };
@@ -715,27 +715,25 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 console.log('Contract status check:', status);
                 
                 if (status.success && status.signed && status.pdf_url) {
-                    // Document is signed! Provide download link
-                    const downloadButton = document.createElement('div');
-                    downloadButton.innerHTML = `
-                        <div style="position: fixed; top: 20px; right: 20px; background: #28a745; color: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 10002; cursor: pointer;" onclick="window.open('${status.pdf_url}', '_blank')">
-                            ✅ Download Signed Document
-                        </div>
-                    `;
-                    document.body.appendChild(downloadButton);
-                    
-                    // Update the iframe close button to also remove the download button
-                    const closeButton = iframeContainer.querySelector('button');
-                    if (closeButton) {
-                        const originalClick = closeButton.onclick;
-                        closeButton.onclick = () => {
-                            originalClick();
-                            downloadButton.remove();
-                        };
+                    // Document is signed! Replace the signing iframe with the signed document viewer
+                    const iframeDiv = iframeContainer.querySelector('div:first-child');
+                    if (iframeDiv) {
+                        iframeDiv.innerHTML = `
+                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                                <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
+                                    ✅ Document Signed Successfully! Email sent to you.
+                                </div>
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                                <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${status.pdf_url}', '_blank')">
+                                    📄 Download PDF
+                                </div>
+                                <iframe src="${status.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
+                            </div>
+                        `;
                     }
                     
                     // Show success notification
-                    alert("🎉 Document Signed Successfully!\n\nYour finalized document is ready for download. Click the green button to download it immediately.");
+                    alert("🎉 Document Signed Successfully!\n\nYour finalized document is now displayed below AND has been emailed to you.");
                     return; // Stop checking
                 }
                 
@@ -857,7 +855,7 @@ ${formData.companyName || '[COMPANY NAME]'}`;
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
                 } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nSign the document in the embedded interface that just opened.");
+                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
