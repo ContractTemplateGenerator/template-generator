@@ -970,11 +970,6 @@ ${formData.companyName || ''}`;
                                     </button>
                                 </div>
                                 
-                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                                    <button onclick="openEmailPreview('${statusData.contract_id}', '${statusData.pdf_url}')" style="background: #28a745; color: white; padding: 15px 25px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: bold;">
-                                        📧 Email to Stripe
-                                    </button>
-                                </div>
                                 
                                 <button onclick="this.parentElement.parentElement.remove()" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
                                     Close
@@ -1042,8 +1037,6 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Store form data globally so email functions can access it
-    window.currentFormData = formData;
 
     // Upload to Google Drive function
     const uploadToDrive = async (contractId, pdfUrl) => {
@@ -2958,11 +2951,3 @@ try {
     document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
 }
 
-// Simple global functions for email preview
-window.openEmailPreview = function(contractId, pdfUrl) {
-    alert('Email preview will open here. Contract: ' + contractId);
-};
-
-window.sendEmailFromPreview = function(contractId, pdfUrl) {
-    alert('Email would be sent here');
-};
