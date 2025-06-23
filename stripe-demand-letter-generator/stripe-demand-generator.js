@@ -853,16 +853,8 @@ ${formData.companyName || ''}`;
                     monitorContractCompletion(result.data.contract_id, iframeContainer);
                 }
                 
-                // Show appropriate success message
-                if (result.contract_id && result.contract_id.startsWith('demo-')) {
-                    alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
-                } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
-                } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
-                    alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
-                } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
-                    alert("🧪 Demo Mode Active\n\nAPI unavailable - using demo mode.\n\nFor real signing, contact support for API setup.");
-                } else if (result.error_code === 'forbidden' || result.error_message) {
+                // No success messages - go straight to signing interface
+                if (result.error_code === 'forbidden' || result.error_message) {
                     // Handle API authentication errors
                     alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
                     // Embed demo URL instead
@@ -878,8 +870,6 @@ ${formData.companyName || ''}`;
                     `;
                     document.body.appendChild(iframeContainer);
                     return; // Don't throw error, just show demo
-                } else {
-                    alert("✅ eSignature ready! Complete signing in the embedded interface");
                 }
             } else {
                 // Handle API errors more gracefully

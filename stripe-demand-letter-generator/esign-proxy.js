@@ -403,7 +403,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     }
     
     const templateData = {
-        title: "Demand Letter for Electronic Signature",
+        title: "Demand Letter",
         document_elements: documentElements,
         labels: ["first_signer"]
     };
