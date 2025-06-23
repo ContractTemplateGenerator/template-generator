@@ -209,14 +209,20 @@ const StripeDemandGenerator = () => {
         return { claims, violations };
     };
 
+    // Helper function to safely add days to a date
+    const addDays = (date, days) => {
+        const result = new Date(date);
+        result.setTime(result.getTime() + (days * 24 * 60 * 60 * 1000));
+        return result;
+    };
+
     // Calculate dates for legal strategy
     const calculateDates = () => {
         const today = new Date();
-        const responseDate = new Date(today);
-        responseDate.setDate(responseDate.getDate() + formData.responseDeadline);
+        const responseDate = addDays(today, formData.responseDeadline);
         
-        const arbitrationDate = new Date(today);
-        arbitrationDate.setDate(arbitrationDate.getDate() + 30); // 30-day notice requirement
+        // CRITICAL: Ensure arbitration date is ALWAYS minimum 30 days from letter date
+        const arbitrationDate = addDays(today, 30); // Exactly 30 days minimum required by SSA 13.3(a)
         
         return {
             letterDate: today.toLocaleDateString('en-US', { 
@@ -1031,6 +1037,32 @@ ${formData.companyName || ''}`;
         let score = 30; // Base score
         let factors = [];
         const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
+        
+        // CRITICAL VALIDATION: Check arbitration notice period and timing risks
+        const today = new Date();
+        const arbitrationDate = addDays(today, 30); // SSA 13.3(a) requires minimum 30 days
+        
+        // Check if promised release date conflicts with arbitration timeline
+        if (formData.promisedReleaseDate) {
+            const promisedDate = new Date(formData.promisedReleaseDate);
+            const daysUntilPromised = Math.ceil((promisedDate - today) / (1000 * 60 * 60 * 24));
+            
+            if (daysUntilPromised > 0 && daysUntilPromised < 30) {
+                score -= 15;
+                factors.push(`🚨 TIMING CONFLICT: Stripe promised to release funds in ${daysUntilPromised} days, but arbitration notice requires 30-day minimum. This creates procedural tension - consider whether to wait for promised date or proceed immediately.`);
+            }
+        }
+        
+        // Warning about response deadline vs arbitration timeline
+        if (formData.responseDeadline && formData.responseDeadline < 30) {
+            factors.push(`⚠️ TIMELINE MISMATCH: Response deadline (${formData.responseDeadline} days) is shorter than arbitration notice period (30 days). The arbitration threat becomes effective after your response deadline expires.`);
+        }
+        
+        // General timing validation - warn if close to holidays or weekends that could affect service
+        const dayOfWeek = arbitrationDate.getDay(); // 0 = Sunday, 6 = Saturday
+        if (dayOfWeek === 0 || dayOfWeek === 6) {
+            factors.push('⚠️ WEEKEND NOTICE: Arbitration notice period expires on a weekend. Consider business days for calculating effective notice and potential Stripe response timing.');
+        }
         
         // Strong evidence factors
         if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
