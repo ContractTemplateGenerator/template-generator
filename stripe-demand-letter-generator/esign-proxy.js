@@ -73,13 +73,23 @@ const server = http.createServer((req, res) => {
                             res.writeHead(200);
                             res.end(JSON.stringify(response));
                         } else {
-                            console.log('eSignatures.com failed, falling back to DocuSeal...');
-                            fallbackToDocuSeal();
+                            console.error('eSignatures.com contract creation failed:', contractResult);
+                            res.writeHead(400);
+                            res.end(JSON.stringify({ 
+                                status: "error", 
+                                error: 'eSignatures.com contract creation failed',
+                                details: contractResult
+                            }));
                         }
                     });
                 } else {
-                    console.log('Template creation failed, falling back to DocuSeal...');
-                    fallbackToDocuSeal();
+                    console.error('eSignatures.com template creation failed');
+                    res.writeHead(400);
+                    res.end(JSON.stringify({ 
+                        status: "error", 
+                        error: 'eSignatures.com template creation failed',
+                        details: 'Template creation returned null'
+                    }));
                 }
             });
             
@@ -323,58 +333,57 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     // Convert content to document elements for eSignatures.com API
     const documentElements = [
         {
-            "type": "text",
-            "text": title,
-            "style": {
-                "font_size": 18,
-                "font_weight": "bold",
-                "text_align": "center"
-            }
+            "type": "text_header_one",
+            "text": title
         },
         {
-            "type": "text", 
-            "text": content,
-            "style": {
-                "font_size": 12,
-                "line_height": 1.5
-            }
+            "type": "text_normal", 
+            "text": content
         },
         {
-            "type": "text",
-            "text": "Electronic Signature Required",
-            "style": {
-                "font_size": 14,
-                "font_weight": "bold",
-                "text_align": "center",
-                "margin_top": 30
-            }
+            "type": "text_header_two",
+            "text": "Electronic Signature Required"
         },
         {
-            "type": "signature_field",
-            "signer_role": "signer1",
-            "label": "Signature",
-            "required": true
+            "type": "text_normal",
+            "text": `Signer: ${signerInfo.name || '[SIGNER_NAME]'}`
         },
         {
-            "type": "date_field", 
-            "signer_role": "signer1",
-            "label": "Date",
-            "required": true
+            "type": "text_normal",
+            "text": `Email: ${signerInfo.email || '[SIGNER_EMAIL]'}`
+        },
+        {
+            "type": "signer_field_text",
+            "text": "Full Name",
+            "signer_field_assigned_to": "first_signer"
+        },
+        {
+            "type": "signer_field_date",
+            "text": "Date Signed",
+            "signer_field_assigned_to": "first_signer"
         }
     ];
     
     const templateData = {
         title: title,
         document_elements: documentElements,
-        labels: {
-            "signer1": "Signer"
-        }
+        labels: ["first_signer"]
     };
     
+    console.log('Template data being sent:', JSON.stringify(templateData, null, 2));
+    
     makeESignaturesAPICall('/templates', templateData, (success, result) => {
-        if (success && result.data && result.data.template_id) {
-            console.log('Template created:', result.data.template_id);
-            callback(result.data.template_id);
+        console.log('Template creation response - success:', success, 'result:', JSON.stringify(result, null, 2));
+        if (success && result.data) {
+            // Check for different response formats
+            const templateId = result.data.template_id || result.data.data?.template_id;
+            if (templateId) {
+                console.log('Template created:', templateId);
+                callback(templateId);
+            } else {
+                console.error('No template_id found in response:', result.data);
+                callback(null);
+            }
         } else {
             console.error('Template creation failed:', result);
             callback(null);
@@ -395,14 +404,22 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     };
     
     makeESignaturesAPICall('/contracts', contractData, (success, result) => {
+        console.log('Contract creation response - success:', success, 'result:', JSON.stringify(result, null, 2));
         if (success && result.data) {
-            console.log('Contract created successfully:', result.data);
+            // Extract contract info from the response
+            const contract = result.data.contract || result.data;
+            const signingUrl = contract.signers?.[0]?.sign_page_url || 
+                              result.data.signing_url || 
+                              result.data.signer_urls?.[0] || 
+                              result.data.url;
+            
+            console.log('Contract created successfully:', contract.id, 'signing URL:', signingUrl);
             callback({
                 success: true,
                 data: {
-                    contract_id: result.data.contract_id || result.data.id,
+                    contract_id: contract.id || result.data.contract_id,
                     contract_url: result.data.contract_url || result.data.url,
-                    signing_url: result.data.signing_url || result.data.signer_urls?.[0] || result.data.url
+                    signing_url: signingUrl
                 }
             });
         } else {
