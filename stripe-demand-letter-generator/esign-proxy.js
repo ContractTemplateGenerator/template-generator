@@ -41,15 +41,50 @@ const server = http.createServer((req, res) => {
             const data = JSON.parse(body);
             console.log('Parsed request data:', data);
 
-            // Create real eSignature request using DocuSeal API
-            console.log('Creating real eSignature document with DocuSeal');
-            
             const documentContent = data.template?.content || '';
             const documentTitle = data.template?.title || 'Document';
             const signerInfo = (data.signers && data.signers[0]) || { 
                 email: 'sergei.tokmakov@gmail.com', 
                 name: 'Sergei Tokmakov' 
             };
+            
+            // Try eSignatures.com first, fallback to DocuSeal
+            console.log('Attempting eSignatures.com API with template creation...');
+            
+            // First try to create a template with eSignatures.com
+            createESignaturesTemplate(documentTitle, documentContent, signerInfo, (templateId) => {
+                if (templateId) {
+                    console.log('Template created successfully:', templateId);
+                    // Use the template to create a contract
+                    createESignaturesContract(templateId, signerInfo, (contractResult) => {
+                        if (contractResult.success) {
+                            const response = {
+                                status: "success",
+                                data: {
+                                    contract_id: contractResult.data.contract_id,
+                                    contract_url: contractResult.data.contract_url,
+                                    signing_url: contractResult.data.signing_url,
+                                    title: documentTitle,
+                                    signers: data.signers || [],
+                                    message: "Real eSignature document created with eSignatures.com"
+                                }
+                            };
+                            console.log('eSignatures.com success:', response);
+                            res.writeHead(200);
+                            res.end(JSON.stringify(response));
+                        } else {
+                            console.log('eSignatures.com failed, falling back to DocuSeal...');
+                            fallbackToDocuSeal();
+                        }
+                    });
+                } else {
+                    console.log('Template creation failed, falling back to DocuSeal...');
+                    fallbackToDocuSeal();
+                }
+            });
+            
+            function fallbackToDocuSeal() {
+                console.log('Creating real eSignature document with DocuSeal');
             
             // Create HTML document with embedded signature fields for DocuSeal
             const htmlWithSignatureFields = `
@@ -107,7 +142,10 @@ ${documentContent}
                         send_sms: false,
                         completed_redirect_url: 'https://template.terms.law',
                         submitters_order: 'preserved',
-                        message: 'Please sign this demand letter document electronically.'
+                        message: {
+                            subject: 'Please sign this demand letter document',
+                            body: 'Please sign this demand letter document electronically.'
+                        }
                     }, (success, result) => {
                 if (success && result.data) {
                     console.log('DocuSeal API complete response:', JSON.stringify(result.data, null, 2));
@@ -152,6 +190,7 @@ ${documentContent}
                     }));
                 }
             });
+            } // End fallbackToDocuSeal function
 
         } catch (error) {
             console.error('JSON parse error:', error);
@@ -272,6 +311,152 @@ function generatePDFFromDemandLetter(title, content, signerInfo, callback) {
         console.error('PDF generation error:', error);
         callback(null);
     }
+}
+
+// eSignatures.com API functions
+const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
+const ESIGNATURES_API_URL = 'https://esignatures.com/api';
+
+function createESignaturesTemplate(title, content, signerInfo, callback) {
+    console.log('Creating eSignatures.com template...');
+    
+    // Convert content to document elements for eSignatures.com API
+    const documentElements = [
+        {
+            "type": "text",
+            "text": title,
+            "style": {
+                "font_size": 18,
+                "font_weight": "bold",
+                "text_align": "center"
+            }
+        },
+        {
+            "type": "text", 
+            "text": content,
+            "style": {
+                "font_size": 12,
+                "line_height": 1.5
+            }
+        },
+        {
+            "type": "text",
+            "text": "Electronic Signature Required",
+            "style": {
+                "font_size": 14,
+                "font_weight": "bold",
+                "text_align": "center",
+                "margin_top": 30
+            }
+        },
+        {
+            "type": "signature_field",
+            "signer_role": "signer1",
+            "label": "Signature",
+            "required": true
+        },
+        {
+            "type": "date_field", 
+            "signer_role": "signer1",
+            "label": "Date",
+            "required": true
+        }
+    ];
+    
+    const templateData = {
+        title: title,
+        document_elements: documentElements,
+        labels: {
+            "signer1": "Signer"
+        }
+    };
+    
+    makeESignaturesAPICall('/templates', templateData, (success, result) => {
+        if (success && result.data && result.data.template_id) {
+            console.log('Template created:', result.data.template_id);
+            callback(result.data.template_id);
+        } else {
+            console.error('Template creation failed:', result);
+            callback(null);
+        }
+    });
+}
+
+function createESignaturesContract(templateId, signerInfo, callback) {
+    console.log('Creating eSignatures.com contract with template:', templateId);
+    
+    const contractData = {
+        template_id: templateId,
+        test: "yes", // Use test mode for the paid account
+        signers: [{
+            name: signerInfo.name || "Sergei Tokmakov",
+            email: signerInfo.email || "sergei.tokmakov@gmail.com"
+        }]
+    };
+    
+    makeESignaturesAPICall('/contracts', contractData, (success, result) => {
+        if (success && result.data) {
+            console.log('Contract created successfully:', result.data);
+            callback({
+                success: true,
+                data: {
+                    contract_id: result.data.contract_id || result.data.id,
+                    contract_url: result.data.contract_url || result.data.url,
+                    signing_url: result.data.signing_url || result.data.signer_urls?.[0] || result.data.url
+                }
+            });
+        } else {
+            console.error('Contract creation failed:', result);
+            callback({ success: false, error: result });
+        }
+    });
+}
+
+function makeESignaturesAPICall(endpoint, data, callback) {
+    const postData = JSON.stringify(data);
+    const url = `${ESIGNATURES_API_URL}${endpoint}?token=${ESIGNATURES_API_TOKEN}`;
+    
+    const options = {
+        hostname: 'esignatures.com',
+        port: 443,
+        path: `/api${endpoint}?token=${ESIGNATURES_API_TOKEN}`,
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': Buffer.byteLength(postData)
+        }
+    };
+
+    console.log(`Making eSignatures.com API call to ${endpoint}:`, options.path);
+
+    const req = https.request(options, (res) => {
+        let responseBody = '';
+        
+        res.on('data', (chunk) => {
+            responseBody += chunk;
+        });
+        
+        res.on('end', () => {
+            console.log(`eSignatures.com API raw response (${res.statusCode}):`, responseBody);
+            try {
+                const result = JSON.parse(responseBody);
+                console.log(`eSignatures.com API parsed response:`, result);
+                callback(res.statusCode >= 200 && res.statusCode < 300, { data: result });
+            } catch (error) {
+                console.error('eSignatures.com API JSON parse error:', error);
+                console.error('Raw response body:', responseBody);
+                callback(false, { error: 'Invalid JSON response', raw: responseBody });
+            }
+        });
+    });
+
+    req.on('error', (error) => {
+        console.error('eSignatures.com API request error:', error);
+        callback(false, { error: error.message });
+    });
+
+    req.write(postData);
+    req.end();
 }
 
 const PORT = 3001;
