@@ -250,7 +250,7 @@ function makeDocuSealAPICall(endpoint, data, callback) {
             try {
                 const result = JSON.parse(responseBody);
                 console.log(`DocuSeal API parsed response:`, result);
-                callback(res.statusCode >= 200 && res.statusCode < 300, { data: result });
+                callback(res.statusCode >= 200 && res.statusCode < 300, result);
             } catch (error) {
                 console.error('DocuSeal API JSON parse error:', error);
                 console.error('Raw response body:', responseBody);
@@ -385,8 +385,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     makeESignaturesAPICall('/templates', templateData, (success, result) => {
         console.log('Template creation response - success:', success, 'result:', JSON.stringify(result, null, 2));
         if (success && result.data) {
-            // Check for different response formats
-            const templateId = result.data.template_id || result.data.data?.template_id;
+            const templateId = result.data.template_id;
             if (templateId) {
                 console.log('Template created:', templateId);
                 callback(templateId);
@@ -419,18 +418,17 @@ function createESignaturesContract(templateId, signerInfo, callback) {
         console.log('Contract creation response - success:', success, 'result:', JSON.stringify(result, null, 2));
         if (success && result.data) {
             // Extract contract info from the response
-            const contract = result.data.contract || result.data;
-            const signingUrl = contract.signers?.[0]?.sign_page_url || 
-                              result.data.signing_url || 
-                              result.data.signer_urls?.[0] || 
-                              result.data.url;
+            const contract = result.data.contract;
+            const signingUrl = contract.signers?.[0]?.sign_page_url;
             
             console.log('Contract created successfully:', contract.id, 'signing URL:', signingUrl);
+            console.log('Full contract object:', JSON.stringify(contract, null, 2));
+            
             callback({
                 success: true,
                 data: {
-                    contract_id: contract.id || result.data.contract_id,
-                    contract_url: result.data.contract_url || result.data.url,
+                    contract_id: contract.id,
+                    contract_url: `https://esignatures.com/contracts/${contract.id}`,
                     signing_url: signingUrl
                 }
             });
@@ -470,7 +468,7 @@ function makeESignaturesAPICall(endpoint, data, callback) {
             try {
                 const result = JSON.parse(responseBody);
                 console.log(`eSignatures.com API parsed response:`, result);
-                callback(res.statusCode >= 200 && res.statusCode < 300, { data: result });
+                callback(res.statusCode >= 200 && res.statusCode < 300, result);
             } catch (error) {
                 console.error('eSignatures.com API JSON parse error:', error);
                 console.error('Raw response body:', responseBody);
