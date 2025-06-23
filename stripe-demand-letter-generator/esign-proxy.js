@@ -61,6 +61,7 @@ const server = http.createServer((req, res) => {
                     console.log('Template created successfully:', templateId);
                     // Use the template to create a contract
                     createESignaturesContract(templateId, signerInfo, (contractResult) => {
+                        console.log('Contract callback received:', JSON.stringify(contractResult, null, 2));
                         if (contractResult.success) {
                             const response = {
                                 status: "success",
@@ -73,7 +74,7 @@ const server = http.createServer((req, res) => {
                                     message: "Real eSignature document created with eSignatures.com"
                                 }
                             };
-                            console.log('eSignatures.com success:', response);
+                            console.log('SUCCESS: Sending eSignatures.com response:', JSON.stringify(response, null, 2));
                             res.writeHead(200);
                             res.end(JSON.stringify(response));
                         } else {
