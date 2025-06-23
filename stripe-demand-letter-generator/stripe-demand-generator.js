@@ -1042,10 +1042,8 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Store form data globally so email functions can access it (update on every render)
-    useEffect(() => {
-        window.currentFormData = formData;
-    }, [formData]);
+    // Store form data globally so email functions can access it
+    window.currentFormData = formData;
 
     // Upload to Google Drive function
     const uploadToDrive = async (contractId, pdfUrl) => {
