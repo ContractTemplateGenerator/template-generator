@@ -106,19 +106,26 @@ ${documentContent}
                         completed_redirect_url: 'https://template.terms.law'
                     }, (success, result) => {
                         if (success && result.data) {
-                            console.log('DocuSeal API success:', result);
+                            console.log('DocuSeal API complete response:', JSON.stringify(result.data, null, 2));
+                            
+                            // Extract the correct signing URL from submitters (DocuSeal uses embed_src field)
+                            const signingUrl = result.data.submitters?.[0]?.embed_src || 
+                                              result.data.submitters?.[0]?.url || 
+                                              `https://docuseal.com/s/${result.data.submitters?.[0]?.slug}`;
+                            console.log('Extracted signing URL:', signingUrl);
+                            
                             const response = {
                                 status: "success",
                                 data: {
                                     contract_id: result.data.id || 'docuseal-' + Date.now(),
-                                    contract_url: result.data.audit_log_url || result.data.url || `https://app.docuseal.com/submissions/${result.data.id}`,
-                                    signing_url: result.data.submitters?.[0]?.url || result.data.url || `https://app.docuseal.com/s/${result.data.id}`,
+                                    contract_url: result.data.audit_log_url || result.data.url,
+                                    signing_url: signingUrl,
                                     title: documentTitle,
                                     signers: data.signers || [],
                                     message: "Real eSignature document created"
                                 }
                             };
-                            console.log('Sending response:', response);
+                            console.log('Sending response with correct URL:', response);
                             res.writeHead(200);
                             res.end(JSON.stringify(response));
                         } else {
