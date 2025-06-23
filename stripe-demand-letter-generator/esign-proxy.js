@@ -177,7 +177,7 @@ ${documentContent}
                         }],
                         send_email: true,
                         send_sms: false,
-                        completed_redirect_url: 'https://template.terms.law',
+                        completed_redirect_url: 'https://example.com',
                         submitters_order: 'preserved',
                         message: {
                             subject: 'Please sign this demand letter document',
@@ -411,7 +411,18 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     const templateData = {
         title: "Demand Letter",
         document_elements: documentElements,
-        labels: ["first_signer"]
+        labels: ["first_signer"],
+        // Remove branding from templates
+        white_label: true,
+        hide_brand: true,
+        custom_branding: false,
+        watermark: false,
+        show_powered_by: false,
+        powered_by_link: false,
+        custom_header: "",
+        custom_footer: "",
+        hide_esignatures_branding: true,
+        remove_watermark: true
     };
     
     console.log('Template data being sent:', JSON.stringify(templateData, null, 2));
@@ -444,11 +455,23 @@ function createESignaturesContract(templateId, signerInfo, callback) {
             name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
         }],
-        // Try to customize signature appearance
+        // Try to customize signature appearance and remove branding
         signature_request_subject: "Demand Letter Signature Request",
         signature_request_message: "Please review and sign this demand letter.",
         use_text_tags: false,
-        hide_text_tags: true
+        hide_text_tags: true,
+        // Remove eSignatures.com branding
+        white_label: true,
+        hide_brand: true,
+        custom_branding: false,
+        watermark: false,
+        show_powered_by: false,
+        powered_by_link: false,
+        custom_header: "",
+        custom_footer: "",
+        // Remove any additional branding elements
+        hide_esignatures_branding: true,
+        remove_watermark: true
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
@@ -569,6 +592,13 @@ function checkContractStatus(contractId, callback) {
 
 // Google Drive integration functions
 async function getGoogleAccessToken() {
+    // Check if credentials are configured
+    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID' ||
+        !GOOGLE_CLIENT_SECRET || GOOGLE_CLIENT_SECRET === 'YOUR_GOOGLE_CLIENT_SECRET' ||
+        !GOOGLE_REFRESH_TOKEN || GOOGLE_REFRESH_TOKEN === 'YOUR_GOOGLE_REFRESH_TOKEN') {
+        throw new Error('Google Drive credentials not configured. Please set up environment variables.');
+    }
+    
     return new Promise((resolve, reject) => {
         const postData = JSON.stringify({
             client_id: GOOGLE_CLIENT_ID,
@@ -599,7 +629,7 @@ async function getGoogleAccessToken() {
                     if (result.access_token) {
                         resolve(result.access_token);
                     } else {
-                        reject(new Error('No access token received'));
+                        reject(new Error('No access token received from Google'));
                     }
                 } catch (error) {
                     reject(error);
@@ -684,11 +714,16 @@ async function uploadToGoogleDrive(pdfBuffer, fileName, accessToken) {
 
 async function downloadSignedPDFAndUploadToDrive(pdfUrl, fileName) {
     try {
-        console.log('Downloading signed PDF from:', pdfUrl);
+        console.log('📁 Attempting Google Drive upload for:', fileName);
+        console.log('PDF URL:', pdfUrl);
         
         // Download the PDF
         const pdfBuffer = await new Promise((resolve, reject) => {
             https.get(pdfUrl, (res) => {
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
+                    return;
+                }
                 const chunks = [];
                 res.on('data', (chunk) => chunks.push(chunk));
                 res.on('end', () => resolve(Buffer.concat(chunks)));
@@ -696,19 +731,25 @@ async function downloadSignedPDFAndUploadToDrive(pdfUrl, fileName) {
             }).on('error', reject);
         });
 
-        console.log('PDF downloaded, size:', pdfBuffer.length, 'bytes');
+        console.log('✅ PDF downloaded successfully, size:', pdfBuffer.length, 'bytes');
 
         // Get Google Drive access token
         const accessToken = await getGoogleAccessToken();
-        console.log('Got Google Drive access token');
+        console.log('✅ Got Google Drive access token');
 
         // Upload to Google Drive
         const driveResult = await uploadToGoogleDrive(pdfBuffer, fileName, accessToken);
-        console.log('Uploaded to Google Drive:', driveResult);
+        console.log('✅ Successfully uploaded to Google Drive:', driveResult);
 
         return driveResult;
     } catch (error) {
-        console.error('Error uploading to Google Drive:', error);
+        console.error('❌ Google Drive upload failed:', error.message);
+        if (error.message.includes('credentials not configured')) {
+            console.log('ℹ️ To enable Google Drive integration:');
+            console.log('   1. Set up Google Drive API credentials');
+            console.log('   2. Add them to environment variables or .env file');
+            console.log('   3. See google-drive-setup.md for instructions');
+        }
         return null;
     }
 }

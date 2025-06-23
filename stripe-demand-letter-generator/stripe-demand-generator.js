@@ -706,31 +706,31 @@ ${formData.companyName || ''}`;
 
     // Monitor contract completion and provide finalized document
     const monitorContractCompletion = (contractId, iframeContainer) => {
+        console.log('🔄 Starting BACKGROUND monitoring for contract:', contractId);
         let checkCount = 0;
-        let rapidCheckCount = 0;
-        const maxChecks = 150; // Check for 12+ minutes total
-        const maxRapidChecks = 30; // First 1.5 minutes with faster checking
         
         const checkStatus = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/contract-status/${contractId}`);
                 const status = await response.json();
                 
-                console.log('📊 Contract status check #' + checkCount + ':', status);
+                console.log('🔍 Background check #' + checkCount + ':', status.status || 'checking...');
                 
                 if (status.success && status.signed && status.pdf_url) {
-                    // Document is signed! Open in new window and show success message
+                    console.log('🎊 BACKGROUND SUCCESS - Document signed!');
+                    
+                    // Open in new window immediately
                     window.open(status.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                     
-                    // Prepare Google Drive button if available
-                    const googleDriveButton = status.google_drive ? `
-                        <button onclick="window.open('${status.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
-                            📁 View in Google Drive
-                        </button>
-                    ` : '';
-                    
+                    // Force replace iframe regardless of current state
                     const iframeDiv = iframeContainer.querySelector('div:first-child');
                     if (iframeDiv) {
+                        const googleDriveButton = status.google_drive ? `
+                            <button onclick="window.open('${status.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                                📁 View in Google Drive
+                            </button>
+                        ` : '';
+                        
                         iframeDiv.innerHTML = `
                             <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
                                 <div style="text-align: center; padding: 40px;">
@@ -738,8 +738,8 @@ ${formData.companyName || ''}`;
                                         ✅ Document Signed Successfully!
                                     </div>
                                     <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
-                                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
-                                    ${status.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
+                                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation has also been sent to you.</p>
+                                    ${status.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">💡 Set up Google Drive integration for automatic backup</p>'}
                                     <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
                                         <button onclick="window.open('${status.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
                                             📄 View Signed Document
@@ -754,34 +754,26 @@ ${formData.companyName || ''}`;
                             </div>
                         `;
                     }
-                    
-                    // No alert popup - just automatic display in new window
-                    console.log('🎉 Document signed and opened in new window via background monitoring!');
                     return; // Stop checking
                 }
                 
                 checkCount++;
-                
-                // Use rapid checking initially (every 2 seconds), then slower checks
-                if (rapidCheckCount < maxRapidChecks) {
-                    rapidCheckCount++;
-                    setTimeout(checkStatus, 2000); // Check every 2 seconds initially
-                } else if (checkCount < maxChecks && (!status.success || !status.signed)) {
-                    setTimeout(checkStatus, 6000); // Then every 6 seconds
+                // Continue checking every 4 seconds for up to 10 minutes
+                if (checkCount < 150) {
+                    setTimeout(checkStatus, 4000);
                 }
                 
             } catch (error) {
-                console.error('Error checking contract status:', error);
+                console.error('Background monitoring error:', error);
                 checkCount++;
-                if (checkCount < maxChecks) {
-                    const interval = rapidCheckCount < maxRapidChecks ? 2000 : 6000;
-                    setTimeout(checkStatus, interval);
+                if (checkCount < 150) {
+                    setTimeout(checkStatus, 4000);
                 }
             }
         };
         
-        // Start checking very soon after setup
-        setTimeout(checkStatus, 1000);
+        // Start immediately
+        setTimeout(checkStatus, 500);
     };
 
     // eSignature document function
@@ -874,180 +866,69 @@ ${formData.companyName || ''}`;
                 `;
                 document.body.appendChild(iframeContainer);
                 
-                // Enhanced iframe monitoring for signing completion detection
+                // Aggressive iframe monitoring to force our success page
                 const iframe = iframeContainer.querySelector('#signingIframe');
-                if (iframe) {
-                    // Monitor iframe URL changes and load events
-                    const monitorIframe = () => {
+                if (iframe && result.data?.contract_id) {
+                    console.log('🚀 Starting aggressive monitoring for contract:', result.data.contract_id);
+                    
+                    // Force status check every 3 seconds regardless of iframe state
+                    const forceStatusCheck = setInterval(async () => {
                         try {
-                            const iframeSrc = iframe.contentWindow?.location?.href || iframe.src;
-                            console.log('Iframe monitoring - URL:', iframeSrc);
+                            console.log('⏰ Force checking contract status...');
+                            const statusResponse = await fetch(`http://localhost:3001/contract-status/${result.data.contract_id}`);
+                            const statusData = await statusResponse.json();
                             
-                            // Check for completion patterns in URL
-                            if (iframeSrc && (
-                                iframeSrc.includes('/signed') || 
-                                iframeSrc.includes('/completed') || 
-                                iframeSrc.includes('/success') ||
-                                iframeSrc.includes('status=completed') ||
-                                iframeSrc.includes('status=signed')
-                            )) {
-                                console.log('🎯 Detected signing completion via URL change - triggering immediate status check');
+                            if (statusData.success && statusData.signed && statusData.pdf_url) {
+                                console.log('🎉 FORCE CHECK SUCCESS - Document is signed!');
+                                clearInterval(forceStatusCheck);
                                 
-                                // Immediate status check when completion detected
-                                const checkCompletion = async () => {
-                                    try {
-                                        const statusResponse = await fetch(`http://localhost:3001/contract-status/${result.data.contract_id}`);
-                                        const statusData = await statusResponse.json();
-                                        console.log('Immediate status check result:', statusData);
-                                        
-                                        if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                            console.log('✅ Document confirmed signed - opening PDF in new window');
-                                            
-                                            // Open signed document in new tab/window immediately
-                                            window.open(statusData.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                                            
-                                            // Prepare Google Drive button if available
-                                            const googleDriveButton = statusData.google_drive ? `
-                                                <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
-                                                    📁 View in Google Drive
-                                                </button>
-                                            ` : '';
-                                            
-                                            // Also replace iframe content with success message and links
-                                            const iframeDiv = iframeContainer.querySelector('div:first-child');
-                                            if (iframeDiv) {
-                                                iframeDiv.innerHTML = `
-                                                    <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                                        <div style="text-align: center; padding: 40px;">
-                                                            <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
-                                                                ✅ Document Signed Successfully!
-                                                            </div>
-                                                            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
-                                                            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
-                                                            ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
-                                                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                                                <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                                                    📄 View Signed Document
-                                                                </button>
-                                                                ${googleDriveButton}
-                                                                <button onclick="this.closest('.parentElement').parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                                                    Close
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
-                                                    </div>
-                                                `;
-                                            }
-                                            return true; // Stop monitoring
-                                        }
-                                    } catch (error) {
-                                        console.error('Immediate status check error:', error);
-                                    }
-                                    return false;
-                                };
+                                // Immediately open PDF and show success
+                                window.open(statusData.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
                                 
-                                // Try immediate check, then retry if needed
-                                setTimeout(async () => {
-                                    const success = await checkCompletion();
-                                    if (!success) {
-                                        // Retry after 2 seconds if first attempt failed
-                                        setTimeout(checkCompletion, 2000);
-                                    }
-                                }, 500);
-                            }
-                        } catch (error) {
-                            // Cross-origin restrictions - normal behavior for external domains
-                            console.log('Iframe cross-origin restriction (normal)');
-                        }
-                    };
-                    
-                    // Monitor on load events
-                    iframe.onload = monitorIframe;
-                    
-                    // Also monitor periodically for URL changes that don't trigger load events
-                    const urlMonitor = setInterval(() => {
-                        monitorIframe();
-                        
-                        // Additional check: if iframe redirects to esignatures.com success page, intercept it
-                        try {
-                            const currentSrc = iframe.src || '';
-                            if (currentSrc.includes('esignatures.com') && (
-                                currentSrc.includes('/signed') ||
-                                currentSrc.includes('/success') ||
-                                currentSrc.includes('/complete')
-                            )) {
-                                console.log('🔄 Intercepting success page redirect - fetching signed document');
-                                
-                                // Extract contract ID from URL if possible
-                                const urlParts = currentSrc.split('/');
-                                const possibleContractId = urlParts.find(part => 
-                                    part.length > 20 && part.includes('-') && !part.includes('.')
-                                );
-                                
-                                if (possibleContractId || result.data?.contract_id) {
-                                    const contractIdToUse = possibleContractId || result.data.contract_id;
-                                    console.log('Using contract ID for status check:', contractIdToUse);
+                                // Force replace iframe content immediately
+                                const iframeDiv = iframeContainer.querySelector('div:first-child');
+                                if (iframeDiv) {
+                                    const googleDriveButton = statusData.google_drive ? `
+                                        <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                                            📁 View in Google Drive
+                                        </button>
+                                    ` : '';
                                     
-                                    setTimeout(async () => {
-                                        try {
-                                            const statusResponse = await fetch(`http://localhost:3001/contract-status/${contractIdToUse}`);
-                                            const statusData = await statusResponse.json();
-                                            
-                                            if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                                // Open signed document in new window immediately
-                                                window.open(statusData.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                                                
-                                                // Prepare Google Drive button if available
-                                                const googleDriveButton = statusData.google_drive ? `
-                                                    <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
-                                                        📁 View in Google Drive
+                                    iframeDiv.innerHTML = `
+                                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                            <div style="text-align: center; padding: 40px;">
+                                                <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
+                                                    ✅ Document Signed Successfully!
+                                                </div>
+                                                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
+                                                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation has also been sent to you.</p>
+                                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">⚠️ Google Drive integration needs setup (see console)</p>'}
+                                                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                        📄 View Signed Document
                                                     </button>
-                                                ` : '';
-                                                
-                                                // Replace with success message
-                                                const iframeDiv = iframeContainer.querySelector('div:first-child');
-                                                if (iframeDiv) {
-                                                    iframeDiv.innerHTML = `
-                                                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                                            <div style="text-align: center; padding: 40px;">
-                                                                <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
-                                                                    ✅ Document Signed Successfully!
-                                                                </div>
-                                                                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
-                                                                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
-                                                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
-                                                                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                                                        📄 View Signed Document
-                                                                    </button>
-                                                                    ${googleDriveButton}
-                                                                    <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                                                        Close
-                                                                    </button>
-                                                                </div>
-                                                            </div>
-                                                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
-                                                        </div>
-                                                    `;
-                                                }
-                                                clearInterval(urlMonitor);
-                                            }
-                                        } catch (error) {
-                                            console.error('Error checking status from success page:', error);
-                                        }
-                                    }, 1000);
+                                                    ${googleDriveButton}
+                                                    <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                        Close
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
+                                        </div>
+                                    `;
                                 }
+                                return; // Exit completely
                             }
                         } catch (error) {
-                            // Normal cross-origin restriction
+                            console.error('Force status check error:', error);
                         }
-                        
-                        // Stop monitoring after iframe is removed
-                        if (!document.body.contains(iframe)) {
-                            clearInterval(urlMonitor);
-                        }
-                    }, 2000);
+                    }, 3000);
+                    
+                    // Set a maximum time limit (5 minutes) then stop checking
+                    setTimeout(() => {
+                        clearInterval(forceStatusCheck);
+                        console.log('⏰ Stopped force checking after 5 minutes');
+                    }, 300000);
                 }
                 
                 // Start monitoring for completion and provide finalized document
