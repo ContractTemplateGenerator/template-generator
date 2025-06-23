@@ -719,25 +719,44 @@ ${formData.companyName || ''}`;
                 console.log('📊 Contract status check #' + checkCount + ':', status);
                 
                 if (status.success && status.signed && status.pdf_url) {
-                    // Document is signed! Replace the signing iframe with the signed document viewer
+                    // Document is signed! Open in new window and show success message
+                    window.open(status.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                    
+                    // Prepare Google Drive button if available
+                    const googleDriveButton = status.google_drive ? `
+                        <button onclick="window.open('${status.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                            📁 View in Google Drive
+                        </button>
+                    ` : '';
+                    
                     const iframeDiv = iframeContainer.querySelector('div:first-child');
                     if (iframeDiv) {
                         iframeDiv.innerHTML = `
-                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
-                                <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
-                                    ✅ Document Signed Successfully! Email also sent to you.
+                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                <div style="text-align: center; padding: 40px;">
+                                    <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
+                                        ✅ Document Signed Successfully!
+                                    </div>
+                                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
+                                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
+                                    ${status.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
+                                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                        <button onclick="window.open('${status.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                            📄 View Signed Document
+                                        </button>
+                                        ${googleDriveButton}
+                                        <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                            Close
+                                        </button>
+                                    </div>
                                 </div>
-                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
-                                <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${status.pdf_url}', '_blank')">
-                                    📄 Open in New Tab
-                                </div>
-                                <iframe src="${status.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
                             </div>
                         `;
                     }
                     
-                    // No alert popup - just automatic display
-                    console.log('🎉 Document signed and displayed automatically via background monitoring!');
+                    // No alert popup - just automatic display in new window
+                    console.log('🎉 Document signed and opened in new window via background monitoring!');
                     return; // Stop checking
                 }
                 
@@ -882,21 +901,41 @@ ${formData.companyName || ''}`;
                                         console.log('Immediate status check result:', statusData);
                                         
                                         if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                            console.log('✅ Document confirmed signed - displaying PDF immediately');
+                                            console.log('✅ Document confirmed signed - opening PDF in new window');
                                             
-                                            // Replace iframe content immediately with signed document
+                                            // Open signed document in new tab/window immediately
+                                            window.open(statusData.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                                            
+                                            // Prepare Google Drive button if available
+                                            const googleDriveButton = statusData.google_drive ? `
+                                                <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                                                    📁 View in Google Drive
+                                                </button>
+                                            ` : '';
+                                            
+                                            // Also replace iframe content with success message and links
                                             const iframeDiv = iframeContainer.querySelector('div:first-child');
                                             if (iframeDiv) {
                                                 iframeDiv.innerHTML = `
-                                                    <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
-                                                        <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
-                                                            ✅ Document Signed Successfully! Email also sent to you.
+                                                    <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                                        <div style="text-align: center; padding: 40px;">
+                                                            <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
+                                                                ✅ Document Signed Successfully!
+                                                            </div>
+                                                            <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
+                                                            <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
+                                                            ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
+                                                            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                                                <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                                    📄 View Signed Document
+                                                                </button>
+                                                                ${googleDriveButton}
+                                                                <button onclick="this.closest('.parentElement').parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                                    Close
+                                                                </button>
+                                                            </div>
                                                         </div>
-                                                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
-                                                        <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${statusData.pdf_url}', '_blank')">
-                                                            📄 Open in New Tab
-                                                        </div>
-                                                        <iframe src="${statusData.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
+                                                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
                                                     </div>
                                                 `;
                                             }
@@ -956,19 +995,39 @@ ${formData.companyName || ''}`;
                                             const statusData = await statusResponse.json();
                                             
                                             if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                                // Replace with signed document immediately
+                                                // Open signed document in new window immediately
+                                                window.open(statusData.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
+                                                
+                                                // Prepare Google Drive button if available
+                                                const googleDriveButton = statusData.google_drive ? `
+                                                    <button onclick="window.open('${statusData.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
+                                                        📁 View in Google Drive
+                                                    </button>
+                                                ` : '';
+                                                
+                                                // Replace with success message
                                                 const iframeDiv = iframeContainer.querySelector('div:first-child');
                                                 if (iframeDiv) {
                                                     iframeDiv.innerHTML = `
-                                                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
-                                                            <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
-                                                                ✅ Document Signed Successfully! Email also sent to you.
+                                                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                                                            <div style="text-align: center; padding: 40px;">
+                                                                <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
+                                                                    ✅ Document Signed Successfully!
+                                                                </div>
+                                                                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
+                                                                <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation with the signed document has also been sent to you.</p>
+                                                                ${statusData.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : ''}
+                                                                <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                                                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                                        📄 View Signed Document
+                                                                    </button>
+                                                                    ${googleDriveButton}
+                                                                    <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                                                        Close
+                                                                    </button>
+                                                                </div>
                                                             </div>
-                                                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
-                                                            <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${statusData.pdf_url}', '_blank')">
-                                                                📄 Open in New Tab
-                                                            </div>
-                                                            <iframe src="${statusData.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
+                                                            <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
                                                         </div>
                                                     `;
                                                 }
@@ -1186,10 +1245,6 @@ ${formData.companyName || ''}`;
             }
         }
         
-        // Warning about response deadline vs arbitration timeline
-        if (formData.responseDeadline && formData.responseDeadline < 30) {
-            factors.push(`⚠️ TIMELINE MISMATCH: Response deadline (${formData.responseDeadline} days) is shorter than arbitration notice period (30 days). The arbitration threat becomes effective after your response deadline expires.`);
-        }
         
         // General timing validation - warn if close to holidays or weekends that could affect service
         const dayOfWeek = arbitrationDate.getDay(); // 0 = Sunday, 6 = Saturday
@@ -2652,7 +2707,7 @@ ${formData.companyName || ''}`;
                                 // Fee Schedule Comparison
                                 elements.push(
                                     React.createElement('div', { key: 'fee-comparison', style: { marginBottom: '20px' } }, [
-                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, 'AAA Fee Schedule Options'),
+                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, flexibleFees ? 'AAA Fee Schedule Options' : 'AAA Fee Schedule'),
                                         
                                         // Standard Schedule
                                         React.createElement('div', { key: 'standard-schedule', style: { 
@@ -2665,7 +2720,7 @@ ${formData.companyName || ''}`;
                                             React.createElement('div', { key: 'standard-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
                                                 React.createElement('h5', { key: 'standard-title', style: { margin: 0, color: '#2c3e50' } }, [
                                                     'Standard Fee Schedule',
-                                                    recommendation.recommended === 'standard' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                    recommendation.recommended === 'standard' && flexibleFees && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
                                                 ]),
                                                 React.createElement('div', { key: 'standard-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${standardFees.total.toLocaleString()} Total`)
                                             ]),
@@ -2687,7 +2742,7 @@ ${formData.companyName || ''}`;
                                             React.createElement('div', { key: 'flexible-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
                                                 React.createElement('h5', { key: 'flexible-title', style: { margin: 0, color: '#2c3e50' } }, [
                                                     'Flexible Fee Schedule',
-                                                    recommendation.recommended === 'flexible' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                    recommendation.recommended === 'flexible' && flexibleFees && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
                                                 ]),
                                                 React.createElement('div', { key: 'flexible-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${flexibleFees.total.toLocaleString()} Total`)
                                             ]),

@@ -1,9 +1,15 @@
-// Node.js proxy server for eSignatures.com API
+// Node.js proxy server for eSignatures.com API with Google Drive integration
 const http = require('http');
 const https = require('https');
 const url = require('url');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
+
+// Google Drive API configuration
+const GOOGLE_DRIVE_API_KEY = process.env.GOOGLE_DRIVE_API_KEY || 'YOUR_GOOGLE_DRIVE_API_KEY';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
+const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || 'YOUR_GOOGLE_REFRESH_TOKEN';
 
 // DocuSeal API configuration (free, open source, supports direct document upload)
 const DOCUSEAL_API_TOKEN = 'UH3xz4ng4L63JjTpqdLrR5aQ6PSbbUPFj5mGBbL12dU'; // Real DocuSeal API token
@@ -525,19 +531,30 @@ function makeESignaturesAPICall(endpoint, data, callback, method = 'POST') {
 function checkContractStatus(contractId, callback) {
     console.log('Checking contract status for:', contractId);
     
-    makeESignaturesAPICall(`/contracts/${contractId}`, {}, (success, result) => {
+    makeESignaturesAPICall(`/contracts/${contractId}`, {}, async (success, result) => {
         console.log('Contract status response:', result);
         
         if (success && result.data && result.data.contract) {
             const contract = result.data.contract;
             const status = contract.status;
+            const pdfUrl = contract.contract_pdf_url;
+            
+            let driveData = null;
+            
+            // If document is signed and has PDF URL, upload to Google Drive
+            if (status === 'signed' && pdfUrl) {
+                console.log('Document is signed, attempting Google Drive upload...');
+                const fileName = `Signed_Demand_Letter_${contractId}_${new Date().toISOString().split('T')[0]}.pdf`;
+                driveData = await downloadSignedPDFAndUploadToDrive(pdfUrl, fileName);
+            }
             
             callback({
                 success: true,
                 status: status,
                 contract_id: contractId,
                 signed: status === 'signed',
-                pdf_url: contract.contract_pdf_url || null,
+                pdf_url: pdfUrl,
+                google_drive: driveData,
                 signers: contract.signers || []
             });
         } else {
@@ -550,9 +567,156 @@ function checkContractStatus(contractId, callback) {
     }, 'GET');
 }
 
+// Google Drive integration functions
+async function getGoogleAccessToken() {
+    return new Promise((resolve, reject) => {
+        const postData = JSON.stringify({
+            client_id: GOOGLE_CLIENT_ID,
+            client_secret: GOOGLE_CLIENT_SECRET,
+            refresh_token: GOOGLE_REFRESH_TOKEN,
+            grant_type: 'refresh_token'
+        });
+
+        const options = {
+            hostname: 'oauth2.googleapis.com',
+            port: 443,
+            path: '/token',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let responseBody = '';
+            res.on('data', (chunk) => {
+                responseBody += chunk;
+            });
+            res.on('end', () => {
+                try {
+                    const result = JSON.parse(responseBody);
+                    if (result.access_token) {
+                        resolve(result.access_token);
+                    } else {
+                        reject(new Error('No access token received'));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            reject(error);
+        });
+
+        req.write(postData);
+        req.end();
+    });
+}
+
+async function uploadToGoogleDrive(pdfBuffer, fileName, accessToken) {
+    return new Promise((resolve, reject) => {
+        // Create multipart form data
+        const boundary = '-------314159265358979323846';
+        const delimiter = "\r\n--" + boundary + "\r\n";
+        const close_delim = "\r\n--" + boundary + "--";
+
+        const metadata = {
+            'name': fileName,
+            'parents': ['YOUR_GOOGLE_DRIVE_FOLDER_ID'] // Replace with your folder ID
+        };
+
+        const multipartRequestBody =
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: application/pdf\r\n\r\n' +
+            pdfBuffer.toString('binary') +
+            close_delim;
+
+        const options = {
+            hostname: 'www.googleapis.com',
+            port: 443,
+            path: '/upload/drive/v3/files?uploadType=multipart',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'multipart/related; boundary="' + boundary + '"',
+                'Content-Length': Buffer.byteLength(multipartRequestBody, 'binary'),
+                'Authorization': 'Bearer ' + accessToken
+            }
+        };
+
+        const req = https.request(options, (res) => {
+            let responseBody = '';
+            res.on('data', (chunk) => {
+                responseBody += chunk;
+            });
+            res.on('end', () => {
+                try {
+                    const result = JSON.parse(responseBody);
+                    if (result.id) {
+                        const driveLink = `https://drive.google.com/file/d/${result.id}/view`;
+                        resolve({
+                            fileId: result.id,
+                            driveLink: driveLink,
+                            downloadLink: `https://drive.google.com/file/d/${result.id}/view?usp=sharing`
+                        });
+                    } else {
+                        reject(new Error('Failed to upload to Google Drive'));
+                    }
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        });
+
+        req.on('error', (error) => {
+            reject(error);
+        });
+
+        req.write(multipartRequestBody, 'binary');
+        req.end();
+    });
+}
+
+async function downloadSignedPDFAndUploadToDrive(pdfUrl, fileName) {
+    try {
+        console.log('Downloading signed PDF from:', pdfUrl);
+        
+        // Download the PDF
+        const pdfBuffer = await new Promise((resolve, reject) => {
+            https.get(pdfUrl, (res) => {
+                const chunks = [];
+                res.on('data', (chunk) => chunks.push(chunk));
+                res.on('end', () => resolve(Buffer.concat(chunks)));
+                res.on('error', reject);
+            }).on('error', reject);
+        });
+
+        console.log('PDF downloaded, size:', pdfBuffer.length, 'bytes');
+
+        // Get Google Drive access token
+        const accessToken = await getGoogleAccessToken();
+        console.log('Got Google Drive access token');
+
+        // Upload to Google Drive
+        const driveResult = await uploadToGoogleDrive(pdfBuffer, fileName, accessToken);
+        console.log('Uploaded to Google Drive:', driveResult);
+
+        return driveResult;
+    } catch (error) {
+        console.error('Error uploading to Google Drive:', error);
+        return null;
+    }
+}
+
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
     console.log('Use /esign-proxy endpoint for API calls');
     console.log('Use /contract-status/<contract_id> to check signing status');
+    console.log('Google Drive integration enabled');
 });
