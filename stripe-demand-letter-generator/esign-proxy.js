@@ -114,6 +114,26 @@ const server = http.createServer((req, res) => {
             }
         });
         return;
+    } else if (req.method === 'POST' && req.url === '/send-email-with-pdf') {
+        // Handle automatic email sending with PDF attachment
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        
+        req.on('end', async () => {
+            try {
+                const data = JSON.parse(body);
+                sendEmailWithPDFAttachment(data, (emailResult) => {
+                    res.writeHead(200);
+                    res.end(JSON.stringify(emailResult));
+                });
+            } catch (error) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
+            }
+        });
+        return;
     } else {
         res.writeHead(404);
         res.end(JSON.stringify({ error: 'Not found' }));
@@ -945,12 +965,121 @@ ${companyName || '[Company Name]'}`;
     }
 }
 
+// Function to send email with PDF attachment automatically
+async function sendEmailWithPDFAttachment(requestData, callback) {
+    try {
+        console.log('📧 Sending automatic email to Stripe with PDF attachment...');
+        const { contractId, pdfUrl, companyName, contactName, withheldAmount, fromEmail, senderName } = requestData;
+        
+        if (!pdfUrl) {
+            callback({ success: false, error: 'No PDF URL provided' });
+            return;
+        }
+        
+        // Download the signed PDF
+        const pdfBuffer = await new Promise((resolve, reject) => {
+            https.get(pdfUrl, (res) => {
+                if (res.statusCode !== 200) {
+                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
+                    return;
+                }
+                const chunks = [];
+                res.on('data', (chunk) => chunks.push(chunk));
+                res.on('end', () => resolve(Buffer.concat(chunks)));
+                res.on('error', reject);
+            }).on('error', reject);
+        });
+        
+        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
+        
+        // Create filename with timestamp
+        const timestamp = new Date().toISOString().split('T')[0];
+        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
+        
+        // Email content
+        const emailSubject = `FORMAL DEMAND LETTER - ${companyName || '[Company Name]'} - Withheld Funds $${withheldAmount || '[Amount]'}`;
+        
+        const emailBody = `Dear Stripe Legal Team,
+
+Please find attached the signed formal demand letter regarding withheld merchant funds for ${companyName || '[Company Name]'}.
+
+This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
+
+Key Details:
+- Company: ${companyName || '[Company Name]'}
+- Contact: ${contactName || '[Contact Name]'}
+- Withheld Amount: $${withheldAmount || '[Amount]'}
+- Document: Signed demand letter with arbitration notice
+
+This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
+
+Respectfully submitted,
+${contactName || '[Contact Name]'}
+${companyName || '[Company Name]'}
+
+---
+This email was sent automatically from the Terms.law Demand Letter Generator.`;
+
+        // Email configuration with sender details
+        const mailOptions = {
+            from: `"${senderName || 'Demand Letter Sender'}" <${EMAIL_USER}>`,
+            replyTo: fromEmail || EMAIL_USER,
+            to: 'complaints@stripe.com',
+            // CC for testing - uncomment for production
+            // cc: 'sergei.tokmakov@gmail.com', 
+            subject: emailSubject,
+            text: emailBody,
+            attachments: [
+                {
+                    filename: filename,
+                    content: pdfBuffer,
+                    contentType: 'application/pdf'
+                }
+            ]
+        };
+        
+        // Send the email
+        mailTransporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.error('❌ Automatic email sending failed:', error);
+                callback({ 
+                    success: false, 
+                    error: 'Email sending failed', 
+                    details: error.message 
+                });
+            } else {
+                console.log('✅ Automatic email sent successfully to Stripe!');
+                console.log('Message ID:', info.messageId);
+                console.log('To:', mailOptions.to);
+                console.log('Subject:', emailSubject);
+                callback({ 
+                    success: true, 
+                    messageId: info.messageId,
+                    to: mailOptions.to,
+                    subject: emailSubject,
+                    message: 'Signed demand letter automatically sent to Stripe with PDF attachment'
+                });
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Error in sendEmailWithPDFAttachment:', error);
+        callback({ 
+            success: false, 
+            error: 'Failed to send automatic email', 
+            details: error.message 
+        });
+    }
+}
+
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
     console.log('Use /esign-proxy endpoint for API calls');
     console.log('Use /contract-status/<contract_id> to check signing status');
-    console.log('Use /send-to-stripe endpoint for email sending');
+    console.log('Use /send-to-stripe endpoint for manual email sending');
+    console.log('Use /send-email-with-pdf endpoint for automatic email with PDF attachment');
+    console.log('Use /upload-to-drive endpoint for Google Drive uploads');
     console.log('Google Drive integration enabled');
     console.log('Email integration enabled');
 });

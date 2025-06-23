@@ -1042,93 +1042,109 @@ ${formData.companyName || ''}`;
         }
     };
 
-    // Email to Stripe using Gmail with enhanced PDF handling
+    // Email to Stripe with automatic PDF attachment via server
     const emailToStripe = async (contractId, pdfUrl) => {
         try {
-            console.log('📧 Preparing Gmail with PDF for Stripe...');
+            console.log('📧 Sending email to Stripe with PDF attachment...');
             
-            const fileName = `Signed_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            // Show loading state
+            const button = event.target;
+            const originalText = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '📧 Sending Email...';
+            button.style.background = '#6c757d';
             
-            // Download PDF and prepare for sharing
-            const response = await fetch(pdfUrl);
-            const pdfBlob = await response.blob();
+            // Prepare email data for server
+            const emailData = {
+                contractId: contractId,
+                pdfUrl: pdfUrl,
+                companyName: formData.companyName || 'Company',
+                contactName: formData.contactName || 'Contact',
+                withheldAmount: formData.withheldAmount || '0',
+                fromEmail: formData.email || 'noreply@terms.law',
+                senderName: formData.contactName || 'Demand Letter Sender'
+            };
             
-            // Create a File object for better handling
-            const pdfFile = new File([pdfBlob], fileName, { type: 'application/pdf' });
+            // Send to our server endpoint that will create and send the email with PDF attached
+            const response = await fetch('http://localhost:3001/send-email-with-pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(emailData)
+            });
             
-            // Create email content
-            const subject = `FORMAL DEMAND LETTER - ${formData.companyName || '[Company Name]'} - Withheld Funds $${formData.withheldAmount || '[Amount]'}`;
+            const result = await response.json();
             
-            const emailBody = `Dear Stripe Legal Team,
+            if (result.success) {
+                button.innerHTML = '✅ Email Sent!';
+                button.style.background = '#28a745';
+                
+                alert(`✅ Email sent successfully to Stripe!
 
-Please find attached the signed formal demand letter regarding withheld merchant funds for ${formData.companyName || '[Company Name]'}.
+The signed demand letter has been automatically sent to complaints@stripe.com with the PDF attached.
 
-This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
+Email details:
+- To: complaints@stripe.com
+- Subject: FORMAL DEMAND LETTER - ${formData.companyName} - Withheld Funds $${formData.withheldAmount}
+- PDF attachment included
+- Message ID: ${result.messageId || 'N/A'}
 
-Key Details:
-- Company: ${formData.companyName || '[Company Name]'}
-- Contact: ${formData.contactName || '[Contact Name]'}
-- Withheld Amount: $${formData.withheldAmount || '[Amount]'}
-- Document: Signed demand letter with arbitration notice
+The email has been sent from your configured email address.`);
+                
+                // Reset button after 3 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#28a745';
+                    button.disabled = false;
+                }, 3000);
+                
+            } else {
+                button.innerHTML = '❌ Email Failed';
+                button.style.background = '#dc2626';
+                
+                // Show helpful error message
+                let errorMessage = 'Failed to send email to Stripe';
+                if (result.details && result.details.includes('BadCredentials')) {
+                    errorMessage = 'Email authentication failed. Please check your Gmail App Password configuration.';
+                } else if (result.details && result.details.includes('EAUTH')) {
+                    errorMessage = 'Email authentication error. Make sure you have a Gmail App Password set up.';
+                } else if (result.error && result.error.includes('credentials')) {
+                    errorMessage = 'Email not configured. Please set up your email credentials.';
+                }
+                
+                alert(`❌ ${errorMessage}
 
-This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
+To fix this:
+1. Run: node check-config.js
+2. Follow the email setup instructions in email-setup.md
+3. Make sure you have Gmail App Password configured
+4. Restart the proxy server
 
-Respectfully submitted,
-${formData.contactName || '[Contact Name]'}
-${formData.companyName || '[Company Name]'}`;
-
-            // Try Web Share API first (if supported)
-            if (navigator.share && navigator.canShare && navigator.canShare({ files: [pdfFile] })) {
-                console.log('📱 Using Web Share API');
-                await navigator.share({
-                    title: subject,
-                    text: emailBody,
-                    files: [pdfFile]
-                });
-                return;
+For now, you can use the "View Signed Document" button to download the PDF and email it manually to complaints@stripe.com`);
+                
+                // Reset button after 5 seconds
+                setTimeout(() => {
+                    button.innerHTML = originalText;
+                    button.style.background = '#28a745';
+                    button.disabled = false;
+                }, 5000);
             }
             
-            // Create downloadable PDF
-            const url = URL.createObjectURL(pdfBlob);
-            const downloadLink = document.createElement('a');
-            downloadLink.href = url;
-            downloadLink.download = fileName;
-            downloadLink.style.display = 'none';
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-            
-            // Small delay then open Gmail
-            setTimeout(() => {
-                const gmailUrl = `https://mail.google.com/mail/?view=cm&to=complaints@stripe.com&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(emailBody)}`;
-                window.open(gmailUrl, '_blank');
-                
-                // Clean up
-                URL.revokeObjectURL(url);
-                
-                // Show improved instructions
-                const instructions = `✅ Gmail opening with prefilled message!
-
-📎 TO ATTACH THE PDF:
-1. The PDF "${fileName}" is downloading to your Downloads folder
-2. In Gmail, click the attachment button (📎)
-3. Select the downloaded PDF file
-4. Or drag & drop the PDF directly into the Gmail compose window
-
-💡 PRO TIP: Keep your Downloads folder open and drag the PDF directly into Gmail!`;
-                
-                alert(instructions);
-            }, 500);
-            
         } catch (error) {
-            console.error('❌ Error preparing Gmail:', error);
+            console.error('❌ Error sending email:', error);
             
-            // Fallback: Simple Gmail compose
-            const simpleSubject = `FORMAL DEMAND LETTER - ${formData.companyName || 'Company'}`;
-            const gmailUrl = `https://mail.google.com/mail/?view=cm&to=complaints@stripe.com&su=${encodeURIComponent(simpleSubject)}`;
-            window.open(gmailUrl, '_blank');
+            const button = event.target;
+            button.innerHTML = '❌ Error';
+            button.style.background = '#dc2626';
             
-            alert('❌ Opening Gmail with basic compose. Please:\n1. Download the PDF using "View Signed Document"\n2. Manually compose your email\n3. Attach the PDF to your message');
+            alert('❌ Network error sending email. Please check:\n1. The proxy server is running (node esign-proxy.js)\n2. Your internet connection\n3. Try again in a moment');
+            
+            setTimeout(() => {
+                button.innerHTML = '📧 Email to Stripe';
+                button.style.background = '#28a745';
+                button.disabled = false;
+            }, 5000);
         }
     };
 
