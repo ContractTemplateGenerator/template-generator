@@ -2702,7 +2702,10 @@ ${formData.companyName || ''}`;
                             onClick: eSignDocument,
                             className: 'nav-button',
                             style: { backgroundColor: "#dc2626", color: "white", border: "none" },
-                            disabled: eSignLoading || !formData.email || !formData.contactName
+                            disabled: eSignLoading || !formData.email || !formData.contactName,
+                            title: (!formData.email || !formData.contactName) ? 
+                                   'Please enter your email address and contact name to enable electronic signature' : 
+                                   'Create and sign document electronically'
                         }, eSignLoading ? 'Processing...' : 'E-Sign'),
                         
                         React.createElement('button', {
