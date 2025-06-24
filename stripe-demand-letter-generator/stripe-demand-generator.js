@@ -67,7 +67,6 @@ const StripeDemandGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [eSignLoading, setESignLoading] = useState(false);
-    const [hasPaywallAccess, setHasPaywallAccess] = useState(true); // Temporarily disable paywall
     const previewRef = useRef(null);
     
     // Form data state
@@ -148,14 +147,6 @@ const StripeDemandGenerator = () => {
         { id: 'arbitration', label: 'Arbitration Demand' },
         { id: 'assessment', label: 'Risk Assessment' }
     ];
-    
-    // Paywall integration - temporarily disabled
-    useEffect(() => {
-        console.log('useEffect running - paywall temporarily disabled');
-        setHasPaywallAccess(true);
-    }, []);
-    
-    
     
     // Handle input changes
     const handleChange = (e) => {
@@ -767,9 +758,6 @@ ${formData.companyName || ''}`;
 
     // eSignature document function
     const eSignDocument = async () => {
-        // Paywall check temporarily disabled
-        console.log('eSignDocument called with paywall disabled');
-        
         // Validate required fields
         if (!formData.email || !formData.contactName) {
             alert('Please fill in your email address and contact name before signing the document.');
@@ -873,6 +861,7 @@ ${formData.companyName || ''}`;
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
                 } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
+                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
