@@ -67,7 +67,23 @@ const StripeDemandGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [eSignLoading, setESignLoading] = useState(false);
+    const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
     const previewRef = useRef(null);
+    
+    // Paywall integration
+    useEffect(() => {
+        // Check if user has already paid
+        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+            setHasPaywallAccess(true);
+        } else {
+            // Apply non-copyable restrictions to preview if not paid
+            setTimeout(() => {
+                if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
+                    window.PaywallSystem.makePreviewNonCopyable();
+                }
+            }, 1000);
+        }
+    }, []);
     
     // Form data state
     const [formData, setFormData] = useState({
@@ -639,6 +655,17 @@ ${formData.companyName || ''}`;
 
     // Copy to clipboard function
     const copyToClipboard = () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('copy');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    window.PaywallSystem.enablePreviewInteraction();
+                    copyToClipboard();
+                });
+            }
+            return;
+        }
         let finalDocumentText;
         
         if (formData.includeArbitrationDraft) {
@@ -663,6 +690,17 @@ ${formData.companyName || ''}`;
 
     // Download as Word document
     const downloadAsWord = () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('download');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    window.PaywallSystem.enablePreviewInteraction();
+                    downloadAsWord();
+                });
+            }
+            return;
+        }
         try {
             console.log("Download MS Word button clicked");
             
@@ -758,6 +796,18 @@ ${formData.companyName || ''}`;
 
     // eSignature document function
     const eSignDocument = async () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('esign');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    window.PaywallSystem.enablePreviewInteraction();
+                    eSignDocument();
+                });
+            }
+            return;
+        }
+        
         // Validate required fields
         if (!formData.email || !formData.contactName) {
             alert('Please fill in your email address and contact name before signing the document.');
