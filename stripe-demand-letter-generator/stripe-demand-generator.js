@@ -758,6 +758,12 @@ ${formData.companyName || ''}`;
 
     // eSignature document function
     const eSignDocument = async () => {
+        // Validate required fields
+        if (!formData.email || !formData.contactName) {
+            alert('Please fill in your email address and contact name before signing the document.');
+            return;
+        }
+        
         try {
             setESignLoading(true);
             console.log("eSignature button clicked");
@@ -785,8 +791,8 @@ ${formData.companyName || ''}`;
                     content_type: "text"
                 },
                 signers: [{
-                    email: "sergei.tokmakov@gmail.com",
-                    name: formData.contactName || "Sergei Tokmakov",
+                    email: formData.email,
+                    name: formData.contactName,
                     role: "signer"
                 }]
             };
@@ -855,7 +861,6 @@ ${formData.companyName || ''}`;
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
                 } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
@@ -2697,7 +2702,7 @@ ${formData.companyName || ''}`;
                             onClick: eSignDocument,
                             className: 'nav-button',
                             style: { backgroundColor: "#dc2626", color: "white", border: "none" },
-                            disabled: eSignLoading
+                            disabled: eSignLoading || !formData.email || !formData.contactName
                         }, eSignLoading ? 'Processing...' : 'E-Sign'),
                         
                         React.createElement('button', {

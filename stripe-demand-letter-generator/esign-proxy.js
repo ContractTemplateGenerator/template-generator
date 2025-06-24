@@ -58,10 +58,16 @@ const server = http.createServer((req, res) => {
             documentContent = documentContent.replace(/\[CONTACT_NAME\]/g, '')
                                            .replace(/\[CONTACT NAME\]/g, '');
             const documentTitle = data.template?.title || 'Document';
-            const signerInfo = (data.signers && data.signers[0]) || { 
-                email: 'sergei.tokmakov@gmail.com', 
-                name: 'Sergei Tokmakov' 
-            };
+            const signerInfo = (data.signers && data.signers[0]) || null;
+            
+            if (!signerInfo || !signerInfo.email || !signerInfo.name) {
+                res.writeHead(400);
+                res.end(JSON.stringify({ 
+                    status: "error", 
+                    error: 'Signer email and name are required' 
+                }));
+                return;
+            }
             
             // Try eSignatures.com first, fallback to DocuSeal
             console.log('Attempting eSignatures.com API with template creation...');
@@ -165,8 +171,8 @@ ${documentContent}
                             file: pdfBase64
                         }],
                         submitters: [{
-                            email: signerInfo.email || 'sergei.tokmakov@gmail.com',
-                            name: signerInfo.name || 'Sergei Tokmakov',
+                            email: signerInfo.email,
+                            name: signerInfo.name,
                             role: 'First Party'
                         }],
                         send_email: true,
@@ -417,8 +423,8 @@ function createESignaturesContract(templateId, signerInfo, callback) {
         template_id: templateId,
         test: "yes", // Use test mode for the paid account
         signers: [{
-            name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
-            email: signerInfo.email || "sergei.tokmakov@gmail.com"
+            name: signerInfo.name.trim(),
+            email: signerInfo.email
         }]
     };
     
