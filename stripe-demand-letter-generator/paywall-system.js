@@ -489,7 +489,8 @@ const PaywallSystem = (() => {
                     <strong>Payment Required</strong>
                     <div style="font-size: 14px; margin-top: 5px;">
                         ${actionType === 'copy' ? 'Copy to clipboard' : 
-                          actionType === 'download' ? 'Download document' : 'This feature'} 
+                          actionType === 'download' ? 'Download document' : 
+                          actionType === 'esign' ? 'Electronic signature' : 'This feature'} 
                         requires payment. Complete your purchase to unlock full access.
                     </div>
                 </div>

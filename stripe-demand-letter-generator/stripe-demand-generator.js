@@ -67,6 +67,7 @@ const StripeDemandGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [eSignLoading, setESignLoading] = useState(false);
+    const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
     const previewRef = useRef(null);
     
     // Form data state
@@ -147,6 +148,64 @@ const StripeDemandGenerator = () => {
         { id: 'arbitration', label: 'Arbitration Demand' },
         { id: 'assessment', label: 'Risk Assessment' }
     ];
+    
+    // Paywall integration
+    useEffect(() => {
+        // Check if user has already paid
+        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+            setHasPaywallAccess(true);
+        }
+        
+        // Apply non-copyable restrictions to preview if not paid
+        if (!hasPaywallAccess && window.PaywallSystem) {
+            setTimeout(() => {
+                window.PaywallSystem.makePreviewNonCopyable();
+            }, 1000);
+        }
+    }, [hasPaywallAccess]);
+    
+    // Copy to clipboard function with paywall check
+    const copyToClipboard = () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('copy');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    copyToClipboard(); // Retry after payment
+                });
+            }
+            return;
+        }
+        
+        const documentText = generateDemandLetter();
+        navigator.clipboard.writeText(documentText).then(() => {
+            alert('Document copied to clipboard!');
+        }).catch(err => {
+            console.error('Failed to copy: ', err);
+        });
+    };
+    
+    // Download as Word function with paywall check
+    const downloadAsWord = () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('download');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    downloadAsWord(); // Retry after payment
+                });
+            }
+            return;
+        }
+        
+        if (window.DocxGenerator) {
+            const documentText = generateDemandLetter();
+            const fileName = `Stripe_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.docx`;
+            window.DocxGenerator.generateDocx(documentText, fileName);
+        } else {
+            alert('Document generator not available. Please refresh the page and try again.');
+        }
+    };
     
     // Handle input changes
     const handleChange = (e) => {
@@ -758,6 +817,18 @@ ${formData.companyName || ''}`;
 
     // eSignature document function
     const eSignDocument = async () => {
+        // Check paywall access first
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('esign');
+                window.PaywallSystem.createPaywallModal(() => {
+                    setHasPaywallAccess(true);
+                    eSignDocument(); // Retry after payment
+                });
+            }
+            return;
+        }
+        
         // Validate required fields
         if (!formData.email || !formData.contactName) {
             alert('Please fill in your email address and contact name before signing the document.');
