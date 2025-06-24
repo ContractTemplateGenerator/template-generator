@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>S-Corporation Tax Strategies for Expats | Interactive Guide</title>
+    <title>Sole Proprietor vs S-Corp Tax Calculator | US Freelancers Abroad</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         * {
@@ -19,7 +19,7 @@
             padding: 20px;
         }
 
-        .widget-container {
+        .calculator-container {
             max-width: 1200px;
             margin: 0 auto;
             background: white;
@@ -33,42 +33,187 @@
             color: white;
             padding: 40px 30px;
             text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
-            animation: float 20s linear infinite;
-        }
-
-        @keyframes float {
-            0% { transform: translate(-50%, -50%) rotate(0deg); }
-            100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
         .header h1 {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             margin-bottom: 10px;
-            position: relative;
-            z-index: 2;
         }
 
         .header p {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             opacity: 0.9;
-            position: relative;
-            z-index: 2;
         }
 
-        .main-content {
+        .audience-tags {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tag {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .calculator-content {
             padding: 40px 30px;
+        }
+
+        .input-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr 1fr;
+            gap: 20px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .input-control {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .slider {
+            flex: 1;
+            -webkit-appearance: none;
+            height: 8px;
+            border-radius: 5px;
+            background: #ddd;
+            outline: none;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .value-display {
+            font-weight: bold;
+            color: #2c3e50;
+            min-width: 100px;
+            text-align: right;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .tax-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+            transition: transform 0.3s ease;
+        }
+
+        .tax-card.sole-prop {
+            border-color: #e74c3c;
+        }
+
+        .tax-card.s-corp {
+            border-color: #27ae60;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 2rem;
+        }
+
+        .sole-prop .card-icon {
+            color: #e74c3c;
+        }
+
+        .s-corp .card-icon {
+            color: #27ae60;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .tax-breakdown {
+            margin-bottom: 20px;
+        }
+
+        .tax-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 5px 0;
+        }
+
+        .tax-line.total {
+            border-top: 2px solid #eee;
+            margin-top: 15px;
+            padding-top: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .tax-amount {
+            font-weight: 600;
+        }
+
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .sole-prop .total-amount {
+            background: #fff5f5;
+            color: #e74c3c;
+        }
+
+        .s-corp .total-amount {
+            background: #f0fff4;
+            color: #27ae60;
         }
 
         .savings-highlight {
@@ -78,99 +223,41 @@
             border-radius: 15px;
             text-align: center;
             margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
         }
 
-        .savings-highlight::before {
-            content: '💰';
-            position: absolute;
-            top: -20px;
-            right: -20px;
-            font-size: 100px;
-            opacity: 0.1;
-        }
-
-        .savings-number {
+        .savings-amount {
             font-size: 3rem;
             font-weight: bold;
             margin-bottom: 10px;
         }
 
-        .card-grid {
+        .savings-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-            margin-bottom: 40px;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
 
-        .strategy-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            border: 2px solid transparent;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .strategy-card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
-            border-color: #667eea;
-        }
-
-        .strategy-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .card-icon {
-            font-size: 3rem;
-            margin-bottom: 20px;
-            display: block;
-            text-align: center;
-        }
-
-        .card-title {
-            font-size: 1.4rem;
-            font-weight: bold;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-
-        .card-content {
-            color: #666;
-            line-height: 1.6;
-            margin-bottom: 20px;
-        }
-
-        .card-benefit {
-            background: #f8f9fa;
+        .savings-stat {
+            background: rgba(255,255,255,0.2);
             padding: 15px;
             border-radius: 10px;
-            border-left: 4px solid #28a745;
-            margin-top: 15px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
         }
 
         .forms-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 40px;
+            margin-top: 40px;
         }
 
-        .forms-title {
+        .section-title {
             font-size: 1.8rem;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
             color: #2c3e50;
             text-align: center;
             display: flex;
@@ -179,24 +266,43 @@
             gap: 10px;
         }
 
-        .forms-grid {
+        .forms-comparison {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .forms-column {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .forms-column h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-list {
+            list-style: none;
         }
 
         .form-item {
             background: white;
             padding: 15px;
             border-radius: 10px;
-            text-align: center;
-            border: 2px solid #e9ecef;
-            transition: all 0.3s ease;
+            margin-bottom: 10px;
+            border-left: 4px solid #667eea;
+            transition: transform 0.2s ease;
         }
 
         .form-item:hover {
-            border-color: #667eea;
-            transform: scale(1.05);
+            transform: translateX(5px);
         }
 
         .form-number {
@@ -205,77 +311,71 @@
             font-size: 1.1rem;
         }
 
-        .form-name {
+        .form-description {
             font-size: 0.9rem;
             color: #666;
             margin-top: 5px;
         }
 
-        .calculation-example {
-            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
-            padding: 30px;
+        .form-deadline {
+            font-size: 0.8rem;
+            color: #e74c3c;
+            font-weight: 500;
+            margin-top: 3px;
+        }
+
+        .optimization-guide {
+            background: #e8f5e8;
+            padding: 25px;
             border-radius: 15px;
-            margin-bottom: 40px;
+            margin-top: 30px;
+            border-left: 4px solid #28a745;
         }
 
-        .calc-title {
-            font-size: 1.8rem;
-            font-weight: bold;
-            margin-bottom: 20px;
-            text-align: center;
-            color: #2d3436;
-        }
-
-        .comparison-table {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .comparison-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .comparison-card.before {
-            border: 3px solid #e74c3c;
-        }
-
-        .comparison-card.after {
-            border: 3px solid #27ae60;
-        }
-
-        .comparison-title {
+        .guide-title {
+            color: #28a745;
             font-weight: bold;
             margin-bottom: 15px;
             font-size: 1.2rem;
         }
 
-        .tax-amount {
-            font-size: 2rem;
+        .salary-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .salary-option {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .salary-option:hover, .salary-option.active {
+            border-color: #28a745;
+            transform: scale(1.02);
+        }
+
+        .option-title {
             font-weight: bold;
-            margin: 10px 0;
+            color: #2c3e50;
+            margin-bottom: 5px;
         }
 
-        .before .tax-amount {
-            color: #e74c3c;
+        .option-savings {
+            color: #28a745;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
         }
 
-        .after .tax-amount {
-            color: #27ae60;
-        }
-
-        .savings-badge {
-            background: #27ae60;
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            margin-top: 20px;
-            display: inline-block;
+        .option-risk {
+            font-size: 0.9rem;
+            color: #666;
         }
 
         .cta-section {
@@ -306,423 +406,415 @@
             transform: scale(1.05);
         }
 
-        .interactive-tabs {
-            margin-bottom: 40px;
-        }
-
-        .tab-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .tab-button {
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-
-        .tab-button.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-
-        .tab-content {
-            display: none;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-
-        .tab-content.active {
-            display: block;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .risk-indicator {
-            display: inline-block;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-left: 10px;
-        }
-
-        .risk-low {
-            background: #d4edda;
-            color: #155724;
-        }
-
-        .risk-medium {
+        .disclaimer {
             background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+            font-size: 0.9rem;
             color: #856404;
         }
 
-        .risk-high {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
         @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .comparison-table {
+            .comparison-grid, .forms-comparison {
                 grid-template-columns: 1fr;
             }
             
-            .card-grid {
+            .input-row {
                 grid-template-columns: 1fr;
+                gap: 10px;
             }
             
-            .tab-buttons {
+            .audience-tags {
                 flex-direction: column;
                 align-items: center;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="widget-container">
+    <div class="calculator-container">
         <div class="header">
-            <h1><i class="fas fa-globe-americas"></i> S-Corp + FEIE Strategy</h1>
-            <p>Maximize Tax Savings for US Expats & Digital Nomads</p>
+            <h1><i class="fas fa-calculator"></i> US Freelancer Tax Calculator</h1>
+            <p>Sole Proprietor vs S-Corporation Comparison for Expats</p>
+            <div class="audience-tags">
+                <div class="tag"><i class="fas fa-laptop"></i> Digital Nomads</div>
+                <div class="tag"><i class="fas fa-code"></i> Software Developers</div>
+                <div class="tag"><i class="fas fa-briefcase"></i> Upwork Freelancers</div>
+                <div class="tag"><i class="fas fa-globe"></i> Remote Entrepreneurs</div>
+            </div>
         </div>
 
-        <div class="main-content">
+        <div class="calculator-content">
+            <!-- Input Controls -->
+            <div class="input-section">
+                <div class="input-row">
+                    <div class="input-label">
+                        <i class="fas fa-dollar-sign"></i> Annual Business Income
+                    </div>
+                    <div class="input-control">
+                        <input type="range" id="incomeSlider" class="slider" min="80000" max="200000" step="10000" value="100000" onchange="updateCalculations()">
+                    </div>
+                    <div class="value-display" id="incomeDisplay">$100,000</div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-label">
+                        <i class="fas fa-user-tie"></i> Reasonable Salary (S-Corp)
+                    </div>
+                    <div class="input-control">
+                        <input type="range" id="salarySlider" class="slider" min="35000" max="80000" step="5000" value="50000" onchange="updateCalculations()">
+                    </div>
+                    <div class="value-display" id="salaryDisplay">$50,000</div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px; color: #666; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Adjust sliders to see how different income levels and salary decisions affect your tax savings
+                </div>
+            </div>
+
+            <!-- Tax Comparison Cards -->
+            <div class="comparison-grid">
+                <!-- Sole Proprietor Card -->
+                <div class="tax-card sole-prop">
+                    <div class="card-header">
+                        <i class="fas fa-user card-icon"></i>
+                        <div class="card-title">Sole Proprietor (Schedule C)</div>
+                    </div>
+                    
+                    <div class="tax-breakdown">
+                        <div class="tax-line">
+                            <span>Business Income:</span>
+                            <span class="tax-amount" id="soloIncome">$100,000</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>FEIE Exclusion:</span>
+                            <span class="tax-amount">-$100,000</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Federal Taxable:</span>
+                            <span class="tax-amount" id="soloFedTaxable">$0</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Federal Income Tax:</span>
+                            <span class="tax-amount" id="soloFedTax">$0</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Self-Employment Tax:</span>
+                            <span class="tax-amount" id="soloSETax">$14,130</span>
+                        </div>
+                        <div class="tax-line total">
+                            <span>Total Annual Tax:</span>
+                            <span class="tax-amount" id="soloTotal">$14,130</span>
+                        </div>
+                    </div>
+
+                    <div class="total-amount" id="soloTotalAmount">$14,130</div>
+                </div>
+
+                <!-- S-Corporation Card -->
+                <div class="tax-card s-corp">
+                    <div class="card-header">
+                        <i class="fas fa-building card-icon"></i>
+                        <div class="card-title">S-Corporation</div>
+                    </div>
+                    
+                    <div class="tax-breakdown">
+                        <div class="tax-line">
+                            <span>Salary (FEIE Excluded):</span>
+                            <span class="tax-amount" id="scorpSalary">$50,000</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Profit Distributions:</span>
+                            <span class="tax-amount" id="scorpDistributions">$50,000</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Payroll Tax (Both Halves):</span>
+                            <span class="tax-amount" id="scorpPayrollTax">$7,650</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>QBI Deduction (20%):</span>
+                            <span class="tax-amount" id="scorpQBI">-$9,235</span>
+                        </div>
+                        <div class="tax-line">
+                            <span>Federal Tax on Distributions:</span>
+                            <span class="tax-amount" id="scorpFedTax">$2,681</span>
+                        </div>
+                        <div class="tax-line total">
+                            <span>Total Annual Tax:</span>
+                            <span class="tax-amount" id="scorpTotal">$10,331</span>
+                        </div>
+                    </div>
+
+                    <div class="total-amount" id="scorpTotalAmount">$10,331</div>
+                </div>
+            </div>
+
+            <!-- Savings Highlight -->
             <div class="savings-highlight">
-                <div class="savings-number">$11,130</div>
-                <div>Annual Tax Savings Potential</div>
-                <div style="font-size: 0.9rem; margin-top: 10px; opacity: 0.9;">
-                    Based on $200,000 annual income in Thailand
-                </div>
-            </div>
-
-            <div class="interactive-tabs">
-                <div class="tab-buttons">
-                    <div class="tab-button active" onclick="showTab(0)">
-                        <i class="fas fa-lightbulb"></i> Strategy Overview
+                <div class="savings-amount" id="savingsAmount">$3,799</div>
+                <div>Annual Tax Savings with S-Corporation</div>
+                
+                <div class="savings-details">
+                    <div class="savings-stat">
+                        <div class="stat-number" id="savingsPercentage">26.9%</div>
+                        <div>Tax Reduction</div>
                     </div>
-                    <div class="tab-button" onclick="showTab(1)">
-                        <i class="fas fa-calculator"></i> Tax Calculations
+                    <div class="savings-stat">
+                        <div class="stat-number" id="fiveYearSavings">$18,995</div>
+                        <div>5-Year Total Savings</div>
                     </div>
-                    <div class="tab-button" onclick="showTab(2)">
-                        <i class="fas fa-file-alt"></i> Required Forms
+                    <div class="savings-stat">
+                        <div class="stat-number" id="monthlyBenefit">$317</div>
+                        <div>Extra Per Month</div>
                     </div>
-                    <div class="tab-button" onclick="showTab(3)">
-                        <i class="fas fa-map-marked-alt"></i> Thailand Example
-                    </div>
-                </div>
-
-                <div class="tab-content active" id="tab-0">
-                    <div class="card-grid">
-                        <div class="strategy-card">
-                            <div class="card-icon" style="color: #e74c3c;">
-                                <i class="fas fa-building"></i>
-                            </div>
-                            <div class="card-title">S-Corporation Formation</div>
-                            <div class="card-content">
-                                Form Wyoming S-Corp for tax advantages and simplified compliance. No state income tax and minimal ongoing requirements.
-                            </div>
-                            <div class="card-benefit">
-                                <strong>Benefit:</strong> Pass-through taxation + employment tax savings
-                            </div>
-                        </div>
-
-                        <div class="strategy-card">
-                            <div class="card-icon" style="color: #f39c12;">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="card-title">Reasonable Salary Strategy</div>
-                            <div class="card-content">
-                                Pay yourself 40-60% of business income as W-2 wages. Remaining profits distributed without self-employment tax.
-                            </div>
-                            <div class="card-benefit">
-                                <strong>Savings:</strong> 15.3% employment tax on distributions
-                            </div>
-                        </div>
-
-                        <div class="strategy-card">
-                            <div class="card-icon" style="color: #27ae60;">
-                                <i class="fas fa-plane"></i>
-                            </div>
-                            <div class="card-title">FEIE Integration</div>
-                            <div class="card-content">
-                                Foreign Earned Income Exclusion applies to S-Corp salary up to $120,000 (2023). Requires 330+ days abroad annually.
-                            </div>
-                            <div class="card-benefit">
-                                <strong>Result:</strong> Zero federal tax on excluded salary portion
-                            </div>
-                        </div>
-
-                        <div class="strategy-card">
-                            <div class="card-icon" style="color: #9b59b6;">
-                                <i class="fas fa-shield-alt"></i>
-                            </div>
-                            <div class="card-title">Compliance & Protection</div>
-                            <div class="card-content">
-                                Maintain detailed records, proper payroll systems, and professional tax preparation to ensure audit defense.
-                            </div>
-                            <div class="card-benefit">
-                                <strong>Safety:</strong> IRS-tested legal strategy with proper documentation
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-1">
-                    <div class="calculation-example">
-                        <div class="calc-title">
-                            <i class="fas fa-calculator"></i> Real Numbers: Thailand Developer
-                        </div>
-                        <div style="text-align: center; margin-bottom: 20px; color: #2d3436;">
-                            Annual Business Income: <strong>$140,000</strong>
-                        </div>
-                        
-                        <div class="comparison-table">
-                            <div class="comparison-card before">
-                                <div class="comparison-title">
-                                    <i class="fas fa-user"></i> As Sole Proprietor
-                                </div>
-                                <div>FEIE Exclusion: $120,000</div>
-                                <div>Taxable Income: $20,000</div>
-                                <div>Federal Tax: $2,200</div>
-                                <div>Self-Employment Tax: $19,756</div>
-                                <div class="tax-amount">$21,956</div>
-                                <div style="font-size: 0.9rem; color: #666;">Total Annual Tax</div>
-                            </div>
-                            
-                            <div class="comparison-card after">
-                                <div class="comparison-title">
-                                    <i class="fas fa-building"></i> With S-Corporation
-                                </div>
-                                <div>Salary: $65,000 (FEIE excluded)</div>
-                                <div>Distributions: $75,000</div>
-                                <div>Payroll Tax: $9,945</div>
-                                <div>Federal Tax: $8,400</div>
-                                <div class="tax-amount">$18,345</div>
-                                <div style="font-size: 0.9rem; color: #666;">Total Annual Tax</div>
-                            </div>
-                        </div>
-                        
-                        <div style="text-align: center; margin-top: 30px;">
-                            <div class="savings-badge">
-                                <i class="fas fa-piggy-bank"></i> Annual Savings: $3,611
-                            </div>
-                            <div style="margin-top: 15px; color: #2d3436;">
-                                <strong>5-Year Savings: $18,055</strong> (before compliance costs)
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-2">
-                    <div class="forms-section">
-                        <div class="forms-title">
-                            <i class="fas fa-file-alt"></i> Required IRS Forms
-                        </div>
-                        
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="color: #2c3e50; margin-bottom: 15px;">
-                                <i class="fas fa-building"></i> S-Corporation Forms
-                            </h3>
-                            <div class="forms-grid">
-                                <div class="form-item">
-                                    <div class="form-number">Form 1120S</div>
-                                    <div class="form-name">S-Corp Return<br><small>Due: March 15</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Form 941</div>
-                                    <div class="form-name">Quarterly Payroll<br><small>Due: Quarterly</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Form 940</div>
-                                    <div class="form-name">Annual FUTA<br><small>Due: January 31</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Schedule K-1</div>
-                                    <div class="form-name">Shareholder Share<br><small>Issued by Corp</small></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="margin-bottom: 30px;">
-                            <h3 style="color: #2c3e50; margin-bottom: 15px;">
-                                <i class="fas fa-user"></i> Individual Forms
-                            </h3>
-                            <div class="forms-grid">
-                                <div class="form-item">
-                                    <div class="form-number">Form 1040</div>
-                                    <div class="form-name">Individual Return<br><small>Due: April 15</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Form 2555</div>
-                                    <div class="form-name">FEIE Election<br><small>With 1040</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Form W-2</div>
-                                    <div class="form-name">Wage Statement<br><small>From S-Corp</small></div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h3 style="color: #2c3e50; margin-bottom: 15px;">
-                                <i class="fas fa-globe"></i> International Reporting
-                            </h3>
-                            <div class="forms-grid">
-                                <div class="form-item">
-                                    <div class="form-number">FBAR</div>
-                                    <div class="form-name">Foreign Accounts<br><small>If > $10K</small></div>
-                                </div>
-                                <div class="form-item">
-                                    <div class="form-number">Form 8938</div>
-                                    <div class="form-name">Foreign Assets<br><small>If Required</small></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-3">
-                    <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);">
-                        <h3 style="color: #2c3e50; margin-bottom: 20px; text-align: center;">
-                            <i class="fas fa-map-marked-alt"></i> Thailand-Specific Considerations
-                        </h3>
-                        
-                        <div class="card-grid">
-                            <div class="strategy-card">
-                                <div class="card-icon" style="color: #e67e22;">
-                                    <i class="fas fa-calendar-check"></i>
-                                </div>
-                                <div class="card-title">Physical Presence Test <span class="risk-indicator risk-low">Low Risk</span></div>
-                                <div class="card-content">
-                                    Living in Thailand 340+ days annually easily satisfies the 330-day requirement for FEIE qualification.
-                                </div>
-                            </div>
-
-                            <div class="strategy-card">
-                                <div class="card-icon" style="color: #3498db;">
-                                    <i class="fas fa-landmark"></i>
-                                </div>
-                                <div class="card-title">Thai Tax Treaty <span class="risk-indicator risk-low">Low Risk</span></div>
-                                <div class="card-content">
-                                    US-Thailand tax treaty provides protection against double taxation and may offer additional foreign tax credit opportunities.
-                                </div>
-                            </div>
-
-                            <div class="strategy-card">
-                                <div class="card-icon" style="color: #f39c12;">
-                                    <i class="fas fa-exclamation-triangle"></i>
-                                </div>
-                                <div class="card-title">Recent Tax Changes <span class="risk-indicator risk-medium">Monitor</span></div>
-                                <div class="card-content">
-                                    Thailand's new tax residency rules may affect US citizens. Stay informed about potential obligations on foreign-sourced income.
-                                </div>
-                            </div>
-
-                            <div class="strategy-card">
-                                <div class="card-icon" style="color: #9b59b6;">
-                                    <i class="fas fa-university"></i>
-                                </div>
-                                <div class="card-title">Banking & Compliance <span class="risk-indicator risk-low">Manageable</span></div>
-                                <div class="card-content">
-                                    Maintain US business banking for S-Corp operations. Thai banking regulations require proper structuring of account relationships.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="background: #e8f5e8; padding: 20px; border-radius: 10px; margin-top: 30px; border-left: 4px solid #27ae60;">
-                            <h4 style="color: #27ae60; margin-bottom: 10px;">
-                                <i class="fas fa-check-circle"></i> Thailand Advantages
-                            </h4>
-                            <ul style="color: #2d3436; line-height: 1.8;">
-                                <li>Territorial tax system historically favorable to expats</li>
-                                <li>Strong expat community and business infrastructure</li>
-                                <li>Cost-effective living while maintaining US business operations</li>
-                                <li>Reliable internet for digital nomad activities</li>
-                            </ul>
-                        </div>
+                    <div class="savings-stat">
+                        <div class="stat-number" id="roiPercentage">127%</div>
+                        <div>ROI on Compliance</div>
                     </div>
                 </div>
             </div>
 
+            <!-- IRS Forms Required -->
+            <div class="forms-section">
+                <div class="section-title">
+                    <i class="fas fa-file-alt"></i> Required IRS Forms Comparison
+                </div>
+
+                <div class="forms-comparison">
+                    <!-- Sole Proprietor Forms -->
+                    <div class="forms-column">
+                        <h3><i class="fas fa-user"></i> Sole Proprietor Forms</h3>
+                        <ul class="form-list">
+                            <li class="form-item">
+                                <div class="form-number">Form 1040</div>
+                                <div class="form-description">Individual Tax Return</div>
+                                <div class="form-deadline">Due: April 15</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Schedule C</div>
+                                <div class="form-description">Business Income & Expenses</div>
+                                <div class="form-deadline">Filed with 1040</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Schedule SE</div>
+                                <div class="form-description">Self-Employment Tax</div>
+                                <div class="form-deadline">Filed with 1040</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form 2555</div>
+                                <div class="form-description">Foreign Earned Income Exclusion</div>
+                                <div class="form-deadline">Filed with 1040</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form 114 (FBAR)</div>
+                                <div class="form-description">Foreign Bank Accounts (if >$10K)</div>
+                                <div class="form-deadline">Due: April 15</div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- S-Corporation Forms -->
+                    <div class="forms-column">
+                        <h3><i class="fas fa-building"></i> S-Corporation Forms</h3>
+                        <ul class="form-list">
+                            <li class="form-item">
+                                <div class="form-number">Form 1120S</div>
+                                <div class="form-description">S-Corporation Tax Return</div>
+                                <div class="form-deadline">Due: March 15</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form 941</div>
+                                <div class="form-description">Quarterly Payroll Tax Return</div>
+                                <div class="form-deadline">Due: Quarterly</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form 940</div>
+                                <div class="form-description">Annual Unemployment Tax</div>
+                                <div class="form-deadline">Due: January 31</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Schedule K-1</div>
+                                <div class="form-description">Shareholder Income Statement</div>
+                                <div class="form-deadline">Issued by S-Corp</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form W-2</div>
+                                <div class="form-description">Employee Wage Statement</div>
+                                <div class="form-deadline">Issued by S-Corp</div>
+                            </li>
+                            <li class="form-item">
+                                <div class="form-number">Form 1040 + 2555</div>
+                                <div class="form-description">Individual Return + FEIE</div>
+                                <div class="form-deadline">Due: April 15</div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Salary Optimization Guide -->
+            <div class="optimization-guide">
+                <div class="guide-title">
+                    <i class="fas fa-target"></i> Salary Optimization Strategy
+                </div>
+                <div>Click on salary options below to see how different approaches affect your tax savings and audit risk:</div>
+                
+                <div class="salary-options">
+                    <div class="salary-option" onclick="setSalary(40000)">
+                        <div class="option-title">Aggressive ($40K)</div>
+                        <div class="option-savings" id="savings40k">$4,295 savings</div>
+                        <div class="option-risk">Higher audit risk, maximum savings</div>
+                    </div>
+                    <div class="salary-option active" onclick="setSalary(50000)">
+                        <div class="option-title">Balanced ($50K)</div>
+                        <div class="option-savings" id="savings50k">$3,799 savings</div>
+                        <div class="option-risk">Good balance of savings & defensibility</div>
+                    </div>
+                    <div class="salary-option" onclick="setSalary(60000)">
+                        <div class="option-title">Conservative ($60K)</div>
+                        <div class="option-savings" id="savings60k">$3,302 savings</div>
+                        <div class="option-risk">Lower audit risk, reduced savings</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
             <div class="cta-section">
-                <h2 style="margin-bottom: 15px;">
-                    <i class="fas fa-rocket"></i> Ready to Optimize Your Expat Taxes?
-                </h2>
-                <p style="font-size: 1.1rem; margin-bottom: 20px;">
-                    Get expert guidance on S-Corporation formation and FEIE strategy implementation
-                </p>
+                <h2><i class="fas fa-rocket"></i> Ready to Start Saving on Your Expat Taxes?</h2>
+                <p style="margin: 15px 0;">Get expert guidance on S-Corporation formation and tax optimization for US freelancers abroad</p>
                 <a href="https://terms.law/call/" class="cta-button">
-                    <i class="fas fa-calendar-alt"></i> Schedule Your Consultation
+                    <i class="fas fa-calendar-alt"></i> Schedule Your Tax Strategy Session
                 </a>
                 <div style="margin-top: 20px; font-size: 0.9rem; opacity: 0.8;">
-                    California Attorney • 13+ Years Experience • 1,750+ Completed Projects
+                    California Attorney • 13+ Years Experience • 1,750+ Expat Tax Projects
                 </div>
+            </div>
+
+            <!-- Disclaimer -->
+            <div class="disclaimer">
+                <strong><i class="fas fa-exclamation-triangle"></i> Important:</strong> This calculator provides estimates for planning purposes only. Actual tax savings depend on your specific situation including state taxes, foreign tax credits, retirement contributions, filing status, and other factors. Results assume FEIE qualification through Physical Presence Test and standard deduction. Consult qualified tax professionals for personalized advice.
             </div>
         </div>
     </div>
 
     <script>
-        function showTab(index) {
-            // Hide all tab contents
-            const contents = document.querySelectorAll('.tab-content');
-            const buttons = document.querySelectorAll('.tab-button');
-            
-            contents.forEach(content => content.classList.remove('active'));
-            buttons.forEach(button => button.classList.remove('active'));
-            
-            // Show selected tab
-            document.getElementById(`tab-${index}`).classList.add('active');
-            buttons[index].classList.add('active');
+        // Tax calculation constants
+        const FEIE_LIMIT = 126500; // 2025 FEIE limit
+        const STD_DEDUCTION = 14600; // 2025 standard deduction (single)
+        const SE_TAX_RATE = 0.153;
+        const SE_DEDUCTION = 0.9235;
+        const QBI_RATE = 0.20;
+        const PAYROLL_TAX_RATE = 0.153;
+        const FED_TAX_RATE = 0.12;
+
+        function updateCalculations() {
+            const income = parseInt(document.getElementById('incomeSlider').value);
+            const salary = parseInt(document.getElementById('salarySlider').value);
+
+            // Update displays
+            document.getElementById('incomeDisplay').textContent = `$${income.toLocaleString()}`;
+            document.getElementById('salaryDisplay').textContent = `$${salary.toLocaleString()}`;
+
+            // Calculate Sole Proprietor taxes
+            const seTax = income * SE_DEDUCTION * SE_TAX_RATE;
+            const soloTaxableAfterFEIE = Math.max(0, income - FEIE_LIMIT);
+            const soloTaxableAfterStd = Math.max(0, soloTaxableAfterFEIE - STD_DEDUCTION);
+            const soloFedTax = soloTaxableAfterStd * FED_TAX_RATE;
+            const soloTotal = seTax + soloFedTax;
+
+            // Calculate S-Corporation taxes
+            const distributions = income - salary;
+            const payrollTax = salary * PAYROLL_TAX_RATE;
+            const employerPayrollTax = salary * (PAYROLL_TAX_RATE / 2);
+            const netProfit = distributions - employerPayrollTax;
+            const qbiDeduction = netProfit * QBI_RATE;
+            const scorpTaxableIncome = Math.max(0, netProfit - qbiDeduction - STD_DEDUCTION);
+            const scorpFedTax = scorpTaxableIncome * FED_TAX_RATE;
+            const scorpTotal = payrollTax + scorpFedTax;
+
+            // Calculate savings
+            const savings = soloTotal - scorpTotal;
+            const savingsPercentage = (savings / soloTotal) * 100;
+            const fiveYearSavings = savings * 5;
+            const monthlyBenefit = savings / 12;
+            const complianceCost = 3000; // Average annual compliance cost
+            const roi = (savings / complianceCost) * 100;
+
+            // Update Sole Proprietor section
+            document.getElementById('soloIncome').textContent = `$${income.toLocaleString()}`;
+            document.getElementById('soloFedTaxable').textContent = `$${soloTaxableAfterStd.toLocaleString()}`;
+            document.getElementById('soloFedTax').textContent = `$${Math.round(soloFedTax).toLocaleString()}`;
+            document.getElementById('soloSETax').textContent = `$${Math.round(seTax).toLocaleString()}`;
+            document.getElementById('soloTotal').textContent = `$${Math.round(soloTotal).toLocaleString()}`;
+            document.getElementById('soloTotalAmount').textContent = `$${Math.round(soloTotal).toLocaleString()}`;
+
+            // Update S-Corporation section
+            document.getElementById('scorpSalary').textContent = `$${salary.toLocaleString()}`;
+            document.getElementById('scorpDistributions').textContent = `$${distributions.toLocaleString()}`;
+            document.getElementById('scorpPayrollTax').textContent = `$${Math.round(payrollTax).toLocaleString()}`;
+            document.getElementById('scorpQBI').textContent = `-$${Math.round(qbiDeduction).toLocaleString()}`;
+            document.getElementById('scorpFedTax').textContent = `$${Math.round(scorpFedTax).toLocaleString()}`;
+            document.getElementById('scorpTotal').textContent = `$${Math.round(scorpTotal).toLocaleString()}`;
+            document.getElementById('scorpTotalAmount').textContent = `$${Math.round(scorpTotal).toLocaleString()}`;
+
+            // Update savings section
+            document.getElementById('savingsAmount').textContent = `$${Math.round(savings).toLocaleString()}`;
+            document.getElementById('savingsPercentage').textContent = `${savingsPercentage.toFixed(1)}%`;
+            document.getElementById('fiveYearSavings').textContent = `$${Math.round(fiveYearSavings).toLocaleString()}`;
+            document.getElementById('monthlyBenefit').textContent = `$${Math.round(monthlyBenefit).toLocaleString()}`;
+            document.getElementById('roiPercentage').textContent = `${Math.round(roi)}%`;
+
+            // Update salary options
+            updateSalaryOptions(income);
         }
 
-        // Add hover effects to cards
-        document.querySelectorAll('.strategy-card').forEach(card => {
-            card.addEventListener('mouseenter', function() {
-                this.style.transform = 'translateY(-10px) scale(1.02)';
-            });
+        function updateSalaryOptions(income) {
+            const salaries = [40000, 50000, 60000];
+            const labels = ['40k', '50k', '60k'];
             
-            card.addEventListener('mouseleave', function() {
-                this.style.transform = 'translateY(0) scale(1)';
+            salaries.forEach((sal, index) => {
+                const distributions = income - sal;
+                const payrollTax = sal * PAYROLL_TAX_RATE;
+                const employerPayrollTax = sal * (PAYROLL_TAX_RATE / 2);
+                const netProfit = distributions - employerPayrollTax;
+                const qbiDeduction = netProfit * QBI_RATE;
+                const scorpTaxableIncome = Math.max(0, netProfit - qbiDeduction - STD_DEDUCTION);
+                const scorpFedTax = scorpTaxableIncome * FED_TAX_RATE;
+                const scorpTotal = payrollTax + scorpFedTax;
+                
+                const seTax = income * SE_DEDUCTION * SE_TAX_RATE;
+                const soloTaxableAfterFEIE = Math.max(0, income - FEIE_LIMIT);
+                const soloTaxableAfterStd = Math.max(0, soloTaxableAfterFEIE - STD_DEDUCTION);
+                const soloFedTax = soloTaxableAfterStd * FED_TAX_RATE;
+                const soloTotal = seTax + soloFedTax;
+                
+                const savings = soloTotal - scorpTotal;
+                
+                document.getElementById(`savings${labels[index]}`).textContent = `$${Math.round(savings).toLocaleString()} savings`;
             });
-        });
+        }
 
-        // Add click effects to form items
-        document.querySelectorAll('.form-item').forEach(item => {
-            item.addEventListener('click', function() {
-                this.style.animation = 'pulse 0.5s';
-                setTimeout(() => {
-                    this.style.animation = '';
-                }, 500);
+        function setSalary(salaryAmount) {
+            document.getElementById('salarySlider').value = salaryAmount;
+            updateCalculations();
+            
+            // Update active state
+            document.querySelectorAll('.salary-option').forEach(option => {
+                option.classList.remove('active');
             });
-        });
+            event.target.closest('.salary-option').classList.add('active');
+        }
 
-        // Add pulse animation
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.1); }
-                100% { transform: scale(1); }
-            }
-        `;
-        document.head.appendChild(style);
+        // Initialize calculations on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCalculations();
+        });
     </script>
 </body>
 </html>
