@@ -1,33 +1,9 @@
-// Node.js proxy server for eSignatures.com API with Google Drive integration and email
+// Node.js proxy server for eSignatures.com API
 const http = require('http');
 const https = require('https');
 const url = require('url');
 const PDFDocument = require('pdfkit');
 const fs = require('fs');
-const nodemailer = require('nodemailer');
-
-// Google Drive API configuration
-const GOOGLE_DRIVE_API_KEY = process.env.GOOGLE_DRIVE_API_KEY || 'YOUR_GOOGLE_DRIVE_API_KEY';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || 'YOUR_GOOGLE_CLIENT_ID';
-const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET || 'YOUR_GOOGLE_CLIENT_SECRET';
-const GOOGLE_REFRESH_TOKEN = process.env.GOOGLE_REFRESH_TOKEN || 'YOUR_GOOGLE_REFRESH_TOKEN';
-
-// Email configuration
-const EMAIL_HOST = process.env.EMAIL_HOST || 'smtp.gmail.com';
-const EMAIL_PORT = process.env.EMAIL_PORT || 587;
-const EMAIL_USER = process.env.EMAIL_USER || 'your_email@gmail.com';
-const EMAIL_PASS = process.env.EMAIL_PASS || 'your_app_password';
-
-// Create email transporter
-const mailTransporter = nodemailer.createTransport({
-    host: EMAIL_HOST,
-    port: EMAIL_PORT,
-    secure: false,
-    auth: {
-        user: EMAIL_USER,
-        pass: EMAIL_PASS
-    }
-});
 
 // DocuSeal API configuration (free, open source, supports direct document upload)
 const DOCUSEAL_API_TOKEN = 'UH3xz4ng4L63JjTpqdLrR5aQ6PSbbUPFj5mGBbL12dU'; // Real DocuSeal API token
@@ -56,102 +32,6 @@ const server = http.createServer((req, res) => {
         checkContractStatus(contractId, (statusResult) => {
             res.writeHead(200);
             res.end(JSON.stringify(statusResult));
-        });
-        return;
-    } else if (req.method === 'POST' && req.url === '/send-to-stripe') {
-        // Handle email sending to Stripe
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        
-        req.on('end', () => {
-            try {
-                const data = JSON.parse(body);
-                sendSignedDocumentToStripe(data, (emailResult) => {
-                    res.writeHead(200);
-                    res.end(JSON.stringify(emailResult));
-                });
-            } catch (error) {
-                res.writeHead(400);
-                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
-            }
-        });
-        return;
-    } else if (req.method === 'POST' && req.url === '/upload-to-drive') {
-        // Handle manual Google Drive upload
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        
-        req.on('end', async () => {
-            try {
-                const { contractId, pdfUrl, fileName } = JSON.parse(body);
-                
-                if (!pdfUrl) {
-                    res.writeHead(400);
-                    res.end(JSON.stringify({ error: 'PDF URL is required' }));
-                    return;
-                }
-                
-                const driveResult = await downloadSignedPDFAndUploadToDrive(
-                    pdfUrl, 
-                    fileName || `Signed_Demand_Letter_${contractId}_${new Date().toISOString().split('T')[0]}.pdf`
-                );
-                
-                if (driveResult) {
-                    res.writeHead(200);
-                    res.end(JSON.stringify({ success: true, drive_data: driveResult }));
-                } else {
-                    res.writeHead(500);
-                    res.end(JSON.stringify({ success: false, error: 'Google Drive upload failed' }));
-                }
-                
-            } catch (error) {
-                res.writeHead(400);
-                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
-            }
-        });
-        return;
-    } else if (req.method === 'POST' && req.url === '/send-email-with-pdf') {
-        // Handle automatic email sending with PDF attachment
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        
-        req.on('end', async () => {
-            try {
-                const data = JSON.parse(body);
-                sendEmailWithPDFAttachment(data, (emailResult) => {
-                    res.writeHead(200);
-                    res.end(JSON.stringify(emailResult));
-                });
-            } catch (error) {
-                res.writeHead(400);
-                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
-            }
-        });
-        return;
-    } else if (req.method === 'POST' && req.url === '/send-custom-email') {
-        // Handle custom email preview interface
-        let body = '';
-        req.on('data', chunk => {
-            body += chunk.toString();
-        });
-        
-        req.on('end', async () => {
-            try {
-                const data = JSON.parse(body);
-                sendCustomEmailWithPDF(data, (emailResult) => {
-                    res.writeHead(200);
-                    res.end(JSON.stringify(emailResult));
-                });
-            } catch (error) {
-                res.writeHead(400);
-                res.end(JSON.stringify({ error: 'Invalid JSON', details: error.message }));
-            }
         });
         return;
     } else {
@@ -291,7 +171,7 @@ ${documentContent}
                         }],
                         send_email: true,
                         send_sms: false,
-                        completed_redirect_url: 'https://example.com',
+                        completed_redirect_url: 'https://template.terms.law',
                         submitters_order: 'preserved',
                         message: {
                             subject: 'Please sign this demand letter document',
@@ -471,59 +351,41 @@ const ESIGNATURES_API_URL = 'https://esignatures.com/api';
 function createESignaturesTemplate(title, content, signerInfo, callback) {
     console.log('Creating eSignatures.com template...');
     
-    // Convert content to document elements with signature between demand letter and arbitration demand
-    // Look for the arbitration section separator
-    const arbitrationSeparator = '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80);
-    const arbitrationIndex = content.indexOf(arbitrationSeparator);
+    // Convert content to document elements with inline signature
+    // Split content at "Sincerely," to insert signature field there
+    const sincerelyIndex = content.indexOf("Sincerely,");
     let documentElements = [];
     
-    if (arbitrationIndex !== -1) {
-        // Split into demand letter part and arbitration part
-        const demandLetterPart = content.substring(0, arbitrationIndex);
-        const arbitrationPart = content.substring(arbitrationIndex);
-        
-        // Add demand letter (which ends with "Sincerely,")
+    if (sincerelyIndex !== -1) {
+        // Content before "Sincerely,"
+        const beforeSincerely = content.substring(0, sincerelyIndex + "Sincerely,".length);
         documentElements.push({
             "type": "text_normal",
-            "text": demandLetterPart
+            "text": beforeSincerely
         });
         
-        // eSignatures.com will automatically place signature fields after "Sincerely,"
+        // eSignatures.com automatically manages signature placement - no need to add signature fields
         
-        // Add arbitration demand as unsigned attachment  
-        documentElements.push({
-            "type": "text_normal",
-            "text": arbitrationPart
-        });
-    } else {
-        // No arbitration demand - just the demand letter with signature at "Sincerely,"
-        const sincerelyIndex = content.indexOf("Sincerely,");
-        if (sincerelyIndex !== -1) {
-            const beforeSincerely = content.substring(0, sincerelyIndex + "Sincerely,".length);
+        // Content after "Sincerely," (excluding signature/name parts)
+        const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
+        // Remove the manual signature lines (name and company) from the content
+        const cleanedAfter = afterSincerely.replace(/\n\n[^\n]+\n[^\n]+$/, '');
+        if (cleanedAfter.trim()) {
             documentElements.push({
                 "type": "text_normal",
-                "text": beforeSincerely
-            });
-            
-            const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
-            const cleanedAfter = afterSincerely.replace(/\n\n[^\n]*\n[^\n]*$/, '');
-            if (cleanedAfter.trim()) {
-                documentElements.push({
-                    "type": "text_normal", 
-                    "text": cleanedAfter
-                });
-            }
-        } else {
-            // Fallback - just add content as is
-            documentElements.push({
-                "type": "text_normal",
-                "text": content
+                "text": cleanedAfter
             });
         }
+    } else {
+        // Fallback if "Sincerely," not found - just add content as is
+        documentElements.push({
+            "type": "text_normal",
+            "text": content
+        });
     }
     
     const templateData = {
-        title: "Demand Letter",
+        title: "",
         document_elements: documentElements,
         labels: ["first_signer"]
     };
@@ -557,34 +419,7 @@ function createESignaturesContract(templateId, signerInfo, callback) {
         signers: [{
             name: (signerInfo.name && signerInfo.name.trim()) || "Sergei Tokmakov",
             email: signerInfo.email || "sergei.tokmakov@gmail.com"
-        }],
-        // Customize signature appearance  
-        signature_request_subject: "Demand Letter Signature Request",
-        signature_request_message: "Please review and sign this demand letter.",
-        use_text_tags: false,
-        hide_text_tags: true,
-        // Try supported branding options
-        custom_branding: {
-            company_name: "",
-            company_logo: "",
-            primary_color: "#ffffff"
-        },
-        // Override success page to redirect back to terms.law
-        redirect_url: "http://localhost:8000/signing-complete.html",
-        declined_redirect_url: "http://localhost:8000/signing-declined.html",
-        // Enable Google Drive integration if available in eSignatures.com
-        integrations: {
-            google_drive: {
-                enabled: true,
-                auto_save: true,
-                folder_name: "Signed_Demand_Letters"
-            }
-        },
-        // Enable automatic cloud storage
-        cloud_storage: {
-            google_drive: true,
-            auto_upload: true
-        }
+        }]
     };
     
     console.log('Contract data being sent:', JSON.stringify(contractData, null, 2));
@@ -667,50 +502,19 @@ function makeESignaturesAPICall(endpoint, data, callback, method = 'POST') {
 function checkContractStatus(contractId, callback) {
     console.log('Checking contract status for:', contractId);
     
-    makeESignaturesAPICall(`/contracts/${contractId}`, {}, async (success, result) => {
+    makeESignaturesAPICall(`/contracts/${contractId}`, {}, (success, result) => {
         console.log('Contract status response:', result);
         
         if (success && result.data && result.data.contract) {
             const contract = result.data.contract;
             const status = contract.status;
-            const pdfUrl = contract.contract_pdf_url;
-            
-            let driveData = null;
-            
-            // If document is signed and has PDF URL, upload to Google Drive
-            if (status === 'signed' && pdfUrl) {
-                console.log('Document is signed, attempting Google Drive upload...');
-                const fileName = `Signed_Demand_Letter_${contractId}_${new Date().toISOString().split('T')[0]}.pdf`;
-                
-                // Try to get any existing Google Drive link from eSignatures.com first
-                let esignDriveData = null;
-                if (contract.google_drive_url || contract.drive_url || contract.integrations?.google_drive) {
-                    console.log('📁 eSignatures.com has Google Drive integration data');
-                    esignDriveData = {
-                        source: 'eSignatures.com',
-                        driveLink: contract.google_drive_url || contract.drive_url,
-                        integration: contract.integrations?.google_drive
-                    };
-                }
-                
-                // Upload to our own Google Drive as backup/alternative
-                const ourDriveData = await downloadSignedPDFAndUploadToDrive(pdfUrl, fileName);
-                
-                // Combine both sources
-                driveData = {
-                    esignatures_drive: esignDriveData,
-                    terms_law_drive: ourDriveData,
-                    primary_source: esignDriveData ? 'eSignatures.com' : (ourDriveData ? 'Terms.law' : null)
-                };
-            }
             
             callback({
                 success: true,
                 status: status,
                 contract_id: contractId,
                 signed: status === 'signed',
-                pdf_url: pdfUrl,
-                google_drive: driveData,
+                pdf_url: contract.contract_pdf_url || null,
                 signers: contract.signers || []
             });
         } else {
@@ -723,470 +527,9 @@ function checkContractStatus(contractId, callback) {
     }, 'GET');
 }
 
-// Google Drive integration functions
-async function getGoogleAccessToken() {
-    // Check if credentials are configured
-    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID' ||
-        !GOOGLE_CLIENT_SECRET || GOOGLE_CLIENT_SECRET === 'YOUR_GOOGLE_CLIENT_SECRET' ||
-        !GOOGLE_REFRESH_TOKEN || GOOGLE_REFRESH_TOKEN === 'YOUR_GOOGLE_REFRESH_TOKEN') {
-        throw new Error('Google Drive credentials not configured. Please set up environment variables.');
-    }
-    
-    return new Promise((resolve, reject) => {
-        const postData = JSON.stringify({
-            client_id: GOOGLE_CLIENT_ID,
-            client_secret: GOOGLE_CLIENT_SECRET,
-            refresh_token: GOOGLE_REFRESH_TOKEN,
-            grant_type: 'refresh_token'
-        });
-
-        const options = {
-            hostname: 'oauth2.googleapis.com',
-            port: 443,
-            path: '/token',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData)
-            }
-        };
-
-        const req = https.request(options, (res) => {
-            let responseBody = '';
-            res.on('data', (chunk) => {
-                responseBody += chunk;
-            });
-            res.on('end', () => {
-                try {
-                    const result = JSON.parse(responseBody);
-                    if (result.access_token) {
-                        resolve(result.access_token);
-                    } else {
-                        reject(new Error('No access token received from Google'));
-                    }
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-
-        req.write(postData);
-        req.end();
-    });
-}
-
-async function uploadToGoogleDrive(pdfBuffer, fileName, accessToken) {
-    return new Promise((resolve, reject) => {
-        // Create multipart form data
-        const boundary = '-------314159265358979323846';
-        const delimiter = "\r\n--" + boundary + "\r\n";
-        const close_delim = "\r\n--" + boundary + "--";
-
-        const metadata = {
-            'name': fileName,
-            'parents': ['YOUR_GOOGLE_DRIVE_FOLDER_ID'] // Replace with your folder ID
-        };
-
-        const multipartRequestBody =
-            delimiter +
-            'Content-Type: application/json\r\n\r\n' +
-            JSON.stringify(metadata) +
-            delimiter +
-            'Content-Type: application/pdf\r\n\r\n' +
-            pdfBuffer.toString('binary') +
-            close_delim;
-
-        const options = {
-            hostname: 'www.googleapis.com',
-            port: 443,
-            path: '/upload/drive/v3/files?uploadType=multipart',
-            method: 'POST',
-            headers: {
-                'Content-Type': 'multipart/related; boundary="' + boundary + '"',
-                'Content-Length': Buffer.byteLength(multipartRequestBody, 'binary'),
-                'Authorization': 'Bearer ' + accessToken
-            }
-        };
-
-        const req = https.request(options, (res) => {
-            let responseBody = '';
-            res.on('data', (chunk) => {
-                responseBody += chunk;
-            });
-            res.on('end', () => {
-                try {
-                    const result = JSON.parse(responseBody);
-                    if (result.id) {
-                        const driveLink = `https://drive.google.com/file/d/${result.id}/view`;
-                        resolve({
-                            fileId: result.id,
-                            driveLink: driveLink,
-                            downloadLink: `https://drive.google.com/file/d/${result.id}/view?usp=sharing`
-                        });
-                    } else {
-                        reject(new Error('Failed to upload to Google Drive'));
-                    }
-                } catch (error) {
-                    reject(error);
-                }
-            });
-        });
-
-        req.on('error', (error) => {
-            reject(error);
-        });
-
-        req.write(multipartRequestBody, 'binary');
-        req.end();
-    });
-}
-
-async function downloadSignedPDFAndUploadToDrive(pdfUrl, fileName) {
-    try {
-        console.log('📁 Attempting Google Drive upload for:', fileName);
-        console.log('PDF URL:', pdfUrl);
-        
-        // Download the PDF
-        const pdfBuffer = await new Promise((resolve, reject) => {
-            https.get(pdfUrl, (res) => {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
-                    return;
-                }
-                const chunks = [];
-                res.on('data', (chunk) => chunks.push(chunk));
-                res.on('end', () => resolve(Buffer.concat(chunks)));
-                res.on('error', reject);
-            }).on('error', reject);
-        });
-
-        console.log('✅ PDF downloaded successfully, size:', pdfBuffer.length, 'bytes');
-
-        // Get Google Drive access token
-        const accessToken = await getGoogleAccessToken();
-        console.log('✅ Got Google Drive access token');
-
-        // Upload to Google Drive
-        const driveResult = await uploadToGoogleDrive(pdfBuffer, fileName, accessToken);
-        console.log('✅ Successfully uploaded to Google Drive:', driveResult);
-
-        return driveResult;
-    } catch (error) {
-        console.error('❌ Google Drive upload failed:', error.message);
-        if (error.message.includes('credentials not configured')) {
-            console.log('ℹ️ To enable Google Drive integration:');
-            console.log('   1. Set up Google Drive API credentials');
-            console.log('   2. Add them to environment variables or .env file');
-            console.log('   3. See google-drive-setup.md for instructions');
-        }
-        return null;
-    }
-}
-
-// Function to send signed document to Stripe via email
-async function sendSignedDocumentToStripe(requestData, callback) {
-    try {
-        console.log('📧 Sending signed document to Stripe via email...');
-        const { contractId, pdfUrl, companyName, contactName, withheldAmount } = requestData;
-        
-        if (!pdfUrl) {
-            callback({ success: false, error: 'No PDF URL provided' });
-            return;
-        }
-        
-        // Download the signed PDF
-        const pdfBuffer = await new Promise((resolve, reject) => {
-            https.get(pdfUrl, (res) => {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
-                    return;
-                }
-                const chunks = [];
-                res.on('data', (chunk) => chunks.push(chunk));
-                res.on('end', () => resolve(Buffer.concat(chunks)));
-                res.on('error', reject);
-            }).on('error', reject);
-        });
-        
-        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
-        
-        // Create filename with timestamp
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
-        
-        // Email content
-        const emailSubject = `FORMAL DEMAND LETTER - ${companyName || '[Company Name]'} - Withheld Funds $${withheldAmount || '[Amount]'}`;
-        
-        const emailBody = `Dear Stripe Legal Team,
-
-Please find attached the signed formal demand letter regarding withheld merchant funds for ${companyName || '[Company Name]'}.
-
-This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
-
-Key Details:
-- Company: ${companyName || '[Company Name]'}
-- Contact: ${contactName || '[Contact Name]'}
-- Withheld Amount: $${withheldAmount || '[Amount]'}
-- Document: Signed demand letter with arbitration notice
-
-This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
-
-Respectfully submitted,
-${contactName || '[Contact Name]'}
-${companyName || '[Company Name]'}`;
-
-        // Email configuration
-        const mailOptions = {
-            from: EMAIL_USER,
-            to: 'sergei.tokmakov@gmail.com', // Testing email - will change to Stripe later
-            cc: 'complaints@stripe.com', // Optional - remove for testing
-            subject: emailSubject,
-            text: emailBody,
-            attachments: [
-                {
-                    filename: filename,
-                    content: pdfBuffer,
-                    contentType: 'application/pdf'
-                }
-            ]
-        };
-        
-        // Send the email
-        mailTransporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('❌ Email sending failed:', error);
-                callback({ 
-                    success: false, 
-                    error: 'Email sending failed', 
-                    details: error.message 
-                });
-            } else {
-                console.log('✅ Email sent successfully to Stripe!');
-                console.log('Message ID:', info.messageId);
-                callback({ 
-                    success: true, 
-                    messageId: info.messageId,
-                    message: 'Signed demand letter sent to Stripe via email with PDF attachment'
-                });
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Error in sendSignedDocumentToStripe:', error);
-        callback({ 
-            success: false, 
-            error: 'Failed to send email', 
-            details: error.message 
-        });
-    }
-}
-
-// Function to send email with PDF attachment automatically
-async function sendEmailWithPDFAttachment(requestData, callback) {
-    try {
-        console.log('📧 Sending automatic email to Stripe with PDF attachment...');
-        const { contractId, pdfUrl, companyName, contactName, withheldAmount, fromEmail, senderName } = requestData;
-        
-        if (!pdfUrl) {
-            callback({ success: false, error: 'No PDF URL provided' });
-            return;
-        }
-        
-        // Download the signed PDF
-        const pdfBuffer = await new Promise((resolve, reject) => {
-            https.get(pdfUrl, (res) => {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
-                    return;
-                }
-                const chunks = [];
-                res.on('data', (chunk) => chunks.push(chunk));
-                res.on('end', () => resolve(Buffer.concat(chunks)));
-                res.on('error', reject);
-            }).on('error', reject);
-        });
-        
-        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
-        
-        // Create filename with timestamp
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
-        
-        // Email content
-        const emailSubject = `FORMAL DEMAND LETTER - ${companyName || '[Company Name]'} - Withheld Funds $${withheldAmount || '[Amount]'}`;
-        
-        const emailBody = `Dear Stripe Legal Team,
-
-Please find attached the signed formal demand letter regarding withheld merchant funds for ${companyName || '[Company Name]'}.
-
-This letter constitutes formal notice under Section 13.3(a) of the Stripe Services Agreement and initiates the required 30-day pre-arbitration notice period.
-
-Key Details:
-- Company: ${companyName || '[Company Name]'}
-- Contact: ${contactName || '[Contact Name]'}
-- Withheld Amount: $${withheldAmount || '[Amount]'}
-- Document: Signed demand letter with arbitration notice
-
-This matter requires immediate attention from your legal department. Please direct all responses to the contact information provided in the attached demand letter.
-
-Respectfully submitted,
-${contactName || '[Contact Name]'}
-${companyName || '[Company Name]'}
-
----
-This email was sent automatically from the Terms.law Demand Letter Generator.`;
-
-        // Email configuration with sender details
-        const mailOptions = {
-            from: `"${senderName || 'Demand Letter Sender'}" <${EMAIL_USER}>`,
-            replyTo: fromEmail || EMAIL_USER,
-            to: 'complaints@stripe.com',
-            // CC for testing - uncomment for production
-            // cc: 'sergei.tokmakov@gmail.com', 
-            subject: emailSubject,
-            text: emailBody,
-            attachments: [
-                {
-                    filename: filename,
-                    content: pdfBuffer,
-                    contentType: 'application/pdf'
-                }
-            ]
-        };
-        
-        // Send the email
-        mailTransporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('❌ Automatic email sending failed:', error);
-                callback({ 
-                    success: false, 
-                    error: 'Email sending failed', 
-                    details: error.message 
-                });
-            } else {
-                console.log('✅ Automatic email sent successfully to Stripe!');
-                console.log('Message ID:', info.messageId);
-                console.log('To:', mailOptions.to);
-                console.log('Subject:', emailSubject);
-                callback({ 
-                    success: true, 
-                    messageId: info.messageId,
-                    to: mailOptions.to,
-                    subject: emailSubject,
-                    message: 'Signed demand letter automatically sent to Stripe with PDF attachment'
-                });
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Error in sendEmailWithPDFAttachment:', error);
-        callback({ 
-            success: false, 
-            error: 'Failed to send automatic email', 
-            details: error.message 
-        });
-    }
-}
-
-// Function to send custom email with PDF attachment from preview interface
-async function sendCustomEmailWithPDF(requestData, callback) {
-    try {
-        console.log('📧 Sending custom email with PDF attachment...');
-        const { contractId, pdfUrl, to, subject, body, companyName, fromEmail, senderName } = requestData;
-        
-        if (!pdfUrl) {
-            callback({ success: false, error: 'No PDF URL provided' });
-            return;
-        }
-        
-        if (!to || !subject || !body) {
-            callback({ success: false, error: 'Missing required email fields (to, subject, body)' });
-            return;
-        }
-        
-        // Download the signed PDF
-        const pdfBuffer = await new Promise((resolve, reject) => {
-            https.get(pdfUrl, (res) => {
-                if (res.statusCode !== 200) {
-                    reject(new Error(`Failed to download PDF: HTTP ${res.statusCode}`));
-                    return;
-                }
-                const chunks = [];
-                res.on('data', (chunk) => chunks.push(chunk));
-                res.on('end', () => resolve(Buffer.concat(chunks)));
-                res.on('error', reject);
-            }).on('error', reject);
-        });
-        
-        console.log('✅ Downloaded signed PDF, size:', pdfBuffer.length, 'bytes');
-        
-        // Create filename with timestamp
-        const timestamp = new Date().toISOString().split('T')[0];
-        const filename = `Signed_Demand_Letter_${companyName || 'Company'}_${timestamp}.pdf`;
-        
-        // Email configuration with custom content
-        const mailOptions = {
-            from: `"${senderName || 'Demand Letter Sender'}" <${EMAIL_USER}>`,
-            replyTo: fromEmail || EMAIL_USER,
-            to: to,
-            subject: subject,
-            text: body,
-            attachments: [
-                {
-                    filename: filename,
-                    content: pdfBuffer,
-                    contentType: 'application/pdf'
-                }
-            ]
-        };
-        
-        // Send the email
-        mailTransporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.error('❌ Custom email sending failed:', error);
-                callback({ 
-                    success: false, 
-                    error: 'Email sending failed', 
-                    details: error.message 
-                });
-            } else {
-                console.log('✅ Custom email sent successfully!');
-                console.log('Message ID:', info.messageId);
-                console.log('To:', to);
-                console.log('Subject:', subject);
-                callback({ 
-                    success: true, 
-                    messageId: info.messageId,
-                    to: to,
-                    subject: subject,
-                    message: 'Custom email sent successfully with PDF attachment'
-                });
-            }
-        });
-        
-    } catch (error) {
-        console.error('❌ Error in sendCustomEmailWithPDF:', error);
-        callback({ 
-            success: false, 
-            error: 'Failed to send custom email', 
-            details: error.message 
-        });
-    }
-}
-
 const PORT = 3001;
 server.listen(PORT, () => {
     console.log(`eSignature proxy server running on http://localhost:${PORT}`);
     console.log('Use /esign-proxy endpoint for API calls');
     console.log('Use /contract-status/<contract_id> to check signing status');
-    console.log('Use /send-to-stripe endpoint for manual email sending');
-    console.log('Use /send-email-with-pdf endpoint for automatic email with PDF attachment');
-    console.log('Use /send-custom-email endpoint for custom email preview interface');
-    console.log('Use /upload-to-drive endpoint for Google Drive uploads');
-    console.log('Google Drive integration enabled');
-    console.log('Email integration enabled');
 });

@@ -209,20 +209,14 @@ const StripeDemandGenerator = () => {
         return { claims, violations };
     };
 
-    // Helper function to safely add days to a date
-    const addDays = (date, days) => {
-        const result = new Date(date);
-        result.setTime(result.getTime() + (days * 24 * 60 * 60 * 1000));
-        return result;
-    };
-
     // Calculate dates for legal strategy
     const calculateDates = () => {
         const today = new Date();
-        const responseDate = addDays(today, formData.responseDeadline);
+        const responseDate = new Date(today);
+        responseDate.setDate(responseDate.getDate() + formData.responseDeadline);
         
-        // CRITICAL: Ensure arbitration date is ALWAYS minimum 30 days from letter date
-        const arbitrationDate = addDays(today, 30); // Exactly 30 days minimum required by SSA 13.3(a)
+        const arbitrationDate = new Date(today);
+        arbitrationDate.setDate(arbitrationDate.getDate() + 30); // 30-day notice requirement
         
         return {
             letterDate: today.toLocaleDateString('en-US', { 
@@ -495,7 +489,11 @@ E. ${formData.includeAttorneyFees ? 'Award reasonable attorney fees and costs of
 ${additionalDamages > 0 ? `F. Award additional damages of $${additionalDamages.toLocaleString()} for business losses and consequential harm;` : 'F. Award such other relief as the Tribunal deems just and proper.'}
 ${additionalDamages > 0 ? 'G. Award such other relief as the Tribunal deems just and proper.' : ''}
 
-[Draft - to be filed if resolution is not reached within 30 days]`;
+${formData.contactName || '[CONTACT NAME]'}
+${formData.companyName || ''}
+Claimant
+
+Dated: _________________`;
 
             return demand;
             
@@ -706,74 +704,56 @@ ${formData.companyName || ''}`;
 
     // Monitor contract completion and provide finalized document
     const monitorContractCompletion = (contractId, iframeContainer) => {
-        console.log('🔄 Starting BACKGROUND monitoring for contract:', contractId);
         let checkCount = 0;
+        const maxChecks = 60; // Check for 5 minutes (every 5 seconds)
         
         const checkStatus = async () => {
             try {
                 const response = await fetch(`http://localhost:3001/contract-status/${contractId}`);
                 const status = await response.json();
                 
-                console.log('🔍 Background check #' + checkCount + ':', status.status || 'checking...');
+                console.log('Contract status check:', status);
                 
                 if (status.success && status.signed && status.pdf_url) {
-                    console.log('🎊 BACKGROUND SUCCESS - Document signed!');
-                    
-                    // Open in new window immediately
-                    window.open(status.pdf_url, '_blank', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                    
-                    // Force replace iframe regardless of current state
+                    // Document is signed! Replace the signing iframe with the signed document viewer
                     const iframeDiv = iframeContainer.querySelector('div:first-child');
                     if (iframeDiv) {
-                        const googleDriveButton = status.google_drive ? `
-                            <button onclick="window.open('${status.google_drive.driveLink}', '_blank')" style="background: #4285f4; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px; margin-left: 10px;">
-                                📁 View in Google Drive
-                            </button>
-                        ` : '';
-                        
                         iframeDiv.innerHTML = `
-                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                                <div style="text-align: center; padding: 40px;">
-                                    <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
-                                        ✅ Document Signed Successfully!
-                                    </div>
-                                    <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your signed document has opened in a new window.</p>
-                                    <p style="font-size: 14px; color: #666; margin-bottom: 20px;">Email confirmation has also been sent to you.</p>
-                                    ${status.google_drive ? '<p style="font-size: 14px; color: #4285f4; margin-bottom: 30px;">📁 Document automatically saved to your Google Drive!</p>' : '<p style="font-size: 14px; color: #999; margin-bottom: 30px;">💡 Set up Google Drive integration for automatic backup</p>'}
-                                    <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                                        <button onclick="window.open('${status.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                            📄 View Signed Document
-                                        </button>
-                                        ${googleDriveButton}
-                                        <button onclick="this.parentElement.parentElement.parentElement.parentElement.remove()" style="background: #dc2626; color: white; padding: 12px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 16px;">
-                                            Close
-                                        </button>
-                                    </div>
+                            <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                                <div style="position: absolute; top: 10px; left: 15px; right: 80px; background: #28a745; color: white; padding: 8px 15px; border-radius: 4px; font-weight: bold; text-align: center; z-index: 10001;">
+                                    ✅ Document Signed Successfully! Email sent to you.
                                 </div>
-                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 15px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">✕</button>
+                                <button onclick="this.parentElement.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                                <div style="position: absolute; top: 60px; right: 15px; background: #007cba; color: white; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;" onclick="window.open('${status.pdf_url}', '_blank')">
+                                    📄 Download PDF
+                                </div>
+                                <iframe src="${status.pdf_url}" style="width: 100%; height: 100%; border: none; border-radius: 8px; padding-top: 60px; box-sizing: border-box;"></iframe>
                             </div>
                         `;
                     }
+                    
+                    // Show success notification
+                    alert("🎉 Document Signed Successfully!\n\nYour finalized document is now displayed below AND has been emailed to you.");
                     return; // Stop checking
                 }
                 
                 checkCount++;
-                // Continue checking every 4 seconds for up to 10 minutes
-                if (checkCount < 150) {
-                    setTimeout(checkStatus, 4000);
+                if (checkCount < maxChecks && (!status.success || !status.signed)) {
+                    // Continue checking every 5 seconds
+                    setTimeout(checkStatus, 5000);
                 }
                 
             } catch (error) {
-                console.error('Background monitoring error:', error);
+                console.error('Error checking contract status:', error);
                 checkCount++;
-                if (checkCount < 150) {
-                    setTimeout(checkStatus, 4000);
+                if (checkCount < maxChecks) {
+                    setTimeout(checkStatus, 5000);
                 }
             }
         };
         
-        // Start immediately
-        setTimeout(checkStatus, 500);
+        // Start checking after 10 seconds (give user time to start signing)
+        setTimeout(checkStatus, 10000);
     };
 
     // eSignature document function
@@ -781,9 +761,6 @@ ${formData.companyName || ''}`;
         try {
             setESignLoading(true);
             console.log("eSignature button clicked");
-            
-            // Store form data in localStorage for success page access
-            localStorage.setItem('demandLetterFormData', JSON.stringify(formData));
             
             let finalDocumentText;
             let documentTitle;
@@ -853,134 +830,37 @@ ${formData.companyName || ''}`;
             }
 
             if (response.ok && (result.signing_url || result.sign_url || result.url || result.data?.signing_url)) {
-                // Get signing URL and open in new window for better control
+                // Embed signing URL directly in the page
                 const signingUrl = result.signing_url || result.sign_url || result.url || result.data?.signing_url;
+                const embeddedUrl = signingUrl + (signingUrl.includes('?') ? '&' : '?') + 'embedded=yes';
                 
-                // Open signing in new window instead of iframe
-                console.log('🚀 Opening signing window for URL:', signingUrl);
-                const signingWindow = window.open(signingUrl, 'eSignWindow', 'width=1200,height=800,scrollbars=yes,resizable=yes');
-                
-                // Create monitoring overlay
-                const overlayContainer = document.createElement('div');
-                overlayContainer.innerHTML = `
+                // Create iframe container for embedded signing
+                const iframeContainer = document.createElement('div');
+                iframeContainer.innerHTML = `
                     <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-                        <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 500px;">
-                            <h2 style="color: #333; margin-bottom: 20px;">📝 Signing in Progress</h2>
-                            <p style="margin-bottom: 20px; color: #666; line-height: 1.5;">
-                                Please complete the signing process in the new window that opened.
-                                <br><br>
-                                This page will automatically update when signing is complete.
-                            </p>
-                            <div id="statusIndicator" style="margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 6px; color: #495057;">
-                                ⏳ Waiting for signature completion...
-                            </div>
-                            <button onclick="this.parentElement.parentElement.remove(); if(window.signingWindow && !window.signingWindow.closed) window.signingWindow.close();" 
-                                    style="background: #dc2626; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer;">
-                                Cancel
-                            </button>
+                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
+                            <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
+                            <iframe src="${embeddedUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
                         </div>
                     </div>
                 `;
-                document.body.appendChild(overlayContainer);
-                window.signingWindow = signingWindow;
+                document.body.appendChild(iframeContainer);
                 
-                // Monitor signing window and check contract status
-                if (result.data?.contract_id) {
-                    console.log('🚀 Starting window monitoring for contract:', result.data.contract_id);
-                    
-                    // Check if signing window is closed (user finished or cancelled)
-                    const windowMonitor = setInterval(() => {
-                        if (signingWindow.closed) {
-                            console.log('🪟 Signing window closed - checking status...');
-                            clearInterval(windowMonitor);
-                            checkFinalStatus();
-                        }
-                    }, 1000);
-                    
-                    // Force status check every 5 seconds regardless of window state
-                    const forceStatusCheck = setInterval(async () => {
-                        try {
-                            console.log('⏰ Force checking contract status...');
-                            const statusResponse = await fetch(`http://localhost:3001/contract-status/${result.data.contract_id}`);
-                            const statusData = await statusResponse.json();
-                            
-                            if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                console.log('🎉 FORCE CHECK SUCCESS - Document is signed!');
-                                clearInterval(forceStatusCheck);
-                                clearInterval(windowMonitor);
-                                
-                                // Close signing window if still open
-                                if (!signingWindow.closed) {
-                                    signingWindow.close();
-                                }
-                                
-                                // Show success in our overlay
-                                showSuccessResult(statusData, overlayContainer);
-                                return;
-                            }
-                        } catch (error) {
-                            console.error('Force status check error:', error);
-                        }
-                    }, 5000);
-                    
-                    // Check final status when window closes
-                    async function checkFinalStatus() {
-                        try {
-                            const statusResponse = await fetch(`http://localhost:3001/contract-status/${result.data.contract_id}`);
-                            const statusData = await statusResponse.json();
-                            
-                            if (statusData.success && statusData.signed && statusData.pdf_url) {
-                                clearInterval(forceStatusCheck);
-                                showSuccessResult(statusData, overlayContainer);
-                            } else {
-                                // Document not signed - remove overlay
-                                overlayContainer.remove();
-                            }
-                        } catch (error) {
-                            console.error('Final status check error:', error);
-                            overlayContainer.remove();
-                        }
-                    }
-                    
-                    // Set a maximum time limit (10 minutes) then stop checking
-                    setTimeout(() => {
-                        clearInterval(forceStatusCheck);
-                        clearInterval(windowMonitor);
-                        console.log('⏰ Stopped monitoring after 10 minutes');
-                    }, 600000);
+                // Start monitoring for completion and provide finalized document
+                if (result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    monitorContractCompletion(result.data.contract_id, iframeContainer);
                 }
                 
-                // Function to show success result
-                function showSuccessResult(statusData, container) {
-                    const overlayDiv = container.querySelector('div:first-child');
-                    if (overlayDiv) {
-                        // No Google Drive buttons as per user request
-                        
-                        overlayDiv.innerHTML = `
-                            <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; max-width: 600px;">
-                                <div style="background: #28a745; color: white; padding: 20px 30px; border-radius: 8px; font-weight: bold; font-size: 18px; margin-bottom: 30px;">
-                                    ✅ Document Signed Successfully!
-                                </div>
-                                <p style="font-size: 16px; color: #333; margin-bottom: 20px;">Your demand letter has been signed and is ready for submission.</p>
-                                <p style="font-size: 14px; color: #666; margin-bottom: 30px;">Email confirmation has also been sent to you.</p>
-                                
-                                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                                    <button onclick="window.open('${statusData.pdf_url}', '_blank')" style="background: #007cba; color: white; padding: 12px 20px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px;">
-                                        📄 View Signed Document
-                                    </button>
-                                </div>
-                                
-                                
-                                <button onclick="this.parentElement.parentElement.remove()" style="background: #dc2626; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 14px;">
-                                    Close
-                                </button>
-                            </div>
-                        `;
-                    }
-                }
-                
-                // No success messages - go straight to signing interface
-                if (result.error_code === 'forbidden' || result.error_message) {
+                // Show appropriate success message
+                if (result.contract_id && result.contract_id.startsWith('demo-')) {
+                    alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
+                } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
+                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
+                } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
+                    alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
+                } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
+                    alert("🧪 Demo Mode Active\n\nAPI unavailable - using demo mode.\n\nFor real signing, contact support for API setup.");
+                } else if (result.error_code === 'forbidden' || result.error_message) {
                     // Handle API authentication errors
                     alert("⚠️ API Authentication Issue:\n" + (result.error_message || result.error_code) + "\n\nFalling back to demo mode for testing.");
                     // Embed demo URL instead
@@ -996,6 +876,8 @@ ${formData.companyName || ''}`;
                     `;
                     document.body.appendChild(iframeContainer);
                     return; // Don't throw error, just show demo
+                } else {
+                    alert("✅ eSignature ready! Complete signing in the embedded interface");
                 }
             } else {
                 // Handle API errors more gracefully
@@ -1036,56 +918,6 @@ ${formData.companyName || ''}`;
             setESignLoading(false);
         }
     };
-
-
-    // Upload to Google Drive function
-    const uploadToDrive = async (contractId, pdfUrl) => {
-        try {
-            console.log('📁 Uploading to Google Drive...');
-            
-            const response = await fetch('http://localhost:3001/upload-to-drive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    contractId: contractId,
-                    pdfUrl: pdfUrl,
-                    fileName: `Signed_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.pdf`
-                })
-            });
-            
-            const result = await response.json();
-            
-            if (result.success) {
-                console.log('✅ Google Drive upload successful!');
-                alert('✅ Document saved to Google Drive successfully!\n\nYou can view it at: ' + result.drive_data.driveLink);
-                
-                // Replace the upload button with a view button
-                const uploadBtn = event.target;
-                if (uploadBtn) {
-                    uploadBtn.innerHTML = '📁 View in Drive';
-                    uploadBtn.onclick = () => window.open(result.drive_data.driveLink, '_blank');
-                    uploadBtn.style.background = '#4285f4';
-                }
-            } else {
-                console.error('❌ Google Drive upload failed:', result.error);
-                let errorMessage = 'Failed to upload to Google Drive';
-                if (result.error && result.error.includes('credentials not configured')) {
-                    errorMessage = 'Google Drive not configured. Please set up Google Drive API credentials in .env file.';
-                }
-                alert('❌ ' + errorMessage + '\n\nSee google-drive-setup.md for configuration instructions.');
-            }
-            
-        } catch (error) {
-            console.error('❌ Error uploading to Drive:', error);
-            alert('❌ Error uploading to Google Drive. Please check the console for details.');
-        }
-    };
-    
-    // Make functions available globally
-    window.emailToStripe = emailToStripe;
-    window.uploadToDrive = uploadToDrive;
 
     // Navigation functions
     const nextTab = () => {
@@ -1203,28 +1035,6 @@ ${formData.companyName || ''}`;
         let score = 30; // Base score
         let factors = [];
         const amount = parseFloat((formData.withheldAmount || '0').replace(/[^\d.]/g, ''));
-        
-        // CRITICAL VALIDATION: Check arbitration notice period and timing risks
-        const today = new Date();
-        const arbitrationDate = addDays(today, 30); // SSA 13.3(a) requires minimum 30 days
-        
-        // Check if promised release date conflicts with arbitration timeline
-        if (formData.promisedReleaseDate) {
-            const promisedDate = new Date(formData.promisedReleaseDate);
-            const daysUntilPromised = Math.ceil((promisedDate - today) / (1000 * 60 * 60 * 24));
-            
-            if (daysUntilPromised > 0 && daysUntilPromised < 30) {
-                score -= 15;
-                factors.push(`🚨 TIMING CONFLICT: Stripe promised to release funds in ${daysUntilPromised} days, but arbitration notice requires 30-day minimum. This creates procedural tension - consider whether to wait for promised date or proceed immediately.`);
-            }
-        }
-        
-        
-        // General timing validation - warn if close to holidays or weekends that could affect service
-        const dayOfWeek = arbitrationDate.getDay(); // 0 = Sunday, 6 = Saturday
-        if (dayOfWeek === 0 || dayOfWeek === 6) {
-            factors.push('⚠️ WEEKEND NOTICE: Arbitration notice period expires on a weekend. Consider business days for calculating effective notice and potential Stripe response timing.');
-        }
         
         // Strong evidence factors
         if (formData.promisedReleaseDate && new Date(formData.promisedReleaseDate) < new Date()) {
@@ -2681,7 +2491,7 @@ ${formData.companyName || ''}`;
                                 // Fee Schedule Comparison
                                 elements.push(
                                     React.createElement('div', { key: 'fee-comparison', style: { marginBottom: '20px' } }, [
-                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, flexibleFees ? 'AAA Fee Schedule Options' : 'AAA Fee Schedule'),
+                                        React.createElement('h4', { key: 'comparison-title', style: { marginBottom: '15px', color: '#2c3e50' } }, 'AAA Fee Schedule Options'),
                                         
                                         // Standard Schedule
                                         React.createElement('div', { key: 'standard-schedule', style: { 
@@ -2694,7 +2504,7 @@ ${formData.companyName || ''}`;
                                             React.createElement('div', { key: 'standard-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
                                                 React.createElement('h5', { key: 'standard-title', style: { margin: 0, color: '#2c3e50' } }, [
                                                     'Standard Fee Schedule',
-                                                    recommendation.recommended === 'standard' && flexibleFees && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                    recommendation.recommended === 'standard' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
                                                 ]),
                                                 React.createElement('div', { key: 'standard-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${standardFees.total.toLocaleString()} Total`)
                                             ]),
@@ -2716,7 +2526,7 @@ ${formData.companyName || ''}`;
                                             React.createElement('div', { key: 'flexible-header', style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } }, [
                                                 React.createElement('h5', { key: 'flexible-title', style: { margin: 0, color: '#2c3e50' } }, [
                                                     'Flexible Fee Schedule',
-                                                    recommendation.recommended === 'flexible' && flexibleFees && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
+                                                    recommendation.recommended === 'flexible' && React.createElement('span', { key: 'recommended', style: { marginLeft: '10px', backgroundColor: '#28a745', color: 'white', padding: '2px 8px', borderRadius: '4px', fontSize: '12px' } }, 'RECOMMENDED')
                                                 ]),
                                                 React.createElement('div', { key: 'flexible-total', style: { fontWeight: 'bold', fontSize: '18px', color: '#2c3e50' } }, `$${flexibleFees.total.toLocaleString()} Total`)
                                             ]),
@@ -2950,4 +2760,3 @@ try {
     console.error('Error rendering component:', error);
     document.getElementById('root').innerHTML = '<h1>Error Loading Generator</h1><p>Please check the console for details.</p>';
 }
-
