@@ -152,27 +152,43 @@ const StripeDemandGenerator = () => {
     // Paywall integration
     useEffect(() => {
         // Check if user has already paid
-        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
-            setHasPaywallAccess(true);
+        try {
+            if (window.PaywallSystem && typeof window.PaywallSystem.hasAccess === 'function') {
+                const hasAccess = window.PaywallSystem.hasAccess();
+                setHasPaywallAccess(hasAccess);
+                
+                // Apply non-copyable restrictions to preview if not paid
+                if (!hasAccess) {
+                    setTimeout(() => {
+                        if (window.PaywallSystem && typeof window.PaywallSystem.makePreviewNonCopyable === 'function') {
+                            window.PaywallSystem.makePreviewNonCopyable();
+                        }
+                    }, 1000);
+                }
+            }
+        } catch (error) {
+            console.error('Paywall system error:', error);
+            // Default to no access if there's an error
+            setHasPaywallAccess(false);
         }
-        
-        // Apply non-copyable restrictions to preview if not paid
-        if (!hasPaywallAccess && window.PaywallSystem) {
-            setTimeout(() => {
-                window.PaywallSystem.makePreviewNonCopyable();
-            }, 1000);
-        }
-    }, [hasPaywallAccess]);
+    }, []);
     
     // Copy to clipboard function with paywall check
     const copyToClipboard = () => {
         if (!hasPaywallAccess) {
-            if (window.PaywallSystem) {
-                window.PaywallSystem.showAccessDenied('copy');
-                window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    copyToClipboard(); // Retry after payment
-                });
+            try {
+                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
+                    window.PaywallSystem.showAccessDenied('copy');
+                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
+                        window.PaywallSystem.createPaywallModal(() => {
+                            setHasPaywallAccess(true);
+                            copyToClipboard(); // Retry after payment
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Paywall error:', error);
+                alert('Payment required to copy document. Please refresh the page and try again.');
             }
             return;
         }
@@ -188,12 +204,19 @@ const StripeDemandGenerator = () => {
     // Download as Word function with paywall check
     const downloadAsWord = () => {
         if (!hasPaywallAccess) {
-            if (window.PaywallSystem) {
-                window.PaywallSystem.showAccessDenied('download');
-                window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    downloadAsWord(); // Retry after payment
-                });
+            try {
+                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
+                    window.PaywallSystem.showAccessDenied('download');
+                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
+                        window.PaywallSystem.createPaywallModal(() => {
+                            setHasPaywallAccess(true);
+                            downloadAsWord(); // Retry after payment
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Paywall error:', error);
+                alert('Payment required to download document. Please refresh the page and try again.');
             }
             return;
         }
@@ -819,12 +842,19 @@ ${formData.companyName || ''}`;
     const eSignDocument = async () => {
         // Check paywall access first
         if (!hasPaywallAccess) {
-            if (window.PaywallSystem) {
-                window.PaywallSystem.showAccessDenied('esign');
-                window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    eSignDocument(); // Retry after payment
-                });
+            try {
+                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
+                    window.PaywallSystem.showAccessDenied('esign');
+                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
+                        window.PaywallSystem.createPaywallModal(() => {
+                            setHasPaywallAccess(true);
+                            eSignDocument(); // Retry after payment
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Paywall error:', error);
+                alert('Payment required for electronic signature. Please refresh the page and try again.');
             }
             return;
         }
