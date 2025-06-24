@@ -67,7 +67,7 @@ const StripeDemandGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [eSignLoading, setESignLoading] = useState(false);
-    const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
+    const [hasPaywallAccess, setHasPaywallAccess] = useState(true); // Temporarily disable paywall
     const previewRef = useRef(null);
     
     // Form data state
@@ -149,50 +149,14 @@ const StripeDemandGenerator = () => {
         { id: 'assessment', label: 'Risk Assessment' }
     ];
     
-    // Paywall integration
+    // Paywall integration - temporarily disabled
     useEffect(() => {
-        // Check if user has already paid
-        try {
-            if (window.PaywallSystem && typeof window.PaywallSystem.hasAccess === 'function') {
-                const hasAccess = window.PaywallSystem.hasAccess();
-                setHasPaywallAccess(hasAccess);
-                
-                // Apply non-copyable restrictions to preview if not paid
-                if (!hasAccess) {
-                    setTimeout(() => {
-                        if (window.PaywallSystem && typeof window.PaywallSystem.makePreviewNonCopyable === 'function') {
-                            window.PaywallSystem.makePreviewNonCopyable();
-                        }
-                    }, 1000);
-                }
-            }
-        } catch (error) {
-            console.error('Paywall system error:', error);
-            // Default to no access if there's an error
-            setHasPaywallAccess(false);
-        }
+        console.log('useEffect running - paywall temporarily disabled');
+        setHasPaywallAccess(true);
     }, []);
     
-    // Copy to clipboard function with paywall check
+    // Copy to clipboard function - simplified
     const copyToClipboard = () => {
-        if (!hasPaywallAccess) {
-            try {
-                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
-                    window.PaywallSystem.showAccessDenied('copy');
-                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
-                        window.PaywallSystem.createPaywallModal(() => {
-                            setHasPaywallAccess(true);
-                            copyToClipboard(); // Retry after payment
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Paywall error:', error);
-                alert('Payment required to copy document. Please refresh the page and try again.');
-            }
-            return;
-        }
-        
         const documentText = generateDemandLetter();
         navigator.clipboard.writeText(documentText).then(() => {
             alert('Document copied to clipboard!');
@@ -201,26 +165,8 @@ const StripeDemandGenerator = () => {
         });
     };
     
-    // Download as Word function with paywall check
+    // Download as Word function - simplified
     const downloadAsWord = () => {
-        if (!hasPaywallAccess) {
-            try {
-                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
-                    window.PaywallSystem.showAccessDenied('download');
-                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
-                        window.PaywallSystem.createPaywallModal(() => {
-                            setHasPaywallAccess(true);
-                            downloadAsWord(); // Retry after payment
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Paywall error:', error);
-                alert('Payment required to download document. Please refresh the page and try again.');
-            }
-            return;
-        }
-        
         if (window.DocxGenerator) {
             const documentText = generateDemandLetter();
             const fileName = `Stripe_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.docx`;
@@ -840,24 +786,8 @@ ${formData.companyName || ''}`;
 
     // eSignature document function
     const eSignDocument = async () => {
-        // Check paywall access first
-        if (!hasPaywallAccess) {
-            try {
-                if (window.PaywallSystem && typeof window.PaywallSystem.showAccessDenied === 'function') {
-                    window.PaywallSystem.showAccessDenied('esign');
-                    if (typeof window.PaywallSystem.createPaywallModal === 'function') {
-                        window.PaywallSystem.createPaywallModal(() => {
-                            setHasPaywallAccess(true);
-                            eSignDocument(); // Retry after payment
-                        });
-                    }
-                }
-            } catch (error) {
-                console.error('Paywall error:', error);
-                alert('Payment required for electronic signature. Please refresh the page and try again.');
-            }
-            return;
-        }
+        // Paywall check temporarily disabled
+        console.log('eSignDocument called with paywall disabled');
         
         // Validate required fields
         if (!formData.email || !formData.contactName) {
