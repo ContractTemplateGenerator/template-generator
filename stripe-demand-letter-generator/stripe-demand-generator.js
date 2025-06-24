@@ -155,26 +155,7 @@ const StripeDemandGenerator = () => {
         setHasPaywallAccess(true);
     }, []);
     
-    // Copy to clipboard function - simplified
-    const copyToClipboard = () => {
-        const documentText = generateDemandLetter();
-        navigator.clipboard.writeText(documentText).then(() => {
-            alert('Document copied to clipboard!');
-        }).catch(err => {
-            console.error('Failed to copy: ', err);
-        });
-    };
     
-    // Download as Word function - simplified
-    const downloadAsWord = () => {
-        if (window.DocxGenerator) {
-            const documentText = generateDemandLetter();
-            const fileName = `Stripe_Demand_Letter_${formData.companyName || 'Company'}_${new Date().toISOString().split('T')[0]}.docx`;
-            window.DocxGenerator.generateDocx(documentText, fileName);
-        } else {
-            alert('Document generator not available. Please refresh the page and try again.');
-        }
-    };
     
     // Handle input changes
     const handleChange = (e) => {
