@@ -248,6 +248,11 @@
                                             </div>
                                         </div>
                                         <p className="insight-content">{insight.content}</p>
+                                        {activeCard === index && insight.expandedContent && (
+                                            <div className="insight-expanded">
+                                                <p>{insight.expandedContent}</p>
+                                            </div>
+                                        )}
                                         <div className="insight-expand">
                                             <i data-feather="chevron-down"></i>
                                         </div>
@@ -449,8 +454,19 @@
             );
         };
 
-        // Render the blog post
-        ReactDOM.render(<BlogPost />, document.getElementById('blog-root'));
+        // Render the blog post with error handling
+        try {
+            ReactDOM.render(<BlogPost />, document.getElementById('blog-root'));
+            console.log('Blog post rendered successfully');
+        } catch (error) {
+            console.error('Error rendering blog post:', error);
+            document.getElementById('blog-root').innerHTML = `
+                <div style="padding: 2rem; text-align: center; color: #dc2626;">
+                    <h1>Error Loading Blog Post</h1>
+                    <p>Please refresh the page. Error: ${error.message}</p>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
