@@ -155,10 +155,10 @@ function parseInstruction(line) {
         };
     }
     
-    // Pattern: Simple format like "Section 2 $40.00 per hour" (interpreted as text to find)
+    // Pattern: Incomplete section instructions like "Section 2 $40.00 per hour"
     if (line.toLowerCase().includes('section') && !line.toLowerCase().includes('change') && !line.toLowerCase().includes('to')) {
-        // This is probably incomplete instruction, skip it
-        console.log(`Skipping unclear instruction: ${line}`);
+        console.log(`⚠️  Incomplete instruction detected: "${line}"`);
+        console.log(`   This appears to be incomplete. Expected format: 'Change "old text" to "new text"'`);
         return null;
     }
     
@@ -238,33 +238,36 @@ function applyReplaceInstructionImproved(doc, instruction) {
         if (paragraphText.includes(find)) {
             console.log(`Found target text in paragraph ${i}: "${paragraphText}"`);
             
+            // Extract formatting from the first run in the paragraph
+            const runs = paragraph.getElementsByTagName('w:r');
+            const formatProperties = runs.length > 0 ? extractRunProperties(runs[0]) : null;
+            
             // Create new runs for the replacement
             const beforeText = paragraphText.substring(0, paragraphText.indexOf(find));
             const afterText = paragraphText.substring(paragraphText.indexOf(find) + find.length);
             
             // Clear all existing runs in this paragraph
-            const runs = paragraph.getElementsByTagName('w:r');
             for (let j = runs.length - 1; j >= 0; j--) {
                 paragraph.removeChild(runs[j]);
             }
             
             // Add before text if any
             if (beforeText) {
-                const beforeRun = createTextRun(doc, beforeText);
+                const beforeRun = createTextRun(doc, beforeText, formatProperties);
                 paragraph.appendChild(beforeRun);
             }
             
             // Add deletion run
-            const deleteRun = createDeleteRun(doc, find);
+            const deleteRun = createDeleteRun(doc, find, formatProperties);
             paragraph.appendChild(deleteRun);
             
             // Add insertion run
-            const insertRun = createInsertRun(doc, replace);
+            const insertRun = createInsertRun(doc, replace, formatProperties);
             paragraph.appendChild(insertRun);
             
             // Add after text if any
             if (afterText) {
-                const afterRun = createTextRun(doc, afterText);
+                const afterRun = createTextRun(doc, afterText, formatProperties);
                 paragraph.appendChild(afterRun);
             }
             
@@ -299,29 +302,32 @@ function applyDeleteInstructionImproved(doc, instruction) {
         if (paragraphText.includes(find)) {
             console.log(`Found target text to delete in paragraph ${i}: "${paragraphText}"`);
             
+            // Extract formatting from the first run in the paragraph
+            const runs = paragraph.getElementsByTagName('w:r');
+            const formatProperties = runs.length > 0 ? extractRunProperties(runs[0]) : null;
+            
             // Create new runs for the deletion
             const beforeText = paragraphText.substring(0, paragraphText.indexOf(find));
             const afterText = paragraphText.substring(paragraphText.indexOf(find) + find.length);
             
             // Clear all existing runs in this paragraph
-            const runs = paragraph.getElementsByTagName('w:r');
             for (let j = runs.length - 1; j >= 0; j--) {
                 paragraph.removeChild(runs[j]);
             }
             
             // Add before text if any
             if (beforeText) {
-                const beforeRun = createTextRun(doc, beforeText);
+                const beforeRun = createTextRun(doc, beforeText, formatProperties);
                 paragraph.appendChild(beforeRun);
             }
             
             // Add deletion run
-            const deleteRun = createDeleteRun(doc, find);
+            const deleteRun = createDeleteRun(doc, find, formatProperties);
             paragraph.appendChild(deleteRun);
             
             // Add after text if any
             if (afterText) {
-                const afterRun = createTextRun(doc, afterText);
+                const afterRun = createTextRun(doc, afterText, formatProperties);
                 paragraph.appendChild(afterRun);
             }
             
@@ -479,10 +485,24 @@ function getParagraphText(paragraph) {
 }
 
 /**
- * Create a normal text run
+ * Extract formatting properties from an existing run
  */
-function createTextRun(doc, text) {
+function extractRunProperties(run) {
+    const properties = run.getElementsByTagName('w:rPr');
+    return properties.length > 0 ? properties[0].cloneNode(true) : null;
+}
+
+/**
+ * Create a normal text run with optional formatting
+ */
+function createTextRun(doc, text, formatProperties = null) {
     const run = doc.createElement('w:r');
+    
+    // Copy formatting if provided
+    if (formatProperties) {
+        run.appendChild(formatProperties.cloneNode(true));
+    }
+    
     const textElement = doc.createElement('w:t');
     textElement.appendChild(doc.createTextNode(text));
     run.appendChild(textElement);
@@ -490,15 +510,21 @@ function createTextRun(doc, text) {
 }
 
 /**
- * Create a deletion run for track changes
+ * Create a deletion run for track changes with formatting
  */
-function createDeleteRun(doc, text) {
+function createDeleteRun(doc, text, formatProperties = null) {
     const deleteRun = doc.createElement('w:del');
     deleteRun.setAttribute('w:id', generateId());
     deleteRun.setAttribute('w:author', 'Redline Processor');
     deleteRun.setAttribute('w:date', new Date().toISOString());
     
     const run = doc.createElement('w:r');
+    
+    // Copy formatting if provided
+    if (formatProperties) {
+        run.appendChild(formatProperties.cloneNode(true));
+    }
+    
     const deleteText = doc.createElement('w:delText');
     deleteText.appendChild(doc.createTextNode(text));
     run.appendChild(deleteText);
@@ -508,15 +534,21 @@ function createDeleteRun(doc, text) {
 }
 
 /**
- * Create an insertion run for track changes
+ * Create an insertion run for track changes with formatting
  */
-function createInsertRun(doc, text) {
+function createInsertRun(doc, text, formatProperties = null) {
     const insertRun = doc.createElement('w:ins');
     insertRun.setAttribute('w:id', generateId());
     insertRun.setAttribute('w:author', 'Redline Processor');
     insertRun.setAttribute('w:date', new Date().toISOString());
     
     const run = doc.createElement('w:r');
+    
+    // Copy formatting if provided
+    if (formatProperties) {
+        run.appendChild(formatProperties.cloneNode(true));
+    }
+    
     const textElement = doc.createElement('w:t');
     textElement.appendChild(doc.createTextNode(text));
     run.appendChild(textElement);
