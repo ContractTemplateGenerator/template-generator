@@ -11,6 +11,7 @@ const path = require('path');
 const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 const { processWordDocument } = require('./wordProcessor');
+const { spawn } = require('child_process');
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -97,8 +98,8 @@ Change "PTO in accordance with California law and Company policy" to "PTO at the
         console.log('Using test document:', testDocPath);
         console.log('Test instructions:', testInstructions);
         
-        // Process the document
-        const processedFilePath = await processWordDocument(
+        // Process the document with Python (MCP-like capabilities)
+        const processedFilePath = await processPythonRedlines(
             testDocPath,
             testInstructions,
             processedDir
@@ -132,7 +133,118 @@ Change "PTO in accordance with California law and Company policy" to "PTO at the
     }
 });
 
-// Process redlines endpoint
+/**
+ * Process document using Python-based processor (with python-docx)
+ */
+async function processPythonRedlines(inputPath, instructions, outputDir) {
+    return new Promise((resolve, reject) => {
+        const outputFileName = `python_processed_${uuidv4()}.docx`;
+        const outputPath = path.join(outputDir, outputFileName);
+        
+        const pythonProcess = spawn('python3', [
+            path.join(__dirname, 'word_processor_python.py'),
+            inputPath,
+            outputPath,
+            '--instructions', instructions
+        ]);
+        
+        let stdout = '';
+        let stderr = '';
+        
+        pythonProcess.stdout.on('data', (data) => {
+            stdout += data.toString();
+        });
+        
+        pythonProcess.stderr.on('data', (data) => {
+            stderr += data.toString();
+        });
+        
+        pythonProcess.on('close', (code) => {
+            if (code === 0) {
+                try {
+                    // Parse the JSON output from Python script
+                    const lines = stdout.trim().split('\n');
+                    const jsonLine = lines[lines.length - 1]; // Last line should be JSON
+                    const result = JSON.parse(jsonLine);
+                    
+                    if (result.success) {
+                        resolve(outputPath);
+                    } else {
+                        reject(new Error(result.error || 'Python processing failed'));
+                    }
+                } catch (parseError) {
+                    reject(new Error(`Failed to parse Python output: ${parseError.message}`));
+                }
+            } else {
+                reject(new Error(`Python process failed with code ${code}: ${stderr}`));
+            }
+        });
+    });
+}
+
+// Process redlines endpoint with Python backend (NEW!)
+app.post('/process-redlines-python', upload.single('wordDocument'), async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({
+                error: 'No Word document uploaded'
+            });
+        }
+
+        const { redlineInstructions } = req.body;
+        
+        if (!redlineInstructions || redlineInstructions.trim() === '') {
+            return res.status(400).json({
+                error: 'No redline instructions provided'
+            });
+        }
+
+        console.log(`Processing file with Python: ${req.file.filename}`);
+        console.log(`Instructions: ${redlineInstructions}`);
+
+        // Process the document with Python
+        const processedFilePath = await processPythonRedlines(
+            req.file.path,
+            redlineInstructions,
+            processedDir
+        );
+
+        // Send the processed file
+        const filename = `python_redlined_${req.file.originalname}`;
+        
+        res.download(processedFilePath, filename, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                res.status(500).json({ error: 'Failed to download processed file' });
+            }
+            
+            // Clean up files after download
+            setTimeout(() => {
+                try {
+                    fs.unlinkSync(req.file.path); // Remove uploaded file
+                    fs.unlinkSync(processedFilePath); // Remove processed file
+                } catch (cleanupError) {
+                    console.error('Cleanup error:', cleanupError);
+                }
+            }, 5000); // Clean up after 5 seconds
+        });
+
+    } catch (error) {
+        console.error('Python processing error:', error);
+        
+        // Clean up uploaded file on error
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
+        
+        res.status(500).json({
+            error: 'Failed to process document with Python backend',
+            details: error.message
+        });
+    }
+});
+
+// Process redlines endpoint (original)
 app.post('/process-redlines', upload.single('wordDocument'), async (req, res) => {
     try {
         if (!req.file) {

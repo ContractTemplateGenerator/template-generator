@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const file = fileInput.files[0];
         const instructions = document.getElementById('redlineInstructions').value.trim();
+        const engine = document.getElementById('processingEngine').value;
         
         // Validation
         if (!file) {
@@ -73,7 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Start processing
         setProcessingState(true);
-        showStatus('Processing your document...', 'info');
+        const engineName = engine === 'python' ? 'Python (MCP-like)' : 'JavaScript';
+        showStatus(`Processing your document with ${engineName} engine...`, 'info');
         showProgress(true);
 
         try {
@@ -82,8 +84,11 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('wordDocument', file);
             formData.append('redlineInstructions', instructions);
 
+            // Choose endpoint based on engine
+            const endpoint = engine === 'python' ? '/process-redlines-python' : '/process-redlines';
+
             // Send request
-            const response = await fetch('/process-redlines', {
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 body: formData
             });
