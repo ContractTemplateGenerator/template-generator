@@ -80,15 +80,41 @@ function parseInstruction(line) {
     const original = line;
     
     // Pattern: Change "old" to "new" [context]
-    const changePattern = /^change\s+"([^"]+)"\s+to\s+"([^"]+)"(?:\s+(.+))?$/i;
-    const changeMatch = line.match(changePattern);
-    if (changeMatch) {
+    const changePattern1 = /^change\s+"([^"]+)"\s+to\s+"([^"]+)"(?:\s+(.+))?$/i;
+    const changeMatch1 = line.match(changePattern1);
+    if (changeMatch1) {
         return {
             type: 'replace',
             original: original,
-            find: changeMatch[1],
-            replace: changeMatch[2],
-            context: changeMatch[3] || null
+            find: changeMatch1[1],
+            replace: changeMatch1[2],
+            context: changeMatch1[3] || null
+        };
+    }
+    
+    // Pattern: Change [text] to [text] (without quotes)
+    const changePattern2 = /^change\s+(.+?)\s+to\s+(.+?)$/i;
+    const changeMatch2 = line.match(changePattern2);
+    if (changeMatch2 && !line.includes('"')) {
+        return {
+            type: 'replace',
+            original: original,
+            find: changeMatch2[1].trim(),
+            replace: changeMatch2[2].trim(),
+            context: null
+        };
+    }
+    
+    // Pattern: Section X change - "old" to "new"
+    const sectionChangePattern = /^section\s+\d+\s+change\s*-\s*"([^"]+)"\s+to\s+"([^"]+)"$/i;
+    const sectionMatch = line.match(sectionChangePattern);
+    if (sectionMatch) {
+        return {
+            type: 'replace',
+            original: original,
+            find: sectionMatch[1],
+            replace: sectionMatch[2],
+            context: null
         };
     }
     
@@ -129,6 +155,13 @@ function parseInstruction(line) {
         };
     }
     
+    // Pattern: Simple format like "Section 2 $40.00 per hour" (interpreted as text to find)
+    if (line.toLowerCase().includes('section') && !line.toLowerCase().includes('change') && !line.toLowerCase().includes('to')) {
+        // This is probably incomplete instruction, skip it
+        console.log(`Skipping unclear instruction: ${line}`);
+        return null;
+    }
+    
     return null;
 }
 
@@ -138,18 +171,15 @@ function parseInstruction(line) {
 function applyRedlineInstructions(doc, instructions) {
     console.log('Applying redline instructions...');
     
-    // Get all text nodes in the document
-    const textNodes = getTextNodes(doc);
-    
     for (const instruction of instructions) {
         console.log(`Processing: ${instruction.original}`);
         
         switch (instruction.type) {
             case 'replace':
-                applyReplaceInstruction(doc, textNodes, instruction);
+                applyReplaceInstructionImproved(doc, instruction);
                 break;
             case 'delete':
-                applyDeleteInstruction(doc, textNodes, instruction);
+                applyDeleteInstructionImproved(doc, instruction);
                 break;
             case 'add':
                 applyAddInstruction(doc, instruction);
@@ -183,59 +213,120 @@ function getTextNodes(doc) {
 }
 
 /**
- * Apply a replace instruction with track changes
+ * Apply a replace instruction with track changes - Improved version
  */
-function applyReplaceInstruction(doc, textNodes, instruction) {
+function applyReplaceInstructionImproved(doc, instruction) {
     const { find, replace } = instruction;
+    console.log(`Looking for: "${find}" to replace with: "${replace}"`);
     
-    for (const textNode of textNodes) {
-        const text = textNode.nodeValue;
-        if (text.includes(find)) {
-            // Create track changes for replacement
-            const parent = textNode.parentNode;
-            const grandParent = parent.parentNode;
+    // Get document text content for searching
+    const documentText = getDocumentText(doc);
+    console.log(`Document contains ${documentText.length} characters`);
+    
+    if (!documentText.includes(find)) {
+        console.log(`Text "${find}" not found in document`);
+        return;
+    }
+    
+    // Find all paragraphs in the document
+    const paragraphs = doc.getElementsByTagName('w:p');
+    
+    for (let i = 0; i < paragraphs.length; i++) {
+        const paragraph = paragraphs[i];
+        const paragraphText = getParagraphText(paragraph);
+        
+        if (paragraphText.includes(find)) {
+            console.log(`Found target text in paragraph ${i}: "${paragraphText}"`);
             
-            // Split the text and create tracked changes
-            const beforeText = text.substring(0, text.indexOf(find));
-            const afterText = text.substring(text.indexOf(find) + find.length);
+            // Create new runs for the replacement
+            const beforeText = paragraphText.substring(0, paragraphText.indexOf(find));
+            const afterText = paragraphText.substring(paragraphText.indexOf(find) + find.length);
             
-            // Clear the original text node
-            textNode.nodeValue = beforeText;
-            
-            // Create deletion markup for original text
-            const deleteRun = doc.createElement('w:del');
-            deleteRun.setAttribute('w:id', generateId());
-            deleteRun.setAttribute('w:author', 'Redline Processor');
-            deleteRun.setAttribute('w:date', new Date().toISOString());
-            
-            const deleteText = doc.createElement('w:delText');
-            deleteText.appendChild(doc.createTextNode(find));
-            deleteRun.appendChild(deleteText);
-            
-            // Create insertion markup for new text
-            const insertRun = doc.createElement('w:ins');
-            insertRun.setAttribute('w:id', generateId());
-            insertRun.setAttribute('w:author', 'Redline Processor');
-            insertRun.setAttribute('w:date', new Date().toISOString());
-            
-            const insertText = doc.createElement('w:t');
-            insertText.appendChild(doc.createTextNode(replace));
-            insertRun.appendChild(insertText);
-            
-            // Insert the track changes into the document
-            if (grandParent) {
-                grandParent.insertBefore(deleteRun, parent.nextSibling);
-                grandParent.insertBefore(insertRun, deleteRun.nextSibling);
-                
-                // Add remaining text if any
-                if (afterText) {
-                    const afterTextNode = doc.createElement('w:t');
-                    afterTextNode.appendChild(doc.createTextNode(afterText));
-                    grandParent.insertBefore(afterTextNode, insertRun.nextSibling);
-                }
+            // Clear all existing runs in this paragraph
+            const runs = paragraph.getElementsByTagName('w:r');
+            for (let j = runs.length - 1; j >= 0; j--) {
+                paragraph.removeChild(runs[j]);
             }
             
-            break; // Only replace first occurrence per text node
+            // Add before text if any
+            if (beforeText) {
+                const beforeRun = createTextRun(doc, beforeText);
+                paragraph.appendChild(beforeRun);
+            }
+            
+            // Add deletion run
+            const deleteRun = createDeleteRun(doc, find);
+            paragraph.appendChild(deleteRun);
+            
+            // Add insertion run
+            const insertRun = createInsertRun(doc, replace);
+            paragraph.appendChild(insertRun);
+            
+            // Add after text if any
+            if (afterText) {
+                const afterRun = createTextRun(doc, afterText);
+                paragraph.appendChild(afterRun);
+            }
+            
+            console.log(`Successfully replaced "${find}" with "${replace}"`);
+            break; // Only replace first occurrence
+        }
+    }
+}
+
+/**
+ * Apply a delete instruction with track changes - Improved version
+ */
+function applyDeleteInstructionImproved(doc, instruction) {
+    const { find } = instruction;
+    console.log(`Looking to delete: "${find}"`);
+    
+    // Get document text content for searching
+    const documentText = getDocumentText(doc);
+    
+    if (!documentText.includes(find)) {
+        console.log(`Text "${find}" not found in document`);
+        return;
+    }
+    
+    // Find all paragraphs in the document
+    const paragraphs = doc.getElementsByTagName('w:p');
+    
+    for (let i = 0; i < paragraphs.length; i++) {
+        const paragraph = paragraphs[i];
+        const paragraphText = getParagraphText(paragraph);
+        
+        if (paragraphText.includes(find)) {
+            console.log(`Found target text to delete in paragraph ${i}: "${paragraphText}"`);
+            
+            // Create new runs for the deletion
+            const beforeText = paragraphText.substring(0, paragraphText.indexOf(find));
+            const afterText = paragraphText.substring(paragraphText.indexOf(find) + find.length);
+            
+            // Clear all existing runs in this paragraph
+            const runs = paragraph.getElementsByTagName('w:r');
+            for (let j = runs.length - 1; j >= 0; j--) {
+                paragraph.removeChild(runs[j]);
+            }
+            
+            // Add before text if any
+            if (beforeText) {
+                const beforeRun = createTextRun(doc, beforeText);
+                paragraph.appendChild(beforeRun);
+            }
+            
+            // Add deletion run
+            const deleteRun = createDeleteRun(doc, find);
+            paragraph.appendChild(deleteRun);
+            
+            // Add after text if any
+            if (afterText) {
+                const afterRun = createTextRun(doc, afterText);
+                paragraph.appendChild(afterRun);
+            }
+            
+            console.log(`Successfully deleted "${find}"`);
+            break; // Only delete first occurrence
         }
     }
 }
@@ -346,6 +437,92 @@ function updateDocumentSettings(zip) {
     } catch (error) {
         console.error('Error updating document settings:', error);
     }
+}
+
+/**
+ * Get all text content from the document
+ */
+function getDocumentText(doc) {
+    let text = '';
+    const textNodes = getTextNodes(doc);
+    for (const node of textNodes) {
+        text += node.nodeValue || '';
+    }
+    return text;
+}
+
+/**
+ * Get text content from a paragraph
+ */
+function getParagraphText(paragraph) {
+    let text = '';
+    const textNodes = [];
+    
+    function traverseNode(node) {
+        if (node.nodeType === 3) { // Text node
+            if (node.nodeValue) {
+                textNodes.push(node);
+            }
+        } else if (node.childNodes) {
+            for (let i = 0; i < node.childNodes.length; i++) {
+                traverseNode(node.childNodes[i]);
+            }
+        }
+    }
+    
+    traverseNode(paragraph);
+    
+    for (const node of textNodes) {
+        text += node.nodeValue || '';
+    }
+    return text;
+}
+
+/**
+ * Create a normal text run
+ */
+function createTextRun(doc, text) {
+    const run = doc.createElement('w:r');
+    const textElement = doc.createElement('w:t');
+    textElement.appendChild(doc.createTextNode(text));
+    run.appendChild(textElement);
+    return run;
+}
+
+/**
+ * Create a deletion run for track changes
+ */
+function createDeleteRun(doc, text) {
+    const deleteRun = doc.createElement('w:del');
+    deleteRun.setAttribute('w:id', generateId());
+    deleteRun.setAttribute('w:author', 'Redline Processor');
+    deleteRun.setAttribute('w:date', new Date().toISOString());
+    
+    const run = doc.createElement('w:r');
+    const deleteText = doc.createElement('w:delText');
+    deleteText.appendChild(doc.createTextNode(text));
+    run.appendChild(deleteText);
+    deleteRun.appendChild(run);
+    
+    return deleteRun;
+}
+
+/**
+ * Create an insertion run for track changes
+ */
+function createInsertRun(doc, text) {
+    const insertRun = doc.createElement('w:ins');
+    insertRun.setAttribute('w:id', generateId());
+    insertRun.setAttribute('w:author', 'Redline Processor');
+    insertRun.setAttribute('w:date', new Date().toISOString());
+    
+    const run = doc.createElement('w:r');
+    const textElement = doc.createElement('w:t');
+    textElement.appendChild(doc.createTextNode(text));
+    run.appendChild(textElement);
+    insertRun.appendChild(run);
+    
+    return insertRun;
 }
 
 /**
