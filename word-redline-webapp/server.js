@@ -77,6 +77,61 @@ app.get('/health', (req, res) => {
     });
 });
 
+// One-click test endpoint
+app.post('/test-redlines', async (req, res) => {
+    try {
+        console.log('Processing one-click test...');
+        
+        // Use the pre-created test document
+        const testDocPath = path.join(__dirname, 'test-document.docx');
+        if (!fs.existsSync(testDocPath)) {
+            throw new Error('Test document not found');
+        }
+        
+        // Default test instructions
+        const testInstructions = `Change "Company" to "Client"
+Change "Consultant" to "Contractor"
+Change "$5,000" to "$7,500"
+Change "60 days" to "90 days"`;
+        
+        console.log('Using test document:', testDocPath);
+        console.log('Test instructions:', testInstructions);
+        
+        // Process the document
+        const processedFilePath = await processWordDocument(
+            testDocPath,
+            testInstructions,
+            processedDir
+        );
+        
+        // Send the processed file
+        const filename = 'test-redlined-document.docx';
+        
+        res.download(processedFilePath, filename, (err) => {
+            if (err) {
+                console.error('Download error:', err);
+                res.status(500).json({ error: 'Failed to download test file' });
+            }
+            
+            // Clean up processed file after download
+            setTimeout(() => {
+                try {
+                    fs.unlinkSync(processedFilePath);
+                } catch (cleanupError) {
+                    console.error('Cleanup error:', cleanupError);
+                }
+            }, 5000);
+        });
+        
+    } catch (error) {
+        console.error('Test processing error:', error);
+        res.status(500).json({
+            error: 'Failed to process test document',
+            details: error.message
+        });
+    }
+});
+
 // Process redlines endpoint
 app.post('/process-redlines', upload.single('wordDocument'), async (req, res) => {
     try {

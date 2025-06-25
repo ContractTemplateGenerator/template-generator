@@ -10,6 +10,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const processBtn = document.getElementById('processBtn');
     const btnText = document.getElementById('btnText');
     const btnLoader = document.getElementById('btnLoader');
+    const testBtn = document.getElementById('testBtn');
+    const testBtnText = document.getElementById('testBtnText');
+    const testBtnLoader = document.getElementById('testBtnLoader');
     const statusMessage = document.getElementById('statusMessage');
     const progressBar = document.getElementById('progressBar');
 
@@ -108,6 +111,49 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // One-click test button
+    testBtn.addEventListener('click', async function(e) {
+        e.preventDefault();
+        
+        console.log('Starting one-click test...');
+        
+        // Start processing
+        setTestProcessingState(true);
+        showStatus('Running one-click test with sample document...', 'info');
+        showProgress(true);
+
+        try {
+            // Send test request
+            const response = await fetch('/test-redlines', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || `Server error: ${response.status}`);
+            }
+
+            // Get the processed file
+            const blob = await response.blob();
+            const filename = getFilenameFromResponse(response) || 'test-redlined-document.docx';
+
+            // Download the file
+            downloadFile(blob, filename);
+            
+            showStatus(`✅ Test completed! Downloaded: ${filename}`, 'success');
+            
+        } catch (error) {
+            console.error('Test processing error:', error);
+            showStatus(`❌ Test Error: ${error.message}`, 'error');
+        } finally {
+            setTestProcessingState(false);
+            showProgress(false);
+        }
+    });
+
     // Helper functions
     function showStatus(message, type) {
         statusMessage.textContent = message;
@@ -135,6 +181,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else {
             btnText.style.display = 'inline';
             btnLoader.style.display = 'none';
+        }
+    }
+
+    function setTestProcessingState(processing) {
+        testBtn.disabled = processing;
+        
+        if (processing) {
+            testBtnText.style.display = 'none';
+            testBtnLoader.style.display = 'inline-block';
+        } else {
+            testBtnText.style.display = 'inline';
+            testBtnLoader.style.display = 'none';
         }
     }
 

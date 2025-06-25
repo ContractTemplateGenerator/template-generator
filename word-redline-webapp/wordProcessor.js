@@ -165,20 +165,20 @@ function applyRedlineInstructions(doc, instructions) {
  */
 function getTextNodes(doc) {
     const textNodes = [];
-    const walker = doc.createTreeWalker(
-        doc,
-        4, // NodeFilter.SHOW_TEXT
-        null,
-        false
-    );
     
-    let node;
-    while (node = walker.nextNode()) {
-        if (node.nodeValue && node.nodeValue.trim()) {
-            textNodes.push(node);
+    function traverseNode(node) {
+        if (node.nodeType === 3) { // Text node
+            if (node.nodeValue && node.nodeValue.trim()) {
+                textNodes.push(node);
+            }
+        } else if (node.childNodes) {
+            for (let i = 0; i < node.childNodes.length; i++) {
+                traverseNode(node.childNodes[i]);
+            }
         }
     }
     
+    traverseNode(doc);
     return textNodes;
 }
 
