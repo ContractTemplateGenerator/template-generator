@@ -69,14 +69,16 @@ const TenantDepositGenerator = () => {
     const [eSignLoading, setESignLoading] = useState(false);
     const previewRef = useRef(null);
     
-    // Form data state - comprehensive
+    // Streamlined form data state - progressive disclosure
     const [formData, setFormData] = useState({
-        // Tab 1: Property & Tenancy Details
+        // Essential info (collected progressively)
         tenantName: '',
-        tenantCurrentAddress: '',
-        tenantCity: '',
-        tenantState: 'CA',
-        tenantZip: '',
+        landlordName: '',
+        landlordCompany: '',
+        landlordAddress: '',
+        landlordCity: '',
+        landlordState: 'CA',
+        landlordZip: '',
         rentalAddress: '',
         rentalUnit: '',
         rentalCity: '',
@@ -85,82 +87,34 @@ const TenantDepositGenerator = () => {
         leaseStartDate: '',
         leaseEndDate: '',
         moveOutDate: '',
-        keyReturnDate: '',
-        forwardingAddressDate: '',
-        forwardingAddressMethod: 'email',
-        landlordName: '',
-        landlordCompany: '',
-        landlordAddress: '',
-        landlordCity: '',
-        landlordState: 'CA',
-        landlordZip: '',
-        landlordEmail: '',
         
-        // Tab 2: Deposit & Deductions
-        securityDeposit: '',
-        petDeposit: '',
-        cleaningDeposit: '',
-        itemizedStatementReceived: 'not-received',
-        itemizedStatementDate: '',
+        // Scenario selection and details
+        primaryScenario: '', // 'complete-non-return' or 'partial-non-return'
         
-        // Disputed deduction categories
-        normalWearCharges: false,
-        excessiveCleaningFees: false,
-        paintingCosts: false,
-        carpetReplacement: false,
-        unpaidRentDisputes: false,
-        keyReplacement: false,
-        preexistingDamage: false,
-        otherDeductions: false,
-        otherDeductionsText: '',
+        // Deposit amounts (asked in scenarios)
+        totalDepositAmount: '',
+        amountReturned: '', // only for partial
         
-        // Tab 3: Legal Violations
-        priorCommunications: false,
-        priorCommunicationsDescription: '',
+        // What happened details
+        landlordCommunication: '', // 'no-response', 'verbal-only', 'written-inadequate', 'written-disputed'
+        landlordJustifications: [], // array of justification types
+        disputedCharges: [], // array of disputed charge types
         
         // Evidence available
-        evidenceMoveInPhotos: false,
-        evidenceReceipts: false,
-        evidenceCommunications: false,
-        evidenceWitnesses: false,
-        evidenceInspectionReport: false,
-        evidenceOther: false,
-        evidenceOtherText: '',
+        evidenceTypes: [], // array of evidence types
+        evidenceDetails: '',
         
-        // Tab 4: Letter Tone & Delivery
+        // Letter preferences
         letterTone: 'firm',
-        deliveryMethod: 'email',
-        ccRecipients: false,
-        ccRecipientsText: '',
-        
-        // Tab 5: Review & Finalize
         responseDeadline: 14,
         includeSmallClaimsThreat: true,
-        requestAttorneyFees: true,
-        
-        // Multiple scenario selections (some mutually exclusive)
-        selectedScenarios: [],
-        // Step-by-step answers for all scenarios
-        totalDepositAmount: '',
-        amountReturned: '',
-        landlordJustifications: '',
-        landlordJustificationDetails: [],
-        
-        // Additional scenario-specific fields
-        excessiveChargeAmount: '',
-        excessiveChargeTypes: [],
-        tenancyLength: '',
-        communicationAttempts: '',
-        propertyCondition: ''
+        requestAttorneyFees: true
     });
 
-    // Tab definitions
+    // Simplified tab definitions
     const tabs = [
-        { id: 'scenarios', label: 'Letter Scenarios', icon: 'zap' },
-        { id: 'property', label: 'Property & Tenancy', icon: 'home' },
-        { id: 'deposits', label: 'Deposit & Deductions', icon: 'dollar-sign' },
-        { id: 'violations', label: 'Legal Violations', icon: 'alert-triangle' },
-        { id: 'assessment', label: 'Case Assessment', icon: 'shield-check' }
+        { id: 'scenarios', label: 'Your Situation', icon: 'message-circle' },
+        { id: 'details', label: 'Details', icon: 'edit-3' }
     ];
 
     // Update form data and trigger highlighting (Stripe-style implementation)
@@ -176,50 +130,33 @@ const TenantDepositGenerator = () => {
     const getSectionToHighlight = () => {
         if (!lastChanged) return null;
         
-        switch (currentTab) {
-            case 0: // Scenarios
-                if (['letterTone'].includes(lastChanged)) {
-                    return 'tone-changes'; // Highlight demand statements that change with tone
-                }
-                if (['selectedScenarios'].includes(lastChanged)) {
-                    return 'scenario-content'; // Highlight content that changes with scenarios
-                }
-                if (['totalDepositAmount', 'amountReturned', 'excessiveChargeAmount'].includes(lastChanged)) {
-                    return 'deposit-details';
-                }
-                if (['landlordJustifications', 'communicationAttempts', 'tenancyLength', 'propertyCondition'].includes(lastChanged)) {
-                    return 'scenario-content';
-                }
-                if (['excessiveChargeTypes'].includes(lastChanged)) {
-                    return 'disputed-deductions';
-                }
-                if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
-                    return 'demand-section';
-                }
-                break;
-            case 1: // Property & Tenancy
-                if (['tenantName', 'landlordName', 'rentalAddress'].includes(lastChanged)) {
-                    return 'header-info';
-                }
-                if (['leaseStartDate', 'leaseEndDate', 'moveOutDate', 'securityDeposit'].includes(lastChanged)) {
-                    return 'tenancy-details';
-                }
-                break;
-            case 2: // Deposit & Deductions
-                if (['normalWearCharges', 'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement', 'preexistingDamage'].includes(lastChanged)) {
-                    return 'disputed-deductions';
-                }
-                if (['itemizedStatementReceived'].includes(lastChanged)) {
-                    return 'legal-violation';
-                }
-                break;
-            case 3: // Legal Violations
-                if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
-                    return 'demand-section';
-                }
-                break;
+        // Always highlight content based on what field changed
+        if (['letterTone'].includes(lastChanged)) {
+            return 'tone-changes'; // Highlight demand statements that change with tone
         }
-        return null;
+        if (['primaryScenario'].includes(lastChanged)) {
+            return 'scenario-content'; // Highlight content that changes with scenarios
+        }
+        if (['totalDepositAmount', 'amountReturned'].includes(lastChanged)) {
+            return 'deposit-details';
+        }
+        if (['landlordCommunication', 'landlordJustifications', 'disputedCharges'].includes(lastChanged)) {
+            return 'scenario-content';
+        }
+        if (['evidenceTypes', 'evidenceDetails'].includes(lastChanged)) {
+            return 'evidence-section';
+        }
+        if (['tenantName', 'landlordName', 'rentalAddress'].includes(lastChanged)) {
+            return 'header-info';
+        }
+        if (['leaseStartDate', 'leaseEndDate', 'moveOutDate'].includes(lastChanged)) {
+            return 'tenancy-details';
+        }
+        if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
+            return 'demand-section';
+        }
+        
+        return 'scenario-content'; // Default to scenario content
     };
 
     // Create highlighted text using Stripe-style regex targeting
@@ -233,12 +170,11 @@ const TenantDepositGenerator = () => {
         const sections = {
             'header-info': /Re: Demand for Return of Security Deposit.*?Property: [^\n]*/s,
             'tone-changes': /(I respectfully request|I demand|I hereby demand).*?(?=\.|\n)/s,
-            'scenario-content': /(Tenancy Details:|Legal Violation:|Disputed Deductions:|No Itemization:|Amount Due:).*?(?=\n\n|<p><strong>)/s,
-            'deposit-details': /security deposit.*?\$[\d,]+/gi,
-            'tenancy-details': /Tenancy Details:.*?(?=<p><strong>|\n\n)/s,
-            'legal-violation': /Legal Violation:.*?(?=<p><strong>|\n\n)/s,
-            'disputed-deductions': /Disputed Deductions:.*?(?=<p><strong>|\n\n)/s,
-            'demand-section': /(You have|Demand:).*?days.*?(?=<p>|\n\n)/s
+            'scenario-content': /(Complete Non-Return|Partial Non-Return|What Happened|Evidence Available).*?(?=<p><strong>|$)/s,
+            'deposit-details': /(\$[\d,]+|\d+\.\d+)/g,
+            'tenancy-details': /Tenancy Details:.*?(?=<p><strong>|$)/s,
+            'evidence-section': /Evidence Available:.*?(?=<p><strong>|$)/s,
+            'demand-section': /(You have|Demand:).*?days.*?(?=<p>|$)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -303,7 +239,7 @@ const TenantDepositGenerator = () => {
         ]);
     };
 
-    // Generate comprehensive letter content
+    // Generate streamlined letter content with progressive disclosure
     const generateLetterContent = () => {
         const state = formData.rentalState;
         const stateData = window.STATE_LAWS ? window.STATE_LAWS[state] : null;
@@ -311,12 +247,20 @@ const TenantDepositGenerator = () => {
         if (!stateData) {
             return `
                 <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
-                <p><em>Please complete the form to generate your demand letter...</em></p>
+                <p><em>Please select your situation to generate your demand letter...</em></p>
             `;
         }
         
-        const calculations = window.StateLawUtils.calculateTotalDemand(formData, state);
-        const riskAssessment = window.StateLawUtils.getRiskAssessment(formData, state);
+        // Calculate based on deposit amounts
+        const totalDeposit = parseFloat(formData.totalDepositAmount) || 0;
+        const amountReturned = parseFloat(formData.amountReturned) || 0;
+        const calculations = window.StateLawUtils ? window.StateLawUtils.calculateTotalDemand(formData, state) : {
+            total: totalDeposit,
+            deposits: totalDeposit,
+            penalty: 0,
+            interest: 0,
+            daysPassed: 45
+        };
         
         const today = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -348,86 +292,73 @@ const TenantDepositGenerator = () => {
                 urgencyLevel = "I request";
         }
 
-        
-        // Build scenario-specific content based on selected scenarios and step-by-step answers
-        const selectedScenarios = formData.selectedScenarios || [];
+        // Build scenario-specific content
         let scenarioContent = [];
-        let disputedText = "";
+        let whatHappenedText = "";
+        let evidenceText = "";
         
-        // Complete Non-Return scenario content
-        if (selectedScenarios.includes('complete-non-return')) {
+        // Generate content based on selected scenario
+        if (formData.primaryScenario === 'complete-non-return') {
             scenarioContent.push(`**Complete Non-Return Situation:** You have withheld my entire security deposit of $${formData.totalDepositAmount || '0'}.`);
             
-            if (formData.landlordJustifications === 'no-response') {
-                scenarioContent.push(`You have provided no response or justification for withholding my deposit.`);
-            } else if (formData.landlordJustifications === 'verbal-only') {
-                scenarioContent.push(`You have only provided verbal explanations, failing to meet legal written notice requirements.`);
-            } else if (formData.landlordJustifications === 'written-reasons') {
-                scenarioContent.push(`While you provided written justifications, these deductions are improper under state law.`);
+            // What happened details
+            if (formData.landlordCommunication === 'no-response') {
+                whatHappenedText = `You have provided no response or justification for withholding my deposit, violating your legal obligation to communicate.`;
+            } else if (formData.landlordCommunication === 'verbal-only') {
+                whatHappenedText = `You provided only verbal explanations, failing to meet legal written notice requirements under ${stateData.citation}.`;
+            } else if (formData.landlordCommunication === 'written-inadequate') {
+                whatHappenedText = `The written justification you provided is inadequate and fails to meet state law requirements for itemized deductions.`;
+            } else if (formData.landlordCommunication === 'written-disputed') {
+                whatHappenedText = `While you provided written justifications, I dispute these charges as improper under state law.`;
             }
         }
         
-        // Partial Non-Return scenario content  
-        if (selectedScenarios.includes('partial-non-return')) {
-            const returnedAmount = formData.amountReturned || '0';
-            const totalDeposit = formData.totalDepositAmount || '0';
-            const withheldAmount = (parseFloat(totalDeposit) - parseFloat(returnedAmount)).toFixed(2);
+        if (formData.primaryScenario === 'partial-non-return') {
+            const withheldAmount = (totalDeposit - amountReturned).toFixed(2);
+            scenarioContent.push(`**Partial Non-Return Situation:** While you returned $${formData.amountReturned || '0'} of my $${formData.totalDepositAmount || '0'} security deposit, you improperly withheld $${withheldAmount}.`);
             
-            scenarioContent.push(`**Partial Non-Return Situation:** While you returned $${returnedAmount} of my $${totalDeposit} security deposit, you improperly withheld $${withheldAmount}.`);
-            
-            if (formData.landlordJustifications === 'no-itemization') {
-                scenarioContent.push(`You failed to provide the required itemized statement of deductions.`);
-            } else if (formData.landlordJustifications === 'inadequate-itemization') {
-                scenarioContent.push(`The itemization you provided is vague and inadequate under state law requirements.`);
-            } else if (formData.landlordJustifications === 'disputed-charges') {
-                scenarioContent.push(`I dispute the charges detailed in your itemization as improper under state law.`);
+            // What happened details for partial return
+            if (formData.landlordCommunication === 'no-response') {
+                whatHappenedText = `You provided no adequate explanation for the withheld amount, violating disclosure requirements.`;
+            } else if (formData.landlordCommunication === 'written-inadequate') {
+                whatHappenedText = `The justification you provided for withholding $${withheldAmount} is inadequate and violates state itemization requirements.`;
+            } else if (formData.landlordCommunication === 'written-disputed') {
+                whatHappenedText = `I dispute the charges used to justify withholding $${withheldAmount} as violations of tenant protection laws.`;
             }
         }
         
-        // Excessive Charges scenario content
-        if (selectedScenarios.includes('excessive-charges')) {
-            scenarioContent.push(`**Excessive Charges:** You charged $${formData.excessiveChargeAmount || '0'} in excessive and improper fees.`);
-            
-            const chargeTypes = formData.excessiveChargeTypes || [];
-            if (chargeTypes.length > 0) {
-                const chargeDescriptions = chargeTypes.map(type => {
-                    switch(type) {
-                        case 'wear-tear-painting': return 'normal wear and tear for painting/wall touch-ups';
-                        case 'wear-tear-carpet': return 'normal carpet wear';
-                        case 'wear-tear-holes': return 'small nail holes from pictures';
-                        case 'cleaning-professional': return 'unnecessary professional cleaning';
-                        case 'cleaning-carpet': return 'full carpet replacement for minor stains';
-                        case 'repairs-minor': return 'minor maintenance charged as major repairs';
-                        case 'preexisting-damage': return 'pre-existing damage';
-                        default: return type;
-                    }
-                });
-                disputedText = `I specifically dispute the following improper charges: ${chargeDescriptions.join(", ")}.`;
-            }
-            
-            if (formData.tenancyLength === 'over-3-years') {
-                scenarioContent.push(`Having lived in the property for over 3 years, normal wear and tear is legally expected.`);
-            } else if (formData.tenancyLength === '1-3-years') {
-                scenarioContent.push(`During my 1-3 year tenancy, any wear is normal and legally non-chargeable.`);
-            }
-            
-            if (formData.propertyCondition === 'excellent') {
-                scenarioContent.push(`I left the property in excellent condition with professional cleaning completed.`);
-            } else if (formData.propertyCondition === 'good') {
-                scenarioContent.push(`I left the property in good condition with normal cleaning completed.`);
-            }
+        // Add disputed charges details
+        if (formData.disputedCharges && formData.disputedCharges.length > 0) {
+            const disputeDescriptions = formData.disputedCharges.map(charge => {
+                switch(charge) {
+                    case 'normal-wear-painting': return 'normal wear and tear (painting)';
+                    case 'normal-wear-carpet': return 'normal carpet wear';
+                    case 'normal-wear-holes': return 'small nail holes';
+                    case 'excessive-cleaning': return 'excessive cleaning fees';
+                    case 'pre-existing-damage': return 'pre-existing damage';
+                    case 'improper-repairs': return 'improper repair charges';
+                    default: return charge;
+                }
+            });
+            whatHappenedText += ` Specifically, I dispute charges for: ${disputeDescriptions.join(", ")}.`;
         }
         
-        // No Itemization scenario content
-        if (selectedScenarios.includes('no-itemization')) {
-            scenarioContent.push(`**Missing Itemization:** You failed to provide the legally required itemized statement of deductions.`);
-            
-            if (formData.communicationAttempts === 'written-requests') {
-                scenarioContent.push(`Despite my written requests for itemization, you have failed to comply.`);
-            } else if (formData.communicationAttempts === 'verbal-requests') {
-                scenarioContent.push(`Despite my requests for itemization, you have failed to provide the required documentation.`);
-            } else if (formData.communicationAttempts === 'no-contact') {
-                scenarioContent.push(`This letter serves as my formal request for the required itemization and deposit return.`);
+        // Add evidence section
+        if (formData.evidenceTypes && formData.evidenceTypes.length > 0) {
+            const evidenceDescriptions = formData.evidenceTypes.map(evidence => {
+                switch(evidence) {
+                    case 'photos': return 'move-in/move-out photos';
+                    case 'receipts': return 'payment receipts and records';
+                    case 'communications': return 'written communications';
+                    case 'witnesses': return 'witness statements';
+                    case 'inspection': return 'inspection reports';
+                    case 'cleaning': return 'professional cleaning receipts';
+                    default: return evidence;
+                }
+            });
+            evidenceText = `**Evidence Available:** I have the following evidence to support my claim: ${evidenceDescriptions.join(", ")}.`;
+            if (formData.evidenceDetails) {
+                evidenceText += ` ${formData.evidenceDetails}`;
             }
         }
         
@@ -487,17 +418,15 @@ Sincerely,`;
             
             <p>${urgencyLevel} the immediate return of my security deposit in the amount of <strong>$${calculations.total.toFixed(2)}</strong>, as required under ${stateData.citation}.</p>
             
-            <p><strong>Tenancy Details:</strong> I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.</p>
+            <p><strong>Tenancy Details:</strong> I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.totalDepositAmount || '0'}.</p>
             
-            <p><strong>Legal Violation:</strong> Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.</p>
+            <p><strong>Legal Violation:</strong> Under ${stateData.citation}, you were required to return my deposit within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed, violating state law.</p>
             
             ${scenarioContent.length > 0 ? scenarioContent.map(content => `<p>${content}</p>`).join('\n            ') : ''}
             
-            ${formData.itemizedStatementReceived === 'not-received' ? 
-                `<p><strong>No Itemization:</strong> You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.</p>` : ''
-            }
+            ${whatHappenedText ? `<p><strong>What Happened:</strong> ${whatHappenedText}</p>` : ''}
             
-            ${disputedText ? `<p><strong>Disputed Deductions:</strong> ${disputedText} These charges violate state law prohibiting deductions for normal wear and tear.</p>` : ''}
+            ${evidenceText ? `<p>${evidenceText}</p>` : ''}
             
             <p><strong>Amount Due:</strong> Due to your non-compliance, you owe statutory penalties totaling <strong>$${calculations.total.toFixed(2)}</strong> (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).</p>
             
@@ -632,129 +561,318 @@ Sincerely,`;
     // Tab content renderers
     const renderScenariosTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
-            // Letter tone section
-            React.createElement('h3', { key: 'tone-title' }, 'Letter Tone'),
-            React.createElement('div', { key: 'tone-options', className: 'radio-group compact-radio-group' }, [
-                createClickableItem('radio', 'letterTone', 'professional', 'Professional', 'Diplomatic approach', formData.letterTone === 'professional'),
-                createClickableItem('radio', 'letterTone', 'firm', 'Firm', 'Business-like tone', formData.letterTone === 'firm'),
-                createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Formal legal notice', formData.letterTone === 'litigation')
+            React.createElement('h3', { key: 'title' }, 'Your Situation'),
+            
+            // Letter tone selection (compact)
+            React.createElement('div', { key: 'tone-section', className: 'form-group' }, [
+                React.createElement('label', { key: 'label' }, 'Letter Tone'),
+                React.createElement('div', { key: 'tone-options', className: 'compact-radio-group' }, [
+                    createClickableItem('radio', 'letterTone', 'professional', 'Professional', 'Respectful but clear', formData.letterTone === 'professional'),
+                    createClickableItem('radio', 'letterTone', 'firm', 'Firm', 'Direct legal demands', formData.letterTone === 'firm'),
+                    createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Strong litigation threats', formData.letterTone === 'litigation')
+                ])
+            ]),
+
+            React.createElement('h4', { key: 'scenarios-title' }, 'What is your situation?'),
+            React.createElement('div', { key: 'help-scenarios', className: 'help-text' }, 'Choose the scenario that best describes your situation. This will guide the rest of the questions.'),
+            
+            // Two main scenarios - radio selection (mutually exclusive)
+            React.createElement('div', { key: 'main-scenarios', className: 'radio-group' }, [
+                createClickableItem('radio', 'primaryScenario', 'complete-non-return', 'Complete Non-Return', 'Landlord has not returned any portion of my security deposit', formData.primaryScenario === 'complete-non-return'),
+                createClickableItem('radio', 'primaryScenario', 'partial-non-return', 'Partial Non-Return', 'Landlord returned some money but withheld the rest improperly', formData.primaryScenario === 'partial-non-return')
             ]),
             
-            // Scenarios section - Radio buttons for mutual exclusivity
-            React.createElement('h3', { key: 'scenarios-title' }, 'Your Situation'),
-            React.createElement('p', { key: 'scenarios-subtitle', className: 'help-text' }, 'Select all scenarios that apply to your situation (you can choose multiple):'),
-            
-            React.createElement('div', { key: 'scenarios-section', className: 'checkbox-grid' }, 
-                scenarios.map(scenario => {
-                    const selectedScenarios = formData.selectedScenarios || [];
-                    const isSelected = selectedScenarios.includes(scenario.id);
-                    return React.createElement('div', { key: scenario.id }, [
-                        createClickableItem('checkbox', 'selectedScenarios', scenario.id, scenario.title, scenario.description, isSelected, '', () => toggleScenario(scenario.id)),
-                        
-                        // Step-by-step questions when scenario is selected
-                        isSelected && scenario.stepByStepQuestions ? React.createElement('div', {
-                            key: 'questions',
-                            className: 'step-by-step-questions'
-                        }, [
-                            React.createElement('h5', { 
-                                key: 'questions-title'
-                            }, [
-                                React.createElement(Icon, { key: 'icon', name: 'help-circle' }),
-                                'Tell us about your situation:'
+            // Progressive disclosure - Complete Non-Return questionnaire
+            formData.primaryScenario === 'complete-non-return' ? 
+                React.createElement('div', { key: 'complete-questions', className: 'step-by-step-questions' }, [
+                    React.createElement('h5', { key: 'title' }, [
+                        React.createElement(Icon, { key: 'icon', name: 'arrow-right' }),
+                        'Complete Non-Return Details'
+                    ]),
+                    
+                    // Deposit amount
+                    React.createElement('div', { key: 'deposit-amount', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'Total security deposit paid'),
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'number',
+                            step: '0.01',
+                            value: formData.totalDepositAmount || '',
+                            onChange: (e) => updateFormData('totalDepositAmount', e.target.value),
+                            placeholder: '0.00'
+                        })
+                    ]),
+                    
+                    // Landlord communication
+                    React.createElement('div', { key: 'communication', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'How has your landlord responded about the deposit?'),
+                        React.createElement('div', { key: 'options', className: 'radio-options' }, [
+                            React.createElement('div', { key: 'no-response', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'no-response',
+                                    checked: formData.landlordCommunication === 'no-response',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'No response/total silence')
                             ]),
-                            ...scenario.stepByStepQuestions.map(question => {
-                                if (question.type === 'number') {
-                                    return React.createElement('div', {
-                                        key: question.field,
-                                        className: 'question-item'
-                                    }, [
-                                        React.createElement('label', {
-                                            key: 'label'
-                                        }, question.label + (question.required ? ' *' : '')),
-                                        React.createElement('input', {
-                                            key: 'input',
-                                            type: 'number',
-                                            step: '0.01',
-                                            value: formData[question.field] || '',
-                                            onChange: (e) => updateFormData(question.field, e.target.value),
-                                            placeholder: '$0.00'
-                                        })
-                                    ]);
-                                } else if (question.type === 'radio' && question.options) {
-                                    return React.createElement('div', {
-                                        key: question.field,
-                                        className: 'question-item'
-                                    }, [
-                                        React.createElement('label', {
-                                            key: 'label'
-                                        }, question.label + (question.required ? ' *' : '')),
-                                        React.createElement('div', {
-                                            key: 'options',
-                                            className: 'radio-options'
-                                        }, question.options.map(option => 
-                                            React.createElement('div', {
-                                                key: option.value,
-                                                className: 'radio-option',
-                                                onClick: () => updateFormData(question.field, option.value)
-                                            }, [
-                                                React.createElement('input', {
-                                                    key: 'input',
-                                                    type: 'radio',
-                                                    name: question.field,
-                                                    value: option.value,
-                                                    checked: formData[question.field] === option.value,
-                                                    onChange: () => updateFormData(question.field, option.value)
-                                                }),
-                                                React.createElement('label', {
-                                                    key: 'label'
-                                                }, option.label)
-                                            ])
-                                        ))
-                                    ]);
-                                } else if (question.type === 'checkbox' && question.options) {
-                                    return React.createElement('div', {
-                                        key: question.field,
-                                        className: 'question-item'
-                                    }, [
-                                        React.createElement('label', {
-                                            key: 'label'
-                                        }, question.label + (question.required ? ' *' : '')),
-                                        React.createElement('div', {
-                                            key: 'options',
-                                            className: 'radio-options'
-                                        }, question.options.map(option => {
-                                            const fieldValue = formData[question.field] || [];
-                                            const isChecked = Array.isArray(fieldValue) ? fieldValue.includes(option.value) : false;
-                                            return React.createElement('div', {
-                                                key: option.value,
-                                                className: 'radio-option',
-                                                onClick: () => {
-                                                    const currentValue = formData[question.field] || [];
-                                                    const newValue = isChecked 
-                                                        ? currentValue.filter(v => v !== option.value)
-                                                        : [...currentValue, option.value];
-                                                    updateFormData(question.field, newValue);
-                                                }
-                                            }, [
-                                                React.createElement('input', {
-                                                    key: 'input',
-                                                    type: 'checkbox',
-                                                    checked: isChecked,
-                                                    onChange: () => {}
-                                                }),
-                                                React.createElement('label', {
-                                                    key: 'label'
-                                                }, option.label)
-                                            ]);
-                                        }))
-                                    ]);
-                                }
-                                return null;
-                            })
+                            React.createElement('div', { key: 'verbal-only', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'verbal-only',
+                                    checked: formData.landlordCommunication === 'verbal-only',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'Verbal explanations only')
+                            ]),
+                            React.createElement('div', { key: 'written-inadequate', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'written-inadequate',
+                                    checked: formData.landlordCommunication === 'written-inadequate',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'Written justifications but inadequate')
+                            ]),
+                            React.createElement('div', { key: 'written-disputed', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'written-disputed',
+                                    checked: formData.landlordCommunication === 'written-disputed',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'Written justifications that I dispute')
+                            ])
+                        ])
+                    ]),
+                    
+                    // Show disputed charges if written-disputed is selected
+                    formData.landlordCommunication === 'written-disputed' ?
+                        React.createElement('div', { key: 'disputed-charges', className: 'question-item' }, [
+                            React.createElement('label', { key: 'label' }, 'What charges do you dispute?'),
+                            React.createElement('div', { key: 'charges', className: 'checkbox-grid' }, [
+                                'normal-wear-painting', 'normal-wear-carpet', 'normal-wear-holes', 
+                                'excessive-cleaning', 'pre-existing-damage', 'improper-repairs'
+                            ].map(charge => {
+                                const currentCharges = formData.disputedCharges || [];
+                                const isChecked = currentCharges.includes(charge);
+                                const labels = {
+                                    'normal-wear-painting': 'Normal wear - Painting/wall touch-ups',
+                                    'normal-wear-carpet': 'Normal wear - Carpet wear',
+                                    'normal-wear-holes': 'Normal wear - Small nail holes',
+                                    'excessive-cleaning': 'Excessive cleaning fees',
+                                    'pre-existing-damage': 'Pre-existing damage',
+                                    'improper-repairs': 'Improper repair charges'
+                                };
+                                
+                                return React.createElement('div', { 
+                                    key: charge, 
+                                    className: `checkbox-item ${isChecked ? 'selected' : ''}`,
+                                    onClick: () => {
+                                        const newCharges = isChecked 
+                                            ? currentCharges.filter(c => c !== charge)
+                                            : [...currentCharges, charge];
+                                        updateFormData('disputedCharges', newCharges);
+                                    }
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'checkbox',
+                                        type: 'checkbox',
+                                        checked: isChecked,
+                                        onChange: () => {}
+                                    }),
+                                    React.createElement('div', { key: 'content', className: 'checkbox-content' }, [
+                                        React.createElement('strong', { key: 'title' }, labels[charge])
+                                    ])
+                                ]);
+                            }))
                         ]) : null
-                    ]);
-                })
-            )
+                ]) : null,
+                
+            // Progressive disclosure - Partial Non-Return questionnaire  
+            formData.primaryScenario === 'partial-non-return' ?
+                React.createElement('div', { key: 'partial-questions', className: 'step-by-step-questions' }, [
+                    React.createElement('h5', { key: 'title' }, [
+                        React.createElement(Icon, { key: 'icon', name: 'arrow-right' }),
+                        'Partial Non-Return Details'
+                    ]),
+                    
+                    // Deposit amounts
+                    React.createElement('div', { key: 'amounts', className: 'form-row' }, [
+                        React.createElement('div', { key: 'total', className: 'question-item' }, [
+                            React.createElement('label', { key: 'label' }, 'Total security deposit paid'),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: 'number',
+                                step: '0.01',
+                                value: formData.totalDepositAmount || '',
+                                onChange: (e) => updateFormData('totalDepositAmount', e.target.value),
+                                placeholder: '0.00'
+                            })
+                        ]),
+                        React.createElement('div', { key: 'returned', className: 'question-item' }, [
+                            React.createElement('label', { key: 'label' }, 'Amount returned to you'),
+                            React.createElement('input', {
+                                key: 'input',
+                                type: 'number',
+                                step: '0.01',
+                                value: formData.amountReturned || '',
+                                onChange: (e) => updateFormData('amountReturned', e.target.value),
+                                placeholder: '0.00'
+                            })
+                        ])
+                    ]),
+                    
+                    // Landlord justifications for partial
+                    React.createElement('div', { key: 'partial-communication', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'What justifications did landlord provide for withholding money?'),
+                        React.createElement('div', { key: 'options', className: 'radio-options' }, [
+                            React.createElement('div', { key: 'no-itemization', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'no-itemization',
+                                    checked: formData.landlordCommunication === 'no-itemization',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'No itemized statement provided')
+                            ]),
+                            React.createElement('div', { key: 'inadequate-itemization', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'inadequate-itemization',
+                                    checked: formData.landlordCommunication === 'inadequate-itemization',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'Vague/incomplete itemization')
+                            ]),
+                            React.createElement('div', { key: 'disputed-charges', className: 'radio-option' }, [
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'radio',
+                                    name: 'landlordCommunication',
+                                    value: 'disputed-charges',
+                                    checked: formData.landlordCommunication === 'disputed-charges',
+                                    onChange: (e) => updateFormData('landlordCommunication', e.target.value)
+                                }),
+                                React.createElement('label', { key: 'label' }, 'Detailed charges I want to dispute')
+                            ])
+                        ])
+                    ]),
+                    
+                    // Show disputed charges for partial non-return if selected
+                    formData.landlordCommunication === 'disputed-charges' ?
+                        React.createElement('div', { key: 'partial-disputed-charges', className: 'question-item' }, [
+                            React.createElement('label', { key: 'label' }, 'What charges do you dispute?'),
+                            React.createElement('div', { key: 'charges', className: 'checkbox-grid' }, [
+                                'normal-wear-painting', 'normal-wear-carpet', 'normal-wear-holes', 
+                                'excessive-cleaning', 'pre-existing-damage', 'improper-repairs'
+                            ].map(charge => {
+                                const currentCharges = formData.disputedCharges || [];
+                                const isChecked = currentCharges.includes(charge);
+                                const labels = {
+                                    'normal-wear-painting': 'Normal wear - Painting/wall touch-ups',
+                                    'normal-wear-carpet': 'Normal wear - Carpet wear', 
+                                    'normal-wear-holes': 'Normal wear - Small nail holes',
+                                    'excessive-cleaning': 'Excessive cleaning fees',
+                                    'pre-existing-damage': 'Pre-existing damage',
+                                    'improper-repairs': 'Improper repair charges'
+                                };
+                                
+                                return React.createElement('div', { 
+                                    key: charge, 
+                                    className: `checkbox-item ${isChecked ? 'selected' : ''}`,
+                                    onClick: () => {
+                                        const newCharges = isChecked 
+                                            ? currentCharges.filter(c => c !== charge)
+                                            : [...currentCharges, charge];
+                                        updateFormData('disputedCharges', newCharges);
+                                    }
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'checkbox',
+                                        type: 'checkbox',
+                                        checked: isChecked,
+                                        onChange: () => {}
+                                    }),
+                                    React.createElement('div', { key: 'content', className: 'checkbox-content' }, [
+                                        React.createElement('strong', { key: 'title' }, labels[charge])
+                                    ])
+                                ]);
+                            }))
+                        ]) : null
+                ]) : null,
+                
+            // Evidence section (shows for both scenarios if one is selected)
+            formData.primaryScenario ?
+                React.createElement('div', { key: 'evidence-section', className: 'step-by-step-questions' }, [
+                    React.createElement('h5', { key: 'title' }, [
+                        React.createElement(Icon, { key: 'icon', name: 'file-text' }),
+                        'Evidence Available'
+                    ]),
+                    
+                    React.createElement('div', { key: 'evidence-types', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'What evidence do you have to support your claim?'),
+                        React.createElement('div', { key: 'evidence', className: 'checkbox-grid' }, [
+                            'photos', 'receipts', 'communications', 'witnesses', 'inspection', 'cleaning'
+                        ].map(evidence => {
+                            const currentEvidence = formData.evidenceTypes || [];
+                            const isChecked = currentEvidence.includes(evidence);
+                            const labels = {
+                                'photos': 'Move-in/move-out photos',
+                                'receipts': 'Payment receipts and records',
+                                'communications': 'Written communications',
+                                'witnesses': 'Witness statements',
+                                'inspection': 'Inspection reports',
+                                'cleaning': 'Professional cleaning receipts'
+                            };
+                            
+                            return React.createElement('div', { 
+                                key: evidence, 
+                                className: `checkbox-item ${isChecked ? 'selected' : ''}`,
+                                onClick: () => {
+                                    const newEvidence = isChecked 
+                                        ? currentEvidence.filter(e => e !== evidence)
+                                        : [...currentEvidence, evidence];
+                                    updateFormData('evidenceTypes', newEvidence);
+                                }
+                            }, [
+                                React.createElement('input', {
+                                    key: 'checkbox',
+                                    type: 'checkbox',
+                                    checked: isChecked,
+                                    onChange: () => {}
+                                }),
+                                React.createElement('div', { key: 'content', className: 'checkbox-content' }, [
+                                    React.createElement('strong', { key: 'title' }, labels[evidence])
+                                ])
+                            ]);
+                        }))
+                    ]),
+                    
+                    // Additional evidence details
+                    React.createElement('div', { key: 'evidence-details', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'Additional evidence details (optional)'),
+                        React.createElement('textarea', {
+                            key: 'textarea',
+                            value: formData.evidenceDetails || '',
+                            onChange: (e) => updateFormData('evidenceDetails', e.target.value),
+                            placeholder: 'Describe any additional evidence or details that strengthen your case...',
+                            rows: 3
+                        })
+                    ])
+                ]) : null
         ]);
     };
 
@@ -1387,14 +1505,207 @@ Sincerely,`;
     };
 
 
+    // Simplified details tab for essential info not covered in progressive disclosure
+    const renderDetailsTab = () => {
+        return React.createElement('div', { className: 'tab-content' }, [
+            React.createElement('h3', { key: 'title' }, 'Essential Details'),
+            React.createElement('div', { key: 'help', className: 'help-text' }, 'Fill in the remaining details needed for your demand letter.'),
+            
+            React.createElement('h4', { key: 'tenant-info' }, 'Your Information'),
+            
+            React.createElement('div', { key: 'tenant-name', className: 'form-group' }, [
+                React.createElement('label', { key: 'label' }, 'Your Full Name'),
+                React.createElement('input', {
+                    key: 'input',
+                    type: 'text',
+                    value: formData.tenantName || '',
+                    onChange: (e) => updateFormData('tenantName', e.target.value),
+                    placeholder: 'Your full legal name'
+                })
+            ]),
+            
+            React.createElement('h4', { key: 'landlord-info' }, 'Landlord Information'),
+            
+            React.createElement('div', { key: 'landlord-details', className: 'form-row' }, [
+                React.createElement('div', { key: 'name', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Landlord Name'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.landlordName || '',
+                        onChange: (e) => updateFormData('landlordName', e.target.value),
+                        placeholder: 'Landlord full name'
+                    })
+                ]),
+                React.createElement('div', { key: 'company', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Company (if applicable)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.landlordCompany || '',
+                        onChange: (e) => updateFormData('landlordCompany', e.target.value),
+                        placeholder: 'Property management company'
+                    })
+                ])
+            ]),
+            
+            React.createElement('div', { key: 'landlord-address', className: 'form-group' }, [
+                React.createElement('label', { key: 'label' }, 'Landlord Mailing Address'),
+                React.createElement('input', {
+                    key: 'input',
+                    type: 'text',
+                    value: formData.landlordAddress || '',
+                    onChange: (e) => updateFormData('landlordAddress', e.target.value),
+                    placeholder: 'Street address'
+                })
+            ]),
+            
+            React.createElement('div', { key: 'landlord-location', className: 'form-row' }, [
+                React.createElement('div', { key: 'city', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'City'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.landlordCity || '',
+                        onChange: (e) => updateFormData('landlordCity', e.target.value),
+                        placeholder: 'City'
+                    })
+                ]),
+                React.createElement('div', { key: 'state', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'State'),
+                    React.createElement('select', {
+                        key: 'select',
+                        value: formData.landlordState || 'CA',
+                        onChange: (e) => updateFormData('landlordState', e.target.value)
+                    }, US_STATES.map(state => 
+                        React.createElement('option', { key: state.value, value: state.value }, state.label)
+                    ))
+                ]),
+                React.createElement('div', { key: 'zip', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'ZIP Code'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.landlordZip || '',
+                        onChange: (e) => updateFormData('landlordZip', e.target.value),
+                        placeholder: 'ZIP'
+                    })
+                ])
+            ]),
+            
+            React.createElement('h4', { key: 'rental-info' }, 'Rental Property'),
+            
+            React.createElement('div', { key: 'rental-address', className: 'form-group' }, [
+                React.createElement('label', { key: 'label' }, 'Rental Property Address'),
+                React.createElement('input', {
+                    key: 'input',
+                    type: 'text',
+                    value: formData.rentalAddress || '',
+                    onChange: (e) => updateFormData('rentalAddress', e.target.value),
+                    placeholder: 'Street address of rental property'
+                })
+            ]),
+            
+            React.createElement('div', { key: 'rental-details', className: 'form-row' }, [
+                React.createElement('div', { key: 'unit', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Unit (if applicable)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.rentalUnit || '',
+                        onChange: (e) => updateFormData('rentalUnit', e.target.value),
+                        placeholder: 'Apt/Unit #'
+                    })
+                ]),
+                React.createElement('div', { key: 'city', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'City'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.rentalCity || '',
+                        onChange: (e) => updateFormData('rentalCity', e.target.value),
+                        placeholder: 'City'
+                    })
+                ]),
+                React.createElement('div', { key: 'state', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'State'),
+                    React.createElement('select', {
+                        key: 'select',
+                        value: formData.rentalState || 'CA',
+                        onChange: (e) => updateFormData('rentalState', e.target.value)
+                    }, US_STATES.map(state => 
+                        React.createElement('option', { key: state.value, value: state.value }, state.label)
+                    ))
+                ])
+            ]),
+            
+            React.createElement('h4', { key: 'dates-info' }, 'Important Dates'),
+            
+            React.createElement('div', { key: 'lease-dates', className: 'form-row' }, [
+                React.createElement('div', { key: 'start', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Lease Start Date'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'date',
+                        value: formData.leaseStartDate || '',
+                        onChange: (e) => updateFormData('leaseStartDate', e.target.value)
+                    })
+                ]),
+                React.createElement('div', { key: 'end', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Lease End Date'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'date',
+                        value: formData.leaseEndDate || '',
+                        onChange: (e) => updateFormData('leaseEndDate', e.target.value)
+                    })
+                ]),
+                React.createElement('div', { key: 'moveout', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Move-Out Date'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'date',
+                        value: formData.moveOutDate || '',
+                        onChange: (e) => updateFormData('moveOutDate', e.target.value)
+                    })
+                ])
+            ]),
+            
+            React.createElement('h4', { key: 'response-info' }, 'Response Preferences'),
+            
+            React.createElement('div', { key: 'response-details', className: 'form-row' }, [
+                React.createElement('div', { key: 'deadline', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Days to respond'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'number',
+                        min: '7',
+                        max: '30',
+                        value: formData.responseDeadline || 14,
+                        onChange: (e) => updateFormData('responseDeadline', e.target.value)
+                    })
+                ]),
+                React.createElement('div', { key: 'threats', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Include legal threats'),
+                    React.createElement('div', { key: 'checkbox' }, [
+                        React.createElement('input', {
+                            key: 'input',
+                            type: 'checkbox',
+                            checked: formData.includeSmallClaimsThreat || false,
+                            onChange: (e) => updateFormData('includeSmallClaimsThreat', e.target.checked)
+                        }),
+                        React.createElement('span', { key: 'text' }, ' Mention small claims court lawsuit')
+                    ])
+                ])
+            ])
+        ]);
+    };
+
     // Main tab content renderer
     const renderTabContent = () => {
         switch (currentTab) {
             case 0: return renderScenariosTab();
-            case 1: return renderPropertyTab();
-            case 2: return renderDepositsTab();
-            case 3: return renderViolationsTab();
-            case 4: return renderAssessmentTab();
+            case 1: return renderDetailsTab();
             default: return renderScenariosTab();
         }
     };
