@@ -157,14 +157,23 @@ const TenantDepositGenerator = () => {
         setTimeout(() => setLastChanged(null), 2000);
     };
 
-    // Auto-scroll to highlighted content
+    // Auto-scroll to highlighted content within preview pane
     useEffect(() => {
         if (lastChanged && previewRef.current) {
             const highlightedElements = previewRef.current.querySelectorAll('.highlight');
             if (highlightedElements.length > 0) {
-                highlightedElements[0].scrollIntoView({ 
-                    behavior: 'smooth', 
-                    block: 'center' 
+                const element = highlightedElements[0];
+                const container = previewRef.current;
+                
+                // Get the position of the highlighted element relative to the container
+                const elementRect = element.getBoundingClientRect();
+                const containerRect = container.getBoundingClientRect();
+                const relativeTop = elementRect.top - containerRect.top;
+                
+                // Scroll the container to center the highlighted element
+                container.scrollTo({
+                    top: container.scrollTop + relativeTop - container.clientHeight / 2,
+                    behavior: 'smooth'
                 });
             }
         }
@@ -555,7 +564,7 @@ const TenantDepositGenerator = () => {
                         onChange: (e) => updateFormData('landlordEmail', e.target.value),
                         placeholder: 'landlord@example.com'
                     }),
-                    React.createElement('div', { key: 'help', className: 'help-text' }, 'Required for electronic signature feature')
+                    React.createElement('div', { key: 'help', className: 'help-text' }, 'Optional - for electronic signature delivery')
                 ])
             ]),
             
@@ -1313,7 +1322,7 @@ const TenantDepositGenerator = () => {
                     React.createElement('button', {
                         key: 'esign',
                         className: 'btn btn-accent',
-                        disabled: eSignLoading || !formData.landlordEmail,
+                        disabled: eSignLoading,
                         onClick: async () => {
                             setESignLoading(true);
                             try {
@@ -1328,7 +1337,7 @@ const TenantDepositGenerator = () => {
                             name: eSignLoading ? 'loader' : 'edit-3',
                             style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
                         }),
-                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'Send for eSignature')
+                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
                     ]),
                     
                     React.createElement('button', {

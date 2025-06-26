@@ -12,19 +12,19 @@ window.generateWordDoc = function(documentText, formData) {
 <title>Security Deposit Demand Letter</title>
 <style>
   body {
-    font-family: Times, "Times New Roman", serif;
+    font-family: Arial, sans-serif;
     font-size: 11pt;
     line-height: 1.5;
     margin: 0;
   }
   h1 {
     text-align: center;
-    font-size: 16pt;
+    font-size: 11pt;
     margin-bottom: 20pt;
     font-weight: bold;
   }
   h2 {
-    font-size: 14pt;
+    font-size: 11pt;
     margin-top: 14pt;
     margin-bottom: 10pt;
     font-weight: bold;
@@ -63,7 +63,7 @@ window.generateWordDoc = function(documentText, formData) {
   }
   .demand-amount {
     font-weight: bold;
-    font-size: 12pt;
+    font-size: 11pt;
   }
   .legal-citation {
     font-style: italic;
