@@ -1261,8 +1261,5 @@ ${formData.ccRecipients && formData.ccRecipientsText ? `
     ]);
 };
 
-// Render the app
-ReactDOM.render(
-    React.createElement(TenantDepositGenerator),
-    document.getElementById('root')
-);
+// Export the component for use in index.html
+window.TenantDepositGenerator = TenantDepositGenerator;

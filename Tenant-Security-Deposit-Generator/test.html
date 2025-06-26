@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .error { color: red; background: #ffebee; padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { color: green; background: #e8f5e8; padding: 10px; margin: 10px 0; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Debug Test</h1>
+    <div id="status"></div>
+    <div id="root"></div>
+
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            statusDiv.appendChild(div);
+            console.log(message);
+        }
+        
+        // Test React loading
+        if (typeof React !== 'undefined') {
+            log('✓ React loaded successfully', 'success');
+        } else {
+            log('✗ React failed to load', 'error');
+        }
+        
+        if (typeof ReactDOM !== 'undefined') {
+            log('✓ ReactDOM loaded successfully', 'success');
+        } else {
+            log('✗ ReactDOM failed to load', 'error');
+        }
+        
+        // Test basic React component
+        try {
+            const TestComponent = () => {
+                return React.createElement('div', null, 'Hello from React!');
+            };
+            
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(TestComponent));
+            log('✓ Basic React component rendered successfully', 'success');
+        } catch (error) {
+            log('✗ React component error: ' + error.message, 'error');
+        }
+    </script>
+    
+    <!-- Test loading individual files -->
+    <script>
+        // Test state-laws.js
+        const script1 = document.createElement('script');
+        script1.src = 'state-laws.js';
+        script1.onload = () => {
+            if (typeof window.STATE_LAWS !== 'undefined') {
+                log('✓ state-laws.js loaded successfully', 'success');
+            } else {
+                log('✗ state-laws.js failed to expose STATE_LAWS', 'error');
+            }
+        };
+        script1.onerror = () => log('✗ Failed to load state-laws.js', 'error');
+        document.head.appendChild(script1);
+        
+        // Test docx-generator.js
+        const script2 = document.createElement('script');
+        script2.src = 'docx-generator.js';
+        script2.onload = () => {
+            if (typeof window.generateWordDoc !== 'undefined') {
+                log('✓ docx-generator.js loaded successfully', 'success');
+            } else {
+                log('✗ docx-generator.js failed to expose generateWordDoc', 'error');
+            }
+        };
+        script2.onerror = () => log('✗ Failed to load docx-generator.js', 'error');
+        document.head.appendChild(script2);
+        
+        // Test tenant-deposit-generator.js
+        const script3 = document.createElement('script');
+        script3.src = 'tenant-deposit-generator.js';
+        script3.onload = () => {
+            if (typeof window.TenantDepositGenerator !== 'undefined') {
+                log('✓ tenant-deposit-generator.js loaded successfully', 'success');
+            } else {
+                log('✗ tenant-deposit-generator.js failed to expose TenantDepositGenerator', 'error');
+            }
+        };
+        script3.onerror = (e) => {
+            log('✗ Failed to load tenant-deposit-generator.js: ' + e.message, 'error');
+            console.error('Script error:', e);
+        };
+        document.head.appendChild(script3);
+    </script>
+</body>
+</html>

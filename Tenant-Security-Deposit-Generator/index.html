@@ -36,24 +36,67 @@
     <!-- Load dependencies -->
     <script src="state-laws.js"></script>
     <script src="docx-generator.js"></script>
-    <script src="tenant-deposit-generator.js"></script>
+    <script src="tenant-deposit-generator-fixed.js"></script>
     
     <!-- Calendly integration script -->
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
     
-    <!-- eSign API integration -->
+    <!-- eSign API integration (using same API as Stripe generator) -->
     <script>
-        // eSign integration function (shared with Stripe generator)
+        // eSign integration function (using esignature.com API like Stripe generator)
         window.initiateESign = async function(documentContent, formData) {
             try {
-                setESignLoading(true);
+                console.log("Initiating eSign process with esignature.com API...");
                 
-                console.log("Initiating eSign process...");
+                // Use the same proxy server as the Stripe generator
+                const proxyUrl = 'http://localhost:3001/esign-proxy';
                 
-                // For demo purposes, we'll simulate the eSign flow
-                // In production, this would integrate with DocuSign, HelloSign, or similar
+                // Prepare data for esignature.com API
+                const eSignData = {
+                    template: {
+                        title: 'Security Deposit Demand Letter',
+                        content: documentContent
+                    },
+                    signers: [{
+                        name: formData.landlordName || 'Landlord',
+                        email: formData.landlordEmail || 'landlord@example.com'
+                    }]
+                };
                 
-                // Show modal with eSign simulation
+                console.log('Sending eSign request:', eSignData);
+                
+                const response = await fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(eSignData)
+                });
+                
+                const result = await response.json();
+                console.log('eSign API response:', result);
+                
+                if (result.status === 'success' && result.data.signing_url) {
+                    // Success - open signing URL
+                    window.open(result.data.signing_url, '_blank');
+                    
+                    // Show success message
+                    alert('✓ eSignature document created successfully! The signing page has opened in a new tab.');
+                    
+                    return {
+                        success: true,
+                        contractId: result.data.contract_id,
+                        signingUrl: result.data.signing_url,
+                        contractUrl: result.data.contract_url
+                    };
+                } else {
+                    throw new Error(result.error || 'eSign API returned error');
+                }
+                
+            } catch (error) {
+                console.error("eSign error:", error);
+                
+                // Show fallback modal for error cases
                 const modal = document.createElement('div');
                 modal.style.cssText = `
                     position: fixed;
@@ -79,44 +122,26 @@
                 `;
                 
                 content.innerHTML = `
-                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">eSign Integration</h3>
+                    <h3 style="color: #dc3545; margin-bottom: 1rem;">eSign Service Unavailable</h3>
                     <p style="margin-bottom: 1.5rem; color: #6c757d;">
-                        Your demand letter is ready for electronic signature. In a production environment, 
-                        this would integrate with DocuSign, HelloSign, or similar eSign platforms.
+                        The eSignature service is currently unavailable. Please download the document 
+                        and send it manually for signature.
                     </p>
                     <div style="margin-bottom: 1.5rem;">
-                        <strong>Document:</strong> Security Deposit Demand Letter<br>
-                        <strong>Recipient:</strong> ${formData.tenantName || 'Tenant'}<br>
-                        <strong>Status:</strong> <span style="color: #28a745;">Ready for Signature</span>
+                        <strong>Error:</strong> ${error.message}<br>
+                        <strong>Alternative:</strong> Use the "Download Word Doc" button instead
                     </div>
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <button onclick="this.closest('.modal').remove()" 
-                                style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            Close
-                        </button>
-                        <button onclick="alert('eSign process would continue here'); this.closest('.modal').remove();" 
-                                style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
-                            Continue to eSign
-                        </button>
-                    </div>
+                    <button onclick="this.closest('.modal').remove()" 
+                            style="padding: 0.75rem 1.5rem; background: #dc3545; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                        Close
+                    </button>
                 `;
                 
                 modal.className = 'modal';
                 modal.appendChild(content);
                 document.body.appendChild(modal);
                 
-                return {
-                    success: true,
-                    signatureUrl: 'https://demo-esign-url.com/sign/12345',
-                    documentId: 'doc_' + Date.now()
-                };
-                
-            } catch (error) {
-                console.error("eSign error:", error);
-                alert("Error initiating eSign process. Please try again or download the document manually.");
                 return { success: false, error: error.message };
-            } finally {
-                setESignLoading(false);
             }
         };
         
