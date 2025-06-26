@@ -136,7 +136,10 @@ const TenantDepositGenerator = () => {
         // Tab 5: Review & Finalize
         responseDeadline: 14,
         includeSmallClaimsThreat: true,
-        requestAttorneyFees: true
+        requestAttorneyFees: true,
+        
+        // Selected scenario tracking
+        selectedScenario: null
     });
 
     // Tab definitions
@@ -399,49 +402,75 @@ const TenantDepositGenerator = () => {
         `;
     };
 
-    // Scenario presets for Letter Scenarios tab
+    // Real-world scenario presets based on actual deposit disputes
     const scenarios = [
         {
-            id: 'professional',
-            title: 'Professional First Contact',
-            description: 'Respectful but firm approach for initial communication',
-            tone: 'professional',
-            useCase: 'First-time contact with reasonable landlord',
-            sample: 'Dear [Landlord], I am writing to request the return of my security deposit...',
-            data: { letterTone: 'professional', includeSmallClaimsThreat: false, requestAttorneyFees: false }
-        },
-        {
-            id: 'firm',
-            title: 'Firm Business Demand',
-            description: 'Direct approach when previous attempts have failed',
-            tone: 'firm',
-            useCase: 'Follow-up after ignored initial requests',
-            sample: 'To [Landlord]: I demand the immediate return of my security deposit...',
-            data: { letterTone: 'firm', includeSmallClaimsThreat: true, requestAttorneyFees: true }
-        },
-        {
-            id: 'litigation',
-            title: 'Pre-Litigation Warning',
-            description: 'Final formal notice before legal action',
-            tone: 'litigation',
-            useCase: 'Last chance before filing lawsuit',
-            sample: 'TO [LANDLORD]: This serves as formal legal notice of your violations...',
-            data: { letterTone: 'litigation', includeSmallClaimsThreat: true, requestAttorneyFees: true }
-        },
-        {
-            id: 'bad-faith',
-            title: 'Bad Faith Retention',
-            description: 'Maximum penalties for deliberate violations',
-            tone: 'litigation',
-            useCase: 'Clear evidence of intentional withholding',
-            sample: 'Your bad faith retention of my security deposit constitutes a willful violation...',
+            id: 'complete-non-return',
+            title: 'Complete Non-Return of Deposit',
+            description: 'Landlord failed to return any portion of security deposit within legal deadline',
+            situation: 'No deposit returned',
+            useCase: 'Landlord missed legal deadline completely',
+            sample: 'You have failed to return my security deposit within the legally required timeframe...',
             data: { 
-                letterTone: 'litigation', 
-                includeSmallClaimsThreat: true, 
+                itemizedStatementReceived: 'not-received',
+                normalWearCharges: false,
+                excessiveCleaningFees: false,
+                paintingCosts: false,
+                carpetReplacement: false,
+                includeSmallClaimsThreat: true,
                 requestAttorneyFees: true,
+                responseDeadline: 10
+            }
+        },
+        {
+            id: 'improper-wear-tear',
+            title: 'Improper Wear & Tear Charges',
+            description: 'Landlord deducted for normal wear and tear items that are legally prohibited',
+            situation: 'Illegal deductions made',
+            useCase: 'Charged for painting, carpet wear, minor scuffs, or normal aging',
+            sample: 'The deductions you have taken for normal wear and tear violate state law...',
+            data: { 
+                itemizedStatementReceived: 'received',
                 normalWearCharges: true,
+                paintingCosts: true,
+                carpetReplacement: true,
                 evidenceMoveInPhotos: true,
-                evidenceReceipts: true
+                includeSmallClaimsThreat: true,
+                requestAttorneyFees: true,
+                responseDeadline: 14
+            }
+        },
+        {
+            id: 'no-itemization',
+            title: 'No Itemization Provided',
+            description: 'Landlord withheld deposit without providing required detailed itemization',
+            situation: 'Missing itemized list',
+            useCase: 'Partial return with no explanation or receipts for deductions',
+            sample: 'You have failed to provide the legally required itemized statement of deductions...',
+            data: { 
+                itemizedStatementReceived: 'not-received',
+                normalWearCharges: false,
+                excessiveCleaningFees: false,
+                includeSmallClaimsThreat: true,
+                requestAttorneyFees: true,
+                responseDeadline: 7
+            }
+        },
+        {
+            id: 'excessive-fees',
+            title: 'Excessive Cleaning Charges',
+            description: 'Unreasonable cleaning fees far exceeding normal market rates',
+            situation: 'Inflated cleaning costs',
+            useCase: 'Professional cleaning bills that seem excessive or suspicious',
+            sample: 'The cleaning charges you have assessed are unreasonable and excessive...',
+            data: { 
+                itemizedStatementReceived: 'received',
+                excessiveCleaningFees: true,
+                evidenceReceipts: true,
+                evidenceCommunications: true,
+                includeSmallClaimsThreat: true,
+                requestAttorneyFees: true,
+                responseDeadline: 14
             }
         }
     ];
@@ -449,24 +478,36 @@ const TenantDepositGenerator = () => {
     // Tab content renderers
     const renderScenariosTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
-            React.createElement('h3', { key: 'title' }, 'Choose Your Letter Scenario'),
-            React.createElement('p', { key: 'subtitle' }, 'Select a scenario that matches your situation to generate the most effective demand letter:'),
+            React.createElement('h3', { key: 'title' }, 'Choose Your Situation'),
+            React.createElement('p', { key: 'subtitle' }, 'Select the scenario that best matches your deposit dispute:'),
+            
+            // Tone selector section
+            React.createElement('div', { key: 'tone-section', className: 'form-group' }, [
+                React.createElement('h4', { key: 'tone-title' }, 'Letter Tone'),
+                React.createElement('p', { key: 'tone-subtitle', className: 'help-text' }, 'Choose the tone that matches your relationship with the landlord:'),
+                React.createElement('div', { key: 'tone-options', className: 'radio-group' }, [
+                    createClickableItem('radio', 'letterTone', 'professional', 'Professional & Respectful', 'Diplomatic approach for first contact or cooperative landlords', formData.letterTone === 'professional'),
+                    createClickableItem('radio', 'letterTone', 'firm', 'Firm & Direct', 'Business-like tone when initial requests were ignored', formData.letterTone === 'firm'),
+                    createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Formal notice threatening legal action as final step', formData.letterTone === 'litigation')
+                ])
+            ]),
             
             React.createElement('div', { key: 'scenarios-grid', className: 'scenarios-grid' }, 
                 scenarios.map(scenario => 
                     React.createElement('div', {
                         key: scenario.id,
-                        className: `scenario-card ${formData.letterTone === scenario.tone ? 'selected' : ''}`,
+                        className: `scenario-card ${formData.selectedScenario === scenario.id ? 'selected' : ''}`,
                         onClick: () => {
                             // Apply scenario data to form
                             Object.keys(scenario.data).forEach(key => {
                                 updateFormData(key, scenario.data[key]);
                             });
+                            updateFormData('selectedScenario', scenario.id);
                         }
                     }, [
                         React.createElement('div', { key: 'header', className: 'scenario-header' }, [
                             React.createElement('h4', { key: 'title' }, scenario.title),
-                            React.createElement('span', { key: 'tone', className: `tone-badge tone-${scenario.id}` }, scenario.tone.toUpperCase())
+                            React.createElement('span', { key: 'situation', className: `tone-badge tone-${scenario.id}` }, scenario.situation)
                         ]),
                         React.createElement('p', { key: 'description', className: 'scenario-description' }, scenario.description),
                         React.createElement('div', { key: 'use-case', className: 'scenario-use-case' }, [
@@ -485,9 +526,10 @@ const TenantDepositGenerator = () => {
                                 Object.keys(scenario.data).forEach(key => {
                                     updateFormData(key, scenario.data[key]);
                                 });
+                                updateFormData('selectedScenario', scenario.id);
                                 setCurrentTab(1); // Move to Property tab
                             }
-                        }, `Use ${scenario.title}`)
+                        }, `Use This Scenario`)
                     ])
                 )
             )
