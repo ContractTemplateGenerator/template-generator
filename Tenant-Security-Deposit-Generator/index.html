@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Security Deposit Demand Letter Generator | Terms.law</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="../favicon.ico">
+    
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Free Tenant Security Deposit Demand Letter Generator with state-specific legal requirements. Generate professional demand letters with automatic penalty calculations.">
+    <meta name="keywords" content="security deposit, tenant rights, demand letter, rental law, landlord tenant">
+    <meta name="author" content="Terms.law">
+    
+    <!-- Open Graph tags -->
+    <meta property="og:title" content="Tenant Security Deposit Demand Letter Generator">
+    <meta property="og:description" content="Free tool to generate professional security deposit demand letters with state-specific legal requirements">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://terms.law/tenant-deposit-generator">
+    
+    <!-- Calendly integration styles -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- Load dependencies -->
+    <script src="state-laws.js"></script>
+    <script src="docx-generator.js"></script>
+    <script src="tenant-deposit-generator.js"></script>
+    
+    <!-- Calendly integration script -->
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    
+    <!-- eSign API integration -->
+    <script>
+        // eSign integration function (shared with Stripe generator)
+        window.initiateESign = async function(documentContent, formData) {
+            try {
+                setESignLoading(true);
+                
+                console.log("Initiating eSign process...");
+                
+                // For demo purposes, we'll simulate the eSign flow
+                // In production, this would integrate with DocuSign, HelloSign, or similar
+                
+                // Show modal with eSign simulation
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.7);
+                    z-index: 10000;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                `;
+                
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    background: white;
+                    padding: 2rem;
+                    border-radius: 12px;
+                    max-width: 500px;
+                    text-align: center;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                `;
+                
+                content.innerHTML = `
+                    <h3 style="color: #2c3e50; margin-bottom: 1rem;">eSign Integration</h3>
+                    <p style="margin-bottom: 1.5rem; color: #6c757d;">
+                        Your demand letter is ready for electronic signature. In a production environment, 
+                        this would integrate with DocuSign, HelloSign, or similar eSign platforms.
+                    </p>
+                    <div style="margin-bottom: 1.5rem;">
+                        <strong>Document:</strong> Security Deposit Demand Letter<br>
+                        <strong>Recipient:</strong> ${formData.tenantName || 'Tenant'}<br>
+                        <strong>Status:</strong> <span style="color: #28a745;">Ready for Signature</span>
+                    </div>
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="this.closest('.modal').remove()" 
+                                style="padding: 0.75rem 1.5rem; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Close
+                        </button>
+                        <button onclick="alert('eSign process would continue here'); this.closest('.modal').remove();" 
+                                style="padding: 0.75rem 1.5rem; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                            Continue to eSign
+                        </button>
+                    </div>
+                `;
+                
+                modal.className = 'modal';
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+                
+                return {
+                    success: true,
+                    signatureUrl: 'https://demo-esign-url.com/sign/12345',
+                    documentId: 'doc_' + Date.now()
+                };
+                
+            } catch (error) {
+                console.error("eSign error:", error);
+                alert("Error initiating eSign process. Please try again or download the document manually.");
+                return { success: false, error: error.message };
+            } finally {
+                setESignLoading(false);
+            }
+        };
+        
+        // Consultation booking function
+        window.openConsultationCalendar = function() {
+            // Integration with Calendly
+            if (typeof Calendly !== 'undefined') {
+                Calendly.initPopupWidget({
+                    url: 'https://calendly.com/your-calendar-link', // Replace with actual Calendly link
+                    text: 'Schedule Consultation',
+                    color: '#667eea',
+                    textColor: '#ffffff',
+                    branding: true
+                });
+            } else {
+                // Fallback if Calendly is not loaded
+                window.open('https://calendly.com/your-calendar-link', '_blank');
+            }
+        };
+    </script>
+
+    <!-- Initialize the React app -->
+    <script>
+        // Initialize Feather icons after component mounts
+        document.addEventListener('DOMContentLoaded', function() {
+            // Render the main component
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(React.createElement(TenantDepositGenerator));
+            
+            // Initialize Feather icons
+            setTimeout(() => {
+                if (typeof feather !== 'undefined') {
+                    feather.replace();
+                }
+            }, 100);
+        });
+        
+        // Re-initialize icons when content changes
+        const observer = new MutationObserver(function(mutations) {
+            mutations.forEach(function(mutation) {
+                if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    setTimeout(() => {
+                        if (typeof feather !== 'undefined') {
+                            feather.replace();
+                        }
+                    }, 50);
+                }
+            });
+        });
+        
+        // Start observing
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true
+        });
+    </script>
+
+    <!-- Analytics (optional) -->
+    <script>
+        // Google Analytics or other tracking code can be added here
+        console.log("Tenant Security Deposit Generator loaded successfully");
+    </script>
+</body>
+</html>
