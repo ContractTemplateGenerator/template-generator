@@ -138,8 +138,8 @@ const TenantDepositGenerator = () => {
         includeSmallClaimsThreat: true,
         requestAttorneyFees: true,
         
-        // Selected scenario tracking
-        selectedScenario: null
+        // Selected scenarios tracking (multiple selection)
+        selectedScenarios: []
     });
 
     // Tab definitions
@@ -227,9 +227,7 @@ const TenantDepositGenerator = () => {
         
         if (!stateData) {
             return `
-                <div class="letterhead">
-                    <h1>SECURITY DEPOSIT DEMAND LETTER</h1>
-                </div>
+                <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
                 <p><em>Please complete the form to generate your demand letter...</em></p>
             `;
         }
@@ -267,142 +265,68 @@ const TenantDepositGenerator = () => {
                 urgencyLevel = "I request";
         }
 
-        // Build disputed deductions list
-        let disputedDeductions = [];
-        if (formData.normalWearCharges) disputedDeductions.push("Normal wear and tear charges");
-        if (formData.excessiveCleaningFees) disputedDeductions.push("Excessive cleaning fees");
-        if (formData.paintingCosts) disputedDeductions.push("Painting costs for normal wear");
-        if (formData.carpetReplacement) disputedDeductions.push("Carpet replacement for normal wear");
-        if (formData.unpaidRentDisputes) disputedDeductions.push("Disputed unpaid rent claims");
-        if (formData.keyReplacement) disputedDeductions.push("Key replacement charges");
-        if (formData.preexistingDamage) disputedDeductions.push("Charges for pre-existing damage");
-        if (formData.otherDeductions && formData.otherDeductionsText) {
-            disputedDeductions.push(formData.otherDeductionsText);
+        
+        // Build disputed deductions - concise
+        let disputedText = "";
+        let disputedItems = [];
+        if (formData.normalWearCharges || formData.paintingCosts || formData.carpetReplacement) {
+            disputedItems.push("normal wear and tear charges");
         }
-
-        // Build evidence list
-        let evidenceItems = [];
-        if (formData.evidenceMoveInPhotos) evidenceItems.push("Move-in photos documenting property condition");
-        if (formData.evidenceReceipts) evidenceItems.push("Receipts and payment records");
-        if (formData.evidenceCommunications) evidenceItems.push("Written communications with landlord");
-        if (formData.evidenceWitnesses) evidenceItems.push("Witness statements");
-        if (formData.evidenceInspectionReport) evidenceItems.push("Move-in/move-out inspection reports");
-        if (formData.evidenceOther && formData.evidenceOtherText) {
-            evidenceItems.push(formData.evidenceOtherText);
+        if (formData.excessiveCleaningFees) {
+            disputedItems.push("excessive cleaning fees");
+        }
+        if (formData.unpaidRentDisputes) {
+            disputedItems.push("disputed rent claims");
+        }
+        if (formData.preexistingDamage) {
+            disputedItems.push("pre-existing damage charges");
+        }
+        if (formData.otherDeductions && formData.otherDeductionsText) {
+            disputedItems.push(formData.otherDeductionsText);
+        }
+        
+        if (disputedItems.length > 0) {
+            disputedText = `I specifically dispute the following improper deductions: ${disputedItems.join(", ")}.`;
         }
         
         return `
-            <div class="letterhead">
-                <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
-            </div>
+            <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
             
-            <div class="date">
-                ${today}
-            </div>
+            <p>${today}</p>
             
-            <div class="address">
-                ${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '<br>' + formData.landlordCompany : ''}<br>
-                ${formData.landlordAddress || '[LANDLORD ADDRESS]'}<br>
-                ${formData.landlordCity || '[CITY]'}, ${formData.landlordState || 'CA'} ${formData.landlordZip || '[ZIP]'}
-            </div>
+            <p>${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '<br>' + formData.landlordCompany : ''}<br>
+            ${formData.landlordAddress || '[LANDLORD ADDRESS]'}<br>
+            ${formData.landlordCity || '[CITY]'}, ${formData.landlordState || 'CA'} ${formData.landlordZip || '[ZIP]'}</p>
             
             <p><strong>Re: Demand for Return of Security Deposit</strong><br>
-            <strong>Former Tenant:</strong> ${formData.tenantName || '[TENANT NAME]'}<br>
-            <strong>Rental Property:</strong> ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}</p>
+            <strong>Tenant:</strong> ${formData.tenantName || '[TENANT NAME]'}<br>
+            <strong>Property:</strong> ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}</p>
             
             <p>${greeting} ${formData.landlordName || '[LANDLORD NAME]'},</p>
             
-            <p>${urgencyLevel} the immediate return of my security deposit in the amount of <span class="demand-amount">$${calculations.total.toFixed(2)}</span>, as required under <span class="legal-citation">${stateData.citation}</span>.</p>
+            <p>${urgencyLevel} the immediate return of my security deposit in the amount of <strong>$${calculations.total.toFixed(2)}</strong>, as required under ${stateData.citation}.</p>
             
-            <h2>TENANCY DETAILS</h2>
-            <p>• Tenant: ${formData.tenantName || '[TENANT NAME]'}<br>
-            • Lease Period: ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}<br>
-            • Move-Out Date: ${formData.moveOutDate || '[MOVE OUT DATE]'}<br>
-            ${formData.keyReturnDate ? `• Keys Returned: ${formData.keyReturnDate}<br>` : ''}
-            ${formData.forwardingAddressDate ? `• Forwarding Address Provided: ${formData.forwardingAddressDate} (via ${formData.forwardingAddressMethod})<br>` : ''}
-            • Security Deposit Paid: $${formData.securityDeposit || '0'}${formData.petDeposit ? '<br>• Pet Deposit: $' + formData.petDeposit : ''}${formData.cleaningDeposit ? '<br>• Cleaning Deposit: $' + formData.cleaningDeposit : ''}</p>
+            <p><strong>Tenancy Details:</strong> I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.</p>
             
-            <h2>LEGAL VIOLATION</h2>
-            <p>Under <span class="legal-citation">${stateData.citation}</span>, you were required to return my security deposit ${formData.itemizedStatementReceived !== 'not-received' ? 'or provide an itemized statement of deductions ' : ''}within <strong>${stateData.returnDeadline} days</strong> of the termination of my tenancy.</p>
+            <p><strong>Legal Violation:</strong> Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.</p>
             
-            <p>As of today, <span class="deadline-notice">${calculations.daysPassed} days have passed</span> since the required return date${calculations.daysPassed > stateData.returnDeadline ? ', constituting a violation of state law' : ''}.</p>
-            
-            ${formData.itemizedStatementReceived !== 'not-received' ? 
-                `<p><strong>Itemized Statement Issues:</strong> ${formData.itemizedStatementReceived === 'inadequate' ? 'The itemized statement provided was inadequate and did not comply with legal requirements.' : formData.itemizedStatementReceived === 'disputed' ? 'I dispute the deductions listed in your itemized statement.' : ''}</p>` : 
-                `<p><strong>No Itemization Provided:</strong> You have failed to provide the required itemized statement of deductions, which under ${stateData.citation} forfeits your right to withhold any portion of the deposit.</p>`
+            ${formData.itemizedStatementReceived === 'not-received' ? 
+                `<p><strong>No Itemization:</strong> You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.</p>` : ''
             }
             
-            ${disputedDeductions.length > 0 ? `
-            <h2>DISPUTED DEDUCTIONS</h2>
-            <p>I specifically dispute the following deductions as improper under state law:</p>
-            <ul>
-                ${disputedDeductions.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-            <p>These charges violate the prohibition against deducting for normal wear and tear under ${stateData.normalWearDefinition ? '<span class="legal-citation">' + stateData.citation + '</span>' : 'state law'}.</p>
-            ` : ''}
+            ${disputedText ? `<p><strong>Disputed Deductions:</strong> ${disputedText} These charges violate state law prohibiting deductions for normal wear and tear.</p>` : ''}
             
-            <h2>STATUTORY PENALTIES</h2>
-            <p>Due to your failure to comply with state law, you are now liable for statutory penalties under <span class="legal-citation">${stateData.citation}</span>:</p>
-            <ul>
-                <li>Original Security Deposit: $${calculations.deposits.toFixed(2)}</li>
-                ${calculations.penalty > 0 ? `<li>Statutory Penalty (${stateData.penaltyDescription}): $${calculations.penalty.toFixed(2)}</li>` : ''}
-                ${calculations.interest > 0 ? `<li>Interest: $${calculations.interest.toFixed(2)}</li>` : ''}
-                ${formData.requestAttorneyFees ? '<li>Attorney fees and court costs (if legal action is required)</li>' : ''}
-            </ul>
-            <p><strong>TOTAL AMOUNT DUE: <span class="demand-amount">$${calculations.total.toFixed(2)}</span></strong></p>
+            <p><strong>Amount Due:</strong> Due to your non-compliance, you owe statutory penalties totaling <strong>$${calculations.total.toFixed(2)}</strong> (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).</p>
             
-            ${evidenceItems.length > 0 ? `
-            <h2>SUPPORTING EVIDENCE</h2>
-            <p>I have the following evidence to support my claim:</p>
-            <ul>
-                ${evidenceItems.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-            ` : ''}
-            
-            ${formData.priorCommunications ? `
-            <h2>PRIOR COMMUNICATIONS</h2>
-            <p>${formData.priorCommunicationsDescription || 'Previous attempts have been made to resolve this matter amicably.'}</p>
-            ` : ''}
-            
-            <h2>DEMAND FOR PAYMENT</h2>
-            <p><strong>You have ${formData.responseDeadline || 14} days from receipt of this letter to pay the full amount of $${calculations.total.toFixed(2)}.</strong></p>
-            
-            ${formData.includeSmallClaimsThreat ? `
-            <p>If you fail to comply with this demand within the specified timeframe, I will file a lawsuit in small claims court seeking:</p>
-            <ul>
-                <li>The full amount of $${calculations.total.toFixed(2)}</li>
-                <li>Court costs and filing fees</li>
-                ${formData.requestAttorneyFees ? '<li>Attorney fees as permitted by law</li>' : ''}
-                <li>Any additional damages permitted under ${stateData.citation}</li>
-            </ul>
-            ` : ''}
+            <p><strong>Demand:</strong> You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}</p>
             
             <p>${closingTone}</p>
             
-            <div class="signature-block">
-                <p>Sincerely,</p>
-                <br><br>
-                <p>_________________________<br>
-                ${formData.tenantName || '[YOUR NAME]'}<br>
-                ${formData.tenantCurrentAddress || '[YOUR CURRENT ADDRESS]'}<br>
-                ${formData.tenantCity || '[CITY]'}, ${formData.tenantState || 'CA'} ${formData.tenantZip || '[ZIP]'}</p>
-            </div>
-            
-            ${formData.deliveryMethod === 'certified-mail' ? `
-            <div class="enclosures">
-                <p><strong>Delivery Method:</strong> Certified Mail, Return Receipt Requested</p>
-            </div>
-            ` : ''}
-            
-            ${formData.ccRecipients && formData.ccRecipientsText ? `
-            <div class="enclosures">
-                <p><strong>cc:</strong> ${formData.ccRecipientsText}</p>
-            </div>
-            ` : ''}
+            <p>Sincerely,</p>
         `;
     };
 
-    // Real-world scenario presets based on actual deposit disputes
+    // Real-world scenario presets based on actual deposit disputes (checkbox selection)
     const scenarios = [
         {
             id: 'complete-non-return',
@@ -411,34 +335,23 @@ const TenantDepositGenerator = () => {
             situation: 'No deposit returned',
             useCase: 'Landlord missed legal deadline completely',
             sample: 'You have failed to return my security deposit within the legally required timeframe...',
-            data: { 
-                itemizedStatementReceived: 'not-received',
-                normalWearCharges: false,
-                excessiveCleaningFees: false,
-                paintingCosts: false,
-                carpetReplacement: false,
-                includeSmallClaimsThreat: true,
-                requestAttorneyFees: true,
-                responseDeadline: 10
-            }
+            expandedOptions: [
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 10 },
+                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true }
+            ]
         },
         {
             id: 'improper-wear-tear',
             title: 'Improper Wear & Tear Charges',
             description: 'Landlord deducted for normal wear and tear items that are legally prohibited',
-            situation: 'Illegal deductions made',
+            situation: 'Illegal deductions',
             useCase: 'Charged for painting, carpet wear, minor scuffs, or normal aging',
             sample: 'The deductions you have taken for normal wear and tear violate state law...',
-            data: { 
-                itemizedStatementReceived: 'received',
-                normalWearCharges: true,
-                paintingCosts: true,
-                carpetReplacement: true,
-                evidenceMoveInPhotos: true,
-                includeSmallClaimsThreat: true,
-                requestAttorneyFees: true,
-                responseDeadline: 14
-            }
+            expandedOptions: [
+                { field: 'paintingCosts', label: 'Painting charges', type: 'checkbox', default: true },
+                { field: 'carpetReplacement', label: 'Carpet replacement charges', type: 'checkbox', default: true },
+                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos as evidence', type: 'checkbox', default: true }
+            ]
         },
         {
             id: 'no-itemization',
@@ -447,39 +360,50 @@ const TenantDepositGenerator = () => {
             situation: 'Missing itemized list',
             useCase: 'Partial return with no explanation or receipts for deductions',
             sample: 'You have failed to provide the legally required itemized statement of deductions...',
-            data: { 
-                itemizedStatementReceived: 'not-received',
-                normalWearCharges: false,
-                excessiveCleaningFees: false,
-                includeSmallClaimsThreat: true,
-                requestAttorneyFees: true,
-                responseDeadline: 7
-            }
+            expandedOptions: [
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 7 },
+                { field: 'requestAttorneyFees', label: 'Request attorney fees', type: 'checkbox', default: true }
+            ]
         },
         {
             id: 'excessive-fees',
             title: 'Excessive Cleaning Charges',
             description: 'Unreasonable cleaning fees far exceeding normal market rates',
-            situation: 'Inflated cleaning costs',
+            situation: 'Inflated costs',
             useCase: 'Professional cleaning bills that seem excessive or suspicious',
             sample: 'The cleaning charges you have assessed are unreasonable and excessive...',
-            data: { 
-                itemizedStatementReceived: 'received',
-                excessiveCleaningFees: true,
-                evidenceReceipts: true,
-                evidenceCommunications: true,
-                includeSmallClaimsThreat: true,
-                requestAttorneyFees: true,
-                responseDeadline: 14
-            }
+            expandedOptions: [
+                { field: 'excessiveCleaningFees', label: 'Mark as excessive cleaning fees', type: 'checkbox', default: true },
+                { field: 'evidenceReceipts', label: 'Have receipts as evidence', type: 'checkbox', default: true }
+            ]
         }
     ];
+
+    // Helper function to toggle scenario selection
+    const toggleScenario = (scenarioId) => {
+        const currentSelected = formData.selectedScenarios;
+        const isSelected = currentSelected.includes(scenarioId);
+        
+        if (isSelected) {
+            // Remove scenario
+            updateFormData('selectedScenarios', currentSelected.filter(id => id !== scenarioId));
+        } else {
+            // Add scenario and apply its default values
+            updateFormData('selectedScenarios', [...currentSelected, scenarioId]);
+            const scenario = scenarios.find(s => s.id === scenarioId);
+            if (scenario && scenario.expandedOptions) {
+                scenario.expandedOptions.forEach(option => {
+                    updateFormData(option.field, option.default);
+                });
+            }
+        }
+    };
 
     // Tab content renderers
     const renderScenariosTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
-            React.createElement('h3', { key: 'title' }, 'Choose Your Situation'),
-            React.createElement('p', { key: 'subtitle' }, 'Select the scenario that best matches your deposit dispute:'),
+            React.createElement('h3', { key: 'title' }, 'Choose Your Situation(s)'),
+            React.createElement('p', { key: 'subtitle' }, 'Select all scenarios that apply to your deposit dispute (you can choose multiple):'),
             
             // Tone selector section
             React.createElement('div', { key: 'tone-section', className: 'form-group' }, [
@@ -492,46 +416,105 @@ const TenantDepositGenerator = () => {
                 ])
             ]),
             
-            React.createElement('div', { key: 'scenarios-grid', className: 'scenarios-grid' }, 
-                scenarios.map(scenario => 
-                    React.createElement('div', {
-                        key: scenario.id,
-                        className: `scenario-card ${formData.selectedScenario === scenario.id ? 'selected' : ''}`,
-                        onClick: () => {
-                            // Apply scenario data to form
-                            Object.keys(scenario.data).forEach(key => {
-                                updateFormData(key, scenario.data[key]);
-                            });
-                            updateFormData('selectedScenario', scenario.id);
-                        }
-                    }, [
-                        React.createElement('div', { key: 'header', className: 'scenario-header' }, [
-                            React.createElement('h4', { key: 'title' }, scenario.title),
-                            React.createElement('span', { key: 'situation', className: `tone-badge tone-${scenario.id}` }, scenario.situation)
+            React.createElement('div', { key: 'scenarios-section' }, 
+                scenarios.map(scenario => {
+                    const isSelected = formData.selectedScenarios.includes(scenario.id);
+                    return React.createElement('div', { key: scenario.id }, [
+                        React.createElement('div', {
+                            key: 'card',
+                            className: `scenario-card ${isSelected ? 'selected' : ''}`,
+                            onClick: () => toggleScenario(scenario.id)
+                        }, [
+                            React.createElement('div', { key: 'header', className: 'scenario-header' }, [
+                                React.createElement('input', {
+                                    key: 'checkbox',
+                                    type: 'checkbox',
+                                    checked: isSelected,
+                                    onChange: (e) => {
+                                        e.stopPropagation();
+                                        toggleScenario(scenario.id);
+                                    },
+                                    style: { marginRight: '1rem', transform: 'scale(1.2)' }
+                                }),
+                                React.createElement('h4', { key: 'title' }, scenario.title),
+                                React.createElement('span', { key: 'situation', className: `tone-badge tone-${scenario.id}` }, scenario.situation)
+                            ]),
+                            React.createElement('p', { key: 'description', className: 'scenario-description' }, scenario.description),
+                            React.createElement('div', { key: 'use-case', className: 'scenario-use-case' }, [
+                                React.createElement('strong', { key: 'label' }, 'Best for: '),
+                                React.createElement('span', { key: 'text' }, scenario.useCase)
+                            ]),
+                            React.createElement('div', { key: 'sample', className: 'scenario-sample' }, [
+                                React.createElement('strong', { key: 'label' }, 'Sample text: '),
+                                React.createElement('em', { key: 'text' }, scenario.sample)
+                            ])
                         ]),
-                        React.createElement('p', { key: 'description', className: 'scenario-description' }, scenario.description),
-                        React.createElement('div', { key: 'use-case', className: 'scenario-use-case' }, [
-                            React.createElement('strong', { key: 'label' }, 'Best for: '),
-                            React.createElement('span', { key: 'text' }, scenario.useCase)
-                        ]),
-                        React.createElement('div', { key: 'sample', className: 'scenario-sample' }, [
-                            React.createElement('strong', { key: 'label' }, 'Sample opening: '),
-                            React.createElement('em', { key: 'text' }, scenario.sample)
-                        ]),
-                        React.createElement('button', {
-                            key: 'btn',
-                            className: 'scenario-btn',
-                            onClick: (e) => {
-                                e.stopPropagation();
-                                Object.keys(scenario.data).forEach(key => {
-                                    updateFormData(key, scenario.data[key]);
-                                });
-                                updateFormData('selectedScenario', scenario.id);
-                                setCurrentTab(1); // Move to Property tab
+                        
+                        // Expanded options when scenario is selected
+                        isSelected && scenario.expandedOptions ? React.createElement('div', {
+                            key: 'expanded',
+                            className: 'scenario-expanded-options',
+                            style: { 
+                                marginTop: '1rem', 
+                                marginBottom: '2rem',
+                                padding: '1.5rem', 
+                                background: '#f8fafc', 
+                                borderRadius: '8px',
+                                border: '1px solid #e2e8f0'
                             }
-                        }, `Use This Scenario`)
-                    ])
-                )
+                        }, [
+                            React.createElement('h5', { 
+                                key: 'options-title',
+                                style: { marginBottom: '1rem', color: '#1e293b' }
+                            }, `${scenario.title} Options:`),
+                            ...scenario.expandedOptions.map(option => {
+                                if (option.type === 'checkbox') {
+                                    return React.createElement('div', {
+                                        key: option.field,
+                                        style: { marginBottom: '1rem' }
+                                    }, [
+                                        React.createElement('label', {
+                                            key: 'label',
+                                            style: { display: 'flex', alignItems: 'center', cursor: 'pointer' }
+                                        }, [
+                                            React.createElement('input', {
+                                                key: 'input',
+                                                type: 'checkbox',
+                                                checked: formData[option.field] || false,
+                                                onChange: (e) => updateFormData(option.field, e.target.checked),
+                                                style: { marginRight: '0.5rem' }
+                                            }),
+                                            React.createElement('span', { key: 'text' }, option.label)
+                                        ])
+                                    ]);
+                                } else if (option.type === 'number') {
+                                    return React.createElement('div', {
+                                        key: option.field,
+                                        style: { marginBottom: '1rem' }
+                                    }, [
+                                        React.createElement('label', {
+                                            key: 'label',
+                                            style: { display: 'block', marginBottom: '0.5rem', fontWeight: '600' }
+                                        }, option.label),
+                                        React.createElement('input', {
+                                            key: 'input',
+                                            type: 'number',
+                                            value: formData[option.field] || option.default,
+                                            onChange: (e) => updateFormData(option.field, parseInt(e.target.value)),
+                                            style: { 
+                                                padding: '0.5rem',
+                                                border: '1px solid #d1d5db',
+                                                borderRadius: '4px',
+                                                width: '100px'
+                                            }
+                                        })
+                                    ]);
+                                }
+                                return null;
+                            })
+                        ]) : null
+                    ]);
+                })
             )
         ]);
     };
