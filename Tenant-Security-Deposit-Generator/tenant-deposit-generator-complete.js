@@ -572,20 +572,16 @@ Sincerely,`;
     // Tab content renderers
     const renderScenariosTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
-            React.createElement('h3', { key: 'title' }, 'Choose Your Situation(s)'),
-            React.createElement('p', { key: 'subtitle' }, 'Select all scenarios that apply to your deposit dispute (you can choose multiple):'),
-            
-            // Tone selector section
-            React.createElement('div', { key: 'tone-section', className: 'form-group' }, [
-                React.createElement('h4', { key: 'tone-title' }, 'Letter Tone'),
-                React.createElement('p', { key: 'tone-subtitle', className: 'help-text' }, 'Choose the tone that matches your relationship with the landlord:'),
-                React.createElement('div', { key: 'tone-options', className: 'radio-group' }, [
-                    createClickableItem('radio', 'letterTone', 'professional', 'Professional & Respectful', 'Diplomatic approach for first contact or cooperative landlords', formData.letterTone === 'professional'),
-                    createClickableItem('radio', 'letterTone', 'firm', 'Firm & Direct', 'Business-like tone when initial requests were ignored', formData.letterTone === 'firm'),
-                    createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Formal notice threatening legal action as final step', formData.letterTone === 'litigation')
-                ])
+            // Letter tone section
+            React.createElement('h3', { key: 'tone-title' }, 'Letter Tone'),
+            React.createElement('div', { key: 'tone-options', className: 'radio-group compact-radio-group' }, [
+                createClickableItem('radio', 'letterTone', 'professional', 'Professional', 'Diplomatic approach', formData.letterTone === 'professional'),
+                createClickableItem('radio', 'letterTone', 'firm', 'Firm', 'Business-like tone', formData.letterTone === 'firm'),
+                createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Formal legal notice', formData.letterTone === 'litigation')
             ]),
             
+            // Scenarios section
+            React.createElement('h3', { key: 'scenarios-title' }, 'Your Situation(s)'),
             React.createElement('div', { key: 'scenarios-section' }, 
                 scenarios.map(scenario => {
                     const isSelected = formData.selectedScenarios.includes(scenario.id);
