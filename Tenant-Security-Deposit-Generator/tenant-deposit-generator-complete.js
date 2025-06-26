@@ -138,8 +138,23 @@ const TenantDepositGenerator = () => {
         includeSmallClaimsThreat: true,
         requestAttorneyFees: true,
         
-        // Selected scenarios tracking (multiple selection)
-        selectedScenarios: []
+        // Primary scenario selection (mutually exclusive)
+        primaryScenario: '',
+        // Step-by-step answers for all scenarios
+        totalDepositAmount: '',
+        amountReturned: '',
+        landlordJustifications: '',
+        landlordJustificationDetails: [],
+        
+        // Additional scenario-specific fields
+        disputedChargeTypes: [],
+        wearTearCharges: '',
+        wearTearItems: [],
+        tenancyLength: '',
+        communicationAttempts: '',
+        excessiveFeeAmount: '',
+        feeTypes: [],
+        propertyCondition: ''
     });
 
     // Tab definitions
@@ -160,30 +175,29 @@ const TenantDepositGenerator = () => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    // Map form fields to document sections for highlighting (enhanced for scenarios)
+    // Map form fields to document sections for highlighting (enhanced with better targeting)
     const getSectionToHighlight = () => {
         if (!lastChanged) return null;
-        
-        // Scenario-related fields mapping
-        const scenarioFields = [
-            'responseDeadline', 'includeSmallClaimsThreat', 'requestAttorneyFees', 
-            'priorCommunications', 'evidenceReceipts', 'evidenceCommunications',
-            'evidenceWitnesses', 'keyReturnDate', 'forwardingAddressDate', 
-            'propertyCondition', 'itemizedStatementReceived', 'normalWearCharges',
-            'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement',
-            'preexistingDamage', 'evidenceMoveInPhotos', 'evidenceInspectionReport',
-            'evidenceMoveOutPhotos', 'wallDamageCharges', 'flooringCharges',
-            'lightFixtureCharges', 'competingQuotes', 'carpetCleaningCharges',
-            'applianceCleaningCharges', 'professionalCleaningReceipt'
-        ];
         
         switch (currentTab) {
             case 0: // Scenarios
                 if (['letterTone'].includes(lastChanged)) {
-                    return 'greeting-section';
+                    return 'tone-changes'; // Highlight demand statements that change with tone
                 }
-                if (['selectedScenarios'].includes(lastChanged) || scenarioFields.includes(lastChanged)) {
+                if (['primaryScenario'].includes(lastChanged)) {
+                    return 'scenario-content'; // Highlight content that changes with scenarios
+                }
+                if (['totalDepositAmount', 'amountReturned', 'landlordJustifications', 'wearTearCharges', 'excessiveFeeAmount'].includes(lastChanged)) {
+                    return 'deposit-details';
+                }
+                if (['disputedChargeTypes', 'wearTearItems', 'feeTypes'].includes(lastChanged)) {
                     return 'disputed-deductions';
+                }
+                if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
+                    return 'demand-section';
+                }
+                if (['communicationAttempts', 'tenancyLength', 'propertyCondition'].includes(lastChanged)) {
+                    return 'scenario-content';
                 }
                 break;
             case 1: // Property & Tenancy
@@ -221,11 +235,13 @@ const TenantDepositGenerator = () => {
         // Define more specific regex patterns for granular highlighting
         const sections = {
             'header-info': /Re: Demand for Return of Security Deposit.*?Property: [^\n]*/s,
-            'greeting-section': /(Dear|To|TO): [^\n]*/,
-            'tenancy-details': /Tenancy Details: [^.]*\./,
-            'legal-violation': /Legal Violation: [^.]*\./,
-            'disputed-deductions': /Disputed Deductions: [^.]*\./,
-            'demand-section': /You have [^.]*days from the date of this letter[^.]*/
+            'tone-changes': /(I respectfully request|I demand|I hereby demand).*?(?=\.|\n)/s,
+            'scenario-content': /(Tenancy Details:|Legal Violation:|Disputed Deductions:|No Itemization:|Amount Due:).*?(?=\n\n|<p><strong>)/s,
+            'deposit-details': /security deposit.*?\$[\d,]+/gi,
+            'tenancy-details': /Tenancy Details:.*?(?=<p><strong>|\n\n)/s,
+            'legal-violation': /Legal Violation:.*?(?=<p><strong>|\n\n)/s,
+            'disputed-deductions': /Disputed Deductions:.*?(?=<p><strong>|\n\n)/s,
+            'demand-section': /(You have|Demand:).*?days.*?(?=<p>|\n\n)/s
         };
         
         if (sections[sectionToHighlight]) {
@@ -433,132 +449,133 @@ Sincerely,`;
         `;
     };
 
-    // Real-world scenario presets based on actual deposit disputes (checkbox selection)
+    // Step-by-step scenario system with mutual exclusivity
     const scenarios = [
         {
             id: 'complete-non-return',
-            title: 'Complete Non-Return of Deposit',
-            description: 'Landlord failed to return any portion of security deposit within legal deadline',
+            title: 'Complete Non-Return',
+            description: 'Landlord has not returned any portion of my security deposit',
             situation: 'No deposit returned',
-            useCase: 'Landlord missed legal deadline completely, total radio silence',
-            sample: 'You have failed to return my security deposit within the legally required timeframe...',
-            expandedOptions: [
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 10 },
-                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true },
-                { field: 'requestAttorneyFees', label: 'Request attorney fees and costs', type: 'checkbox', default: true },
-                { field: 'priorCommunications', label: 'Previous failed attempts to contact', type: 'checkbox', default: false },
-                { field: 'evidenceReceipts', label: 'Have deposit payment records', type: 'checkbox', default: true },
-                { field: 'evidenceCommunications', label: 'Have written requests for return', type: 'checkbox', default: false },
-                { field: 'evidenceWitnesses', label: 'Have witnesses to deposit payment', type: 'checkbox', default: false },
-                { field: 'keyReturnDate', label: 'Keys returned promptly', type: 'checkbox', default: true },
-                { field: 'forwardingAddressDate', label: 'Provided forwarding address', type: 'checkbox', default: true },
-                { field: 'propertyCondition', label: 'Left property in good condition', type: 'checkbox', default: true }
+            mutuallyExclusive: ['partial-non-return'],
+            stepByStepQuestions: [
+                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
+                { field: 'landlordJustifications', label: 'Did landlord provide any justifications?', type: 'radio', options: [
+                    { value: 'no-response', label: 'No response/total silence' },
+                    { value: 'verbal-only', label: 'Verbal explanations only' },
+                    { value: 'written-reasons', label: 'Written justifications provided' }
+                ]},
+                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 10 }
             ]
         },
         {
             id: 'partial-non-return',
-            title: 'Partial Non-Return of Deposit',
-            description: 'Landlord returned some deposit but illegally withheld remainder without proper justification',
+            title: 'Partial Non-Return',
+            description: 'Landlord returned some money but withheld the rest',
             situation: 'Partial withholding',
-            useCase: 'Got some money back but landlord kept portion illegally, inadequate or missing itemization',
-            sample: 'You returned only a portion of my deposit without proper legal justification...',
-            expandedOptions: [
-                { field: 'itemizedStatementReceived', label: 'Received itemized statement', type: 'select', options: ['not-received', 'inadequate', 'disputed'], default: 'inadequate' },
-                { field: 'normalWearCharges', label: 'Charged for normal wear & tear', type: 'checkbox', default: true },
-                { field: 'excessiveCleaningFees', label: 'Excessive cleaning charges', type: 'checkbox', default: false },
-                { field: 'paintingCosts', label: 'Improper painting charges', type: 'checkbox', default: false },
-                { field: 'carpetReplacement', label: 'Improper carpet charges', type: 'checkbox', default: false },
-                { field: 'preexistingDamage', label: 'Charged for pre-existing damage', type: 'checkbox', default: false },
-                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos', type: 'checkbox', default: true },
-                { field: 'evidenceReceipts', label: 'Have cleaning/repair receipts', type: 'checkbox', default: false },
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
-                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true }
+            mutuallyExclusive: ['complete-non-return'],
+            stepByStepQuestions: [
+                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
+                { field: 'amountReturned', label: 'Amount returned to you', type: 'number', required: true },
+                { field: 'landlordJustifications', label: 'What justifications did landlord provide?', type: 'radio', options: [
+                    { value: 'no-itemization', label: 'No itemized statement provided' },
+                    { value: 'inadequate-itemization', label: 'Vague/incomplete itemization' },
+                    { value: 'disputed-charges', label: 'Detailed charges I want to dispute' }
+                ]},
+                { field: 'disputedChargeTypes', label: 'What types of charges do you dispute?', type: 'checkbox', options: [
+                    { value: 'normal-wear', label: 'Normal wear and tear (painting, carpet wear)' },
+                    { value: 'cleaning-excessive', label: 'Excessive cleaning fees' },
+                    { value: 'damage-preexisting', label: 'Pre-existing damage charges' },
+                    { value: 'unpaid-rent', label: 'Disputed unpaid rent claims' }
+                ]},
+                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
             ]
         },
         {
             id: 'improper-wear-tear',
             title: 'Improper Wear & Tear Charges',
-            description: 'Landlord deducted for normal wear and tear items that are legally prohibited',
-            situation: 'Illegal deductions',
-            useCase: 'Charged for painting, carpet wear, minor scuffs, or normal aging - classic illegal charges',
-            sample: 'The deductions you have taken for normal wear and tear violate state law...',
-            expandedOptions: [
-                { field: 'paintingCosts', label: 'Painting charges (most common)', type: 'checkbox', default: true },
-                { field: 'carpetReplacement', label: 'Carpet replacement charges', type: 'checkbox', default: true },
-                { field: 'normalWearCharges', label: 'General normal wear charges', type: 'checkbox', default: true },
-                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos as evidence', type: 'checkbox', default: true },
-                { field: 'evidenceInspectionReport', label: 'Have move-in inspection report', type: 'checkbox', default: false },
-                { field: 'evidenceMoveOutPhotos', label: 'Have move-out photos', type: 'checkbox', default: false },
-                { field: 'wallDamageCharges', label: 'Charged for nail holes/scuffs', type: 'checkbox', default: false },
-                { field: 'flooringCharges', label: 'Charged for floor scratches', type: 'checkbox', default: false },
-                { field: 'lightFixtureCharges', label: 'Charged for light bulb replacement', type: 'checkbox', default: false },
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
-                { field: 'includeSmallClaimsThreat', label: 'Threaten legal action', type: 'checkbox', default: true }
+            description: 'Landlord charged me for normal wear and tear (prohibited by law)',
+            situation: 'Illegal wear and tear deductions',
+            mutuallyExclusive: [],
+            stepByStepQuestions: [
+                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
+                { field: 'wearTearCharges', label: 'Amount charged for wear and tear', type: 'number', required: true },
+                { field: 'wearTearItems', label: 'What items were you charged for?', type: 'checkbox', options: [
+                    { value: 'painting', label: 'Painting/wall touch-ups' },
+                    { value: 'carpet-normal', label: 'Normal carpet wear' },
+                    { value: 'nail-holes', label: 'Small nail holes from pictures' },
+                    { value: 'light-fixtures', label: 'Light bulb replacement' },
+                    { value: 'cabinet-wear', label: 'Cabinet/door handle wear' }
+                ]},
+                { field: 'tenancyLength', label: 'How long did you live there?', type: 'radio', options: [
+                    { value: 'under-1-year', label: 'Less than 1 year' },
+                    { value: '1-3-years', label: '1-3 years' },
+                    { value: 'over-3-years', label: 'More than 3 years' }
+                ]},
+                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
             ]
         },
         {
             id: 'no-itemization',
             title: 'No Itemization Provided',
-            description: 'Landlord withheld deposit without providing required detailed itemization',
-            situation: 'Missing itemized list',
-            useCase: 'Partial return with no explanation, receipts, or legally required itemized breakdown',
-            sample: 'You have failed to provide the legally required itemized statement of deductions...',
-            expandedOptions: [
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 7 },
-                { field: 'requestAttorneyFees', label: 'Request attorney fees', type: 'checkbox', default: true },
-                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true },
-                { field: 'priorCommunications', label: 'Previously requested itemization', type: 'checkbox', default: false },
-                { field: 'evidenceCommunications', label: 'Have written requests for itemization', type: 'checkbox', default: false }
+            description: 'Landlord failed to provide required itemized statement of deductions',
+            situation: 'Missing itemized statement',
+            mutuallyExclusive: [],
+            stepByStepQuestions: [
+                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
+                { field: 'amountReturned', label: 'Amount returned (if any)', type: 'number', required: false },
+                { field: 'communicationAttempts', label: 'Have you contacted landlord about itemization?', type: 'radio', options: [
+                    { value: 'no-contact', label: 'No, this is my first contact' },
+                    { value: 'verbal-requests', label: 'Yes, requested verbally' },
+                    { value: 'written-requests', label: 'Yes, requested in writing' }
+                ]},
+                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 10 }
             ]
         },
         {
             id: 'excessive-fees',
-            title: 'Excessive Cleaning Charges',
-            description: 'Unreasonable cleaning fees far exceeding normal market rates or property condition',
-            situation: 'Inflated costs',
-            useCase: 'Professional cleaning bills that seem excessive, suspicious, or don\'t match property condition',
-            sample: 'The cleaning charges you have assessed are unreasonable and excessive...',
-            expandedOptions: [
-                { field: 'excessiveCleaningFees', label: 'Mark as excessive cleaning fees', type: 'checkbox', default: true },
-                { field: 'evidenceReceipts', label: 'Have market rate evidence', type: 'checkbox', default: true },
-                { field: 'evidenceMoveInPhotos', label: 'Have photos of clean move-in condition', type: 'checkbox', default: true },
-                { field: 'competingQuotes', label: 'Have competing cleaning quotes', type: 'checkbox', default: false },
-                { field: 'normalWearCharges', label: 'Also charged for normal wear', type: 'checkbox', default: false },
-                { field: 'carpetCleaningCharges', label: 'Excessive carpet cleaning', type: 'checkbox', default: false },
-                { field: 'applianceCleaningCharges', label: 'Excessive appliance cleaning', type: 'checkbox', default: false },
-                { field: 'professionalCleaningReceipt', label: 'Have actual receipt from cleaner', type: 'checkbox', default: false },
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
-                { field: 'includeSmallClaimsThreat', label: 'Threaten legal action', type: 'checkbox', default: true }
+            title: 'Excessive Cleaning/Repair Fees',
+            description: 'Landlord charged unreasonable amounts for cleaning or minor repairs',
+            situation: 'Excessive fees charged',
+            mutuallyExclusive: [],
+            stepByStepQuestions: [
+                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
+                { field: 'excessiveFeeAmount', label: 'Amount of excessive fees', type: 'number', required: true },
+                { field: 'feeTypes', label: 'What types of excessive fees?', type: 'checkbox', options: [
+                    { value: 'cleaning-professional', label: 'Professional cleaning (when not needed)' },
+                    { value: 'carpet-replacement', label: 'Full carpet replacement for minor stains' },
+                    { value: 'paint-entire', label: 'Entire unit painting for small scuffs' },
+                    { value: 'appliance-replacement', label: 'Appliance replacement for minor issues' }
+                ]},
+                { field: 'propertyCondition', label: 'What was the condition when you moved out?', type: 'radio', options: [
+                    { value: 'excellent', label: 'Excellent - professionally cleaned' },
+                    { value: 'good', label: 'Good - normal cleaning done' },
+                    { value: 'fair', label: 'Fair - some cleaning needed' }
+                ]},
+                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
             ]
         }
     ];
 
-    // Helper function to toggle scenario selection
-    const toggleScenario = (scenarioId) => {
-        const currentSelected = formData.selectedScenarios;
-        const isSelected = currentSelected.includes(scenarioId);
+    // Helper function to select primary scenario (mutually exclusive)
+    const selectScenario = (scenarioId) => {
+        const scenario = scenarios.find(s => s.id === scenarioId);
         
-        if (isSelected) {
-            // Remove scenario - use updateFormData to trigger highlighting
-            updateFormData('selectedScenarios', currentSelected.filter(id => id !== scenarioId));
-        } else {
-            // Add scenario - use updateFormData to trigger highlighting
-            const scenario = scenarios.find(s => s.id === scenarioId);
-            const updatedScenarios = [...currentSelected, scenarioId];
-            
-            // First update the scenarios selection
-            updateFormData('selectedScenarios', updatedScenarios);
-            
-            // Then apply defaults for this scenario
-            if (scenario && scenario.expandedOptions) {
-                scenario.expandedOptions.forEach(option => {
-                    // Use setTimeout to allow the first highlighting to process
-                    setTimeout(() => {
-                        updateFormData(option.field, option.default);
-                    }, 50);
-                });
-            }
+        // Clear mutually exclusive scenarios
+        if (scenario && scenario.mutuallyExclusive) {
+            scenario.mutuallyExclusive.forEach(exclusiveId => {
+                if (formData.primaryScenario === exclusiveId) {
+                    // Clear this scenario's data
+                    updateFormData('primaryScenario', '');
+                }
+            });
         }
+        
+        // Set the new primary scenario
+        updateFormData('primaryScenario', scenarioId);
+        
+        // Clear related fields when switching scenarios
+        updateFormData('landlordJustifications', '');
+        updateFormData('landlordJustificationDetails', []);
     };
 
     // Tab content renderers
@@ -572,121 +589,112 @@ Sincerely,`;
                 createClickableItem('radio', 'letterTone', 'litigation', 'Legal Warning', 'Formal legal notice', formData.letterTone === 'litigation')
             ]),
             
-            // Scenarios section
-            React.createElement('h3', { key: 'scenarios-title' }, 'Your Situation(s)'),
-            React.createElement('div', { key: 'scenarios-section' }, 
+            // Scenarios section - Radio buttons for mutual exclusivity
+            React.createElement('h3', { key: 'scenarios-title' }, 'Your Situation'),
+            React.createElement('p', { key: 'scenarios-subtitle', className: 'help-text' }, 'Choose the situation that best describes what happened:'),
+            
+            React.createElement('div', { key: 'scenarios-section', className: 'radio-group' }, 
                 scenarios.map(scenario => {
-                    const isSelected = formData.selectedScenarios.includes(scenario.id);
+                    const isSelected = formData.primaryScenario === scenario.id;
                     return React.createElement('div', { key: scenario.id }, [
-                        React.createElement('div', {
-                            key: 'card',
-                            className: `scenario-card ${isSelected ? 'selected' : ''}`,
-                            onClick: () => toggleScenario(scenario.id)
-                        }, [
-                            React.createElement('div', { key: 'header', className: 'scenario-header' }, [
-                                React.createElement('input', {
-                                    key: 'checkbox',
-                                    type: 'checkbox',
-                                    checked: isSelected,
-                                    onChange: (e) => {
-                                        e.stopPropagation();
-                                        toggleScenario(scenario.id);
-                                    },
-                                    style: { marginRight: '1rem', transform: 'scale(1.2)' }
-                                }),
-                                React.createElement('h4', { key: 'title' }, scenario.title),
-                                React.createElement('span', { key: 'situation', className: `tone-badge tone-${scenario.id}` }, scenario.situation)
-                            ]),
-                            React.createElement('p', { key: 'description', className: 'scenario-description' }, scenario.description),
-                            React.createElement('div', { key: 'use-case', className: 'scenario-use-case' }, [
-                                React.createElement('strong', { key: 'label' }, 'Best for: '),
-                                React.createElement('span', { key: 'text' }, scenario.useCase)
-                            ]),
-                            React.createElement('div', { key: 'sample', className: 'scenario-sample' }, [
-                                React.createElement('strong', { key: 'label' }, 'Sample text: '),
-                                React.createElement('em', { key: 'text' }, scenario.sample)
-                            ])
-                        ]),
+                        createClickableItem('radio', 'primaryScenario', scenario.id, scenario.title, scenario.description, isSelected),
                         
-                        // Expanded options when scenario is selected - using CSS classes for compact design
-                        isSelected && scenario.expandedOptions ? React.createElement('div', {
-                            key: 'expanded',
-                            className: 'scenario-expanded-options'
+                        // Step-by-step questions when scenario is selected
+                        isSelected && scenario.stepByStepQuestions ? React.createElement('div', {
+                            key: 'questions',
+                            className: 'step-by-step-questions'
                         }, [
                             React.createElement('h5', { 
-                                key: 'options-title'
-                            }, `${scenario.title} Options:`),
-                            ...scenario.expandedOptions.map(option => {
-                                if (option.type === 'checkbox') {
+                                key: 'questions-title'
+                            }, [
+                                React.createElement(Icon, { key: 'icon', name: 'help-circle' }),
+                                'Tell us about your situation:'
+                            ]),
+                            ...scenario.stepByStepQuestions.map(question => {
+                                if (question.type === 'number') {
                                     return React.createElement('div', {
-                                        key: option.field
-                                    }, [
-                                        React.createElement('label', {
-                                            key: 'label',
-                                            style: { display: 'flex', alignItems: 'center', cursor: 'pointer' },
-                                            onClick: (e) => {
-                                                e.preventDefault();
-                                                updateFormData(option.field, !formData[option.field]);
-                                            }
-                                        }, [
-                                            React.createElement('input', {
-                                                key: 'input',
-                                                type: 'checkbox',
-                                                checked: formData[option.field] || false,
-                                                onChange: (e) => {
-                                                    e.stopPropagation();
-                                                    updateFormData(option.field, e.target.checked);
-                                                },
-                                                style: { marginRight: '0.5rem' }
-                                            }),
-                                            React.createElement('span', { key: 'text' }, option.label)
-                                        ])
-                                    ]);
-                                } else if (option.type === 'number') {
-                                    return React.createElement('div', {
-                                        key: option.field
+                                        key: question.field,
+                                        className: 'question-item'
                                     }, [
                                         React.createElement('label', {
                                             key: 'label'
-                                        }, option.label),
+                                        }, question.label + (question.required ? ' *' : '')),
                                         React.createElement('input', {
                                             key: 'input',
                                             type: 'number',
-                                            value: formData[option.field] || option.default,
-                                            onChange: (e) => {
-                                                e.stopPropagation();
-                                                updateFormData(option.field, parseInt(e.target.value));
-                                            }
+                                            step: '0.01',
+                                            value: formData[question.field] || '',
+                                            onChange: (e) => updateFormData(question.field, e.target.value),
+                                            placeholder: '$0.00'
                                         })
                                     ]);
-                                } else if (option.type === 'select') {
+                                } else if (question.type === 'radio' && question.options) {
                                     return React.createElement('div', {
-                                        key: option.field
+                                        key: question.field,
+                                        className: 'question-item'
                                     }, [
                                         React.createElement('label', {
                                             key: 'label'
-                                        }, option.label),
-                                        React.createElement('select', {
-                                            key: 'select',
-                                            value: formData[option.field] || option.default,
-                                            onChange: (e) => {
-                                                e.stopPropagation();
-                                                updateFormData(option.field, e.target.value);
-                                            },
-                                            style: { 
-                                                padding: '0.375rem 0.5rem',
-                                                border: '1px solid #d1d5db',
-                                                borderRadius: '4px',
-                                                fontSize: '0.8125rem'
-                                            }
-                                        }, option.options.map(opt => 
-                                            React.createElement('option', { 
-                                                key: opt, 
-                                                value: opt 
-                                            }, opt === 'not-received' ? 'Not Received' : 
-                                               opt === 'inadequate' ? 'Inadequate' : 
-                                               opt === 'disputed' ? 'Disputed' : opt)
+                                        }, question.label + (question.required ? ' *' : '')),
+                                        React.createElement('div', {
+                                            key: 'options',
+                                            className: 'radio-options'
+                                        }, question.options.map(option => 
+                                            React.createElement('div', {
+                                                key: option.value,
+                                                className: 'radio-option',
+                                                onClick: () => updateFormData(question.field, option.value)
+                                            }, [
+                                                React.createElement('input', {
+                                                    key: 'input',
+                                                    type: 'radio',
+                                                    name: question.field,
+                                                    value: option.value,
+                                                    checked: formData[question.field] === option.value,
+                                                    onChange: () => updateFormData(question.field, option.value)
+                                                }),
+                                                React.createElement('label', {
+                                                    key: 'label'
+                                                }, option.label)
+                                            ])
                                         ))
+                                    ]);
+                                } else if (question.type === 'checkbox' && question.options) {
+                                    return React.createElement('div', {
+                                        key: question.field,
+                                        className: 'question-item'
+                                    }, [
+                                        React.createElement('label', {
+                                            key: 'label'
+                                        }, question.label + (question.required ? ' *' : '')),
+                                        React.createElement('div', {
+                                            key: 'options',
+                                            className: 'radio-options'
+                                        }, question.options.map(option => {
+                                            const fieldValue = formData[question.field] || [];
+                                            const isChecked = Array.isArray(fieldValue) ? fieldValue.includes(option.value) : false;
+                                            return React.createElement('div', {
+                                                key: option.value,
+                                                className: 'radio-option',
+                                                onClick: () => {
+                                                    const currentValue = formData[question.field] || [];
+                                                    const newValue = isChecked 
+                                                        ? currentValue.filter(v => v !== option.value)
+                                                        : [...currentValue, option.value];
+                                                    updateFormData(question.field, newValue);
+                                                }
+                                            }, [
+                                                React.createElement('input', {
+                                                    key: 'input',
+                                                    type: 'checkbox',
+                                                    checked: isChecked,
+                                                    onChange: () => {}
+                                                }),
+                                                React.createElement('label', {
+                                                    key: 'label'
+                                                }, option.label)
+                                            ]);
+                                        }))
                                     ]);
                                 }
                                 return null;
@@ -1370,69 +1378,10 @@ Sincerely,`;
                     renderTabContent()
                 ),
                 
-                // Action buttons
+                // Action buttons with navigation
                 React.createElement('div', { key: 'actions', className: 'action-buttons' }, [
-                    React.createElement('button', {
-                        key: 'copy',
-                        className: 'btn btn-secondary',
-                        onClick: () => {
-                            const content = generateLetterContent().replace(/<[^>]*>/g, '');
-                            window.copyToClipboard(content);
-                        }
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'copy' }),
-                        React.createElement('span', { key: 'text' }, 'Copy Letter')
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'download',
-                        className: 'btn btn-primary',
-                        onClick: () => window.generateWordDoc(generateLetterContent(), formData)
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'download' }),
-                        React.createElement('span', { key: 'text' }, 'Download Word Doc')
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'esign',
-                        className: 'btn btn-accent',
-                        disabled: eSignLoading,
-                        onClick: async () => {
-                            setESignLoading(true);
-                            try {
-                                // Generate letter content to populate window.cleanLetterText
-                                generateLetterContent();
-                                // Use clean text version for eSignature
-                                await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
-                            } finally {
-                                setESignLoading(false);
-                            }
-                        }
-                    }, [
-                        React.createElement(Icon, { 
-                            key: 'icon', 
-                            name: eSignLoading ? 'loader' : 'edit-3',
-                            style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
-                        }),
-                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
-                    ]),
-                    
-                    React.createElement('button', {
-                        key: 'consult',
-                        className: 'btn btn-secondary',
-                        onClick: () => window.openConsultationCalendar()
-                    }, [
-                        React.createElement(Icon, { key: 'icon', name: 'calendar' }),
-                        React.createElement('span', { key: 'text' }, 'Schedule Consultation')
-                    ])
-                ])
-            ]),
-            
-            // Preview pane
-            React.createElement('div', { key: 'preview', className: 'preview-pane' }, [
-                React.createElement('div', { key: 'header', className: 'preview-header' }, [
-                    React.createElement('h3', { key: 'title' }, 'DEMAND FOR RETURN OF SECURITY DEPOSIT'),
-                    React.createElement('div', { key: 'actions' }, [
+                    // Navigation buttons on the left
+                    React.createElement('div', { key: 'navigation', className: 'nav-buttons' }, [
                         React.createElement('button', {
                             key: 'prev-tab',
                             className: 'btn btn-secondary',
@@ -1451,7 +1400,62 @@ Sincerely,`;
                             React.createElement('span', { key: 'text' }, 'Next'),
                             React.createElement(Icon, { key: 'icon', name: 'chevron-right' })
                         ])
+                    ]),
+                    
+                    // Action buttons on the right
+                    React.createElement('div', { key: 'document-actions', className: 'doc-buttons' }, [
+                        React.createElement('button', {
+                            key: 'copy',
+                            className: 'btn btn-secondary',
+                            onClick: () => {
+                                const content = generateLetterContent().replace(/<[^>]*>/g, '');
+                                window.copyToClipboard(content);
+                            }
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'copy' }),
+                            React.createElement('span', { key: 'text' }, 'Copy')
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'download',
+                            className: 'btn btn-primary',
+                            onClick: () => window.generateWordDoc(generateLetterContent(), formData)
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: 'download' }),
+                            React.createElement('span', { key: 'text' }, 'Word Doc')
+                        ]),
+                        
+                        React.createElement('button', {
+                            key: 'esign',
+                            className: 'btn btn-accent',
+                            disabled: eSignLoading,
+                            onClick: async () => {
+                                setESignLoading(true);
+                                try {
+                                    // Generate letter content to populate window.cleanLetterText
+                                    generateLetterContent();
+                                    // Use clean text version for eSignature
+                                    await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
+                                } finally {
+                                    setESignLoading(false);
+                                }
+                            }
+                        }, [
+                            React.createElement(Icon, { 
+                                key: 'icon', 
+                                name: eSignLoading ? 'loader' : 'edit-3',
+                                style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
+                            }),
+                            React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
+                        ])
                     ])
+                ])
+            ]),
+            
+            // Preview pane
+            React.createElement('div', { key: 'preview', className: 'preview-pane' }, [
+                React.createElement('div', { key: 'header', className: 'preview-header' }, [
+                    React.createElement('h3', { key: 'title' }, 'Live Preview')
                 ]),
                 React.createElement('div', {
                     key: 'content',
