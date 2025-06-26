@@ -151,34 +151,82 @@ const TenantDepositGenerator = () => {
         { id: 'assessment', label: 'Case Assessment', icon: 'shield-check' }
     ];
 
-    // Update form data and trigger highlighting
+    // Update form data and trigger highlighting (Stripe-style implementation)
     const updateFormData = (field, value) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         setLastChanged(field);
         
-        // Clear highlighting after 2 seconds
-        setTimeout(() => setLastChanged(null), 2000);
+        // Clear highlighting after 8 seconds (Stripe timing)
+        setTimeout(() => setLastChanged(null), 8000);
     };
 
-    // Auto-scroll to highlighted content within preview pane
+    // Map form fields to document sections for highlighting
+    const getSectionToHighlight = () => {
+        if (!lastChanged) return null;
+        
+        switch (currentTab) {
+            case 0: // Scenarios
+                if (['letterTone', 'selectedScenarios'].includes(lastChanged)) {
+                    return 'greeting-section';
+                }
+                break;
+            case 1: // Property & Tenancy
+                if (['tenantName', 'landlordName', 'rentalAddress'].includes(lastChanged)) {
+                    return 'header-info';
+                }
+                if (['leaseStartDate', 'leaseEndDate', 'moveOutDate', 'securityDeposit'].includes(lastChanged)) {
+                    return 'tenancy-details';
+                }
+                break;
+            case 2: // Deposit & Deductions
+                if (['normalWearCharges', 'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement'].includes(lastChanged)) {
+                    return 'disputed-deductions';
+                }
+                if (['itemizedStatementReceived'].includes(lastChanged)) {
+                    return 'legal-violation';
+                }
+                break;
+            case 3: // Legal Violations
+                if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
+                    return 'demand-section';
+                }
+                break;
+        }
+        return null;
+    };
+
+    // Create highlighted text using Stripe-style regex targeting
+    const createHighlightedText = (documentText) => {
+        const sectionToHighlight = getSectionToHighlight();
+        if (!sectionToHighlight) return documentText;
+        
+        const sections = {
+            'header-info': /Re: Demand for Return of Security Deposit.*?Property: [^\n]*/s,
+            'greeting-section': /(Dear|To|TO): [^\n]*/,
+            'tenancy-details': /Tenancy Details: [^.]*\./,
+            'legal-violation': /Legal Violation: [^.]*\./,
+            'disputed-deductions': /Disputed Deductions: [^.]*\./,
+            'demand-section': /Demand: [^.]*\./
+        };
+        
+        if (sections[sectionToHighlight]) {
+            return documentText.replace(sections[sectionToHighlight], match => 
+                `<span class="highlighted-text">${match}</span>`
+            );
+        }
+        
+        return documentText;
+    };
+
+    // Auto-scroll with Stripe-style implementation
     useEffect(() => {
-        if (lastChanged && previewRef.current) {
-            const highlightedElements = previewRef.current.querySelectorAll('.highlight');
-            if (highlightedElements.length > 0) {
-                const element = highlightedElements[0];
-                const container = previewRef.current;
-                
-                // Get the position of the highlighted element relative to the container
-                const elementRect = element.getBoundingClientRect();
-                const containerRect = container.getBoundingClientRect();
-                const relativeTop = elementRect.top - containerRect.top;
-                
-                // Scroll the container to center the highlighted element
-                container.scrollTo({
-                    top: container.scrollTop + relativeTop - container.clientHeight / 2,
-                    behavior: 'smooth'
-                });
-            }
+        if (previewRef.current && lastChanged) {
+            setTimeout(() => {
+                const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                if (highlightedElement) {
+                    highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100); // Stripe timing for DOM updates
         }
     }, [lastChanged]);
 
@@ -289,7 +337,46 @@ const TenantDepositGenerator = () => {
             disputedText = `I specifically dispute the following improper deductions: ${disputedItems.join(", ")}.`;
         }
         
-        return `
+        // Create clean text version for eSignatures (no HTML)
+        const cleanText = `DEMAND FOR RETURN OF SECURITY DEPOSIT
+
+${today}
+
+${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '\n' + formData.landlordCompany : ''}
+${formData.landlordAddress || '[LANDLORD ADDRESS]'}
+${formData.landlordCity || '[CITY]'}, ${formData.landlordState || 'CA'} ${formData.landlordZip || '[ZIP]'}
+
+Re: Demand for Return of Security Deposit
+Tenant: ${formData.tenantName || '[TENANT NAME]'}
+Property: ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}
+
+${greeting} ${formData.landlordName || '[LANDLORD NAME]'},
+
+${urgencyLevel} the immediate return of my security deposit in the amount of $${calculations.total.toFixed(2)}, as required under ${stateData.citation}.
+
+Tenancy Details: I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.
+
+Legal Violation: Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
+
+${formData.itemizedStatementReceived === 'not-received' ? 
+    `No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
+}
+
+${disputedText ? `Disputed Deductions: ${disputedText} These charges violate state law prohibiting deductions for normal wear and tear.` : ''}
+
+Amount Due: Due to your non-compliance, you owe statutory penalties totaling $${calculations.total.toFixed(2)} (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
+
+Demand: You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}
+
+${closingTone}
+
+Sincerely,`;
+
+        // Store clean text globally for eSignature use
+        window.cleanLetterText = cleanText;
+        
+        // Return HTML version with highlighting for preview
+        return createHighlightedText(`
             <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
             
             <p>${today}</p>
@@ -323,7 +410,7 @@ const TenantDepositGenerator = () => {
             <p>${closingTone}</p>
             
             <p>Sincerely,</p>
-        `;
+        `);
     };
 
     // Real-world scenario presets based on actual deposit disputes (checkbox selection)
@@ -963,27 +1050,6 @@ const TenantDepositGenerator = () => {
                     })
                 ]) : null,
             
-            riskAssessment ?
-                React.createElement('div', { key: 'risk-assessment', className: `risk-assessment ${riskAssessment.color}` }, [
-                    React.createElement('h4', { key: 'title' }, `Case Strength Assessment: ${riskAssessment.level.toUpperCase()}`),
-                    React.createElement('div', { key: 'details', className: 'assessment-details' }, [
-                        React.createElement('div', { key: 'score', className: 'assessment-item' }, 
-                            React.createElement('strong', null, `Strength Score: ${riskAssessment.score}/6`)
-                        ),
-                        React.createElement('div', { key: 'recommendation', className: 'assessment-item' }, 
-                            React.createElement('strong', null, riskAssessment.recommendation)
-                        )
-                    ]),
-                    riskAssessment.factors.length > 0 ?
-                        React.createElement('div', { key: 'factors' }, [
-                            React.createElement('p', { key: 'title' }, React.createElement('strong', null, 'Factors in your favor:')),
-                            React.createElement('ul', { key: 'list' }, 
-                                riskAssessment.factors.map((factor, index) => 
-                                    React.createElement('li', { key: index }, factor)
-                                )
-                            )
-                        ]) : null
-                ]) : null
         ]);
     };
 
@@ -1048,7 +1114,7 @@ const TenantDepositGenerator = () => {
 
         return React.createElement('div', { className: 'tab-content' }, [
             React.createElement('h3', { key: 'title' }, 'Legal Case Assessment'),
-            React.createElement('p', { key: 'subtitle' }, 'Attorney-level analysis of your security deposit case based on your specific situation:'),
+            React.createElement('p', { key: 'subtitle' }, 'Analysis of your security deposit case based on your specific situation:'),
             
             // Overall case strength
             riskAssessment ?
@@ -1115,7 +1181,7 @@ const TenantDepositGenerator = () => {
             // Recommendations
             caseAnalysis.recommendations.length > 0 ?
                 React.createElement('div', { key: 'recommendations', className: 'analysis-section' }, [
-                    React.createElement('h4', { key: 'title' }, '💡 Attorney Recommendations'),
+                    React.createElement('h4', { key: 'title' }, '💡 General Suggestions'),
                     React.createElement('ul', { key: 'list', className: 'analysis-list recommendations' }, 
                         caseAnalysis.recommendations.map((rec, index) => 
                             React.createElement('li', { key: index }, rec)
@@ -1242,7 +1308,10 @@ const TenantDepositGenerator = () => {
                         onClick: async () => {
                             setESignLoading(true);
                             try {
-                                await window.initiateESign(generateLetterContent(), formData);
+                                // Generate letter content to populate window.cleanLetterText
+                                generateLetterContent();
+                                // Use clean text version for eSignature
+                                await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
                             } finally {
                                 setESignLoading(false);
                             }
