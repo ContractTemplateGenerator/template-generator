@@ -179,7 +179,7 @@ const TenantDepositGenerator = () => {
                 }
                 break;
             case 2: // Deposit & Deductions
-                if (['normalWearCharges', 'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement'].includes(lastChanged)) {
+                if (['normalWearCharges', 'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement', 'preexistingDamage'].includes(lastChanged)) {
                     return 'disputed-deductions';
                 }
                 if (['itemizedStatementReceived'].includes(lastChanged)) {
@@ -420,10 +420,33 @@ Sincerely,`;
             title: 'Complete Non-Return of Deposit',
             description: 'Landlord failed to return any portion of security deposit within legal deadline',
             situation: 'No deposit returned',
-            useCase: 'Landlord missed legal deadline completely',
+            useCase: 'Landlord missed legal deadline completely, total radio silence',
             sample: 'You have failed to return my security deposit within the legally required timeframe...',
             expandedOptions: [
                 { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 10 },
+                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true },
+                { field: 'requestAttorneyFees', label: 'Request attorney fees and costs', type: 'checkbox', default: true },
+                { field: 'priorCommunications', label: 'Previous failed attempts to contact', type: 'checkbox', default: false },
+                { field: 'evidenceReceipts', label: 'Have deposit payment records', type: 'checkbox', default: true }
+            ]
+        },
+        {
+            id: 'partial-non-return',
+            title: 'Partial Non-Return of Deposit',
+            description: 'Landlord returned some deposit but illegally withheld remainder without proper justification',
+            situation: 'Partial withholding',
+            useCase: 'Got some money back but landlord kept portion illegally, inadequate or missing itemization',
+            sample: 'You returned only a portion of my deposit without proper legal justification...',
+            expandedOptions: [
+                { field: 'itemizedStatementReceived', label: 'Received itemized statement', type: 'select', options: ['not-received', 'inadequate', 'disputed'], default: 'inadequate' },
+                { field: 'normalWearCharges', label: 'Charged for normal wear & tear', type: 'checkbox', default: true },
+                { field: 'excessiveCleaningFees', label: 'Excessive cleaning charges', type: 'checkbox', default: false },
+                { field: 'paintingCosts', label: 'Improper painting charges', type: 'checkbox', default: false },
+                { field: 'carpetReplacement', label: 'Improper carpet charges', type: 'checkbox', default: false },
+                { field: 'preexistingDamage', label: 'Charged for pre-existing damage', type: 'checkbox', default: false },
+                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos', type: 'checkbox', default: true },
+                { field: 'evidenceReceipts', label: 'Have cleaning/repair receipts', type: 'checkbox', default: false },
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
                 { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true }
             ]
         },
@@ -432,12 +455,16 @@ Sincerely,`;
             title: 'Improper Wear & Tear Charges',
             description: 'Landlord deducted for normal wear and tear items that are legally prohibited',
             situation: 'Illegal deductions',
-            useCase: 'Charged for painting, carpet wear, minor scuffs, or normal aging',
+            useCase: 'Charged for painting, carpet wear, minor scuffs, or normal aging - classic illegal charges',
             sample: 'The deductions you have taken for normal wear and tear violate state law...',
             expandedOptions: [
-                { field: 'paintingCosts', label: 'Painting charges', type: 'checkbox', default: true },
+                { field: 'paintingCosts', label: 'Painting charges (most common)', type: 'checkbox', default: true },
                 { field: 'carpetReplacement', label: 'Carpet replacement charges', type: 'checkbox', default: true },
-                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos as evidence', type: 'checkbox', default: true }
+                { field: 'normalWearCharges', label: 'General normal wear charges', type: 'checkbox', default: true },
+                { field: 'evidenceMoveInPhotos', label: 'Have move-in photos as evidence', type: 'checkbox', default: true },
+                { field: 'evidenceInspectionReport', label: 'Have move-in inspection report', type: 'checkbox', default: false },
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
+                { field: 'includeSmallClaimsThreat', label: 'Threaten legal action', type: 'checkbox', default: true }
             ]
         },
         {
@@ -445,23 +472,30 @@ Sincerely,`;
             title: 'No Itemization Provided',
             description: 'Landlord withheld deposit without providing required detailed itemization',
             situation: 'Missing itemized list',
-            useCase: 'Partial return with no explanation or receipts for deductions',
+            useCase: 'Partial return with no explanation, receipts, or legally required itemized breakdown',
             sample: 'You have failed to provide the legally required itemized statement of deductions...',
             expandedOptions: [
                 { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 7 },
-                { field: 'requestAttorneyFees', label: 'Request attorney fees', type: 'checkbox', default: true }
+                { field: 'requestAttorneyFees', label: 'Request attorney fees', type: 'checkbox', default: true },
+                { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true },
+                { field: 'priorCommunications', label: 'Previously requested itemization', type: 'checkbox', default: false },
+                { field: 'evidenceCommunications', label: 'Have written requests for itemization', type: 'checkbox', default: false }
             ]
         },
         {
             id: 'excessive-fees',
             title: 'Excessive Cleaning Charges',
-            description: 'Unreasonable cleaning fees far exceeding normal market rates',
+            description: 'Unreasonable cleaning fees far exceeding normal market rates or property condition',
             situation: 'Inflated costs',
-            useCase: 'Professional cleaning bills that seem excessive or suspicious',
+            useCase: 'Professional cleaning bills that seem excessive, suspicious, or don\'t match property condition',
             sample: 'The cleaning charges you have assessed are unreasonable and excessive...',
             expandedOptions: [
                 { field: 'excessiveCleaningFees', label: 'Mark as excessive cleaning fees', type: 'checkbox', default: true },
-                { field: 'evidenceReceipts', label: 'Have receipts as evidence', type: 'checkbox', default: true }
+                { field: 'evidenceReceipts', label: 'Have market rate evidence', type: 'checkbox', default: true },
+                { field: 'evidenceMoveInPhotos', label: 'Have photos of clean move-in condition', type: 'checkbox', default: true },
+                { field: 'evidenceReceipts', label: 'Have competing cleaning quotes', type: 'checkbox', default: false },
+                { field: 'normalWearCharges', label: 'Also charged for normal wear', type: 'checkbox', default: false },
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 }
             ]
         }
     ];
@@ -537,28 +571,18 @@ Sincerely,`;
                             ])
                         ]),
                         
-                        // Expanded options when scenario is selected
+                        // Expanded options when scenario is selected - using CSS classes for compact design
                         isSelected && scenario.expandedOptions ? React.createElement('div', {
                             key: 'expanded',
-                            className: 'scenario-expanded-options',
-                            style: { 
-                                marginTop: '1rem', 
-                                marginBottom: '2rem',
-                                padding: '1.5rem', 
-                                background: '#f8fafc', 
-                                borderRadius: '8px',
-                                border: '1px solid #e2e8f0'
-                            }
+                            className: 'scenario-expanded-options'
                         }, [
                             React.createElement('h5', { 
-                                key: 'options-title',
-                                style: { marginBottom: '1rem', color: '#1e293b' }
+                                key: 'options-title'
                             }, `${scenario.title} Options:`),
                             ...scenario.expandedOptions.map(option => {
                                 if (option.type === 'checkbox') {
                                     return React.createElement('div', {
-                                        key: option.field,
-                                        style: { marginBottom: '1rem' }
+                                        key: option.field
                                     }, [
                                         React.createElement('label', {
                                             key: 'label',
@@ -576,25 +600,43 @@ Sincerely,`;
                                     ]);
                                 } else if (option.type === 'number') {
                                     return React.createElement('div', {
-                                        key: option.field,
-                                        style: { marginBottom: '1rem' }
+                                        key: option.field
                                     }, [
                                         React.createElement('label', {
-                                            key: 'label',
-                                            style: { display: 'block', marginBottom: '0.5rem', fontWeight: '600' }
+                                            key: 'label'
                                         }, option.label),
                                         React.createElement('input', {
                                             key: 'input',
                                             type: 'number',
                                             value: formData[option.field] || option.default,
-                                            onChange: (e) => updateFormData(option.field, parseInt(e.target.value)),
+                                            onChange: (e) => updateFormData(option.field, parseInt(e.target.value))
+                                        })
+                                    ]);
+                                } else if (option.type === 'select') {
+                                    return React.createElement('div', {
+                                        key: option.field
+                                    }, [
+                                        React.createElement('label', {
+                                            key: 'label'
+                                        }, option.label),
+                                        React.createElement('select', {
+                                            key: 'select',
+                                            value: formData[option.field] || option.default,
+                                            onChange: (e) => updateFormData(option.field, e.target.value),
                                             style: { 
-                                                padding: '0.5rem',
+                                                padding: '0.375rem 0.5rem',
                                                 border: '1px solid #d1d5db',
                                                 borderRadius: '4px',
-                                                width: '100px'
+                                                fontSize: '0.8125rem'
                                             }
-                                        })
+                                        }, option.options.map(opt => 
+                                            React.createElement('option', { 
+                                                key: opt, 
+                                                value: opt 
+                                            }, opt === 'not-received' ? 'Not Received' : 
+                                               opt === 'inadequate' ? 'Inadequate' : 
+                                               opt === 'disputed' ? 'Disputed' : opt)
+                                        ))
                                     ]);
                                 }
                                 return null;
