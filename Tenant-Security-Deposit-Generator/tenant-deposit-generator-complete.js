@@ -153,11 +153,11 @@ const TenantDepositGenerator = () => {
 
     // Update form data and trigger highlighting (Stripe-style implementation)
     const updateFormData = (field, value) => {
-        setFormData(prev => ({ ...prev, [field]: value }));
+        // Record what field was changed for highlighting
         setLastChanged(field);
         
-        // Clear highlighting after 8 seconds (Stripe timing)
-        setTimeout(() => setLastChanged(null), 8000);
+        // Update form data
+        setFormData(prev => ({ ...prev, [field]: value }));
     };
 
     // Map form fields to document sections for highlighting (enhanced for scenarios)
@@ -216,22 +216,25 @@ const TenantDepositGenerator = () => {
         const sectionToHighlight = getSectionToHighlight();
         if (!sectionToHighlight) return documentText;
         
+        let highlightedText = documentText;
+        
+        // Define more specific regex patterns for granular highlighting
         const sections = {
             'header-info': /Re: Demand for Return of Security Deposit.*?Property: [^\n]*/s,
             'greeting-section': /(Dear|To|TO): [^\n]*/,
             'tenancy-details': /Tenancy Details: [^.]*\./,
             'legal-violation': /Legal Violation: [^.]*\./,
             'disputed-deductions': /Disputed Deductions: [^.]*\./,
-            'demand-section': /Demand: [^.]*\./
+            'demand-section': /You have [^.]*days from the date of this letter[^.]*/
         };
         
         if (sections[sectionToHighlight]) {
-            return documentText.replace(sections[sectionToHighlight], match => 
+            highlightedText = documentText.replace(sections[sectionToHighlight], match => 
                 `<span class="highlighted-text">${match}</span>`
             );
         }
         
-        return documentText;
+        return highlightedText;
     };
 
     // Auto-scroll with Stripe-style implementation
@@ -243,6 +246,9 @@ const TenantDepositGenerator = () => {
                     highlightedElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }
             }, 100); // Stripe timing for DOM updates
+            
+            // Clear highlighting after 8 seconds
+            setTimeout(() => setLastChanged(null), 8000);
         }
     }, [lastChanged]);
 
@@ -391,8 +397,8 @@ Sincerely,`;
         // Store clean text globally for eSignature use
         window.cleanLetterText = cleanText;
         
-        // Return HTML version with highlighting for preview
-        return createHighlightedText(`
+        // Return HTML version for preview (highlighting will be applied separately)
+        return `
             <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
             
             <p>${today}</p>
@@ -426,7 +432,7 @@ Sincerely,`;
             <p>${closingTone}</p>
             
             <p>Sincerely,</p>
-        `);
+        `;
     };
 
     // Real-world scenario presets based on actual deposit disputes (checkbox selection)
@@ -534,18 +540,32 @@ Sincerely,`;
         const currentSelected = formData.selectedScenarios;
         const isSelected = currentSelected.includes(scenarioId);
         
+        // Trigger highlighting for scenario changes
+        setLastChanged('selectedScenarios');
+        
         if (isSelected) {
             // Remove scenario
-            updateFormData('selectedScenarios', currentSelected.filter(id => id !== scenarioId));
+            setFormData(prev => ({
+                ...prev,
+                selectedScenarios: currentSelected.filter(id => id !== scenarioId)
+            }));
         } else {
             // Add scenario and apply its default values
-            updateFormData('selectedScenarios', [...currentSelected, scenarioId]);
             const scenario = scenarios.find(s => s.id === scenarioId);
+            const updatedScenarios = [...currentSelected, scenarioId];
+            
+            let newFormData = {
+                ...formData,
+                selectedScenarios: updatedScenarios
+            };
+            
             if (scenario && scenario.expandedOptions) {
                 scenario.expandedOptions.forEach(option => {
-                    updateFormData(option.field, option.default);
+                    newFormData[option.field] = option.default;
                 });
             }
+            
+            setFormData(newFormData);
         }
     };
 
@@ -1437,10 +1457,7 @@ Sincerely,`;
                     className: 'preview-content',
                     ref: previewRef,
                     dangerouslySetInnerHTML: { 
-                        __html: generateLetterContent().replace(
-                            new RegExp(`(${lastChanged && formData[lastChanged] ? formData[lastChanged].toString().replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : 'NOMATCH'})`, 'gi'),
-                            lastChanged && formData[lastChanged] ? '<span class="highlight">$1</span>' : '$1'
-                        )
+                        __html: createHighlightedText(generateLetterContent())
                     }
                 })
             ])
