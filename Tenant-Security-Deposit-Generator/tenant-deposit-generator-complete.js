@@ -179,6 +179,44 @@ const TenantDepositGenerator = () => {
         }
     }, [lastChanged]);
 
+    // Helper function for clickable checkbox/radio items
+    const createClickableItem = (type, fieldName, value, title, description, checked, extraClassName = '') => {
+        const inputProps = type === 'checkbox' 
+            ? {
+                type: 'checkbox',
+                checked: checked,
+                onChange: (e) => e.stopPropagation()
+            }
+            : {
+                type: 'radio',
+                name: fieldName,
+                value: value,
+                checked: checked,
+                onChange: (e) => e.stopPropagation()
+            };
+
+        return React.createElement('div', { 
+            key: value || fieldName,
+            className: `${type}-item ${checked ? 'selected' : ''} ${extraClassName}`,
+            onClick: () => {
+                if (type === 'checkbox') {
+                    updateFormData(fieldName, !checked);
+                } else {
+                    updateFormData(fieldName, value);
+                }
+            }
+        }, [
+            React.createElement('input', {
+                key: 'input',
+                ...inputProps
+            }),
+            React.createElement('div', { key: 'content', className: `${type}-content` }, [
+                React.createElement('strong', { key: 'title' }, title),
+                React.createElement('p', { key: 'desc' }, description)
+            ])
+        ]);
+    };
+
     // Generate comprehensive letter content
     const generateLetterContent = () => {
         const state = formData.rentalState;
@@ -665,48 +703,9 @@ const TenantDepositGenerator = () => {
             React.createElement('div', { key: 'itemization', className: 'form-group' }, [
                 React.createElement('label', { key: 'label' }, 'Have you received an itemized statement of deductions?'),
                 React.createElement('div', { key: 'radio-group', className: 'radio-group' }, [
-                    React.createElement('div', { key: 'not-received', className: 'radio-item' }, [
-                        React.createElement('input', {
-                            key: 'input',
-                            type: 'radio',
-                            name: 'itemizedStatement',
-                            value: 'not-received',
-                            checked: formData.itemizedStatementReceived === 'not-received',
-                            onChange: (e) => updateFormData('itemizedStatementReceived', e.target.value)
-                        }),
-                        React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                            React.createElement('strong', { key: 'title' }, 'No Statement Received'),
-                            React.createElement('p', { key: 'desc' }, 'Landlord has not provided any itemization (strongest legal position)')
-                        ])
-                    ]),
-                    React.createElement('div', { key: 'inadequate', className: 'radio-item' }, [
-                        React.createElement('input', {
-                            key: 'input',
-                            type: 'radio',
-                            name: 'itemizedStatement',
-                            value: 'inadequate',
-                            checked: formData.itemizedStatementReceived === 'inadequate',
-                            onChange: (e) => updateFormData('itemizedStatementReceived', e.target.value)
-                        }),
-                        React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                            React.createElement('strong', { key: 'title' }, 'Inadequate Statement'),
-                            React.createElement('p', { key: 'desc' }, 'Statement lacks required details or supporting documentation')
-                        ])
-                    ]),
-                    React.createElement('div', { key: 'disputed', className: 'radio-item' }, [
-                        React.createElement('input', {
-                            key: 'input',
-                            type: 'radio',
-                            name: 'itemizedStatement',
-                            value: 'disputed',
-                            checked: formData.itemizedStatementReceived === 'disputed',
-                            onChange: (e) => updateFormData('itemizedStatementReceived', e.target.value)
-                        }),
-                        React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                            React.createElement('strong', { key: 'title' }, 'Statement Received but Disputed'),
-                            React.createElement('p', { key: 'desc' }, 'Statement contains improper or excessive charges')
-                        ])
-                    ])
+                    createClickableItem('radio', 'itemizedStatementReceived', 'not-received', 'No Statement Received', 'Landlord has not provided any itemization (strongest legal position)', formData.itemizedStatementReceived === 'not-received'),
+                    createClickableItem('radio', 'itemizedStatementReceived', 'inadequate', 'Inadequate Statement', 'Statement lacks required details or supporting documentation', formData.itemizedStatementReceived === 'inadequate'),
+                    createClickableItem('radio', 'itemizedStatementReceived', 'disputed', 'Statement Received but Disputed', 'Statement contains improper or excessive charges', formData.itemizedStatementReceived === 'disputed')
                 ])
             ]),
             
@@ -725,102 +724,14 @@ const TenantDepositGenerator = () => {
             React.createElement('p', { key: 'deductions-desc' }, 'Select all improper deductions from your security deposit:'),
             
             React.createElement('div', { key: 'deductions-grid', className: 'checkbox-grid' }, [
-                React.createElement('div', { key: 'normal-wear', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.normalWearCharges,
-                        onChange: (e) => updateFormData('normalWearCharges', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Normal Wear and Tear Charges'),
-                        React.createElement('p', { key: 'desc' }, 'Charges for normal deterioration from intended use')
-                    ])
-                ]),
-                React.createElement('div', { key: 'cleaning', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.excessiveCleaningFees,
-                        onChange: (e) => updateFormData('excessiveCleaningFees', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Excessive Cleaning Fees'),
-                        React.createElement('p', { key: 'desc' }, 'Unreasonable or inflated cleaning charges')
-                    ])
-                ]),
-                React.createElement('div', { key: 'painting', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.paintingCosts,
-                        onChange: (e) => updateFormData('paintingCosts', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Painting Costs'),
-                        React.createElement('p', { key: 'desc' }, 'Repainting for normal wear or cosmetic purposes')
-                    ])
-                ]),
-                React.createElement('div', { key: 'carpet', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.carpetReplacement,
-                        onChange: (e) => updateFormData('carpetReplacement', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Carpet Replacement'),
-                        React.createElement('p', { key: 'desc' }, 'Carpet replacement due to normal wear')
-                    ])
-                ]),
-                React.createElement('div', { key: 'rent', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.unpaidRentDisputes,
-                        onChange: (e) => updateFormData('unpaidRentDisputes', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Disputed Unpaid Rent'),
-                        React.createElement('p', { key: 'desc' }, 'Claims for rent that was actually paid')
-                    ])
-                ]),
-                React.createElement('div', { key: 'keys', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.keyReplacement,
-                        onChange: (e) => updateFormData('keyReplacement', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Key Replacement Charges'),
-                        React.createElement('p', { key: 'desc' }, 'Excessive charges for key replacement')
-                    ])
-                ]),
-                React.createElement('div', { key: 'preexisting', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.preexistingDamage,
-                        onChange: (e) => updateFormData('preexistingDamage', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Pre-existing Damage'),
-                        React.createElement('p', { key: 'desc' }, 'Charges for damage that existed before tenancy')
-                    ])
-                ]),
-                React.createElement('div', { key: 'other', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.otherDeductions,
-                        onChange: (e) => updateFormData('otherDeductions', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Other Improper Deductions'),
-                        React.createElement('p', { key: 'desc' }, 'Specify other disputed charges')
-                    ])
-                ])
+                createClickableItem('checkbox', 'normalWearCharges', null, 'Normal Wear and Tear Charges', 'Charges for normal deterioration from intended use', formData.normalWearCharges),
+                createClickableItem('checkbox', 'excessiveCleaningFees', null, 'Excessive Cleaning Fees', 'Unreasonable or inflated cleaning charges', formData.excessiveCleaningFees),
+                createClickableItem('checkbox', 'paintingCosts', null, 'Painting Costs', 'Repainting for normal wear or cosmetic purposes', formData.paintingCosts),
+                createClickableItem('checkbox', 'carpetReplacement', null, 'Carpet Replacement', 'Carpet replacement due to normal wear', formData.carpetReplacement),
+                createClickableItem('checkbox', 'unpaidRentDisputes', null, 'Disputed Unpaid Rent', 'Claims for rent that was actually paid', formData.unpaidRentDisputes),
+                createClickableItem('checkbox', 'keyReplacement', null, 'Key Replacement Charges', 'Excessive charges for key replacement', formData.keyReplacement),
+                createClickableItem('checkbox', 'preexistingDamage', null, 'Pre-existing Damage', 'Charges for damage that existed before tenancy', formData.preexistingDamage),
+                createClickableItem('checkbox', 'otherDeductions', null, 'Other Improper Deductions', 'Specify other disputed charges', formData.otherDeductions)
             ]),
             
             formData.otherDeductions ?
