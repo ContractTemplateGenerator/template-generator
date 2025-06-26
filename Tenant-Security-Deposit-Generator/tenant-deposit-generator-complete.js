@@ -138,8 +138,8 @@ const TenantDepositGenerator = () => {
         includeSmallClaimsThreat: true,
         requestAttorneyFees: true,
         
-        // Primary scenario selection (mutually exclusive)
-        primaryScenario: '',
+        // Multiple scenario selections (some mutually exclusive)
+        selectedScenarios: [],
         // Step-by-step answers for all scenarios
         totalDepositAmount: '',
         amountReturned: '',
@@ -147,13 +147,10 @@ const TenantDepositGenerator = () => {
         landlordJustificationDetails: [],
         
         // Additional scenario-specific fields
-        disputedChargeTypes: [],
-        wearTearCharges: '',
-        wearTearItems: [],
+        excessiveChargeAmount: '',
+        excessiveChargeTypes: [],
         tenancyLength: '',
         communicationAttempts: '',
-        excessiveFeeAmount: '',
-        feeTypes: [],
         propertyCondition: ''
     });
 
@@ -184,20 +181,20 @@ const TenantDepositGenerator = () => {
                 if (['letterTone'].includes(lastChanged)) {
                     return 'tone-changes'; // Highlight demand statements that change with tone
                 }
-                if (['primaryScenario'].includes(lastChanged)) {
+                if (['selectedScenarios'].includes(lastChanged)) {
                     return 'scenario-content'; // Highlight content that changes with scenarios
                 }
-                if (['totalDepositAmount', 'amountReturned', 'landlordJustifications', 'wearTearCharges', 'excessiveFeeAmount'].includes(lastChanged)) {
+                if (['totalDepositAmount', 'amountReturned', 'excessiveChargeAmount'].includes(lastChanged)) {
                     return 'deposit-details';
                 }
-                if (['disputedChargeTypes', 'wearTearItems', 'feeTypes'].includes(lastChanged)) {
+                if (['landlordJustifications', 'communicationAttempts', 'tenancyLength', 'propertyCondition'].includes(lastChanged)) {
+                    return 'scenario-content';
+                }
+                if (['excessiveChargeTypes'].includes(lastChanged)) {
                     return 'disputed-deductions';
                 }
                 if (['responseDeadline', 'includeSmallClaimsThreat'].includes(lastChanged)) {
                     return 'demand-section';
-                }
-                if (['communicationAttempts', 'tenancyLength', 'propertyCondition'].includes(lastChanged)) {
-                    return 'scenario-content';
                 }
                 break;
             case 1: // Property & Tenancy
@@ -269,7 +266,7 @@ const TenantDepositGenerator = () => {
     }, [lastChanged]);
 
     // Helper function for clickable checkbox/radio items
-    const createClickableItem = (type, fieldName, value, title, description, checked, extraClassName = '') => {
+    const createClickableItem = (type, fieldName, value, title, description, checked, extraClassName = '', customOnClick = null) => {
         const inputProps = type === 'checkbox' 
             ? {
                 type: 'checkbox',
@@ -287,13 +284,13 @@ const TenantDepositGenerator = () => {
         return React.createElement('div', { 
             key: value || fieldName,
             className: `${type}-item ${checked ? 'selected' : ''} ${extraClassName}`,
-            onClick: () => {
+            onClick: customOnClick || (() => {
                 if (type === 'checkbox') {
                     updateFormData(fieldName, !checked);
                 } else {
                     updateFormData(fieldName, value);
                 }
-            }
+            })
         }, [
             React.createElement('input', {
                 key: 'input',
@@ -352,27 +349,86 @@ const TenantDepositGenerator = () => {
         }
 
         
-        // Build disputed deductions - concise
+        // Build scenario-specific content based on selected scenarios and step-by-step answers
+        const selectedScenarios = formData.selectedScenarios || [];
+        let scenarioContent = [];
         let disputedText = "";
-        let disputedItems = [];
-        if (formData.normalWearCharges || formData.paintingCosts || formData.carpetReplacement) {
-            disputedItems.push("normal wear and tear charges");
-        }
-        if (formData.excessiveCleaningFees) {
-            disputedItems.push("excessive cleaning fees");
-        }
-        if (formData.unpaidRentDisputes) {
-            disputedItems.push("disputed rent claims");
-        }
-        if (formData.preexistingDamage) {
-            disputedItems.push("pre-existing damage charges");
-        }
-        if (formData.otherDeductions && formData.otherDeductionsText) {
-            disputedItems.push(formData.otherDeductionsText);
+        
+        // Complete Non-Return scenario content
+        if (selectedScenarios.includes('complete-non-return')) {
+            scenarioContent.push(`**Complete Non-Return Situation:** You have withheld my entire security deposit of $${formData.totalDepositAmount || '0'}.`);
+            
+            if (formData.landlordJustifications === 'no-response') {
+                scenarioContent.push(`You have provided no response or justification for withholding my deposit.`);
+            } else if (formData.landlordJustifications === 'verbal-only') {
+                scenarioContent.push(`You have only provided verbal explanations, failing to meet legal written notice requirements.`);
+            } else if (formData.landlordJustifications === 'written-reasons') {
+                scenarioContent.push(`While you provided written justifications, these deductions are improper under state law.`);
+            }
         }
         
-        if (disputedItems.length > 0) {
-            disputedText = `I specifically dispute the following improper deductions: ${disputedItems.join(", ")}.`;
+        // Partial Non-Return scenario content  
+        if (selectedScenarios.includes('partial-non-return')) {
+            const returnedAmount = formData.amountReturned || '0';
+            const totalDeposit = formData.totalDepositAmount || '0';
+            const withheldAmount = (parseFloat(totalDeposit) - parseFloat(returnedAmount)).toFixed(2);
+            
+            scenarioContent.push(`**Partial Non-Return Situation:** While you returned $${returnedAmount} of my $${totalDeposit} security deposit, you improperly withheld $${withheldAmount}.`);
+            
+            if (formData.landlordJustifications === 'no-itemization') {
+                scenarioContent.push(`You failed to provide the required itemized statement of deductions.`);
+            } else if (formData.landlordJustifications === 'inadequate-itemization') {
+                scenarioContent.push(`The itemization you provided is vague and inadequate under state law requirements.`);
+            } else if (formData.landlordJustifications === 'disputed-charges') {
+                scenarioContent.push(`I dispute the charges detailed in your itemization as improper under state law.`);
+            }
+        }
+        
+        // Excessive Charges scenario content
+        if (selectedScenarios.includes('excessive-charges')) {
+            scenarioContent.push(`**Excessive Charges:** You charged $${formData.excessiveChargeAmount || '0'} in excessive and improper fees.`);
+            
+            const chargeTypes = formData.excessiveChargeTypes || [];
+            if (chargeTypes.length > 0) {
+                const chargeDescriptions = chargeTypes.map(type => {
+                    switch(type) {
+                        case 'wear-tear-painting': return 'normal wear and tear for painting/wall touch-ups';
+                        case 'wear-tear-carpet': return 'normal carpet wear';
+                        case 'wear-tear-holes': return 'small nail holes from pictures';
+                        case 'cleaning-professional': return 'unnecessary professional cleaning';
+                        case 'cleaning-carpet': return 'full carpet replacement for minor stains';
+                        case 'repairs-minor': return 'minor maintenance charged as major repairs';
+                        case 'preexisting-damage': return 'pre-existing damage';
+                        default: return type;
+                    }
+                });
+                disputedText = `I specifically dispute the following improper charges: ${chargeDescriptions.join(", ")}.`;
+            }
+            
+            if (formData.tenancyLength === 'over-3-years') {
+                scenarioContent.push(`Having lived in the property for over 3 years, normal wear and tear is legally expected.`);
+            } else if (formData.tenancyLength === '1-3-years') {
+                scenarioContent.push(`During my 1-3 year tenancy, any wear is normal and legally non-chargeable.`);
+            }
+            
+            if (formData.propertyCondition === 'excellent') {
+                scenarioContent.push(`I left the property in excellent condition with professional cleaning completed.`);
+            } else if (formData.propertyCondition === 'good') {
+                scenarioContent.push(`I left the property in good condition with normal cleaning completed.`);
+            }
+        }
+        
+        // No Itemization scenario content
+        if (selectedScenarios.includes('no-itemization')) {
+            scenarioContent.push(`**Missing Itemization:** You failed to provide the legally required itemized statement of deductions.`);
+            
+            if (formData.communicationAttempts === 'written-requests') {
+                scenarioContent.push(`Despite my written requests for itemization, you have failed to comply.`);
+            } else if (formData.communicationAttempts === 'verbal-requests') {
+                scenarioContent.push(`Despite my requests for itemization, you have failed to provide the required documentation.`);
+            } else if (formData.communicationAttempts === 'no-contact') {
+                scenarioContent.push(`This letter serves as my formal request for the required itemization and deposit return.`);
+            }
         }
         
         // Create clean text version for eSignatures (no HTML, but with formatting)
@@ -395,6 +451,8 @@ ${urgencyLevel} the immediate return of my security deposit in the amount of **$
 **Tenancy Details:** I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.
 
 **Legal Violation:** Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
+
+${scenarioContent.length > 0 ? scenarioContent.join('\n\n') : ''}
 
 ${formData.itemizedStatementReceived === 'not-received' ? 
     `**No Itemization:** You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
@@ -432,6 +490,8 @@ Sincerely,`;
             <p><strong>Tenancy Details:</strong> I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.</p>
             
             <p><strong>Legal Violation:</strong> Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.</p>
+            
+            ${scenarioContent.length > 0 ? scenarioContent.map(content => `<p>${content}</p>`).join('\n            ') : ''}
             
             ${formData.itemizedStatementReceived === 'not-received' ? 
                 `<p><strong>No Itemization:</strong> You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.</p>` : ''
@@ -481,35 +541,36 @@ Sincerely,`;
                     { value: 'inadequate-itemization', label: 'Vague/incomplete itemization' },
                     { value: 'disputed-charges', label: 'Detailed charges I want to dispute' }
                 ]},
-                { field: 'disputedChargeTypes', label: 'What types of charges do you dispute?', type: 'checkbox', options: [
-                    { value: 'normal-wear', label: 'Normal wear and tear (painting, carpet wear)' },
-                    { value: 'cleaning-excessive', label: 'Excessive cleaning fees' },
-                    { value: 'damage-preexisting', label: 'Pre-existing damage charges' },
-                    { value: 'unpaid-rent', label: 'Disputed unpaid rent claims' }
-                ]},
                 { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
             ]
         },
         {
-            id: 'improper-wear-tear',
-            title: 'Improper Wear & Tear Charges',
-            description: 'Landlord charged me for normal wear and tear (prohibited by law)',
-            situation: 'Illegal wear and tear deductions',
+            id: 'excessive-charges',
+            title: 'Excessive Charges',
+            description: 'Landlord charged unreasonable amounts for wear, cleaning, or repairs',
+            situation: 'Excessive or improper charges',
             mutuallyExclusive: [],
             stepByStepQuestions: [
                 { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
-                { field: 'wearTearCharges', label: 'Amount charged for wear and tear', type: 'number', required: true },
-                { field: 'wearTearItems', label: 'What items were you charged for?', type: 'checkbox', options: [
-                    { value: 'painting', label: 'Painting/wall touch-ups' },
-                    { value: 'carpet-normal', label: 'Normal carpet wear' },
-                    { value: 'nail-holes', label: 'Small nail holes from pictures' },
-                    { value: 'light-fixtures', label: 'Light bulb replacement' },
-                    { value: 'cabinet-wear', label: 'Cabinet/door handle wear' }
+                { field: 'excessiveChargeAmount', label: 'Total amount of excessive charges', type: 'number', required: true },
+                { field: 'excessiveChargeTypes', label: 'What types of excessive charges?', type: 'checkbox', options: [
+                    { value: 'wear-tear-painting', label: 'Normal wear & tear - Painting/wall touch-ups' },
+                    { value: 'wear-tear-carpet', label: 'Normal wear & tear - Carpet wear' },
+                    { value: 'wear-tear-holes', label: 'Normal wear & tear - Small nail holes' },
+                    { value: 'cleaning-professional', label: 'Excessive cleaning - Professional cleaning when not needed' },
+                    { value: 'cleaning-carpet', label: 'Excessive cleaning - Full carpet replacement for minor stains' },
+                    { value: 'repairs-minor', label: 'Excessive repairs - Minor maintenance charged as major repairs' },
+                    { value: 'preexisting-damage', label: 'Pre-existing damage charges' }
                 ]},
                 { field: 'tenancyLength', label: 'How long did you live there?', type: 'radio', options: [
                     { value: 'under-1-year', label: 'Less than 1 year' },
                     { value: '1-3-years', label: '1-3 years' },
                     { value: 'over-3-years', label: 'More than 3 years' }
+                ]},
+                { field: 'propertyCondition', label: 'What was the condition when you moved out?', type: 'radio', options: [
+                    { value: 'excellent', label: 'Excellent - professionally cleaned' },
+                    { value: 'good', label: 'Good - normal cleaning done' },
+                    { value: 'fair', label: 'Fair - some cleaning needed' }
                 ]},
                 { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
             ]
@@ -530,52 +591,42 @@ Sincerely,`;
                 ]},
                 { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 10 }
             ]
-        },
-        {
-            id: 'excessive-fees',
-            title: 'Excessive Cleaning/Repair Fees',
-            description: 'Landlord charged unreasonable amounts for cleaning or minor repairs',
-            situation: 'Excessive fees charged',
-            mutuallyExclusive: [],
-            stepByStepQuestions: [
-                { field: 'totalDepositAmount', label: 'Total security deposit paid', type: 'number', required: true },
-                { field: 'excessiveFeeAmount', label: 'Amount of excessive fees', type: 'number', required: true },
-                { field: 'feeTypes', label: 'What types of excessive fees?', type: 'checkbox', options: [
-                    { value: 'cleaning-professional', label: 'Professional cleaning (when not needed)' },
-                    { value: 'carpet-replacement', label: 'Full carpet replacement for minor stains' },
-                    { value: 'paint-entire', label: 'Entire unit painting for small scuffs' },
-                    { value: 'appliance-replacement', label: 'Appliance replacement for minor issues' }
-                ]},
-                { field: 'propertyCondition', label: 'What was the condition when you moved out?', type: 'radio', options: [
-                    { value: 'excellent', label: 'Excellent - professionally cleaned' },
-                    { value: 'good', label: 'Good - normal cleaning done' },
-                    { value: 'fair', label: 'Fair - some cleaning needed' }
-                ]},
-                { field: 'responseDeadline', label: 'Days to respond', type: 'number', default: 14 }
-            ]
         }
     ];
 
-    // Helper function to select primary scenario (mutually exclusive)
-    const selectScenario = (scenarioId) => {
+    // Helper function to select/deselect scenarios with mutual exclusivity
+    const toggleScenario = (scenarioId) => {
         const scenario = scenarios.find(s => s.id === scenarioId);
+        const currentSelected = formData.selectedScenarios || [];
+        const isCurrentlySelected = currentSelected.includes(scenarioId);
         
-        // Clear mutually exclusive scenarios
-        if (scenario && scenario.mutuallyExclusive) {
-            scenario.mutuallyExclusive.forEach(exclusiveId => {
-                if (formData.primaryScenario === exclusiveId) {
-                    // Clear this scenario's data
-                    updateFormData('primaryScenario', '');
+        let newSelected;
+        
+        if (isCurrentlySelected) {
+            // Deselect scenario
+            newSelected = currentSelected.filter(id => id !== scenarioId);
+        } else {
+            // Select scenario
+            newSelected = [...currentSelected, scenarioId];
+            
+            // Handle mutual exclusivity - remove conflicting scenarios
+            if (scenario && scenario.mutuallyExclusive) {
+                scenario.mutuallyExclusive.forEach(exclusiveId => {
+                    newSelected = newSelected.filter(id => id !== exclusiveId);
+                });
+            }
+            
+            // Also check if any existing scenarios exclude this new one
+            scenarios.forEach(existingScenario => {
+                if (existingScenario.mutuallyExclusive && 
+                    existingScenario.mutuallyExclusive.includes(scenarioId) &&
+                    newSelected.includes(existingScenario.id)) {
+                    newSelected = newSelected.filter(id => id !== existingScenario.id);
                 }
             });
         }
         
-        // Set the new primary scenario
-        updateFormData('primaryScenario', scenarioId);
-        
-        // Clear related fields when switching scenarios
-        updateFormData('landlordJustifications', '');
-        updateFormData('landlordJustificationDetails', []);
+        updateFormData('selectedScenarios', newSelected);
     };
 
     // Tab content renderers
@@ -591,13 +642,14 @@ Sincerely,`;
             
             // Scenarios section - Radio buttons for mutual exclusivity
             React.createElement('h3', { key: 'scenarios-title' }, 'Your Situation'),
-            React.createElement('p', { key: 'scenarios-subtitle', className: 'help-text' }, 'Choose the situation that best describes what happened:'),
+            React.createElement('p', { key: 'scenarios-subtitle', className: 'help-text' }, 'Select all scenarios that apply to your situation (you can choose multiple):'),
             
-            React.createElement('div', { key: 'scenarios-section', className: 'radio-group' }, 
+            React.createElement('div', { key: 'scenarios-section', className: 'checkbox-grid' }, 
                 scenarios.map(scenario => {
-                    const isSelected = formData.primaryScenario === scenario.id;
+                    const selectedScenarios = formData.selectedScenarios || [];
+                    const isSelected = selectedScenarios.includes(scenario.id);
                     return React.createElement('div', { key: scenario.id }, [
-                        createClickableItem('radio', 'primaryScenario', scenario.id, scenario.title, scenario.description, isSelected),
+                        createClickableItem('checkbox', 'selectedScenarios', scenario.id, scenario.title, scenario.description, isSelected, '', () => toggleScenario(scenario.id)),
                         
                         // Step-by-step questions when scenario is selected
                         isSelected && scenario.stepByStepQuestions ? React.createElement('div', {
