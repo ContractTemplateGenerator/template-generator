@@ -141,11 +141,11 @@ const TenantDepositGenerator = () => {
 
     // Tab definitions
     const tabs = [
+        { id: 'scenarios', label: 'Letter Scenarios', icon: 'zap' },
         { id: 'property', label: 'Property & Tenancy', icon: 'home' },
         { id: 'deposits', label: 'Deposit & Deductions', icon: 'dollar-sign' },
         { id: 'violations', label: 'Legal Violations', icon: 'alert-triangle' },
-        { id: 'delivery', label: 'Letter Tone & Delivery', icon: 'send' },
-        { id: 'review', label: 'Review & Finalize', icon: 'check-circle' }
+        { id: 'assessment', label: 'Case Assessment', icon: 'shield-check' }
     ];
 
     // Update form data and trigger highlighting
@@ -399,7 +399,101 @@ const TenantDepositGenerator = () => {
         `;
     };
 
+    // Scenario presets for Letter Scenarios tab
+    const scenarios = [
+        {
+            id: 'professional',
+            title: 'Professional First Contact',
+            description: 'Respectful but firm approach for initial communication',
+            tone: 'professional',
+            useCase: 'First-time contact with reasonable landlord',
+            sample: 'Dear [Landlord], I am writing to request the return of my security deposit...',
+            data: { letterTone: 'professional', includeSmallClaimsThreat: false, requestAttorneyFees: false }
+        },
+        {
+            id: 'firm',
+            title: 'Firm Business Demand',
+            description: 'Direct approach when previous attempts have failed',
+            tone: 'firm',
+            useCase: 'Follow-up after ignored initial requests',
+            sample: 'To [Landlord]: I demand the immediate return of my security deposit...',
+            data: { letterTone: 'firm', includeSmallClaimsThreat: true, requestAttorneyFees: true }
+        },
+        {
+            id: 'litigation',
+            title: 'Pre-Litigation Warning',
+            description: 'Final formal notice before legal action',
+            tone: 'litigation',
+            useCase: 'Last chance before filing lawsuit',
+            sample: 'TO [LANDLORD]: This serves as formal legal notice of your violations...',
+            data: { letterTone: 'litigation', includeSmallClaimsThreat: true, requestAttorneyFees: true }
+        },
+        {
+            id: 'bad-faith',
+            title: 'Bad Faith Retention',
+            description: 'Maximum penalties for deliberate violations',
+            tone: 'litigation',
+            useCase: 'Clear evidence of intentional withholding',
+            sample: 'Your bad faith retention of my security deposit constitutes a willful violation...',
+            data: { 
+                letterTone: 'litigation', 
+                includeSmallClaimsThreat: true, 
+                requestAttorneyFees: true,
+                normalWearCharges: true,
+                evidenceMoveInPhotos: true,
+                evidenceReceipts: true
+            }
+        }
+    ];
+
     // Tab content renderers
+    const renderScenariosTab = () => {
+        return React.createElement('div', { className: 'tab-content' }, [
+            React.createElement('h3', { key: 'title' }, 'Choose Your Letter Scenario'),
+            React.createElement('p', { key: 'subtitle' }, 'Select a scenario that matches your situation to generate the most effective demand letter:'),
+            
+            React.createElement('div', { key: 'scenarios-grid', className: 'scenarios-grid' }, 
+                scenarios.map(scenario => 
+                    React.createElement('div', {
+                        key: scenario.id,
+                        className: `scenario-card ${formData.letterTone === scenario.tone ? 'selected' : ''}`,
+                        onClick: () => {
+                            // Apply scenario data to form
+                            Object.keys(scenario.data).forEach(key => {
+                                updateFormData(key, scenario.data[key]);
+                            });
+                        }
+                    }, [
+                        React.createElement('div', { key: 'header', className: 'scenario-header' }, [
+                            React.createElement('h4', { key: 'title' }, scenario.title),
+                            React.createElement('span', { key: 'tone', className: `tone-badge tone-${scenario.id}` }, scenario.tone.toUpperCase())
+                        ]),
+                        React.createElement('p', { key: 'description', className: 'scenario-description' }, scenario.description),
+                        React.createElement('div', { key: 'use-case', className: 'scenario-use-case' }, [
+                            React.createElement('strong', { key: 'label' }, 'Best for: '),
+                            React.createElement('span', { key: 'text' }, scenario.useCase)
+                        ]),
+                        React.createElement('div', { key: 'sample', className: 'scenario-sample' }, [
+                            React.createElement('strong', { key: 'label' }, 'Sample opening: '),
+                            React.createElement('em', { key: 'text' }, scenario.sample)
+                        ]),
+                        React.createElement('button', {
+                            key: 'btn',
+                            className: 'scenario-btn',
+                            onClick: (e) => {
+                                e.stopPropagation();
+                                Object.keys(scenario.data).forEach(key => {
+                                    updateFormData(key, scenario.data[key]);
+                                });
+                                setCurrentTab(1); // Move to Property tab
+                            }
+                        }, `Use ${scenario.title}`)
+                    ])
+                )
+            )
+        ]);
+    };
+
     const renderPropertyTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
             React.createElement('h3', { key: 'title' }, 'Property & Tenancy Details'),
@@ -824,78 +918,12 @@ const TenantDepositGenerator = () => {
             React.createElement('p', { key: 'evidence-desc' }, 'Select all evidence you have to support your claim:'),
             
             React.createElement('div', { key: 'evidence-grid', className: 'checkbox-grid' }, [
-                React.createElement('div', { key: 'photos', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceMoveInPhotos,
-                        onChange: (e) => updateFormData('evidenceMoveInPhotos', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Move-in/Move-out Photos'),
-                        React.createElement('p', { key: 'desc' }, 'Photos documenting property condition')
-                    ])
-                ]),
-                React.createElement('div', { key: 'receipts', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceReceipts,
-                        onChange: (e) => updateFormData('evidenceReceipts', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Receipts & Payment Records'),
-                        React.createElement('p', { key: 'desc' }, 'Proof of deposit payment and rent payments')
-                    ])
-                ]),
-                React.createElement('div', { key: 'communications', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceCommunications,
-                        onChange: (e) => updateFormData('evidenceCommunications', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Written Communications'),
-                        React.createElement('p', { key: 'desc' }, 'Emails, texts, letters with landlord')
-                    ])
-                ]),
-                React.createElement('div', { key: 'witnesses', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceWitnesses,
-                        onChange: (e) => updateFormData('evidenceWitnesses', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Witness Statements'),
-                        React.createElement('p', { key: 'desc' }, 'Third-party witnesses to condition/events')
-                    ])
-                ]),
-                React.createElement('div', { key: 'inspection', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceInspectionReport,
-                        onChange: (e) => updateFormData('evidenceInspectionReport', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Inspection Reports'),
-                        React.createElement('p', { key: 'desc' }, 'Official move-in/move-out inspection documents')
-                    ])
-                ]),
-                React.createElement('div', { key: 'other', className: 'checkbox-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.evidenceOther,
-                        onChange: (e) => updateFormData('evidenceOther', e.target.checked)
-                    }),
-                    React.createElement('div', { key: 'content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Other Evidence'),
-                        React.createElement('p', { key: 'desc' }, 'Specify other supporting documentation')
-                    ])
-                ])
+                createClickableItem('checkbox', 'evidenceMoveInPhotos', null, 'Move-in/Move-out Photos', 'Photos documenting property condition', formData.evidenceMoveInPhotos),
+                createClickableItem('checkbox', 'evidenceReceipts', null, 'Receipts & Payment Records', 'Proof of deposit payment and rent payments', formData.evidenceReceipts),
+                createClickableItem('checkbox', 'evidenceCommunications', null, 'Written Communications', 'Emails, texts, letters with landlord', formData.evidenceCommunications),
+                createClickableItem('checkbox', 'evidenceWitnesses', null, 'Witness Statements', 'Third-party witnesses to condition/events', formData.evidenceWitnesses),
+                createClickableItem('checkbox', 'evidenceInspectionReport', null, 'Inspection Reports', 'Official move-in/move-out inspection documents', formData.evidenceInspectionReport),
+                createClickableItem('checkbox', 'evidenceOther', null, 'Other Evidence', 'Specify other supporting documentation', formData.evidenceOther)
             ]),
             
             formData.evidenceOther ?
@@ -934,245 +962,197 @@ const TenantDepositGenerator = () => {
         ]);
     };
 
-    const renderDeliveryTab = () => {
-        return React.createElement('div', { className: 'tab-content' }, [
-            React.createElement('h3', { key: 'title' }, 'Letter Tone & Delivery'),
-            
-            React.createElement('h4', { key: 'tone-title' }, 'Letter Tone'),
-            React.createElement('p', { key: 'tone-desc' }, 'Choose the tone that best fits your situation:'),
-            
-            React.createElement('div', { key: 'tone-options', className: 'radio-group' }, [
-                React.createElement('div', { key: 'professional', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'letterTone',
-                        value: 'professional',
-                        checked: formData.letterTone === 'professional',
-                        onChange: (e) => updateFormData('letterTone', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Professional & Courteous'),
-                        React.createElement('p', { key: 'desc' }, 'Respectful tone for first-time communication or ongoing relationships')
-                    ])
-                ]),
-                React.createElement('div', { key: 'firm', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'letterTone',
-                        value: 'firm',
-                        checked: formData.letterTone === 'firm',
-                        onChange: (e) => updateFormData('letterTone', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Firm & Direct'),
-                        React.createElement('p', { key: 'desc' }, 'Strong but professional tone when previous attempts have failed')
-                    ])
-                ]),
-                React.createElement('div', { key: 'litigation', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'letterTone',
-                        value: 'litigation',
-                        checked: formData.letterTone === 'litigation',
-                        onChange: (e) => updateFormData('letterTone', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Litigation-Ready'),
-                        React.createElement('p', { key: 'desc' }, 'Formal legal tone as final notice before court action')
-                    ])
-                ])
-            ]),
-            
-            React.createElement('h4', { key: 'delivery-title' }, 'Delivery Method'),
-            
-            React.createElement('div', { key: 'delivery-options', className: 'radio-group' }, [
-                React.createElement('div', { key: 'email', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'deliveryMethod',
-                        value: 'email',
-                        checked: formData.deliveryMethod === 'email',
-                        onChange: (e) => updateFormData('deliveryMethod', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Email'),
-                        React.createElement('p', { key: 'desc' }, 'Fast delivery with read receipts (if available)')
-                    ])
-                ]),
-                React.createElement('div', { key: 'certified', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'deliveryMethod',
-                        value: 'certified-mail',
-                        checked: formData.deliveryMethod === 'certified-mail',
-                        onChange: (e) => updateFormData('deliveryMethod', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Certified Mail'),
-                        React.createElement('p', { key: 'desc' }, 'Legal proof of delivery (recommended for litigation)') 
-                    ])
-                ]),
-                React.createElement('div', { key: 'both', className: 'radio-item' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'radio',
-                        name: 'deliveryMethod',
-                        value: 'both',
-                        checked: formData.deliveryMethod === 'both',
-                        onChange: (e) => updateFormData('deliveryMethod', e.target.value)
-                    }),
-                    React.createElement('div', { key: 'content', className: 'radio-content' }, [
-                        React.createElement('strong', { key: 'title' }, 'Email + Certified Mail'),
-                        React.createElement('p', { key: 'desc' }, 'Maximum legal protection and speed')
-                    ])
-                ])
-            ]),
-            
-            React.createElement('h4', { key: 'cc-title' }, 'Copy Recipients'),
-            
-            React.createElement('div', { key: 'cc-checkbox', className: 'form-group' }, [
-                React.createElement('label', { key: 'label' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.ccRecipients,
-                        onChange: (e) => updateFormData('ccRecipients', e.target.checked)
-                    }),
-                    ' Send copies to additional recipients'
-                ]),
-                React.createElement('div', { key: 'help', className: 'help-text' }, 
-                    'Consider copying your attorney, tenant rights organization, or property management company'
-                )
-            ]),
-            
-            formData.ccRecipients ?
-                React.createElement('div', { key: 'cc-text', className: 'form-group' }, [
-                    React.createElement('label', { key: 'label' }, 'CC Recipients'),
-                    React.createElement('textarea', {
-                        key: 'textarea',
-                        value: formData.ccRecipientsText,
-                        onChange: (e) => updateFormData('ccRecipientsText', e.target.value),
-                        placeholder: 'List names and roles of copy recipients (e.g., "John Smith, Attorney; Local Tenant Rights Organization")',
-                        rows: 3
-                    })
-                ]) : null
-        ]);
-    };
-
-    const renderReviewTab = () => {
+    const renderAssessmentTab = () => {
         const state = formData.rentalState;
         const stateData = window.STATE_LAWS ? window.STATE_LAWS[state] : null;
         const calculations = stateData ? window.StateLawUtils.calculateTotalDemand(formData, state) : null;
+        const riskAssessment = stateData ? window.StateLawUtils.getRiskAssessment(formData, state) : null;
+
+        // Detailed case analysis based on user input
+        const analyzeCase = () => {
+            let strengths = [];
+            let weaknesses = [];
+            let recommendations = [];
+
+            if (calculations && calculations.daysPassed > 0) {
+                strengths.push(`Landlord missed legal deadline by ${calculations.daysPassed} days`);
+                if (calculations.daysPassed > 30) {
+                    strengths.push('Significant delay strengthens penalty claims');
+                }
+            }
+
+            if (formData.itemizedStatementReceived === 'not-received') {
+                strengths.push('No itemization provided - forfeits landlord\'s right to withhold');
+                strengths.push('Strongest legal position under state law');
+            }
+
+            if (formData.evidenceMoveInPhotos) {
+                strengths.push('Move-in photos provide strong evidence of property condition');
+            }
+
+            if (formData.evidenceReceipts) {
+                strengths.push('Payment records prove deposit was actually paid');
+            }
+
+            if (formData.normalWearCharges) {
+                strengths.push('Normal wear charges are illegal under state law');
+            }
+
+            // Check for potential weaknesses
+            if (!formData.moveOutDate) {
+                weaknesses.push('Move-out date not specified - needed to calculate violations');
+            }
+
+            if (!formData.securityDeposit) {
+                weaknesses.push('Security deposit amount not specified');
+            }
+
+            if (!formData.evidenceMoveInPhotos && !formData.evidenceReceipts) {
+                weaknesses.push('Limited documentation could weaken case');
+                recommendations.push('Gather any available photos, receipts, or records');
+            }
+
+            if (formData.priorCommunications && !formData.priorCommunicationsDescription) {
+                recommendations.push('Document previous communications in detail');
+            }
+
+            return { strengths, weaknesses, recommendations };
+        };
+
+        const caseAnalysis = analyzeCase();
 
         return React.createElement('div', { className: 'tab-content' }, [
-            React.createElement('h3', { key: 'title' }, 'Review & Finalize'),
+            React.createElement('h3', { key: 'title' }, 'Legal Case Assessment'),
+            React.createElement('p', { key: 'subtitle' }, 'Attorney-level analysis of your security deposit case based on your specific situation:'),
             
-            React.createElement('h4', { key: 'deadline-title' }, 'Response Deadline'),
-            
-            React.createElement('div', { key: 'deadline', className: 'form-group' }, [
-                React.createElement('label', { key: 'label' }, 'Days to respond to this demand letter'),
-                React.createElement('input', {
-                    key: 'input',
-                    type: 'number',
-                    min: '7',
-                    max: '30',
-                    value: formData.responseDeadline,
-                    onChange: (e) => updateFormData('responseDeadline', e.target.value)
-                }),
-                React.createElement('div', { key: 'help', className: 'help-text' }, 
-                    'Recommended: 14-21 days for reasonable response time'
-                )
-            ]),
-            
-            React.createElement('h4', { key: 'legal-title' }, 'Legal Action Threats'),
-            
-            React.createElement('div', { key: 'small-claims', className: 'form-group' }, [
-                React.createElement('label', { key: 'label' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.includeSmallClaimsThreat,
-                        onChange: (e) => updateFormData('includeSmallClaimsThreat', e.target.checked)
-                    }),
-                    ' Include threat of small claims court action'
-                ]),
-                React.createElement('div', { key: 'help', className: 'help-text' }, 
-                    'Strong deterrent - shows you are serious about pursuing legal action'
-                )
-            ]),
-            
-            React.createElement('div', { key: 'attorney-fees', className: 'form-group' }, [
-                React.createElement('label', { key: 'label' }, [
-                    React.createElement('input', {
-                        key: 'input',
-                        type: 'checkbox',
-                        checked: formData.requestAttorneyFees,
-                        onChange: (e) => updateFormData('requestAttorneyFees', e.target.checked)
-                    }),
-                    ' Request attorney fees and court costs'
-                ]),
-                React.createElement('div', { key: 'help', className: 'help-text' }, 
-                    'Available in most states for security deposit violations'
-                )
-            ]),
-            
-            calculations ? 
-                React.createElement('div', { key: 'final-calculation', className: 'calculation-summary' }, [
-                    React.createElement('h4', { key: 'title' }, 'Final Demand Summary'),
-                    React.createElement('div', { key: 'deposits', className: 'calculation-row' }, [
-                        React.createElement('span', { key: 'label' }, 'Total Deposits:'),
-                        React.createElement('span', { key: 'amount' }, `$${calculations.deposits.toFixed(2)}`)
-                    ]),
-                    calculations.penalty > 0 ?
-                        React.createElement('div', { key: 'penalty', className: 'calculation-row' }, [
-                            React.createElement('span', { key: 'label' }, 'Statutory Penalty:'),
-                            React.createElement('span', { key: 'amount' }, `$${calculations.penalty.toFixed(2)}`)
-                        ]) : null,
-                    calculations.interest > 0 ?
-                        React.createElement('div', { key: 'interest', className: 'calculation-row' }, [
-                            React.createElement('span', { key: 'label' }, 'Interest:'),
-                            React.createElement('span', { key: 'amount' }, `$${calculations.interest.toFixed(2)}`)
-                        ]) : null,
-                    React.createElement('div', { key: 'total', className: 'calculation-row total' }, [
-                        React.createElement('span', { key: 'label' }, 'TOTAL DEMAND:'),
-                        React.createElement('strong', { key: 'amount' }, `$${calculations.total.toFixed(2)}`)
+            // Overall case strength
+            riskAssessment ?
+                React.createElement('div', { key: 'risk-assessment', className: `risk-assessment ${riskAssessment.color}` }, [
+                    React.createElement('h4', { key: 'title' }, `Case Strength: ${riskAssessment.level.toUpperCase()}`),
+                    React.createElement('div', { key: 'details', className: 'assessment-details' }, [
+                        React.createElement('div', { key: 'score', className: 'assessment-item' }, 
+                            React.createElement('strong', null, `Strength Score: ${riskAssessment.score}/6`)
+                        ),
+                        React.createElement('div', { key: 'recommendation', className: 'assessment-item' }, 
+                            React.createElement('strong', null, riskAssessment.recommendation)
+                        )
                     ])
                 ]) : null,
-            
+
+            // Detailed financial analysis
+            calculations ?
+                React.createElement('div', { key: 'financial-analysis', className: 'analysis-section' }, [
+                    React.createElement('h4', { key: 'title' }, 'Financial Analysis'),
+                    React.createElement('div', { key: 'calculations', className: 'calculation-summary' }, [
+                        React.createElement('div', { key: 'deposits', className: 'calculation-row' }, [
+                            React.createElement('span', { key: 'label' }, 'Original Deposits:'),
+                            React.createElement('span', { key: 'amount' }, `$${calculations.deposits.toFixed(2)}`)
+                        ]),
+                        calculations.penalty > 0 ?
+                            React.createElement('div', { key: 'penalty', className: 'calculation-row' }, [
+                                React.createElement('span', { key: 'label' }, 'Statutory Penalties:'),
+                                React.createElement('span', { key: 'amount' }, `$${calculations.penalty.toFixed(2)}`)
+                            ]) : null,
+                        calculations.interest > 0 ?
+                            React.createElement('div', { key: 'interest', className: 'calculation-row' }, [
+                                React.createElement('span', { key: 'label' }, 'Interest:'),
+                                React.createElement('span', { key: 'amount' }, `$${calculations.interest.toFixed(2)}`)
+                            ]) : null,
+                        React.createElement('div', { key: 'total', className: 'calculation-row total' }, [
+                            React.createElement('span', { key: 'label' }, 'Total Recovery Potential:'),
+                            React.createElement('strong', { key: 'amount' }, `$${calculations.total.toFixed(2)}`)
+                        ])
+                    ])
+                ]) : null,
+
+            // Case strengths
+            caseAnalysis.strengths.length > 0 ?
+                React.createElement('div', { key: 'strengths', className: 'analysis-section' }, [
+                    React.createElement('h4', { key: 'title' }, '✅ Case Strengths'),
+                    React.createElement('ul', { key: 'list', className: 'analysis-list strengths' }, 
+                        caseAnalysis.strengths.map((strength, index) => 
+                            React.createElement('li', { key: index }, strength)
+                        )
+                    )
+                ]) : null,
+
+            // Case weaknesses
+            caseAnalysis.weaknesses.length > 0 ?
+                React.createElement('div', { key: 'weaknesses', className: 'analysis-section' }, [
+                    React.createElement('h4', { key: 'title' }, '⚠️ Potential Issues'),
+                    React.createElement('ul', { key: 'list', className: 'analysis-list weaknesses' }, 
+                        caseAnalysis.weaknesses.map((weakness, index) => 
+                            React.createElement('li', { key: index }, weakness)
+                        )
+                    )
+                ]) : null,
+
+            // Recommendations
+            caseAnalysis.recommendations.length > 0 ?
+                React.createElement('div', { key: 'recommendations', className: 'analysis-section' }, [
+                    React.createElement('h4', { key: 'title' }, '💡 Attorney Recommendations'),
+                    React.createElement('ul', { key: 'list', className: 'analysis-list recommendations' }, 
+                        caseAnalysis.recommendations.map((rec, index) => 
+                            React.createElement('li', { key: index }, rec)
+                        )
+                    )
+                ]) : null,
+
+            // State-specific insights
+            stateData ?
+                React.createElement('div', { key: 'state-specifics', className: 'analysis-section' }, [
+                    React.createElement('h4', { key: 'title' }, `${stateData.state} Law Specifics`),
+                    React.createElement('div', { key: 'content', className: 'state-details' }, [
+                        React.createElement('p', { key: 'citation' }, [
+                            React.createElement('strong', null, 'Governing Law: '),
+                            React.createElement('span', { className: 'legal-citation' }, stateData.citation)
+                        ]),
+                        React.createElement('p', { key: 'deadline' }, [
+                            React.createElement('strong', null, 'Return Deadline: '),
+                            `${stateData.returnDeadline} days from tenancy termination`
+                        ]),
+                        React.createElement('p', { key: 'penalty' }, [
+                            React.createElement('strong', null, 'Violation Penalty: '),
+                            stateData.penaltyDescription
+                        ]),
+                        React.createElement('p', { key: 'small-claims' }, [
+                            React.createElement('strong', null, 'Small Claims Limit: '),
+                            `$${stateData.smallClaimsLimit.toLocaleString()}`
+                        ])
+                    ])
+                ]) : null,
+
+            // Next steps
             React.createElement('div', { key: 'next-steps', className: 'next-steps' }, [
-                React.createElement('h4', { key: 'title' }, 'Next Steps'),
+                React.createElement('h4', { key: 'title' }, 'Recommended Next Steps'),
                 React.createElement('ol', { key: 'list' }, [
-                    React.createElement('li', { key: 'review' }, 'Review the letter preview carefully'),
-                    React.createElement('li', { key: 'download' }, 'Download or copy the letter'),
-                    React.createElement('li', { key: 'send' }, `Send via ${formData.deliveryMethod === 'email' ? 'email' : formData.deliveryMethod === 'certified-mail' ? 'certified mail' : 'email and certified mail'}`),
-                    React.createElement('li', { key: 'wait' }, `Wait ${formData.responseDeadline} days for response`),
-                    React.createElement('li', { key: 'file' }, 'If no response, consider filing in small claims court')
+                    React.createElement('li', { key: 'review' }, 'Review the generated demand letter carefully'),
+                    React.createElement('li', { key: 'send' }, 'Send via email and certified mail for maximum legal protection'),
+                    React.createElement('li', { key: 'wait' }, `Wait ${formData.responseDeadline || 14} days for landlord response`),
+                    React.createElement('li', { key: 'file' }, 'If no response, file in small claims court immediately'),
+                    React.createElement('li', { key: 'attorney' }, 'Consider consulting an attorney if damages exceed small claims limit')
                 ])
             ]),
             
             React.createElement('div', { key: 'disclaimer', className: 'disclaimer' }, [
                 React.createElement('p', { key: 'text' }, 
-                    '⚠️ This tool provides general legal information only and does not constitute legal advice. ' +
-                    'Consult with a qualified attorney for advice specific to your situation.'
+                    '⚖️ This assessment is based on general legal principles and your provided information. ' +
+                    'For complex cases or significant amounts, consult with a qualified attorney in your jurisdiction.'
                 )
             ])
         ]);
     };
 
+
     // Main tab content renderer
     const renderTabContent = () => {
         switch (currentTab) {
-            case 0: return renderPropertyTab();
-            case 1: return renderDepositsTab();
-            case 2: return renderViolationsTab();
-            case 3: return renderDeliveryTab();
-            case 4: return renderReviewTab();
-            default: return renderPropertyTab();
+            case 0: return renderScenariosTab();
+            case 1: return renderPropertyTab();
+            case 2: return renderDepositsTab();
+            case 3: return renderViolationsTab();
+            case 4: return renderAssessmentTab();
+            default: return renderScenariosTab();
         }
     };
 
