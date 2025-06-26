@@ -359,8 +359,8 @@ const TenantDepositGenerator = () => {
             disputedText = `I specifically dispute the following improper deductions: ${disputedItems.join(", ")}.`;
         }
         
-        // Create clean text version for eSignatures (no HTML)
-        const cleanText = `DEMAND FOR RETURN OF SECURITY DEPOSIT
+        // Create clean text version for eSignatures (no HTML, but with formatting)
+        const cleanText = `**DEMAND FOR RETURN OF SECURITY DEPOSIT**
 
 ${today}
 
@@ -368,27 +368,27 @@ ${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCom
 ${formData.landlordAddress || '[LANDLORD ADDRESS]'}
 ${formData.landlordCity || '[CITY]'}, ${formData.landlordState || 'CA'} ${formData.landlordZip || '[ZIP]'}
 
-Re: Demand for Return of Security Deposit
-Tenant: ${formData.tenantName || '[TENANT NAME]'}
-Property: ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}
+**Re: Demand for Return of Security Deposit**
+**Tenant:** ${formData.tenantName || '[TENANT NAME]'}
+**Property:** ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}
 
 ${greeting} ${formData.landlordName || '[LANDLORD NAME]'},
 
-${urgencyLevel} the immediate return of my security deposit in the amount of $${calculations.total.toFixed(2)}, as required under ${stateData.citation}.
+${urgencyLevel} the immediate return of my security deposit in the amount of **$${calculations.total.toFixed(2)}**, as required under ${stateData.citation}.
 
-Tenancy Details: I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.
+**Tenancy Details:** I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.securityDeposit || '0'}${formData.petDeposit ? ' plus a pet deposit of $' + formData.petDeposit : ''}.
 
-Legal Violation: Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
+**Legal Violation:** Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
 
 ${formData.itemizedStatementReceived === 'not-received' ? 
-    `No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
+    `**No Itemization:** You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
 }
 
-${disputedText ? `Disputed Deductions: ${disputedText} These charges violate state law prohibiting deductions for normal wear and tear.` : ''}
+${disputedText ? `**Disputed Deductions:** ${disputedText} These charges violate state law prohibiting deductions for normal wear and tear.` : ''}
 
-Amount Due: Due to your non-compliance, you owe statutory penalties totaling $${calculations.total.toFixed(2)} (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
+**Amount Due:** Due to your non-compliance, you owe statutory penalties totaling **$${calculations.total.toFixed(2)}** (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
 
-Demand: You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}
+**Demand:** You have ${formData.responseDeadline || 14} days from the date of this letter to pay **$${calculations.total.toFixed(2)}**.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}
 
 ${closingTone}
 
@@ -399,8 +399,6 @@ Sincerely,`;
         
         // Return HTML version for preview (highlighting will be applied separately)
         return `
-            <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
-            
             <p>${today}</p>
             
             <p>${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '<br>' + formData.landlordCompany : ''}<br>
@@ -540,32 +538,26 @@ Sincerely,`;
         const currentSelected = formData.selectedScenarios;
         const isSelected = currentSelected.includes(scenarioId);
         
-        // Trigger highlighting for scenario changes
-        setLastChanged('selectedScenarios');
-        
         if (isSelected) {
-            // Remove scenario
-            setFormData(prev => ({
-                ...prev,
-                selectedScenarios: currentSelected.filter(id => id !== scenarioId)
-            }));
+            // Remove scenario - use updateFormData to trigger highlighting
+            updateFormData('selectedScenarios', currentSelected.filter(id => id !== scenarioId));
         } else {
-            // Add scenario and apply its default values
+            // Add scenario - use updateFormData to trigger highlighting
             const scenario = scenarios.find(s => s.id === scenarioId);
             const updatedScenarios = [...currentSelected, scenarioId];
             
-            let newFormData = {
-                ...formData,
-                selectedScenarios: updatedScenarios
-            };
+            // First update the scenarios selection
+            updateFormData('selectedScenarios', updatedScenarios);
             
+            // Then apply defaults for this scenario
             if (scenario && scenario.expandedOptions) {
                 scenario.expandedOptions.forEach(option => {
-                    newFormData[option.field] = option.default;
+                    // Use setTimeout to allow the first highlighting to process
+                    setTimeout(() => {
+                        updateFormData(option.field, option.default);
+                    }, 50);
                 });
             }
-            
-            setFormData(newFormData);
         }
     };
 
@@ -631,13 +623,20 @@ Sincerely,`;
                                     }, [
                                         React.createElement('label', {
                                             key: 'label',
-                                            style: { display: 'flex', alignItems: 'center', cursor: 'pointer' }
+                                            style: { display: 'flex', alignItems: 'center', cursor: 'pointer' },
+                                            onClick: (e) => {
+                                                e.preventDefault();
+                                                updateFormData(option.field, !formData[option.field]);
+                                            }
                                         }, [
                                             React.createElement('input', {
                                                 key: 'input',
                                                 type: 'checkbox',
                                                 checked: formData[option.field] || false,
-                                                onChange: (e) => updateFormData(option.field, e.target.checked),
+                                                onChange: (e) => {
+                                                    e.stopPropagation();
+                                                    updateFormData(option.field, e.target.checked);
+                                                },
                                                 style: { marginRight: '0.5rem' }
                                             }),
                                             React.createElement('span', { key: 'text' }, option.label)
@@ -654,7 +653,10 @@ Sincerely,`;
                                             key: 'input',
                                             type: 'number',
                                             value: formData[option.field] || option.default,
-                                            onChange: (e) => updateFormData(option.field, parseInt(e.target.value))
+                                            onChange: (e) => {
+                                                e.stopPropagation();
+                                                updateFormData(option.field, parseInt(e.target.value));
+                                            }
                                         })
                                     ]);
                                 } else if (option.type === 'select') {
@@ -667,7 +669,10 @@ Sincerely,`;
                                         React.createElement('select', {
                                             key: 'select',
                                             value: formData[option.field] || option.default,
-                                            onChange: (e) => updateFormData(option.field, e.target.value),
+                                            onChange: (e) => {
+                                                e.stopPropagation();
+                                                updateFormData(option.field, e.target.value);
+                                            },
                                             style: { 
                                                 padding: '0.375rem 0.5rem',
                                                 border: '1px solid #d1d5db',
@@ -1426,7 +1431,7 @@ Sincerely,`;
             // Preview pane
             React.createElement('div', { key: 'preview', className: 'preview-pane' }, [
                 React.createElement('div', { key: 'header', className: 'preview-header' }, [
-                    React.createElement('h3', { key: 'title' }, 'Letter Preview'),
+                    React.createElement('h3', { key: 'title' }, 'DEMAND FOR RETURN OF SECURITY DEPOSIT'),
                     React.createElement('div', { key: 'actions' }, [
                         React.createElement('button', {
                             key: 'prev-tab',
