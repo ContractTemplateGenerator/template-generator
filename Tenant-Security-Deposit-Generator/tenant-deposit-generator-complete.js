@@ -160,14 +160,30 @@ const TenantDepositGenerator = () => {
         setTimeout(() => setLastChanged(null), 8000);
     };
 
-    // Map form fields to document sections for highlighting
+    // Map form fields to document sections for highlighting (enhanced for scenarios)
     const getSectionToHighlight = () => {
         if (!lastChanged) return null;
         
+        // Scenario-related fields mapping
+        const scenarioFields = [
+            'responseDeadline', 'includeSmallClaimsThreat', 'requestAttorneyFees', 
+            'priorCommunications', 'evidenceReceipts', 'evidenceCommunications',
+            'evidenceWitnesses', 'keyReturnDate', 'forwardingAddressDate', 
+            'propertyCondition', 'itemizedStatementReceived', 'normalWearCharges',
+            'excessiveCleaningFees', 'paintingCosts', 'carpetReplacement',
+            'preexistingDamage', 'evidenceMoveInPhotos', 'evidenceInspectionReport',
+            'evidenceMoveOutPhotos', 'wallDamageCharges', 'flooringCharges',
+            'lightFixtureCharges', 'competingQuotes', 'carpetCleaningCharges',
+            'applianceCleaningCharges', 'professionalCleaningReceipt'
+        ];
+        
         switch (currentTab) {
             case 0: // Scenarios
-                if (['letterTone', 'selectedScenarios'].includes(lastChanged)) {
+                if (['letterTone'].includes(lastChanged)) {
                     return 'greeting-section';
+                }
+                if (['selectedScenarios'].includes(lastChanged) || scenarioFields.includes(lastChanged)) {
+                    return 'disputed-deductions';
                 }
                 break;
             case 1: // Property & Tenancy
@@ -427,7 +443,12 @@ Sincerely,`;
                 { field: 'includeSmallClaimsThreat', label: 'Threaten small claims court', type: 'checkbox', default: true },
                 { field: 'requestAttorneyFees', label: 'Request attorney fees and costs', type: 'checkbox', default: true },
                 { field: 'priorCommunications', label: 'Previous failed attempts to contact', type: 'checkbox', default: false },
-                { field: 'evidenceReceipts', label: 'Have deposit payment records', type: 'checkbox', default: true }
+                { field: 'evidenceReceipts', label: 'Have deposit payment records', type: 'checkbox', default: true },
+                { field: 'evidenceCommunications', label: 'Have written requests for return', type: 'checkbox', default: false },
+                { field: 'evidenceWitnesses', label: 'Have witnesses to deposit payment', type: 'checkbox', default: false },
+                { field: 'keyReturnDate', label: 'Keys returned promptly', type: 'checkbox', default: true },
+                { field: 'forwardingAddressDate', label: 'Provided forwarding address', type: 'checkbox', default: true },
+                { field: 'propertyCondition', label: 'Left property in good condition', type: 'checkbox', default: true }
             ]
         },
         {
@@ -463,6 +484,10 @@ Sincerely,`;
                 { field: 'normalWearCharges', label: 'General normal wear charges', type: 'checkbox', default: true },
                 { field: 'evidenceMoveInPhotos', label: 'Have move-in photos as evidence', type: 'checkbox', default: true },
                 { field: 'evidenceInspectionReport', label: 'Have move-in inspection report', type: 'checkbox', default: false },
+                { field: 'evidenceMoveOutPhotos', label: 'Have move-out photos', type: 'checkbox', default: false },
+                { field: 'wallDamageCharges', label: 'Charged for nail holes/scuffs', type: 'checkbox', default: false },
+                { field: 'flooringCharges', label: 'Charged for floor scratches', type: 'checkbox', default: false },
+                { field: 'lightFixtureCharges', label: 'Charged for light bulb replacement', type: 'checkbox', default: false },
                 { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
                 { field: 'includeSmallClaimsThreat', label: 'Threaten legal action', type: 'checkbox', default: true }
             ]
@@ -493,9 +518,13 @@ Sincerely,`;
                 { field: 'excessiveCleaningFees', label: 'Mark as excessive cleaning fees', type: 'checkbox', default: true },
                 { field: 'evidenceReceipts', label: 'Have market rate evidence', type: 'checkbox', default: true },
                 { field: 'evidenceMoveInPhotos', label: 'Have photos of clean move-in condition', type: 'checkbox', default: true },
-                { field: 'evidenceReceipts', label: 'Have competing cleaning quotes', type: 'checkbox', default: false },
+                { field: 'competingQuotes', label: 'Have competing cleaning quotes', type: 'checkbox', default: false },
                 { field: 'normalWearCharges', label: 'Also charged for normal wear', type: 'checkbox', default: false },
-                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 }
+                { field: 'carpetCleaningCharges', label: 'Excessive carpet cleaning', type: 'checkbox', default: false },
+                { field: 'applianceCleaningCharges', label: 'Excessive appliance cleaning', type: 'checkbox', default: false },
+                { field: 'professionalCleaningReceipt', label: 'Have actual receipt from cleaner', type: 'checkbox', default: false },
+                { field: 'responseDeadline', label: 'Response deadline (days)', type: 'number', default: 14 },
+                { field: 'includeSmallClaimsThreat', label: 'Threaten legal action', type: 'checkbox', default: true }
             ]
         }
     ];
