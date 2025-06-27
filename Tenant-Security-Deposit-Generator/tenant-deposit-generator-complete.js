@@ -427,9 +427,28 @@ const TenantDepositGenerator = () => {
         }
         
         // Create clean text version for eSignatures (no HTML, no asterisks, no strong tags)
-        const cleanScenarioContent = scenarioContent.map(content => content.replace(/<[^>]*>/g, '')).join('\n\n');
+        const cleanScenarioContent = scenarioContent.map(content => content.replace(/<[^>]*>/g, '')).join('\n');
         const cleanWhatHappenedText = whatHappenedText.replace(/<[^>]*>/g, '');
         const cleanEvidenceText = evidenceText ? evidenceText.replace(/<[^>]*>/g, '').replace(/\*\*/g, '') : '';
+        
+        // Build clean sections array, filtering out empty content
+        const cleanSections = [];
+        
+        if (cleanScenarioContent.trim()) {
+            cleanSections.push(cleanScenarioContent.trim());
+        }
+        
+        if (formData.itemizedStatementReceived === 'not-received') {
+            cleanSections.push(`No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.`);
+        }
+        
+        if (cleanWhatHappenedText.trim()) {
+            cleanSections.push(`What Happened: ${cleanWhatHappenedText.trim()}`);
+        }
+        
+        if (cleanEvidenceText.trim()) {
+            cleanSections.push(cleanEvidenceText.trim());
+        }
         
         const cleanText = `${today}
 
@@ -449,15 +468,7 @@ Tenancy Details: I was a tenant from ${formData.leaseStartDate || '[START DATE]'
 
 Legal Violation: Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
 
-${cleanScenarioContent}
-
-${formData.itemizedStatementReceived === 'not-received' ? 
-    `No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
-}
-
-${cleanWhatHappenedText ? `What Happened: ${cleanWhatHappenedText}` : ''}
-
-${cleanEvidenceText}
+${cleanSections.join('\n\n')}
 
 Amount Due: Due to your non-compliance, you owe statutory penalties totaling $${calculations.total.toFixed(2)} (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
 
@@ -1839,7 +1850,7 @@ Sincerely,`;
                     ]),
                     React.createElement('li', { key: 'email-follow' }, [
                         React.createElement('strong', null, 'Email + PDF Copy: '),
-                        'Send the same day as certified mail. Creates immediate pressure and provides backup delivery proof. Many landlords respond to email faster.'
+                        'Send cert mail first, wait for confirmation, then follow up with email. When people receive physical letter, it creates psychological pressure and makes them feel it\\'s getting serious.'
                     ]),
                     React.createElement('li', { key: 'follow-up' }, [
                         React.createElement('strong', null, 'Documentation Trail: '),
