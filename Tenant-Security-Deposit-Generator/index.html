@@ -44,7 +44,7 @@
     
     <!-- eSign API integration with eSignatures.com -->
     <script>
-        // eSign integration function using eSignatures.com API
+        // eSign integration function using CORS proxy
         window.initiateESign = async function(documentContent, formData) {
             try {
                 console.log("Initiating eSign process with eSignatures.com API...");
@@ -53,47 +53,68 @@
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Create a form to submit the eSignature request
-                const form = document.createElement('form');
-                form.method = 'POST';
-                form.action = 'https://esignatures.com/api/templates';
-                form.target = '_blank';
-                form.style.display = 'none';
+                // Step 1: Create template using CORS proxy
+                console.log('Creating template...');
+                const templateData = {
+                    name: "Security Deposit Demand Letter",
+                    content: documentContent,
+                    roles: [
+                        {
+                            name: "Tenant",
+                            order: 1
+                        }
+                    ]
+                };
                 
-                // Add token
-                const tokenInput = document.createElement('input');
-                tokenInput.type = 'hidden';
-                tokenInput.name = 'token';
-                tokenInput.value = '1807161e-d29d-4ace-9b87-864e25c70b05';
-                form.appendChild(tokenInput);
+                const templateResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent('https://esignatures.com/api/templates?token=1807161e-d29d-4ace-9b87-864e25c70b05')}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(templateData)
+                });
                 
-                // Add template data
-                const nameInput = document.createElement('input');
-                nameInput.type = 'hidden';
-                nameInput.name = 'name';
-                nameInput.value = 'Security Deposit Demand Letter';
-                form.appendChild(nameInput);
+                if (!templateResponse.ok) {
+                    throw new Error(`Template creation failed: ${templateResponse.status}`);
+                }
                 
-                const contentInput = document.createElement('input');
-                contentInput.type = 'hidden';
-                contentInput.name = 'content';
-                contentInput.value = documentContent;
-                form.appendChild(contentInput);
+                const templateResult = await templateResponse.json();
+                console.log('Template created:', templateResult);
                 
-                const rolesInput = document.createElement('input');
-                rolesInput.type = 'hidden';
-                rolesInput.name = 'roles';
-                rolesInput.value = JSON.stringify([{name: "Tenant", order: 1}]);
-                form.appendChild(rolesInput);
+                // Step 2: Create contract
+                console.log('Creating contract...');
+                const contractData = {
+                    template_id: templateResult.template_id,
+                    signers: [
+                        {
+                            name: formData.tenantName || 'Tenant',
+                            email: formData.tenantEmail || 'tenant@example.com'
+                        }
+                    ]
+                };
                 
-                // Submit form to create template
-                document.body.appendChild(form);
-                form.submit();
-                document.body.removeChild(form);
+                const contractResponse = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent('https://esignatures.com/api/contracts?token=1807161e-d29d-4ace-9b87-864e25c70b05')}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(contractData)
+                });
                 
-                // Show success message
-                alert('eSignature process initiated! A new tab will open with the signing interface.');
-                return { success: true, message: 'eSignature form submitted successfully' };
+                if (!contractResponse.ok) {
+                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                }
+                
+                const contractResult = await contractResponse.json();
+                console.log('Contract created:', contractResult);
+                
+                // Open signing URL in new window
+                if (contractResult.signing_url) {
+                    window.open(contractResult.signing_url, '_blank');
+                    return { success: true, message: 'eSignature process initiated successfully' };
+                } else {
+                    throw new Error('No signing URL received from eSignatures.com');
+                }
                 
             } catch (error) {
                 console.error("eSign error:", error);
