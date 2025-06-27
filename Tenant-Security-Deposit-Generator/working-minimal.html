@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Working Minimal Version</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        // Mock state laws
+        window.STATE_LAWS = {
+            'CA': {
+                state: 'California',
+                returnDeadline: 21,
+                citation: 'Civil Code §1950.5',
+                penaltyDescription: 'Up to twice the amount plus attorney fees'
+            }
+        };
+        
+        window.StateLawUtils = {
+            calculateTotalDemand: (formData, state) => ({
+                total: parseFloat(formData.totalDepositAmount) || 1000,
+                deposits: parseFloat(formData.totalDepositAmount) || 1000,
+                penalty: 0,
+                interest: 0,
+                daysPassed: 45
+            })
+        };
+        
+        // Mock utility functions
+        window.generateWordDoc = () => alert('Word doc generation clicked');
+        window.initiateESign = () => alert('eSign clicked');
+        window.copyToClipboard = (text) => {
+            navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard'));
+        };
+
+        // Working minimal component
+        const TenantDepositGenerator = () => {
+            const [currentTab, setCurrentTab] = React.useState(0);
+            const [formData, setFormData] = React.useState({
+                letterTone: 'firm',
+                primaryScenario: '',
+                totalDepositAmount: '',
+                tenantName: '',
+                landlordName: '',
+                rentalState: 'CA'
+            });
+
+            const tabs = [
+                { id: 'scenarios', label: 'Your Situation', icon: 'message-circle' },
+                { id: 'details', label: 'Details', icon: 'edit-3' },
+                { id: 'assessment', label: 'Case Assessment', icon: 'bar-chart-2' }
+            ];
+
+            const updateFormData = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const generateLetterContent = () => {
+                const stateData = window.STATE_LAWS[formData.rentalState];
+                return `
+                    <h1>DEMAND FOR RETURN OF SECURITY DEPOSIT</h1>
+                    <p><strong>Scenario:</strong> ${formData.primaryScenario || 'Not selected'}</p>
+                    <p><strong>Tenant:</strong> ${formData.tenantName || '[Your Name]'}</p>
+                    <p><strong>Amount:</strong> $${formData.totalDepositAmount || '0'}</p>
+                    <p>This demand letter is generated under ${stateData.citation}.</p>
+                `;
+            };
+
+            const Icon = ({ name }) => React.createElement('i', { 'data-feather': name });
+
+            const renderTabContent = () => {
+                switch (currentTab) {
+                    case 0:
+                        return React.createElement('div', { className: 'tab-content' }, [
+                            React.createElement('h3', { key: 'title' }, 'Your Situation'),
+                            React.createElement('div', { key: 'scenario' }, [
+                                React.createElement('label', { key: 'label' }, 'Primary Scenario:'),
+                                React.createElement('select', {
+                                    key: 'select',
+                                    value: formData.primaryScenario,
+                                    onChange: (e) => updateFormData('primaryScenario', e.target.value)
+                                }, [
+                                    React.createElement('option', { key: 'empty', value: '' }, 'Select...'),
+                                    React.createElement('option', { key: 'complete', value: 'complete-non-return' }, 'Complete Non-Return'),
+                                    React.createElement('option', { key: 'partial', value: 'partial-non-return' }, 'Partial Non-Return')
+                                ])
+                            ]),
+                            React.createElement('div', { key: 'amount' }, [
+                                React.createElement('label', { key: 'label' }, 'Deposit Amount:'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'number',
+                                    value: formData.totalDepositAmount,
+                                    onChange: (e) => updateFormData('totalDepositAmount', e.target.value)
+                                })
+                            ])
+                        ]);
+                    case 1:
+                        return React.createElement('div', { className: 'tab-content' }, [
+                            React.createElement('h3', { key: 'title' }, 'Details'),
+                            React.createElement('div', { key: 'name' }, [
+                                React.createElement('label', { key: 'label' }, 'Your Name:'),
+                                React.createElement('input', {
+                                    key: 'input',
+                                    type: 'text',
+                                    value: formData.tenantName,
+                                    onChange: (e) => updateFormData('tenantName', e.target.value)
+                                })
+                            ])
+                        ]);
+                    case 2:
+                        return React.createElement('div', { className: 'tab-content' }, [
+                            React.createElement('h3', { key: 'title' }, 'Case Assessment'),
+                            React.createElement('p', { key: 'desc' }, 'Legal analysis of your case will appear here.')
+                        ]);
+                    default:
+                        return React.createElement('div', {}, 'Loading...');
+                }
+            };
+
+            return React.createElement('div', { className: 'app-container' }, [
+                React.createElement('header', { key: 'header', className: 'app-header' }, [
+                    React.createElement('h1', { key: 'title' }, 'Tenant Security Deposit Generator - Working'),
+                    React.createElement('p', { key: 'subtitle' }, 'Three-tab interface test')
+                ]),
+                
+                React.createElement('div', { key: 'main', className: 'main-container' }, [
+                    React.createElement('div', { key: 'form', className: 'form-pane' }, [
+                        React.createElement('div', { key: 'tabs', className: 'tab-navigation' },
+                            tabs.map((tab, index) => 
+                                React.createElement('button', {
+                                    key: tab.id,
+                                    className: `tab-button ${currentTab === index ? 'active' : ''}`,
+                                    onClick: () => setCurrentTab(index)
+                                }, [
+                                    React.createElement(Icon, { key: 'icon', name: tab.icon }),
+                                    React.createElement('span', { key: 'label' }, tab.label)
+                                ])
+                            )
+                        ),
+                        
+                        React.createElement('div', { key: 'content', className: 'tab-content-container' },
+                            renderTabContent()
+                        )
+                    ]),
+                    
+                    React.createElement('div', { key: 'preview', className: 'preview-pane' }, [
+                        React.createElement('div', { key: 'header', className: 'preview-header' }, [
+                            React.createElement('h3', { key: 'title' }, 'Live Preview')
+                        ]),
+                        React.createElement('div', { 
+                            key: 'content', 
+                            className: 'preview-content',
+                            dangerouslySetInnerHTML: { __html: generateLetterContent() }
+                        })
+                    ])
+                ])
+            ]);
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - working minimal version');
+            
+            try {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(React.createElement(TenantDepositGenerator));
+                console.log('Working minimal component rendered');
+                
+                setTimeout(() => {
+                    if (window.feather) {
+                        feather.replace();
+                    }
+                }, 100);
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;"><h2>Error:</h2><pre>' + error.message + '</pre></div>';
+            }
+        });
+    </script>
+</body>
+</html>

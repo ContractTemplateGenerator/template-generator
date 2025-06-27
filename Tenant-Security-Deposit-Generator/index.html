@@ -161,22 +161,76 @@
                 window.open('https://calendly.com/your-calendar-link', '_blank');
             }
         };
+        
+        // Copy to clipboard utility function
+        window.copyToClipboard = function(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Content copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Content copied to clipboard!');
+                } catch (err) {
+                    console.error('Fallback copy failed: ', err);
+                    alert('Failed to copy to clipboard');
+                }
+                document.body.removeChild(textArea);
+            }
+        };
     </script>
 
     <!-- Initialize the React app -->
     <script>
-        // Initialize Feather icons after component mounts
+        // Initialize app after all dependencies are loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Render the main component
-            const root = ReactDOM.createRoot(document.getElementById('root'));
-            root.render(React.createElement(TenantDepositGenerator));
+            console.log('DOM loaded - starting app initialization');
             
-            // Initialize Feather icons
+            // Check React is available
+            if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+                console.error('React is not available');
+                document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">React libraries failed to load</div>';
+                return;
+            }
+            
+            console.log('React available, checking dependencies...');
+            
+            // Wait for all dependencies to load
             setTimeout(() => {
-                if (typeof feather !== 'undefined') {
-                    feather.replace();
+                // Check if TenantDepositGenerator is available
+                if (typeof window.TenantDepositGenerator === 'undefined') {
+                    console.error('TenantDepositGenerator component not found');
+                    document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Component failed to load. Check console for details.</div>';
+                    return;
                 }
-            }, 100);
+                
+                // Render the app
+                try {
+                    const root = ReactDOM.createRoot(document.getElementById('root'));
+                    root.render(React.createElement(window.TenantDepositGenerator));
+                    console.log('App rendered successfully');
+                    
+                    // Initialize Feather icons
+                    setTimeout(() => {
+                        if (typeof feather !== 'undefined') {
+                            feather.replace();
+                            console.log('Feather icons initialized');
+                        }
+                    }, 100);
+                } catch (error) {
+                    console.error('Error rendering app:', error);
+                    document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;"><h2>Render Error:</h2><pre>' + error.message + '</pre></div>';
+                }
+            }, 500); // Give scripts time to load
         });
         
         // Re-initialize icons when content changes

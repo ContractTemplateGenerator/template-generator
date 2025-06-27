@@ -295,10 +295,8 @@ const StateLawUtils = {
     },
     
     calculateTotalDemand: (formData, state) => {
-        const deposit = parseFloat(formData.securityDeposit) || 0;
-        const petDeposit = parseFloat(formData.petDeposit) || 0;
-        const cleaningDeposit = parseFloat(formData.cleaningDeposit) || 0;
-        const totalDeposits = deposit + petDeposit + cleaningDeposit;
+        const deposit = parseFloat(formData.totalDepositAmount) || 0;
+        const totalDeposits = deposit;
         
         const daysPassed = StateLawUtils.calculateDeadlinePassed(formData.moveOutDate, state);
         const penalty = StateLawUtils.calculatePenaltyAmount(totalDeposits, state, daysPassed);

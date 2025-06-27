@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tenant Security Deposit Demand Letter Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script>
+        // Initialize app after all dependencies are loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded - starting app initialization');
+            
+            // Check React is available
+            if (typeof React === 'undefined' || typeof ReactDOM === 'undefined') {
+                console.error('React is not available');
+                document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">React libraries failed to load</div>';
+                return;
+            }
+            
+            console.log('React available, loading dependencies...');
+            
+            // Load scripts in sequence
+            const scripts = [
+                'state-laws.js',
+                'docx-generator.js', 
+                'tenant-deposit-generator-complete.js'
+            ];
+            
+            let loadedScripts = 0;
+            
+            function loadScript(src) {
+                return new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = src;
+                    script.onload = () => {
+                        console.log(`Loaded: ${src}`);
+                        resolve();
+                    };
+                    script.onerror = () => {
+                        console.error(`Failed to load: ${src}`);
+                        reject(new Error(`Failed to load ${src}`));
+                    };
+                    document.head.appendChild(script);
+                });
+            }
+            
+            // Load all scripts
+            Promise.all(scripts.map(loadScript))
+                .then(() => {
+                    console.log('All dependencies loaded, rendering app...');
+                    
+                    // Check if TenantDepositGenerator is available
+                    if (typeof window.TenantDepositGenerator === 'undefined') {
+                        console.error('TenantDepositGenerator component not found');
+                        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;">Component failed to load</div>';
+                        return;
+                    }
+                    
+                    // Render the app
+                    try {
+                        const root = ReactDOM.createRoot(document.getElementById('root'));
+                        root.render(React.createElement(window.TenantDepositGenerator));
+                        console.log('App rendered successfully');
+                        
+                        // Initialize Feather icons
+                        setTimeout(() => {
+                            if (typeof feather !== 'undefined') {
+                                feather.replace();
+                                console.log('Feather icons initialized');
+                            }
+                        }, 100);
+                    } catch (error) {
+                        console.error('Error rendering app:', error);
+                        document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;"><h2>Render Error:</h2><pre>' + error.message + '</pre></div>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading dependencies:', error);
+                    document.getElementById('root').innerHTML = '<div style="color: red; padding: 20px;"><h2>Loading Error:</h2><pre>' + error.message + '</pre></div>';
+                });
+        });
+        
+        // Mock eSign and utility functions
+        window.initiateESign = async function(documentContent, formData) {
+            console.log('eSign initiated (mock)');
+            alert('eSign feature is currently in development mode');
+            return { success: true };
+        };
+        
+        window.copyToClipboard = function(text) {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Content copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy to clipboard');
+                });
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    alert('Content copied to clipboard!');
+                } catch (err) {
+                    console.error('Fallback copy failed: ', err);
+                    alert('Failed to copy to clipboard');
+                }
+                document.body.removeChild(textArea);
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug - Simple Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="root">
+        <div style="padding: 20px;">
+            <h1>Testing Basic HTML</h1>
+            <p>If you see this, HTML is working.</p>
+            <div id="js-test">JavaScript not loaded yet...</div>
+        </div>
+    </div>
+
+    <script>
+        console.log('Basic JavaScript running');
+        document.getElementById('js-test').innerHTML = 'JavaScript is working!';
+        
+        // Test if React CDN loads
+        const script1 = document.createElement('script');
+        script1.src = 'https://unpkg.com/react@18/umd/react.production.min.js';
+        script1.onload = () => {
+            console.log('React loaded');
+            
+            const script2 = document.createElement('script');
+            script2.src = 'https://unpkg.com/react-dom@18/umd/react-dom.production.min.js';
+            script2.onload = () => {
+                console.log('ReactDOM loaded');
+                document.getElementById('js-test').innerHTML = 'React libraries loaded successfully!';
+            };
+            script2.onerror = () => {
+                console.error('ReactDOM failed to load');
+                document.getElementById('js-test').innerHTML = 'ReactDOM failed to load';
+            };
+            document.head.appendChild(script2);
+        };
+        script1.onerror = () => {
+            console.error('React failed to load');
+            document.getElementById('js-test').innerHTML = 'React failed to load';
+        };
+        document.head.appendChild(script1);
+    </script>
+</body>
+</html>
