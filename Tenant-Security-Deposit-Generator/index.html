@@ -72,12 +72,31 @@
                 });
                 
                 if (!templateResponse.ok) {
-                    const errorData = await templateResponse.json();
-                    console.error('Template creation failed:', errorData);
+                    console.error('Template creation failed with status:', templateResponse.status);
+                    let errorData;
+                    try {
+                        const responseText = await templateResponse.text();
+                        console.log('Raw error response:', responseText);
+                        // Try to parse as JSON, fallback to text
+                        try {
+                            errorData = JSON.parse(responseText);
+                        } catch (parseError) {
+                            errorData = { error: `Server returned HTML instead of JSON (status ${templateResponse.status})` };
+                        }
+                    } catch (textError) {
+                        errorData = { error: `Failed to read error response (status ${templateResponse.status})` };
+                    }
                     throw new Error(errorData.error || `Template creation failed: ${templateResponse.status}`);
                 }
                 
-                const templateResult = await templateResponse.json();
+                let templateResult;
+                try {
+                    const responseText = await templateResponse.text();
+                    templateResult = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse template response as JSON:', parseError);
+                    throw new Error('Server returned invalid response format');
+                }
                 console.log('Template created:', templateResult);
                 
                 if (!templateResult.success) {
@@ -103,12 +122,31 @@
                 });
                 
                 if (!contractResponse.ok) {
-                    const errorData = await contractResponse.json();
-                    console.error('Contract creation failed:', errorData);
+                    console.error('Contract creation failed with status:', contractResponse.status);
+                    let errorData;
+                    try {
+                        const responseText = await contractResponse.text();
+                        console.log('Raw contract error response:', responseText);
+                        // Try to parse as JSON, fallback to text
+                        try {
+                            errorData = JSON.parse(responseText);
+                        } catch (parseError) {
+                            errorData = { error: `Server returned HTML instead of JSON (status ${contractResponse.status})` };
+                        }
+                    } catch (textError) {
+                        errorData = { error: `Failed to read error response (status ${contractResponse.status})` };
+                    }
                     throw new Error(errorData.error || `Contract creation failed: ${contractResponse.status}`);
                 }
                 
-                const contractResult = await contractResponse.json();
+                let contractResult;
+                try {
+                    const responseText = await contractResponse.text();
+                    contractResult = JSON.parse(responseText);
+                } catch (parseError) {
+                    console.error('Failed to parse contract response as JSON:', parseError);
+                    throw new Error('Server returned invalid response format');
+                }
                 console.log('Contract created:', contractResult);
                 
                 if (!contractResult.success) {
