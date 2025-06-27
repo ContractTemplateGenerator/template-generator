@@ -1850,7 +1850,7 @@ Sincerely,`;
                     ]),
                     React.createElement('li', { key: 'email-follow' }, [
                         React.createElement('strong', null, 'Email + PDF Copy: '),
-                        'Send cert mail first, wait for confirmation, then follow up with email. When people receive physical letter, it creates psychological pressure and makes them feel it\\'s getting serious.'
+                        'Send cert mail first, wait for confirmation, then follow up with email. When people receive physical letter, it creates psychological pressure and makes them feel it\'s getting serious.'
                     ]),
                     React.createElement('li', { key: 'follow-up' }, [
                         React.createElement('strong', null, 'Documentation Trail: '),
