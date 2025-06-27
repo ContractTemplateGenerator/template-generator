@@ -346,20 +346,34 @@ const TenantDepositGenerator = () => {
             whatHappenedText += ` Specifically, I dispute charges for: ${disputeDescriptions.join(", ")}.`;
         }
         
-        // Add evidence section
+        // Add evidence section with detailed descriptions
         if (formData.evidenceTypes && formData.evidenceTypes.length > 0) {
             const evidenceDescriptions = formData.evidenceTypes.map(evidence => {
                 switch(evidence) {
-                    case 'photos': return 'move-in/move-out photos';
-                    case 'receipts': return 'payment receipts and records';
-                    case 'communications': return 'written communications';
-                    case 'witnesses': return 'witness statements';
-                    case 'inspection': return 'inspection reports';
-                    case 'cleaning': return 'professional cleaning receipts';
+                    case 'photos': return 'move-in/move-out photos showing property condition';
+                    case 'receipts': return 'payment receipts and bank records proving deposit payment';
+                    case 'communications': return 'written communications with landlord';
+                    case 'witnesses': return 'witness statements attesting to property condition';
+                    case 'inspection': return 'official inspection reports documenting condition';
+                    case 'cleaning': return 'professional cleaning receipts demonstrating proper maintenance';
+                    case 'lease': return 'lease agreement provisions supporting my position';
+                    case 'repairs': return 'documentation of maintenance and repairs performed';
                     default: return evidence;
                 }
             });
             evidenceText = `<strong>Evidence Available:</strong> I have the following evidence to support my claim: ${evidenceDescriptions.join(", ")}.`;
+            
+            // Add lease clause citations if available
+            if (formData.leaseViolationClaims && formData.leaseViolationClaims.length > 0) {
+                const validClauses = formData.leaseViolationClaims.filter(clause => clause.section && clause.violation);
+                if (validClauses.length > 0) {
+                    evidenceText += ` Specifically, the lease agreement violations include: `;
+                    evidenceText += validClauses.map(clause => 
+                        `${clause.section} (${clause.violation})`
+                    ).join('; ') + '.';
+                }
+            }
+            
             if (formData.evidenceDetails) {
                 evidenceText += ` ${formData.evidenceDetails}`;
             }
@@ -438,6 +452,7 @@ Sincerely,`;
             <p>${closingTone}</p>
             
             <p>Sincerely,</p>
+            <p><strong>${formData.tenantName || '[YOUR NAME]'}</strong></p>
         `;
     };
 
@@ -1021,56 +1036,103 @@ Sincerely,`;
                                 title: 'Move-in/Move-out Photos',
                                 description: 'Shows actual condition vs. claimed damages',
                                 strength: 'Very Strong',
-                                tip: 'Take photos of every room, focusing on areas landlord claims are damaged'
+                                tip: 'Take photos of every room, focusing on areas landlord claims are damaged',
+                                professionalTip: '📸 Pro Tip: Use timestamp-enabled photos. Take wide shots for context, then close-ups of specific areas. Include a newspaper or dated item in photos for additional verification. Photos should be high-resolution and well-lit.',
+                                fields: [
+                                    { name: 'photoDate', label: 'Photo Date', type: 'date', placeholder: 'When photos were taken' },
+                                    { name: 'photoDetails', label: 'Photo Details', type: 'textarea', placeholder: 'Describe what the photos show and how they support your case...' }
+                                ]
                             },
                             {
                                 id: 'receipts',
                                 title: 'Payment Records & Receipts',
                                 description: 'Proves deposit payment and amount',
                                 strength: 'Essential',
-                                tip: 'Include bank statements, money orders, or cancelled checks'
+                                tip: 'Include bank statements, money orders, or cancelled checks',
+                                professionalTip: '💰 Pro Tip: Bank records trump cash receipts. If you paid cash, look for ATM withdrawal records on the same day. Money orders and cashier\'s checks provide excellent paper trails. Include both the payment method AND proof of landlord receipt.',
+                                fields: [
+                                    { name: 'paymentDate', label: 'Payment Date', type: 'date', placeholder: 'When deposit was paid' },
+                                    { name: 'paymentMethod', label: 'Payment Method', type: 'select', options: ['Check', 'Money Order', 'Cash', 'Bank Transfer', 'Credit Card', 'Other'], placeholder: 'How was deposit paid' },
+                                    { name: 'paymentDetails', label: 'Payment Details', type: 'textarea', placeholder: 'Check number, money order details, receipt information...' }
+                                ]
                             },
                             {
                                 id: 'communications',
                                 title: 'Written Communications',
                                 description: 'Email, texts, letters with landlord',
                                 strength: 'Strong',
-                                tip: 'Shows landlord admissions or contradictory statements'
+                                tip: 'Shows landlord admissions or contradictory statements',
+                                professionalTip: '📧 Pro Tip: Screenshots of texts should show phone numbers and timestamps. Print emails with full headers. Look for admissions like "I know the carpet was old" or contradictory statements between conversations.',
+                                fields: [
+                                    { name: 'commType', label: 'Communication Type', type: 'select', options: ['Email', 'Text Messages', 'Letters', 'Voicemail Transcripts', 'Mixed'], placeholder: 'Type of communications' },
+                                    { name: 'commDates', label: 'Date Range', type: 'text', placeholder: 'e.g., March 2024 - June 2024' },
+                                    { name: 'commDetails', label: 'Key Communications', type: 'textarea', placeholder: 'Describe the most important communications and what they prove...' }
+                                ]
                             },
                             {
                                 id: 'lease',
                                 title: 'Lease Agreement',
                                 description: 'Original lease terms and deposit conditions',
                                 strength: 'Essential',
-                                tip: 'Check for wear and tear clauses or deposit return terms'
+                                tip: 'Specific lease clauses strengthen your legal arguments',
+                                professionalTip: '📋 Pro Tip: Highlight specific clauses about deposit returns, normal wear definitions, and maintenance responsibilities. If lease is silent on key issues, state law applies in your favor.',
+                                fields: [
+                                    { name: 'leaseDate', label: 'Lease Signing Date', type: 'date', placeholder: 'When lease was signed' },
+                                    { name: 'leaseType', label: 'Lease Type', type: 'select', options: ['Standard Residential', 'Month-to-Month', 'Corporate Housing', 'Rent-Controlled', 'Other'], placeholder: 'Type of lease agreement' },
+                                    { name: 'leaseNotes', label: 'Relevant Lease Provisions', type: 'textarea', placeholder: 'Note specific sections that support your case...' }
+                                ]
                             },
                             {
                                 id: 'inspection',
                                 title: 'Inspection Reports',
                                 description: 'Official move-in or move-out inspections',
                                 strength: 'Very Strong',
-                                tip: 'Government or professional inspection carries most weight'
+                                tip: 'Government or professional inspection carries most weight',
+                                professionalTip: '🔍 Pro Tip: Official inspections by licensed professionals or government agencies carry the most legal weight. Even informal walkthroughs with witnesses are valuable if documented properly.',
+                                fields: [
+                                    { name: 'inspectionDate', label: 'Inspection Date', type: 'date', placeholder: 'Date of inspection' },
+                                    { name: 'inspectorType', label: 'Inspector Type', type: 'select', options: ['Property Manager', 'Landlord', 'Professional Inspector', 'Government Agency', 'Tenant + Witness'], placeholder: 'Who conducted inspection' },
+                                    { name: 'inspectionFindings', label: 'Key Findings', type: 'textarea', placeholder: 'What did the inspection show? Include any noted pre-existing conditions...' }
+                                ]
                             },
                             {
                                 id: 'cleaning',
                                 title: 'Professional Cleaning Records',
                                 description: 'Receipts showing you cleaned properly',
                                 strength: 'Strong',
-                                tip: 'Counters excessive cleaning fee claims'
+                                tip: 'Counters excessive cleaning fee claims',
+                                professionalTip: '🧹 Pro Tip: Professional cleaning receipts provide objective evidence of cleanliness standards. Even DIY cleaning can be documented with before/after photos and detailed itemized lists of tasks completed.',
+                                fields: [
+                                    { name: 'cleaningDate', label: 'Cleaning Date', type: 'date', placeholder: 'When cleaning was performed' },
+                                    { name: 'cleaningType', label: 'Cleaning Type', type: 'select', options: ['Professional Service', 'DIY Deep Clean', 'Carpet Professional', 'Window Professional', 'Mixed Services'], placeholder: 'Type of cleaning performed' },
+                                    { name: 'cleaningDetails', label: 'Cleaning Details', type: 'textarea', placeholder: 'Company name, services performed, areas cleaned, cost...' }
+                                ]
                             },
                             {
                                 id: 'witnesses',
                                 title: 'Witness Statements',
                                 description: 'People who saw property condition',
                                 strength: 'Moderate',
-                                tip: 'Friends, family, or professionals who visited'
+                                tip: 'Friends, family, or professionals who visited',
+                                professionalTip: '👥 Pro Tip: Professional witnesses (contractors, real estate agents) carry more weight than friends. Get signed statements with witness contact info. Video testimony on phones can be powerful if done properly.',
+                                fields: [
+                                    { name: 'witnessCount', label: 'Number of Witnesses', type: 'number', placeholder: 'How many witnesses' },
+                                    { name: 'witnessTypes', label: 'Witness Types', type: 'text', placeholder: 'e.g., friend, contractor, real estate agent' },
+                                    { name: 'witnessDetails', label: 'What Witnesses Saw', type: 'textarea', placeholder: 'What did witnesses observe? Include their names and how to contact them...' }
+                                ]
                             },
                             {
                                 id: 'repairs',
                                 title: 'Repair Documentation',
                                 description: 'Records of maintenance you performed',
                                 strength: 'Strong',
-                                tip: 'Shows you maintained the property well'
+                                tip: 'Shows you maintained the property well',
+                                professionalTip: '🔧 Pro Tip: Document all repairs with photos, receipts, and dates. This shows responsible tenancy and can counter claims of damage. Include both professional repairs and DIY maintenance.',
+                                fields: [
+                                    { name: 'repairDates', label: 'Repair Period', type: 'text', placeholder: 'e.g., Throughout 2023-2024' },
+                                    { name: 'repairTypes', label: 'Types of Repairs', type: 'textarea', placeholder: 'List major repairs, maintenance, or improvements made...' },
+                                    { name: 'repairCost', label: 'Total Investment', type: 'number', placeholder: 'Total spent on repairs/maintenance' }
+                                ]
                             }
                         ].map(evidence => {
                             const currentEvidence = formData.evidenceTypes || [];
@@ -1079,7 +1141,11 @@ Sincerely,`;
                             return React.createElement('div', { 
                                 key: evidence.id, 
                                 className: `evidence-card ${isChecked ? 'selected' : ''}`,
-                                onClick: () => {
+                                onClick: (e) => {
+                                    // Don't toggle if clicking on input fields
+                                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                                        return;
+                                    }
                                     const newEvidence = isChecked 
                                         ? currentEvidence.filter(e => e !== evidence.id)
                                         : [...currentEvidence, evidence.id];
@@ -1101,11 +1167,140 @@ Sincerely,`;
                                     React.createElement('div', { key: 'tip', className: 'evidence-tip' }, [
                                         React.createElement('span', { key: 'icon' }, '💡 '),
                                         React.createElement('span', { key: 'text' }, evidence.tip)
-                                    ])
+                                    ]),
+                                    // Professional tip section
+                                    evidence.professionalTip ? 
+                                        React.createElement('div', { key: 'pro-tip', className: 'professional-tip' }, evidence.professionalTip) : null,
+                                    // Detailed input fields when evidence is selected
+                                    isChecked && evidence.fields ? 
+                                        React.createElement('div', { key: 'evidence-details', className: 'evidence-detail-fields' }, [
+                                            React.createElement('h7', { key: 'details-title' }, 'Evidence Details:'),
+                                            ...evidence.fields.map((field, fieldIndex) => 
+                                                React.createElement('div', { key: `field-${fieldIndex}`, className: 'evidence-field' }, [
+                                                    React.createElement('label', { key: 'label' }, field.label),
+                                                    field.type === 'textarea' ? 
+                                                        React.createElement('textarea', {
+                                                            key: 'input',
+                                                            value: formData[`${evidence.id}_${field.name}`] || '',
+                                                            onChange: (e) => updateFormData(`${evidence.id}_${field.name}`, e.target.value),
+                                                            placeholder: field.placeholder,
+                                                            rows: 2,
+                                                            className: 'form-control'
+                                                        }) :
+                                                    field.type === 'select' ?
+                                                        React.createElement('select', {
+                                                            key: 'input',
+                                                            value: formData[`${evidence.id}_${field.name}`] || '',
+                                                            onChange: (e) => updateFormData(`${evidence.id}_${field.name}`, e.target.value),
+                                                            className: 'form-control'
+                                                        }, [
+                                                            React.createElement('option', { key: 'default', value: '' }, field.placeholder),
+                                                            ...field.options.map(option => 
+                                                                React.createElement('option', { key: option, value: option }, option)
+                                                            )
+                                                        ]) :
+                                                        React.createElement('input', {
+                                                            key: 'input',
+                                                            type: field.type,
+                                                            value: formData[`${evidence.id}_${field.name}`] || '',
+                                                            onChange: (e) => updateFormData(`${evidence.id}_${field.name}`, e.target.value),
+                                                            placeholder: field.placeholder,
+                                                            className: 'form-control'
+                                                        })
+                                                ])
+                                            )
+                                        ]) : null
                                 ])
                             ]);
                         }))
                     ]),
+                    
+                    // Lease clause citation system - shows if lease is selected as evidence
+                    formData.evidenceTypes && formData.evidenceTypes.includes('lease') ?
+                        React.createElement('div', { key: 'lease-citation-section', className: 'lease-violation-section' }, [
+                            React.createElement('h6', { key: 'title' }, [
+                                React.createElement(Icon, { key: 'icon', name: 'file-text' }),
+                                ' Lease Agreement Evidence Details'
+                            ]),
+                            React.createElement('div', { key: 'lease-help', className: 'strategic-tip' }, 
+                                'Citing specific lease clauses strengthens your legal position. Be precise about which sections support your case.'
+                            ),
+                            React.createElement('button', {
+                                key: 'add-clause',
+                                type: 'button',
+                                className: 'btn btn-secondary',
+                                onClick: () => {
+                                    const currentClauses = formData.leaseViolationClaims || [];
+                                    const newClauses = [...currentClauses, { section: '', clause: '', violation: '' }];
+                                    updateFormData('leaseViolationClaims', newClauses);
+                                }
+                            }, '+ Add Lease Clause Citation'),
+                            
+                            // Render lease clause citation inputs
+                            formData.leaseViolationClaims && formData.leaseViolationClaims.length > 0 ?
+                                React.createElement('div', { key: 'lease-clauses', className: 'lease-clauses-list' },
+                                    formData.leaseViolationClaims.map((clause, index) => 
+                                        React.createElement('div', { key: index, className: 'lease-clause-item' }, [
+                                            React.createElement('div', { key: 'section-row', className: 'form-row' }, [
+                                                React.createElement('div', { key: 'section', className: 'form-group' }, [
+                                                    React.createElement('label', { key: 'label' }, 'Lease Section/Paragraph'),
+                                                    React.createElement('input', {
+                                                        key: 'input',
+                                                        type: 'text',
+                                                        value: clause.section || '',
+                                                        onChange: (e) => {
+                                                            const updated = [...formData.leaseViolationClaims];
+                                                            updated[index] = { ...updated[index], section: e.target.value };
+                                                            updateFormData('leaseViolationClaims', updated);
+                                                        },
+                                                        placeholder: 'e.g., Section 12.3, Paragraph 8, Clause B',
+                                                        className: 'form-control'
+                                                    })
+                                                ])
+                                            ]),
+                                            React.createElement('div', { key: 'clause', className: 'form-group' }, [
+                                                React.createElement('label', { key: 'label' }, 'What the lease says (quote the exact language)'),
+                                                React.createElement('textarea', {
+                                                    key: 'textarea',
+                                                    value: clause.clause || '',
+                                                    onChange: (e) => {
+                                                        const updated = [...formData.leaseViolationClaims];
+                                                        updated[index] = { ...updated[index], clause: e.target.value };
+                                                        updateFormData('leaseViolationClaims', updated);
+                                                    },
+                                                    placeholder: 'Quote the exact text from your lease agreement...',
+                                                    rows: 2,
+                                                    className: 'form-control'
+                                                })
+                                            ]),
+                                            React.createElement('div', { key: 'violation', className: 'form-group' }, [
+                                                React.createElement('label', { key: 'label' }, 'How is the landlord violating this lease provision?'),
+                                                React.createElement('textarea', {
+                                                    key: 'textarea',
+                                                    value: clause.violation || '',
+                                                    onChange: (e) => {
+                                                        const updated = [...formData.leaseViolationClaims];
+                                                        updated[index] = { ...updated[index], violation: e.target.value };
+                                                        updateFormData('leaseViolationClaims', updated);
+                                                    },
+                                                    placeholder: 'Explain how the landlord\'s actions contradict this lease provision...',
+                                                    rows: 3,
+                                                    className: 'form-control'
+                                                })
+                                            ]),
+                                            React.createElement('button', {
+                                                key: 'remove',
+                                                type: 'button',
+                                                className: 'btn btn-danger btn-sm',
+                                                onClick: () => {
+                                                    const updated = formData.leaseViolationClaims.filter((_, i) => i !== index);
+                                                    updateFormData('leaseViolationClaims', updated);
+                                                }
+                                            }, 'Remove Clause')
+                                        ])
+                                    )
+                                ) : null
+                        ]) : null,
                     
                     // Additional evidence details
                     React.createElement('div', { key: 'evidence-details', className: 'question-item' }, [
@@ -1583,15 +1778,39 @@ Sincerely,`;
                     ])
                 ]) : null,
 
+            // Professional delivery strategies
+            React.createElement('div', { key: 'delivery-tips', className: 'delivery-tips' }, [
+                React.createElement('h6', { key: 'title' }, '📮 Professional Delivery Strategy'),
+                React.createElement('ul', { key: 'list' }, [
+                    React.createElement('li', { key: 'cert-mail' }, [
+                        React.createElement('strong', null, 'Certified Mail with Return Receipt: '),
+                        'Landlords perceive this as serious escalation. The signed receipt proves they received it and starts the legal clock ticking against them psychologically.'
+                    ]),
+                    React.createElement('li', { key: 'email-follow' }, [
+                        React.createElement('strong', null, 'Email + PDF Copy: '),
+                        'Send the same day as certified mail. Creates immediate pressure and provides backup delivery proof. Many landlords respond to email faster.'
+                    ]),
+                    React.createElement('li', { key: 'timing' }, [
+                        React.createElement('strong', null, 'Strategic Timing: '),
+                        'Send Monday-Wednesday for maximum business day response time. Avoid Fridays (delayed response) and holidays (excuses to delay).'
+                    ]),
+                    React.createElement('li', { key: 'follow-up' }, [
+                        React.createElement('strong', null, 'Documentation Trail: '),
+                        'Keep postal receipts, email delivery confirmations, and certified mail tracking. This trail becomes evidence in court if needed.'
+                    ])
+                ])
+            ]),
+
             // Next steps
             React.createElement('div', { key: 'next-steps', className: 'next-steps' }, [
-                React.createElement('h4', { key: 'title' }, '📋 Next Steps'),
+                React.createElement('h4', { key: 'title' }, '📋 Strategic Action Plan'),
                 React.createElement('ol', { key: 'list' }, [
-                    React.createElement('li', { key: 'review' }, 'Review your generated demand letter'),
-                    React.createElement('li', { key: 'send' }, 'Send via certified mail and email for maximum legal protection'),
-                    React.createElement('li', { key: 'wait' }, `Wait ${formData.responseDeadline || 14} days for landlord response`),
-                    React.createElement('li', { key: 'file' }, 'If no response, consider filing in small claims court'),
-                    React.createElement('li', { key: 'attorney' }, 'Consult an attorney for complex cases or large amounts')
+                    React.createElement('li', { key: 'review' }, 'Review your generated demand letter for accuracy and completeness'),
+                    React.createElement('li', { key: 'gather' }, 'Organize all evidence in chronological order with clear labels'),
+                    React.createElement('li', { key: 'send' }, 'Send via certified mail with return receipt AND email with PDF attachment'),
+                    React.createElement('li', { key: 'calendar' }, `Mark calendar for ${formData.responseDeadline || 14}-day deadline and prepare for next actions`),
+                    React.createElement('li', { key: 'prepare' }, 'If no response, prepare small claims court filing with all documentation ready'),
+                    React.createElement('li', { key: 'attorney' }, 'For amounts over $3,000 or complex cases, consult a tenant rights attorney')
                 ])
             ]),
             
