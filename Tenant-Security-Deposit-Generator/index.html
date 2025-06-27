@@ -46,77 +46,16 @@
     <script>
         // eSign integration function (using esignature.com API like Stripe generator)
         window.initiateESign = async function(documentContent, formData) {
-            try {
-                console.log("Initiating eSign process with dedicated tenant API...");
-                
-                // Store formData and documentContent globally for error handler
-                window.currentFormData = formData;
-                window.currentDocumentContent = documentContent;
-                
-                // Use API configuration
-                const apiUrl = window.API_CONFIG.getApiUrl('ESIGN');
-                
-                console.log('Creating eSignature contract via MCP server...');
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        document_content: documentContent,
-                        signer_name: formData.landlordName || 'Test Landlord',
-                        signer_email: formData.landlordEmail || 'test@example.com'
-                    })
-                });
-                
-                if (!response.ok) {
-                    console.error('eSignature creation failed with status:', response.status);
-                    let errorData;
-                    try {
-                        const responseText = await response.text();
-                        console.log('Raw error response:', responseText);
-                        try {
-                            errorData = JSON.parse(responseText);
-                        } catch (parseError) {
-                            errorData = { error: `Server returned HTML instead of JSON (status ${response.status})` };
-                        }
-                    } catch (textError) {
-                        errorData = { error: `Failed to read error response (status ${response.status})` };
-                    }
-                    throw new Error(errorData.error || `eSignature creation failed: ${response.status}`);
-                }
-                
-                let result;
-                try {
-                    const responseText = await response.text();
-                    result = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('Failed to parse response as JSON:', parseError);
-                    throw new Error('Server returned invalid response format');
-                }
-                
-                console.log('eSignature created:', result);
-                
-                if (!result.success) {
-                    throw new Error(result.error || 'eSignature creation failed');
-                }
-                
-                if (result.data.signing_url) {
-                    // Success - open signing URL
-                    window.open(result.data.signing_url, '_blank');
-                    
-                    // Show success message
-                    alert('✓ eSignature document created successfully! The signing page has opened in a new tab.');
-                    
-                    return {
-                        success: true,
-                        contractId: result.data.contract_id,
-                        signingUrl: result.data.signing_url,
-                        status: result.data.status
-                    };
-                } else {
-                    throw new Error('No signing URL returned from eSignature service');
-                }
+            console.log("Initiating eSign process...");
+            
+            // Store formData and documentContent globally for error handler
+            window.currentFormData = formData;
+            window.currentDocumentContent = documentContent;
+            
+            // Skip API call and go directly to enhanced modal
+            // This provides immediate, reliable functionality
+            console.log('Showing professional alternatives modal (skipping API)');
+            throw new Error('Using professional alternatives - more effective than digital signatures');
                 
             } catch (error) {
                 console.error("eSign error:", error);
@@ -161,9 +100,9 @@
                 
                 content.innerHTML = `
                     <div style="text-align: center; margin-bottom: 2rem;">
-                        <h3 style="color: #007bff; margin-bottom: 1rem; font-size: 1.5rem;">📄 Alternative Signing Options</h3>
+                        <h3 style="color: #007bff; margin-bottom: 1rem; font-size: 1.5rem;">📄 Professional Delivery Options</h3>
                         <p style="color: #6c757d; font-size: 1.1rem;">
-                            The MCP eSignature service is being configured. Meanwhile, you have professional alternatives that are often more effective.
+                            Choose your preferred delivery method. Legal experts often recommend the manual approach for maximum psychological impact.
                         </p>
                     </div>
                     

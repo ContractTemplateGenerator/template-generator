@@ -1997,7 +1997,7 @@ Sincerely,`;
                             name: eSignLoading ? 'loader' : 'edit-3',
                             style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
                         }),
-                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
+                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'Delivery Options')
                     ])
                 ])
             ]),
