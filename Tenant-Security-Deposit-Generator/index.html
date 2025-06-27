@@ -46,80 +46,83 @@
         // eSign integration function (using esignature.com API like Stripe generator)
         window.initiateESign = async function(documentContent, formData) {
             try {
-                console.log("Initiating eSign process with direct eSignatures.com API...");
+                console.log("Initiating eSign process with dedicated tenant API...");
                 
-                // Direct API calls to eSignatures.com (bypassing broken proxy)
-                const apiToken = '1807161e-d29d-4ace-9b87-864e25c70b05';
-                const apiBase = 'https://api.esignatures.io';
+                // Use dedicated tenant eSignature endpoint
+                const apiUrl = 'https://template.terms.law/api/tenant-esign';
                 
                 // Step 1: Create template
                 console.log('Creating template...');
-                const templateResponse = await fetch(`${apiBase}/templates`, {
+                const templateResponse = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${apiToken}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        name: 'Security Deposit Demand Letter',
-                        content: documentContent,
-                        content_type: 'html'
+                        step: 'create_template',
+                        data: {
+                            name: 'Security Deposit Demand Letter',
+                            content: documentContent
+                        }
                     })
                 });
                 
                 if (!templateResponse.ok) {
-                    const errorText = await templateResponse.text();
-                    console.error('Template creation failed:', errorText);
-                    throw new Error(`Template creation failed: ${templateResponse.status}`);
+                    const errorData = await templateResponse.json();
+                    console.error('Template creation failed:', errorData);
+                    throw new Error(errorData.error || `Template creation failed: ${templateResponse.status}`);
                 }
                 
                 const templateResult = await templateResponse.json();
                 console.log('Template created:', templateResult);
                 
+                if (!templateResult.success) {
+                    throw new Error(templateResult.error || 'Template creation failed');
+                }
+                
                 // Step 2: Create contract
                 console.log('Creating contract...');
-                const contractResponse = await fetch(`${apiBase}/contracts`, {
+                const contractResponse = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
-                        'Authorization': `Bearer ${apiToken}`,
                         'Content-Type': 'application/json',
-                        'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        template_id: templateResult.id,
-                        test: "no", // Production mode
-                        signers: [{
-                            email: formData.landlordEmail || 'test@example.com',
-                            name: formData.landlordName || 'Test Landlord',
-                            redirect_url: 'https://template.terms.law/Tenant-Security-Deposit-Generator/',
-                            role: 'signer'
-                        }],
-                        embedded: true
+                        step: 'create_contract',
+                        data: {
+                            template_id: templateResult.data.id,
+                            signer_email: formData.landlordEmail || 'test@example.com',
+                            signer_name: formData.landlordName || 'Test Landlord',
+                            redirect_url: 'https://template.terms.law/Tenant-Security-Deposit-Generator/'
+                        }
                     })
                 });
                 
                 if (!contractResponse.ok) {
-                    const errorText = await contractResponse.text();
-                    console.error('Contract creation failed:', errorText);
-                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                    const errorData = await contractResponse.json();
+                    console.error('Contract creation failed:', errorData);
+                    throw new Error(errorData.error || `Contract creation failed: ${contractResponse.status}`);
                 }
                 
                 const contractResult = await contractResponse.json();
                 console.log('Contract created:', contractResult);
                 
-                if (contractResult.signing_url) {
+                if (!contractResult.success) {
+                    throw new Error(contractResult.error || 'Contract creation failed');
+                }
+                
+                if (contractResult.data.signing_url) {
                     // Success - open signing URL
-                    window.open(contractResult.signing_url, '_blank');
+                    window.open(contractResult.data.signing_url, '_blank');
                     
                     // Show success message
                     alert('✓ eSignature document created successfully! The signing page has opened in a new tab.');
                     
                     return {
                         success: true,
-                        contractId: contractResult.contract_id,
-                        signingUrl: contractResult.signing_url,
-                        contractUrl: contractResult.contract_url
+                        contractId: contractResult.data.contract_id,
+                        signingUrl: contractResult.data.signing_url,
+                        contractUrl: contractResult.data.contract_url
                     };
                 } else {
                     throw new Error('No signing URL returned from contract creation');
