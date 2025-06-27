@@ -48,18 +48,21 @@
             try {
                 console.log("Initiating eSign process with esignature.com API...");
                 
-                // Use production eSignature API endpoint
-                const proxyUrl = 'https://template.terms.law/api/esignature';
+                // Use same proxy endpoint as stripe generators  
+                const proxyUrl = 'https://template.terms.law/esign-proxy';
                 
-                // Prepare data for esignature.com API
+                // Prepare data for esignature.com API (matching stripe generator format)
                 const eSignData = {
+                    test: "no", // Production mode
                     template: {
                         title: 'Security Deposit Demand Letter',
-                        content: documentContent
+                        content: documentContent,
+                        content_type: "text"
                     },
                     signers: [{
+                        email: formData.landlordEmail || 'test@example.com',
                         name: formData.landlordName || 'Test Landlord',
-                        email: formData.landlordEmail || 'test@example.com'
+                        role: "signer"
                     }]
                 };
                 
