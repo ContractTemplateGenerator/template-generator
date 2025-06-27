@@ -164,7 +164,7 @@ ${formData.contactName || '[CONTACT NAME]'}`;
             const documentContent = generateLetterText();
             
             const requestData = {
-                test: "yes",
+                test: "no", // Production mode
                 template: {
                     title: `Demand Letter`,
                     content: documentContent,

@@ -834,7 +834,7 @@ ${formData.companyName || ''}`;
 
             // eSignatures.com API call - using templates endpoint
             const apiData = {
-                test: "yes", // Use test mode for free trial account
+                test: "no", // Production mode - no demo stamp
                 template: {
                     title: documentTitle,
                     content: finalDocumentText,

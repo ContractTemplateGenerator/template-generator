@@ -421,7 +421,7 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     
     const contractData = {
         template_id: templateId,
-        test: "yes", // Use test mode for the paid account
+        test: "no", // Production mode - no demo stamp
         signers: [{
             name: signerInfo.name.trim(),
             email: signerInfo.email
