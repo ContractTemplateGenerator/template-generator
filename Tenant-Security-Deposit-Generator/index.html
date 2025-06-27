@@ -34,6 +34,7 @@
     <div id="root"></div>
 
     <!-- Load dependencies -->
+    <script src="api-config.js"></script>
     <script src="state-laws.js"></script>
     <script src="docx-generator.js"></script>
     <script src="tenant-deposit-generator-complete.js"></script>
@@ -52,8 +53,8 @@
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Use MCP server compatible endpoint
-                const apiUrl = 'https://template.terms.law/api/mcp-esign';
+                // Use API configuration
+                const apiUrl = window.API_CONFIG.getApiUrl('ESIGN');
                 
                 console.log('Creating eSignature contract via MCP server...');
                 const response = await fetch(apiUrl, {
@@ -249,6 +250,19 @@
             } else {
                 // Fallback if Calendly is not loaded
                 window.open('https://calendly.com/your-calendar-link', '_blank');
+            }
+        };
+        
+        // Test API connectivity
+        window.testApiConnection = async function() {
+            try {
+                const response = await fetch(window.API_CONFIG.getApiUrl('TEST'));
+                const data = await response.json();
+                console.log('API Test Success:', data);
+                return data;
+            } catch (error) {
+                console.error('API Test Failed:', error);
+                return { error: error.message };
             }
         };
         
