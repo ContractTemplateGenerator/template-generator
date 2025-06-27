@@ -427,9 +427,7 @@ const TenantDepositGenerator = () => {
         }
         
         // Create clean text version for eSignatures (no HTML, no asterisks)
-        const cleanText = `DEMAND FOR RETURN OF SECURITY DEPOSIT
-
-${today}
+        const cleanText = `${today}
 
 ${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '\n' + formData.landlordCompany : ''}
 ${formData.landlordAddress || '[LANDLORD ADDRESS]'}
@@ -1909,76 +1907,72 @@ Sincerely,`;
                     renderTabContent()
                 ),
                 
-                // Action buttons with navigation
+                // Action buttons with navigation all on same line
                 React.createElement('div', { key: 'actions', className: 'action-buttons' }, [
-                    // Navigation buttons on the left
-                    React.createElement('div', { key: 'navigation', className: 'nav-buttons' }, [
-                        React.createElement('button', {
-                            key: 'prev-tab',
-                            className: 'btn btn-secondary',
-                            disabled: currentTab === 0,
-                            onClick: () => setCurrentTab(Math.max(0, currentTab - 1))
-                        }, [
-                            React.createElement(Icon, { key: 'icon', name: 'chevron-left' }),
-                            React.createElement('span', { key: 'text' }, 'Previous')
-                        ]),
-                        React.createElement('button', {
-                            key: 'next-tab',
-                            className: 'btn btn-primary',
-                            disabled: currentTab === tabs.length - 1,
-                            onClick: () => setCurrentTab(Math.min(tabs.length - 1, currentTab + 1))
-                        }, [
-                            React.createElement('span', { key: 'text' }, 'Next'),
-                            React.createElement(Icon, { key: 'icon', name: 'chevron-right' })
-                        ])
+                    // Navigation buttons
+                    React.createElement('button', {
+                        key: 'prev-tab',
+                        className: 'btn btn-secondary',
+                        disabled: currentTab === 0,
+                        onClick: () => setCurrentTab(Math.max(0, currentTab - 1))
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'chevron-left' }),
+                        React.createElement('span', { key: 'text' }, 'Previous')
+                    ]),
+                    React.createElement('button', {
+                        key: 'next-tab',
+                        className: 'btn btn-primary',
+                        disabled: currentTab === tabs.length - 1,
+                        onClick: () => setCurrentTab(Math.min(tabs.length - 1, currentTab + 1))
+                    }, [
+                        React.createElement('span', { key: 'text' }, 'Next'),
+                        React.createElement(Icon, { key: 'icon', name: 'chevron-right' })
                     ]),
                     
-                    // Action buttons on the right
-                    React.createElement('div', { key: 'document-actions', className: 'doc-buttons' }, [
-                        React.createElement('button', {
-                            key: 'copy',
-                            className: 'btn btn-secondary',
-                            onClick: () => {
-                                const content = generateLetterContent().replace(/<[^>]*>/g, '');
-                                window.copyToClipboard(content);
+                    // Document action buttons
+                    React.createElement('button', {
+                        key: 'copy',
+                        className: 'btn btn-secondary',
+                        onClick: () => {
+                            const content = generateLetterContent().replace(/<[^>]*>/g, '');
+                            window.copyToClipboard(content);
+                        }
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'copy' }),
+                        React.createElement('span', { key: 'text' }, 'Copy')
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'download',
+                        className: 'btn btn-primary',
+                        onClick: () => window.generateWordDoc(generateLetterContent(), formData)
+                    }, [
+                        React.createElement(Icon, { key: 'icon', name: 'download' }),
+                        React.createElement('span', { key: 'text' }, 'Word Doc')
+                    ]),
+                    
+                    React.createElement('button', {
+                        key: 'esign',
+                        className: 'btn btn-accent',
+                        disabled: eSignLoading,
+                        onClick: async () => {
+                            setESignLoading(true);
+                            try {
+                                // Generate letter content to populate window.cleanLetterText
+                                generateLetterContent();
+                                // Use clean text version for eSignature
+                                await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
+                            } finally {
+                                setESignLoading(false);
                             }
-                        }, [
-                            React.createElement(Icon, { key: 'icon', name: 'copy' }),
-                            React.createElement('span', { key: 'text' }, 'Copy')
-                        ]),
-                        
-                        React.createElement('button', {
-                            key: 'download',
-                            className: 'btn btn-primary',
-                            onClick: () => window.generateWordDoc(generateLetterContent(), formData)
-                        }, [
-                            React.createElement(Icon, { key: 'icon', name: 'download' }),
-                            React.createElement('span', { key: 'text' }, 'Word Doc')
-                        ]),
-                        
-                        React.createElement('button', {
-                            key: 'esign',
-                            className: 'btn btn-accent',
-                            disabled: eSignLoading,
-                            onClick: async () => {
-                                setESignLoading(true);
-                                try {
-                                    // Generate letter content to populate window.cleanLetterText
-                                    generateLetterContent();
-                                    // Use clean text version for eSignature
-                                    await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
-                                } finally {
-                                    setESignLoading(false);
-                                }
-                            }
-                        }, [
-                            React.createElement(Icon, { 
-                                key: 'icon', 
-                                name: eSignLoading ? 'loader' : 'edit-3',
-                                style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
-                            }),
-                            React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
-                        ])
+                        }
+                    }, [
+                        React.createElement(Icon, { 
+                            key: 'icon', 
+                            name: eSignLoading ? 'loader' : 'edit-3',
+                            style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
+                        }),
+                        React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'eSignature')
                     ])
                 ])
             ]),
