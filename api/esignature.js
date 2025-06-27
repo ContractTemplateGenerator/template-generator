@@ -4,7 +4,7 @@
 const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
 const ESIGNATURES_API_BASE = 'https://api.esignatures.io';
 
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
     // Enable CORS for client requests
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
