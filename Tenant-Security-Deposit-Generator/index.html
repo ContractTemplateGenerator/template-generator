@@ -52,122 +52,69 @@
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Use dedicated tenant eSignature endpoint
+                // Use corrected eSignatures.com API implementation
                 const apiUrl = 'https://template.terms.law/api/tenant-esign';
                 
-                // Step 1: Create template
-                console.log('Creating template...');
-                const templateResponse = await fetch(apiUrl, {
+                console.log('Creating eSignature contract...');
+                const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        step: 'create_template',
-                        data: {
-                            name: 'Security Deposit Demand Letter',
-                            content: documentContent
-                        }
+                        document_content: documentContent,
+                        signer_name: formData.landlordName || 'Test Landlord',
+                        signer_email: formData.landlordEmail || 'test@example.com'
                     })
                 });
                 
-                if (!templateResponse.ok) {
-                    console.error('Template creation failed with status:', templateResponse.status);
+                if (!response.ok) {
+                    console.error('eSignature creation failed with status:', response.status);
                     let errorData;
                     try {
-                        const responseText = await templateResponse.text();
+                        const responseText = await response.text();
                         console.log('Raw error response:', responseText);
-                        // Try to parse as JSON, fallback to text
                         try {
                             errorData = JSON.parse(responseText);
                         } catch (parseError) {
-                            errorData = { error: `Server returned HTML instead of JSON (status ${templateResponse.status})` };
+                            errorData = { error: `Server returned HTML instead of JSON (status ${response.status})` };
                         }
                     } catch (textError) {
-                        errorData = { error: `Failed to read error response (status ${templateResponse.status})` };
+                        errorData = { error: `Failed to read error response (status ${response.status})` };
                     }
-                    throw new Error(errorData.error || `Template creation failed: ${templateResponse.status}`);
+                    throw new Error(errorData.error || `eSignature creation failed: ${response.status}`);
                 }
                 
-                let templateResult;
+                let result;
                 try {
-                    const responseText = await templateResponse.text();
-                    templateResult = JSON.parse(responseText);
+                    const responseText = await response.text();
+                    result = JSON.parse(responseText);
                 } catch (parseError) {
-                    console.error('Failed to parse template response as JSON:', parseError);
+                    console.error('Failed to parse response as JSON:', parseError);
                     throw new Error('Server returned invalid response format');
                 }
-                console.log('Template created:', templateResult);
                 
-                if (!templateResult.success) {
-                    throw new Error(templateResult.error || 'Template creation failed');
+                console.log('eSignature created:', result);
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'eSignature creation failed');
                 }
                 
-                // Step 2: Create contract
-                console.log('Creating contract...');
-                const contractResponse = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        step: 'create_contract',
-                        data: {
-                            template_id: templateResult.data.id,
-                            signer_email: formData.landlordEmail || 'test@example.com',
-                            signer_name: formData.landlordName || 'Test Landlord',
-                            redirect_url: 'https://template.terms.law/Tenant-Security-Deposit-Generator/'
-                        }
-                    })
-                });
-                
-                if (!contractResponse.ok) {
-                    console.error('Contract creation failed with status:', contractResponse.status);
-                    let errorData;
-                    try {
-                        const responseText = await contractResponse.text();
-                        console.log('Raw contract error response:', responseText);
-                        // Try to parse as JSON, fallback to text
-                        try {
-                            errorData = JSON.parse(responseText);
-                        } catch (parseError) {
-                            errorData = { error: `Server returned HTML instead of JSON (status ${contractResponse.status})` };
-                        }
-                    } catch (textError) {
-                        errorData = { error: `Failed to read error response (status ${contractResponse.status})` };
-                    }
-                    throw new Error(errorData.error || `Contract creation failed: ${contractResponse.status}`);
-                }
-                
-                let contractResult;
-                try {
-                    const responseText = await contractResponse.text();
-                    contractResult = JSON.parse(responseText);
-                } catch (parseError) {
-                    console.error('Failed to parse contract response as JSON:', parseError);
-                    throw new Error('Server returned invalid response format');
-                }
-                console.log('Contract created:', contractResult);
-                
-                if (!contractResult.success) {
-                    throw new Error(contractResult.error || 'Contract creation failed');
-                }
-                
-                if (contractResult.data.signing_url) {
+                if (result.data.signing_url) {
                     // Success - open signing URL
-                    window.open(contractResult.data.signing_url, '_blank');
+                    window.open(result.data.signing_url, '_blank');
                     
                     // Show success message
                     alert('✓ eSignature document created successfully! The signing page has opened in a new tab.');
                     
                     return {
                         success: true,
-                        contractId: contractResult.data.contract_id,
-                        signingUrl: contractResult.data.signing_url,
-                        contractUrl: contractResult.data.contract_url
+                        contractId: result.data.contract_id,
+                        signingUrl: result.data.signing_url,
+                        status: result.data.status
                     };
                 } else {
-                    throw new Error('No signing URL returned from contract creation');
+                    throw new Error('No signing URL returned from eSignature service');
                 }
                 
             } catch (error) {
