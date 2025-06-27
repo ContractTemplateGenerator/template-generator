@@ -1,5 +1,5 @@
-// Simple eSignatures.com proxy specifically for tenant generator  
-const ESIGNATURES_API_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
+// eSignatures.com proxy using official MCP server pattern
+const ESIGNATURES_SECRET_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
 const ESIGNATURES_API_BASE = 'https://esignatures.com/api';
 
 export default async function handler(req, res) {
@@ -34,7 +34,7 @@ export default async function handler(req, res) {
         // First create a template with the document content
         console.log('Creating template with document content...');
         
-        const templateResponse = await fetch(`${ESIGNATURES_API_BASE}/templates?token=${ESIGNATURES_API_TOKEN}`, {
+        const templateResponse = await fetch(`${ESIGNATURES_API_BASE}/templates?token=${ESIGNATURES_SECRET_TOKEN}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -61,7 +61,7 @@ export default async function handler(req, res) {
         // Now create contract using the template
         console.log('Creating contract with template ID:', templateResult.id);
         
-        const contractResponse = await fetch(`${ESIGNATURES_API_BASE}/contracts?token=${ESIGNATURES_API_TOKEN}`, {
+        const contractResponse = await fetch(`${ESIGNATURES_API_BASE}/contracts?token=${ESIGNATURES_SECRET_TOKEN}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
