@@ -107,6 +107,11 @@ const TenantDepositGenerator = () => {
         landlordCommunication: '', // 'no-response', 'verbal-only', 'written-inadequate', 'written-disputed'
         landlordJustifications: [], // array of justification types
         disputedCharges: [], // array of disputed charge types
+        customDisputedCharges: [], // array of custom charges with responses
+        
+        // Detailed evidence and arguments
+        leaseViolationClaims: [], // specific lease clauses cited by user
+        specificCounterArguments: {}, // detailed responses to each claim type
         
         // Evidence available
         evidenceTypes: [], // array of evidence types
@@ -663,46 +668,212 @@ Sincerely,`;
                         ])
                     ]),
                     
-                    // Show disputed charges if written-disputed is selected
+                    // Show comprehensive disputed charges if written-disputed is selected
                     formData.landlordCommunication === 'written-disputed' ?
                         React.createElement('div', { key: 'disputed-charges', className: 'question-item' }, [
-                            React.createElement('label', { key: 'label' }, 'What charges do you dispute?'),
-                            React.createElement('div', { key: 'charges', className: 'checkbox-grid' }, [
-                                'normal-wear-painting', 'normal-wear-carpet', 'normal-wear-holes', 
-                                'excessive-cleaning', 'pre-existing-damage', 'improper-repairs'
+                            React.createElement('label', { key: 'label' }, 'What specific charges do you dispute?'),
+                            React.createElement('div', { key: 'charges-help', className: 'help-text premium-tip' }, 
+                                '💡 Premium Feature: Build detailed counter-arguments for each disputed charge. Each selection provides strategic legal arguments to strengthen your position.'
+                            ),
+                            React.createElement('div', { key: 'charges', className: 'disputed-charges-grid' }, [
+                                {
+                                    id: 'normal-wear-painting',
+                                    title: 'Normal Wear - Painting/Wall Touch-ups',
+                                    description: 'Landlord charging for repainting or minor wall repairs',
+                                    arguments: [
+                                        'Normal wear and tear cannot be charged to tenant under state law',
+                                        'Paint typically lasts 2-3 years in rental properties',
+                                        'Minor nail holes and scuff marks are expected normal use',
+                                        'Landlord must prove damage beyond normal wear'
+                                    ],
+                                    evidence: ['Before/after photos', 'Length of tenancy documentation', 'Professional assessment']
+                                },
+                                {
+                                    id: 'normal-wear-carpet',
+                                    title: 'Normal Wear - Carpet/Flooring',
+                                    description: 'Charges for carpet cleaning, replacement, or floor refinishing',
+                                    arguments: [
+                                        'Carpet naturally wears with normal use over time',
+                                        'Professional cleaning typically required only for excessive soil/stains',
+                                        'Carpet replacement only justified for damage beyond normal wear',
+                                        'Age and useful life of carpet must be considered'
+                                    ],
+                                    evidence: ['Move-in carpet condition photos', 'Professional cleaning receipts', 'Carpet age documentation']
+                                },
+                                {
+                                    id: 'excessive-cleaning',
+                                    title: 'Excessive Cleaning Fees',
+                                    description: 'Unreasonable charges for cleaning or maintenance',
+                                    arguments: [
+                                        'Tenant only responsible for cleaning beyond normal standards',
+                                        'Professional cleaning fees must be reasonable and documented',
+                                        'Landlord cannot charge for cleaning normal move-out condition',
+                                        'Excessive fees may violate state consumer protection laws'
+                                    ],
+                                    evidence: ['Move-out cleaning receipts', 'Property condition photos', 'Market rate cleaning comparisons']
+                                },
+                                {
+                                    id: 'pre-existing-damage',
+                                    title: 'Pre-existing Damage',
+                                    description: 'Charges for damage that existed before tenancy',
+                                    arguments: [
+                                        'Tenant cannot be charged for damage present at move-in',
+                                        'Landlord bears burden of proving damage occurred during tenancy',
+                                        'Lack of proper move-in documentation protects tenant',
+                                        'Pre-existing conditions documented in photos provide strong defense'
+                                    ],
+                                    evidence: ['Move-in photos/videos', 'Move-in inspection report', 'Email communications about existing issues']
+                                },
+                                {
+                                    id: 'improper-repairs',
+                                    title: 'Improper Repair Charges',
+                                    description: 'Charges for repairs that are landlord responsibility',
+                                    arguments: [
+                                        'Landlord responsible for maintaining habitability and structural repairs',
+                                        'Normal maintenance cannot be charged to tenant',
+                                        'Tenant only liable for damage caused by negligence or misuse',
+                                        'Repair costs must be reasonable and properly documented'
+                                    ],
+                                    evidence: ['Repair documentation', 'Communications about maintenance requests', 'Professional assessments']
+                                },
+                                {
+                                    id: 'unauthorized-deductions',
+                                    title: 'Unauthorized Deductions',
+                                    description: 'Charges not permitted under lease or state law',
+                                    arguments: [
+                                        'Deductions must be specifically authorized by lease agreement',
+                                        'State law limits allowable deposit deductions',
+                                        'Tenant cannot waive rights protected by state law',
+                                        'Invalid deductions may result in penalties against landlord'
+                                    ],
+                                    evidence: ['Lease agreement terms', 'State law research', 'Legal precedent documentation']
+                                }
                             ].map(charge => {
                                 const currentCharges = formData.disputedCharges || [];
-                                const isChecked = currentCharges.includes(charge);
-                                const labels = {
-                                    'normal-wear-painting': 'Normal wear - Painting/wall touch-ups',
-                                    'normal-wear-carpet': 'Normal wear - Carpet wear',
-                                    'normal-wear-holes': 'Normal wear - Small nail holes',
-                                    'excessive-cleaning': 'Excessive cleaning fees',
-                                    'pre-existing-damage': 'Pre-existing damage',
-                                    'improper-repairs': 'Improper repair charges'
-                                };
+                                const isChecked = currentCharges.includes(charge.id);
                                 
                                 return React.createElement('div', { 
-                                    key: charge, 
-                                    className: `checkbox-item ${isChecked ? 'selected' : ''}`,
+                                    key: charge.id, 
+                                    className: `disputed-charge-card ${isChecked ? 'selected' : ''}`,
                                     onClick: () => {
                                         const newCharges = isChecked 
-                                            ? currentCharges.filter(c => c !== charge)
-                                            : [...currentCharges, charge];
+                                            ? currentCharges.filter(c => c !== charge.id)
+                                            : [...currentCharges, charge.id];
                                         updateFormData('disputedCharges', newCharges);
                                     }
                                 }, [
-                                    React.createElement('input', {
-                                        key: 'checkbox',
-                                        type: 'checkbox',
-                                        checked: isChecked,
-                                        onChange: () => {}
-                                    }),
-                                    React.createElement('div', { key: 'content', className: 'checkbox-content' }, [
-                                        React.createElement('strong', { key: 'title' }, labels[charge])
+                                    React.createElement('div', { key: 'header', className: 'charge-header' }, [
+                                        React.createElement('input', {
+                                            key: 'checkbox',
+                                            type: 'checkbox',
+                                            checked: isChecked,
+                                            onChange: () => {}
+                                        }),
+                                        React.createElement('h6', { key: 'title' }, charge.title)
+                                    ]),
+                                    React.createElement('p', { key: 'desc', className: 'charge-description' }, charge.description),
+                                    React.createElement('div', { key: 'arguments', className: 'legal-arguments' }, [
+                                        React.createElement('strong', { key: 'arg-title' }, 'Legal Arguments:'),
+                                        React.createElement('ul', { key: 'arg-list' }, 
+                                            charge.arguments.map((arg, index) => 
+                                                React.createElement('li', { key: index }, arg)
+                                            )
+                                        )
+                                    ]),
+                                    React.createElement('div', { key: 'evidence-suggest', className: 'evidence-suggestions' }, [
+                                        React.createElement('strong', { key: 'ev-title' }, 'Recommended Evidence:'),
+                                        React.createElement('div', { key: 'ev-list', className: 'evidence-tags' }, 
+                                            charge.evidence.map((ev, index) => 
+                                                React.createElement('span', { key: index, className: 'evidence-tag' }, ev)
+                                            )
+                                        )
                                     ])
                                 ]);
-                            }))
+                            })),
+                            
+                            // Custom disputed charges section
+                            React.createElement('div', { key: 'custom-charges-section', className: 'custom-charges-section' }, [
+                                React.createElement('h6', { key: 'custom-title' }, 'Additional Disputed Charges'),
+                                React.createElement('div', { key: 'custom-help', className: 'help-text' }, 
+                                    'Add any other charges not listed above that you want to dispute:'
+                                ),
+                                React.createElement('button', {
+                                    key: 'add-custom',
+                                    type: 'button',
+                                    className: 'btn btn-secondary',
+                                    onClick: () => {
+                                        const currentCustom = formData.customDisputedCharges || [];
+                                        const newCustom = [...currentCustom, { charge: '', amount: '', response: '' }];
+                                        updateFormData('customDisputedCharges', newCustom);
+                                    }
+                                }, '+ Add Custom Disputed Charge'),
+                                
+                                // Render custom charge inputs
+                                formData.customDisputedCharges && formData.customDisputedCharges.length > 0 ?
+                                    React.createElement('div', { key: 'custom-charges', className: 'custom-charges-list' },
+                                        formData.customDisputedCharges.map((custom, index) => 
+                                            React.createElement('div', { key: index, className: 'custom-charge-item' }, [
+                                                React.createElement('div', { key: 'charge-row', className: 'form-row' }, [
+                                                    React.createElement('div', { key: 'charge', className: 'form-group' }, [
+                                                        React.createElement('label', { key: 'label' }, 'Charge Description'),
+                                                        React.createElement('input', {
+                                                            key: 'input',
+                                                            type: 'text',
+                                                            value: custom.charge || '',
+                                                            onChange: (e) => {
+                                                                const updated = [...formData.customDisputedCharges];
+                                                                updated[index] = { ...updated[index], charge: e.target.value };
+                                                                updateFormData('customDisputedCharges', updated);
+                                                            },
+                                                            placeholder: 'e.g., Excessive utility charges',
+                                                            className: 'form-control'
+                                                        })
+                                                    ]),
+                                                    React.createElement('div', { key: 'amount', className: 'form-group' }, [
+                                                        React.createElement('label', { key: 'label' }, 'Amount'),
+                                                        React.createElement('input', {
+                                                            key: 'input',
+                                                            type: 'number',
+                                                            step: '0.01',
+                                                            value: custom.amount || '',
+                                                            onChange: (e) => {
+                                                                const updated = [...formData.customDisputedCharges];
+                                                                updated[index] = { ...updated[index], amount: e.target.value };
+                                                                updateFormData('customDisputedCharges', updated);
+                                                            },
+                                                            placeholder: '0.00',
+                                                            className: 'form-control'
+                                                        })
+                                                    ])
+                                                ]),
+                                                React.createElement('div', { key: 'response', className: 'form-group' }, [
+                                                    React.createElement('label', { key: 'label' }, 'Your Counter-Argument'),
+                                                    React.createElement('textarea', {
+                                                        key: 'textarea',
+                                                        value: custom.response || '',
+                                                        onChange: (e) => {
+                                                            const updated = [...formData.customDisputedCharges];
+                                                            updated[index] = { ...updated[index], response: e.target.value };
+                                                            updateFormData('customDisputedCharges', updated);
+                                                        },
+                                                        placeholder: 'Explain why this charge is improper, citing relevant law or lease terms...',
+                                                        rows: 3,
+                                                        className: 'form-control'
+                                                    })
+                                                ]),
+                                                React.createElement('button', {
+                                                    key: 'remove',
+                                                    type: 'button',
+                                                    className: 'btn btn-danger btn-sm',
+                                                    onClick: () => {
+                                                        const updated = formData.customDisputedCharges.filter((_, i) => i !== index);
+                                                        updateFormData('customDisputedCharges', updated);
+                                                    }
+                                                }, 'Remove')
+                                            ])
+                                        )
+                                    ) : null
+                            ])
                         ]) : null
                 ]) : null,
                 
