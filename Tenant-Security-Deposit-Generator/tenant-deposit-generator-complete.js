@@ -153,10 +153,10 @@ const TenantDepositGenerator = () => {
         if (['totalDepositAmount', 'amountReturned'].includes(lastChanged)) {
             return 'deposit-details';
         }
-        if (['landlordCommunication', 'landlordJustifications', 'disputedCharges'].includes(lastChanged)) {
+        if (['landlordCommunication', 'landlordJustifications', 'disputedCharges', 'customDisputedCharges', 'leaseViolationClaims'].includes(lastChanged)) {
             return 'scenario-content';
         }
-        if (['evidenceTypes', 'evidenceDetails'].includes(lastChanged)) {
+        if (['evidenceTypes', 'evidenceDetails'].includes(lastChanged) || lastChanged.includes('_')) {
             return 'evidence-section';
         }
         if (['tenantName', 'landlordName', 'rentalAddress'].includes(lastChanged)) {
@@ -183,10 +183,10 @@ const TenantDepositGenerator = () => {
         const sections = {
             'header-info': /Re: Demand for Return of Security Deposit.*?Property: [^\n]*/s,
             'tone-changes': /(I respectfully request|I demand|I hereby demand).*?(?=\.|\n)/s,
-            'scenario-content': /(Complete Non-Return|Partial Non-Return|What Happened|Evidence Available).*?(?=<p><strong>|$)/s,
+            'scenario-content': /(What Happened:|lease agreement violations include:|Specifically, I dispute charges for:).*?(?=<p><strong>|$)/s,
             'deposit-details': /(\$[\d,]+|\d+\.\d+)/g,
             'tenancy-details': /Tenancy Details:.*?(?=<p><strong>|$)/s,
-            'evidence-section': /Evidence Available:.*?(?=<p><strong>|$)/s,
+            'evidence-section': /(Evidence Available:.*?)(?=<p><strong>Amount Due|$)/s,
             'demand-section': /(You have|Demand:).*?days.*?(?=<p>|$)/s
         };
         
@@ -349,19 +349,66 @@ const TenantDepositGenerator = () => {
         // Add evidence section with detailed descriptions
         if (formData.evidenceTypes && formData.evidenceTypes.length > 0) {
             const evidenceDescriptions = formData.evidenceTypes.map(evidence => {
+                let baseDescription = '';
+                let detailsText = '';
+                
+                // Base description
                 switch(evidence) {
-                    case 'photos': return 'move-in/move-out photos showing property condition';
-                    case 'receipts': return 'payment receipts and bank records proving deposit payment';
-                    case 'communications': return 'written communications with landlord';
-                    case 'witnesses': return 'witness statements attesting to property condition';
-                    case 'inspection': return 'official inspection reports documenting condition';
-                    case 'cleaning': return 'professional cleaning receipts demonstrating proper maintenance';
-                    case 'lease': return 'lease agreement provisions supporting my position';
-                    case 'repairs': return 'documentation of maintenance and repairs performed';
-                    default: return evidence;
+                    case 'photos': 
+                        baseDescription = 'move-in/move-out photos showing property condition';
+                        if (formData.photos_photoDate) detailsText += ` taken on ${formData.photos_photoDate}`;
+                        if (formData.photos_photoDetails) detailsText += `: ${formData.photos_photoDetails}`;
+                        break;
+                    case 'receipts': 
+                        baseDescription = 'payment receipts and bank records proving deposit payment';
+                        if (formData.receipts_paymentDate) detailsText += ` dated ${formData.receipts_paymentDate}`;
+                        if (formData.receipts_paymentMethod) detailsText += ` via ${formData.receipts_paymentMethod}`;
+                        if (formData.receipts_paymentDetails) detailsText += `: ${formData.receipts_paymentDetails}`;
+                        break;
+                    case 'communications': 
+                        baseDescription = 'written communications with landlord';
+                        if (formData.communications_commType) detailsText += ` (${formData.communications_commType})`;
+                        if (formData.communications_commDates) detailsText += ` from ${formData.communications_commDates}`;
+                        if (formData.communications_commDetails) detailsText += `: ${formData.communications_commDetails}`;
+                        break;
+                    case 'witnesses': 
+                        baseDescription = 'witness statements attesting to property condition';
+                        if (formData.witnesses_witnessCount) detailsText += ` (${formData.witnesses_witnessCount} witnesses)`;
+                        if (formData.witnesses_witnessTypes) detailsText += ` including ${formData.witnesses_witnessTypes}`;
+                        if (formData.witnesses_witnessDetails) detailsText += `: ${formData.witnesses_witnessDetails}`;
+                        break;
+                    case 'inspection': 
+                        baseDescription = 'official inspection reports documenting condition';
+                        if (formData.inspection_inspectionDate) detailsText += ` conducted on ${formData.inspection_inspectionDate}`;
+                        if (formData.inspection_inspectorType) detailsText += ` by ${formData.inspection_inspectorType}`;
+                        if (formData.inspection_inspectionFindings) detailsText += `: ${formData.inspection_inspectionFindings}`;
+                        break;
+                    case 'cleaning': 
+                        baseDescription = 'professional cleaning receipts demonstrating proper maintenance';
+                        if (formData.cleaning_cleaningDate) detailsText += ` performed on ${formData.cleaning_cleaningDate}`;
+                        if (formData.cleaning_cleaningType) detailsText += ` (${formData.cleaning_cleaningType})`;
+                        if (formData.cleaning_cleaningDetails) detailsText += `: ${formData.cleaning_cleaningDetails}`;
+                        break;
+                    case 'lease': 
+                        baseDescription = 'lease agreement provisions supporting my position';
+                        if (formData.lease_leaseDate) detailsText += ` signed ${formData.lease_leaseDate}`;
+                        if (formData.lease_leaseType) detailsText += ` (${formData.lease_leaseType})`;
+                        if (formData.lease_leaseNotes) detailsText += `: ${formData.lease_leaseNotes}`;
+                        break;
+                    case 'repairs': 
+                        baseDescription = 'documentation of maintenance and repairs performed';
+                        if (formData.repairs_repairDates) detailsText += ` during ${formData.repairs_repairDates}`;
+                        if (formData.repairs_repairCost) detailsText += ` (total investment: $${formData.repairs_repairCost})`;
+                        if (formData.repairs_repairTypes) detailsText += `: ${formData.repairs_repairTypes}`;
+                        break;
+                    default: 
+                        baseDescription = evidence;
                 }
+                
+                return baseDescription + detailsText;
             });
-            evidenceText = `<strong>Evidence Available:</strong> I have the following evidence to support my claim: ${evidenceDescriptions.join(", ")}.`;
+            
+            evidenceText = `<strong>Evidence Available:</strong> I have the following evidence to support my claim: ${evidenceDescriptions.join("; ")}.`;
             
             // Add lease clause citations if available
             if (formData.leaseViolationClaims && formData.leaseViolationClaims.length > 0) {
@@ -379,8 +426,8 @@ const TenantDepositGenerator = () => {
             }
         }
         
-        // Create clean text version for eSignatures (no HTML, but with formatting)
-        const cleanText = `**DEMAND FOR RETURN OF SECURITY DEPOSIT**
+        // Create clean text version for eSignatures (no HTML, no asterisks)
+        const cleanText = `DEMAND FOR RETURN OF SECURITY DEPOSIT
 
 ${today}
 
@@ -388,29 +435,31 @@ ${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCom
 ${formData.landlordAddress || '[LANDLORD ADDRESS]'}
 ${formData.landlordCity || '[CITY]'}, ${formData.landlordState || 'CA'} ${formData.landlordZip || '[ZIP]'}
 
-**Re: Demand for Return of Security Deposit**
-**Tenant:** ${formData.tenantName || '[TENANT NAME]'}
-**Property:** ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}
+Re: Demand for Return of Security Deposit
+Tenant: ${formData.tenantName || '[TENANT NAME]'}
+Property: ${formData.rentalAddress || '[RENTAL ADDRESS]'}${formData.rentalUnit ? ', Unit ' + formData.rentalUnit : ''}, ${formData.rentalCity || '[CITY]'}, ${formData.rentalState || 'CA'}
 
 ${greeting} ${formData.landlordName || '[LANDLORD NAME]'},
 
-${urgencyLevel} the immediate return of my security deposit in the amount of **$${calculations.total.toFixed(2)}**, as required under ${stateData.citation}.
+${urgencyLevel} the immediate return of my security deposit in the amount of $${calculations.total.toFixed(2)}, as required under ${stateData.citation}.
 
-**Tenancy Details:** I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.totalDepositAmount || '0'}.
+Tenancy Details: I was a tenant from ${formData.leaseStartDate || '[START DATE]'} to ${formData.leaseEndDate || '[END DATE]'}, moved out on ${formData.moveOutDate || '[MOVE OUT DATE]'}, and paid a security deposit of $${formData.totalDepositAmount || '0'}.
 
-**Legal Violation:** Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
+Legal Violation: Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
 
 ${scenarioContent.length > 0 ? scenarioContent.join('\n\n') : ''}
 
 ${formData.itemizedStatementReceived === 'not-received' ? 
-    `**No Itemization:** You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
+    `No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
 }
 
-${whatHappenedText ? `**What Happened:** ${whatHappenedText}` : ''}
+${whatHappenedText ? `What Happened: ${whatHappenedText}` : ''}
 
-**Amount Due:** Due to your non-compliance, you owe statutory penalties totaling **$${calculations.total.toFixed(2)}** (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
+${evidenceText ? evidenceText.replace(/<[^>]*>/g, '').replace(/\*\*/g, '') : ''}
 
-**Demand:** You have ${formData.responseDeadline || 14} days from the date of this letter to pay **$${calculations.total.toFixed(2)}**.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}
+Amount Due: Due to your non-compliance, you owe statutory penalties totaling $${calculations.total.toFixed(2)} (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
+
+Demand: You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply can result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}
 
 ${closingTone}
 
@@ -447,7 +496,7 @@ Sincerely,`;
             
             <p><strong>Amount Due:</strong> Due to your non-compliance, you owe statutory penalties totaling <strong>$${calculations.total.toFixed(2)}</strong> (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).</p>
             
-            <p><strong>Demand:</strong> You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply will result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}</p>
+            <p><strong>Demand:</strong> You have ${formData.responseDeadline || 14} days from the date of this letter to pay $${calculations.total.toFixed(2)}.${formData.includeSmallClaimsThreat ? ` Failure to comply can result in a lawsuit seeking the full amount plus court costs and additional damages under ${stateData.citation}.` : ''}</p>
             
             <p>${closingTone}</p>
             
@@ -1789,10 +1838,6 @@ Sincerely,`;
                     React.createElement('li', { key: 'email-follow' }, [
                         React.createElement('strong', null, 'Email + PDF Copy: '),
                         'Send the same day as certified mail. Creates immediate pressure and provides backup delivery proof. Many landlords respond to email faster.'
-                    ]),
-                    React.createElement('li', { key: 'timing' }, [
-                        React.createElement('strong', null, 'Strategic Timing: '),
-                        'Send Monday-Wednesday for maximum business day response time. Avoid Fridays (delayed response) and holidays (excuses to delay).'
                     ]),
                     React.createElement('li', { key: 'follow-up' }, [
                         React.createElement('strong', null, 'Documentation Trail: '),
