@@ -1982,11 +1982,8 @@ Sincerely,`;
                                 }
                             } catch (error) {
                                 console.error('eSign error caught in React component:', error);
-                                // The error modal should already be shown by initiateESign function
-                                // If not, show a basic alert as fallback
-                                if (!document.querySelector('.modal')) {
-                                    alert('eSignature service is unavailable. Please use the Download Word Doc button instead.');
-                                }
+                                // The enhanced modal should be showing from initiateESign function
+                                // No fallback needed - enhanced modal handles all cases
                             } finally {
                                 setESignLoading(false);
                             }
