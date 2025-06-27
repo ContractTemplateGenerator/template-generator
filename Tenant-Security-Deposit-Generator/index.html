@@ -46,80 +46,83 @@
         // eSign integration function (using esignature.com API like Stripe generator)
         window.initiateESign = async function(documentContent, formData) {
             try {
-                console.log("Initiating eSign process with esignature.com API...");
+                console.log("Initiating eSign process with direct eSignatures.com API...");
                 
-                // Use production API endpoint
-                const proxyUrl = 'https://template.terms.law/api/esignature';
-                
-                // Prepare data for production API (action/data format)
-                const eSignData = {
-                    action: 'create_contract',
-                    data: {
-                        template_id: null, // Will create template first
-                        signer_email: formData.landlordEmail || 'test@example.com',
-                        signer_name: formData.landlordName || 'Test Landlord',
-                        redirect_url: 'https://template.terms.law/Tenant-Security-Deposit-Generator/',
-                        email_to_stripe: false
-                    }
-                };
-                
-                // First create template, then create contract
-                const templateData = {
-                    action: 'create_template',
-                    data: {
-                        name: 'Security Deposit Demand Letter',
-                        content: documentContent
-                    }
-                };
-                
-                console.log('Creating template first:', templateData);
+                // Direct API calls to eSignatures.com (bypassing broken proxy)
+                const apiToken = '1807161e-d29d-4ace-9b87-864e25c70b05';
+                const apiBase = 'https://api.esignatures.io';
                 
                 // Step 1: Create template
-                const templateResponse = await fetch(proxyUrl, {
+                console.log('Creating template...');
+                const templateResponse = await fetch(`${apiBase}/templates`, {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${apiToken}`,
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(templateData)
+                    body: JSON.stringify({
+                        name: 'Security Deposit Demand Letter',
+                        content: documentContent,
+                        content_type: 'html'
+                    })
                 });
                 
-                const templateResult = await templateResponse.json();
-                console.log('Template creation response:', templateResult);
-                
-                if (!templateResult.success) {
-                    throw new Error(templateResult.error || 'Failed to create template');
+                if (!templateResponse.ok) {
+                    const errorText = await templateResponse.text();
+                    console.error('Template creation failed:', errorText);
+                    throw new Error(`Template creation failed: ${templateResponse.status}`);
                 }
                 
-                // Step 2: Create contract with template ID
-                eSignData.data.template_id = templateResult.data.id;
-                console.log('Creating contract with template ID:', eSignData);
+                const templateResult = await templateResponse.json();
+                console.log('Template created:', templateResult);
                 
-                const contractResponse = await fetch(proxyUrl, {
+                // Step 2: Create contract
+                console.log('Creating contract...');
+                const contractResponse = await fetch(`${apiBase}/contracts`, {
                     method: 'POST',
                     headers: {
+                        'Authorization': `Bearer ${apiToken}`,
                         'Content-Type': 'application/json',
+                        'Accept': 'application/json'
                     },
-                    body: JSON.stringify(eSignData)
+                    body: JSON.stringify({
+                        template_id: templateResult.id,
+                        test: "no", // Production mode
+                        signers: [{
+                            email: formData.landlordEmail || 'test@example.com',
+                            name: formData.landlordName || 'Test Landlord',
+                            redirect_url: 'https://template.terms.law/Tenant-Security-Deposit-Generator/',
+                            role: 'signer'
+                        }],
+                        embedded: true
+                    })
                 });
                 
-                const contractResult = await contractResponse.json();
-                console.log('Contract creation response:', contractResult);
+                if (!contractResponse.ok) {
+                    const errorText = await contractResponse.text();
+                    console.error('Contract creation failed:', errorText);
+                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                }
                 
-                if (contractResult.success && contractResult.data.signing_url) {
+                const contractResult = await contractResponse.json();
+                console.log('Contract created:', contractResult);
+                
+                if (contractResult.signing_url) {
                     // Success - open signing URL
-                    window.open(contractResult.data.signing_url, '_blank');
+                    window.open(contractResult.signing_url, '_blank');
                     
                     // Show success message
                     alert('✓ eSignature document created successfully! The signing page has opened in a new tab.');
                     
                     return {
                         success: true,
-                        contractId: contractResult.data.contract_id,
-                        signingUrl: contractResult.data.signing_url,
-                        contractUrl: contractResult.data.contract_url
+                        contractId: contractResult.contract_id,
+                        signingUrl: contractResult.signing_url,
+                        contractUrl: contractResult.contract_url
                     };
                 } else {
-                    throw new Error(contractResult.error || 'eSign contract creation failed');
+                    throw new Error('No signing URL returned from contract creation');
                 }
                 
             } catch (error) {
