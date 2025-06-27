@@ -94,6 +94,8 @@ const TenantDepositGenerator = () => {
         // Deposit amounts (asked in scenarios)
         totalDepositAmount: '',
         amountReturned: '', // only for partial
+        petDeposit: '', // additional pet deposit
+        cleaningDeposit: '', // additional cleaning deposit
         
         // What happened details
         landlordCommunication: '', // 'no-response', 'verbal-only', 'written-inadequate', 'written-disputed'
@@ -251,12 +253,16 @@ const TenantDepositGenerator = () => {
             `;
         }
         
-        // Calculate based on deposit amounts
+        // Calculate based on all deposit amounts
         const totalDeposit = parseFloat(formData.totalDepositAmount) || 0;
+        const petDeposit = parseFloat(formData.petDeposit) || 0;
+        const cleaningDeposit = parseFloat(formData.cleaningDeposit) || 0;
+        const totalAllDeposits = totalDeposit + petDeposit + cleaningDeposit;
         const amountReturned = parseFloat(formData.amountReturned) || 0;
+        
         const calculations = window.StateLawUtils ? window.StateLawUtils.calculateTotalDemand(formData, state) : {
-            total: totalDeposit,
-            deposits: totalDeposit,
+            total: totalAllDeposits,
+            deposits: totalAllDeposits,
             penalty: 0,
             interest: 0,
             daysPassed: 45
@@ -280,7 +286,12 @@ const TenantDepositGenerator = () => {
         
         // Generate content based on selected scenario
         if (formData.primaryScenario === 'complete-non-return') {
-            scenarioContent.push(`<strong>Complete Non-Return Situation:</strong> You have withheld my entire security deposit of $${formData.totalDepositAmount || '0'}.`);
+            let depositBreakdown = `security deposit of $${formData.totalDepositAmount || '0'}`;
+            if (petDeposit > 0) depositBreakdown += `, pet deposit of $${petDeposit}`;
+            if (cleaningDeposit > 0) depositBreakdown += `, cleaning deposit of $${cleaningDeposit}`;
+            if (totalAllDeposits > totalDeposit) depositBreakdown += ` (total: $${totalAllDeposits.toFixed(2)})`;
+            
+            scenarioContent.push(`<strong>Complete Non-Return Situation:</strong> You have withheld my entire ${depositBreakdown}.`);
             
             // What happened details
             if (formData.landlordCommunication === 'no-response') {
@@ -552,6 +563,22 @@ Sincerely,`;
                 createClickableItem('radio', 'primaryScenario', 'partial-non-return', 'Partial Non-Return', 'Landlord returned some money but withheld the rest improperly', formData.primaryScenario === 'partial-non-return')
             ]),
             
+            // Quick deposit amount input for immediate calculation
+            formData.primaryScenario ? 
+                React.createElement('div', { key: 'quick-amount', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Security Deposit Amount'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'number',
+                        step: '0.01',
+                        min: '0',
+                        value: formData.totalDepositAmount || '',
+                        onChange: (e) => updateFormData('totalDepositAmount', e.target.value),
+                        placeholder: 'Enter deposit amount',
+                        className: 'form-control'
+                    })
+                ]) : null,
+            
             // Progressive disclosure - Complete Non-Return questionnaire
             formData.primaryScenario === 'complete-non-return' ? 
                 React.createElement('div', { key: 'complete-questions', className: 'step-by-step-questions' }, [
@@ -560,18 +587,24 @@ Sincerely,`;
                         'Complete Non-Return Details'
                     ]),
                     
-                    // Deposit amount
-                    React.createElement('div', { key: 'deposit-amount', className: 'question-item' }, [
-                        React.createElement('label', { key: 'label' }, 'Total security deposit paid'),
+                    // Move-out details
+                    React.createElement('div', { key: 'moveout-details', className: 'question-item' }, [
+                        React.createElement('label', { key: 'label' }, 'When did you move out?'),
                         React.createElement('input', {
                             key: 'input',
-                            type: 'number',
-                            step: '0.01',
-                            value: formData.totalDepositAmount || '',
-                            onChange: (e) => updateFormData('totalDepositAmount', e.target.value),
-                            placeholder: '0.00'
+                            type: 'date',
+                            value: formData.moveOutDate || '',
+                            onChange: (e) => updateFormData('moveOutDate', e.target.value),
+                            className: 'form-control'
                         })
                     ]),
+                    
+                    // Days since move-out calculation
+                    formData.moveOutDate ? 
+                        React.createElement('div', { key: 'days-info', className: 'info-box' }, [
+                            React.createElement('p', { key: 'days' }, `Days since move-out: ${Math.floor((new Date() - new Date(formData.moveOutDate)) / (1000 * 60 * 60 * 24))} days`),
+                            React.createElement('p', { key: 'deadline' }, `Legal deadline: ${window.STATE_LAWS && window.STATE_LAWS[formData.rentalState] ? window.STATE_LAWS[formData.rentalState].returnDeadline : 21} days`)
+                        ]) : null,
                     
                     // Landlord communication
                     React.createElement('div', { key: 'communication', className: 'question-item' }, [
@@ -855,11 +888,29 @@ Sincerely,`;
     };
 
 
-    // Simplified details tab for essential info not covered in progressive disclosure
+    // Comprehensive details tab for all property and contact information
     const renderDetailsTab = () => {
         return React.createElement('div', { className: 'tab-content' }, [
             React.createElement('h3', { key: 'title' }, 'Essential Details'),
-            React.createElement('div', { key: 'help', className: 'help-text' }, 'Fill in the remaining details needed for your demand letter.'),
+            React.createElement('div', { key: 'help', className: 'help-text' }, 'Complete information for your demand letter. All fields help strengthen your legal position.'),
+            
+            // Property state selection (affects legal calculations)
+            React.createElement('div', { key: 'state-selection', className: 'form-group highlighted-section' }, [
+                React.createElement('label', { key: 'label' }, 'Property State (Important for Legal Requirements)'),
+                React.createElement('select', {
+                    key: 'select',
+                    value: formData.rentalState || 'CA',
+                    onChange: (e) => updateFormData('rentalState', e.target.value),
+                    className: 'form-control'
+                }, US_STATES.map(state => 
+                    React.createElement('option', { key: state.value, value: state.value }, state.label)
+                )),
+                React.createElement('div', { key: 'state-info', className: 'help-text' }, 
+                    window.STATE_LAWS && window.STATE_LAWS[formData.rentalState] ? 
+                        `${window.STATE_LAWS[formData.rentalState].state} requires deposit return within ${window.STATE_LAWS[formData.rentalState].returnDeadline} days` : 
+                        'Select your state to see specific legal requirements'
+                )
+            ]),
             
             React.createElement('h4', { key: 'tenant-info' }, 'Your Information'),
             
@@ -998,7 +1049,8 @@ Sincerely,`;
                         key: 'input',
                         type: 'date',
                         value: formData.leaseStartDate || '',
-                        onChange: (e) => updateFormData('leaseStartDate', e.target.value)
+                        onChange: (e) => updateFormData('leaseStartDate', e.target.value),
+                        className: 'form-control'
                     })
                 ]),
                 React.createElement('div', { key: 'end', className: 'form-group' }, [
@@ -1007,7 +1059,8 @@ Sincerely,`;
                         key: 'input',
                         type: 'date',
                         value: formData.leaseEndDate || '',
-                        onChange: (e) => updateFormData('leaseEndDate', e.target.value)
+                        onChange: (e) => updateFormData('leaseEndDate', e.target.value),
+                        className: 'form-control'
                     })
                 ]),
                 React.createElement('div', { key: 'moveout', className: 'form-group' }, [
@@ -1016,7 +1069,48 @@ Sincerely,`;
                         key: 'input',
                         type: 'date',
                         value: formData.moveOutDate || '',
-                        onChange: (e) => updateFormData('moveOutDate', e.target.value)
+                        onChange: (e) => updateFormData('moveOutDate', e.target.value),
+                        className: 'form-control'
+                    })
+                ])
+            ]),
+            
+            // Tenancy duration info
+            formData.leaseStartDate && formData.leaseEndDate ? 
+                React.createElement('div', { key: 'tenancy-info', className: 'info-box' }, [
+                    React.createElement('p', { key: 'duration' }, 
+                        `Lease Duration: ${Math.floor((new Date(formData.leaseEndDate) - new Date(formData.leaseStartDate)) / (1000 * 60 * 60 * 24 * 30))} months`
+                    ),
+                    React.createElement('p', { key: 'help' }, 'Longer tenancies often strengthen cases against normal wear and tear charges')
+                ]) : null,
+            
+            // Additional deposit types
+            React.createElement('h4', { key: 'additional-deposits' }, 'Additional Deposit Information'),
+            React.createElement('div', { key: 'deposit-details', className: 'form-row' }, [
+                React.createElement('div', { key: 'pet-deposit', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Pet Deposit (if any)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'number',
+                        step: '0.01',
+                        min: '0',
+                        value: formData.petDeposit || '',
+                        onChange: (e) => updateFormData('petDeposit', e.target.value),
+                        placeholder: '0.00',
+                        className: 'form-control'
+                    })
+                ]),
+                React.createElement('div', { key: 'cleaning-deposit', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Cleaning Deposit (if any)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'number',
+                        step: '0.01',
+                        min: '0',
+                        value: formData.cleaningDeposit || '',
+                        onChange: (e) => updateFormData('cleaningDeposit', e.target.value),
+                        placeholder: '0.00',
+                        className: 'form-control'
                     })
                 ])
             ]),
