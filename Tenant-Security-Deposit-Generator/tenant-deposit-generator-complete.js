@@ -73,6 +73,12 @@ const TenantDepositGenerator = () => {
     const [formData, setFormData] = useState({
         // Essential info (collected progressively)
         tenantName: '',
+        tenantAddress: '',
+        tenantCity: '',
+        tenantState: 'CA',
+        tenantZip: '',
+        tenantPhone: '',
+        tenantEmail: '',
         landlordName: '',
         landlordCompany: '',
         landlordAddress: '',
@@ -835,38 +841,96 @@ Sincerely,`;
                     
                     React.createElement('div', { key: 'evidence-types', className: 'question-item' }, [
                         React.createElement('label', { key: 'label' }, 'What evidence do you have to support your claim?'),
-                        React.createElement('div', { key: 'evidence', className: 'checkbox-grid' }, [
-                            'photos', 'receipts', 'communications', 'witnesses', 'inspection', 'cleaning'
+                        React.createElement('div', { key: 'evidence-help', className: 'help-text premium-tip' }, 
+                            '💡 Premium Feature: Smart evidence organization helps build the strongest possible case. Each type strengthens different legal arguments.'
+                        ),
+                        React.createElement('div', { key: 'evidence', className: 'evidence-grid' }, [
+                            {
+                                id: 'photos',
+                                title: 'Move-in/Move-out Photos',
+                                description: 'Shows actual condition vs. claimed damages',
+                                strength: 'Very Strong',
+                                tip: 'Take photos of every room, focusing on areas landlord claims are damaged'
+                            },
+                            {
+                                id: 'receipts',
+                                title: 'Payment Records & Receipts',
+                                description: 'Proves deposit payment and amount',
+                                strength: 'Essential',
+                                tip: 'Include bank statements, money orders, or cancelled checks'
+                            },
+                            {
+                                id: 'communications',
+                                title: 'Written Communications',
+                                description: 'Email, texts, letters with landlord',
+                                strength: 'Strong',
+                                tip: 'Shows landlord admissions or contradictory statements'
+                            },
+                            {
+                                id: 'lease',
+                                title: 'Lease Agreement',
+                                description: 'Original lease terms and deposit conditions',
+                                strength: 'Essential',
+                                tip: 'Check for wear and tear clauses or deposit return terms'
+                            },
+                            {
+                                id: 'inspection',
+                                title: 'Inspection Reports',
+                                description: 'Official move-in or move-out inspections',
+                                strength: 'Very Strong',
+                                tip: 'Government or professional inspection carries most weight'
+                            },
+                            {
+                                id: 'cleaning',
+                                title: 'Professional Cleaning Records',
+                                description: 'Receipts showing you cleaned properly',
+                                strength: 'Strong',
+                                tip: 'Counters excessive cleaning fee claims'
+                            },
+                            {
+                                id: 'witnesses',
+                                title: 'Witness Statements',
+                                description: 'People who saw property condition',
+                                strength: 'Moderate',
+                                tip: 'Friends, family, or professionals who visited'
+                            },
+                            {
+                                id: 'repairs',
+                                title: 'Repair Documentation',
+                                description: 'Records of maintenance you performed',
+                                strength: 'Strong',
+                                tip: 'Shows you maintained the property well'
+                            }
                         ].map(evidence => {
                             const currentEvidence = formData.evidenceTypes || [];
-                            const isChecked = currentEvidence.includes(evidence);
-                            const labels = {
-                                'photos': 'Move-in/move-out photos',
-                                'receipts': 'Payment receipts and records',
-                                'communications': 'Written communications',
-                                'witnesses': 'Witness statements',
-                                'inspection': 'Inspection reports',
-                                'cleaning': 'Professional cleaning receipts'
-                            };
+                            const isChecked = currentEvidence.includes(evidence.id);
                             
                             return React.createElement('div', { 
-                                key: evidence, 
-                                className: `checkbox-item ${isChecked ? 'selected' : ''}`,
+                                key: evidence.id, 
+                                className: `evidence-card ${isChecked ? 'selected' : ''}`,
                                 onClick: () => {
                                     const newEvidence = isChecked 
-                                        ? currentEvidence.filter(e => e !== evidence)
-                                        : [...currentEvidence, evidence];
+                                        ? currentEvidence.filter(e => e !== evidence.id)
+                                        : [...currentEvidence, evidence.id];
                                     updateFormData('evidenceTypes', newEvidence);
                                 }
                             }, [
-                                React.createElement('input', {
-                                    key: 'checkbox',
-                                    type: 'checkbox',
-                                    checked: isChecked,
-                                    onChange: () => {}
-                                }),
-                                React.createElement('div', { key: 'content', className: 'checkbox-content' }, [
-                                    React.createElement('strong', { key: 'title' }, labels[evidence])
+                                React.createElement('div', { key: 'header', className: 'evidence-header' }, [
+                                    React.createElement('input', {
+                                        key: 'checkbox',
+                                        type: 'checkbox',
+                                        checked: isChecked,
+                                        onChange: () => {}
+                                    }),
+                                    React.createElement('div', { key: 'strength', className: `strength-badge ${evidence.strength.toLowerCase().replace(' ', '-')}` }, evidence.strength)
+                                ]),
+                                React.createElement('div', { key: 'content', className: 'evidence-content' }, [
+                                    React.createElement('h6', { key: 'title' }, evidence.title),
+                                    React.createElement('p', { key: 'desc' }, evidence.description),
+                                    React.createElement('div', { key: 'tip', className: 'evidence-tip' }, [
+                                        React.createElement('span', { key: 'icon' }, '💡 '),
+                                        React.createElement('span', { key: 'text' }, evidence.tip)
+                                    ])
                                 ])
                             ]);
                         }))
@@ -913,6 +977,7 @@ Sincerely,`;
             ]),
             
             React.createElement('h4', { key: 'tenant-info' }, 'Your Information'),
+            React.createElement('div', { key: 'tenant-help', className: 'help-text' }, 'Your contact information will appear at the bottom of the demand letter for landlord response.'),
             
             React.createElement('div', { key: 'tenant-name', className: 'form-group' }, [
                 React.createElement('label', { key: 'label' }, 'Your Full Name'),
@@ -921,8 +986,82 @@ Sincerely,`;
                     type: 'text',
                     value: formData.tenantName || '',
                     onChange: (e) => updateFormData('tenantName', e.target.value),
-                    placeholder: 'Your full legal name'
+                    placeholder: 'Your full legal name',
+                    className: 'form-control'
                 })
+            ]),
+            
+            React.createElement('div', { key: 'tenant-address', className: 'form-group' }, [
+                React.createElement('label', { key: 'label' }, 'Your Current Address'),
+                React.createElement('input', {
+                    key: 'input',
+                    type: 'text',
+                    value: formData.tenantAddress || '',
+                    onChange: (e) => updateFormData('tenantAddress', e.target.value),
+                    placeholder: 'Street address',
+                    className: 'form-control'
+                })
+            ]),
+            
+            React.createElement('div', { key: 'tenant-location', className: 'form-row' }, [
+                React.createElement('div', { key: 'city', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'City'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.tenantCity || '',
+                        onChange: (e) => updateFormData('tenantCity', e.target.value),
+                        placeholder: 'City',
+                        className: 'form-control'
+                    })
+                ]),
+                React.createElement('div', { key: 'state', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'State'),
+                    React.createElement('select', {
+                        key: 'select',
+                        value: formData.tenantState || 'CA',
+                        onChange: (e) => updateFormData('tenantState', e.target.value),
+                        className: 'form-control'
+                    }, US_STATES.map(state => 
+                        React.createElement('option', { key: state.value, value: state.value }, state.label)
+                    ))
+                ]),
+                React.createElement('div', { key: 'zip', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'ZIP Code'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'text',
+                        value: formData.tenantZip || '',
+                        onChange: (e) => updateFormData('tenantZip', e.target.value),
+                        placeholder: 'ZIP',
+                        className: 'form-control'
+                    })
+                ])
+            ]),
+            
+            React.createElement('div', { key: 'tenant-contact', className: 'form-row' }, [
+                React.createElement('div', { key: 'phone', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Phone Number (Optional)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'tel',
+                        value: formData.tenantPhone || '',
+                        onChange: (e) => updateFormData('tenantPhone', e.target.value),
+                        placeholder: '(555) 123-4567',
+                        className: 'form-control'
+                    })
+                ]),
+                React.createElement('div', { key: 'email', className: 'form-group' }, [
+                    React.createElement('label', { key: 'label' }, 'Email Address (Optional)'),
+                    React.createElement('input', {
+                        key: 'input',
+                        type: 'email',
+                        value: formData.tenantEmail || '',
+                        onChange: (e) => updateFormData('tenantEmail', e.target.value),
+                        placeholder: 'your.email@example.com',
+                        className: 'form-control'
+                    })
+                ])
             ]),
             
             React.createElement('h4', { key: 'landlord-info' }, 'Landlord Information'),
