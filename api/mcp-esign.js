@@ -1,6 +1,8 @@
-// MCP Server integration for eSignatures.com
-// This endpoint is designed to work with the official MCP server
-// https://github.com/esignaturescom/mcp-server-esignatures
+// eSignatures.com API implementation based on official documentation
+// https://esignatures.com/docs/api#esignatures-api
+
+const ESIGNATURES_SECRET_TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
+const ESIGNATURES_API_BASE = 'https://esignatures.com/api';
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -29,30 +31,81 @@ export default async function handler(req, res) {
             });
         }
 
-        console.log('MCP eSign request received for:', signer_email);
+        console.log('Creating eSignature contract for:', signer_email);
 
-        // When MCP server is available, this would use MCP tools
-        // For now, we'll simulate the expected response structure
-        // and fall back to the enhanced modal
+        // Step 1: Create template with document content
+        console.log('Creating template...');
+        const templateUrl = `${ESIGNATURES_API_BASE}/templates?token=${ESIGNATURES_SECRET_TOKEN}`;
         
-        // This simulates what the MCP server would return
-        // In actual implementation, this would call MCP server tools
-        const mockResponse = {
-            success: false,
-            error: 'MCP server integration pending - using enhanced modal fallback',
-            fallback_reason: 'API endpoints returning 405 errors',
-            recommendation: 'Use enhanced modal with download functionality'
-        };
+        const templateResponse = await fetch(templateUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: `Security Deposit Demand Letter - ${new Date().toISOString()}`,
+                content: document_content
+            })
+        });
 
-        // Return structured response that triggers enhanced modal
-        res.status(503).json(mockResponse);
+        if (!templateResponse.ok) {
+            const errorText = await templateResponse.text();
+            console.error('Template creation failed:', templateResponse.status, errorText);
+            return res.status(templateResponse.status).json({
+                error: `Template creation failed: ${templateResponse.status}`,
+                details: errorText
+            });
+        }
+
+        const templateResult = await templateResponse.json();
+        console.log('Template created successfully:', templateResult.id);
+
+        // Step 2: Create contract using the template
+        console.log('Creating contract with template ID:', templateResult.id);
+        const contractUrl = `${ESIGNATURES_API_BASE}/contracts?token=${ESIGNATURES_SECRET_TOKEN}`;
+        
+        const contractResponse = await fetch(contractUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                template_id: templateResult.id,
+                title: 'Security Deposit Demand Letter',
+                signers: [{
+                    name: signer_name,
+                    email: signer_email
+                }]
+            })
+        });
+
+        if (!contractResponse.ok) {
+            const errorText = await contractResponse.text();
+            console.error('Contract creation failed:', contractResponse.status, errorText);
+            return res.status(contractResponse.status).json({
+                error: `Contract creation failed: ${contractResponse.status}`,
+                details: errorText
+            });
+        }
+
+        const contractResult = await contractResponse.json();
+        console.log('Contract created successfully:', contractResult);
+
+        // Return success response with signing URL
+        res.status(200).json({
+            success: true,
+            data: {
+                contract_id: contractResult.contract_id,
+                signing_url: contractResult.signers?.[0]?.sign_page_url,
+                status: contractResult.status
+            }
+        });
 
     } catch (error) {
-        console.error('MCP eSign API error:', error);
+        console.error('eSignature API error:', error);
         res.status(500).json({
-            error: 'Server error processing MCP eSignature request',
-            details: error.message,
-            fallback: true
+            error: 'Server error processing eSignature request',
+            details: error.message
         });
     }
 }
