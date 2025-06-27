@@ -426,7 +426,11 @@ const TenantDepositGenerator = () => {
             }
         }
         
-        // Create clean text version for eSignatures (no HTML, no asterisks)
+        // Create clean text version for eSignatures (no HTML, no asterisks, no strong tags)
+        const cleanScenarioContent = scenarioContent.map(content => content.replace(/<[^>]*>/g, '')).join('\n\n');
+        const cleanWhatHappenedText = whatHappenedText.replace(/<[^>]*>/g, '');
+        const cleanEvidenceText = evidenceText ? evidenceText.replace(/<[^>]*>/g, '').replace(/\*\*/g, '') : '';
+        
         const cleanText = `${today}
 
 ${greeting}: ${formData.landlordName || '[LANDLORD NAME]'}${formData.landlordCompany ? '\n' + formData.landlordCompany : ''}
@@ -445,15 +449,15 @@ Tenancy Details: I was a tenant from ${formData.leaseStartDate || '[START DATE]'
 
 Legal Violation: Under ${stateData.citation}, you were required to return my deposit${formData.itemizedStatementReceived !== 'not-received' ? ' or provide an itemized statement' : ''} within ${stateData.returnDeadline} days. As of today, ${calculations.daysPassed} days have passed${calculations.daysPassed > stateData.returnDeadline ? ', violating state law' : ''}.
 
-${scenarioContent.length > 0 ? scenarioContent.join('\n\n') : ''}
+${cleanScenarioContent}
 
 ${formData.itemizedStatementReceived === 'not-received' ? 
     `No Itemization: You failed to provide the required itemized statement, which forfeits your right to withhold any deposit under ${stateData.citation}.` : ''
 }
 
-${whatHappenedText ? `What Happened: ${whatHappenedText}` : ''}
+${cleanWhatHappenedText ? `What Happened: ${cleanWhatHappenedText}` : ''}
 
-${evidenceText ? evidenceText.replace(/<[^>]*>/g, '').replace(/\*\*/g, '') : ''}
+${cleanEvidenceText}
 
 Amount Due: Due to your non-compliance, you owe statutory penalties totaling $${calculations.total.toFixed(2)} (original deposit: $${calculations.deposits.toFixed(2)}${calculations.penalty > 0 ? `, penalty: $${calculations.penalty.toFixed(2)}` : ''}${calculations.interest > 0 ? `, interest: $${calculations.interest.toFixed(2)}` : ''}${formData.requestAttorneyFees ? ', plus attorney fees if legal action becomes necessary' : ''}).
 
