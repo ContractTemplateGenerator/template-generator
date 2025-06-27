@@ -55,14 +55,20 @@
                 
                 // Step 1: Create template
                 console.log('Creating template...');
-                const templateResponse = await fetch('/api/esignatures-api', {
+                const templateResponse = await fetch('https://esignatures.com/api/templates?token=1807161e-d29d-4ace-9b87-864e25c70b05', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: 'create_template',
-                        documentContent: documentContent
+                        name: "Security Deposit Demand Letter",
+                        content: documentContent,
+                        roles: [
+                            {
+                                name: "Tenant",
+                                order: 1
+                            }
+                        ]
                     })
                 });
                 
@@ -75,16 +81,19 @@
                 
                 // Step 2: Create contract with signer info
                 console.log('Creating contract...');
-                const contractResponse = await fetch('/api/esignatures-api', {
+                const contractResponse = await fetch(`https://esignatures.com/api/contracts?token=1807161e-d29d-4ace-9b87-864e25c70b05`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: 'create_contract',
                         template_id: templateData.template_id,
-                        signer_name: formData.tenantName || 'Tenant',
-                        signer_email: formData.tenantEmail || 'tenant@example.com'
+                        signers: [
+                            {
+                                name: formData.tenantName || 'Tenant',
+                                email: formData.tenantEmail || 'tenant@example.com'
+                            }
+                        ]
                     })
                 });
                 
