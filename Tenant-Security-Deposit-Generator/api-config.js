@@ -7,7 +7,7 @@ window.API_CONFIG = {
     
     // API endpoints
     ENDPOINTS: {
-        ESIGN: '/api/mcp-esign',
+        ESIGN: '/api/esignatures-api',
         TEST: '/api/test'
     },
     

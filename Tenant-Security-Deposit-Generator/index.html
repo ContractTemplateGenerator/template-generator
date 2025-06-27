@@ -42,21 +42,66 @@
     <!-- Calendly integration script -->
     <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
     
-    <!-- eSign API integration (using same API as Stripe generator) -->
+    <!-- eSign API integration with eSignatures.com -->
     <script>
-        // eSign integration function (using esignature.com API like Stripe generator)
+        // eSign integration function using eSignatures.com API
         window.initiateESign = async function(documentContent, formData) {
             try {
-                console.log("Initiating eSign process...");
+                console.log("Initiating eSign process with eSignatures.com API...");
                 
-                // Store formData and documentContent globally for error handler
+                // Store formData and documentContent globally
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Skip API call and go directly to enhanced modal
-                // This provides immediate, reliable functionality
-                console.log('Showing professional alternatives modal (skipping API)');
-                throw new Error('Using professional alternatives - more effective than digital signatures');
+                // Step 1: Create template
+                console.log('Creating template...');
+                const templateResponse = await fetch('/api/esignatures-api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'create_template',
+                        documentContent: documentContent
+                    })
+                });
+                
+                if (!templateResponse.ok) {
+                    throw new Error(`Template creation failed: ${templateResponse.status}`);
+                }
+                
+                const templateData = await templateResponse.json();
+                console.log('Template created:', templateData);
+                
+                // Step 2: Create contract with signer info
+                console.log('Creating contract...');
+                const contractResponse = await fetch('/api/esignatures-api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'create_contract',
+                        template_id: templateData.template_id,
+                        signer_name: formData.tenantName || 'Tenant',
+                        signer_email: formData.tenantEmail || 'tenant@example.com'
+                    })
+                });
+                
+                if (!contractResponse.ok) {
+                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                }
+                
+                const contractData = await contractResponse.json();
+                console.log('Contract created:', contractData);
+                
+                // Open signing URL in new window
+                if (contractData.signing_url) {
+                    window.open(contractData.signing_url, '_blank');
+                    return { success: true, message: 'eSignature process initiated successfully' };
+                } else {
+                    throw new Error('No signing URL received from eSignatures.com');
+                }
                 
             } catch (error) {
                 console.error("eSign error:", error);
