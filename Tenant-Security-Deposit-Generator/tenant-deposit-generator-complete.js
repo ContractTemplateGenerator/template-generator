@@ -1976,7 +1976,17 @@ Sincerely,`;
                                 // Generate letter content to populate window.cleanLetterText
                                 generateLetterContent();
                                 // Use clean text version for eSignature
-                                await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
+                                const result = await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
+                                if (!result.success) {
+                                    console.log('eSign failed, enhanced modal should be showing');
+                                }
+                            } catch (error) {
+                                console.error('eSign error caught in React component:', error);
+                                // The error modal should already be shown by initiateESign function
+                                // If not, show a basic alert as fallback
+                                if (!document.querySelector('.modal')) {
+                                    alert('eSignature service is unavailable. Please use the Download Word Doc button instead.');
+                                }
                             } finally {
                                 setESignLoading(false);
                             }
