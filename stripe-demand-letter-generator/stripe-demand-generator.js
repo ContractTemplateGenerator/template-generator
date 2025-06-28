@@ -72,10 +72,17 @@ const StripeDemandGenerator = () => {
     
     // Paywall integration
     useEffect(() => {
-        // Check if user has already paid
-        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
-            setHasPaywallAccess(true);
-        } else {
+        // Function to check and update payment status
+        const checkPaymentStatus = () => {
+            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                setHasPaywallAccess(true);
+                return true;
+            }
+            return false;
+        };
+        
+        // Initial check
+        if (!checkPaymentStatus()) {
             // Apply non-copyable restrictions to preview if not paid
             setTimeout(() => {
                 if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
@@ -83,7 +90,35 @@ const StripeDemandGenerator = () => {
                 }
             }, 1000);
         }
-    }, []);
+        
+        // Listen for payment success events
+        const handlePaymentSuccess = () => {
+            console.log('Payment success event received, updating access state');
+            setHasPaywallAccess(true);
+            if (window.PaywallSystem && window.PaywallSystem.enablePreviewInteraction) {
+                window.PaywallSystem.enablePreviewInteraction();
+            }
+        };
+        
+        // Add event listener for payment success
+        window.addEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+        
+        // Also poll payment status every 2 seconds as backup
+        const pollInterval = setInterval(() => {
+            if (!hasPaywallAccess && checkPaymentStatus()) {
+                console.log('Payment status changed, updating access state');
+                if (window.PaywallSystem && window.PaywallSystem.enablePreviewInteraction) {
+                    window.PaywallSystem.enablePreviewInteraction();
+                }
+            }
+        }, 2000);
+        
+        // Cleanup function
+        return () => {
+            window.removeEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+            clearInterval(pollInterval);
+        };
+    }, [hasPaywallAccess]);
     
     // Form data state
     const [formData, setFormData] = useState({
@@ -659,9 +694,21 @@ ${formData.companyName || ''}`;
             if (window.PaywallSystem) {
                 window.PaywallSystem.showAccessDenied('copy');
                 window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    window.PaywallSystem.enablePreviewInteraction();
-                    copyToClipboard();
+                    // Double-check access status after modal closes
+                    if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                        setHasPaywallAccess(true);
+                        window.PaywallSystem.enablePreviewInteraction();
+                        copyToClipboard();
+                    } else {
+                        console.log('Payment not confirmed, retrying access check...');
+                        setTimeout(() => {
+                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                setHasPaywallAccess(true);
+                                window.PaywallSystem.enablePreviewInteraction();
+                                copyToClipboard();
+                            }
+                        }, 1000);
+                    }
                 });
             }
             return;
@@ -694,9 +741,21 @@ ${formData.companyName || ''}`;
             if (window.PaywallSystem) {
                 window.PaywallSystem.showAccessDenied('download');
                 window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    window.PaywallSystem.enablePreviewInteraction();
-                    downloadAsWord();
+                    // Double-check access status after modal closes
+                    if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                        setHasPaywallAccess(true);
+                        window.PaywallSystem.enablePreviewInteraction();
+                        downloadAsWord();
+                    } else {
+                        console.log('Payment not confirmed, retrying access check...');
+                        setTimeout(() => {
+                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                setHasPaywallAccess(true);
+                                window.PaywallSystem.enablePreviewInteraction();
+                                downloadAsWord();
+                            }
+                        }, 1000);
+                    }
                 });
             }
             return;
@@ -800,9 +859,21 @@ ${formData.companyName || ''}`;
             if (window.PaywallSystem) {
                 window.PaywallSystem.showAccessDenied('esign');
                 window.PaywallSystem.createPaywallModal(() => {
-                    setHasPaywallAccess(true);
-                    window.PaywallSystem.enablePreviewInteraction();
-                    eSignDocument();
+                    // Double-check access status after modal closes
+                    if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                        setHasPaywallAccess(true);
+                        window.PaywallSystem.enablePreviewInteraction();
+                        eSignDocument();
+                    } else {
+                        console.log('Payment not confirmed, retrying access check...');
+                        setTimeout(() => {
+                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                setHasPaywallAccess(true);
+                                window.PaywallSystem.enablePreviewInteraction();
+                                eSignDocument();
+                            }
+                        }, 1000);
+                    }
                 });
             }
             return;

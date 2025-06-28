@@ -115,6 +115,13 @@ const PaywallSystem = (() => {
 
                     // Enable preview interaction immediately
                     enablePreviewInteraction();
+                    
+                    // Notify React components that payment succeeded
+                    const event = new CustomEvent('paywallPaymentSuccess', {
+                        detail: { transactionId: order.id, paymentDate: new Date().toISOString() }
+                    });
+                    window.dispatchEvent(event);
+                    console.log('Dispatched paywallPaymentSuccess event for PayPal payment');
 
                     // Call success callback
                     if (onSuccess) {
@@ -449,6 +456,13 @@ const PaywallSystem = (() => {
 
             // Enable preview interaction immediately
             enablePreviewInteraction();
+            
+            // Notify React components that payment succeeded
+            const event = new CustomEvent('paywallPaymentSuccess', {
+                detail: { transactionId: paypalId, paymentDate: new Date().toISOString(), manualEntry: true }
+            });
+            window.dispatchEvent(event);
+            console.log('Dispatched paywallPaymentSuccess event for manual PayPal ID');
             
             // Show success message
             alert('Access unlocked! You can now copy and download your demand letter.');
