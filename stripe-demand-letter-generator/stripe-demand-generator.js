@@ -937,8 +937,8 @@ ${formData.companyName || ''}`;
                 console.log("eSignatures.com API response:", result);
                 
                 // Check if we got a real API response (not demo)
-                if (response.ok && result && !result.contract_id?.startsWith('demo-')) {
-                    console.log("Real API response received");
+                if (response.ok && result && result.status === 'success' && result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    console.log("Real API response received with contract_id:", result.data.contract_id);
                 }
                 
             } catch (proxyError) {
@@ -981,8 +981,10 @@ ${formData.companyName || ''}`;
                 // Show appropriate success message
                 if (result.contract_id && result.contract_id.startsWith('demo-')) {
                     alert("🧪 Demo Mode: eSignature interface embedded!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
-                } else if (result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
-                    alert("🔥 REAL eSignature Created!\n\nPlease review and sign the document in the interface.");
+                } else if (result.status === 'success' && result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
+                    alert("🔥 REAL eSignature Created!\n\nContract ID: " + result.data.contract_id + "\n\nPlease review and sign the document in the interface.");
+                } else if (result.status === 'success' && result.data?.contract_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(result.data.contract_id)) {
+                    alert("🔥 LIVE eSignature Created!\n\nReal contract ID: " + result.data.contract_id + "\n\nPlease review and sign the document in the interface.");
                 } else if (result.data?.contract_id && (result.data.contract_id.startsWith('contract-') || result.data.contract_id.startsWith('docuseal-'))) {
                     alert("📄 Document Ready for Signing!\n\nYour demand letter has been prepared for electronic signature.\n\nYou can now review and sign the document directly in the embedded interface.");
                 } else if (result.data?.contract_id && result.data.contract_id.startsWith('demo-')) {
