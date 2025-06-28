@@ -391,7 +391,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
     }
     
     const templateData = {
-        title: "",
+        title: title || "Document Template",
         document_elements: documentElements,
         labels: ["first_signer"]
     };
@@ -403,14 +403,14 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
         if (success && result.data) {
             const templateId = result.data.template_id;
             if (templateId) {
-                console.log('Template created:', templateId);
+                console.log('Template created successfully:', templateId);
                 callback(templateId);
             } else {
                 console.error('No template_id found in response:', result.data);
                 callback(null);
             }
         } else {
-            console.error('Template creation failed:', result);
+            console.error('Template creation failed - success:', success, 'result:', result);
             callback(null);
         }
     });
