@@ -53,17 +53,18 @@
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Create a URL with the document content and user info as parameters
-                const params = new URLSearchParams({
-                    token: '1807161e-d29d-4ace-9b87-864e25c70b05',
-                    name: 'Security Deposit Demand Letter',
-                    content: documentContent,
-                    signer_name: formData.tenantName || 'Tenant',
-                    signer_email: formData.tenantEmail || 'tenant@example.com'
-                });
+                // Open main eSignatures.com site for manual setup
+                const esignUrl = 'https://esignatures.com/login';
                 
-                // Open eSignatures.com interface with pre-filled data
-                const esignUrl = `https://esignatures.com/dashboard/templates/new?${params.toString()}`;
+                // Copy document content to clipboard for easy pasting
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    try {
+                        await navigator.clipboard.writeText(documentContent);
+                        console.log('Document content copied to clipboard');
+                    } catch (err) {
+                        console.log('Could not copy to clipboard:', err);
+                    }
+                }
                 
                 // Show instructions modal
                 const modal = document.createElement('div');
@@ -93,23 +94,37 @@
                 content.innerHTML = `
                     <div style="text-align: center; margin-bottom: 2rem;">
                         <h3 style="color: #007bff; margin-bottom: 1rem;">✍️ eSignature Setup</h3>
-                        <p style="color: #6c757d;">Your eSignatures.com dashboard will open in a new tab with your document ready to send.</p>
+                        <p style="color: #6c757d;">Log in to eSignatures.com to send your document for signature.</p>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem; background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
+                        <h4 style="color: #28a745; margin-bottom: 1rem;">🔑 Your API Token:</h4>
+                        <div style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; word-break: break-all;">
+                            1807161e-d29d-4ace-9b87-864e25c70b05
+                        </div>
                     </div>
                     
                     <div style="margin-bottom: 2rem;">
-                        <h4 style="color: #28a745; margin-bottom: 1rem;">📋 Quick Steps:</h4>
+                        <h4 style="color: #007bff; margin-bottom: 1rem;">📋 Setup Steps:</h4>
                         <ol style="text-align: left; padding-left: 1.5rem; line-height: 1.8;">
-                            <li>The eSignatures.com dashboard will open</li>
-                            <li>Your document content will be pre-filled</li>
-                            <li>Add recipient email and send for signature</li>
-                            <li>Track signing status in your dashboard</li>
+                            <li><strong>Login</strong> to eSignatures.com with your account</li>
+                            <li><strong>Create New Document</strong> or template</li>
+                            <li><strong>Paste Document</strong> (copied to clipboard automatically)</li>
+                            <li><strong>Add Recipient</strong>: ${formData.tenantEmail || 'tenant@example.com'}</li>
+                            <li><strong>Send for Signature</strong></li>
                         </ol>
+                    </div>
+                    
+                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f4fd; border-left: 4px solid #007bff; border-radius: 4px;">
+                        <small style="color: #495057;">
+                            <strong>✅ Document copied to clipboard!</strong> Just paste (Ctrl+V) when creating your template.
+                        </small>
                     </div>
                     
                     <div style="display: flex; gap: 1rem; justify-content: center;">
                         <button onclick="window.open('${esignUrl}', '_blank'); this.closest('.modal').remove();" 
                                 style="padding: 1rem 2rem; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                            🚀 Open eSignatures.com
+                            🔐 Login to eSignatures.com
                         </button>
                         <button onclick="this.closest('.modal').remove()" 
                                 style="padding: 1rem 2rem; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
