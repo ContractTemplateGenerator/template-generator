@@ -191,12 +191,12 @@ const StripeDemandGenerator = () => {
 
     // Tab configuration
     const tabs = [
-        { id: 'account', label: 'Account Details' },
-        { id: 'reasons', label: 'Stripe\'s Reasons' },
-        { id: 'violations', label: 'SSA Violations' },
-        { id: 'evidence', label: 'Evidence' },
-        { id: 'arbitration', label: 'Arbitration Demand' },
-        { id: 'assessment', label: 'Risk Assessment' }
+        { id: 'account', label: 'Account Details', icon: 'user' },
+        { id: 'reasons', label: 'Stripe\'s Reasons', icon: 'alert-circle' },
+        { id: 'violations', label: 'SSA Violations', icon: 'file-text' },
+        { id: 'evidence', label: 'Evidence', icon: 'folder' },
+        { id: 'arbitration', label: 'Arbitration Demand', icon: 'scale' },
+        { id: 'assessment', label: 'Risk Assessment', icon: 'bar-chart-2' }
     ];
     
     // Handle input changes
@@ -1669,7 +1669,10 @@ ${formData.companyName || ''}`;
                             key: tab.id,
                             className: `tab-button ${currentTab === index ? 'active' : ''}`,
                             onClick: () => goToTab(index)
-                        }, `${index + 1}. ${tab.label}`)
+                        }, [
+                            React.createElement(Icon, { key: 'icon', name: tab.icon }),
+                            React.createElement('span', { key: 'label' }, tab.label)
+                        ])
                     )
                 ),
                 

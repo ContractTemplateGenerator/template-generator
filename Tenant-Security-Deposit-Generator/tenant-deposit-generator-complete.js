@@ -610,7 +610,7 @@ Sincerely,`;
             // Generate clean document text for eSignature
             generateLetterContent(); // This populates window.cleanLetterText
             const finalDocumentText = window.cleanLetterText || generateLetterContent();
-            const documentTitle = `Security Deposit Demand Letter - ${formData.tenantName || 'Tenant'}`;
+            const documentTitle = `Security Deposit Demand Letter`;
 
             // eSignatures.com API call - using templates endpoint
             const apiData = {
