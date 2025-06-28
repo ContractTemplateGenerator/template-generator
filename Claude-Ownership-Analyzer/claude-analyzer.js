@@ -26,6 +26,9 @@ const ClaudeOwnershipAnalyzer = () => {
         factors: []
     });
     const [detailedAnalysis, setDetailedAnalysis] = useState(null);
+    const [completionProgress, setCompletionProgress] = useState(0);
+    const [achievements, setAchievements] = useState([]);
+    const [systemUptime, setSystemUptime] = useState(0);
 
     const tabs = [
         { id: 'setup', label: 'Account Setup', icon: 'settings' },
@@ -33,11 +36,53 @@ const ClaudeOwnershipAnalyzer = () => {
         { id: 'compliance', label: 'Risk Factors', icon: 'shield' }
     ];
 
-    // Real-time risk calculation
+    // Gamification calculations
+    useEffect(() => {
+        // Calculate completion progress
+        const totalFields = 11; // Total configurable fields
+        let completedFields = 0;
+        
+        if (formData.accountType !== 'consumer') completedFields++;
+        if (formData.useCase !== 'general') completedFields++;
+        if (formData.contentUse !== 'internal') completedFields++;
+        if (formData.humanOversight !== 'full') completedFields++;
+        if (formData.disclosurePlanned) completedFields++;
+        if (formData.servesMinors) completedFields++;
+        if (formData.interactionType !== 'no-interaction') completedFields++;
+        if (formData.prohibitedContent.length > 0) completedFields++;
+        if (formData.aiDevelopment.length > 0) completedFields++;
+        if (formData.confidentialityLevel !== 'public') completedFields++;
+        completedFields += Math.min(currentTab + 1, 3); // Tab completion bonus
+        
+        const progress = Math.round((completedFields / totalFields) * 100);
+        setCompletionProgress(progress);
+        
+        // Achievement system
+        const newAchievements = [];
+        if (progress >= 100) newAchievements.push('🏆 MASTER_ANALYZER');
+        if (formData.accountType === 'commercial') newAchievements.push('💼 PRO_USER');
+        if (formData.humanOversight === 'full') newAchievements.push('👁️ SAFETY_FIRST');
+        if (formData.prohibitedContent.length === 0 && formData.aiDevelopment.length === 0) {
+            newAchievements.push('✅ CLEAN_CONFIG');
+        }
+        if (currentTab === 2) newAchievements.push('🛡️ RISK_ASSESSED');
+        
+        setAchievements(newAchievements);
+    }, [formData, currentTab]);
+
+    // Real-time risk calculation with gamification
     useEffect(() => {
         const newRiskAnalysis = window.RiskAnalyzer.calculateRiskScore(formData);
         setRiskAnalysis(newRiskAnalysis);
     }, [formData]);
+
+    // System uptime simulator for tech appeal
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setSystemUptime(prev => prev + 1);
+        }, 1000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Generate detailed analysis for live gauge pane
     useEffect(() => {
@@ -579,8 +624,94 @@ const ClaudeOwnershipAnalyzer = () => {
     return (
         <div className="analyzer-container">
             <div className="header">
-                <h1>Claude Risk Analyzer</h1>
-                <p>Test your Claude usage scenario to discover real-time risk factors and compliance levels</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <h1>Claude Risk Analyzer</h1>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        {/* Completion Progress */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                            <span style={{ 
+                                fontFamily: 'Orbitron, monospace', 
+                                fontSize: '0.7rem', 
+                                color: '#8892a6',
+                                textTransform: 'uppercase'
+                            }}>
+                                Progress
+                            </span>
+                            <div style={{ 
+                                width: '60px', 
+                                height: '6px', 
+                                background: '#2a3441', 
+                                borderRadius: '3px',
+                                overflow: 'hidden'
+                            }}>
+                                <div style={{ 
+                                    width: `${completionProgress}%`, 
+                                    height: '100%', 
+                                    background: 'linear-gradient(90deg, #00d4ff, #39ff14)',
+                                    borderRadius: '3px',
+                                    transition: 'width 0.5s ease'
+                                }} />
+                            </div>
+                            <span style={{ 
+                                fontFamily: 'Orbitron, monospace', 
+                                fontSize: '0.7rem', 
+                                color: completionProgress >= 100 ? '#39ff14' : '#00d4ff',
+                                fontWeight: 'bold'
+                            }}>
+                                {completionProgress}%
+                            </span>
+                        </div>
+                        
+                        {/* System Uptime */}
+                        <div style={{ 
+                            fontFamily: 'Orbitron, monospace', 
+                            fontSize: '0.65rem', 
+                            color: '#8892a6',
+                            textAlign: 'right'
+                        }}>
+                            <div>UPTIME: {Math.floor(systemUptime / 60)}:{(systemUptime % 60).toString().padStart(2, '0')}</div>
+                            <div style={{ color: '#39ff14' }}>STATUS: ONLINE</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <p>Advanced compliance scanner • Real-time risk assessment • Legal framework analysis</p>
+                    
+                    {/* Achievements Display */}
+                    {achievements.length > 0 && (
+                        <div style={{ display: 'flex', gap: '0.25rem' }}>
+                            {achievements.slice(0, 3).map((achievement, index) => (
+                                <span 
+                                    key={index}
+                                    style={{
+                                        fontSize: '0.8rem',
+                                        padding: '0.25rem 0.5rem',
+                                        background: 'rgba(57, 255, 20, 0.1)',
+                                        border: '1px solid #39ff14',
+                                        borderRadius: '4px',
+                                        color: '#39ff14',
+                                        fontFamily: 'Orbitron, monospace',
+                                        fontSize: '0.65rem',
+                                        animation: 'pulse 2s infinite'
+                                    }}
+                                    title={achievement.split(' ')[1]?.replace('_', ' ')}
+                                >
+                                    {achievement.split(' ')[0]}
+                                </span>
+                            ))}
+                            {achievements.length > 3 && (
+                                <span style={{
+                                    fontSize: '0.65rem',
+                                    color: '#8892a6',
+                                    fontFamily: 'Orbitron, monospace'
+                                }}>
+                                    +{achievements.length - 3}
+                                </span>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* Tab Navigation */}
