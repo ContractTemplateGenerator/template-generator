@@ -10,6 +10,13 @@ const ClaudeOwnershipAnalyzer = () => {
         accountType: 'free',
         useCase: 'general',
         contentUse: 'internal',
+        commercialUseType: '',
+        academicUseType: '',
+        creativeLicense: '',
+        healthcareSpecialty: '',
+        legalPracticeArea: '',
+        mcpIntegrations: false,
+        researchFeature: false,
         humanOversight: 'full',
         disclosurePlanned: false,
         requiresDisclosure: false,
@@ -453,6 +460,8 @@ const ClaudeOwnershipAnalyzer = () => {
                                 >
                                     <option value="free">Free (Claude.ai Free)</option>
                                     <option value="consumer">Consumer (Claude.ai Pro)</option>
+                                    <option value="max5x">Max 5x (Claude Max 5x Pro)</option>
+                                    <option value="max20x">Max 20x (Claude Max 20x Pro)</option>
                                     <option value="commercial">Commercial (API, Enterprise)</option>
                                 </select>
                             </div>
@@ -500,6 +509,46 @@ const ClaudeOwnershipAnalyzer = () => {
                                 </select>
                             </div>
                         </div>
+
+                        <div className="form-section">
+                            <h3><Icon name="cpu" className="form-section-icon" />New Claude Features (2025)</h3>
+                            
+                            <div className="form-group">
+                                <div className="checkbox-item">
+                                    <input 
+                                        type="checkbox" 
+                                        id="mcpIntegrations"
+                                        name="mcpIntegrations" 
+                                        checked={formData.mcpIntegrations}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label htmlFor="mcpIntegrations">
+                                        <strong>MCP (Model Context Protocol) Integrations</strong>
+                                        <div style={{fontSize: '0.8rem', color: '#8892a6', marginTop: '0.25rem'}}>
+                                            Using third-party tools and services through MCP connections
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div className="form-group">
+                                <div className="checkbox-item">
+                                    <input 
+                                        type="checkbox" 
+                                        id="researchFeature"
+                                        name="researchFeature" 
+                                        checked={formData.researchFeature}
+                                        onChange={handleInputChange}
+                                    />
+                                    <label htmlFor="researchFeature">
+                                        <strong>Claude Research Feature</strong>
+                                        <div style={{fontSize: '0.8rem', color: '#8892a6', marginTop: '0.25rem'}}>
+                                            Using Claude's autonomous research capabilities with web access
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 );
 
@@ -522,6 +571,172 @@ const ClaudeOwnershipAnalyzer = () => {
                                     <option value="public">Public distribution</option>
                                 </select>
                             </div>
+                            
+                            {/* Clarifying questions based on use case */}
+                            {formData.useCase === 'commercial' && (
+                                <div className="form-group" style={{
+                                    padding: '1rem',
+                                    background: 'rgba(0, 212, 255, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(0, 212, 255, 0.2)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <label htmlFor="commercialUseType" style={{color: '#00d4ff', fontWeight: '600'}}>What type of commercial use?</label>
+                                    <select 
+                                        id="commercialUseType" 
+                                        name="commercialUseType" 
+                                        value={formData.commercialUseType} 
+                                        onChange={handleInputChange}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            background: 'rgba(26, 31, 46, 0.8)',
+                                            border: '1px solid #2a3441',
+                                            color: '#e1e8f0'
+                                        }}
+                                    >
+                                        <option value="">Select commercial use type...</option>
+                                        <option value="content-creation">Content creation for clients</option>
+                                        <option value="product-development">Product/service development</option>
+                                        <option value="marketing-materials">Marketing and advertising materials</option>
+                                        <option value="customer-support">Customer support automation</option>
+                                        <option value="software-development">Software development assistance</option>
+                                        <option value="consulting-services">Consulting and professional services</option>
+                                        <option value="resale-platform">Reselling AI outputs as products</option>
+                                    </select>
+                                </div>
+                            )}
+                            
+                            {formData.useCase === 'academic' && (
+                                <div className="form-group" style={{
+                                    padding: '1rem',
+                                    background: 'rgba(57, 255, 20, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(57, 255, 20, 0.2)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <label htmlFor="academicUseType" style={{color: '#39ff14', fontWeight: '600'}}>What type of academic use?</label>
+                                    <select 
+                                        id="academicUseType" 
+                                        name="academicUseType" 
+                                        value={formData.academicUseType} 
+                                        onChange={handleInputChange}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            background: 'rgba(26, 31, 46, 0.8)',
+                                            border: '1px solid #2a3441',
+                                            color: '#e1e8f0'
+                                        }}
+                                    >
+                                        <option value="">Select academic use type...</option>
+                                        <option value="research-assistance">Research and data analysis</option>
+                                        <option value="writing-support">Writing assistance and editing</option>
+                                        <option value="homework-help">Homework and assignment help</option>
+                                        <option value="thesis-dissertation">Thesis and dissertation work</option>
+                                        <option value="teaching-materials">Creating teaching materials</option>
+                                        <option value="exam-preparation">Exam and test preparation</option>
+                                        <option value="publication-writing">Academic publication writing</option>
+                                    </select>
+                                </div>
+                            )}
+                            
+                            {formData.useCase === 'creative' && (
+                                <div className="form-group" style={{
+                                    padding: '1rem',
+                                    background: 'rgba(255, 170, 0, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 170, 0, 0.2)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <label htmlFor="creativeLicense" style={{color: '#ffaa00', fontWeight: '600'}}>What type of creative work?</label>
+                                    <select 
+                                        id="creativeLicense" 
+                                        name="creativeLicense" 
+                                        value={formData.creativeLicense} 
+                                        onChange={handleInputChange}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            background: 'rgba(26, 31, 46, 0.8)',
+                                            border: '1px solid #2a3441',
+                                            color: '#e1e8f0'
+                                        }}
+                                    >
+                                        <option value="">Select creative use type...</option>
+                                        <option value="personal-blog">Personal blog writing</option>
+                                        <option value="fiction-writing">Fiction and storytelling</option>
+                                        <option value="marketing-copy">Marketing copywriting</option>
+                                        <option value="social-media">Social media content</option>
+                                        <option value="video-scripts">Video and podcast scripts</option>
+                                        <option value="artistic-projects">Artistic and experimental projects</option>
+                                        <option value="commercial-licensing">Commercial licensing/attribution</option>
+                                    </select>
+                                </div>
+                            )}
+                            
+                            {formData.useCase === 'healthcare' && (
+                                <div className="form-group" style={{
+                                    padding: '1rem',
+                                    background: 'rgba(255, 51, 68, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(255, 51, 68, 0.2)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <label htmlFor="healthcareSpecialty" style={{color: '#ff3344', fontWeight: '600'}}>Healthcare specialty area?</label>
+                                    <select 
+                                        id="healthcareSpecialty" 
+                                        name="healthcareSpecialty" 
+                                        value={formData.healthcareSpecialty} 
+                                        onChange={handleInputChange}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            background: 'rgba(26, 31, 46, 0.8)',
+                                            border: '1px solid #2a3441',
+                                            color: '#e1e8f0'
+                                        }}
+                                    >
+                                        <option value="">Select healthcare area...</option>
+                                        <option value="patient-communication">Patient communication templates</option>
+                                        <option value="administrative">Administrative and billing</option>
+                                        <option value="research-summaries">Medical research summaries</option>
+                                        <option value="education-materials">Patient education materials</option>
+                                        <option value="clinical-notes">Clinical documentation assistance</option>
+                                        <option value="diagnostic-support">Diagnostic decision support</option>
+                                        <option value="treatment-plans">Treatment planning assistance</option>
+                                    </select>
+                                </div>
+                            )}
+                            
+                            {formData.useCase === 'legal' && (
+                                <div className="form-group" style={{
+                                    padding: '1rem',
+                                    background: 'rgba(138, 43, 226, 0.05)',
+                                    borderRadius: '8px',
+                                    border: '1px solid rgba(138, 43, 226, 0.2)',
+                                    marginTop: '1rem'
+                                }}>
+                                    <label htmlFor="legalPracticeArea" style={{color: '#8a2be2', fontWeight: '600'}}>Legal practice area?</label>
+                                    <select 
+                                        id="legalPracticeArea" 
+                                        name="legalPracticeArea" 
+                                        value={formData.legalPracticeArea} 
+                                        onChange={handleInputChange}
+                                        style={{
+                                            marginTop: '0.5rem',
+                                            background: 'rgba(26, 31, 46, 0.8)',
+                                            border: '1px solid #2a3441',
+                                            color: '#e1e8f0'
+                                        }}
+                                    >
+                                        <option value="">Select legal practice area...</option>
+                                        <option value="contract-review">Contract review and drafting</option>
+                                        <option value="legal-research">Legal research and case law</option>
+                                        <option value="client-communication">Client communication</option>
+                                        <option value="document-analysis">Document analysis and summary</option>
+                                        <option value="compliance-guidance">Compliance and regulatory guidance</option>
+                                        <option value="litigation-support">Litigation support and discovery</option>
+                                        <option value="legal-advice">Direct legal advice to clients</option>
+                                    </select>
+                                </div>
+                            )}
 
                             <div className="form-group">
                                 <label htmlFor="interactionType">User interaction model</label>

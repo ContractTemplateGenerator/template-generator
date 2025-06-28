@@ -18,6 +18,23 @@ window.RiskAnalyzer = {
             disclosure: "Usage Policy - Universal Usage Standards",
             indemnification: "Not available for consumer users"
         },
+        max5x: {
+            ownership: "Section 4.2 (Rights and Responsibilities) - Consumer Terms (Enhanced)",
+            aiTraining: "Section 3.2 (Use Restrictions) - Consumer Terms",
+            commercialUse: "Section 3 (Use of our Services) - Consumer Terms",
+            disclosure: "Usage Policy - Universal Usage Standards",
+            indemnification: "Limited indemnification for Max users",
+            mcpPolicy: "MCP integrations subject to third-party terms"
+        },
+        max20x: {
+            ownership: "Section 4.2 (Rights and Responsibilities) - Consumer Terms (Enhanced)",
+            aiTraining: "Section 3.2 (Use Restrictions) - Consumer Terms",
+            commercialUse: "Section 3 (Use of our Services) - Consumer Terms",
+            disclosure: "Usage Policy - Universal Usage Standards",
+            indemnification: "Limited indemnification for Max users",
+            mcpPolicy: "MCP integrations subject to third-party terms",
+            researchPolicy: "Research feature subject to additional terms"
+        },
         commercial: {
             ownership: "Section B (Customer Content) - Commercial Terms",
             aiTraining: "Section D.4 (Use Restrictions) - Commercial Terms",
@@ -44,6 +61,23 @@ window.RiskAnalyzer = {
         } else if (formData.accountType === 'consumer') {
             score += 20;
             factors.push("Consumer account provides fewer protections than commercial");
+        } else if (formData.accountType === 'max5x') {
+            score += 15;
+            factors.push("Max 5x provides enhanced features but still limited compared to commercial");
+        } else if (formData.accountType === 'max20x') {
+            score += 10;
+            factors.push("Max 20x provides premium features but still consumer-level protections");
+        }
+        
+        // New Claude features risk assessment
+        if (formData.mcpIntegrations) {
+            score += 15;
+            factors.push("MCP integrations introduce third-party service dependencies and risks");
+        }
+        
+        if (formData.researchFeature) {
+            score += 20;
+            factors.push("Research feature with web access increases data exposure and compliance complexity");
         }
 
         // Use case risk assessment
@@ -109,10 +143,16 @@ window.RiskAnalyzer = {
     analyzeOwnership: function(formData) {
         const isCommercial = formData.accountType === 'commercial';
         const isFree = formData.accountType === 'free';
+        const isMax5x = formData.accountType === 'max5x';
+        const isMax20x = formData.accountType === 'max20x';
         
         let analysis = {
             status: 'allowed',
-            title: isCommercial ? 'Full Ownership Rights' : isFree ? 'Basic Ownership Rights (Free)' : 'Conditional Ownership Rights',
+            title: isCommercial ? 'Full Ownership Rights' : 
+                   isFree ? 'Basic Ownership Rights (Free)' :
+                   isMax5x ? 'Enhanced Ownership Rights (Max 5x)' :
+                   isMax20x ? 'Premium Ownership Rights (Max 20x)' :
+                   'Conditional Ownership Rights',
             description: '',
             details: [],
             termsRef: ''
@@ -142,6 +182,28 @@ window.RiskAnalyzer = {
                 analysis.status = 'restricted';
                 analysis.title = 'Commercial Use Not Recommended (Free)';
                 analysis.details.push('Consider upgrading for commercial use rights');
+            }
+        } else if (isMax5x || isMax20x) {
+            const planName = isMax5x ? 'Max 5x' : 'Max 20x';
+            analysis.description = `You own outputs with enhanced ${planName} features, subject to Terms of Service compliance. Better than basic consumer but limited commercial protections.`;
+            analysis.details = [
+                'Assignment of rights "if any" exist in outputs',
+                'Ownership conditional on ToS compliance',
+                'Limited indemnification protection for Max users',
+                `Enhanced ${planName} usage allowances`,
+                'Suitable for professional and light commercial use'
+            ];
+            
+            if (isMax20x) {
+                analysis.details.push('Premium tier with highest consumer-level protections');
+            }
+            
+            analysis.termsRef = isMax5x ? this.termsReferences.max5x.ownership : this.termsReferences.max20x.ownership;
+            
+            if (formData.contentUse === 'commercial' && (formData.commercialUseType === 'resale-platform' || formData.commercialUseType === 'product-development')) {
+                analysis.status = 'restricted';
+                analysis.title = `Heavy Commercial Use May Need Upgrade (${planName})`;
+                analysis.details.push('Consider Commercial account for extensive business use');
             }
         } else {
             analysis.description = 'You own outputs subject to compliance with Terms of Service. Rights are conditional on following usage restrictions.';
@@ -266,10 +328,16 @@ window.RiskAnalyzer = {
     analyzeCopyright: function(formData) {
         const isCommercial = formData.accountType === 'commercial';
         const isFree = formData.accountType === 'free';
+        const isMax5x = formData.accountType === 'max5x';
+        const isMax20x = formData.accountType === 'max20x';
         
         let analysis = {
             status: 'allowed',
-            title: isCommercial ? 'Strong Copyright Protection' : isFree ? 'No Copyright Protection (Free)' : 'Limited Copyright Protection',
+            title: isCommercial ? 'Strong Copyright Protection' : 
+                   isFree ? 'No Copyright Protection (Free)' :
+                   isMax5x ? 'Limited Copyright Protection (Max 5x)' :
+                   isMax20x ? 'Enhanced Copyright Protection (Max 20x)' :
+                   'Limited Copyright Protection',
             description: '',
             details: [],
             termsRef: ''
@@ -294,6 +362,32 @@ window.RiskAnalyzer = {
                 'Usage limits may affect copyright claims'
             ];
             analysis.termsRef = this.termsReferences.free.indemnification;
+            analysis.status = 'requires-review';
+        } else if (isMax5x || isMax20x) {
+            const planName = isMax5x ? 'Max 5x' : 'Max 20x';
+            const protectionLevel = isMax20x ? 'enhanced' : 'limited';
+            
+            analysis.description = `${planName} users receive ${protectionLevel} copyright protections. Better than free/basic consumer but not as comprehensive as commercial accounts.`;
+            analysis.details = [
+                `${protectionLevel.charAt(0).toUpperCase() + protectionLevel.slice(1)} copyright indemnification`,
+                'User responsible for copyright verification',
+                `${planName} tier legal protections`,
+                'Rights assignment "if any" exists'
+            ];
+            
+            if (isMax20x) {
+                analysis.details.push('Premium tier offers strongest consumer-level protection');
+            }
+            
+            if (formData.mcpIntegrations) {
+                analysis.details.push('MCP integrations may introduce additional copyright complexities');
+            }
+            
+            if (formData.researchFeature) {
+                analysis.details.push('Research feature outputs may include copyrighted web content');
+            }
+            
+            analysis.termsRef = isMax5x ? this.termsReferences.max5x.indemnification : this.termsReferences.max20x.indemnification;
             analysis.status = 'requires-review';
         } else {
             analysis.description = 'Consumer users must independently verify copyright status of outputs and handle any potential disputes.';
@@ -351,13 +445,30 @@ window.RiskAnalyzer = {
         if (formData.accountType === 'free' && (formData.contentUse === 'commercial' || formData.contentUse === 'external')) {
             suggestions.push({
                 title: 'Upgrade from Free Account',
-                description: 'Free accounts have limited rights and usage restrictions. Consider upgrading to Pro or Commercial for better protections and fewer limitations.',
+                description: 'Free accounts have limited rights and usage restrictions. Consider upgrading to Pro, Max, or Commercial for better protections and fewer limitations.',
                 priority: 'high'
             });
-        } else if (formData.accountType === 'consumer' && (formData.contentUse === 'commercial' || formData.contentUse === 'external')) {
+        } else if ((formData.accountType === 'consumer' || formData.accountType === 'max5x' || formData.accountType === 'max20x') && formData.contentUse === 'commercial') {
             suggestions.push({
-                title: 'Consider Upgrading to Commercial Account',
-                description: 'Commercial accounts provide stronger ownership rights, indemnification coverage, and clearer permissions for business use cases.',
+                title: 'Consider Commercial Account for Business Use',
+                description: 'Consumer accounts (including Max plans) provide limited commercial protections. Commercial accounts offer stronger ownership rights and indemnification coverage.',
+                priority: 'medium'
+            });
+        }
+        
+        // MCP and Research feature suggestions
+        if (formData.mcpIntegrations) {
+            suggestions.push({
+                title: 'Review MCP Integration Terms',
+                description: 'MCP integrations are subject to third-party service terms. Ensure you understand data sharing and liability implications of connected services.',
+                priority: 'medium'
+            });
+        }
+        
+        if (formData.researchFeature) {
+            suggestions.push({
+                title: 'Understand Research Feature Limitations',
+                description: 'Claude Research accesses web content and may include information subject to copyright or other restrictions. Review outputs carefully.',
                 priority: 'medium'
             });
         }
