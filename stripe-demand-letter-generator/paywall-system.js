@@ -35,7 +35,8 @@ const PaywallSystem = (() => {
             transactionId: null,
             paymentDate: null,
             sessionActive: false,
-            esignatureUsage: 0
+            esignatureUsage: 0,
+            esignatureClicks: 0
         };
     };
 
@@ -111,7 +112,8 @@ const PaywallSystem = (() => {
                         transactionId: order.id,
                         paymentDate: new Date().toISOString(),
                         sessionActive: true,
-                        esignatureUsage: 0
+                        esignatureUsage: 0,
+                        esignatureClicks: 0
                     };
                     savePaymentStatus(paymentStatus);
 
@@ -171,10 +173,25 @@ const PaywallSystem = (() => {
         return hasAccess() && (paymentStatus.esignatureUsage || 0) < 3;
     };
 
+    // Check if user can click eSign button (5 clicks per payment)
+    const canClickESignature = () => {
+        return hasAccess() && (paymentStatus.esignatureClicks || 0) < 5;
+    };
+
     // Increment eSignature usage
     const incrementESignatureUsage = () => {
         if (hasAccess()) {
             paymentStatus.esignatureUsage = (paymentStatus.esignatureUsage || 0) + 1;
+            savePaymentStatus(paymentStatus);
+            return true;
+        }
+        return false;
+    };
+
+    // Increment eSignature click count
+    const incrementESignatureClicks = () => {
+        if (hasAccess()) {
+            paymentStatus.esignatureClicks = (paymentStatus.esignatureClicks || 0) + 1;
             savePaymentStatus(paymentStatus);
             return true;
         }
@@ -465,7 +482,8 @@ const PaywallSystem = (() => {
                 paymentDate: new Date().toISOString(),
                 sessionActive: true,
                 manualEntry: true,
-                esignatureUsage: 0
+                esignatureUsage: 0,
+                esignatureClicks: 0
             };
             savePaymentStatus(paymentStatus);
 
@@ -654,7 +672,9 @@ const PaywallSystem = (() => {
         validateManualPayPalId,
         hasAccess,
         canUseESignature,
+        canClickESignature,
         incrementESignatureUsage,
+        incrementESignatureClicks,
         backupFormData,
         restoreFormData,
         showAccessDenied,

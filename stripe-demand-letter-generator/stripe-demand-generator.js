@@ -877,12 +877,17 @@ ${formData.companyName || ''}`;
             return;
         }
         
-        // Check eSignature usage limit (3 uses per payment)
-        if (window.PaywallSystem && !window.PaywallSystem.canUseESignature()) {
+        // Check eSignature click limit (5 clicks per payment)
+        if (window.PaywallSystem && !window.PaywallSystem.canClickESignature()) {
             const paymentStatus = window.PaywallSystem.getPaymentStatus();
-            const usageCount = paymentStatus.esignatureUsage || 0;
-            alert(`🚫 eSignature Limit Reached\n\nYou have used ${usageCount}/3 eSignatures for this payment.\n\nTo create more eSignatures, please make a new payment.`);
+            const clickCount = paymentStatus.esignatureClicks || 0;
+            alert(`🚫 eSignature Click Limit Reached\n\nYou have used ${clickCount}/5 eSignature clicks for this payment.\n\nTo create more eSignatures, please make a new payment.`);
             return;
+        }
+
+        // Increment click counter
+        if (window.PaywallSystem) {
+            window.PaywallSystem.incrementESignatureClicks();
         }
         
         // Validate required fields
@@ -903,10 +908,10 @@ ${formData.companyName || ''}`;
                 const demandLetter = generateDemandLetter();
                 const arbitrationDemand = generateArbitrationDemand();
                 finalDocumentText = demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
-                documentTitle = `Demand Letter with Arbitration - ${formData.companyName || 'Company'}`;
+                documentTitle = `Demand Letter with Arbitration`;
             } else {
                 finalDocumentText = generateDemandLetter();
-                documentTitle = `Demand Letter - ${formData.companyName || 'Company'}`;
+                documentTitle = `Demand Letter`;
             }
 
             // eSignatures.com API call - using templates endpoint
