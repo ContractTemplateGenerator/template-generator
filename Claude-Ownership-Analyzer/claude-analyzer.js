@@ -36,25 +36,67 @@ const ClaudeOwnershipAnalyzer = () => {
     const [achievements, setAchievements] = useState([]);
 
     const tabs = [
-        { id: 'scenarios', label: 'Scenarios', icon: 'zap' },
-        { id: 'setup', label: 'Account Setup', icon: 'settings' },
-        { id: 'usage', label: 'Usage Type', icon: 'file-text' },
-        { id: 'compliance', label: 'Risk Factors', icon: 'shield' }
+        { id: 'scenarios', label: 'Choose Your Scenario', icon: 'zap' },
+        { id: 'compliance', label: 'Risk Analysis', icon: 'shield' }
     ];
 
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [customScenario, setCustomScenario] = useState({
-        title: '',
-        description: '',
-        industry: 'technology',
-        teamSize: 'small',
-        customChallenge: ''
+        accountType: 'free',
+        useCase: 'general', 
+        contentUse: 'internal',
+        commercialUseType: '',
+        academicUseType: '',
+        creativeLicense: '',
+        healthcareSpecialty: '',
+        legalPracticeArea: '',
+        developmentType: '',
+        mcpIntegrations: false,
+        researchFeature: false,
+        humanOversight: 'full',
+        disclosurePlanned: false,
+        confidentialityLevel: 'public',
+        aiDevelopment: [],
+        industryFocus: []
     });
     const [scenarioHistory, setScenarioHistory] = useState([]);
     const [showCustomBuilder, setShowCustomBuilder] = useState(false);
+    const [customizingScenario, setCustomizingScenario] = useState(null);
 
     // Enhanced scenarios with more customization options
     const gameScenarios = [
+        {
+            id: 'developer_scenario',
+            title: '💻 Software Developer',
+            description: 'You develop software applications and want to use Claude for coding assistance, documentation, and potentially AI-related features',
+            industry: 'Technology & Software',
+            difficulty: 'Intermediate',
+            timeToComplete: '6 min',
+            setup: {
+                accountType: 'consumer',
+                useCase: 'software',
+                contentUse: 'commercial',
+                humanOversight: 'substantial',
+                disclosurePlanned: false,
+                confidentialityLevel: 'internal',
+                developmentType: 'web-applications'
+            },
+            challenge: 'Navigate AI development restrictions and code ownership',
+            expectedRisk: 'medium',
+            learningPoints: 'Code ownership, AI development restrictions, commercial licensing',
+            keyDecisions: [
+                'Can you use Claude-generated code in commercial products?',
+                'What are the restrictions on AI/ML development?',
+                'How to handle intellectual property for client projects?'
+            ],
+            realWorldContext: 'Developers increasingly use AI for coding assistance while navigating complex ownership and licensing requirements.',
+            legalPitfalls: ['AI development violations', 'Client IP complications', 'Commercial licensing issues'],
+            customizationOptions: {
+                developmentType: ['web-applications', 'mobile-apps', 'enterprise-software', 'open-source', 'ai-ml-development', 'api-services', 'embedded-systems'],
+                clientWork: ['solo-developer', 'freelance-clients', 'enterprise-clients', 'startup-team'],
+                codeUsage: ['internal-tools', 'client-delivery', 'open-source-contribution', 'commercial-products']
+            }
+        },
         {
             id: 'startup_blog',
             title: '🚀 Startup Blog Writer',
@@ -79,12 +121,17 @@ const ClaudeOwnershipAnalyzer = () => {
                 'Can you monetize AI-generated content directly?'
             ],
             realWorldContext: 'Many tech blogs are exploring AI assistance for faster content creation while maintaining credibility.',
-            legalPitfalls: ['Inadequate disclosure', 'Over-reliance without human input', 'Copyright attribution issues']
+            legalPitfalls: ['Inadequate disclosure', 'Over-reliance without human input', 'Copyright attribution issues'],
+            customizationOptions: {
+                contentType: ['technical-articles', 'marketing-content', 'product-updates', 'thought-leadership'],
+                monetization: ['ad-revenue', 'sponsored-content', 'lead-generation', 'product-promotion'],
+                audience: ['developers', 'business-users', 'general-tech', 'industry-specific']
+            }
         },
         {
             id: 'legal_firm',
-            title: '⚖️ Legal Document Assistant',
-            description: 'Law firm wants to use Claude for contract review and legal research',
+            title: '⚖️ Legal Research Assistant', 
+            description: 'Law firm wants to use Claude for legal research, contract drafting, lawsuit preparation, and demand letter creation',
             industry: 'Legal Services',
             difficulty: 'Expert',
             timeToComplete: '8 min',
@@ -104,8 +151,13 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to maintain attorney-client privilege?',
                 'What human oversight is required for different document types?'
             ],
-            realWorldContext: 'Law firms increasingly use AI for document review, contract analysis, and legal research while navigating strict ethical obligations.',
-            legalPitfalls: ['Unauthorized practice concerns', 'Confidentiality breaches', 'Professional liability issues']
+            realWorldContext: 'Law firms increasingly use AI for document review, contract analysis, legal research, lawsuit drafting, and demand letter creation while navigating strict ethical obligations.',
+            legalPitfalls: ['Unauthorized practice concerns', 'Confidentiality breaches', 'Professional liability issues'],
+            customizationOptions: {
+                legalWork: ['contract-review', 'legal-research', 'lawsuit-drafting', 'demand-letters', 'client-communication', 'document-analysis', 'compliance-guidance'],
+                clientType: ['individual-clients', 'small-business', 'corporate-clients', 'government-entities'],
+                practiceSize: ['solo-practice', 'small-firm', 'medium-firm', 'large-firm', 'in-house-counsel']
+            }
         },
         {
             id: 'free_user_blogger',
@@ -131,7 +183,12 @@ const ClaudeOwnershipAnalyzer = () => {
                 'What disclosure is recommended for personal blogs?'
             ],
             realWorldContext: 'Many personal bloggers and content creators start with Claude Free to explore AI assistance.',
-            legalPitfalls: ['Usage limit violations', 'Misunderstanding ownership rights', 'Inadequate attribution']
+            legalPitfalls: ['Usage limit violations', 'Misunderstanding ownership rights', 'Inadequate attribution'],
+            customizationOptions: {
+                blogType: ['personal-blog', 'hobby-blog', 'lifestyle-blog', 'tech-blog', 'creative-writing'],
+                monetization: ['no-monetization', 'affiliate-links', 'sponsored-posts', 'ad-revenue'],
+                platform: ['wordpress', 'medium', 'substack', 'ghost', 'custom-site']
+            }
         },
         {
             id: 'student_helper',
@@ -157,7 +214,12 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to maintain academic integrity while using AI tools?'
             ],
             realWorldContext: 'Students across universities are adapting to AI tools while institutions develop new academic integrity policies.',
-            legalPitfalls: ['Plagiarism violations', 'Honor code breaches', 'Institutional sanctions']
+            legalPitfalls: ['Plagiarism violations', 'Honor code breaches', 'Institutional sanctions'],
+            customizationOptions: {
+                academicLevel: ['undergraduate', 'graduate', 'phd-research', 'professional-school'],
+                workType: ['homework-assistance', 'research-papers', 'thesis-work', 'exam-preparation'],
+                institution: ['public-university', 'private-university', 'community-college', 'online-program']
+            }
         },
         {
             id: 'creative_agency',
@@ -183,7 +245,12 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to ensure copyright protection for client work?'
             ],
             realWorldContext: 'Creative agencies are rapidly integrating AI tools while maintaining quality standards and client trust.',
-            legalPitfalls: ['Copyright infringement claims', 'Client contract violations', 'Misrepresentation of services']
+            legalPitfalls: ['Copyright infringement claims', 'Client contract violations', 'Misrepresentation of services'],
+            customizationOptions: {
+                agencyType: ['digital-marketing', 'advertising-agency', 'design-studio', 'content-marketing'],
+                serviceOffered: ['copywriting', 'visual-design', 'video-production', 'social-media', 'branding'],
+                clientSize: ['startups', 'small-business', 'enterprise', 'non-profit']
+            }
         },
         {
             id: 'healthcare_admin',
@@ -209,7 +276,12 @@ const ClaudeOwnershipAnalyzer = () => {
                 'What medical disclaimers are required?'
             ],
             realWorldContext: 'Healthcare organizations explore AI for administrative efficiency while navigating complex regulatory requirements.',
-            legalPitfalls: ['HIPAA violations', 'Medical malpractice exposure', 'Regulatory non-compliance']
+            legalPitfalls: ['HIPAA violations', 'Medical malpractice exposure', 'Regulatory non-compliance'],
+            customizationOptions: {
+                facilityType: ['hospital', 'private-practice', 'clinic', 'telehealth', 'healthcare-tech'],
+                patientInteraction: ['direct-patient-care', 'administrative-only', 'patient-communication', 'medical-records'],
+                specialization: ['general-medicine', 'surgery', 'mental-health', 'pediatrics', 'geriatrics']
+            }
         }
     ];
 
@@ -440,7 +512,7 @@ const ClaudeOwnershipAnalyzer = () => {
             prohibitedContent: [],
             aiDevelopment: []
         }));
-        setCurrentTab(1); // Go to setup tab to see the changes
+        setCurrentTab(1); // Go to risk analysis to see the changes
     };
 
     const renderTabContent = () => {
@@ -449,23 +521,35 @@ const ClaudeOwnershipAnalyzer = () => {
                 return (
                     <div>
                         <div className="form-section">
-                            <h3><Icon name="user" className="form-section-icon" />Account Configuration</h3>
-                            <div className="form-group">
-                                <label htmlFor="accountType">Claude Account Type</label>
-                                <select 
-                                    id="accountType" 
-                                    name="accountType" 
-                                    value={formData.accountType} 
-                                    onChange={handleInputChange}
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3><Icon name="zap" className="form-section-icon" />Choose Your Scenario</h3>
+                                <button 
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        background: 'linear-gradient(135deg, #39ff14, #00d4ff)',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        color: '#000',
+                                        fontFamily: 'Orbitron, monospace',
+                                        fontSize: '0.7rem',
+                                        fontWeight: '700',
+                                        textTransform: 'uppercase',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onClick={() => setShowCustomBuilder(!showCustomBuilder)}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
+                                        e.target.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.boxShadow = 'none';
+                                    }}
                                 >
-                                    <option value="free">Free (Claude.ai Free)</option>
-                                    <option value="consumer">Consumer (Claude.ai Pro)</option>
-                                    <option value="max5x">Max 5x (Claude Max 5x Pro)</option>
-                                    <option value="max20x">Max 20x (Claude Max 20x Pro)</option>
-                                    <option value="commercial">Commercial (API, Enterprise)</option>
-                                </select>
+                                    {showCustomBuilder ? '📋 Back to Scenarios' : '🛠️ Create Custom'}
+                                </button>
                             </div>
-                        </div>
 
                         <div className="form-section">
                             <h3><Icon name="briefcase" className="form-section-icon" />Primary Use Case</h3>
@@ -896,17 +980,18 @@ const ClaudeOwnershipAnalyzer = () => {
                             
                             {!showCustomBuilder && (
                                 <p style={{ 
-                                    fontSize: '0.85rem', 
-                                    color: '#8892a6', 
-                                    marginBottom: '1rem',
-                                    lineHeight: '1.4'
+                                    fontSize: '0.9rem', 
+                                    color: '#e1e8f0', 
+                                    marginBottom: '1.5rem',
+                                    lineHeight: '1.5',
+                                    textAlign: 'center'
                                 }}>
-                                    🎮 <strong>Interactive Learning Hub:</strong> Master Claude's terms through hands-on scenarios. Each scenario teaches different compliance requirements and risk factors.
+                                    🎯 <strong>Find your situation below</strong> or create a custom scenario. Each scenario will instantly analyze your specific risk factors and provide tailored guidance.
                                 </p>
                             )}
                             
                             {showCustomBuilder ? (
-                                // Custom Scenario Builder
+                                // Custom Scenario Builder with Risk-Relevant Options
                                 <div style={{
                                     padding: '1.5rem',
                                     background: 'rgba(0, 212, 255, 0.05)',
@@ -921,52 +1006,14 @@ const ClaudeOwnershipAnalyzer = () => {
                                         fontSize: '0.9rem'
                                     }}>🛠️ Custom Scenario Builder</h4>
                                     
-                                    <div style={{ display: 'grid', gap: '1rem' }}>
-                                        <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Scenario Title:</label>
-                                            <input 
-                                                type="text"
-                                                value={customScenario.title}
-                                                onChange={(e) => setCustomScenario({...customScenario, title: e.target.value})}
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.75rem',
-                                                    background: 'rgba(26, 31, 46, 0.8)',
-                                                    border: '1px solid #2a3441',
-                                                    borderRadius: '6px',
-                                                    color: '#e1e8f0',
-                                                    fontSize: '0.8rem'
-                                                }}
-                                                placeholder="e.g., AI-Powered Legal Research Tool"
-                                            />
-                                        </div>
-                                        
-                                        <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Description:</label>
-                                            <textarea 
-                                                value={customScenario.description}
-                                                onChange={(e) => setCustomScenario({...customScenario, description: e.target.value})}
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.75rem',
-                                                    background: 'rgba(26, 31, 46, 0.8)',
-                                                    border: '1px solid #2a3441',
-                                                    borderRadius: '6px',
-                                                    color: '#e1e8f0',
-                                                    fontSize: '0.8rem',
-                                                    minHeight: '80px',
-                                                    resize: 'vertical'
-                                                }}
-                                                placeholder="Describe your specific use case scenario..."
-                                            />
-                                        </div>
-                                        
+                                    <div style={{ display: 'grid', gap: '1.5rem' }}>
+                                        {/* Account & Features */}
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                                             <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Industry:</label>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Claude Account Type:</label>
                                                 <select 
-                                                    value={customScenario.industry}
-                                                    onChange={(e) => setCustomScenario({...customScenario, industry: e.target.value})}
+                                                    value={customScenario.accountType}
+                                                    onChange={(e) => setCustomScenario({...customScenario, accountType: e.target.value})}
                                                     style={{
                                                         width: '100%',
                                                         padding: '0.75rem',
@@ -977,22 +1024,19 @@ const ClaudeOwnershipAnalyzer = () => {
                                                         fontSize: '0.8rem'
                                                     }}
                                                 >
-                                                    <option value="technology">Technology</option>
-                                                    <option value="healthcare">Healthcare</option>
-                                                    <option value="legal">Legal Services</option>
-                                                    <option value="finance">Finance</option>
-                                                    <option value="education">Education</option>
-                                                    <option value="marketing">Marketing</option>
-                                                    <option value="consulting">Consulting</option>
-                                                    <option value="retail">Retail</option>
+                                                    <option value="free">Free (Claude.ai Free)</option>
+                                                    <option value="consumer">Consumer (Claude.ai Pro)</option>
+                                                    <option value="max5x">Max 5x (Claude Max 5x Pro)</option>
+                                                    <option value="max20x">Max 20x (Claude Max 20x Pro)</option>
+                                                    <option value="commercial">Commercial (API, Enterprise)</option>
                                                 </select>
                                             </div>
                                             
                                             <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Team Size:</label>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Primary Use Case:</label>
                                                 <select 
-                                                    value={customScenario.teamSize}
-                                                    onChange={(e) => setCustomScenario({...customScenario, teamSize: e.target.value})}
+                                                    value={customScenario.useCase}
+                                                    onChange={(e) => setCustomScenario({...customScenario, useCase: e.target.value})}
                                                     style={{
                                                         width: '100%',
                                                         padding: '0.75rem',
@@ -1003,32 +1047,106 @@ const ClaudeOwnershipAnalyzer = () => {
                                                         fontSize: '0.8rem'
                                                     }}
                                                 >
-                                                    <option value="solo">Solo (1 person)</option>
-                                                    <option value="small">Small Team (2-10)</option>
-                                                    <option value="medium">Medium Team (11-50)</option>
-                                                    <option value="large">Large Team (50+)</option>
-                                                    <option value="enterprise">Enterprise (1000+)</option>
+                                                    <option value="general">General assistance</option>
+                                                    <option value="legal">Legal advice/documents</option>
+                                                    <option value="healthcare">Healthcare guidance</option>
+                                                    <option value="finance">Financial advice</option>
+                                                    <option value="academic">Academic/Testing</option>
+                                                    <option value="journalism">Media/Journalism</option>
+                                                    <option value="software">Software development</option>
+                                                    <option value="creative">Creative content</option>
+                                                    <option value="gaming">Gaming content</option>
                                                 </select>
                                             </div>
                                         </div>
                                         
+                                        {/* Content Use & Features */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Output Usage:</label>
+                                                <select 
+                                                    value={customScenario.contentUse}
+                                                    onChange={(e) => setCustomScenario({...customScenario, contentUse: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="internal">Internal use only</option>
+                                                    <option value="external">External sharing</option>
+                                                    <option value="commercial">Commercial use</option>
+                                                    <option value="public">Public distribution</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Human Oversight:</label>
+                                                <select 
+                                                    value={customScenario.humanOversight}
+                                                    onChange={(e) => setCustomScenario({...customScenario, humanOversight: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="full">Full professional review</option>
+                                                    <option value="substantial">Substantial editing</option>
+                                                    <option value="minimal">Basic review</option>
+                                                    <option value="none">No review planned</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Advanced Features & Risk Factors */}
                                         <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Specific Challenge:</label>
-                                            <input 
-                                                type="text"
-                                                value={customScenario.customChallenge}
-                                                onChange={(e) => setCustomScenario({...customScenario, customChallenge: e.target.value})}
-                                                style={{
-                                                    width: '100%',
-                                                    padding: '0.75rem',
-                                                    background: 'rgba(26, 31, 46, 0.8)',
-                                                    border: '1px solid #2a3441',
-                                                    borderRadius: '6px',
-                                                    color: '#e1e8f0',
-                                                    fontSize: '0.8rem'
-                                                }}
-                                                placeholder="What's your main compliance concern?"
-                                            />
+                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.75rem', display: 'block' }}>Industry Focus & Special Features:</label>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                                                {[
+                                                    { value: 'ai-development', label: 'AI/ML Development', risk: 'high' },
+                                                    { value: 'gaming-content', label: 'Gaming Content', risk: 'low' },
+                                                    { value: 'mcp-integrations', label: 'MCP Integrations', risk: 'medium' },
+                                                    { value: 'research-feature', label: 'Research Feature', risk: 'medium' },
+                                                    { value: 'financial-advice', label: 'Financial Guidance', risk: 'high' },
+                                                    { value: 'medical-content', label: 'Medical Content', risk: 'high' }
+                                                ].map((item, index) => (
+                                                    <div key={index} style={{
+                                                        padding: '0.5rem',
+                                                        background: item.risk === 'high' ? 'rgba(255, 51, 68, 0.1)' : 
+                                                                   item.risk === 'medium' ? 'rgba(255, 170, 0, 0.1)' : 'rgba(57, 255, 20, 0.1)',
+                                                        borderRadius: '6px',
+                                                        border: `1px solid ${item.risk === 'high' ? 'rgba(255, 51, 68, 0.3)' : 
+                                                               item.risk === 'medium' ? 'rgba(255, 170, 0, 0.3)' : 'rgba(57, 255, 20, 0.3)'}`
+                                                    }}>
+                                                        <div className="checkbox-item">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                id={`custom-${item.value}`}
+                                                                checked={customScenario.industryFocus.includes(item.value)}
+                                                                onChange={(e) => {
+                                                                    const newFocus = e.target.checked 
+                                                                        ? [...customScenario.industryFocus, item.value]
+                                                                        : customScenario.industryFocus.filter(f => f !== item.value);
+                                                                    setCustomScenario({...customScenario, industryFocus: newFocus});
+                                                                }}
+                                                            />
+                                                            <label htmlFor={`custom-${item.value}`} style={{
+                                                                fontSize: '0.7rem',
+                                                                color: '#e1e8f0'
+                                                            }}>{item.label}</label>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                         
                                         <button 
@@ -1047,29 +1165,19 @@ const ClaudeOwnershipAnalyzer = () => {
                                                 marginTop: '0.5rem'
                                             }}
                                             onClick={() => {
-                                                // Add custom scenario to history
-                                                const newScenario = {
-                                                    id: 'custom_' + Date.now(),
-                                                    title: customScenario.title || 'Custom Scenario',
-                                                    description: customScenario.description,
-                                                    industry: customScenario.industry,
-                                                    teamSize: customScenario.teamSize,
-                                                    challenge: customScenario.customChallenge,
-                                                    created: new Date().toLocaleString()
-                                                };
-                                                setScenarioHistory([newScenario, ...scenarioHistory.slice(0, 4)]); // Keep last 5
+                                                // Apply custom scenario to formData for immediate analysis
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    ...customScenario,
+                                                    mcpIntegrations: customScenario.industryFocus.includes('mcp-integrations'),
+                                                    researchFeature: customScenario.industryFocus.includes('research-feature'),
+                                                    aiDevelopment: customScenario.industryFocus.includes('ai-development') ? ['competing-ai'] : []
+                                                }));
                                                 setShowCustomBuilder(false);
-                                                // Reset form
-                                                setCustomScenario({
-                                                    title: '',
-                                                    description: '',
-                                                    industry: 'technology',
-                                                    teamSize: 'small',
-                                                    customChallenge: ''
-                                                });
+                                                setCurrentTab(1); // Go to risk analysis
                                             }}
                                         >
-                                            🚀 Create & Analyze Scenario
+                                            🚀 Analyze My Custom Scenario
                                         </button>
                                     </div>
                                 </div>
