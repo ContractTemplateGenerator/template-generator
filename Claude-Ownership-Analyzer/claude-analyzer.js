@@ -156,29 +156,33 @@ const ClaudeOwnershipAnalyzer = () => {
 
     // Real-time risk calculation with gamification
     useEffect(() => {
-        const newRiskAnalysis = window.RiskAnalyzer.calculateRiskScore(formData);
-        setRiskAnalysis(newRiskAnalysis);
+        if (window.RiskAnalyzer) {
+            const newRiskAnalysis = window.RiskAnalyzer.calculateRiskScore(formData);
+            setRiskAnalysis(newRiskAnalysis);
+        }
     }, [formData]);
 
 
     // Generate detailed analysis for live gauge pane
     useEffect(() => {
-        const ownershipAnalysis = window.RiskAnalyzer.analyzeOwnership(formData);
-        const usageAnalysis = window.RiskAnalyzer.analyzeUsage(formData);
-        const disclosureAnalysis = window.RiskAnalyzer.analyzeDisclosure(formData);
-        const copyrightAnalysis = window.RiskAnalyzer.analyzeCopyright(formData);
-        const suggestions = window.RiskAnalyzer.generateSuggestions(formData, riskAnalysis);
+        if (window.RiskAnalyzer) {
+            const ownershipAnalysis = window.RiskAnalyzer.analyzeOwnership(formData);
+            const usageAnalysis = window.RiskAnalyzer.analyzeUsage(formData);
+            const disclosureAnalysis = window.RiskAnalyzer.analyzeDisclosure(formData);
+            const copyrightAnalysis = window.RiskAnalyzer.analyzeCopyright(formData);
+            const suggestions = window.RiskAnalyzer.generateSuggestions(formData, riskAnalysis);
 
-        setDetailedAnalysis({
-            ownership: ownershipAnalysis,
-            usage: usageAnalysis,
-            disclosure: disclosureAnalysis,
-            copyright: copyrightAnalysis,
-            suggestions
-        });
-        
-        // Replace feather icons after each render
-        setTimeout(() => feather.replace(), 0);
+            setDetailedAnalysis({
+                ownership: ownershipAnalysis,
+                usage: usageAnalysis,
+                disclosure: disclosureAnalysis,
+                copyright: copyrightAnalysis,
+                suggestions
+            });
+            
+            // Replace feather icons after each render
+            setTimeout(() => feather.replace(), 0);
+        }
     }, [formData, riskAnalysis]);
 
     const handleInputChange = (e) => {
