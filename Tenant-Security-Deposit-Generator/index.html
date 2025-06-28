@@ -44,99 +44,103 @@
     
     <!-- eSign API integration with eSignatures.com -->
     <script>
-        // eSign integration function - direct eSignatures.com interface
+        // eSign integration function using proper eSignatures.com API
         window.initiateESign = async function(documentContent, formData) {
             try {
-                console.log("Opening eSignatures.com interface...");
+                console.log("Initiating eSign process with eSignatures.com API...");
                 
                 // Store formData and documentContent globally
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Open main eSignatures.com site for manual setup
-                const esignUrl = 'https://esignatures.com/login';
+                // Step 1: Create template
+                console.log('Creating template...');
+                const templateResponse = await fetch('/api/esignatures-api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'create_template',
+                        documentContent: documentContent
+                    })
+                });
                 
-                // Copy document content to clipboard for easy pasting
-                if (navigator.clipboard && navigator.clipboard.writeText) {
-                    try {
-                        await navigator.clipboard.writeText(documentContent);
-                        console.log('Document content copied to clipboard');
-                    } catch (err) {
-                        console.log('Could not copy to clipboard:', err);
-                    }
+                if (!templateResponse.ok) {
+                    throw new Error(`Template creation failed: ${templateResponse.status}`);
                 }
                 
-                // Show instructions modal
-                const modal = document.createElement('div');
-                modal.style.cssText = `
-                    position: fixed !important;
-                    top: 0 !important;
-                    left: 0 !important;
-                    width: 100% !important;
-                    height: 100% !important;
-                    background: rgba(0,0,0,0.9) !important;
-                    z-index: 999999 !important;
-                    display: flex !important;
-                    justify-content: center !important;
-                    align-items: center !important;
-                `;
+                const templateData = await templateResponse.json();
+                console.log('Template created:', templateData);
                 
-                const content = document.createElement('div');
-                content.style.cssText = `
-                    background: white !important;
-                    padding: 2.5rem !important;
-                    border-radius: 16px !important;
-                    max-width: 600px !important;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
-                    margin: 2rem !important;
-                `;
+                // Step 2: Create contract with signer info
+                console.log('Creating contract...');
+                const contractResponse = await fetch('/api/esignatures-api', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        action: 'create_contract',
+                        template_id: templateData.template_id,
+                        signer_name: formData.tenantName || 'Tenant',
+                        signer_email: formData.tenantEmail || 'tenant@example.com'
+                    })
+                });
                 
-                content.innerHTML = `
-                    <div style="text-align: center; margin-bottom: 2rem;">
-                        <h3 style="color: #007bff; margin-bottom: 1rem;">✍️ eSignature Setup</h3>
-                        <p style="color: #6c757d;">Log in to eSignatures.com to send your document for signature.</p>
-                    </div>
+                if (!contractResponse.ok) {
+                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                }
+                
+                const contractData = await contractResponse.json();
+                console.log('Contract created:', contractData);
+                
+                // Open signing URL in new window
+                if (contractData.signing_url) {
+                    window.open(contractData.signing_url, '_blank');
                     
-                    <div style="margin-bottom: 2rem; background: #f8f9fa; padding: 1.5rem; border-radius: 8px;">
-                        <h4 style="color: #28a745; margin-bottom: 1rem;">🔑 Your API Token:</h4>
-                        <div style="background: #fff; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; font-family: monospace; word-break: break-all;">
-                            1807161e-d29d-4ace-9b87-864e25c70b05
-                        </div>
-                    </div>
+                    // Show success modal
+                    const successModal = document.createElement('div');
+                    successModal.style.cssText = `
+                        position: fixed !important;
+                        top: 0 !important;
+                        left: 0 !important;
+                        width: 100% !important;
+                        height: 100% !important;
+                        background: rgba(0,0,0,0.9) !important;
+                        z-index: 999999 !important;
+                        display: flex !important;
+                        justify-content: center !important;
+                        align-items: center !important;
+                    `;
                     
-                    <div style="margin-bottom: 2rem;">
-                        <h4 style="color: #007bff; margin-bottom: 1rem;">📋 Setup Steps:</h4>
-                        <ol style="text-align: left; padding-left: 1.5rem; line-height: 1.8;">
-                            <li><strong>Login</strong> to eSignatures.com with your account</li>
-                            <li><strong>Create New Document</strong> or template</li>
-                            <li><strong>Paste Document</strong> (copied to clipboard automatically)</li>
-                            <li><strong>Add Recipient</strong>: ${formData.tenantEmail || 'tenant@example.com'}</li>
-                            <li><strong>Send for Signature</strong></li>
-                        </ol>
-                    </div>
+                    const content = document.createElement('div');
+                    content.style.cssText = `
+                        background: white !important;
+                        padding: 2.5rem !important;
+                        border-radius: 16px !important;
+                        max-width: 500px !important;
+                        text-align: center !important;
+                    `;
                     
-                    <div style="margin-bottom: 1.5rem; padding: 1rem; background: #e8f4fd; border-left: 4px solid #007bff; border-radius: 4px;">
-                        <small style="color: #495057;">
-                            <strong>✅ Document copied to clipboard!</strong> Just paste (Ctrl+V) when creating your template.
-                        </small>
-                    </div>
-                    
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
-                        <button onclick="window.open('${esignUrl}', '_blank'); this.closest('.modal').remove();" 
-                                style="padding: 1rem 2rem; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                            🔐 Login to eSignatures.com
-                        </button>
+                    content.innerHTML = `
+                        <h3 style="color: #28a745; margin-bottom: 1rem;">✅ eSignature Sent!</h3>
+                        <p style="color: #6c757d; margin-bottom: 2rem;">
+                            Your security deposit demand letter has been sent to <strong>${formData.tenantEmail || 'tenant@example.com'}</strong> for electronic signature.
+                        </p>
                         <button onclick="this.closest('.modal').remove()" 
-                                style="padding: 1rem 2rem; background: #6c757d; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                            Cancel
+                                style="padding: 1rem 2rem; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                            Done
                         </button>
-                    </div>
-                `;
-                
-                modal.appendChild(content);
-                document.body.appendChild(modal);
-                
-                return { success: true, message: 'eSignature interface ready to open' };
+                    `;
+                    
+                    successModal.appendChild(content);
+                    document.body.appendChild(successModal);
+                    
+                    return { success: true, message: 'eSignature process initiated successfully' };
+                } else {
+                    throw new Error('No signing URL received from eSignatures.com');
+                }
                 
             } catch (error) {
                 console.error("eSign error:", error);

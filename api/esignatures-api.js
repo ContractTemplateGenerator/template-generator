@@ -16,24 +16,46 @@ module.exports = async function handler(req, res) {
     const TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
     
     try {
-        const { action, documentContent, signerInfo } = req.body;
+        const { action, documentContent, signer_name, signer_email, template_id } = req.body;
         
         if (action === 'create_template') {
-            // Step 1: Create template with document content
+            // Convert document content to document_elements format
+            const lines = documentContent.split('\n');
+            const document_elements = [];
+            
+            for (const line of lines) {
+                if (line.trim()) {
+                    if (line.startsWith('Re:') || line.includes('Dear') || line.includes('Sincerely')) {
+                        document_elements.push({
+                            type: 'text_header_two',
+                            text: line.trim()
+                        });
+                    } else {
+                        document_elements.push({
+                            type: 'text_normal',
+                            text: line.trim()
+                        });
+                    }
+                }
+            }
+            
+            // Add signature field at the end
+            document_elements.push({
+                type: 'signer_field_text',
+                text: 'Tenant Signature',
+                signer_field_assigned_to: 'first_signer',
+                signer_field_id: 'tenant_signature',
+                signer_field_required: 'yes'
+            });
+            
             const templateResponse = await fetch(`https://esignatures.com/api/templates?token=${TOKEN}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    name: "Security Deposit Demand Letter",
-                    content: documentContent,
-                    roles: [
-                        {
-                            name: "Tenant",
-                            order: 1
-                        }
-                    ]
+                    title: "Security Deposit Demand Letter",
+                    document_elements: document_elements
                 })
             });
             
@@ -45,14 +67,12 @@ module.exports = async function handler(req, res) {
             const templateData = await templateResponse.json();
             return res.status(200).json({ 
                 success: true, 
-                template_id: templateData.template_id,
+                template_id: templateData.data[0].template_id,
                 message: 'Template created successfully'
             });
             
         } else if (action === 'create_contract') {
             // Step 2: Create contract from template
-            const { template_id, signer_name, signer_email } = req.body;
-            
             const contractResponse = await fetch(`https://esignatures.com/api/contracts?token=${TOKEN}`, {
                 method: 'POST',
                 headers: {
@@ -60,10 +80,12 @@ module.exports = async function handler(req, res) {
                 },
                 body: JSON.stringify({
                     template_id: template_id,
+                    test: "yes", // Set to "no" for production
                     signers: [
                         {
                             name: signer_name,
-                            email: signer_email
+                            email: signer_email,
+                            signature_request_delivery_methods: ["email"]
                         }
                     ]
                 })
@@ -77,8 +99,8 @@ module.exports = async function handler(req, res) {
             const contractData = await contractResponse.json();
             return res.status(200).json({ 
                 success: true, 
-                contract_id: contractData.contract_id,
-                signing_url: contractData.signing_url,
+                contract_id: contractData.data.contract.id,
+                signing_url: contractData.data.contract.signers[0].sign_page_url,
                 message: 'Contract created successfully'
             });
         }
@@ -92,4 +114,4 @@ module.exports = async function handler(req, res) {
             message: error.message
         });
     }
-}
+};
