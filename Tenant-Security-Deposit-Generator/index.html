@@ -53,47 +53,26 @@
                 window.currentFormData = formData;
                 window.currentDocumentContent = documentContent;
                 
-                // Step 1: Create template
-                console.log('Creating template...');
-                const templateResponse = await fetch('/api/esignatures-api', {
+                // Single API call - create template and contract in one step
+                console.log('Creating eSignature contract...');
+                const response = await fetch('/api/esignatures-api', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        action: 'create_template',
-                        documentContent: documentContent
-                    })
-                });
-                
-                if (!templateResponse.ok) {
-                    throw new Error(`Template creation failed: ${templateResponse.status}`);
-                }
-                
-                const templateData = await templateResponse.json();
-                console.log('Template created:', templateData);
-                
-                // Step 2: Create contract with signer info
-                console.log('Creating contract...');
-                const contractResponse = await fetch('/api/esignatures-api', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        action: 'create_contract',
-                        template_id: templateData.template_id,
+                        documentContent: documentContent,
                         signer_name: formData.tenantName || 'Tenant',
                         signer_email: formData.tenantEmail || 'tenant@example.com'
                     })
                 });
                 
-                if (!contractResponse.ok) {
-                    throw new Error(`Contract creation failed: ${contractResponse.status}`);
+                if (!response.ok) {
+                    throw new Error(`eSignature creation failed: ${response.status}`);
                 }
                 
-                const contractData = await contractResponse.json();
-                console.log('Contract created:', contractData);
+                const contractData = await response.json();
+                console.log('eSignature contract created:', contractData);
                 
                 // Open signing URL in new window
                 if (contractData.signing_url) {
