@@ -67,6 +67,7 @@ const TenantDepositGenerator = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [lastChanged, setLastChanged] = useState(null);
     const [eSignLoading, setESignLoading] = useState(false);
+    const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
     const previewRef = useRef(null);
     
     // Streamlined form data state - progressive disclosure
@@ -129,6 +130,50 @@ const TenantDepositGenerator = () => {
         { id: 'details', label: 'Details', icon: 'edit-3' },
         { id: 'assessment', label: 'Case Assessment', icon: 'bar-chart-2' }
     ];
+
+    // Paywall integration
+    useEffect(() => {
+        // Function to check and update payment status
+        const checkPaymentStatus = () => {
+            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                setHasPaywallAccess(true);
+                return true;
+            }
+            return false;
+        };
+        
+        // Initial check
+        if (!checkPaymentStatus()) {
+            // Apply non-copyable restrictions to preview if not paid
+            setTimeout(() => {
+                if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
+                    window.PaywallSystem.makePreviewNonCopyable();
+                }
+            }, 1000);
+        }
+        
+        // Listen for payment success events
+        const handlePaymentSuccess = () => {
+            console.log('Payment success event received, updating access state');
+            setHasPaywallAccess(true);
+            if (window.PaywallSystem && window.PaywallSystem.enablePreviewInteraction) {
+                window.PaywallSystem.enablePreviewInteraction();
+            }
+        };
+        
+        window.addEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+        
+        const pollInterval = setInterval(() => {
+            if (!hasPaywallAccess && checkPaymentStatus()) {
+                console.log('Payment status changed, updating access state');
+            }
+        }, 2000);
+        
+        return () => {
+            window.removeEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+            clearInterval(pollInterval);
+        };
+    }, [hasPaywallAccess]);
 
     // Update form data and trigger highlighting (Stripe-style implementation)
     const updateFormData = (field, value) => {
@@ -516,6 +561,143 @@ Sincerely,`;
             <p>Sincerely,</p>
             <p><strong>${formData.tenantName || '[YOUR NAME]'}</strong></p>
         `;
+    };
+
+    // eSignature document function
+    const eSignDocument = async () => {
+        if (!hasPaywallAccess) {
+            if (window.PaywallSystem) {
+                window.PaywallSystem.showAccessDenied('esign');
+                window.PaywallSystem.createPaywallModal(() => {
+                    // Double-check access status after modal closes
+                    if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                        setHasPaywallAccess(true);
+                        window.PaywallSystem.enablePreviewInteraction();
+                        eSignDocument();
+                    } else {
+                        console.log('Payment not confirmed, retrying access check...');
+                        setTimeout(() => {
+                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                setHasPaywallAccess(true);
+                                window.PaywallSystem.enablePreviewInteraction();
+                                eSignDocument();
+                            }
+                        }, 1000);
+                    }
+                });
+            }
+            return;
+        }
+        
+        // Check eSignature usage limit (3 uses per payment)
+        if (window.PaywallSystem && !window.PaywallSystem.canUseESignature()) {
+            const paymentStatus = window.PaywallSystem.getPaymentStatus();
+            const usageCount = paymentStatus.esignatureUsage || 0;
+            alert(`🚫 eSignature Limit Reached\n\nYou have used ${usageCount}/3 eSignatures for this payment.\n\nTo create more eSignatures, please make a new payment.`);
+            return;
+        }
+        
+        // Validate required fields
+        if (!formData.tenantEmail || !formData.tenantName) {
+            alert('Please fill in your email address and name before signing the document.');
+            return;
+        }
+        
+        try {
+            setESignLoading(true);
+            console.log("eSignature button clicked");
+            
+            // Generate clean document text for eSignature
+            generateLetterContent(); // This populates window.cleanLetterText
+            const finalDocumentText = window.cleanLetterText || generateLetterContent();
+            const documentTitle = `Security Deposit Demand Letter - ${formData.tenantName || 'Tenant'}`;
+
+            // eSignatures.com API call - using templates endpoint
+            const apiData = {
+                test: "no", // Production mode - no demo stamp
+                template: {
+                    title: documentTitle,
+                    content: finalDocumentText,
+                    content_type: "text"
+                },
+                signers: [{
+                    email: formData.tenantEmail,
+                    name: formData.tenantName,
+                    role: "signer"
+                }]
+            };
+
+            console.log("Sending to eSignatures.com API:", apiData);
+
+            // Try Node.js proxy first, then fallback to demo mode
+            let response, result;
+            
+            try {
+                // Use Node.js proxy server to avoid CORS issues
+                response = await fetch('http://localhost:3001/esign-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(apiData)
+                });
+
+                result = await response.json();
+                console.log("eSignatures.com API response:", result);
+                
+                // Check if we got a real API response (not demo)
+                if (response.ok && result && result.status === 'success' && result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    console.log("Real API response received with contract_id:", result.data.contract_id);
+                }
+                
+            } catch (proxyError) {
+                console.log("Node.js proxy not available, using demo mode...", proxyError);
+                
+                // Demo mode - simulate successful eSignature creation
+                result = {
+                    success: true,
+                    signing_url: "https://esignatures.com/demo-signing-page",
+                    contract_id: "demo-" + Date.now(),
+                    message: "Demo mode - would create real eSignature contract in production"
+                };
+                
+                response = { ok: true };
+                console.log("Demo mode response:", result);
+            }
+
+            if (response.ok && (result.signing_url || result.sign_url || result.url || result.data?.signing_url)) {
+                // Increment usage counter for real eSignatures
+                if (result.status === 'success' && result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    if (window.PaywallSystem) {
+                        window.PaywallSystem.incrementESignatureUsage();
+                    }
+                }
+                
+                // Open signing URL in new window to preserve form state
+                const signingUrl = result.signing_url || result.sign_url || result.url || result.data?.signing_url;
+                window.open(signingUrl, '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+                
+                // Show appropriate success message
+                if (result.contract_id && result.contract_id.startsWith('demo-')) {
+                    alert("🧪 Demo Mode: eSignature interface opened!\n\nNote: This is a demo. Real eSignature integration requires:\n1. Node.js proxy server: node esign-proxy.js\n2. Valid API credentials\n\nCurrently running in demo mode.");
+                } else if (result.status === 'success' && result.data?.contract_id && result.data?.message?.includes("Real eSignature document created")) {
+                    alert("🔥 REAL eSignature Created!\n\nContract ID: " + result.data.contract_id + "\n\nPlease review and sign the document in the new window.");
+                } else if (result.status === 'success' && result.data?.contract_id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(result.data.contract_id)) {
+                    alert("🔥 LIVE eSignature Created!\n\nReal contract ID: " + result.data.contract_id + "\n\nPlease review and sign the document in the new window.");
+                } else {
+                    alert("📄 Document Ready for Signing!\n\nYour security deposit demand letter has been prepared for electronic signature.\n\nPlease review and sign the document in the new window.");
+                }
+            } else {
+                console.error("eSignature creation failed:", result);
+                alert("❌ eSignature creation failed. Please try again or contact support.\n\nError: " + (result.error || 'Unknown error'));
+            }
+
+        } catch (error) {
+            console.error("eSignature error:", error);
+            alert("❌ An error occurred while creating the eSignature. Please try again.\n\nError: " + error.message);
+        } finally {
+            setESignLoading(false);
+        }
     };
 
     // Step-by-step scenario system with mutual exclusivity
@@ -1949,6 +2131,20 @@ Sincerely,`;
                         key: 'copy',
                         className: 'btn btn-secondary',
                         onClick: () => {
+                            if (!hasPaywallAccess) {
+                                if (window.PaywallSystem) {
+                                    window.PaywallSystem.showAccessDenied('copy');
+                                    window.PaywallSystem.createPaywallModal(() => {
+                                        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                            setHasPaywallAccess(true);
+                                            window.PaywallSystem.enablePreviewInteraction();
+                                            const content = generateLetterContent().replace(/<[^>]*>/g, '');
+                                            window.copyToClipboard(content);
+                                        }
+                                    });
+                                }
+                                return;
+                            }
                             const content = generateLetterContent().replace(/<[^>]*>/g, '');
                             window.copyToClipboard(content);
                         }
@@ -1960,7 +2156,22 @@ Sincerely,`;
                     React.createElement('button', {
                         key: 'download',
                         className: 'btn btn-primary',
-                        onClick: () => window.generateWordDoc(generateLetterContent(), formData)
+                        onClick: () => {
+                            if (!hasPaywallAccess) {
+                                if (window.PaywallSystem) {
+                                    window.PaywallSystem.showAccessDenied('download');
+                                    window.PaywallSystem.createPaywallModal(() => {
+                                        if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                            setHasPaywallAccess(true);
+                                            window.PaywallSystem.enablePreviewInteraction();
+                                            window.generateWordDoc(generateLetterContent(), formData);
+                                        }
+                                    });
+                                }
+                                return;
+                            }
+                            window.generateWordDoc(generateLetterContent(), formData);
+                        }
                     }, [
                         React.createElement(Icon, { key: 'icon', name: 'download' }),
                         React.createElement('span', { key: 'text' }, 'Word Doc')
@@ -1970,24 +2181,7 @@ Sincerely,`;
                         key: 'esign',
                         className: 'btn btn-accent',
                         disabled: eSignLoading,
-                        onClick: async () => {
-                            setESignLoading(true);
-                            try {
-                                // Generate letter content to populate window.cleanLetterText
-                                generateLetterContent();
-                                // Use clean text version for eSignature
-                                const result = await window.initiateESign(window.cleanLetterText || generateLetterContent(), formData);
-                                if (!result.success) {
-                                    console.log('eSign failed, enhanced modal should be showing');
-                                }
-                            } catch (error) {
-                                console.error('eSign error caught in React component:', error);
-                                // The enhanced modal should be showing from initiateESign function
-                                // No fallback needed - enhanced modal handles all cases
-                            } finally {
-                                setESignLoading(false);
-                            }
-                        }
+                        onClick: eSignDocument
                     }, [
                         React.createElement(Icon, { 
                             key: 'icon', 
