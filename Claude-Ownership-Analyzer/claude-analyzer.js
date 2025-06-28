@@ -1,5 +1,4 @@
 const { useState, useEffect } = React;
-const { createRoot } = ReactDOM;
 
 const Icon = ({ name, size = 24, style = {} }) => {
     return <i data-feather={name} style={{ width: size, height: size, ...style }}></i>;
@@ -28,7 +27,6 @@ const ClaudeOwnershipAnalyzer = () => {
     const [detailedAnalysis, setDetailedAnalysis] = useState(null);
     const [completionProgress, setCompletionProgress] = useState(0);
     const [achievements, setAchievements] = useState([]);
-    const [systemUptime, setSystemUptime] = useState(0);
 
     const tabs = [
         { id: 'setup', label: 'Account Setup', icon: 'settings' },
@@ -144,16 +142,17 @@ const ClaudeOwnershipAnalyzer = () => {
         
         // Achievement system
         const newAchievements = [];
-        if (progress >= 100) newAchievements.push('🏆 MASTER_ANALYZER');
-        if (formData.accountType === 'commercial') newAchievements.push('💼 PRO_USER');
-        if (formData.humanOversight === 'full') newAchievements.push('👁️ SAFETY_FIRST');
+        if (progress >= 100) newAchievements.push({ icon: '🏆', label: 'MASTER_ANALYZER', points: 100 });
+        if (formData.accountType === 'commercial') newAchievements.push({ icon: '💼', label: 'PRO_USER', points: 50 });
+        if (formData.humanOversight === 'full') newAchievements.push({ icon: '👁️', label: 'SAFETY_FIRST', points: 75 });
         if (formData.prohibitedContent.length === 0 && formData.aiDevelopment.length === 0) {
-            newAchievements.push('✅ CLEAN_CONFIG');
+            newAchievements.push({ icon: '✅', label: 'CLEAN_CONFIG', points: 60 });
         }
-        if (currentTab === 2) newAchievements.push('🛡️ RISK_ASSESSED');
+        if (currentTab === 2) newAchievements.push({ icon: '🛡️', label: 'RISK_ASSESSED', points: 40 });
+        if (riskAnalysis.score <= 30) newAchievements.push({ icon: '🌟', label: 'LOW_RISK_HERO', points: 80 });
         
         setAchievements(newAchievements);
-    }, [formData, currentTab]);
+    }, [formData, currentTab, riskAnalysis.score]);
 
     // Real-time risk calculation with gamification
     useEffect(() => {
@@ -161,13 +160,6 @@ const ClaudeOwnershipAnalyzer = () => {
         setRiskAnalysis(newRiskAnalysis);
     }, [formData]);
 
-    // System uptime simulator for tech appeal
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setSystemUptime(prev => prev + 1);
-        }, 1000);
-        return () => clearInterval(interval);
-    }, []);
 
     // Generate detailed analysis for live gauge pane
     useEffect(() => {
@@ -930,8 +922,8 @@ const ClaudeOwnershipAnalyzer = () => {
                             color: '#8892a6',
                             textAlign: 'right'
                         }}>
-                            <div>SCENARIOS: {gameStats.scenariosAnalyzed}</div>
-                            <div style={{ color: '#39ff14' }}>POINTS: {gameStats.learningPoints}</div>
+                            <div>SCENARIOS: {achievements.length}</div>
+                            <div style={{ color: '#39ff14' }}>POINTS: {completionProgress}</div>
                         </div>
                     </div>
                 </div>
@@ -1027,5 +1019,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Render the application
-const root = createRoot(document.getElementById('root'));
-root.render(<ClaudeOwnershipAnalyzer />);
+ReactDOM.render(<ClaudeOwnershipAnalyzer />, document.getElementById('root'));
