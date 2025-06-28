@@ -3,6 +3,14 @@
 window.RiskAnalyzer = {
     // Terms reference mapping
     termsReferences: {
+        free: {
+            ownership: "Section 4.2 (Rights and Responsibilities) - Consumer Terms",
+            aiTraining: "Section 3.2 (Use Restrictions) - Consumer Terms",
+            commercialUse: "Section 3 (Use of our Services) - Consumer Terms",
+            disclosure: "Usage Policy - Universal Usage Standards",
+            indemnification: "Not available for free users",
+            usageLimits: "Free tier usage limits apply"
+        },
         consumer: {
             ownership: "Section 4.2 (Rights and Responsibilities) - Consumer Terms",
             aiTraining: "Section 3.2 (Use Restrictions) - Consumer Terms",
@@ -30,9 +38,12 @@ window.RiskAnalyzer = {
         let factors = [];
 
         // Account type factor
-        if (formData.accountType === 'consumer') {
+        if (formData.accountType === 'free') {
+            score += 30;
+            factors.push("Free account has most limited protections and usage restrictions");
+        } else if (formData.accountType === 'consumer') {
             score += 20;
-            factors.push("Consumer account provides fewer protections");
+            factors.push("Consumer account provides fewer protections than commercial");
         }
 
         // Use case risk assessment
@@ -97,10 +108,11 @@ window.RiskAnalyzer = {
     // Analyze ownership rights
     analyzeOwnership: function(formData) {
         const isCommercial = formData.accountType === 'commercial';
+        const isFree = formData.accountType === 'free';
         
         let analysis = {
             status: 'allowed',
-            title: isCommercial ? 'Full Ownership Rights' : 'Conditional Ownership Rights',
+            title: isCommercial ? 'Full Ownership Rights' : isFree ? 'Basic Ownership Rights (Free)' : 'Conditional Ownership Rights',
             description: '',
             details: [],
             termsRef: ''
@@ -115,6 +127,22 @@ window.RiskAnalyzer = {
                 'Permitted for external commercial use'
             ];
             analysis.termsRef = this.termsReferences.commercial.ownership;
+        } else if (isFree) {
+            analysis.description = 'You own outputs subject to Terms of Service compliance and free tier usage limits. Rights are conditional and limited.';
+            analysis.details = [
+                'Assignment of rights "if any" exist in outputs',
+                'Ownership conditional on ToS compliance',
+                'No indemnification protection',
+                'Subject to free tier usage limitations',
+                'Primarily for personal/non-commercial use'
+            ];
+            analysis.termsRef = this.termsReferences.free.ownership;
+            
+            if (formData.contentUse === 'commercial') {
+                analysis.status = 'restricted';
+                analysis.title = 'Commercial Use Not Recommended (Free)';
+                analysis.details.push('Consider upgrading for commercial use rights');
+            }
         } else {
             analysis.description = 'You own outputs subject to compliance with Terms of Service. Rights are conditional on following usage restrictions.';
             analysis.details = [
@@ -237,10 +265,11 @@ window.RiskAnalyzer = {
     // Analyze copyright and intellectual property
     analyzeCopyright: function(formData) {
         const isCommercial = formData.accountType === 'commercial';
+        const isFree = formData.accountType === 'free';
         
         let analysis = {
             status: 'allowed',
-            title: isCommercial ? 'Strong Copyright Protection' : 'Limited Copyright Protection',
+            title: isCommercial ? 'Strong Copyright Protection' : isFree ? 'No Copyright Protection (Free)' : 'Limited Copyright Protection',
             description: '',
             details: [],
             termsRef: ''
@@ -255,6 +284,17 @@ window.RiskAnalyzer = {
                 'Protection for authorized business use'
             ];
             analysis.termsRef = this.termsReferences.commercial.indemnification;
+        } else if (isFree) {
+            analysis.description = 'Free users have no copyright indemnification and must handle all potential disputes independently. Consider upgrading for better protection.';
+            analysis.details = [
+                'No copyright indemnification whatsoever',
+                'User fully responsible for copyright verification',
+                'No legal protections from Anthropic',
+                'Rights assignment "if any" exists',
+                'Usage limits may affect copyright claims'
+            ];
+            analysis.termsRef = this.termsReferences.free.indemnification;
+            analysis.status = 'requires-review';
         } else {
             analysis.description = 'Consumer users must independently verify copyright status of outputs and handle any potential disputes.';
             analysis.details = [
@@ -308,7 +348,13 @@ window.RiskAnalyzer = {
         }
 
         // Account type suggestions
-        if (formData.accountType === 'consumer' && (formData.contentUse === 'commercial' || formData.contentUse === 'external')) {
+        if (formData.accountType === 'free' && (formData.contentUse === 'commercial' || formData.contentUse === 'external')) {
+            suggestions.push({
+                title: 'Upgrade from Free Account',
+                description: 'Free accounts have limited rights and usage restrictions. Consider upgrading to Pro or Commercial for better protections and fewer limitations.',
+                priority: 'high'
+            });
+        } else if (formData.accountType === 'consumer' && (formData.contentUse === 'commercial' || formData.contentUse === 'external')) {
             suggestions.push({
                 title: 'Consider Upgrading to Commercial Account',
                 description: 'Commercial accounts provide stronger ownership rights, indemnification coverage, and clearer permissions for business use cases.',

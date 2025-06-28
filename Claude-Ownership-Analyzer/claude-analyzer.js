@@ -7,7 +7,7 @@ const Icon = ({ name, size = 24, style = {} }) => {
 const ClaudeOwnershipAnalyzer = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [formData, setFormData] = useState({
-        accountType: 'consumer',
+        accountType: 'free',
         useCase: 'general',
         contentUse: 'internal',
         humanOversight: 'full',
@@ -99,6 +99,32 @@ const ClaudeOwnershipAnalyzer = () => {
             ],
             realWorldContext: 'Law firms increasingly use AI for document review, contract analysis, and legal research while navigating strict ethical obligations.',
             legalPitfalls: ['Unauthorized practice concerns', 'Confidentiality breaches', 'Professional liability issues']
+        },
+        {
+            id: 'free_user_blogger',
+            title: '📝 Free User Personal Blog',
+            description: 'Personal blogger using Claude Free for creative writing and blog posts',
+            industry: 'Personal/Creative',
+            difficulty: 'Beginner',
+            timeToComplete: '3 min',
+            setup: {
+                accountType: 'free',
+                useCase: 'creative',
+                contentUse: 'public',
+                humanOversight: 'substantial',
+                disclosurePlanned: true,
+                confidentialityLevel: 'public'
+            },
+            challenge: 'Understanding free tier limitations and ownership rights',
+            expectedRisk: 'low',
+            learningPoints: 'Free tier restrictions, basic ownership rights, usage limits',
+            keyDecisions: [
+                'What are the usage limits for free accounts?',
+                'Do I own content created with Claude Free?',
+                'What disclosure is recommended for personal blogs?'
+            ],
+            realWorldContext: 'Many personal bloggers and content creators start with Claude Free to explore AI assistance.',
+            legalPitfalls: ['Usage limit violations', 'Misunderstanding ownership rights', 'Inadequate attribution']
         },
         {
             id: 'student_helper',
@@ -407,7 +433,7 @@ const ClaudeOwnershipAnalyzer = () => {
             prohibitedContent: [],
             aiDevelopment: []
         }));
-        setCurrentTab(0); // Go back to setup to see the changes
+        setCurrentTab(1); // Go to setup tab to see the changes
     };
 
     const renderTabContent = () => {
@@ -425,7 +451,8 @@ const ClaudeOwnershipAnalyzer = () => {
                                     value={formData.accountType} 
                                     onChange={handleInputChange}
                                 >
-                                    <option value="consumer">Consumer (Claude.ai, Pro)</option>
+                                    <option value="free">Free (Claude.ai Free)</option>
+                                    <option value="consumer">Consumer (Claude.ai Pro)</option>
                                     <option value="commercial">Commercial (API, Enterprise)</option>
                                 </select>
                             </div>
