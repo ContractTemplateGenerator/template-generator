@@ -33,7 +33,92 @@ const ClaudeOwnershipAnalyzer = () => {
     const tabs = [
         { id: 'setup', label: 'Account Setup', icon: 'settings' },
         { id: 'usage', label: 'Usage Type', icon: 'file-text' },
-        { id: 'compliance', label: 'Risk Factors', icon: 'shield' }
+        { id: 'compliance', label: 'Risk Factors', icon: 'shield' },
+        { id: 'scenarios', label: 'Scenarios', icon: 'zap' }
+    ];
+
+    // Predefined scenarios for educational gaming
+    const gameScenarios = [
+        {
+            id: 'startup_blog',
+            title: '🚀 Startup Blog Writer',
+            description: 'You run a tech startup blog and want to use Claude for content creation',
+            setup: {
+                accountType: 'commercial',
+                useCase: 'journalism',
+                contentUse: 'public',
+                humanOversight: 'substantial',
+                disclosurePlanned: true,
+                confidentialityLevel: 'public'
+            },
+            challenge: 'Balance efficiency with transparency requirements',
+            expectedRisk: 'medium',
+            learningPoints: 'Disclosure requirements, commercial benefits, content quality'
+        },
+        {
+            id: 'legal_firm',
+            title: '⚖️ Legal Document Assistant',
+            description: 'Law firm wants to use Claude for contract review and legal research',
+            setup: {
+                accountType: 'commercial',
+                useCase: 'legal',
+                contentUse: 'internal',
+                humanOversight: 'full',
+                disclosurePlanned: false,
+                confidentialityLevel: 'confidential'
+            },
+            challenge: 'Ensure compliance while maintaining attorney-client privilege',
+            expectedRisk: 'high',
+            learningPoints: 'Professional responsibility, confidentiality, human oversight requirements'
+        },
+        {
+            id: 'student_helper',
+            title: '🎓 Student Research Assistant',
+            description: 'College student using Claude for academic research and writing',
+            setup: {
+                accountType: 'consumer',
+                useCase: 'academic',
+                contentUse: 'external',
+                humanOversight: 'minimal',
+                disclosurePlanned: false,
+                confidentialityLevel: 'public'
+            },
+            challenge: 'Academic integrity vs efficiency',
+            expectedRisk: 'high',
+            learningPoints: 'Academic disclosure, plagiarism concerns, institutional policies'
+        },
+        {
+            id: 'creative_agency',
+            title: '🎨 Creative Agency',
+            description: 'Digital agency using Claude for client marketing materials',
+            setup: {
+                accountType: 'commercial',
+                useCase: 'creative',
+                contentUse: 'commercial',
+                humanOversight: 'substantial',
+                disclosurePlanned: true,
+                confidentialityLevel: 'internal'
+            },
+            challenge: 'Client expectations vs AI limitations',
+            expectedRisk: 'low',
+            learningPoints: 'Client disclosure, creative ownership, quality control'
+        },
+        {
+            id: 'healthcare_admin',
+            title: '🏥 Healthcare Administrator',
+            description: 'Hospital admin using Claude for patient communication templates',
+            setup: {
+                accountType: 'commercial',
+                useCase: 'healthcare',
+                contentUse: 'external',
+                humanOversight: 'full',
+                disclosurePlanned: true,
+                confidentialityLevel: 'personal'
+            },
+            challenge: 'HIPAA compliance and patient safety',
+            expectedRisk: 'high',
+            learningPoints: 'Healthcare regulations, patient privacy, professional liability'
+        }
     ];
 
     // Gamification calculations
@@ -257,6 +342,17 @@ const ClaudeOwnershipAnalyzer = () => {
         return false;
     };
 
+    // Apply a scenario to the form data
+    const applyScenario = (scenario) => {
+        setFormData(prev => ({
+            ...prev,
+            ...scenario.setup,
+            prohibitedContent: [],
+            aiDevelopment: []
+        }));
+        setCurrentTab(0); // Go back to setup to see the changes
+    };
+
     const renderTabContent = () => {
         switch (currentTab) {
             case 0:
@@ -465,158 +561,323 @@ const ClaudeOwnershipAnalyzer = () => {
                     </div>
                 );
 
+            case 3:
+                return (
+                    <div>
+                        <div className="form-section">
+                            <h3><Icon name="zap" className="form-section-icon" />Gaming Scenarios</h3>
+                            <p style={{ 
+                                fontSize: '0.85rem', 
+                                color: '#8892a6', 
+                                marginBottom: '1rem',
+                                lineHeight: '1.4'
+                            }}>
+                                Test your knowledge with real-world scenarios! Click any scenario to automatically configure the analyzer and see how different use cases affect risk levels.
+                            </p>
+                            
+                            <div style={{ 
+                                display: 'grid',
+                                gridTemplateColumns: '1fr',
+                                gap: '0.75rem'
+                            }}>
+                                {gameScenarios.map((scenario, index) => (
+                                    <div 
+                                        key={scenario.id}
+                                        style={{
+                                            padding: '1rem',
+                                            background: 'rgba(26, 31, 46, 0.5)',
+                                            borderRadius: '8px',
+                                            border: '1px solid #2a3441',
+                                            cursor: 'pointer',
+                                            transition: 'all 0.3s ease',
+                                            position: 'relative'
+                                        }}
+                                        className="scenario-card"
+                                        onClick={() => applyScenario(scenario)}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.borderColor = '#00d4ff';
+                                            e.target.style.background = 'rgba(0, 212, 255, 0.05)';
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.borderColor = '#2a3441';
+                                            e.target.style.background = 'rgba(26, 31, 46, 0.5)';
+                                        }}
+                                    >
+                                        <div style={{
+                                            display: 'flex',
+                                            justifyContent: 'space-between',
+                                            alignItems: 'flex-start',
+                                            marginBottom: '0.5rem'
+                                        }}>
+                                            <h4 style={{
+                                                fontFamily: 'Orbitron, monospace',
+                                                fontSize: '0.9rem',
+                                                color: '#00d4ff',
+                                                margin: 0,
+                                                textTransform: 'uppercase',
+                                                letterSpacing: '0.5px'
+                                            }}>
+                                                {scenario.title}
+                                            </h4>
+                                            <span style={{
+                                                fontSize: '0.7rem',
+                                                padding: '0.25rem 0.5rem',
+                                                borderRadius: '4px',
+                                                background: scenario.expectedRisk === 'low' ? 'rgba(57, 255, 20, 0.2)' : 
+                                                           scenario.expectedRisk === 'medium' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(255, 51, 68, 0.2)',
+                                                color: scenario.expectedRisk === 'low' ? '#39ff14' : 
+                                                       scenario.expectedRisk === 'medium' ? '#ffaa00' : '#ff3344',
+                                                textTransform: 'uppercase',
+                                                fontFamily: 'Orbitron, monospace'
+                                            }}>
+                                                {scenario.expectedRisk} RISK
+                                            </span>
+                                        </div>
+                                        
+                                        <p style={{
+                                            fontSize: '0.8rem',
+                                            color: '#b4c1d3',
+                                            marginBottom: '0.75rem',
+                                            lineHeight: '1.4'
+                                        }}>
+                                            {scenario.description}
+                                        </p>
+                                        
+                                        <div style={{
+                                            padding: '0.5rem',
+                                            background: 'rgba(0, 212, 255, 0.05)',
+                                            borderRadius: '6px',
+                                            border: '1px solid rgba(0, 212, 255, 0.2)',
+                                            marginBottom: '0.5rem'
+                                        }}>
+                                            <div style={{
+                                                fontSize: '0.7rem',
+                                                color: '#00d4ff',
+                                                fontWeight: '600',
+                                                marginBottom: '0.25rem'
+                                            }}>
+                                                💡 Challenge:
+                                            </div>
+                                            <div style={{
+                                                fontSize: '0.75rem',
+                                                color: '#e1e8f0',
+                                                lineHeight: '1.3'
+                                            }}>
+                                                {scenario.challenge}
+                                            </div>
+                                        </div>
+                                        
+                                        <div style={{
+                                            fontSize: '0.7rem',
+                                            color: '#8892a6',
+                                            fontStyle: 'italic'
+                                        }}>
+                                            🎯 Learning Focus: {scenario.learningPoints}
+                                        </div>
+                                        
+                                        {/* Click indicator */}
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: '0.75rem',
+                                            right: '0.75rem',
+                                            fontSize: '0.6rem',
+                                            color: '#39ff14',
+                                            fontFamily: 'Orbitron, monospace',
+                                            textTransform: 'uppercase',
+                                            opacity: 0.7
+                                        }}>
+                                            Click to Apply →
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
     };
 
-    // Render comprehensive gauge pane with analysis
+    // Render compact gauge pane without scrolling
     const renderGaugePane = () => {
         return (
-            <div style={{ padding: '1rem', overflow: 'auto', height: '100%' }}>
+            <div style={{ 
+                padding: '0.75rem', 
+                height: '100%',
+                display: 'grid',
+                gridTemplateRows: 'auto 1fr auto',
+                gap: '0.75rem',
+                overflow: 'hidden'
+            }}>
                 {/* Compact Gauge */}
-                <CompactRiskGauge score={riskAnalysis.score} level={riskAnalysis.level} />
+                <div style={{ textAlign: 'center' }}>
+                    <div style={{ width: '120px', height: '120px', margin: '0 auto' }}>
+                        <CompactRiskGauge score={riskAnalysis.score} level={riskAnalysis.level} />
+                    </div>
+                </div>
                 
-                {/* Risk Factors */}
-                {riskAnalysis.factors.length > 0 && (
-                    <div style={{
-                        background: 'rgba(26, 31, 46, 0.5)',
-                        borderRadius: '8px',
-                        padding: '0.75rem',
-                        marginBottom: '1rem',
-                        border: '1px solid #2a3441'
-                    }}>
-                        <h4 style={{
-                            fontFamily: 'Orbitron, monospace',
-                            fontSize: '0.8rem',
-                            color: '#00d4ff',
-                            marginBottom: '0.5rem',
-                            textTransform: 'uppercase',
-                            letterSpacing: '0.5px'
-                        }}>Risk Factors</h4>
-                        <ul style={{ listStyle: 'none', padding: 0 }}>
-                            {riskAnalysis.factors.slice(0, 3).map((factor, index) => (
-                                <li key={index} style={{
-                                    fontSize: '0.75rem',
-                                    color: '#b4c1d3',
-                                    marginBottom: '0.25rem',
-                                    paddingLeft: '0.5rem',
-                                    position: 'relative'
-                                }}>
-                                    <span style={{
-                                        position: 'absolute',
-                                        left: 0,
-                                        color: '#39ff14'
-                                    }}>▸</span>
-                                    {factor}
-                                </li>
-                            ))}
-                            {riskAnalysis.factors.length > 3 && (
-                                <li style={{
-                                    fontSize: '0.75rem',
-                                    color: '#8892a6',
-                                    paddingLeft: '0.5rem'
-                                }}>
-                                    +{riskAnalysis.factors.length - 3} more factors
-                                </li>
-                            )}
-                        </ul>
-                    </div>
-                )}
-
-                {/* Analysis Cards */}
-                {detailedAnalysis && (
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: '1fr',
-                        gap: '0.5rem'
-                    }}>
-                        {/* Ownership Rights */}
-                        <div className={`result-card ${detailedAnalysis.ownership.status === 'allowed' ? 'low' : detailedAnalysis.ownership.status === 'requires-review' ? 'medium' : 'high'}`}>
-                            <h4>
-                                <Icon name="award" size={12} style={{ marginRight: '0.5rem' }} />
-                                Ownership
-                            </h4>
-                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
-                                <strong>{detailedAnalysis.ownership.title}</strong>
-                            </p>
-                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.ownership.status)}`}>
-                                {detailedAnalysis.ownership.status.replace('-', ' ')}
-                            </span>
-                        </div>
-
-                        {/* Usage Compliance */}
-                        <div className={`result-card ${detailedAnalysis.usage.status === 'allowed' ? 'low' : detailedAnalysis.usage.status === 'requires-review' ? 'medium' : 'high'}`}>
-                            <h4>
-                                <Icon name="check-circle" size={12} style={{ marginRight: '0.5rem' }} />
-                                Compliance
-                            </h4>
-                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
-                                <strong>{detailedAnalysis.usage.title}</strong>
-                            </p>
-                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.usage.status)}`}>
-                                {detailedAnalysis.usage.status.replace('-', ' ')}
-                            </span>
-                        </div>
-
-                        {/* Disclosure Requirements */}
-                        <div className={`result-card ${detailedAnalysis.disclosure.status === 'allowed' ? 'low' : detailedAnalysis.disclosure.status === 'requires-review' ? 'medium' : 'high'}`}>
-                            <h4>
-                                <Icon name="info" size={12} style={{ marginRight: '0.5rem' }} />
-                                Disclosure
-                            </h4>
-                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
-                                <strong>{detailedAnalysis.disclosure.title}</strong>
-                            </p>
-                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
-                                {detailedAnalysis.disclosure.status.replace('-', ' ')}
-                            </span>
-                        </div>
-
-                        {/* Copyright Protection */}
-                        <div className={`result-card ${detailedAnalysis.copyright.status === 'allowed' ? 'low' : detailedAnalysis.copyright.status === 'requires-review' ? 'medium' : 'high'}`}>
-                            <h4>
-                                <Icon name="shield" size={12} style={{ marginRight: '0.5rem' }} />
-                                Copyright
-                            </h4>
-                            <p style={{ fontSize: '0.8rem', margin: '0.5rem 0' }}>
-                                <strong>{detailedAnalysis.copyright.title}</strong>
-                            </p>
-                            <span className={`status-indicator ${getStatusClass(detailedAnalysis.copyright.status)}`}>
-                                {detailedAnalysis.copyright.status.replace('-', ' ')}
-                            </span>
-                        </div>
-                    </div>
-                )}
-
-                {/* Consultation Button - Only when high risk or violations */}
-                {(riskAnalysis.level === 'high' || riskAnalysis.score > 60) && (
-                    <div style={{
-                        marginTop: '1rem',
-                        padding: '0.75rem',
-                        textAlign: 'center',
-                        background: 'rgba(26, 31, 46, 0.3)',
-                        borderRadius: '8px',
-                        border: '1px solid #2a3441'
-                    }}>
-                        <p style={{ 
-                            marginBottom: '0.75rem', 
-                            color: '#8892a6', 
-                            fontSize: '0.8rem' 
-                        }}>
-                            Consider legal consultation for high-risk scenarios
-                        </p>
-                        <a 
-                            href="" 
-                            onClick={openCalendlyPopup}
-                            className="consultation-btn"
-                            style={{ fontSize: '0.8rem', padding: '0.5rem 1rem' }}
+                {/* Compact Analysis Cards */}
+                <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '0.5rem',
+                    alignContent: 'start'
+                }}>
+                    {detailedAnalysis && [
+                        { key: 'ownership', data: detailedAnalysis.ownership, icon: 'award' },
+                        { key: 'usage', data: detailedAnalysis.usage, icon: 'check-circle' },
+                        { key: 'disclosure', data: detailedAnalysis.disclosure, icon: 'info' },
+                        { key: 'copyright', data: detailedAnalysis.copyright, icon: 'shield' }
+                    ].map(({ key, data, icon }) => (
+                        <div 
+                            key={key}
+                            style={{
+                                padding: '0.5rem',
+                                background: 'rgba(26, 31, 46, 0.6)',
+                                borderRadius: '6px',
+                                border: '1px solid #2a3441',
+                                borderLeft: `3px solid ${data.status === 'allowed' ? '#39ff14' : data.status === 'requires-review' ? '#ffaa00' : '#ff3344'}`
+                            }}
                         >
-                            <Icon name="calendar" size={14} />
-                            Legal Consultation
-                        </a>
+                            <div style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '0.25rem',
+                                marginBottom: '0.25rem'
+                            }}>
+                                <Icon name={icon} size={10} />
+                                <span style={{
+                                    fontFamily: 'Orbitron, monospace',
+                                    fontSize: '0.65rem',
+                                    color: '#00d4ff',
+                                    textTransform: 'uppercase'
+                                }}>
+                                    {key}
+                                </span>
+                            </div>
+                            <div style={{
+                                fontSize: '0.6rem',
+                                color: '#e1e8f0',
+                                marginBottom: '0.25rem',
+                                lineHeight: '1.2'
+                            }}>
+                                {data.title}
+                            </div>
+                            <span style={{
+                                fontSize: '0.55rem',
+                                padding: '0.15rem 0.4rem',
+                                borderRadius: '3px',
+                                background: data.status === 'allowed' ? 'rgba(57, 255, 20, 0.2)' : 
+                                           data.status === 'requires-review' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(255, 51, 68, 0.2)',
+                                color: data.status === 'allowed' ? '#39ff14' : 
+                                       data.status === 'requires-review' ? '#ffaa00' : '#ff3344',
+                                textTransform: 'uppercase',
+                                fontFamily: 'Orbitron, monospace'
+                            }}>
+                                {data.status.replace('-', ' ')}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Bottom Section: Achievements and Actions */}
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: '0.5rem'
+                }}>
+                    {/* Achievement Badges */}
+                    {achievements.length > 0 && (
+                        <div style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            gap: '0.25rem',
+                            justifyContent: 'center'
+                        }}>
+                            {achievements.slice(0, 6).map((achievement, index) => (
+                                <div
+                                    key={index}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '0.25rem',
+                                        padding: '0.25rem 0.5rem',
+                                        background: 'rgba(57, 255, 20, 0.1)',
+                                        border: '1px solid #39ff14',
+                                        borderRadius: '4px',
+                                        fontSize: '0.6rem',
+                                        fontFamily: 'Orbitron, monospace',
+                                        color: '#39ff14'
+                                    }}
+                                    title={`${achievement.label.replace('_', ' ')} (+${achievement.points} pts)`}
+                                >
+                                    <span>{achievement.icon}</span>
+                                    <span>{achievement.points}</span>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    {/* Quick Actions */}
+                    <div style={{
+                        display: 'flex',
+                        gap: '0.5rem',
+                        justifyContent: 'center'
+                    }}>
+                        {(riskAnalysis.level === 'high' || riskAnalysis.score > 60) && (
+                            <button
+                                onClick={openCalendlyPopup}
+                                style={{
+                                    padding: '0.5rem 0.75rem',
+                                    background: 'rgba(255, 51, 68, 0.15)',
+                                    color: '#ff3344',
+                                    border: '1px solid #ff3344',
+                                    borderRadius: '4px',
+                                    fontSize: '0.65rem',
+                                    fontFamily: 'Orbitron, monospace',
+                                    textTransform: 'uppercase',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                ⚠ Get Help
+                            </button>
+                        )}
+                        <button
+                            onClick={() => {
+                                // Reset form for new scenario
+                                setFormData({
+                                    accountType: 'consumer',
+                                    useCase: 'general',
+                                    contentUse: 'internal',
+                                    humanOversight: 'full',
+                                    disclosurePlanned: false,
+                                    requiresDisclosure: false,
+                                    servesMinors: false,
+                                    interactionType: 'no-interaction',
+                                    prohibitedContent: [],
+                                    aiDevelopment: [],
+                                    confidentialityLevel: 'public'
+                                });
+                                setCurrentTab(0);
+                            }}
+                            style={{
+                                padding: '0.5rem 0.75rem',
+                                background: 'rgba(0, 212, 255, 0.15)',
+                                color: '#00d4ff',
+                                border: '1px solid #00d4ff',
+                                borderRadius: '4px',
+                                fontSize: '0.65rem',
+                                fontFamily: 'Orbitron, monospace',
+                                textTransform: 'uppercase',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            🔄 New Test
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
         );
     };
@@ -662,15 +923,15 @@ const ClaudeOwnershipAnalyzer = () => {
                             </span>
                         </div>
                         
-                        {/* System Uptime */}
+                        {/* User Profile Stats */}
                         <div style={{ 
                             fontFamily: 'Orbitron, monospace', 
                             fontSize: '0.65rem', 
                             color: '#8892a6',
                             textAlign: 'right'
                         }}>
-                            <div>UPTIME: {Math.floor(systemUptime / 60)}:{(systemUptime % 60).toString().padStart(2, '0')}</div>
-                            <div style={{ color: '#39ff14' }}>STATUS: ONLINE</div>
+                            <div>SCENARIOS: {gameStats.scenariosAnalyzed}</div>
+                            <div style={{ color: '#39ff14' }}>POINTS: {gameStats.learningPoints}</div>
                         </div>
                     </div>
                 </div>
