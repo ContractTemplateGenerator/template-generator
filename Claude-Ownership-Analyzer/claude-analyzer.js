@@ -1022,5 +1022,37 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => feather.replace(), 0);
 });
 
-// Render the application
-ReactDOM.render(<ClaudeOwnershipAnalyzer />, document.getElementById('root'));
+// Safe initialization with dependency checking
+function initializeAnalyzer() {
+    console.log('Initializing Claude Analyzer...');
+    console.log('React available:', typeof React);
+    console.log('ReactDOM available:', typeof ReactDOM);
+    console.log('RiskAnalyzer available:', typeof window.RiskAnalyzer);
+    console.log('Root element:', document.getElementById('root'));
+    
+    try {
+        ReactDOM.render(<ClaudeOwnershipAnalyzer />, document.getElementById('root'));
+        console.log('✅ Analyzer rendered successfully');
+    } catch (error) {
+        console.error('❌ Error rendering analyzer:', error);
+        const root = document.getElementById('root');
+        if (root) {
+            root.innerHTML = `
+                <div style="padding: 2rem; font-family: Arial, sans-serif;">
+                    <h1 style="color: #ff3344;">Analyzer Error</h1>
+                    <p><strong>Error:</strong> ${error.message}</p>
+                    <p><strong>Stack:</strong> ${error.stack}</p>
+                    <p>Please check the browser console for more details.</p>
+                </div>
+            `;
+        }
+    }
+}
+
+// Wait for all dependencies to load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeAnalyzer);
+} else {
+    // DOM already loaded
+    setTimeout(initializeAnalyzer, 100);
+}
