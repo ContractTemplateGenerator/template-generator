@@ -952,9 +952,9 @@ const ClaudeOwnershipAnalyzer = () => {
                                         fontSize: '0.65rem',
                                         animation: 'pulse 2s infinite'
                                     }}
-                                    title={achievement.split(' ')[1]?.replace('_', ' ')}
+                                    title={achievement.label?.replace('_', ' ')}
                                 >
-                                    {achievement.split(' ')[0]}
+                                    {achievement.icon}
                                 </span>
                             ))}
                             {achievements.length > 3 && (
