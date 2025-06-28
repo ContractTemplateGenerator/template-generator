@@ -879,6 +879,14 @@ ${formData.companyName || ''}`;
             return;
         }
         
+        // Check eSignature usage limit (3 uses per payment)
+        if (window.PaywallSystem && !window.PaywallSystem.canUseESignature()) {
+            const paymentStatus = window.PaywallSystem.getPaymentStatus();
+            const usageCount = paymentStatus.esignatureUsage || 0;
+            alert(`🚫 eSignature Limit Reached\n\nYou have used ${usageCount}/3 eSignatures for this payment.\n\nTo create more eSignatures, please make a new payment.`);
+            return;
+        }
+        
         // Validate required fields
         if (!formData.email || !formData.contactName) {
             alert('Please fill in your email address and contact name before signing the document.');
@@ -897,10 +905,10 @@ ${formData.companyName || ''}`;
                 const demandLetter = generateDemandLetter();
                 const arbitrationDemand = generateArbitrationDemand();
                 finalDocumentText = demandLetter + '\n\n' + '='.repeat(80) + '\nARBITRATION DEMAND (ATTACHMENT)\n' + '='.repeat(80) + '\n\n' + arbitrationDemand;
-                documentTitle = `Stripe Demand Letter with Arbitration - ${formData.companyName || 'Company'}`;
+                documentTitle = `Demand Letter with Arbitration - ${formData.companyName || 'Company'}`;
             } else {
                 finalDocumentText = generateDemandLetter();
-                documentTitle = `Stripe Demand Letter - ${formData.companyName || 'Company'}`;
+                documentTitle = `Demand Letter - ${formData.companyName || 'Company'}`;
             }
 
             // eSignatures.com API call - using templates endpoint
@@ -957,25 +965,20 @@ ${formData.companyName || ''}`;
             }
 
             if (response.ok && (result.signing_url || result.sign_url || result.url || result.data?.signing_url)) {
-                // Embed signing URL directly in the page
-                const signingUrl = result.signing_url || result.sign_url || result.url || result.data?.signing_url;
-                const embeddedUrl = signingUrl + (signingUrl.includes('?') ? '&' : '?') + 'embedded=yes';
+                // Increment usage counter for real eSignatures
+                if (result.status === 'success' && result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
+                    if (window.PaywallSystem) {
+                        window.PaywallSystem.incrementESignatureUsage();
+                    }
+                }
                 
-                // Create iframe container for embedded signing
-                const iframeContainer = document.createElement('div');
-                iframeContainer.innerHTML = `
-                    <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-                        <div style="width: 95%; height: 95%; background: white; border-radius: 8px; position: relative;">
-                            <button onclick="this.parentElement.parentElement.remove()" style="position: absolute; top: 10px; right: 15px; background: #dc2626; color: white; border: none; padding: 8px 12px; border-radius: 4px; cursor: pointer; z-index: 10001;">Close</button>
-                            <iframe src="${embeddedUrl}" style="width: 100%; height: 100%; border: none; border-radius: 8px;"></iframe>
-                        </div>
-                    </div>
-                `;
-                document.body.appendChild(iframeContainer);
+                // Open signing URL in new window to preserve form state
+                const signingUrl = result.signing_url || result.sign_url || result.url || result.data?.signing_url;
+                window.open(signingUrl, '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
                 
                 // Start monitoring for completion and provide finalized document
                 if (result.data?.contract_id && !result.data.contract_id.startsWith('demo-')) {
-                    monitorContractCompletion(result.data.contract_id, iframeContainer);
+                    monitorContractCompletion(result.data.contract_id);
                 }
                 
                 // Show appropriate success message

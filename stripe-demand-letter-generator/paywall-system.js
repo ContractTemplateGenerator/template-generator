@@ -34,7 +34,8 @@ const PaywallSystem = (() => {
             isPaid: false,
             transactionId: null,
             paymentDate: null,
-            sessionActive: false
+            sessionActive: false,
+            esignatureUsage: 0
         };
     };
 
@@ -109,7 +110,8 @@ const PaywallSystem = (() => {
                         isPaid: true,
                         transactionId: order.id,
                         paymentDate: new Date().toISOString(),
-                        sessionActive: true
+                        sessionActive: true,
+                        esignatureUsage: 0
                     };
                     savePaymentStatus(paymentStatus);
 
@@ -162,6 +164,21 @@ const PaywallSystem = (() => {
     // Check if user has paid in current session
     const hasAccess = () => {
         return paymentStatus.isPaid && paymentStatus.sessionActive;
+    };
+
+    // Check if user can use eSignature (3 uses per payment)
+    const canUseESignature = () => {
+        return hasAccess() && (paymentStatus.esignatureUsage || 0) < 3;
+    };
+
+    // Increment eSignature usage
+    const incrementESignatureUsage = () => {
+        if (hasAccess()) {
+            paymentStatus.esignatureUsage = (paymentStatus.esignatureUsage || 0) + 1;
+            savePaymentStatus(paymentStatus);
+            return true;
+        }
+        return false;
     };
 
     // Create paywall modal
@@ -435,16 +452,20 @@ const PaywallSystem = (() => {
         
         const paypalId = input.value.trim();
         
-        // Basic PayPal transaction ID validation
-        // PayPal transaction IDs are typically 17 characters, alphanumeric
-        if (paypalId.length >= 10 && /^[A-Z0-9]+$/i.test(paypalId)) {
+        // Strict PayPal transaction ID validation
+        // Must be exactly 17 characters, all uppercase, mix of letters and numbers
+        if (paypalId.length === 17 && 
+            /^[A-Z0-9]+$/.test(paypalId) && 
+            /[A-Z]/.test(paypalId) && 
+            /[0-9]/.test(paypalId)) {
             // Update payment status
             paymentStatus = {
                 isPaid: true,
                 transactionId: paypalId,
                 paymentDate: new Date().toISOString(),
                 sessionActive: true,
-                manualEntry: true
+                manualEntry: true,
+                esignatureUsage: 0
             };
             savePaymentStatus(paymentStatus);
 
@@ -473,7 +494,7 @@ const PaywallSystem = (() => {
                 window.manualUnlockCallback = null;
             }
         } else {
-            alert('Please enter a valid PayPal transaction ID. Transaction IDs are typically 10+ characters and contain only letters and numbers.');
+            alert('Please enter a valid PayPal transaction ID. Transaction IDs must be exactly 17 characters, all uppercase, and contain both letters and numbers (e.g., 1AB2C3D4E5F6G7H8I).');
             input.focus();
         }
     };
@@ -632,6 +653,8 @@ const PaywallSystem = (() => {
         closePaywallModal,
         validateManualPayPalId,
         hasAccess,
+        canUseESignature,
+        incrementESignatureUsage,
         backupFormData,
         restoreFormData,
         showAccessDenied,

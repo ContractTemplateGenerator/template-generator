@@ -372,16 +372,7 @@ function createESignaturesTemplate(title, content, signerInfo, callback) {
         
         // eSignatures.com automatically manages signature placement - no need to add signature fields
         
-        // Content after "Sincerely," (excluding signature/name parts)
-        const afterSincerely = content.substring(sincerelyIndex + "Sincerely,".length);
-        // Remove the manual signature lines (name and company) from the content
-        const cleanedAfter = afterSincerely.replace(/\n\n[^\n]+\n[^\n]+$/, '');
-        if (cleanedAfter.trim()) {
-            documentElements.push({
-                "type": "text_normal",
-                "text": cleanedAfter
-            });
-        }
+        // Don't add anything after "Sincerely," - eSignatures.com will handle signature placement automatically
     } else {
         // Fallback if "Sincerely," not found - just add content as is
         documentElements.push({
@@ -422,6 +413,7 @@ function createESignaturesContract(templateId, signerInfo, callback) {
     const contractData = {
         template_id: templateId,
         test: "no", // Production mode - no demo stamp
+        redirect_url: "https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/?signed=true",
         signers: [{
             name: signerInfo.name.trim(),
             email: signerInfo.email
