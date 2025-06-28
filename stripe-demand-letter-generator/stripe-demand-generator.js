@@ -193,9 +193,7 @@ const StripeDemandGenerator = () => {
     const tabs = [
         { id: 'account', label: 'Account Details', icon: 'user' },
         { id: 'reasons', label: 'Stripe\'s Reasons', icon: 'alert-circle' },
-        { id: 'violations', label: 'SSA Violations', icon: 'file-text' },
         { id: 'evidence', label: 'Evidence', icon: 'folder' },
-        { id: 'arbitration', label: 'Arbitration Demand', icon: 'scale' },
         { id: 'assessment', label: 'Risk Assessment', icon: 'bar-chart-2' }
     ];
     
@@ -1092,17 +1090,17 @@ ${formData.companyName || ''}`;
                     return 'stripe-reasons';
                 }
                 return null;
-            case 3: // Evidence
+            case 2: // Evidence (now tab 2, includes arbitration checkbox)
                 if (lastChanged && formData[lastChanged]) {
                     return 'evidence-section';
                 }
-                return null;
-            case 4: // Arbitration Demand tab (NEW)
                 if (lastChanged === 'includeArbitrationDraft') {
                     return formData.includeArbitrationDraft ? 'arbitration-section' : 'demand-letter-section';
                 }
-                if (['expeditedProcedures', 'claimPunitiveDamages', 'injunctiveRelief'].includes(lastChanged)) {
-                    return 'arbitration-options';
+                return null;
+            case 3: // Risk Assessment (now tab 3)
+                if (lastChanged && formData[lastChanged]) {
+                    return 'assessment-section';
                 }
                 if (['arbitrationVenue', 'hearingPreference', 'specificDamagesAmount', 'additionalClaims', 'includeAttorneyFees', 'includeInterestOnFunds'].includes(lastChanged)) {
                     return 'arbitration-config';
@@ -2282,34 +2280,8 @@ ${formData.companyName || ''}`;
                     ]),
                     
                     // Tab 3: SSA Violations with Explanations
+                    // Tab 3: Evidence with Custom Input (now tab 2)
                     currentTab === 2 && React.createElement('div', { key: 'tab3' }, [
-                        React.createElement('h2', { key: 'h2' }, 'SSA Violations (Auto-Selected)'),
-                        React.createElement('p', { key: 'p' }, 'These legal claims will be automatically included based on your situation:'),
-                        
-                        React.createElement('div', { key: 'claims' }, 
-                            getAutoSelectedClaims().claims.map((claim, index) => 
-                                React.createElement('div', { key: index, className: 'legal-claim' }, [
-                                    React.createElement('h4', { key: 'title' }, [
-                                        claim.name,
-                                        createTooltip(claim.tooltip)
-                                    ]),
-                                    React.createElement('p', { key: 'desc' }, claim.explanation)
-                                ])
-                            )
-                        ),
-                        
-                        getAutoSelectedClaims().violations.length > 0 && React.createElement('div', { key: 'violations', className: 'risk-card risk-moderate' }, [
-                            React.createElement('h3', { key: 'h3' }, 'Specific SSA Violations Based on Your Situation'),
-                            React.createElement('ul', { key: 'ul' }, 
-                                getAutoSelectedClaims().violations.map((violation, index) => 
-                                    React.createElement('li', { key: index }, violation)
-                                )
-                            )
-                        ])
-                    ]),
-                    
-                    // Tab 4: Evidence with Custom Input
-                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
                         React.createElement('h2', { key: 'h2' }, 'Supporting Evidence'),
                         React.createElement('p', { key: 'p' }, 'Select evidence you have to support your position:'),
                         
@@ -2451,12 +2423,38 @@ ${formData.companyName || ''}`;
                                 placeholder: 'Describe additional evidence you have that supports your position...',
                                 rows: 3
                             })
+                        ]),
+
+                        // Arbitration Decision Section
+                        React.createElement('div', { key: 'arbitration-section', style: { marginTop: '30px' } }, [
+                            React.createElement('h3', { key: 'h3' }, 'Arbitration Demand Option'),
+                            React.createElement('p', { key: 'p' }, 'Include a draft AAA arbitration demand attachment for maximum legal pressure.'),
+                            
+                            React.createElement('div', { key: 'arb-checkbox', className: 'checkbox-grid' }, [
+                                React.createElement('div', { 
+                                    key: 'enable-arb',
+                                    className: `checkbox-item ${formData.includeArbitrationDraft ? 'selected' : ''}`,
+                                    onClick: () => handleChange({ target: { name: 'includeArbitrationDraft', type: 'checkbox', checked: !formData.includeArbitrationDraft }})
+                                }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        name: 'includeArbitrationDraft',
+                                        checked: formData.includeArbitrationDraft,
+                                        onChange: handleChange
+                                    }),
+                                    React.createElement('div', { key: 'content' }, [
+                                        React.createElement('div', { key: 'label', className: 'checkbox-label' }, 'Include Arbitration Demand Attachment'),
+                                        React.createElement('div', { key: 'desc', className: 'checkbox-description' }, 'Generate a professional AAA arbitration demand. Creates maximum pressure and shows serious intent.')
+                                    ])
+                                ])
+                            ])
                         ])
                     ]),
                     
-                    // Tab 5: Arbitration Demand Options (NEW TAB)
-                    currentTab === 4 && React.createElement('div', { key: 'tab5' }, [
-                        React.createElement('h2', { key: 'h2' }, 'Arbitration Demand Strategy'),
+                    // Tab 4: Risk Assessment (now tab 3)
+                    currentTab === 3 && React.createElement('div', { key: 'tab4' }, [
+                        React.createElement('h2', { key: 'h2' }, 'Case Analysis & Strategy'),
                         React.createElement('p', { key: 'p' }, 'Decide whether to include a draft AAA arbitration demand with your letter. This shows maximum seriousness and preparation.'),
                         
                         // Decision Factors Section
