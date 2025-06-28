@@ -1,5 +1,5 @@
 // eSignatures.com API implementation - production ready
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
@@ -16,7 +16,18 @@ module.exports = async function handler(req, res) {
     const TOKEN = '1807161e-d29d-4ace-9b87-864e25c70b05';
     
     try {
-        const { documentContent, signer_name, signer_email } = req.body;
+        // Get the request body
+        const body = req.body;
+        console.log('Received request body:', body);
+        
+        if (!body) {
+            return res.status(400).json({ 
+                error: 'No request body provided',
+                message: 'A JSON formatted HTTP body must be added.'
+            });
+        }
+        
+        const { documentContent, signer_name, signer_email } = body;
         
         // Step 1: Create template using the working format
         console.log('Creating template...');
