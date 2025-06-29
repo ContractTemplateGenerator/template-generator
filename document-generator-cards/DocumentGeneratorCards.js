@@ -1,8 +1,38 @@
 const { useState, useEffect, useRef } = React;
 
-// All blog post/generator data from the original design
+// All blog post/generator data - Enhanced for legal professionalism and tech-savviness
 const allCardsData = [
-  // Document Generators (Top Section)
+  // Featured & Popular Posts (Top Row)
+  {
+    id: 'claude-outputs',
+    icon: '🤖',
+    category: 'AI Law • Featured',
+    categoryColor: 'from-gradient-start to-gradient-end',
+    categoryGradient: 'from-purple-600 via-blue-600 to-cyan-500',
+    title: 'Who Owns Claude\'s Outputs and How Can They Be Used?',
+    description: 'Deep-dive legal analysis of AI ownership rights, copyright implications, and strategic guidance for businesses leveraging Claude. Includes our interactive Risk Analyzer tool.',
+    url: 'https://terms.law/2024/08/24/who-owns-claudes-outputs-and-how-can-they-be-used/',
+    gradient: 'from-purple-600 via-blue-500 to-cyan-500',
+    bgGradient: 'from-purple-50 via-blue-50 to-cyan-50',
+    isPopular: true,
+    hasAnalyzer: true,
+    badge: 'Most Popular',
+    badgeColor: 'from-purple-500 to-pink-500'
+  },
+  {
+    id: 'angel-investor',
+    icon: '👼',
+    category: 'Document Generator',
+    categoryColor: 'from-rose-500 to-pink-600',
+    title: 'Angel Investor Agreement Generator & Template',
+    description: 'Create tailored agreements for early-stage investments with essential details including company information, investment structure, and comprehensive investor rights.',
+    url: 'https://terms.law/2023/08/11/drafting-angel-investor-agreements-a-comprehensive-guide-free-template-included/',
+    gradient: 'from-rose-600 to-pink-600',
+    bgGradient: 'from-rose-50 to-pink-50',
+    isPopular: true,
+    badge: 'Popular',
+    badgeColor: 'from-rose-400 to-pink-400'
+  },
   {
     id: 'trump-tariffs',
     icon: '🛡️',
@@ -13,17 +43,6 @@ const allCardsData = [
     url: 'https://terms.law/2025/04/03/price-adjustment-clause-generator-for-tariff-fluctuations/',
     gradient: 'from-blue-600 to-indigo-600',
     bgGradient: 'from-blue-50 to-indigo-50'
-  },
-  {
-    id: 'claude-outputs',
-    icon: '🤖',
-    category: 'AI Law',
-    categoryColor: 'from-purple-500 to-violet-600',
-    title: 'Who Owns Claude\'s Outputs and How Can They Be Used?',
-    description: 'This analysis examines legal aspects of ownership and usage rights for AI-generated content, highlighting user responsibilities, copyright considerations, and practical strategies for retaining ownership.',
-    url: 'https://terms.law/2024/08/24/who-owns-claudes-outputs-and-how-can-they-be-used/',
-    gradient: 'from-purple-600 to-violet-600',
-    bgGradient: 'from-purple-50 to-violet-50'
   },
   {
     id: 'stock-transfer',
@@ -52,7 +71,7 @@ const allCardsData = [
     icon: '🌍',
     category: 'Document Generator',
     categoryColor: 'from-orange-500 to-red-600',
-    title: 'IMPORT AGENCY AGREEMENT (Generator)',
+    title: 'Import Agency Agreement Generator',
     description: 'Create tailored agreements defining the relationship between a Principal and an Agent for importing merchandise, with clear expectations and legal protections for international trade.',
     url: 'https://terms.law/2022/11/02/import-agency-agreement-free-template/',
     gradient: 'from-orange-600 to-red-600',
@@ -148,17 +167,6 @@ const allCardsData = [
     bgGradient: 'from-blue-50 to-indigo-50'
   },
   {
-    id: 'angel-investor',
-    icon: '👼',
-    category: 'Document Generator',
-    categoryColor: 'from-rose-500 to-pink-600',
-    title: 'Angel Investor Agreement Generator & Template',
-    description: 'Create tailored agreements for early-stage investments with essential details including company information, investment structure, and comprehensive investor rights.',
-    url: 'https://terms.law/2023/08/11/drafting-angel-investor-agreements-a-comprehensive-guide-free-template-included/',
-    gradient: 'from-rose-600 to-pink-600',
-    bgGradient: 'from-rose-50 to-pink-50'
-  },
-  {
     id: 'fifty-shades-nda',
     icon: '🔒',
     category: 'Document Generator',
@@ -204,10 +212,11 @@ const allCardsData = [
   }
 ];
 
-// Individual card component
+// Enhanced card component with professional design
 const BlogCard = ({ data, index, onCardHover }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const cardRef = useRef(null);
 
   useEffect(() => {
@@ -217,90 +226,217 @@ const BlogCard = ({ data, index, onCardHover }) => {
 
   const handleMouseEnter = () => {
     setIsHovered(true);
+    setIsAnimating(true);
     onCardHover(data.id);
   };
 
   const handleMouseLeave = () => {
     setIsHovered(false);
+    setIsAnimating(false);
     onCardHover(null);
   };
 
   const handleCardClick = () => {
     window.open(data.url, '_blank');
   };
+  
+  // Create animated background patterns for popular cards
+  const renderAnimatedBackground = () => {
+    if (!data.isPopular || !isHovered) return null;
+    
+    return (
+      <div className="absolute inset-0 overflow-hidden rounded-xl">
+        <div className="absolute inset-0 opacity-5">
+          <div className="absolute w-96 h-96 -top-48 -left-48 bg-gradient-to-br from-purple-400 to-blue-400 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute w-64 h-64 -bottom-32 -right-32 bg-gradient-to-br from-cyan-400 to-purple-400 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1s'}}></div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Render analyzer visualization for Claude outputs post
+  const renderAnalyzerVisualization = () => {
+    if (data.id !== 'claude-outputs' || !isHovered) return null;
+    
+    return (
+      <div className="absolute top-4 right-4 w-16 h-16 opacity-20">
+        <svg viewBox="0 0 64 64" className="w-full h-full text-purple-500">
+          <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin" style={{animationDuration: '3s'}}></circle>
+          <circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6"></circle>
+          <circle cx="32" cy="32" r="12" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.4"></circle>
+          <circle cx="32" cy="32" r="4" fill="currentColor" className="animate-pulse"></circle>
+          <path d="M32 8 L36 16 L32 24 L28 16 Z" fill="currentColor" opacity="0.8" className="animate-pulse" style={{animationDelay: '0.5s'}}></path>
+          <path d="M56 32 L48 36 L40 32 L48 28 Z" fill="currentColor" opacity="0.6" className="animate-pulse" style={{animationDelay: '1s'}}></path>
+          <path d="M32 56 L28 48 L32 40 L36 48 Z" fill="currentColor" opacity="0.4" className="animate-pulse" style={{animationDelay: '1.5s'}}></path>
+          <path d="M8 32 L16 28 L24 32 L16 36 Z" fill="currentColor" opacity="0.3" className="animate-pulse" style={{animationDelay: '2s'}}></path>
+        </svg>
+      </div>
+    );
+  };
 
   return (
     <div
       ref={cardRef}
       className={`
-        group relative bg-white rounded-xl shadow-lg border border-gray-100
-        transition-all duration-500 ease-out cursor-pointer
-        hover:shadow-2xl hover:-translate-y-2 hover:scale-[1.02]
-        ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}
+        group relative bg-white rounded-xl border cursor-pointer overflow-hidden
+        transition-all duration-700 ease-out transform-gpu
+        ${data.isPopular ? 'shadow-2xl border-purple-200' : 'shadow-lg border-gray-100'}
+        ${isHovered ? 'shadow-3xl -translate-y-3 scale-[1.03]' : 'shadow-lg translate-y-0 scale-100'}
+        ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'}
+        ${data.isPopular ? 'ring-2 ring-purple-100 ring-opacity-50' : ''}
       `}
       style={{
-        background: isHovered 
-          ? `linear-gradient(135deg, ${data.bgGradient.replace('from-', '').replace('to-', ', ')})` 
+        background: isHovered && data.isPopular
+          ? 'linear-gradient(135deg, rgba(147, 51, 234, 0.03), rgba(59, 130, 246, 0.03), rgba(6, 182, 212, 0.03))'
+          : isHovered 
+          ? `linear-gradient(135deg, ${data.bgGradient.replace('from-', '').replace('to-', ', ').replace('-50', '-30')})` 
           : 'white',
-        transitionDelay: `${index * 100}ms`
+        transitionDelay: `${index * 80}ms`,
+        backdropFilter: isHovered ? 'blur(10px)' : 'none'
       }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       onClick={handleCardClick}
     >
+      {/* Animated background for popular cards */}
+      {renderAnimatedBackground()}
+      
+      {/* Premium gradient border for popular cards */}
+      {data.isPopular && (
+        <div className={`
+          absolute inset-0 rounded-xl opacity-0 transition-opacity duration-700
+          bg-gradient-to-r ${data.categoryGradient || data.gradient}
+          ${isHovered ? 'opacity-20' : 'opacity-10'}
+        `} />
+      )}
+      
+      {/* Analyzer visualization for Claude outputs */}
+      {renderAnalyzerVisualization()}
+      
       {/* Gradient overlay */}
       <div 
         className={`
-          absolute inset-0 rounded-xl opacity-0 transition-opacity duration-500
-          bg-gradient-to-br ${data.bgGradient}
-          ${isHovered ? 'opacity-10' : 'opacity-0'}
+          absolute inset-0 rounded-xl transition-opacity duration-500
+          ${data.isPopular 
+            ? `bg-gradient-to-br ${data.categoryGradient || data.bgGradient} opacity-5`
+            : `bg-gradient-to-br ${data.bgGradient} opacity-0`}
+          ${isHovered ? (data.isPopular ? 'opacity-10' : 'opacity-8') : (data.isPopular ? 'opacity-5' : 'opacity-0')}
         `}
       />
 
-      <div className="relative p-5 z-10">
-        {/* Category badge and icon */}
-        <div className="flex items-center justify-between mb-3">
-          <span className={`
-            inline-block font-size-12px color-#64748b background-color-#f8fafc 
-            padding-3px-10px border-radius-20px text-xs font-medium
-            bg-gradient-to-r ${data.categoryColor} text-white px-3 py-1 rounded-full
-          `}>
-            {data.category}
-          </span>
-          <div 
-            className={`
-              w-8 h-8 rounded-lg flex items-center justify-center text-lg
-              bg-gradient-to-br ${data.gradient} text-white
-              transform transition-transform duration-300
-              ${isHovered ? 'scale-110 rotate-6' : 'scale-100 rotate-0'}
-            `}
-          >
-            {data.icon}
+      <div className="relative p-6 z-10">
+        {/* Enhanced header with badges */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex flex-col gap-2">
+            <span className={`
+              inline-block text-xs font-semibold px-3 py-1.5 rounded-full
+              ${data.isPopular 
+                ? `bg-gradient-to-r ${data.categoryGradient || data.categoryColor} text-white shadow-lg`
+                : `bg-gradient-to-r ${data.categoryColor} text-white`
+              }
+              transform transition-all duration-300
+              ${isHovered ? 'scale-105 shadow-lg' : 'scale-100'}
+            `}>
+              {data.category}
+            </span>
+            {data.badge && (
+              <span className={`
+                inline-block text-xs font-bold px-2 py-1 rounded-md
+                bg-gradient-to-r ${data.badgeColor} text-white
+                animate-pulse shadow-sm
+                ${isHovered ? 'animate-none' : ''}
+              `}>
+                {data.badge}
+              </span>
+            )}
+          </div>
+          
+          <div className="flex flex-col items-end gap-2">
+            <div 
+              className={`
+                w-10 h-10 rounded-xl flex items-center justify-center text-xl
+                ${data.isPopular 
+                  ? `bg-gradient-to-br ${data.categoryGradient || data.gradient} shadow-lg`
+                  : `bg-gradient-to-br ${data.gradient}`
+                } text-white backdrop-blur-sm
+                transform transition-all duration-500
+                ${isHovered ? 'scale-125 rotate-12 shadow-2xl' : 'scale-100 rotate-0'}
+              `}
+            >
+              {data.icon}
+            </div>
+            
+            {data.hasAnalyzer && (
+              <div className={`
+                text-xs font-medium px-2 py-1 rounded-md bg-purple-100 text-purple-700
+                transition-all duration-300 border border-purple-200
+                ${isHovered ? 'bg-purple-200 scale-105' : ''}
+              `}>
+                ✨ Interactive Tool
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="font-size-18px font-weight-600 margin-bottom-12px color-#1e293b line-height-1.4 text-lg font-semibold text-gray-900 leading-tight mb-3">
+        {/* Enhanced title with professional typography */}
+        <h3 className={`
+          ${data.isPopular ? 'text-xl' : 'text-lg'} font-bold text-gray-900 leading-tight mb-4
+          transition-all duration-300
+          ${isHovered ? 'text-gray-800' : 'text-gray-900'}
+          ${data.isPopular ? 'bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent' : ''}
+        `}>
           {data.title}
         </h3>
 
-        {/* Description */}
-        <p className="color-#4b5563 font-size-14px line-height-1.6 text-sm text-gray-600 leading-relaxed">
+        {/* Enhanced description with better readability */}
+        <p className={`
+          text-sm leading-relaxed transition-all duration-300
+          ${data.isPopular ? 'text-gray-700' : 'text-gray-600'}
+          ${isHovered ? 'text-gray-800' : ''}
+        `}>
           {data.description}
         </p>
+        
+        {/* Call-to-action hint for popular posts */}
+        {data.isPopular && (
+          <div className={`
+            mt-4 text-xs font-medium transition-all duration-300
+            ${isHovered ? 'text-purple-600 translate-x-1' : 'text-gray-400'}
+            flex items-center gap-1
+          `}>
+            <span>→</span>
+            <span>Click to explore</span>
+          </div>
+        )}
       </div>
 
-      {/* Hover glow effect */}
+      {/* Enhanced glow effects */}
       <div className={`
-        absolute -inset-0.5 rounded-xl blur opacity-0 transition-opacity duration-500
-        bg-gradient-to-r ${data.gradient}
-        ${isHovered ? 'opacity-15' : 'opacity-0'}
+        absolute -inset-1 rounded-xl blur-xl transition-all duration-700
+        ${data.isPopular 
+          ? `bg-gradient-to-r ${data.categoryGradient || data.gradient} opacity-0`
+          : `bg-gradient-to-r ${data.gradient} opacity-0`}
+        ${isHovered ? (data.isPopular ? 'opacity-30 blur-2xl' : 'opacity-20 blur-lg') : 'opacity-0'}
       `} />
+      
+      {/* Premium shine effect for popular cards */}
+      {data.isPopular && (
+        <div className={`
+          absolute inset-0 rounded-xl transition-all duration-1000
+          bg-gradient-to-r from-transparent via-white to-transparent
+          transform -skew-x-12 -translate-x-full
+          ${isAnimating ? 'translate-x-full opacity-20' : '-translate-x-full opacity-0'}
+        `} style={{
+          background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+          width: '200%',
+          animation: isAnimating ? 'shine 2s ease-in-out' : 'none'
+        }} />
+      )}
     </div>
   );
 };
 
-// Main component
+// Enhanced main component with professional layout
 const BlogCards = () => {
   const [hoveredCard, setHoveredCard] = useState(null);
 
@@ -309,9 +445,19 @@ const BlogCards = () => {
   };
 
   return (
-    <div className="max-width-1200px margin-0-auto padding-40px-20px w-full max-w-7xl mx-auto p-6">
-      {/* Cards grid */}
-      <div className="display-grid grid-template-columns-repeat-3-1fr gap-24px margin-bottom-40px grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <div className="w-full max-w-7xl mx-auto p-6">
+      {/* Enhanced header section */}
+      <div className="text-center mb-12">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
+          Legal Tools & Analysis
+        </h1>
+        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          Professional-grade document generators, in-depth legal analysis, and cutting-edge AI law insights for modern businesses.
+        </p>
+      </div>
+
+      {/* Cards grid with enhanced spacing */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
         {allCardsData.map((data, index) => (
           <BlogCard
             key={data.id}
@@ -322,18 +468,41 @@ const BlogCards = () => {
         ))}
       </div>
 
-      {/* View All Button */}
-      <div className="margin-top-30px text-align-center mt-8 text-center">
+      {/* Enhanced View All Button */}
+      <div className="text-center">
         <a 
           href="https://terms.law/posts/"
-          className="display-inline-block border-1px-solid-#1e293b color-#1e293b padding-12px-24px font-size-14px font-weight-500 text-decoration-none border-radius-4px transition-all-0.2s-ease background-color-#f8fafc box-shadow-0-2px-4px-rgba-0-0-0-0.05 inline-block border border-gray-800 text-gray-800 px-6 py-3 text-sm font-medium rounded-lg hover:bg-gray-50 hover:shadow-md transition-all duration-200"
+          className="
+            inline-flex items-center gap-3 px-8 py-4 text-base font-semibold
+            text-white bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600
+            rounded-xl shadow-lg hover:shadow-2xl
+            transform transition-all duration-300 hover:scale-105
+            border border-purple-200 backdrop-blur-sm
+          "
         >
-          View All Articles
+          <span>Explore All Articles</span>
+          <svg className="w-5 h-5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
         </a>
       </div>
     </div>
   );
 };
 
-// Render the component
+// Add custom animations
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shine {
+    0% { transform: translateX(-100%) skewX(-12deg); }
+    100% { transform: translateX(200%) skewX(-12deg); }
+  }
+  
+  .shadow-3xl {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 50px rgba(147, 51, 234, 0.1);
+  }
+`;
+document.head.appendChild(style);
+
+// Render the enhanced component
 ReactDOM.render(<BlogCards />, document.getElementById('root'));

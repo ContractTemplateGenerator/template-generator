@@ -494,7 +494,7 @@ const PaywallSystem = (() => {
                 window.manualUnlockCallback = null;
             }
         } else {
-            alert('Please enter a valid PayPal transaction ID. Transaction IDs must be exactly 17 characters, all uppercase, and contain both letters and numbers (e.g., 1AB2C3D4E5F6G7H8I).');
+            alert('Please enter a valid PayPal transaction ID.');
             input.focus();
         }
     };
