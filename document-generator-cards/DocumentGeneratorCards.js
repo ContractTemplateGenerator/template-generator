@@ -14,10 +14,7 @@ const allCardsData = [
     url: 'https://terms.law/2024/08/24/who-owns-claudes-outputs-and-how-can-they-be-used/',
     gradient: 'from-purple-600 via-blue-500 to-cyan-500',
     bgGradient: 'from-purple-50 via-blue-50 to-cyan-50',
-    isPopular: true,
-    hasAnalyzer: true,
-    badge: 'Most Popular',
-    badgeColor: 'from-purple-500 to-pink-500'
+    hasAnalyzer: true
   },
   {
     id: 'angel-investor',
@@ -29,9 +26,6 @@ const allCardsData = [
     url: 'https://terms.law/2023/08/11/drafting-angel-investor-agreements-a-comprehensive-guide-free-template-included/',
     gradient: 'from-rose-600 to-pink-600',
     bgGradient: 'from-rose-50 to-pink-50',
-    isPopular: true,
-    badge: 'Popular',
-    badgeColor: 'from-rose-400 to-pink-400'
   },
   {
     id: 'stripe-funds',
@@ -42,10 +36,7 @@ const allCardsData = [
     description: 'Payment processors like Stripe can hold merchant funds for various reasons, from suspected fraud to policy violations. This guide examines the legal frameworks that govern these holds, your rights as a merchant, and practical steps to expedite the release of your funds.',
     url: 'https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/',
     gradient: 'from-green-600 to-emerald-600',
-    bgGradient: 'from-green-50 to-emerald-50',
-    isPopular: true,
-    badge: 'Popular',
-    badgeColor: 'from-green-400 to-emerald-400'
+    bgGradient: 'from-green-50 to-emerald-50'
   },
   {
     id: 'tax-calculator',
@@ -56,10 +47,7 @@ const allCardsData = [
     description: 'Comprehensive comparison tool with FSA benefits, retirement planning, work schedule analysis, and detailed tax insights to help you make informed employment decisions.',
     url: 'https://terms.law/2024/12/15/tax-burden-calculator-for-1099-vs-w-2-employees/',
     gradient: 'from-green-600 to-emerald-600',
-    bgGradient: 'from-green-50 to-emerald-50',
-    isPopular: true,
-    badge: 'Popular',
-    badgeColor: 'from-green-400 to-emerald-400'
+    bgGradient: 'from-green-50 to-emerald-50'
   },
   {
     id: 'trump-tariffs',
@@ -70,10 +58,7 @@ const allCardsData = [
     description: 'As global trade faces disruption from renewed tariffs, businesses must adopt specialized contract provisions to mitigate risks. These include indemnity clauses, price adjustment mechanisms, and force majeure provisions.',
     url: 'https://terms.law/2025/04/03/price-adjustment-clause-generator-for-tariff-fluctuations/',
     gradient: 'from-blue-600 to-indigo-600',
-    bgGradient: 'from-blue-50 to-indigo-50',
-    isPopular: true,
-    badge: 'Popular',
-    badgeColor: 'from-blue-400 to-indigo-400'
+    bgGradient: 'from-blue-50 to-indigo-50'
   },
   {
     id: 'stock-transfer',
@@ -344,6 +329,226 @@ const BlogCard = ({ data, index, onCardHover }) => {
     );
   };
 
+  // Render Trump tariff animation
+  const renderTrumpTariffAnimation = () => {
+    if (data.id !== 'trump-tariffs') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-blue-600">
+            <defs>
+              <linearGradient id="tariffGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="50%" stopColor="#1d4ed8" />
+                <stop offset="100%" stopColor="#1e40af" />
+              </linearGradient>
+            </defs>
+            
+            {/* Shield background */}
+            <path d="M50 10 L20 25 L20 60 Q20 80 50 90 Q80 80 80 60 L80 25 Z" fill="url(#tariffGradient)" opacity="0.3"/>
+            
+            {/* Tariff protection bars */}
+            <rect x="35" y="35" width="30" height="4" rx="2" fill="currentColor" className={isHovered ? "animate-pulse" : ""} opacity="0.8"/>
+            <rect x="30" y="45" width="40" height="4" rx="2" fill="currentColor" className={isHovered ? "animate-pulse" : ""} opacity="0.6" style={{animationDelay: '0.3s'}}/>
+            <rect x="25" y="55" width="50" height="4" rx="2" fill="currentColor" className={isHovered ? "animate-pulse" : ""} opacity="0.4" style={{animationDelay: '0.6s'}}/>
+            
+            {/* Contract protection indicator */}
+            <circle cx="50" cy="25" r="8" fill="none" stroke="currentColor" strokeWidth="2" className={isHovered ? "animate-ping" : ""} opacity="0.7"/>
+            <circle cx="50" cy="25" r="4" fill="currentColor" opacity="0.9"/>
+          </svg>
+          
+          {/* Protection badge */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-sm border border-blue-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-blue-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-blue-700">
+                <div className="text-[6px] font-bold">PROT</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render token issuance animation
+  const renderTokenIssuanceAnimation = () => {
+    if (data.id !== 'token-issuance') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-purple-600">
+            <defs>
+              <linearGradient id="tokenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#8b5cf6" />
+                <stop offset="50%" stopColor="#7c3aed" />
+                <stop offset="100%" stopColor="#6d28d9" />
+              </linearGradient>
+            </defs>
+            
+            {/* Token circles */}
+            <circle cx="30" cy="40" r="12" fill="url(#tokenGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0s'}}/>
+            <circle cx="70" cy="40" r="12" fill="url(#tokenGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.5s'}}/>
+            <circle cx="50" cy="65" r="12" fill="url(#tokenGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '1s'}}/>
+            
+            {/* Connecting lines */}
+            <line x1="30" y1="40" x2="70" y2="40" stroke="currentColor" strokeWidth="2" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+            <line x1="30" y1="40" x2="50" y2="65" stroke="currentColor" strokeWidth="2" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+            <line x1="70" y1="40" x2="50" y2="65" stroke="currentColor" strokeWidth="2" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+            
+            {/* Center token */}
+            <circle cx="50" cy="50" r="8" fill="currentColor" className={isHovered ? "animate-ping" : ""} opacity="0.8"/>
+          </svg>
+          
+          {/* Blockchain badge */}
+          <div className={`absolute bottom-2 right-2 w-8 h-6 bg-gradient-to-br from-purple-100 to-purple-200 rounded-sm border border-purple-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-purple-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-purple-700">
+                <div className="text-[6px] font-bold">TOK</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render import agency animation
+  const renderImportAgencyAnimation = () => {
+    if (data.id !== 'import-agency') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-orange-600">
+            <defs>
+              <linearGradient id="importGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ea580c" />
+                <stop offset="50%" stopColor="#dc2626" />
+                <stop offset="100%" stopColor="#b91c1c" />
+              </linearGradient>
+            </defs>
+            
+            {/* Globe outline */}
+            <circle cx="50" cy="50" r="35" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3"/>
+            
+            {/* Import arrows */}
+            <path d="M20 50 L45 50" stroke="url(#importGradient)" strokeWidth="3" fill="none" className={isHovered ? "animate-pulse" : ""} markerEnd="url(#arrowhead)"/>
+            <path d="M55 50 L80 50" stroke="url(#importGradient)" strokeWidth="3" fill="none" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.5s'}} markerEnd="url(#arrowhead)"/>
+            
+            {/* Shipping containers */}
+            <rect x="15" y="45" width="8" height="10" rx="1" fill="currentColor" opacity="0.6" className={isHovered ? "animate-pulse" : ""}/>
+            <rect x="77" y="45" width="8" height="10" rx="1" fill="currentColor" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.3s'}}/>
+            
+            {/* Arrow marker definition */}
+            <defs>
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="currentColor"/>
+              </marker>
+            </defs>
+          </svg>
+          
+          {/* Trade badge */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-orange-100 to-orange-200 rounded-sm border border-orange-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-orange-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-orange-700">
+                <div className="text-[6px] font-bold">IMP</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render interior design animation
+  const renderInteriorDesignAnimation = () => {
+    if (data.id !== 'interior-design') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-indigo-600">
+            <defs>
+              <linearGradient id="designGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#4f46e5" />
+                <stop offset="50%" stopColor="#3730a3" />
+                <stop offset="100%" stopColor="#312e81" />
+              </linearGradient>
+            </defs>
+            
+            {/* Room outline */}
+            <rect x="20" y="30" width="60" height="50" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.4"/>
+            
+            {/* Furniture elements */}
+            <rect x="25" y="60" width="15" height="8" rx="2" fill="url(#designGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0s'}}/>
+            <rect x="60" y="35" width="8" height="15" rx="2" fill="url(#designGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.3s'}}/>
+            <circle cx="50" cy="55" r="8" fill="url(#designGradient)" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.6s'}}/>
+            
+            {/* Design lines */}
+            <line x1="30" y1="25" x2="70" y2="25" stroke="currentColor" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" className={isHovered ? "animate-pulse" : ""}/>
+            <line x1="85" y1="35" x2="85" y2="75" stroke="currentColor" strokeWidth="1" strokeDasharray="2,2" opacity="0.5" className={isHovered ? "animate-pulse" : ""}/>
+          </svg>
+          
+          {/* Design badge */}
+          <div className={`absolute bottom-2 right-2 w-8 h-6 bg-gradient-to-br from-indigo-100 to-indigo-200 rounded-sm border border-indigo-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-indigo-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-indigo-700">
+                <div className="text-[6px] font-bold">DES</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render SaaS partnership animation
+  const renderSaaSPartnershipAnimation = () => {
+    if (data.id !== 'saas-partnership') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-cyan-600">
+            <defs>
+              <linearGradient id="saasGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="50%" stopColor="#0891b2" />
+                <stop offset="100%" stopColor="#0e7490" />
+              </linearGradient>
+            </defs>
+            
+            {/* Cloud platforms */}
+            <ellipse cx="30" cy="40" rx="15" ry="8" fill="url(#saasGradient)" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0s'}}/>
+            <ellipse cx="70" cy="40" rx="15" ry="8" fill="url(#saasGradient)" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.5s'}}/>
+            
+            {/* Partnership connection */}
+            <path d="M45 40 Q50 30 55 40" stroke="currentColor" strokeWidth="3" fill="none" className={isHovered ? "animate-pulse" : ""} opacity="0.7"/>
+            
+            {/* API endpoints */}
+            <circle cx="30" cy="40" r="3" fill="currentColor" className={isHovered ? "animate-ping" : ""} opacity="0.8"/>
+            <circle cx="70" cy="40" r="3" fill="currentColor" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '0.3s'}} opacity="0.8"/>
+            
+            {/* Data flow indicators */}
+            <rect x="25" y="55" width="50" height="2" rx="1" fill="currentColor" opacity="0.5" className={isHovered ? "animate-pulse" : ""}/>
+            <rect x="30" y="60" width="40" height="2" rx="1" fill="currentColor" opacity="0.3" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.2s'}}/>
+          </svg>
+          
+          {/* SaaS badge */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-sm border border-cyan-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-cyan-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-cyan-700">
+                <div className="text-[6px] font-bold">SaaS</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Render MSA generator animation
   const renderMSAAnimation = () => {
     if (data.id !== 'master-services') return null;
@@ -512,6 +717,21 @@ const BlogCard = ({ data, index, onCardHover }) => {
       {/* Tax calculator sample for W2 vs 1099 card */}
       {renderTaxCalculatorSample()}
       
+      {/* Trump tariff animation */}
+      {renderTrumpTariffAnimation()}
+      
+      {/* Token issuance animation */}
+      {renderTokenIssuanceAnimation()}
+      
+      {/* Import agency animation */}
+      {renderImportAgencyAnimation()}
+      
+      {/* Interior design animation */}
+      {renderInteriorDesignAnimation()}
+      
+      {/* SaaS partnership animation */}
+      {renderSaaSPartnershipAnimation()}
+      
       {/* Gradient overlay */}
       <div 
         className={`
@@ -551,19 +771,22 @@ const BlogCard = ({ data, index, onCardHover }) => {
           </div>
           
           <div className="flex flex-col items-end gap-2">
-            <div 
-              className={`
-                w-10 h-10 rounded-xl flex items-center justify-center text-xl
-                ${data.isPopular 
-                  ? `bg-gradient-to-br ${data.categoryGradient || data.gradient} shadow-lg`
-                  : `bg-gradient-to-br ${data.gradient}`
-                } text-white backdrop-blur-sm
-                transform transition-all duration-500
-                ${isHovered ? 'scale-125 rotate-12 shadow-2xl' : 'scale-100 rotate-0'}
-              `}
-            >
-              {data.icon}
-            </div>
+            {/* Hide icon for cards with animations */}
+            {!['claude-outputs', 'tax-calculator', 'stock-transfer', 'master-services', 'trump-tariffs', 'token-issuance', 'import-agency', 'interior-design', 'saas-partnership'].includes(data.id) && (
+              <div 
+                className={`
+                  w-10 h-10 rounded-xl flex items-center justify-center text-xl
+                  ${data.isPopular 
+                    ? `bg-gradient-to-br ${data.categoryGradient || data.gradient} shadow-lg`
+                    : `bg-gradient-to-br ${data.gradient}`
+                  } text-white backdrop-blur-sm
+                  transform transition-all duration-500
+                  ${isHovered ? 'scale-125 rotate-12 shadow-2xl' : 'scale-100 rotate-0'}
+                `}
+              >
+                {data.icon}
+              </div>
+            )}
             
             {data.hasAnalyzer && (
               <div className={`
