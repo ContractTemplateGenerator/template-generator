@@ -291,6 +291,110 @@ const BlogCard = ({ data, index, onCardHover }) => {
     );
   };
   
+  // Render stock transfer animation
+  const renderStockTransferAnimation = () => {
+    if (data.id !== 'stock-transfer') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          {/* Stock chart background */}
+          <svg viewBox="0 0 100 100" className="w-full h-full text-emerald-600">
+            <defs>
+              <linearGradient id="stockGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#10b981" />
+                <stop offset="50%" stopColor="#059669" />
+                <stop offset="100%" stopColor="#047857" />
+              </linearGradient>
+            </defs>
+            
+            {/* Chart grid */}
+            <g opacity="0.2">
+              <line x1="20" y1="0" x2="20" y2="100" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="40" y1="0" x2="40" y2="100" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="60" y1="0" x2="60" y2="100" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="80" y1="0" x2="80" y2="100" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="0" y1="25" x2="100" y2="25" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="0" y1="50" x2="100" y2="50" stroke="currentColor" strokeWidth="0.5"/>
+              <line x1="0" y1="75" x2="100" y2="75" stroke="currentColor" strokeWidth="0.5"/>
+            </g>
+            
+            {/* Stock transfer arrow */}
+            <path d="M20 60 L50 40 L80 50" stroke="url(#stockGradient)" strokeWidth="3" fill="none" className={isHovered ? "animate-pulse" : ""} strokeDasharray={isHovered ? "none" : "5,5"}/>
+            
+            {/* Transfer points */}
+            <circle cx="20" cy="60" r="3" fill="url(#stockGradient)" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '0.5s'}}/>
+            <circle cx="50" cy="40" r="3" fill="url(#stockGradient)" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '1s'}}/>
+            <circle cx="80" cy="50" r="3" fill="url(#stockGradient)" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '1.5s'}}/>
+          </svg>
+          
+          {/* Certificate overlay */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-emerald-100 to-emerald-200 rounded-sm border border-emerald-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-emerald-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-emerald-700">
+                <div className="text-[6px] font-bold">CERT</div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Digital signature indicator */}
+          <div className={`absolute top-2 right-2 w-3 h-3 bg-green-500 rounded-full ${isHovered ? 'animate-ping' : ''}`} style={{animationDelay: '0.3s'}}></div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render MSA generator animation
+  const renderMSAAnimation = () => {
+    if (data.id !== 'master-services') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          {/* Master agreement framework */}
+          <svg viewBox="0 0 100 100" className="w-full h-full text-slate-600">
+            <defs>
+              <linearGradient id="msaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#64748b" />
+                <stop offset="50%" stopColor="#475569" />
+                <stop offset="100%" stopColor="#334155" />
+              </linearGradient>
+            </defs>
+            
+            {/* Main document structure */}
+            <rect x="25" y="20" width="50" height="60" rx="3" fill="none" stroke="url(#msaGradient)" strokeWidth="2" className={isHovered ? "animate-pulse" : ""}/>
+            
+            {/* Document sections */}
+            <line x1="30" y1="30" x2="70" y2="30" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <line x1="30" y1="40" x2="65" y2="40" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <line x1="30" y1="50" x2="60" y2="50" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <line x1="30" y1="60" x2="70" y2="60" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            <line x1="30" y1="70" x2="55" y2="70" stroke="currentColor" strokeWidth="1" opacity="0.5"/>
+            
+            {/* SOW modules */}
+            <rect x="15" y="35" width="8" height="10" rx="1" fill="url(#msaGradient)" opacity="0.7" className={isHovered ? "animate-bounce" : ""} style={{animationDelay: '0.5s'}}/>
+            <rect x="15" y="50" width="8" height="10" rx="1" fill="url(#msaGradient)" opacity="0.7" className={isHovered ? "animate-bounce" : ""} style={{animationDelay: '1s'}}/>
+            <rect x="77" y="40" width="8" height="10" rx="1" fill="url(#msaGradient)" opacity="0.7" className={isHovered ? "animate-bounce" : ""} style={{animationDelay: '1.5s'}}/>
+            
+            {/* Connection lines */}
+            <line x1="23" y1="40" x2="25" y2="40" stroke="currentColor" strokeWidth="1" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+            <line x1="23" y1="55" x2="25" y2="55" stroke="currentColor" strokeWidth="1" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+            <line x1="75" y1="45" x2="77" y2="45" stroke="currentColor" strokeWidth="1" opacity="0.4" className={isHovered ? "animate-pulse" : ""}/>
+          </svg>
+          
+          {/* MSA badge */}
+          <div className={`absolute bottom-1 left-1 text-xs font-bold text-slate-500 ${isHovered ? 'animate-pulse' : ''}`}>
+            MSA
+          </div>
+          
+          {/* SOW indicators */}
+          <div className={`absolute top-1 left-1 w-2 h-2 bg-blue-500 rounded-full ${isHovered ? 'animate-ping' : ''}`} style={{animationDelay: '0.2s'}}></div>
+          <div className={`absolute top-1 right-1 w-2 h-2 bg-green-500 rounded-full ${isHovered ? 'animate-ping' : ''}`} style={{animationDelay: '0.8s'}}></div>
+        </div>
+      </div>
+    );
+  };
+
   // Render analyzer visualization for Claude outputs post
   const renderAnalyzerVisualization = () => {
     if (data.id !== 'claude-outputs') return null;
@@ -398,6 +502,12 @@ const BlogCard = ({ data, index, onCardHover }) => {
       
       {/* Analyzer visualization for Claude outputs */}
       {renderAnalyzerVisualization()}
+      
+      {/* Stock transfer animation */}
+      {renderStockTransferAnimation()}
+      
+      {/* MSA generator animation */}
+      {renderMSAAnimation()}
       
       {/* Tax calculator sample for W2 vs 1099 card */}
       {renderTaxCalculatorSample()}
