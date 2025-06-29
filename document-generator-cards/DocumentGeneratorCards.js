@@ -788,15 +788,6 @@ const BlogCard = ({ data, index, onCardHover }) => {
               </div>
             )}
             
-            {data.hasAnalyzer && (
-              <div className={`
-                text-xs font-medium px-2 py-1 rounded-md bg-purple-100 text-purple-700
-                transition-all duration-300 border border-purple-200
-                ${isHovered ? 'bg-purple-200 scale-105' : ''}
-              `}>
-                ✨ Interactive Tool
-              </div>
-            )}
           </div>
         </div>
 
