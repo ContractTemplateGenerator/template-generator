@@ -34,6 +34,34 @@ const allCardsData = [
     badgeColor: 'from-rose-400 to-pink-400'
   },
   {
+    id: 'stripe-funds',
+    icon: '💳',
+    category: 'Financial Law',
+    categoryColor: 'from-green-500 to-emerald-600',
+    title: 'When Stripe Holds Your Money: The Definitive Legal Guide to Getting Your Funds Released',
+    description: 'Payment processors like Stripe can hold merchant funds for various reasons, from suspected fraud to policy violations. This guide examines the legal frameworks that govern these holds, your rights as a merchant, and practical steps to expedite the release of your funds.',
+    url: 'https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/',
+    gradient: 'from-green-600 to-emerald-600',
+    bgGradient: 'from-green-50 to-emerald-50',
+    isPopular: true,
+    badge: 'Popular',
+    badgeColor: 'from-green-400 to-emerald-400'
+  },
+  {
+    id: 'tax-calculator',
+    icon: '💰',
+    category: 'Tax Calculator',
+    categoryColor: 'from-green-500 to-emerald-600',
+    title: '1099 vs W-2 Tax Calculator',
+    description: 'Comprehensive comparison tool with FSA benefits, retirement planning, work schedule analysis, and detailed tax insights to help you make informed employment decisions.',
+    url: 'https://terms.law/2024/12/15/tax-burden-calculator-for-1099-vs-w-2-employees/',
+    gradient: 'from-green-600 to-emerald-600',
+    bgGradient: 'from-green-50 to-emerald-50',
+    isPopular: true,
+    badge: 'Popular',
+    badgeColor: 'from-green-400 to-emerald-400'
+  },
+  {
     id: 'trump-tariffs',
     icon: '🛡️',
     category: 'Document Generator',
@@ -42,7 +70,10 @@ const allCardsData = [
     description: 'As global trade faces disruption from renewed tariffs, businesses must adopt specialized contract provisions to mitigate risks. These include indemnity clauses, price adjustment mechanisms, and force majeure provisions.',
     url: 'https://terms.law/2025/04/03/price-adjustment-clause-generator-for-tariff-fluctuations/',
     gradient: 'from-blue-600 to-indigo-600',
-    bgGradient: 'from-blue-50 to-indigo-50'
+    bgGradient: 'from-blue-50 to-indigo-50',
+    isPopular: true,
+    badge: 'Popular',
+    badgeColor: 'from-blue-400 to-indigo-400'
   },
   {
     id: 'stock-transfer',
@@ -78,17 +109,6 @@ const allCardsData = [
     bgGradient: 'from-orange-50 to-red-50'
   },
   // Popular Blog Posts and Generators
-  {
-    id: 'tax-calculator',
-    icon: '💰',
-    category: 'Tax Calculator',
-    categoryColor: 'from-green-500 to-emerald-600',
-    title: '1099 vs W-2 Tax Calculator',
-    description: 'Comprehensive comparison tool with FSA benefits, retirement planning, work schedule analysis, and detailed tax insights to help you make informed employment decisions.',
-    url: 'https://terms.law/2024/12/15/tax-burden-calculator-for-1099-vs-w-2-employees/',
-    gradient: 'from-green-600 to-emerald-600',
-    bgGradient: 'from-green-50 to-emerald-50'
-  },
   {
     id: 'sweepstakes-generator',
     icon: '🎯',
@@ -143,17 +163,6 @@ const allCardsData = [
     url: 'https://terms.law/2024/04/19/drafting-effective-master-services-agreements-and-statements-of-work-free-template/',
     gradient: 'from-slate-600 to-gray-600',
     bgGradient: 'from-slate-50 to-gray-50'
-  },
-  {
-    id: 'stripe-funds',
-    icon: '💳',
-    category: 'Financial Law',
-    categoryColor: 'from-green-500 to-emerald-600',
-    title: 'When Stripe Holds Your Money: The Definitive Legal Guide to Getting Your Funds Released',
-    description: 'Payment processors like Stripe can hold merchant funds for various reasons, from suspected fraud to policy violations. This guide examines the legal frameworks that govern these holds, your rights as a merchant, and practical steps to expedite the release of your funds.',
-    url: 'https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/',
-    gradient: 'from-green-600 to-emerald-600',
-    bgGradient: 'from-green-50 to-emerald-50'
   },
   {
     id: 'dppa-guide',
@@ -254,22 +263,99 @@ const BlogCard = ({ data, index, onCardHover }) => {
     );
   };
   
-  // Render analyzer visualization for Claude outputs post
-  const renderAnalyzerVisualization = () => {
-    if (data.id !== 'claude-outputs' || !isHovered) return null;
+  // Render tax calculator sample for W2 vs 1099 card
+  const renderTaxCalculatorSample = () => {
+    if (data.id !== 'tax-calculator') return null;
     
     return (
-      <div className="absolute top-4 right-4 w-16 h-16 opacity-20">
-        <svg viewBox="0 0 64 64" className="w-full h-full text-purple-500">
-          <circle cx="32" cy="32" r="28" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin" style={{animationDuration: '3s'}}></circle>
-          <circle cx="32" cy="32" r="20" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.6"></circle>
-          <circle cx="32" cy="32" r="12" fill="none" stroke="currentColor" strokeWidth="1" opacity="0.4"></circle>
-          <circle cx="32" cy="32" r="4" fill="currentColor" className="animate-pulse"></circle>
-          <path d="M32 8 L36 16 L32 24 L28 16 Z" fill="currentColor" opacity="0.8" className="animate-pulse" style={{animationDelay: '0.5s'}}></path>
-          <path d="M56 32 L48 36 L40 32 L48 28 Z" fill="currentColor" opacity="0.6" className="animate-pulse" style={{animationDelay: '1s'}}></path>
-          <path d="M32 56 L28 48 L32 40 L36 48 Z" fill="currentColor" opacity="0.4" className="animate-pulse" style={{animationDelay: '1.5s'}}></path>
-          <path d="M8 32 L16 28 L24 32 L16 36 Z" fill="currentColor" opacity="0.3" className="animate-pulse" style={{animationDelay: '2s'}}></path>
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-32 h-20 opacity-50' : 'w-24 h-16 opacity-25'}`}>
+        <div className="w-full h-full bg-gradient-to-br from-green-900/30 via-emerald-900/30 to-teal-900/30 rounded-lg border border-green-300/20 backdrop-blur-sm p-2">
+          <div className="text-xs font-mono text-green-200 space-y-1">
+            <div className="flex justify-between">
+              <span>W-2:</span>
+              <span className="text-green-400">$85,340</span>
+            </div>
+            <div className="flex justify-between">
+              <span>1099:</span>
+              <span className="text-red-400">$78,920</span>
+            </div>
+            <div className="w-full bg-green-900/40 rounded-full h-1 mt-1">
+              <div className="bg-gradient-to-r from-green-400 to-emerald-400 h-1 rounded-full w-3/4"></div>
+            </div>
+            <div className="text-center text-xs text-green-300">
+              {isHovered ? 'Better W-2' : '↑ Better'}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Render analyzer visualization for Claude outputs post
+  const renderAnalyzerVisualization = () => {
+    if (data.id !== 'claude-outputs') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-40' : 'w-16 h-16 opacity-20'}`}>
+        <svg viewBox="0 0 100 100" className="w-full h-full text-purple-500">
+          {/* Outer rotating ring */}
+          <circle cx="50" cy="50" r="45" fill="none" stroke="currentColor" strokeWidth="2" className="animate-spin" style={{animationDuration: '4s'}} opacity="0.8"></circle>
+          
+          {/* Risk gauge arc */}
+          <path 
+            d="M 20 50 A 30 30 0 0 1 80 50" 
+            fill="none" 
+            stroke="url(#riskGradient)" 
+            strokeWidth="3"
+            className={isHovered ? "animate-pulse" : ""}
+          />
+          
+          {/* Center pulse */}
+          <circle cx="50" cy="50" r="8" fill="currentColor" className="animate-pulse" opacity="0.9"></circle>
+          
+          {/* Risk indicators */}
+          <circle cx="25" cy="35" r="2" fill="#39ff14" className="animate-pulse" style={{animationDelay: '0.5s'}} opacity="0.7"></circle>
+          <circle cx="75" cy="35" r="2" fill="#ffaa00" className="animate-pulse" style={{animationDelay: '1s'}} opacity="0.7"></circle>
+          <circle cx="50" cy="25" r="2" fill="#ff3344" className="animate-pulse" style={{animationDelay: '1.5s'}} opacity="0.7"></circle>
+          
+          {/* Analysis rays */}
+          <line x1="50" y1="50" x2="25" y2="35" stroke="currentColor" strokeWidth="1" opacity="0.3" className={isHovered ? "animate-pulse" : ""}></line>
+          <line x1="50" y1="50" x2="75" y2="35" stroke="currentColor" strokeWidth="1" opacity="0.3" className={isHovered ? "animate-pulse" : ""}></line>
+          <line x1="50" y1="50" x2="50" y2="25" stroke="currentColor" strokeWidth="1" opacity="0.3" className={isHovered ? "animate-pulse" : ""}></line>
+          
+          {/* Mini legal scales */}
+          <g transform="translate(15, 70)" opacity="0.6">
+            <rect x="0" y="0" width="8" height="2" rx="1" fill="currentColor"></rect>
+            <rect x="2" y="-3" width="4" height="1" rx="0.5" fill="currentColor"></rect>
+            <line x1="4" y1="-3" x2="4" y2="2" stroke="currentColor" strokeWidth="0.5"></line>
+          </g>
+          
+          {/* Mini document stack */}
+          <g transform="translate(75, 70)" opacity="0.6">
+            <rect x="0" y="0" width="6" height="8" rx="1" fill="currentColor"></rect>
+            <rect x="1" y="-1" width="6" height="8" rx="1" fill="none" stroke="currentColor" strokeWidth="0.5"></rect>
+            <rect x="2" y="-2" width="6" height="8" rx="1" fill="none" stroke="currentColor" strokeWidth="0.5"></rect>
+          </g>
+          
+          {/* Gradient definition */}
+          <defs>
+            <linearGradient id="riskGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#39ff14" />
+              <stop offset="50%" stopColor="#ffaa00" />
+              <stop offset="100%" stopColor="#ff3344" />
+            </linearGradient>
+          </defs>
         </svg>
+        
+        {/* Hover overlay with mini screenshot effect */}
+        {isHovered && (
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-blue-900/20 to-cyan-900/20 rounded-lg backdrop-blur-sm border border-purple-300/20 flex items-center justify-center">
+            <div className="text-white text-xs font-mono opacity-80 text-center">
+              <div>RISK</div>
+              <div className="text-purple-300">ANALYZER</div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
@@ -312,6 +398,9 @@ const BlogCard = ({ data, index, onCardHover }) => {
       
       {/* Analyzer visualization for Claude outputs */}
       {renderAnalyzerVisualization()}
+      
+      {/* Tax calculator sample for W2 vs 1099 card */}
+      {renderTaxCalculatorSample()}
       
       {/* Gradient overlay */}
       <div 
