@@ -35,17 +35,17 @@ const allCardsData = [
   },
   {
     id: 'stripe-funds',
-    icon: '📄',
-    category: 'Demand Letter Generator',
-    categoryColor: 'from-slate-600 to-slate-700',
-    title: 'Stripe Demand Letter & Arbitration Demand Generator',
-    description: 'Professional demand letter generator with built-in AAA arbitration templates, instant e-signature integration, and automated Word download. Preview your customized legal document with live formatting before generating.',
+    icon: '💳',
+    category: 'Financial Law',
+    categoryColor: 'from-green-500 to-emerald-600',
+    title: 'When Stripe Holds Your Money: The Definitive Legal Guide to Getting Your Funds Released',
+    description: 'Payment processors like Stripe can hold merchant funds for various reasons, from suspected fraud to policy violations. This guide examines the legal frameworks that govern these holds, your rights as a merchant, and practical steps to expedite the release of your funds.',
     url: 'https://terms.law/2025/03/03/when-stripe-holds-your-money-the-definitive-legal-guide-to-getting-your-funds-released/',
-    gradient: 'from-slate-600 to-slate-700',
-    bgGradient: 'from-slate-50 to-slate-100',
+    gradient: 'from-green-600 to-emerald-600',
+    bgGradient: 'from-green-50 to-emerald-50',
     isPopular: true,
     badge: 'Popular',
-    badgeColor: 'from-slate-400 to-slate-500'
+    badgeColor: 'from-green-400 to-emerald-400'
   },
   {
     id: 'tax-calculator',
@@ -268,23 +268,22 @@ const BlogCard = ({ data, index, onCardHover }) => {
     if (data.id !== 'tax-calculator') return null;
     
     return (
-      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
-        <div className="w-full h-full bg-gradient-to-br from-slate-800/80 via-gray-800/80 to-slate-700/80 rounded-lg border border-slate-400/30 backdrop-blur-sm p-2">
-          <div className="text-xs font-mono text-slate-200 space-y-0.5">
-            <div className="text-center text-xs font-semibold text-slate-300 mb-1">$75K National Avg</div>
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">W-2 Net:</span>
-              <span className="text-emerald-400 font-medium">$58,920</span>
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-32 h-20 opacity-50' : 'w-24 h-16 opacity-25'}`}>
+        <div className="w-full h-full bg-gradient-to-br from-green-900/30 via-emerald-900/30 to-teal-900/30 rounded-lg border border-green-300/20 backdrop-blur-sm p-2">
+          <div className="text-xs font-mono text-green-200 space-y-1">
+            <div className="flex justify-between">
+              <span>W-2:</span>
+              <span className="text-green-400">$85,340</span>
             </div>
-            <div className="flex justify-between text-xs">
-              <span className="text-slate-400">1099 Net:</span>
-              <span className="text-amber-400 font-medium">$56,340</span>
+            <div className="flex justify-between">
+              <span>1099:</span>
+              <span className="text-red-400">$78,920</span>
             </div>
-            <div className="w-full bg-slate-900/40 rounded-full h-1 mt-1">
-              <div className="bg-gradient-to-r from-emerald-400 to-emerald-500 h-1 rounded-full w-3/4"></div>
+            <div className="w-full bg-green-900/40 rounded-full h-1 mt-1">
+              <div className="bg-gradient-to-r from-green-400 to-emerald-400 h-1 rounded-full w-3/4"></div>
             </div>
-            <div className="text-center text-xs text-emerald-300">
-              {isHovered ? 'W-2 Advantage' : '↑ Better'}
+            <div className="text-center text-xs text-green-300">
+              {isHovered ? 'Better W-2' : '↑ Better'}
             </div>
           </div>
         </div>
@@ -648,7 +647,7 @@ const BlogCards = () => {
     <div className="w-full max-w-7xl mx-auto p-6">
       {/* Enhanced header section */}
       <div className="text-center mb-12">
-        <h1 className="text-2xl font-semibold text-slate-700 mb-4">
+        <h1 className="text-3xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
           Legal Tools & Analysis
         </h1>
         <p className="text-lg text-gray-600 max-w-3xl mx-auto">

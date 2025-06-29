@@ -7,16 +7,9 @@ const Icon = ({ name, size = 24, style = {} }) => {
 const ClaudeOwnershipAnalyzer = () => {
     const [currentTab, setCurrentTab] = useState(0);
     const [formData, setFormData] = useState({
-        accountType: 'free',
+        accountType: 'consumer',
         useCase: 'general',
         contentUse: 'internal',
-        commercialUseType: '',
-        academicUseType: '',
-        creativeLicense: '',
-        healthcareSpecialty: '',
-        legalPracticeArea: '',
-        mcpIntegrations: false,
-        researchFeature: false,
         humanOversight: 'full',
         disclosurePlanned: false,
         requiresDisclosure: false,
@@ -36,67 +29,25 @@ const ClaudeOwnershipAnalyzer = () => {
     const [achievements, setAchievements] = useState([]);
 
     const tabs = [
-        { id: 'scenarios', label: 'Choose Your Scenario', icon: 'zap' },
-        { id: 'compliance', label: 'Risk Analysis', icon: 'shield' }
+        { id: 'scenarios', label: 'Scenarios', icon: 'zap' },
+        { id: 'setup', label: 'Account Setup', icon: 'settings' },
+        { id: 'usage', label: 'Usage Type', icon: 'file-text' },
+        { id: 'compliance', label: 'Risk Factors', icon: 'shield' }
     ];
 
     const [selectedScenario, setSelectedScenario] = useState(null);
     const [customScenario, setCustomScenario] = useState({
-        accountType: 'free',
-        useCase: 'general', 
-        contentUse: 'internal',
-        commercialUseType: '',
-        academicUseType: '',
-        creativeLicense: '',
-        healthcareSpecialty: '',
-        legalPracticeArea: '',
-        developmentType: '',
-        mcpIntegrations: false,
-        researchFeature: false,
-        humanOversight: 'full',
-        disclosurePlanned: false,
-        confidentialityLevel: 'public',
-        aiDevelopment: [],
-        industryFocus: []
+        title: '',
+        description: '',
+        industry: 'technology',
+        teamSize: 'small',
+        customChallenge: ''
     });
     const [scenarioHistory, setScenarioHistory] = useState([]);
     const [showCustomBuilder, setShowCustomBuilder] = useState(false);
-    const [customizingScenario, setCustomizingScenario] = useState(null);
 
     // Enhanced scenarios with more customization options
     const gameScenarios = [
-        {
-            id: 'developer_scenario',
-            title: '💻 Software Developer',
-            description: 'You develop software applications and want to use Claude for coding assistance, documentation, and potentially AI-related features',
-            industry: 'Technology & Software',
-            difficulty: 'Intermediate',
-            timeToComplete: '6 min',
-            setup: {
-                accountType: 'consumer',
-                useCase: 'software',
-                contentUse: 'commercial',
-                humanOversight: 'substantial',
-                disclosurePlanned: false,
-                confidentialityLevel: 'internal',
-                developmentType: 'web-applications'
-            },
-            challenge: 'Navigate AI development restrictions and code ownership',
-            expectedRisk: 'medium',
-            learningPoints: 'Code ownership, AI development restrictions, commercial licensing',
-            keyDecisions: [
-                'Can you use Claude-generated code in commercial products?',
-                'What are the restrictions on AI/ML development?',
-                'How to handle intellectual property for client projects?'
-            ],
-            realWorldContext: 'Developers increasingly use AI for coding assistance while navigating complex ownership and licensing requirements.',
-            legalPitfalls: ['AI development violations', 'Client IP complications', 'Commercial licensing issues'],
-            customizationOptions: {
-                developmentType: ['web-applications', 'mobile-apps', 'enterprise-software', 'open-source', 'ai-ml-development', 'api-services', 'embedded-systems'],
-                clientWork: ['solo-developer', 'freelance-clients', 'enterprise-clients', 'startup-team'],
-                codeUsage: ['internal-tools', 'client-delivery', 'open-source-contribution', 'commercial-products']
-            }
-        },
         {
             id: 'startup_blog',
             title: '🚀 Startup Blog Writer',
@@ -121,17 +72,12 @@ const ClaudeOwnershipAnalyzer = () => {
                 'Can you monetize AI-generated content directly?'
             ],
             realWorldContext: 'Many tech blogs are exploring AI assistance for faster content creation while maintaining credibility.',
-            legalPitfalls: ['Inadequate disclosure', 'Over-reliance without human input', 'Copyright attribution issues'],
-            customizationOptions: {
-                contentType: ['technical-articles', 'marketing-content', 'product-updates', 'thought-leadership'],
-                monetization: ['ad-revenue', 'sponsored-content', 'lead-generation', 'product-promotion'],
-                audience: ['developers', 'business-users', 'general-tech', 'industry-specific']
-            }
+            legalPitfalls: ['Inadequate disclosure', 'Over-reliance without human input', 'Copyright attribution issues']
         },
         {
             id: 'legal_firm',
-            title: '⚖️ Legal Research Assistant', 
-            description: 'Law firm wants to use Claude for legal research, contract drafting, lawsuit preparation, and demand letter creation',
+            title: '⚖️ Legal Document Assistant',
+            description: 'Law firm wants to use Claude for contract review and legal research',
             industry: 'Legal Services',
             difficulty: 'Expert',
             timeToComplete: '8 min',
@@ -151,44 +97,8 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to maintain attorney-client privilege?',
                 'What human oversight is required for different document types?'
             ],
-            realWorldContext: 'Law firms increasingly use AI for document review, contract analysis, legal research, lawsuit drafting, and demand letter creation while navigating strict ethical obligations.',
-            legalPitfalls: ['Unauthorized practice concerns', 'Confidentiality breaches', 'Professional liability issues'],
-            customizationOptions: {
-                legalWork: ['contract-review', 'legal-research', 'lawsuit-drafting', 'demand-letters', 'client-communication', 'document-analysis', 'compliance-guidance'],
-                clientType: ['individual-clients', 'small-business', 'corporate-clients', 'government-entities'],
-                practiceSize: ['solo-practice', 'small-firm', 'medium-firm', 'large-firm', 'in-house-counsel']
-            }
-        },
-        {
-            id: 'free_user_blogger',
-            title: '📝 Free User Personal Blog',
-            description: 'Personal blogger using Claude Free for creative writing and blog posts',
-            industry: 'Personal/Creative',
-            difficulty: 'Beginner',
-            timeToComplete: '3 min',
-            setup: {
-                accountType: 'free',
-                useCase: 'creative',
-                contentUse: 'public',
-                humanOversight: 'substantial',
-                disclosurePlanned: true,
-                confidentialityLevel: 'public'
-            },
-            challenge: 'Understanding free tier limitations and ownership rights',
-            expectedRisk: 'low',
-            learningPoints: 'Free tier restrictions, basic ownership rights, usage limits',
-            keyDecisions: [
-                'What are the usage limits for free accounts?',
-                'Do I own content created with Claude Free?',
-                'What disclosure is recommended for personal blogs?'
-            ],
-            realWorldContext: 'Many personal bloggers and content creators start with Claude Free to explore AI assistance.',
-            legalPitfalls: ['Usage limit violations', 'Misunderstanding ownership rights', 'Inadequate attribution'],
-            customizationOptions: {
-                blogType: ['personal-blog', 'hobby-blog', 'lifestyle-blog', 'tech-blog', 'creative-writing'],
-                monetization: ['no-monetization', 'affiliate-links', 'sponsored-posts', 'ad-revenue'],
-                platform: ['wordpress', 'medium', 'substack', 'ghost', 'custom-site']
-            }
+            realWorldContext: 'Law firms increasingly use AI for document review, contract analysis, and legal research while navigating strict ethical obligations.',
+            legalPitfalls: ['Unauthorized practice concerns', 'Confidentiality breaches', 'Professional liability issues']
         },
         {
             id: 'student_helper',
@@ -214,12 +124,7 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to maintain academic integrity while using AI tools?'
             ],
             realWorldContext: 'Students across universities are adapting to AI tools while institutions develop new academic integrity policies.',
-            legalPitfalls: ['Plagiarism violations', 'Honor code breaches', 'Institutional sanctions'],
-            customizationOptions: {
-                academicLevel: ['undergraduate', 'graduate', 'phd-research', 'professional-school'],
-                workType: ['homework-assistance', 'research-papers', 'thesis-work', 'exam-preparation'],
-                institution: ['public-university', 'private-university', 'community-college', 'online-program']
-            }
+            legalPitfalls: ['Plagiarism violations', 'Honor code breaches', 'Institutional sanctions']
         },
         {
             id: 'creative_agency',
@@ -245,12 +150,7 @@ const ClaudeOwnershipAnalyzer = () => {
                 'How to ensure copyright protection for client work?'
             ],
             realWorldContext: 'Creative agencies are rapidly integrating AI tools while maintaining quality standards and client trust.',
-            legalPitfalls: ['Copyright infringement claims', 'Client contract violations', 'Misrepresentation of services'],
-            customizationOptions: {
-                agencyType: ['digital-marketing', 'advertising-agency', 'design-studio', 'content-marketing'],
-                serviceOffered: ['copywriting', 'visual-design', 'video-production', 'social-media', 'branding'],
-                clientSize: ['startups', 'small-business', 'enterprise', 'non-profit']
-            }
+            legalPitfalls: ['Copyright infringement claims', 'Client contract violations', 'Misrepresentation of services']
         },
         {
             id: 'healthcare_admin',
@@ -276,12 +176,7 @@ const ClaudeOwnershipAnalyzer = () => {
                 'What medical disclaimers are required?'
             ],
             realWorldContext: 'Healthcare organizations explore AI for administrative efficiency while navigating complex regulatory requirements.',
-            legalPitfalls: ['HIPAA violations', 'Medical malpractice exposure', 'Regulatory non-compliance'],
-            customizationOptions: {
-                facilityType: ['hospital', 'private-practice', 'clinic', 'telehealth', 'healthcare-tech'],
-                patientInteraction: ['direct-patient-care', 'administrative-only', 'patient-communication', 'medical-records'],
-                specialization: ['general-medicine', 'surgery', 'mental-health', 'pediatrics', 'geriatrics']
-            }
+            legalPitfalls: ['HIPAA violations', 'Medical malpractice exposure', 'Regulatory non-compliance']
         }
     ];
 
@@ -512,7 +407,7 @@ const ClaudeOwnershipAnalyzer = () => {
             prohibitedContent: [],
             aiDevelopment: []
         }));
-        setCurrentTab(1); // Go to risk analysis to see the changes
+        setCurrentTab(0); // Go back to setup to see the changes
     };
 
     const renderTabContent = () => {
@@ -521,35 +416,20 @@ const ClaudeOwnershipAnalyzer = () => {
                 return (
                     <div>
                         <div className="form-section">
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                                <h3><Icon name="zap" className="form-section-icon" />Choose Your Scenario</h3>
-                                <button 
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        background: 'linear-gradient(135deg, #39ff14, #00d4ff)',
-                                        border: 'none',
-                                        borderRadius: '6px',
-                                        color: '#000',
-                                        fontFamily: 'Orbitron, monospace',
-                                        fontSize: '0.7rem',
-                                        fontWeight: '700',
-                                        textTransform: 'uppercase',
-                                        cursor: 'pointer',
-                                        transition: 'all 0.3s ease'
-                                    }}
-                                    onClick={() => setShowCustomBuilder(!showCustomBuilder)}
-                                    onMouseEnter={(e) => {
-                                        e.target.style.transform = 'scale(1.05)';
-                                        e.target.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.4)';
-                                    }}
-                                    onMouseLeave={(e) => {
-                                        e.target.style.transform = 'scale(1)';
-                                        e.target.style.boxShadow = 'none';
-                                    }}
+                            <h3><Icon name="user" className="form-section-icon" />Account Configuration</h3>
+                            <div className="form-group">
+                                <label htmlFor="accountType">Claude Account Type</label>
+                                <select 
+                                    id="accountType" 
+                                    name="accountType" 
+                                    value={formData.accountType} 
+                                    onChange={handleInputChange}
                                 >
-                                    {showCustomBuilder ? '📋 Back to Scenarios' : '🛠️ Create Custom'}
-                                </button>
+                                    <option value="consumer">Consumer (Claude.ai, Pro)</option>
+                                    <option value="commercial">Commercial (API, Enterprise)</option>
+                                </select>
                             </div>
+                        </div>
 
                         <div className="form-section">
                             <h3><Icon name="briefcase" className="form-section-icon" />Primary Use Case</h3>
@@ -593,46 +473,6 @@ const ClaudeOwnershipAnalyzer = () => {
                                 </select>
                             </div>
                         </div>
-
-                        <div className="form-section">
-                            <h3><Icon name="cpu" className="form-section-icon" />New Claude Features (2025)</h3>
-                            
-                            <div className="form-group">
-                                <div className="checkbox-item">
-                                    <input 
-                                        type="checkbox" 
-                                        id="mcpIntegrations"
-                                        name="mcpIntegrations" 
-                                        checked={formData.mcpIntegrations}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label htmlFor="mcpIntegrations">
-                                        <strong>MCP (Model Context Protocol) Integrations</strong>
-                                        <div style={{fontSize: '0.8rem', color: '#8892a6', marginTop: '0.25rem'}}>
-                                            Using third-party tools and services through MCP connections
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                            
-                            <div className="form-group">
-                                <div className="checkbox-item">
-                                    <input 
-                                        type="checkbox" 
-                                        id="researchFeature"
-                                        name="researchFeature" 
-                                        checked={formData.researchFeature}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label htmlFor="researchFeature">
-                                        <strong>Claude Research Feature</strong>
-                                        <div style={{fontSize: '0.8rem', color: '#8892a6', marginTop: '0.25rem'}}>
-                                            Using Claude's autonomous research capabilities with web access
-                                        </div>
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 );
 
@@ -640,346 +480,21 @@ const ClaudeOwnershipAnalyzer = () => {
                 return (
                     <div>
                         <div className="form-section">
-                            <h3><Icon name="shield" className="form-section-icon" />Risk Analysis Results</h3>
-                            <p style={{ 
-                                fontSize: '0.9rem', 
-                                color: '#b4c1d3', 
-                                marginBottom: '1.5rem',
-                                lineHeight: '1.5',
-                                textAlign: 'center'
-                            }}>
-                                Based on your scenario selection, here's your comprehensive risk assessment and compliance guidance:
-                            </p>
-                            
-                            {detailedAnalysis ? (
-                                <div>
-                                    {/* Risk Analysis Cards */}
-                                    <div style={{
-                                        display: 'grid',
-                                        gap: '1rem',
-                                        marginBottom: '2rem'
-                                    }}>
-                                        {/* Ownership Analysis */}
-                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.ownership.status)}`}>
-                                            <h4><Icon name="award" className="analysis-icon" />{detailedAnalysis.ownership.title}</h4>
-                                            <p>{detailedAnalysis.ownership.description}</p>
-                                            <ul>
-                                                {detailedAnalysis.ownership.details.map((detail, index) => (
-                                                    <li key={index}>{detail}</li>
-                                                ))}
-                                            </ul>
-                                            <div className="terms-ref">
-                                                <strong>Terms Reference:</strong> {detailedAnalysis.ownership.termsRef}
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Usage Analysis */}
-                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.usage.status)}`}>
-                                            <h4><Icon name="file-text" className="analysis-icon" />{detailedAnalysis.usage.title}</h4>
-                                            <p>{detailedAnalysis.usage.description}</p>
-                                            {detailedAnalysis.usage.details.length > 0 && (
-                                                <ul>
-                                                    {detailedAnalysis.usage.details.map((detail, index) => (
-                                                        <li key={index}>{detail}</li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                            {detailedAnalysis.usage.violations && detailedAnalysis.usage.violations.length > 0 && (
-                                                <div className="violations">
-                                                    <strong>⚠️ Violations Detected:</strong>
-                                                    <ul>
-                                                        {detailedAnalysis.usage.violations.map((violation, index) => (
-                                                            <li key={index}>{violation}</li>
-                                                        ))}
-                                                    </ul>
-                                                </div>
-                                            )}
-                                            <div className="terms-ref">
-                                                <strong>Terms Reference:</strong> {detailedAnalysis.usage.termsRef}
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Copyright Analysis */}
-                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.copyright.status)}`}>
-                                            <h4><Icon name="shield" className="analysis-icon" />{detailedAnalysis.copyright.title}</h4>
-                                            <p>{detailedAnalysis.copyright.description}</p>
-                                            <ul>
-                                                {detailedAnalysis.copyright.details.map((detail, index) => (
-                                                    <li key={index}>{detail}</li>
-                                                ))}
-                                            </ul>
-                                            <div className="terms-ref">
-                                                <strong>Terms Reference:</strong> {detailedAnalysis.copyright.termsRef}
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Disclosure Analysis */}
-                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
-                                            <h4><Icon name="eye" className="analysis-icon" />{detailedAnalysis.disclosure.title}</h4>
-                                            <p>{detailedAnalysis.disclosure.description}</p>
-                                            {detailedAnalysis.disclosure.details.length > 0 && (
-                                                <ul>
-                                                    {detailedAnalysis.disclosure.details.map((detail, index) => (
-                                                        <li key={index}>{detail}</li>
-                                                    ))}
-                                                </ul>
-                                            )}
-                                            <div className="terms-ref">
-                                                <strong>Terms Reference:</strong> {detailedAnalysis.disclosure.termsRef}
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Recommendations */}
-                                    {detailedAnalysis.suggestions && detailedAnalysis.suggestions.length > 0 && (
-                                        <div className="recommendations">
-                                            <h4><Icon name="lightbulb" className="analysis-icon" />Recommendations</h4>
-                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
-                                                {detailedAnalysis.suggestions.map((suggestion, index) => (
-                                                    <div key={index} className={`suggestion-card priority-${suggestion.priority}`}>
-                                                        <div className="suggestion-header">
-                                                            <span className="priority-badge">{suggestion.priority.toUpperCase()}</span>
-                                                            <strong>{suggestion.title}</strong>
-                                                        </div>
-                                                        <p>{suggestion.description}</p>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        </div>
-                                    )}
-                                    
-                                    {/* Action Buttons */}
-                                    <div style={{
-                                        display: 'flex',
-                                        gap: '1rem',
-                                        marginTop: '2rem',
-                                        justifyContent: 'center'
-                                    }}>
-                                        <button 
-                                            style={{
-                                                padding: '0.75rem 1.5rem',
-                                                background: 'linear-gradient(135deg, #00d4ff, #39ff14)',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                color: '#000',
-                                                fontFamily: 'Orbitron, monospace',
-                                                fontSize: '0.8rem',
-                                                fontWeight: '700',
-                                                textTransform: 'uppercase',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease'
-                                            }}
-                                            onClick={() => setCurrentTab(0)}
-                                        >
-                                            ← Try Different Scenario
-                                        </button>
-                                        
-                                        <button 
-                                            style={{
-                                                padding: '0.75rem 1.5rem',
-                                                background: 'rgba(0, 212, 255, 0.2)',
-                                                border: '1px solid #00d4ff',
-                                                borderRadius: '8px',
-                                                color: '#00d4ff',
-                                                fontFamily: 'Orbitron, monospace',
-                                                fontSize: '0.8rem',
-                                                fontWeight: '700',
-                                                textTransform: 'uppercase',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease'
-                                            }}
-                                            onClick={openCalendlyPopup}
-                                        >
-                                            📞 Get Legal Consultation
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <div style={{ textAlign: 'center', padding: '2rem' }}>
-                                    <div style={{ 
-                                        fontSize: '1.2rem', 
-                                        color: '#8892a6', 
-                                        marginBottom: '1rem'
-                                    }}>
-                                        🔄 Analyzing your scenario...
-                                    </div>
-                                    <p style={{ color: '#b4c1d3' }}>
-                                        Please select a scenario from the previous tab to see your risk analysis.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                );
-            
-            default:
-                return null;
-                            
-                            {/* Clarifying questions based on use case */}
-                            {formData.useCase === 'commercial' && (
-                                <div className="form-group" style={{
-                                    padding: '1rem',
-                                    background: 'rgba(0, 212, 255, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(0, 212, 255, 0.2)',
-                                    marginTop: '1rem'
-                                }}>
-                                    <label htmlFor="commercialUseType" style={{color: '#00d4ff', fontWeight: '600'}}>What type of commercial use?</label>
-                                    <select 
-                                        id="commercialUseType" 
-                                        name="commercialUseType" 
-                                        value={formData.commercialUseType} 
-                                        onChange={handleInputChange}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            background: 'rgba(26, 31, 46, 0.8)',
-                                            border: '1px solid #2a3441',
-                                            color: '#e1e8f0'
-                                        }}
-                                    >
-                                        <option value="">Select commercial use type...</option>
-                                        <option value="content-creation">Content creation for clients</option>
-                                        <option value="product-development">Product/service development</option>
-                                        <option value="marketing-materials">Marketing and advertising materials</option>
-                                        <option value="customer-support">Customer support automation</option>
-                                        <option value="software-development">Software development assistance</option>
-                                        <option value="consulting-services">Consulting and professional services</option>
-                                        <option value="resale-platform">Reselling AI outputs as products</option>
-                                    </select>
-                                </div>
-                            )}
-                            
-                            {formData.useCase === 'academic' && (
-                                <div className="form-group" style={{
-                                    padding: '1rem',
-                                    background: 'rgba(57, 255, 20, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(57, 255, 20, 0.2)',
-                                    marginTop: '1rem'
-                                }}>
-                                    <label htmlFor="academicUseType" style={{color: '#39ff14', fontWeight: '600'}}>What type of academic use?</label>
-                                    <select 
-                                        id="academicUseType" 
-                                        name="academicUseType" 
-                                        value={formData.academicUseType} 
-                                        onChange={handleInputChange}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            background: 'rgba(26, 31, 46, 0.8)',
-                                            border: '1px solid #2a3441',
-                                            color: '#e1e8f0'
-                                        }}
-                                    >
-                                        <option value="">Select academic use type...</option>
-                                        <option value="research-assistance">Research and data analysis</option>
-                                        <option value="writing-support">Writing assistance and editing</option>
-                                        <option value="homework-help">Homework and assignment help</option>
-                                        <option value="thesis-dissertation">Thesis and dissertation work</option>
-                                        <option value="teaching-materials">Creating teaching materials</option>
-                                        <option value="exam-preparation">Exam and test preparation</option>
-                                        <option value="publication-writing">Academic publication writing</option>
-                                    </select>
-                                </div>
-                            )}
-                            
-                            {formData.useCase === 'creative' && (
-                                <div className="form-group" style={{
-                                    padding: '1rem',
-                                    background: 'rgba(255, 170, 0, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(255, 170, 0, 0.2)',
-                                    marginTop: '1rem'
-                                }}>
-                                    <label htmlFor="creativeLicense" style={{color: '#ffaa00', fontWeight: '600'}}>What type of creative work?</label>
-                                    <select 
-                                        id="creativeLicense" 
-                                        name="creativeLicense" 
-                                        value={formData.creativeLicense} 
-                                        onChange={handleInputChange}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            background: 'rgba(26, 31, 46, 0.8)',
-                                            border: '1px solid #2a3441',
-                                            color: '#e1e8f0'
-                                        }}
-                                    >
-                                        <option value="">Select creative use type...</option>
-                                        <option value="personal-blog">Personal blog writing</option>
-                                        <option value="fiction-writing">Fiction and storytelling</option>
-                                        <option value="marketing-copy">Marketing copywriting</option>
-                                        <option value="social-media">Social media content</option>
-                                        <option value="video-scripts">Video and podcast scripts</option>
-                                        <option value="artistic-projects">Artistic and experimental projects</option>
-                                        <option value="commercial-licensing">Commercial licensing/attribution</option>
-                                    </select>
-                                </div>
-                            )}
-                            
-                            {formData.useCase === 'healthcare' && (
-                                <div className="form-group" style={{
-                                    padding: '1rem',
-                                    background: 'rgba(255, 51, 68, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(255, 51, 68, 0.2)',
-                                    marginTop: '1rem'
-                                }}>
-                                    <label htmlFor="healthcareSpecialty" style={{color: '#ff3344', fontWeight: '600'}}>Healthcare specialty area?</label>
-                                    <select 
-                                        id="healthcareSpecialty" 
-                                        name="healthcareSpecialty" 
-                                        value={formData.healthcareSpecialty} 
-                                        onChange={handleInputChange}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            background: 'rgba(26, 31, 46, 0.8)',
-                                            border: '1px solid #2a3441',
-                                            color: '#e1e8f0'
-                                        }}
-                                    >
-                                        <option value="">Select healthcare area...</option>
-                                        <option value="patient-communication">Patient communication templates</option>
-                                        <option value="administrative">Administrative and billing</option>
-                                        <option value="research-summaries">Medical research summaries</option>
-                                        <option value="education-materials">Patient education materials</option>
-                                        <option value="clinical-notes">Clinical documentation assistance</option>
-                                        <option value="diagnostic-support">Diagnostic decision support</option>
-                                        <option value="treatment-plans">Treatment planning assistance</option>
-                                    </select>
-                                </div>
-                            )}
-                            
-                            {formData.useCase === 'legal' && (
-                                <div className="form-group" style={{
-                                    padding: '1rem',
-                                    background: 'rgba(138, 43, 226, 0.05)',
-                                    borderRadius: '8px',
-                                    border: '1px solid rgba(138, 43, 226, 0.2)',
-                                    marginTop: '1rem'
-                                }}>
-                                    <label htmlFor="legalPracticeArea" style={{color: '#8a2be2', fontWeight: '600'}}>Legal practice area?</label>
-                                    <select 
-                                        id="legalPracticeArea" 
-                                        name="legalPracticeArea" 
-                                        value={formData.legalPracticeArea} 
-                                        onChange={handleInputChange}
-                                        style={{
-                                            marginTop: '0.5rem',
-                                            background: 'rgba(26, 31, 46, 0.8)',
-                                            border: '1px solid #2a3441',
-                                            color: '#e1e8f0'
-                                        }}
-                                    >
-                                        <option value="">Select legal practice area...</option>
-                                        <option value="contract-review">Contract review and drafting</option>
-                                        <option value="legal-research">Legal research and case law</option>
-                                        <option value="client-communication">Client communication</option>
-                                        <option value="document-analysis">Document analysis and summary</option>
-                                        <option value="compliance-guidance">Compliance and regulatory guidance</option>
-                                        <option value="litigation-support">Litigation support and discovery</option>
-                                        <option value="legal-advice">Direct legal advice to clients</option>
-                                    </select>
-                                </div>
-                            )}
+                            <h3><Icon name="globe" className="form-section-icon" />Output Distribution</h3>
+                            <div className="form-group">
+                                <label htmlFor="contentUse">How will you use Claude's outputs?</label>
+                                <select 
+                                    id="contentUse" 
+                                    name="contentUse" 
+                                    value={formData.contentUse} 
+                                    onChange={handleInputChange}
+                                >
+                                    <option value="internal">Internal use only</option>
+                                    <option value="external">External sharing</option>
+                                    <option value="commercial">Commercial use</option>
+                                    <option value="public">Public distribution</option>
+                                </select>
+                            </div>
 
                             <div className="form-group">
                                 <label htmlFor="interactionType">User interaction model</label>
@@ -1139,18 +654,17 @@ const ClaudeOwnershipAnalyzer = () => {
                             
                             {!showCustomBuilder && (
                                 <p style={{ 
-                                    fontSize: '0.9rem', 
-                                    color: '#e1e8f0', 
-                                    marginBottom: '1.5rem',
-                                    lineHeight: '1.5',
-                                    textAlign: 'center'
+                                    fontSize: '0.85rem', 
+                                    color: '#8892a6', 
+                                    marginBottom: '1rem',
+                                    lineHeight: '1.4'
                                 }}>
-                                    🎯 <strong>Find your situation below</strong> or create a custom scenario. Each scenario will instantly analyze your specific risk factors and provide tailored guidance.
+                                    🎮 <strong>Interactive Learning Hub:</strong> Master Claude's terms through hands-on scenarios. Each scenario teaches different compliance requirements and risk factors.
                                 </p>
                             )}
                             
                             {showCustomBuilder ? (
-                                // Custom Scenario Builder with Risk-Relevant Options
+                                // Custom Scenario Builder
                                 <div style={{
                                     padding: '1.5rem',
                                     background: 'rgba(0, 212, 255, 0.05)',
@@ -1165,147 +679,114 @@ const ClaudeOwnershipAnalyzer = () => {
                                         fontSize: '0.9rem'
                                     }}>🛠️ Custom Scenario Builder</h4>
                                     
-                                    <div style={{ display: 'grid', gap: '1.5rem' }}>
-                                        {/* Account & Features */}
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Claude Account Type:</label>
-                                                <select 
-                                                    value={customScenario.accountType}
-                                                    onChange={(e) => setCustomScenario({...customScenario, accountType: e.target.value})}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '0.75rem',
-                                                        background: 'rgba(26, 31, 46, 0.8)',
-                                                        border: '1px solid #2a3441',
-                                                        borderRadius: '6px',
-                                                        color: '#e1e8f0',
-                                                        fontSize: '0.8rem'
-                                                    }}
-                                                >
-                                                    <option value="free">Free (Claude.ai Free)</option>
-                                                    <option value="consumer">Consumer (Claude.ai Pro)</option>
-                                                    <option value="max5x">Max 5x (Claude Max 5x Pro)</option>
-                                                    <option value="max20x">Max 20x (Claude Max 20x Pro)</option>
-                                                    <option value="commercial">Commercial (API, Enterprise)</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Primary Use Case:</label>
-                                                <select 
-                                                    value={customScenario.useCase}
-                                                    onChange={(e) => setCustomScenario({...customScenario, useCase: e.target.value})}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '0.75rem',
-                                                        background: 'rgba(26, 31, 46, 0.8)',
-                                                        border: '1px solid #2a3441',
-                                                        borderRadius: '6px',
-                                                        color: '#e1e8f0',
-                                                        fontSize: '0.8rem'
-                                                    }}
-                                                >
-                                                    <option value="general">General assistance</option>
-                                                    <option value="legal">Legal advice/documents</option>
-                                                    <option value="healthcare">Healthcare guidance</option>
-                                                    <option value="finance">Financial advice</option>
-                                                    <option value="academic">Academic/Testing</option>
-                                                    <option value="journalism">Media/Journalism</option>
-                                                    <option value="software">Software development</option>
-                                                    <option value="creative">Creative content</option>
-                                                    <option value="gaming">Gaming content</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Content Use & Features */}
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Output Usage:</label>
-                                                <select 
-                                                    value={customScenario.contentUse}
-                                                    onChange={(e) => setCustomScenario({...customScenario, contentUse: e.target.value})}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '0.75rem',
-                                                        background: 'rgba(26, 31, 46, 0.8)',
-                                                        border: '1px solid #2a3441',
-                                                        borderRadius: '6px',
-                                                        color: '#e1e8f0',
-                                                        fontSize: '0.8rem'
-                                                    }}
-                                                >
-                                                    <option value="internal">Internal use only</option>
-                                                    <option value="external">External sharing</option>
-                                                    <option value="commercial">Commercial use</option>
-                                                    <option value="public">Public distribution</option>
-                                                </select>
-                                            </div>
-                                            
-                                            <div>
-                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Human Oversight:</label>
-                                                <select 
-                                                    value={customScenario.humanOversight}
-                                                    onChange={(e) => setCustomScenario({...customScenario, humanOversight: e.target.value})}
-                                                    style={{
-                                                        width: '100%',
-                                                        padding: '0.75rem',
-                                                        background: 'rgba(26, 31, 46, 0.8)',
-                                                        border: '1px solid #2a3441',
-                                                        borderRadius: '6px',
-                                                        color: '#e1e8f0',
-                                                        fontSize: '0.8rem'
-                                                    }}
-                                                >
-                                                    <option value="full">Full professional review</option>
-                                                    <option value="substantial">Substantial editing</option>
-                                                    <option value="minimal">Basic review</option>
-                                                    <option value="none">No review planned</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        
-                                        {/* Advanced Features & Risk Factors */}
+                                    <div style={{ display: 'grid', gap: '1rem' }}>
                                         <div>
-                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.75rem', display: 'block' }}>Industry Focus & Special Features:</label>
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
-                                                {[
-                                                    { value: 'ai-development', label: 'AI/ML Development', risk: 'high' },
-                                                    { value: 'gaming-content', label: 'Gaming Content', risk: 'low' },
-                                                    { value: 'mcp-integrations', label: 'MCP Integrations', risk: 'medium' },
-                                                    { value: 'research-feature', label: 'Research Feature', risk: 'medium' },
-                                                    { value: 'financial-advice', label: 'Financial Guidance', risk: 'high' },
-                                                    { value: 'medical-content', label: 'Medical Content', risk: 'high' }
-                                                ].map((item, index) => (
-                                                    <div key={index} style={{
-                                                        padding: '0.5rem',
-                                                        background: item.risk === 'high' ? 'rgba(255, 51, 68, 0.1)' : 
-                                                                   item.risk === 'medium' ? 'rgba(255, 170, 0, 0.1)' : 'rgba(57, 255, 20, 0.1)',
+                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Scenario Title:</label>
+                                            <input 
+                                                type="text"
+                                                value={customScenario.title}
+                                                onChange={(e) => setCustomScenario({...customScenario, title: e.target.value})}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    background: 'rgba(26, 31, 46, 0.8)',
+                                                    border: '1px solid #2a3441',
+                                                    borderRadius: '6px',
+                                                    color: '#e1e8f0',
+                                                    fontSize: '0.8rem'
+                                                }}
+                                                placeholder="e.g., AI-Powered Legal Research Tool"
+                                            />
+                                        </div>
+                                        
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Description:</label>
+                                            <textarea 
+                                                value={customScenario.description}
+                                                onChange={(e) => setCustomScenario({...customScenario, description: e.target.value})}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    background: 'rgba(26, 31, 46, 0.8)',
+                                                    border: '1px solid #2a3441',
+                                                    borderRadius: '6px',
+                                                    color: '#e1e8f0',
+                                                    fontSize: '0.8rem',
+                                                    minHeight: '80px',
+                                                    resize: 'vertical'
+                                                }}
+                                                placeholder="Describe your specific use case scenario..."
+                                            />
+                                        </div>
+                                        
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Industry:</label>
+                                                <select 
+                                                    value={customScenario.industry}
+                                                    onChange={(e) => setCustomScenario({...customScenario, industry: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
                                                         borderRadius: '6px',
-                                                        border: `1px solid ${item.risk === 'high' ? 'rgba(255, 51, 68, 0.3)' : 
-                                                               item.risk === 'medium' ? 'rgba(255, 170, 0, 0.3)' : 'rgba(57, 255, 20, 0.3)'}`
-                                                    }}>
-                                                        <div className="checkbox-item">
-                                                            <input 
-                                                                type="checkbox" 
-                                                                id={`custom-${item.value}`}
-                                                                checked={customScenario.industryFocus.includes(item.value)}
-                                                                onChange={(e) => {
-                                                                    const newFocus = e.target.checked 
-                                                                        ? [...customScenario.industryFocus, item.value]
-                                                                        : customScenario.industryFocus.filter(f => f !== item.value);
-                                                                    setCustomScenario({...customScenario, industryFocus: newFocus});
-                                                                }}
-                                                            />
-                                                            <label htmlFor={`custom-${item.value}`} style={{
-                                                                fontSize: '0.7rem',
-                                                                color: '#e1e8f0'
-                                                            }}>{item.label}</label>
-                                                        </div>
-                                                    </div>
-                                                ))}
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="technology">Technology</option>
+                                                    <option value="healthcare">Healthcare</option>
+                                                    <option value="legal">Legal Services</option>
+                                                    <option value="finance">Finance</option>
+                                                    <option value="education">Education</option>
+                                                    <option value="marketing">Marketing</option>
+                                                    <option value="consulting">Consulting</option>
+                                                    <option value="retail">Retail</option>
+                                                </select>
                                             </div>
+                                            
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Team Size:</label>
+                                                <select 
+                                                    value={customScenario.teamSize}
+                                                    onChange={(e) => setCustomScenario({...customScenario, teamSize: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="solo">Solo (1 person)</option>
+                                                    <option value="small">Small Team (2-10)</option>
+                                                    <option value="medium">Medium Team (11-50)</option>
+                                                    <option value="large">Large Team (50+)</option>
+                                                    <option value="enterprise">Enterprise (1000+)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Specific Challenge:</label>
+                                            <input 
+                                                type="text"
+                                                value={customScenario.customChallenge}
+                                                onChange={(e) => setCustomScenario({...customScenario, customChallenge: e.target.value})}
+                                                style={{
+                                                    width: '100%',
+                                                    padding: '0.75rem',
+                                                    background: 'rgba(26, 31, 46, 0.8)',
+                                                    border: '1px solid #2a3441',
+                                                    borderRadius: '6px',
+                                                    color: '#e1e8f0',
+                                                    fontSize: '0.8rem'
+                                                }}
+                                                placeholder="What's your main compliance concern?"
+                                            />
                                         </div>
                                         
                                         <button 
@@ -1324,19 +805,29 @@ const ClaudeOwnershipAnalyzer = () => {
                                                 marginTop: '0.5rem'
                                             }}
                                             onClick={() => {
-                                                // Apply custom scenario to formData for immediate analysis
-                                                setFormData(prev => ({
-                                                    ...prev,
-                                                    ...customScenario,
-                                                    mcpIntegrations: customScenario.industryFocus.includes('mcp-integrations'),
-                                                    researchFeature: customScenario.industryFocus.includes('research-feature'),
-                                                    aiDevelopment: customScenario.industryFocus.includes('ai-development') ? ['competing-ai'] : []
-                                                }));
+                                                // Add custom scenario to history
+                                                const newScenario = {
+                                                    id: 'custom_' + Date.now(),
+                                                    title: customScenario.title || 'Custom Scenario',
+                                                    description: customScenario.description,
+                                                    industry: customScenario.industry,
+                                                    teamSize: customScenario.teamSize,
+                                                    challenge: customScenario.customChallenge,
+                                                    created: new Date().toLocaleString()
+                                                };
+                                                setScenarioHistory([newScenario, ...scenarioHistory.slice(0, 4)]); // Keep last 5
                                                 setShowCustomBuilder(false);
-                                                setCurrentTab(1); // Go to risk analysis
+                                                // Reset form
+                                                setCustomScenario({
+                                                    title: '',
+                                                    description: '',
+                                                    industry: 'technology',
+                                                    teamSize: 'small',
+                                                    customChallenge: ''
+                                                });
                                             }}
                                         >
-                                            🚀 Analyze My Custom Scenario
+                                            🚀 Create & Analyze Scenario
                                         </button>
                                     </div>
                                 </div>
