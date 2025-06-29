@@ -1041,7 +1041,529 @@ const ClaudeOwnershipAnalyzer = () => {
                         </div>
                     </div>
                 );
-            
+
+            case 2:
+                return (
+                    <div>
+                        <div className="form-section">
+                            <h3><Icon name="alert-triangle" className="form-section-icon" />Prohibited Activities</h3>
+                            <div className="checkbox-group">
+                                {[
+                                    { value: 'child-safety', label: 'Child safety concerns' },
+                                    { value: 'critical-infrastructure', label: 'Critical infrastructure' },
+                                    { value: 'violence-hate', label: 'Violence/hate content' },
+                                    { value: 'privacy-identity', label: 'Privacy violations' },
+                                    { value: 'illegal-weapons', label: 'Illegal weapons/goods' },
+                                    { value: 'psychological-harm', label: 'Psychological harm' },
+                                    { value: 'misinformation', label: 'Misinformation creation' },
+                                    { value: 'political-campaigns', label: 'Political campaigns' },
+                                    { value: 'law-enforcement', label: 'Law enforcement apps' },
+                                    { value: 'fraudulent-practices', label: 'Fraudulent practices' },
+                                    { value: 'platform-abuse', label: 'Platform abuse' },
+                                    { value: 'sexually-explicit', label: 'Explicit content' }
+                                ].map((item, index) => (
+                                    <div key={index} className="checkbox-item">
+                                        <input 
+                                            type="checkbox" 
+                                            id={`prohibited-${item.value}`}
+                                            name="prohibitedContent" 
+                                            value={item.value}
+                                            checked={formData.prohibitedContent.includes(item.value)}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor={`prohibited-${item.value}`}>{item.label}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <h3><Icon name="cpu" className="form-section-icon" />AI Development Restrictions</h3>
+                            <div className="checkbox-group">
+                                {[
+                                    { value: 'competing-ai', label: 'Competing AI development' },
+                                    { value: 'model-training', label: 'Training other models' },
+                                    { value: 'model-scraping', label: 'Automated scraping' },
+                                    { value: 'reselling-outputs', label: 'Reselling outputs' }
+                                ].map((item, index) => (
+                                    <div key={index} className="checkbox-item">
+                                        <input 
+                                            type="checkbox" 
+                                            id={`ai-dev-${item.value}`}
+                                            name="aiDevelopment" 
+                                            value={item.value}
+                                            checked={formData.aiDevelopment.includes(item.value)}
+                                            onChange={handleInputChange}
+                                        />
+                                        <label htmlFor={`ai-dev-${item.value}`}>{item.label}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 3:
+                return (
+                    <div>
+                        <div className="form-section">
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                                <h3><Icon name="zap" className="form-section-icon" />Gaming Scenarios</h3>
+                                <button 
+                                    style={{
+                                        padding: '0.5rem 1rem',
+                                        background: 'linear-gradient(135deg, #39ff14, #00d4ff)',
+                                        border: 'none',
+                                        borderRadius: '6px',
+                                        color: '#000',
+                                        fontFamily: 'Orbitron, monospace',
+                                        fontSize: '0.7rem',
+                                        fontWeight: '700',
+                                        textTransform: 'uppercase',
+                                        cursor: 'pointer',
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                    onClick={() => setShowCustomBuilder(!showCustomBuilder)}
+                                    onMouseEnter={(e) => {
+                                        e.target.style.transform = 'scale(1.05)';
+                                        e.target.style.boxShadow = '0 0 20px rgba(57, 255, 20, 0.4)';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                        e.target.style.transform = 'scale(1)';
+                                        e.target.style.boxShadow = 'none';
+                                    }}
+                                >
+                                    {showCustomBuilder ? '📋 Back to Scenarios' : '🛠️ Create Custom'}
+                                </button>
+                            </div>
+                            
+                            {!showCustomBuilder && (
+                                <p style={{ 
+                                    fontSize: '0.9rem', 
+                                    color: '#e1e8f0', 
+                                    marginBottom: '1.5rem',
+                                    lineHeight: '1.5',
+                                    textAlign: 'center'
+                                }}>
+                                    🎯 <strong>Find your situation below</strong> or create a custom scenario. Each scenario will instantly analyze your specific risk factors and provide tailored guidance.
+                                </p>
+                            )}
+                            
+                            {showCustomBuilder ? (
+                                // Custom Scenario Builder with Risk-Relevant Options
+                                <div style={{
+                                    padding: '1.5rem',
+                                    background: 'rgba(0, 212, 255, 0.05)',
+                                    borderRadius: '12px',
+                                    border: '1px solid rgba(0, 212, 255, 0.3)'
+                                }}>
+                                    <h4 style={{
+                                        fontFamily: 'Orbitron, monospace',
+                                        color: '#00d4ff',
+                                        marginBottom: '1rem',
+                                        textTransform: 'uppercase',
+                                        fontSize: '0.9rem'
+                                    }}>🛠️ Custom Scenario Builder</h4>
+                                    
+                                    <div style={{ display: 'grid', gap: '1.5rem' }}>
+                                        {/* Account & Features */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Claude Account Type:</label>
+                                                <select 
+                                                    value={customScenario.accountType}
+                                                    onChange={(e) => setCustomScenario({...customScenario, accountType: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="free">Free (Claude.ai Free)</option>
+                                                    <option value="consumer">Consumer (Claude.ai Pro)</option>
+                                                    <option value="max5x">Max 5x (Claude Max 5x Pro)</option>
+                                                    <option value="max20x">Max 20x (Claude Max 20x Pro)</option>
+                                                    <option value="commercial">Commercial (API, Enterprise)</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Primary Use Case:</label>
+                                                <select 
+                                                    value={customScenario.useCase}
+                                                    onChange={(e) => setCustomScenario({...customScenario, useCase: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="general">General assistance</option>
+                                                    <option value="legal">Legal advice/documents</option>
+                                                    <option value="healthcare">Healthcare guidance</option>
+                                                    <option value="finance">Financial advice</option>
+                                                    <option value="academic">Academic/Testing</option>
+                                                    <option value="journalism">Media/Journalism</option>
+                                                    <option value="software">Software development</option>
+                                                    <option value="creative">Creative content</option>
+                                                    <option value="gaming">Gaming content</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Content Use & Features */}
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Output Usage:</label>
+                                                <select 
+                                                    value={customScenario.contentUse}
+                                                    onChange={(e) => setCustomScenario({...customScenario, contentUse: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="internal">Internal use only</option>
+                                                    <option value="external">External sharing</option>
+                                                    <option value="commercial">Commercial use</option>
+                                                    <option value="public">Public distribution</option>
+                                                </select>
+                                            </div>
+                                            
+                                            <div>
+                                                <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.5rem', display: 'block' }}>Human Oversight:</label>
+                                                <select 
+                                                    value={customScenario.humanOversight}
+                                                    onChange={(e) => setCustomScenario({...customScenario, humanOversight: e.target.value})}
+                                                    style={{
+                                                        width: '100%',
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(26, 31, 46, 0.8)',
+                                                        border: '1px solid #2a3441',
+                                                        borderRadius: '6px',
+                                                        color: '#e1e8f0',
+                                                        fontSize: '0.8rem'
+                                                    }}
+                                                >
+                                                    <option value="full">Full professional review</option>
+                                                    <option value="substantial">Substantial editing</option>
+                                                    <option value="minimal">Basic review</option>
+                                                    <option value="none">No review planned</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Advanced Features & Risk Factors */}
+                                        <div>
+                                            <label style={{ fontSize: '0.8rem', color: '#e1e8f0', marginBottom: '0.75rem', display: 'block' }}>Industry Focus & Special Features:</label>
+                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                                                {[
+                                                    { value: 'ai-development', label: 'AI/ML Development', risk: 'high' },
+                                                    { value: 'gaming-content', label: 'Gaming Content', risk: 'low' },
+                                                    { value: 'mcp-integrations', label: 'MCP Integrations', risk: 'medium' },
+                                                    { value: 'research-feature', label: 'Research Feature', risk: 'medium' },
+                                                    { value: 'financial-advice', label: 'Financial Guidance', risk: 'high' },
+                                                    { value: 'medical-content', label: 'Medical Content', risk: 'high' }
+                                                ].map((item, index) => (
+                                                    <div key={index} style={{
+                                                        padding: '0.5rem',
+                                                        background: item.risk === 'high' ? 'rgba(255, 51, 68, 0.1)' : 
+                                                                   item.risk === 'medium' ? 'rgba(255, 170, 0, 0.1)' : 'rgba(57, 255, 20, 0.1)',
+                                                        borderRadius: '6px',
+                                                        border: `1px solid ${item.risk === 'high' ? 'rgba(255, 51, 68, 0.3)' : 
+                                                               item.risk === 'medium' ? 'rgba(255, 170, 0, 0.3)' : 'rgba(57, 255, 20, 0.3)'}`
+                                                    }}>
+                                                        <div className="checkbox-item">
+                                                            <input 
+                                                                type="checkbox" 
+                                                                id={`custom-${item.value}`}
+                                                                checked={customScenario.industryFocus.includes(item.value)}
+                                                                onChange={(e) => {
+                                                                    const newFocus = e.target.checked 
+                                                                        ? [...customScenario.industryFocus, item.value]
+                                                                        : customScenario.industryFocus.filter(f => f !== item.value);
+                                                                    setCustomScenario({...customScenario, industryFocus: newFocus});
+                                                                }}
+                                                            />
+                                                            <label htmlFor={`custom-${item.value}`} style={{
+                                                                fontSize: '0.7rem',
+                                                                color: '#e1e8f0'
+                                                            }}>{item.label}</label>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                        
+                                        <button 
+                                            style={{
+                                                padding: '0.75rem 1.5rem',
+                                                background: 'linear-gradient(135deg, #39ff14, #00d4ff)',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                color: '#000',
+                                                fontFamily: 'Orbitron, monospace',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '700',
+                                                textTransform: 'uppercase',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease',
+                                                marginTop: '0.5rem'
+                                            }}
+                                            onClick={() => {
+                                                // Apply custom scenario to formData for immediate analysis
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    ...customScenario,
+                                                    mcpIntegrations: customScenario.industryFocus.includes('mcp-integrations'),
+                                                    researchFeature: customScenario.industryFocus.includes('research-feature'),
+                                                    aiDevelopment: customScenario.industryFocus.includes('ai-development') ? ['competing-ai'] : []
+                                                }));
+                                                setShowCustomBuilder(false);
+                                                setCurrentTab(1); // Go to risk analysis
+                                            }}
+                                        >
+                                            🚀 Analyze My Custom Scenario
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div>
+                                    {/* Scenario History */}
+                                    {scenarioHistory.length > 0 && (
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h4 style={{
+                                                fontFamily: 'Orbitron, monospace',
+                                                fontSize: '0.8rem',
+                                                color: '#39ff14',
+                                                marginBottom: '0.75rem',
+                                                textTransform: 'uppercase'
+                                            }}>📚 Your Custom Scenarios</h4>
+                                            
+                                            <div style={{ display: 'grid', gap: '0.5rem' }}>
+                                                {scenarioHistory.map((scenario, index) => (
+                                                    <div key={scenario.id} style={{
+                                                        padding: '0.75rem',
+                                                        background: 'rgba(57, 255, 20, 0.05)',
+                                                        borderRadius: '6px',
+                                                        border: '1px solid rgba(57, 255, 20, 0.2)',
+                                                        fontSize: '0.75rem'
+                                                    }}>
+                                                        <div style={{ color: '#39ff14', fontWeight: '600' }}>{scenario.title}</div>
+                                                        <div style={{ color: '#8892a6', fontSize: '0.7rem' }}>
+                                                            {scenario.industry} • {scenario.teamSize} • {scenario.created}
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Built-in Scenarios */}
+                                    <div style={{ 
+                                        display: 'grid',
+                                        gridTemplateColumns: '1fr',
+                                        gap: '0.75rem'
+                                    }}>
+                                        {gameScenarios.map((scenario, index) => (
+                                            <div 
+                                                key={scenario.id}
+                                                style={{
+                                                    padding: '1rem',
+                                                    background: 'rgba(26, 31, 46, 0.5)',
+                                                    borderRadius: '8px',
+                                                    border: '1px solid #2a3441',
+                                                    cursor: 'pointer',
+                                                    transition: 'all 0.3s ease',
+                                                    position: 'relative'
+                                                }}
+                                                className="scenario-card"
+                                                onClick={() => applyScenario(scenario)}
+                                                onMouseEnter={(e) => {
+                                                    e.target.style.borderColor = '#00d4ff';
+                                                    e.target.style.background = 'rgba(0, 212, 255, 0.05)';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    e.target.style.borderColor = '#2a3441';
+                                                    e.target.style.background = 'rgba(26, 31, 46, 0.5)';
+                                                }}
+                                            >
+                                                <div style={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'flex-start',
+                                                    marginBottom: '0.5rem'
+                                                }}>
+                                                    <h4 style={{
+                                                        fontFamily: 'Orbitron, monospace',
+                                                        fontSize: '0.9rem',
+                                                        color: '#00d4ff',
+                                                        margin: 0,
+                                                        textTransform: 'uppercase',
+                                                        letterSpacing: '0.5px'
+                                                    }}>
+                                                        {scenario.title}
+                                                    </h4>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                                                        <span style={{
+                                                            fontSize: '0.6rem',
+                                                            padding: '0.2rem 0.4rem',
+                                                            borderRadius: '3px',
+                                                            background: 'rgba(255, 255, 255, 0.1)',
+                                                            color: '#b4c1d3',
+                                                            fontFamily: 'Orbitron, monospace'
+                                                        }}>
+                                                            {scenario.industry} • {scenario.difficulty} • {scenario.timeToComplete}
+                                                        </span>
+                                                        <span style={{
+                                                            fontSize: '0.7rem',
+                                                            padding: '0.25rem 0.5rem',
+                                                            borderRadius: '4px',
+                                                            background: scenario.expectedRisk === 'low' ? 'rgba(57, 255, 20, 0.2)' : 
+                                                                       scenario.expectedRisk === 'medium' ? 'rgba(255, 170, 0, 0.2)' : 'rgba(255, 51, 68, 0.2)',
+                                                            color: scenario.expectedRisk === 'low' ? '#39ff14' : 
+                                                                   scenario.expectedRisk === 'medium' ? '#ffaa00' : '#ff3344',
+                                                            textTransform: 'uppercase',
+                                                            fontFamily: 'Orbitron, monospace'
+                                                        }}>
+                                                            {scenario.expectedRisk} RISK
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                
+                                                <p style={{
+                                                    fontSize: '0.8rem',
+                                                    color: '#b4c1d3',
+                                                    marginBottom: '0.75rem',
+                                                    lineHeight: '1.4'
+                                                }}>
+                                                    {scenario.description}
+                                                </p>
+                                                
+                                                <div style={{
+                                                    padding: '0.5rem',
+                                                    background: 'rgba(0, 212, 255, 0.05)',
+                                                    borderRadius: '6px',
+                                                    border: '1px solid rgba(0, 212, 255, 0.2)',
+                                                    marginBottom: '0.5rem'
+                                                }}>
+                                                    <div style={{
+                                                        fontSize: '0.7rem',
+                                                        color: '#00d4ff',
+                                                        fontWeight: '600',
+                                                        marginBottom: '0.25rem'
+                                                    }}>
+                                                        💡 Challenge:
+                                                    </div>
+                                                    <div style={{
+                                                        fontSize: '0.75rem',
+                                                        color: '#e1e8f0',
+                                                        lineHeight: '1.3'
+                                                    }}>
+                                                        {scenario.challenge}
+                                                    </div>
+                                                </div>
+                                                
+                                                {/* Enhanced Info Sections */}
+                                                {scenario.keyDecisions && (
+                                                    <div style={{
+                                                        marginBottom: '0.5rem',
+                                                        padding: '0.5rem',
+                                                        background: 'rgba(57, 255, 20, 0.05)',
+                                                        borderRadius: '6px',
+                                                        border: '1px solid rgba(57, 255, 20, 0.2)'
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: '0.7rem',
+                                                            color: '#39ff14',
+                                                            fontWeight: '600',
+                                                            marginBottom: '0.25rem'
+                                                        }}>
+                                                            🤔 Key Decisions:
+                                                        </div>
+                                                        <ul style={{
+                                                            fontSize: '0.7rem',
+                                                            color: '#b4c1d3',
+                                                            margin: 0,
+                                                            paddingLeft: '1rem',
+                                                            lineHeight: '1.3'
+                                                        }}>
+                                                            {scenario.keyDecisions.map((decision, idx) => (
+                                                                <li key={idx}>{decision}</li>
+                                                            ))}
+                                                        </ul>
+                                                    </div>
+                                                )}
+                                                
+                                                {scenario.legalPitfalls && (
+                                                    <div style={{
+                                                        marginBottom: '0.5rem',
+                                                        padding: '0.5rem',
+                                                        background: 'rgba(255, 51, 68, 0.05)',
+                                                        borderRadius: '6px',
+                                                        border: '1px solid rgba(255, 51, 68, 0.2)'
+                                                    }}>
+                                                        <div style={{
+                                                            fontSize: '0.7rem',
+                                                            color: '#ff3344',
+                                                            fontWeight: '600',
+                                                            marginBottom: '0.25rem'
+                                                        }}>
+                                                            ⚠️ Common Pitfalls:
+                                                        </div>
+                                                        <div style={{
+                                                            fontSize: '0.7rem',
+                                                            color: '#b4c1d3',
+                                                            lineHeight: '1.3'
+                                                        }}>
+                                                            {scenario.legalPitfalls.join(' • ')}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                
+                                                <div style={{
+                                                    fontSize: '0.7rem',
+                                                    color: '#8892a6',
+                                                    fontStyle: 'italic'
+                                                }}>
+                                                    🎯 Learning Focus: {scenario.learningPoints}
+                                                </div>
+                                                
+                                                {/* Click indicator */}
+                                                <div style={{
+                                                    position: 'absolute',
+                                                    top: '0.75rem',
+                                                    right: '0.75rem',
+                                                    fontSize: '0.6rem',
+                                                    color: '#39ff14',
+                                                    fontFamily: 'Orbitron, monospace',
+                                                    textTransform: 'uppercase',
+                                                    opacity: 0.7
+                                                }}>
+                                                    Click to Apply →
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+
             default:
                 return null;
         }
