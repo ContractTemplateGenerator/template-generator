@@ -640,21 +640,180 @@ const ClaudeOwnershipAnalyzer = () => {
                 return (
                     <div>
                         <div className="form-section">
-                            <h3><Icon name="globe" className="form-section-icon" />Output Distribution</h3>
-                            <div className="form-group">
-                                <label htmlFor="contentUse">How will you use Claude's outputs?</label>
-                                <select 
-                                    id="contentUse" 
-                                    name="contentUse" 
-                                    value={formData.contentUse} 
-                                    onChange={handleInputChange}
-                                >
-                                    <option value="internal">Internal use only</option>
-                                    <option value="external">External sharing</option>
-                                    <option value="commercial">Commercial use</option>
-                                    <option value="public">Public distribution</option>
-                                </select>
-                            </div>
+                            <h3><Icon name="shield" className="form-section-icon" />Risk Analysis Results</h3>
+                            <p style={{ 
+                                fontSize: '0.9rem', 
+                                color: '#b4c1d3', 
+                                marginBottom: '1.5rem',
+                                lineHeight: '1.5',
+                                textAlign: 'center'
+                            }}>
+                                Based on your scenario selection, here's your comprehensive risk assessment and compliance guidance:
+                            </p>
+                            
+                            {detailedAnalysis ? (
+                                <div>
+                                    {/* Risk Analysis Cards */}
+                                    <div style={{
+                                        display: 'grid',
+                                        gap: '1rem',
+                                        marginBottom: '2rem'
+                                    }}>
+                                        {/* Ownership Analysis */}
+                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.ownership.status)}`}>
+                                            <h4><Icon name="award" className="analysis-icon" />{detailedAnalysis.ownership.title}</h4>
+                                            <p>{detailedAnalysis.ownership.description}</p>
+                                            <ul>
+                                                {detailedAnalysis.ownership.details.map((detail, index) => (
+                                                    <li key={index}>{detail}</li>
+                                                ))}
+                                            </ul>
+                                            <div className="terms-ref">
+                                                <strong>Terms Reference:</strong> {detailedAnalysis.ownership.termsRef}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Usage Analysis */}
+                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.usage.status)}`}>
+                                            <h4><Icon name="file-text" className="analysis-icon" />{detailedAnalysis.usage.title}</h4>
+                                            <p>{detailedAnalysis.usage.description}</p>
+                                            {detailedAnalysis.usage.details.length > 0 && (
+                                                <ul>
+                                                    {detailedAnalysis.usage.details.map((detail, index) => (
+                                                        <li key={index}>{detail}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                            {detailedAnalysis.usage.violations && detailedAnalysis.usage.violations.length > 0 && (
+                                                <div className="violations">
+                                                    <strong>⚠️ Violations Detected:</strong>
+                                                    <ul>
+                                                        {detailedAnalysis.usage.violations.map((violation, index) => (
+                                                            <li key={index}>{violation}</li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
+                                            )}
+                                            <div className="terms-ref">
+                                                <strong>Terms Reference:</strong> {detailedAnalysis.usage.termsRef}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Copyright Analysis */}
+                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.copyright.status)}`}>
+                                            <h4><Icon name="shield" className="analysis-icon" />{detailedAnalysis.copyright.title}</h4>
+                                            <p>{detailedAnalysis.copyright.description}</p>
+                                            <ul>
+                                                {detailedAnalysis.copyright.details.map((detail, index) => (
+                                                    <li key={index}>{detail}</li>
+                                                ))}
+                                            </ul>
+                                            <div className="terms-ref">
+                                                <strong>Terms Reference:</strong> {detailedAnalysis.copyright.termsRef}
+                                            </div>
+                                        </div>
+                                        
+                                        {/* Disclosure Analysis */}
+                                        <div className={`analysis-card ${getStatusClass(detailedAnalysis.disclosure.status)}`}>
+                                            <h4><Icon name="eye" className="analysis-icon" />{detailedAnalysis.disclosure.title}</h4>
+                                            <p>{detailedAnalysis.disclosure.description}</p>
+                                            {detailedAnalysis.disclosure.details.length > 0 && (
+                                                <ul>
+                                                    {detailedAnalysis.disclosure.details.map((detail, index) => (
+                                                        <li key={index}>{detail}</li>
+                                                    ))}
+                                                </ul>
+                                            )}
+                                            <div className="terms-ref">
+                                                <strong>Terms Reference:</strong> {detailedAnalysis.disclosure.termsRef}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Recommendations */}
+                                    {detailedAnalysis.suggestions && detailedAnalysis.suggestions.length > 0 && (
+                                        <div className="recommendations">
+                                            <h4><Icon name="lightbulb" className="analysis-icon" />Recommendations</h4>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                {detailedAnalysis.suggestions.map((suggestion, index) => (
+                                                    <div key={index} className={`suggestion-card priority-${suggestion.priority}`}>
+                                                        <div className="suggestion-header">
+                                                            <span className="priority-badge">{suggestion.priority.toUpperCase()}</span>
+                                                            <strong>{suggestion.title}</strong>
+                                                        </div>
+                                                        <p>{suggestion.description}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    
+                                    {/* Action Buttons */}
+                                    <div style={{
+                                        display: 'flex',
+                                        gap: '1rem',
+                                        marginTop: '2rem',
+                                        justifyContent: 'center'
+                                    }}>
+                                        <button 
+                                            style={{
+                                                padding: '0.75rem 1.5rem',
+                                                background: 'linear-gradient(135deg, #00d4ff, #39ff14)',
+                                                border: 'none',
+                                                borderRadius: '8px',
+                                                color: '#000',
+                                                fontFamily: 'Orbitron, monospace',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '700',
+                                                textTransform: 'uppercase',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onClick={() => setCurrentTab(0)}
+                                        >
+                                            ← Try Different Scenario
+                                        </button>
+                                        
+                                        <button 
+                                            style={{
+                                                padding: '0.75rem 1.5rem',
+                                                background: 'rgba(0, 212, 255, 0.2)',
+                                                border: '1px solid #00d4ff',
+                                                borderRadius: '8px',
+                                                color: '#00d4ff',
+                                                fontFamily: 'Orbitron, monospace',
+                                                fontSize: '0.8rem',
+                                                fontWeight: '700',
+                                                textTransform: 'uppercase',
+                                                cursor: 'pointer',
+                                                transition: 'all 0.3s ease'
+                                            }}
+                                            onClick={openCalendlyPopup}
+                                        >
+                                            📞 Get Legal Consultation
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <div style={{ 
+                                        fontSize: '1.2rem', 
+                                        color: '#8892a6', 
+                                        marginBottom: '1rem'
+                                    }}>
+                                        🔄 Analyzing your scenario...
+                                    </div>
+                                    <p style={{ color: '#b4c1d3' }}>
+                                        Please select a scenario from the previous tab to see your risk analysis.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                );
+            
+            default:
+                return null;
                             
                             {/* Clarifying questions based on use case */}
                             {formData.useCase === 'commercial' && (
