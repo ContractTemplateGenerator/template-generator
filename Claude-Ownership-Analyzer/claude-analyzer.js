@@ -216,30 +216,39 @@ const ClaudeOwnershipAnalyzer = () => {
         setCurrentTab(1); // Go to Account Setup to see results
     };
 
-    // Handle customization form changes
+    // Handle customization form changes with real-time updates
     const handleCustomizationChange = (e) => {
         const { name, value, type, checked } = e.target;
         
+        let newData;
         if (type === 'checkbox') {
             if (name === 'prohibitedContent' || name === 'aiDevelopment') {
-                setCustomizationData(prev => ({
-                    ...prev,
+                newData = {
+                    ...customizationData,
                     [name]: checked 
-                        ? [...prev[name], value]
-                        : prev[name].filter(item => item !== value)
-                }));
+                        ? [...customizationData[name], value]
+                        : customizationData[name].filter(item => item !== value)
+                };
             } else {
-                setCustomizationData(prev => ({
-                    ...prev,
+                newData = {
+                    ...customizationData,
                     [name]: checked
-                }));
+                };
             }
         } else {
-            setCustomizationData(prev => ({
-                ...prev,
+            newData = {
+                ...customizationData,
                 [name]: value
-            }));
+            };
         }
+        
+        setCustomizationData(newData);
+        
+        // Apply changes to formData immediately for real-time gauge updates
+        setFormData(prev => ({
+            ...prev,
+            ...newData
+        }));
     };
 
     const renderTabContent = () => {
@@ -483,25 +492,31 @@ const ClaudeOwnershipAnalyzer = () => {
                                             </div>
                                         </div>
                                         
-                                        <button 
-                                            onClick={applyCustomizedScenario}
-                                            style={{
-                                                padding: '0.75rem 1.5rem',
-                                                background: 'linear-gradient(135deg, #39ff14, #00d4ff)',
-                                                border: 'none',
-                                                borderRadius: '8px',
-                                                color: '#000',
-                                                fontFamily: 'Orbitron, monospace',
+                                        <div style={{
+                                            padding: '0.75rem',
+                                            background: 'rgba(57, 255, 20, 0.1)',
+                                            borderRadius: '8px',
+                                            border: '1px solid rgba(57, 255, 20, 0.3)',
+                                            marginTop: '0.5rem',
+                                            textAlign: 'center'
+                                        }}>
+                                            <div style={{
                                                 fontSize: '0.8rem',
+                                                color: '#39ff14',
+                                                fontFamily: 'Orbitron, monospace',
                                                 fontWeight: '700',
-                                                textTransform: 'uppercase',
-                                                cursor: 'pointer',
-                                                transition: 'all 0.3s ease',
-                                                marginTop: '0.5rem'
-                                            }}
-                                        >
-                                            🚀 Analyze Risk
-                                        </button>
+                                                textTransform: 'uppercase'
+                                            }}>
+                                                ⚡ Live Analysis Active
+                                            </div>
+                                            <div style={{
+                                                fontSize: '0.7rem',
+                                                color: '#8892a6',
+                                                marginTop: '0.25rem'
+                                            }}>
+                                                Risk gauge updates in real-time
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ) : (
@@ -727,7 +742,7 @@ const ClaudeOwnershipAnalyzer = () => {
 
                 {/* Risk Factors */}
                 {riskAnalysis.factors.length > 0 && (
-                    <div className="risk-factors-list">
+                    <div className="risk-factors-list" style={{ maxHeight: '200px', minHeight: '150px' }}>
                         <h4>Risk Factors</h4>
                         <ul>
                             {riskAnalysis.factors.map((factor, index) => (

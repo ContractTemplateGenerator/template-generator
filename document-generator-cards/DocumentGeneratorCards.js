@@ -10,7 +10,7 @@ const allCardsData = [
     categoryColor: 'from-gradient-start to-gradient-end',
     categoryGradient: 'from-purple-600 via-blue-600 to-cyan-500',
     title: 'Who Owns Claude\'s Outputs and How Can They Be Used?',
-    description: 'Deep-dive legal analysis of AI ownership rights, copyright implications, and strategic guidance for businesses leveraging Claude. Includes our interactive Risk Analyzer tool.',
+    description: 'Deep-dive legal analysis of AI ownership rights, copyright implications, and strategic guidance for businesses leveraging Claude. Includes my interactive Risk Analyzer tool.',
     url: 'https://terms.law/2024/08/24/who-owns-claudes-outputs-and-how-can-they-be-used/',
     gradient: 'from-purple-600 via-blue-500 to-cyan-500',
     bgGradient: 'from-purple-50 via-blue-50 to-cyan-50',
@@ -549,6 +549,145 @@ const BlogCard = ({ data, index, onCardHover }) => {
     );
   };
 
+  // Render 50 Shades NDA animation
+  const renderFiftyShadesAnimation = () => {
+    if (data.id !== 'fifty-shades-nda') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-gray-600">
+            <defs>
+              <linearGradient id="ndaGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#6b7280" />
+                <stop offset="50%" stopColor="#4b5563" />
+                <stop offset="100%" stopColor="#374151" />
+              </linearGradient>
+            </defs>
+            
+            {/* Lock/confidentiality symbol */}
+            <rect x="40" y="35" width="20" height="25" rx="3" fill="url(#ndaGradient)" opacity="0.6" className={isHovered ? "animate-pulse" : ""}/>
+            <path d="M45 35 Q45 25 55 25 Q65 25 65 35" fill="none" stroke="currentColor" strokeWidth="3" opacity="0.7" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.3s'}}/>
+            
+            {/* Document lines */}
+            <rect x="25" y="45" width="50" height="2" rx="1" fill="currentColor" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.6s'}}/>
+            <rect x="25" y="50" width="40" height="2" rx="1" fill="currentColor" opacity="0.3" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.9s'}}/>
+            <rect x="25" y="55" width="45" height="2" rx="1" fill="currentColor" opacity="0.3" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '1.2s'}}/>
+            
+            {/* Privacy shields */}
+            <circle cx="30" cy="25" r="4" fill="currentColor" opacity="0.5" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '0.5s'}}/>
+            <circle cx="70" cy="75" r="4" fill="currentColor" opacity="0.5" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '1s'}}/>
+          </svg>
+          
+          {/* NDA badge */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-sm border border-gray-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-gray-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-gray-700">
+                <div className="text-[6px] font-bold">NDA</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render Russian NDA animation
+  const renderRussianNDAAnimation = () => {
+    if (data.id !== 'russian-nda') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-cyan-600">
+            <defs>
+              <linearGradient id="bilingualGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#06b6d4" />
+                <stop offset="50%" stopColor="#0891b2" />
+                <stop offset="100%" stopColor="#0e7490" />
+              </linearGradient>
+            </defs>
+            
+            {/* Dual language documents */}
+            <rect x="20" y="20" width="25" height="35" rx="2" fill="url(#bilingualGradient)" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0s'}}/>
+            <rect x="55" y="20" width="25" height="35" rx="2" fill="url(#bilingualGradient)" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.5s'}}/>
+            
+            {/* Connection bridge */}
+            <rect x="45" y="35" width="10" height="5" rx="1" fill="currentColor" opacity="0.6" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.3s'}}/>
+            
+            {/* Language indicators */}
+            <circle cx="32" cy="70" r="6" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.5" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '0.2s'}}/>
+            <circle cx="68" cy="70" r="6" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.5" className={isHovered ? "animate-ping" : ""} style={{animationDelay: '0.7s'}}/>
+            
+            {/* Text lines representing bilingual content */}
+            <rect x="23" y="25" width="18" height="1" rx="0.5" fill="currentColor" opacity="0.4"/>
+            <rect x="23" y="28" width="15" height="1" rx="0.5" fill="currentColor" opacity="0.4"/>
+            <rect x="58" y="25" width="18" height="1" rx="0.5" fill="currentColor" opacity="0.4"/>
+            <rect x="58" y="28" width="15" height="1" rx="0.5" fill="currentColor" opacity="0.4"/>
+          </svg>
+          
+          {/* Bilingual badge */}
+          <div className={`absolute bottom-2 right-2 w-8 h-6 bg-gradient-to-br from-cyan-100 to-cyan-200 rounded-sm border border-cyan-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-cyan-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-cyan-700">
+                <div className="text-[6px] font-bold">RU</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // Render LLC nonresidents animation
+  const renderLLCAnimation = () => {
+    if (data.id !== 'llc-nonresidents') return null;
+    
+    return (
+      <div className={`absolute top-4 right-4 transition-all duration-500 ${isHovered ? 'w-24 h-24 opacity-70' : 'w-16 h-16 opacity-40'}`}>
+        <div className="relative w-full h-full">
+          <svg viewBox="0 0 100 100" className="w-full h-full text-blue-600">
+            <defs>
+              <linearGradient id="llcGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#3b82f6" />
+                <stop offset="50%" stopColor="#1d4ed8" />
+                <stop offset="100%" stopColor="#1e40af" />
+              </linearGradient>
+            </defs>
+            
+            {/* Building/corporate structure */}
+            <rect x="35" y="25" width="30" height="35" rx="2" fill="url(#llcGradient)" opacity="0.5" className={isHovered ? "animate-pulse" : ""}/>
+            
+            {/* Flag indicating international */}
+            <rect x="20" y="15" width="15" height="10" rx="1" fill="currentColor" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.3s'}}/>
+            <rect x="65" y="15" width="15" height="10" rx="1" fill="currentColor" opacity="0.4" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.6s'}}/>
+            
+            {/* Connection lines showing international flow */}
+            <path d="M35 20 Q50 10 65 20" stroke="currentColor" strokeWidth="2" fill="none" opacity="0.5" className={isHovered ? "animate-pulse" : ""} style={{animationDelay: '0.9s'}}/>
+            
+            {/* LLC structure indicators */}
+            <rect x="40" y="35" width="20" height="2" rx="1" fill="currentColor" opacity="0.6"/>
+            <rect x="42" y="40" width="16" height="2" rx="1" fill="currentColor" opacity="0.6"/>
+            <rect x="44" y="45" width="12" height="2" rx="1" fill="currentColor" opacity="0.6"/>
+            
+            {/* Global connection points */}
+            <circle cx="25" cy="75" r="3" fill="currentColor" className={isHovered ? "animate-ping" : ""} opacity="0.7" style={{animationDelay: '0.4s'}}/>
+            <circle cx="75" cy="75" r="3" fill="currentColor" className={isHovered ? "animate-ping" : ""} opacity="0.7" style={{animationDelay: '0.8s'}}/>
+          </svg>
+          
+          {/* LLC badge */}
+          <div className={`absolute bottom-2 left-2 w-8 h-6 bg-gradient-to-br from-blue-100 to-blue-200 rounded-sm border border-blue-300 ${isHovered ? 'animate-pulse' : ''}`}>
+            <div className="absolute inset-1 border border-blue-400 rounded-sm">
+              <div className="flex flex-col justify-center items-center h-full text-xs text-blue-700">
+                <div className="text-[6px] font-bold">LLC</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   // Render MSA generator animation
   const renderMSAAnimation = () => {
     if (data.id !== 'master-services') return null;
@@ -732,6 +871,15 @@ const BlogCard = ({ data, index, onCardHover }) => {
       {/* SaaS partnership animation */}
       {renderSaaSPartnershipAnimation()}
       
+      {/* 50 Shades NDA animation */}
+      {renderFiftyShadesAnimation()}
+      
+      {/* Russian NDA animation */}
+      {renderRussianNDAAnimation()}
+      
+      {/* LLC nonresidents animation */}
+      {renderLLCAnimation()}
+      
       {/* Gradient overlay */}
       <div 
         className={`
@@ -772,7 +920,7 @@ const BlogCard = ({ data, index, onCardHover }) => {
           
           <div className="flex flex-col items-end gap-2">
             {/* Hide icon for cards with animations */}
-            {!['claude-outputs', 'tax-calculator', 'stock-transfer', 'master-services', 'trump-tariffs', 'token-issuance', 'import-agency', 'interior-design', 'saas-partnership'].includes(data.id) && (
+            {!['claude-outputs', 'tax-calculator', 'stock-transfer', 'master-services', 'trump-tariffs', 'token-issuance', 'import-agency', 'interior-design', 'saas-partnership', 'fifty-shades-nda', 'russian-nda', 'llc-nonresidents'].includes(data.id) && (
               <div 
                 className={`
                   w-10 h-10 rounded-xl flex items-center justify-center text-xl
@@ -859,15 +1007,6 @@ const BlogCards = () => {
 
   return (
     <div className="w-full max-w-7xl mx-auto p-6">
-      {/* Enhanced header section */}
-      <div className="text-center mb-12">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-purple-600 via-blue-600 to-cyan-600 bg-clip-text text-transparent">
-          Legal Tools & Analysis
-        </h1>
-        <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-          Professional-grade document generators, in-depth legal analysis, and cutting-edge AI law insights for modern businesses.
-        </p>
-      </div>
 
       {/* Cards grid with enhanced spacing */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
