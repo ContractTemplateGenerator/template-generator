@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Interactive Features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collapsible scenario cards
+            const scenarioCards = document.querySelectorAll('.scenario-card');
+            scenarioCards.forEach(card => {
+                const header = card.querySelector('.scenario-header');
+                const content = card.querySelector('.scenario-content');
+                
+                header.addEventListener('click', () => {
+                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    if (isExpanded) {
+                        content.style.maxHeight = '0px';
+                        header.querySelector('.expand-icon').textContent = '▶️';
+                        card.classList.remove('expanded');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        header.querySelector('.expand-icon').textContent = '▼';
+                        card.classList.add('expanded');
+                    }
+                });
+            });
+            
+            // Interactive tooltips
+            const tooltips = document.querySelectorAll('[data-tooltip]');
+            tooltips.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+            
+            // Copy to clipboard functionality with fade-out success message
+            window.copyText = function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showCopySuccess();
+                });
+            };
+            
+            // Show copy success message that fades away
+            window.showCopySuccess = function() {
+                const message = document.createElement('div');
+                message.textContent = '✅ Copied to clipboard!';
+                message.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: #10b981; color: white; padding: 0.75rem 1.5rem;
+                    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                    animation: copyFadeIn 0.3s ease, copyFadeOut 0.3s ease 2s forwards;
+                `;
+                document.body.appendChild(message);
+                setTimeout(() => {
+                    if (message.parentNode) message.remove();
+                }, 2500);
+            };
+            
+            // Show notification
+            window.showNotification = function(message) {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
+                    background: #1e40af; color: white; padding: 1rem 2rem;
+                    border-radius: 8px; font-weight: 600; animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            };
+        });
+        
+        function showTooltip(e) {
+            const tooltip = document.createElement('div');
+            tooltip.textContent = e.target.getAttribute('data-tooltip');
+            tooltip.className = 'tooltip-popup';
+            tooltip.style.cssText = `
+                position: absolute; background: #1f2937; color: white; padding: 0.5rem 1rem;
+                border-radius: 6px; font-size: 0.8rem; white-space: nowrap; z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none;
+            `;
+            document.body.appendChild(tooltip);
+            
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
+        }
+        
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-popup');
+            if (tooltip) tooltip.remove();
+        }
+    </script>
+    
+    <!-- Styles -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .content-wrapper {
+            max-width: 100%;
+            margin: 2rem 0;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem 0;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            color: #495057;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+        
+        h4 {
+            color: #6c757d;
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .generator-iframe {
+            width: 100%;
+            min-height: 900px;
+            border: none;
+            margin: 3rem 0;
+            background: white;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .scenario-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .scenario-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .scenario-card.expanded {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1);
+        }
+        
+        .scenario-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .scenario-header:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        
+        .scenario-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+        }
+        
+        .scenario-content.expanded {
+            padding: 1.5rem;
+        }
+        
+        .expand-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .legal-tip {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 4px solid #16a34a;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .legal-tip::before {
+            content: '💼';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #16a34a;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .interactive-element {
+            cursor: pointer;
+            border-bottom: 1px dotted #3b82f6;
+            color: #3b82f6;
+            font-weight: 500;
+        }
+        
+        .interactive-element:hover {
+            background: rgba(59, 130, 246, 0.1);
+            border-bottom-style: solid;
+        }
+        
+        .copy-button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+            transition: background 0.2s;
+        }
+        
+        .copy-button:hover {
+            background: #2563eb;
+        }
+        
+        .statute-reference {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .deadline-calculator {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            border: 2px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 4px solid #ffc107;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .tip-box {
+            background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%);
+            border-left: 4px solid #28a745;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .industry-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .industry-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        
+        .industry-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                padding: 2rem;
+            }
+            
+            .highlight-box > div {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .scenario-header {
+                padding: 1rem;
+            }
+            
+            .scenario-content {
+                padding: 0 1rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .industry-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .industry-card {
+                padding: 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .generator-iframe {
+                min-height: 700px;
+            }
+            
+            .highlight-box h3 {
+                font-size: 1.5rem;
+            }
+            
+            .highlight-box div div {
+                font-size: 2rem;
+            }
+            
+            .deadline-calculator div {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 10px;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .generator-iframe {
+                min-height: 600px;
+            }
+            
+            .highlight-box {
+                padding: 1.5rem;
+            }
+            
+            .highlight-box h3 {
+                font-size: 1.25rem;
+            }
+            
+            .highlight-box div div {
+                font-size: 1.75rem;
+            }
+            
+            .industry-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .scenario-header {
+                padding: 0.75rem;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .scenario-header h4 {
+                font-size: 1rem;
+            }
+            
+            .scenario-content {
+                padding: 0 0.75rem;
+            }
+            
+            .copy-button {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.8rem;
+            }
+            
+            h2 {
+                font-size: 1.5rem;
+            }
+            
+            p {
+                font-size: 1rem;
+            }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes copyFadeIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes copyFadeOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(-10px); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-wrapper">
+            <main class="main-content">
+                <!-- Introduction -->
+                <div class="highlight-box">
+                    <h3 style="margin: 0 0 1rem 0; color: #3b82f6;">💼 Get Your Unpaid Invoices Collected</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: #dc2626;">Your $</div>
+                            <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">invoices are sitting unpaid</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: #059669;">Collect</div>
+                            <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">with professional demand letters</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: #3b82f6;">Profit</div>
+                            <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">recover what you're owed fast</p>
+                        </div>
+                    </div>
+                    <p style="margin: 0; font-weight: 500;">💼 Stop chasing clients who ignore your payment requests. This generator creates professional demand letters that get results. Many businesses recover payment promptly when they receive formal collection notices via certified mail - it signals you're serious about collecting and creates legal pressure to pay before facing collection agencies or legal action.</p>
+                </div>
+                
+                <!-- Generator Iframe -->
+                <iframe 
+                    src="https://template.terms.law/Unpaid-Invoice-Demand-Letter-Generator/"
+                    class="generator-iframe"
+                    title="Unpaid Invoice Demand Letter Generator"
+                    loading="lazy">
+                </iframe>
+                
+                <h2 id="scenarios">Business Collection Scenarios & Strategies</h2>
+                <p style="color: #6b7280; margin-bottom: 2rem;">Click each scenario to expand proven collection strategies. These represent the most common situations I help businesses resolve.</p>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">💻</span>
+                                SaaS Subscription Non-Payment
+                                <span class="interactive-element" data-tooltip="Most common B2B collection issue">🚨</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Client continues using service but stops paying monthly/annual fees</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>🎯 SaaS Strategy:</strong> Leverage service suspension as immediate pressure while pursuing payment for past usage.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Immediate Actions:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                            <li><strong>Service suspension:</strong> Suspend access immediately upon payment failure</li>
+                            <li><strong>Data retention notice:</strong> Inform client of data deletion timeline</li>
+                            <li><strong>Usage documentation:</strong> Capture logs showing continued platform usage</li>
+                            <li><strong>Contract enforcement:</strong> Reference specific payment terms from SaaS agreement</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 SaaS-Specific Leverage:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                            <li><strong>Business dependency:</strong> Client likely depends on your service for operations</li>
+                            <li><strong>Integration costs:</strong> Switching providers is expensive and time-consuming</li>
+                            <li><strong>Data hostage:</strong> Their data/configurations are valuable assets</li>
+                            <li><strong>Recurring relationship:</strong> They want to continue the service relationship</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Select <strong>"SaaS/Subscription Services"</strong> in work description. The generator emphasizes service suspension, data retention policies, and the business disruption caused by non-payment.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>SaaS Demand Language:</strong><br>
+                            "Your continued use of our SaaS platform while failing to pay constitutes breach of contract and unjust enrichment. We have suspended your account and will permanently delete your data in [X] days unless payment is received immediately."
+                            <button class="copy-button" onclick="copyText('Your continued use of our SaaS platform while failing to pay constitutes breach of contract and unjust enrichment. We have suspended your account and will permanently delete your data in [X] days unless payment is received immediately.')">📋 Copy SaaS Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">👨‍💻</span>
+                                Freelancer Project Non-Payment
+                                <span class="interactive-element" data-tooltip="Protect your freelance income">💪</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Completed project work but client refuses to pay final invoice</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>🏆 Freelancer Power:</strong> Your work product gives you significant leverage in collection efforts.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🚫 Client Stall Tactics (Don't Accept):</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                            <li><strong>"Need minor revisions":</strong> Scope creep to avoid payment</li>
+                            <li><strong>"Waiting for approval":</strong> Indefinite internal process delays</li>
+                            <li><strong>"Cash flow issues":</strong> Their problem, not yours</li>
+                            <li><strong>"Quality concerns":</strong> Raising issues after acceptance</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Freelancer Enforcement Tools:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                            <li><strong>Copyright retention:</strong> You own the work until paid</li>
+                            <li><strong>Platform leverage:</strong> Report to Upwork, Fiverr, etc.</li>
+                            <li><strong>Public reviews:</strong> Honest feedback about payment issues</li>
+                            <li><strong>Industry reputation:</strong> Word spreads in professional networks</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">The generator includes freelancer-specific language about copyright retention, platform reporting, and professional reputation damage for non-paying clients.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Freelancer Rights Language:</strong><br>
+                            "As the creator of this work, I retain all copyright and intellectual property rights until payment is received in full. Continued use of my work without payment constitutes copyright infringement and will be reported to relevant platforms and professional networks."
+                            <button class="copy-button" onclick="copyText('As the creator of this work, I retain all copyright and intellectual property rights until payment is received in full. Continued use of my work without payment constitutes copyright infringement and will be reported to relevant platforms and professional networks.')">📋 Copy Freelancer Rights</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">🔨</span>
+                                Contractor/Construction Payment
+                                <span class="interactive-element" data-tooltip="Powerful lien rights available">⚖️</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Completed construction/renovation work with unpaid final invoice</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>🔥 Lien Power:</strong> Contractors have the strongest collection tools - mechanic's liens can force property sales to collect payment.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Mechanic's Lien Process:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Preliminary notice:</strong> File within 20 days of starting work (varies by state)</li>
+                            <li><strong>Lien filing:</strong> Must file within 60-120 days of completion</li>
+                            <li><strong>Lien enforcement:</strong> Can force property sale to collect payment</li>
+                            <li><strong>Priority position:</strong> Liens often have priority over other debts</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💰 Additional Contractor Rights:</h5>
+                        <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <ul style="margin: 0; line-height: 1.6; font-size: 0.9rem;">
+                                <li><strong>Stop work orders:</strong> Halt project until payment current</li>
+                                <li><strong>Material supplier liens:</strong> Suppliers can also lien the property</li>
+                                <li><strong>Bond claims:</strong> Claim against payment/performance bonds</li>
+                                <li><strong>Prompt payment laws:</strong> Many states require quick payment</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Check <strong>"File Mechanic's Lien"</strong> option. The generator emphasizes lien rights and includes specific construction industry language about property encumbrance.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Lien Threat Language:</strong><br>
+                            "As a contractor who has improved your property, I have the right to file a mechanic's lien for unpaid amounts. This lien will encumber your property title and may prevent sale or refinancing until satisfied. Lien filing deadline: [DATE]."
+                            <button class="copy-button" onclick="copyText('As a contractor who has improved your property, I have the right to file a mechanic\\'s lien for unpaid amounts. This lien will encumber your property title and may prevent sale or refinancing until satisfied. Lien filing deadline: [DATE].')">📋 Copy Lien Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">🏪</span>
+                                Small Business B2B Collection
+                                <span class="interactive-element" data-tooltip="Business relationship leverage">🤝</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Business-to-business unpaid invoices for goods or services</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>💼 B2B Advantage:</strong> Businesses fear credit damage and industry reputation harm more than individuals.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🎯 B2B Pressure Points:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Credit reporting:</strong> Business credit damage affects their borrowing</li>
+                            <li><strong>Industry reputation:</strong> Word spreads in business communities</li>
+                            <li><strong>Vendor relationships:</strong> Other suppliers may demand cash payments</li>
+                            <li><strong>Professional networks:</strong> Trade associations, chambers of commerce</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">📊 Collection Escalation Ladder:</h5>
+                        <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <ol style="margin: 0; line-height: 1.6; font-size: 0.9rem;">
+                                <li><strong>Day 30:</strong> Friendly payment reminder</li>
+                                <li><strong>Day 45:</strong> Formal demand letter (this generator)</li>
+                                <li><strong>Day 60:</strong> Credit bureau reporting threat</li>
+                                <li><strong>Day 75:</strong> Collection agency referral</li>
+                                <li><strong>Day 90:</strong> Legal action filing</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">The generator includes B2B-specific consequences like credit bureau reporting, vendor network notification, and industry reputation damage.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>B2B Collection Language:</strong><br>
+                            "Continued non-payment will result in reporting to business credit bureaus, notification to trade associations, and communication with other vendors in our network about your payment practices. This may affect your ability to obtain credit terms from suppliers."
+                            <button class="copy-button" onclick="copyText('Continued non-payment will result in reporting to business credit bureaus, notification to trade associations, and communication with other vendors in our network about your payment practices. This may affect your ability to obtain credit terms from suppliers.')">📋 Copy B2B Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">📞</span>
+                                Client Communication Breakdown
+                                <span class="interactive-element" data-tooltip="When clients go silent">📵</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Client stops responding to calls, emails, and payment requests</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>📬 Documentation Strategy:</strong> Create a paper trail showing your collection efforts and their avoidance.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">📋 Communication Documentation:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Email read receipts:</strong> Prove they received your messages</li>
+                            <li><strong>Certified mail:</strong> Legal proof of delivery</li>
+                            <li><strong>Phone call logs:</strong> Date, time, outcome of calls</li>
+                            <li><strong>Social media activity:</strong> Shows they're active but ignoring you</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🎯 Breaking the Silence:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                            <li><strong>Multiple channels:</strong> Email, phone, mail, LinkedIn, etc.</li>
+                            <li><strong>Third-party contacts:</strong> Colleagues, partners, mutual connections</li>
+                            <li><strong>Public pressure:</strong> Professional platform reviews/comments</li>
+                            <li><strong>Legal service:</strong> Process server for formal notices</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Include your previous communication attempts in the <strong>"Previous Attempts"</strong> section. The generator creates urgency by highlighting their avoidance behavior.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Communication Breakdown Language:</strong><br>
+                            "Your failure to respond to our repeated attempts to contact you regarding this overdue debt demonstrates bad faith. This formal demand letter serves as final notice before escalating to collection agencies and legal action."
+                            <button class="copy-button" onclick="copyText('Your failure to respond to our repeated attempts to contact you regarding this overdue debt demonstrates bad faith. This formal demand letter serves as final notice before escalating to collection agencies and legal action.')">📋 Copy Communication Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">⏰</span>
+                                Net 30/60/90 Terms Violation
+                                <span class="interactive-element" data-tooltip="Contract enforcement power">📋</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Client violates agreed payment terms in contract or invoice</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>📋 Contract Power:</strong> Clear payment terms give you legal grounds for immediate collection action.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Payment Terms Enforcement:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Breach of contract:</strong> Violation of agreed payment schedule</li>
+                            <li><strong>Late fees:</strong> Enforce penalty clauses immediately</li>
+                            <li><strong>Interest charges:</strong> Compound daily from due date</li>
+                            <li><strong>Acceleration clauses:</strong> Make entire balance due immediately</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💪 Contract Leverage Points:</h5>
+                        <div style="background: #f3f4f6; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
+                            <ul style="margin: 0; line-height: 1.6; font-size: 0.9rem;">
+                                <li><strong>Attorney fees clause:</strong> They pay your collection costs</li>
+                                <li><strong>Jurisdiction clause:</strong> Force litigation in your preferred court</li>
+                                <li><strong>Personal guarantees:</strong> Hold individuals personally liable</li>
+                                <li><strong>Security interests:</strong> Rights to collateral or assets</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">The generator automatically calculates days overdue and references contract breach. Include your original payment terms and any penalty clauses in the work description.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Contract Breach Language:</strong><br>
+                            "Your failure to pay within the agreed Net [X] terms constitutes material breach of our contract. This triggers late fees of [X]%, interest charges, and our right to accelerate the entire outstanding balance to immediate payment."
+                            <button class="copy-button" onclick="copyText('Your failure to pay within the agreed Net [X] terms constitutes material breach of our contract. This triggers late fees of [X]%, interest charges, and our right to accelerate the entire outstanding balance to immediate payment.')">📋 Copy Contract Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <h2 id="industry-guide">Industry-Specific Collection Tips</h2>
+                <p>Different industries have unique collection challenges and opportunities. Here's how to maximize your recovery based on your business type:</p>
+                
+                <div class="industry-grid">
+                    <div class="industry-card">
+                        <h4>💻 SaaS & Tech</h4>
+                        <p><strong>Leverage:</strong> Service suspension, data retention policies</p>
+                        <p><strong>Timeline:</strong> Immediate suspension upon payment failure</p>
+                        <small style="color: #6b7280;">High success rate due to business dependency</small>
+                    </div>
+                    <div class="industry-card">
+                        <h4>🎨 Creative Services</h4>
+                        <p><strong>Leverage:</strong> Copyright retention, portfolio removal</p>
+                        <p><strong>Timeline:</strong> 30-day demand period before IP action</p>
+                        <small style="color: #6b7280;">Strong IP rights provide collection power</small>
+                    </div>
+                    <div class="industry-card">
+                        <h4>🔧 Construction</h4>
+                        <p><strong>Leverage:</strong> Mechanic's liens, stop work orders</p>
+                        <p><strong>Timeline:</strong> File lien within 60-120 days</p>
+                        <small style="color: #6b7280;">Strongest collection rights available</small>
+                    </div>
+                    <div class="industry-card">
+                        <h4>📊 Consulting</h4>
+                        <p><strong>Leverage:</strong> Industry reputation, referral networks</p>
+                        <p><strong>Timeline:</strong> 45-day escalation to public review</p>
+                        <small style="color: #6b7280;">Professional reputation damage effective</small>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>💼 Business Collection Best Practices</h4>
+                    <p><strong>Send via certified mail:</strong> Creates legal proof of delivery and demonstrates serious intent. Include payment options and deadlines to show good faith. Document all collection efforts for potential legal action. Most businesses prefer to settle quietly rather than face public collection proceedings that damage their reputation.</p>
+                </div>
+                
+                <h2>Ready to Collect Your Unpaid Invoices?</h2>
+                <p>Use the generator above to create your professional demand letter and/or schedule consultation at the calendar below.</p>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
