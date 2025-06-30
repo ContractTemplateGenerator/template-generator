@@ -7,7 +7,7 @@ const PaywallSystem = (() => {
         clientId: 'ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx',
         secretKey: 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI',
         currency: 'USD',
-        amount: '19.95', // Price for the tenant deposit letter generator
+        amount: '14.95', // Price for the tenant deposit letter generator
         description: 'Tenant Security Deposit Demand Letter Generator - Professional Legal Document'
     };
 
