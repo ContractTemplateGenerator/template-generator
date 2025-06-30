@@ -35,10 +35,10 @@
                 element.addEventListener('mouseleave', hideTooltip);
             });
             
-            // Copy to clipboard functionality
+            // Copy to clipboard functionality with fade-out success message
             window.copyText = function(text) {
                 navigator.clipboard.writeText(text).then(() => {
-                    showNotification('✅ Copied to clipboard!');
+                    showCopySuccess();
                 }).catch(() => {
                     // Fallback for older browsers
                     const textArea = document.createElement('textarea');
@@ -47,8 +47,25 @@
                     textArea.select();
                     document.execCommand('copy');
                     document.body.removeChild(textArea);
-                    showNotification('✅ Copied to clipboard!');
+                    showCopySuccess();
                 });
+            };
+            
+            // Show copy success message that fades away
+            window.showCopySuccess = function() {
+                const message = document.createElement('div');
+                message.textContent = '✅ Copied to clipboard!';
+                message.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: #10b981; color: white; padding: 0.75rem 1.5rem;
+                    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                    animation: copyFadeIn 0.3s ease, copyFadeOut 0.3s ease 2s forwards;
+                `;
+                document.body.appendChild(message);
+                setTimeout(() => {
+                    if (message.parentNode) message.remove();
+                }, 2500);
             };
             
             // Show notification
@@ -377,6 +394,16 @@
             from { transform: translateX(100%); opacity: 0; }
             to { transform: translateX(0); opacity: 1; }
         }
+        
+        @keyframes copyFadeIn {
+            from { transform: translateY(-10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        @keyframes copyFadeOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(-10px); opacity: 0; }
+        }
     </style>
 </head>
 <body>
@@ -420,49 +447,55 @@
                     <strong>🔍 Pro Tip:</strong> States with higher penalty multipliers (Texas 3x, California 2x) often result in faster settlements because landlords face real financial consequences.
                 </div>
                 
-                <h3>Strategic State Variations:</h3>
+                <h3>Key State Variations:</h3>
                 <div class="state-grid">
-                    <div class="state-card" data-tooltip="21-day deadline, 2x penalty multiplier, interest required">
+                    <div class="state-card" data-tooltip="Click to view California Civil Code Section 1950.5" onclick="window.open('https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?sectionNum=1950.5&lawCode=CIV', '_blank')">
                         <h4>🌴 California</h4>
                         <p><strong>21 days</strong> deadline<br><strong>2x damages</strong> penalty<br><strong>Interest required</strong></p>
-                        <small style="color: #6b7280;">Tenant-friendly, strict enforcement</small>
+                        <small style="color: #6b7280;">Click for Civil Code §1950.5</small>
                     </div>
-                    <div class="state-card" data-tooltip="Variable timeline, interest required, complex city rules">
+                    <div class="state-card" data-tooltip="Click to view New York General Obligations Law" onclick="window.open('https://www.nysenate.gov/legislation/laws/GOB/7-103', '_blank')">
                         <h4>🗽 New York</h4>
                         <p><strong>Reasonable time</strong><br><strong>Interest required</strong><br><strong>Itemization mandatory</strong></p>
-                        <small style="color: #6b7280;">Complex rules, varies by city</small>
+                        <small style="color: #6b7280;">Click for Gen. Oblig. Law §7-103</small>
                     </div>
-                    <div class="state-card" data-tooltip="30-day deadline, highest penalty multiplier at 3x">
+                    <div class="state-card" data-tooltip="Click to view Texas Property Code Section 92.109" onclick="window.open('https://statutes.capitol.texas.gov/Docs/PR/htm/PR.92.htm#92.109', '_blank')">
                         <h4>🤠 Texas</h4>
                         <p><strong>30 days</strong> deadline<br><strong>3x damages</strong> penalty<br><strong>Automatic forfeiture</strong></p>
-                        <small style="color: #6b7280;">Highest penalties, fast results</small>
+                        <small style="color: #6b7280;">Click for Property Code §92.109</small>
                     </div>
-                    <div class="state-card" data-tooltip="Variable timeline based on notice given to tenant">
-                        <h4>🌴 Florida</h4>
+                    <div class="state-card" data-tooltip="Click to view Florida Statutes Section 83.49" onclick="window.open('http://www.leg.state.fl.us/Statutes/index.cfm?App_mode=Display_Statute&URL=0000-0099/0083/Sections/0083.49.html', '_blank')">
+                        <h4>🏖️ Florida</h4>
                         <p><strong>15-60 days</strong> variable<br><strong>Interest + attorney fees</strong><br><strong>Notice dependent</strong></p>
-                        <small style="color: #6b7280;">Timeline varies by notice given</small>
+                        <small style="color: #6b7280;">Click for Statute §83.49</small>
                     </div>
                 </div>
                 
                 <div class="deadline-calculator">
-                    <h4 style="margin: 0 0 1rem 0; color: #92400e;">🎯 Strategy by State Penalty Level</h4>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1rem; border-radius: 8px;">
-                            <h5 style="color: #dc2626; margin: 0 0 0.5rem 0;">High Penalty States (3x+)</h5>
-                            <p style="margin: 0; font-size: 0.8rem;">Texas, Massachusetts, Connecticut</p>
-                            <small style="color: #6b7280;">Aggressive demands work best</small>
+                    <h4 style="margin: 0 0 1rem 0; color: #92400e;">📊 All 50 States Penalty Overview</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem; font-size: 0.75rem;">
+                        <div style="background: rgba(220, 38, 38, 0.1); padding: 0.75rem; border-radius: 6px;">
+                            <h6 style="color: #dc2626; margin: 0 0 0.5rem 0; font-size: 0.8rem;">High Penalty (3x+)</h6>
+                            <p style="margin: 0; line-height: 1.3;">TX (3x), MA (3x), CT (2x+fees), MD (3x), TN (2x+fees)</p>
                         </div>
-                        <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 8px;">
-                            <h5 style="color: #f59e0b; margin: 0 0 0.5rem 0;">Medium Penalty States (2x)</h5>
-                            <p style="margin: 0; font-size: 0.8rem;">California, Illinois, Nevada</p>
-                            <small style="color: #6b7280;">Professional tone with firm deadlines</small>
+                        <div style="background: rgba(245, 158, 11, 0.1); padding: 0.75rem; border-radius: 6px;">
+                            <h6 style="color: #f59e0b; margin: 0 0 0.5rem 0; font-size: 0.8rem;">Medium Penalty (2x)</h6>
+                            <p style="margin: 0; line-height: 1.3;">CA (2x), IL (2x), NV (2x), NJ (2x), NM (2x), OR (2x)</p>
                         </div>
-                        <div style="background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px;">
-                            <h5 style="color: #22c55e; margin: 0 0 0.5rem 0;">Limited Penalty States</h5>
-                            <p style="margin: 0; font-size: 0.8rem;">Alabama, Wyoming, Arkansas</p>
-                            <small style="color: #6b7280;">Focus on statutory violations</small>
+                        <div style="background: rgba(59, 130, 246, 0.1); padding: 0.75rem; border-radius: 6px;">
+                            <h6 style="color: #3b82f6; margin: 0 0 0.5rem 0; font-size: 0.8rem;">Interest + Fees</h6>
+                            <p style="margin: 0; line-height: 1.3;">NY (interest), FL (fees), AK (1.5x), DE (2x), HI (fees)</p>
+                        </div>
+                        <div style="background: rgba(34, 197, 94, 0.1); padding: 0.75rem; border-radius: 6px;">
+                            <h6 style="color: #22c55e; margin: 0 0 0.5rem 0; font-size: 0.8rem;">Limited/Standard</h6>
+                            <p style="margin: 0; line-height: 1.3;">AL, AR, AZ, CO, GA, ID, IN, IA, KS, KY, LA, ME, MI, MN, MS, MO, MT, NE, NH, NC, ND, OH, OK, PA, RI, SC, SD, UT, VT, VA, WA, WV, WI, WY</p>
+                        </div>
+                        <div style="background: rgba(156, 163, 175, 0.1); padding: 0.75rem; border-radius: 6px;">
+                            <h6 style="color: #6b7280; margin: 0 0 0.5rem 0; font-size: 0.8rem;">No State Law</h6>
+                            <p style="margin: 0; line-height: 1.3;">No states completely lack deposit laws</p>
                         </div>
                     </div>
+                    <p style="margin-top: 1rem; font-size: 0.8rem; color: #6b7280; text-align: center;">💡 My generator automatically applies the correct penalties for your state</p>
                 </div>
                 
                 <div class="warning-box">
@@ -579,6 +612,128 @@
                             <strong>Demand Letter Language:</strong><br>
                             "Your failure to provide itemized deductions within the statutory period violates [State Code]. I demand immediate refund of the full deposit amount plus statutory penalties."
                             <button class="copy-button" onclick="copyText('Your failure to provide itemized deductions within the statutory period violates [State Code]. I demand immediate refund of the full deposit amount plus statutory penalties.')">📋 Copy Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">🧽</span>
+                                Excessive Cleaning Charges
+                                <span class="interactive-element" data-tooltip="Most common deposit dispute">⚠️</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Unreasonable cleaning fees beyond normal wear and tear</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>🎯 Key Defense:</strong> Tenants are only liable for cleaning beyond normal wear and tear. Regular cleaning is landlord's responsibility.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🚫 Invalid Cleaning Charges:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                            <li><strong>Routine cleaning:</strong> Basic vacuuming, mopping, window cleaning</li>
+                            <li><strong>Professional carpet cleaning:</strong> Unless lease specifically requires it AND carpet is excessively dirty</li>
+                            <li><strong>General kitchen/bathroom cleaning:</strong> Normal soap scum, food residue</li>
+                            <li><strong>Paint touch-ups:</strong> Minor scuffs, nail holes, normal fading</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">✅ Valid Cleaning Charges:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                            <li><strong>Excessive grease/grime:</strong> Beyond normal cooking residue</li>
+                            <li><strong>Pet odors/stains:</strong> Requiring special treatment</li>
+                            <li><strong>Damage cleaning:</strong> Crayon marks, adhesive residue</li>
+                            <li><strong>Hoarder-level conditions:</strong> Extreme uncleanliness</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">My generator addresses this in the <strong>"Disputed Charges"</strong> section where you can select "Excessive cleaning charges" and provide your counter-argument. It automatically cites normal wear and tear laws.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Demand Letter Language:</strong><br>
+                            "The $[AMOUNT] cleaning charge violates [State] normal wear and tear laws. I left the property in clean condition appropriate for normal tenancy turnover. You cannot charge tenants for routine cleaning that any property requires between tenants."
+                            <button class="copy-button" onclick="copyText('The $[AMOUNT] cleaning charge violates [State] normal wear and tear laws. I left the property in clean condition appropriate for normal tenancy turnover. You cannot charge tenants for routine cleaning that any property requires between tenants.')">📋 Copy Language</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">🔨</span>
+                                Inflated Repair Costs
+                                <span class="interactive-element" data-tooltip="Challenge excessive estimates">💰</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Repair costs that exceed reasonable market rates</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>⚡ Challenge Rule:</strong> Landlords must use reasonable costs and can only restore to original condition, not upgrade.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🚩 Red Flag Charges:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Premium materials:</strong> Luxury upgrades vs. original quality</li>
+                            <li><strong>Emergency rates:</strong> After-hours or rush charges without justification</li>
+                            <li><strong>No receipts:</strong> Estimates only, no proof of actual work</li>
+                            <li><strong>Contractor markup:</strong> 50%+ above reasonable market rates</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Use the <strong>"Custom Disputed Charges"</strong> section to detail specific overcharges. The generator helps you cite the reasonableness standard and demand proof of actual costs.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Challenge Template:</strong><br>
+                            "The $[AMOUNT] repair charge is unreasonable and exceeds market rates. Please provide: (1) Three competing estimates, (2) Proof of actual work completion with receipts, (3) Justification for any premium materials beyond original property condition."
+                            <button class="copy-button" onclick="copyText('The $[AMOUNT] repair charge is unreasonable and exceeds market rates. Please provide: (1) Three competing estimates, (2) Proof of actual work completion with receipts, (3) Justification for any premium materials beyond original property condition.')">📋 Copy Challenge</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">📺</span>
+                                Appliance "Replacement" Charges
+                                <span class="interactive-element" data-tooltip="Depreciation defense">📉</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Charges for appliances at end of useful life</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>💡 Depreciation Defense:</strong> Appliances have useful lives. Tenants only pay for premature damage, not normal wear-out.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">📊 Standard Appliance Lifespans:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Refrigerator:</strong> 10-15 years (zero liability after 10 years)</li>
+                            <li><strong>Dishwasher:</strong> 8-12 years</li>
+                            <li><strong>Microwave:</strong> 5-8 years</li>
+                            <li><strong>Garbage disposal:</strong> 8-12 years</li>
+                        </ul>
+                        
+                        <div class="deadline-calculator">
+                            <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Coverage</h6>
+                            <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Select <strong>"Appliance replacement charges"</strong> in disputed charges. Provide the appliance age and condition when you moved in to establish depreciation defense.</p>
+                        </div>
+                        
+                        <div class="statute-reference">
+                            <strong>Depreciation Argument:</strong><br>
+                            "The [APPLIANCE] was [AGE] years old when I moved in and [AGE+TENANCY] years old at move-out. Given the [LIFESPAN]-year useful life, this appliance reached normal end-of-life. I cannot be charged for replacing an appliance that died of old age."
+                            <button class="copy-button" onclick="copyText('The [APPLIANCE] was [AGE] years old when I moved in and [AGE+TENANCY] years old at move-out. Given the [LIFESPAN]-year useful life, this appliance reached normal end-of-life. I cannot be charged for replacing an appliance that died of old age.')">📋 Copy Argument</button>
                         </div>
                     </div>
                 </div>
