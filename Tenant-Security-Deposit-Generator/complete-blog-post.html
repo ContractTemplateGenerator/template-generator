@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Interactive Features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collapsible scenario cards
+            const scenarioCards = document.querySelectorAll('.scenario-card');
+            scenarioCards.forEach(card => {
+                const header = card.querySelector('.scenario-header');
+                const content = card.querySelector('.scenario-content');
+                
+                header.addEventListener('click', () => {
+                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    if (isExpanded) {
+                        content.style.maxHeight = '0px';
+                        header.querySelector('.expand-icon').textContent = '▶️';
+                        card.classList.remove('expanded');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        header.querySelector('.expand-icon').textContent = '▼';
+                        card.classList.add('expanded');
+                    }
+                });
+            });
+            
+            // Interactive tooltips
+            const tooltips = document.querySelectorAll('[data-tooltip]');
+            tooltips.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+            
+            // Copy to clipboard functionality
+            window.copyText = function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('✅ Copied to clipboard!');
+                });
+            };
+            
+            // Show notification
+            window.showNotification = function(message) {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
+                    background: #1e40af; color: white; padding: 1rem 2rem;
+                    border-radius: 8px; font-weight: 600; animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            };
+        });
+        
+        function showTooltip(e) {
+            const tooltip = document.createElement('div');
+            tooltip.textContent = e.target.getAttribute('data-tooltip');
+            tooltip.className = 'tooltip-popup';
+            tooltip.style.cssText = `
+                position: absolute; background: #1f2937; color: white; padding: 0.5rem 1rem;
+                border-radius: 6px; font-size: 0.8rem; white-space: nowrap; z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none;
+            `;
+            document.body.appendChild(tooltip);
+            
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
+        }
+        
+        function hideTooltip() {
+            const tooltip = document.querySelector('.tooltip-popup');
+            if (tooltip) tooltip.remove();
+        }
+    </script>
+    
+    <!-- Styles -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .content-wrapper {
+            max-width: 100%;
+            margin: 2rem 0;
+        }
+        
+        .main-content {
+            background: white;
+            padding: 3rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            width: 100%;
+        }
+        
+        h2 {
+            color: #2c3e50;
+            font-size: 2rem;
+            margin: 2.5rem 0 1.5rem 0;
+            border-bottom: 3px solid #1e40af;
+            padding-bottom: 0.5rem;
+        }
+        
+        h3 {
+            color: #495057;
+            font-size: 1.5rem;
+            margin: 2rem 0 1rem 0;
+        }
+        
+        h4 {
+            color: #6c757d;
+            font-size: 1.25rem;
+            margin: 1.5rem 0 1rem 0;
+        }
+        
+        p {
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.7;
+        }
+        
+        .generator-iframe {
+            width: 100%;
+            min-height: 900px;
+            border: none;
+            margin: 3rem 0;
+            background: white;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #eff6ff 100%);
+            border-left: 4px solid #1e40af;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .scenario-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin: 1rem 0;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .scenario-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .scenario-card.expanded {
+            border-color: #1e40af;
+            box-shadow: 0 4px 20px rgba(30, 64, 175, 0.1);
+        }
+        
+        .scenario-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .scenario-header:hover {
+            background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+        }
+        
+        .scenario-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            padding: 0 1.5rem;
+        }
+        
+        .scenario-content.expanded {
+            padding: 1.5rem;
+        }
+        
+        .expand-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .legal-tip {
+            background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
+            border-left: 4px solid #16a34a;
+            padding: 1rem 1.5rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            position: relative;
+        }
+        
+        .legal-tip::before {
+            content: '⚖️';
+            position: absolute;
+            left: -12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #16a34a;
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .interactive-element {
+            cursor: pointer;
+            border-bottom: 1px dotted #1e40af;
+            color: #1e40af;
+            font-weight: 500;
+        }
+        
+        .interactive-element:hover {
+            background: rgba(30, 64, 175, 0.1);
+            border-bottom-style: solid;
+        }
+        
+        .copy-button {
+            background: #1e40af;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin: 0.5rem 0;
+            transition: background 0.2s;
+        }
+        
+        .copy-button:hover {
+            background: #1e3a8a;
+        }
+        
+        .statute-reference {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+        }
+        
+        .deadline-calculator {
+            background: linear-gradient(135deg, #fef3c7 0%, #fed7aa 100%);
+            border: 2px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+        }
+        
+        .warning-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 4px solid #ffc107;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .tip-box {
+            background: linear-gradient(135deg, #d4edda 0%, #a8e6cf 100%);
+            border-left: 4px solid #28a745;
+            padding: 2rem;
+            margin: 2rem 0;
+            border-radius: 8px;
+        }
+        
+        .state-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+        
+        .state-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: box-shadow 0.2s;
+        }
+        
+        .state-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1.5rem;
+            }
+            
+            .state-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .generator-iframe {
+                min-height: 600px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 15px;
+            }
+            
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .generator-iframe {
+                min-height: 500px;
+            }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-wrapper">
+            <main class="main-content">
+                <!-- Introduction -->
+                <p>
+                    Security deposits are one of the most contentious issues in landlord-tenant relationships. Every year, millions of tenants struggle to recover their deposits, often losing hundreds or thousands of dollars due to unfair deductions or landlord delays. Understanding your rights and having the right legal tools can make the difference between losing your deposit and getting your money back with interest and penalties.
+                </p>
+                
+                <p>
+                    As a legal professional who has helped thousands of tenants recover their deposits, I've created this comprehensive guide and professional demand letter generator to level the playing field. Most landlords respond quickly when they receive a well-crafted legal demand that demonstrates you know your rights and are prepared to take action.
+                </p>
+                
+                <!-- Generator Iframe -->
+                <iframe 
+                    src="https://template.terms.law/Tenant-Security-Deposit-Generator/"
+                    class="generator-iframe"
+                    title="Security Deposit Demand Letter Generator"
+                    loading="lazy">
+                </iframe>
+                
+                <h2 id="when-to-send">When to Send a Security Deposit Demand Letter</h2>
+                <p>
+                    Timing is critical when it comes to security deposit recovery. Most states have specific deadlines that landlords must meet for returning deposits, and understanding these timeframes is essential for building your case.
+                </p>
+                
+                <div class="tip-box">
+                    <h4>💡 Pro Tip: Document Everything</h4>
+                    <p>Before sending your demand letter, gather all evidence including photos, receipts, communication records, and your lease agreement. A well-documented case significantly increases your chances of success.</p>
+                </div>
+                
+                <h2 id="state-laws">State-by-State Legal Requirements</h2>
+                <p>
+                    Security deposit laws vary dramatically by state. My generator automatically applies the correct legal standards, but here are the key differences that determine your strategy:
+                </p>
+                
+                <div class="legal-tip">
+                    <strong>🔍 Pro Tip:</strong> States with higher penalty multipliers (Texas 3x, California 2x) often result in faster settlements because landlords face real financial consequences.
+                </div>
+                
+                <h3>Strategic State Variations:</h3>
+                <div class="state-grid">
+                    <div class="state-card" style="cursor: pointer;" data-tooltip="Click for detailed CA requirements">
+                        <h4>🌴 California</h4>
+                        <p><strong>21 days</strong> deadline<br><strong>2x damages</strong> penalty<br><strong>Interest required</strong></p>
+                        <small style="color: #6b7280;">Tenant-friendly, strict enforcement</small>
+                    </div>
+                    <div class="state-card" style="cursor: pointer;" data-tooltip="Click for detailed NY requirements">
+                        <h4>🗽 New York</h4>
+                        <p><strong>Reasonable time</strong><br><strong>Interest required</strong><br><strong>Itemization mandatory</strong></p>
+                        <small style="color: #6b7280;">Complex rules, varies by city</small>
+                    </div>
+                    <div class="state-card" style="cursor: pointer;" data-tooltip="Click for detailed TX requirements">
+                        <h4>🤠 Texas</h4>
+                        <p><strong>30 days</strong> deadline<br><strong>3x damages</strong> penalty<br><strong>Automatic forfeiture</strong></p>
+                        <small style="color: #6b7280;">Highest penalties, fast results</small>
+                    </div>
+                    <div class="state-card" style="cursor: pointer;" data-tooltip="Click for detailed FL requirements">
+                        <h4>🌴 Florida</h4>
+                        <p><strong>15-60 days</strong> variable<br><strong>Interest + attorney fees</strong><br><strong>Notice dependent</strong></p>
+                        <small style="color: #6b7280;">Timeline varies by notice given</small>
+                    </div>
+                </div>
+                
+                <div class="deadline-calculator">
+                    <h4 style="margin: 0 0 1rem 0; color: #92400e;">🎯 Strategy by State Penalty Level</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="background: rgba(220, 38, 38, 0.1); padding: 1rem; border-radius: 8px;">
+                            <h5 style="color: #dc2626; margin: 0 0 0.5rem 0;">High Penalty States (3x+)</h5>
+                            <p style="margin: 0; font-size: 0.8rem;">Texas, Massachusetts, Connecticut</p>
+                            <small style="color: #6b7280;">Aggressive demands work best</small>
+                        </div>
+                        <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 8px;">
+                            <h5 style="color: #f59e0b; margin: 0 0 0.5rem 0;">Medium Penalty States (2x)</h5>
+                            <p style="margin: 0; font-size: 0.8rem;">California, Illinois, Nevada</p>
+                            <small style="color: #6b7280;">Professional tone with firm deadlines</small>
+                        </div>
+                        <div style="background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px;">
+                            <h5 style="color: #22c55e; margin: 0 0 0.5rem 0;">Limited Penalty States</h5>
+                            <p style="margin: 0; font-size: 0.8rem;">Alabama, Wyoming, Arkansas</p>
+                            <small style="color: #6b7280;">Focus on statutory violations</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="warning-box">
+                    <h4>⚠️ Important: Statute of Limitations</h4>
+                    <p>Most states have deadlines for filing deposit-related claims, typically ranging from 2-6 years. Don't wait too long to pursue your claim, as you may lose your right to recover.</p>
+                </div>
+                
+                <h2 id="scenarios">Interactive Legal Scenarios & Defenses</h2>
+                <p style="color: #6b7280; margin-bottom: 2rem;">Click each scenario to expand detailed legal strategies and precedents. These represent the most common disputes I handle.</p>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">⏰</span>
+                                Missed Legal Deadline
+                                <span class="interactive-element" data-tooltip="Click to see penalty multipliers by state">📊</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Landlord failed to return deposit within statutory timeframe</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>⚡ Immediate Action:</strong> Calculate your penalty multiplier. Most states award 2-3x damages for missed deadlines.
+                        </div>
+                        
+                        <div class="deadline-calculator">
+                            <h5 style="margin: 0 0 1rem 0; color: #92400e;">📅 Deadline Calculator</h5>
+                            <p style="margin: 0; font-size: 0.9rem;">Days since move-out: <strong style="color: #dc2626;">[Use generator to calculate]</strong></p>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.8rem; color: #6b7280;">Our generator automatically calculates deadlines and penalties for your state.</p>
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">🎯 Winning Strategy:</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6;">
+                            <li><strong>Prove exact move-out date:</strong> Use timestamped photos, key return receipts, certified mail receipts</li>
+                            <li><strong>Document forwarding address:</strong> Email confirmation or certified mail to landlord</li>
+                            <li><strong>Calculate statutory penalties:</strong> <span class="interactive-element" data-tooltip="CA: 2x damages, TX: 3x damages, NY: Interest + penalties">State-specific multipliers</span></li>
+                        </ul>
+                        
+                        <div class="statute-reference">
+                            <strong>Sample Legal Citation:</strong><br>
+                            "Per [State] Civil Code § [XXX], failure to return security deposit within [XX] days subjects landlord to statutory penalties of [X]x the deposit amount plus interest."
+                            <button class="copy-button" onclick="copyText('Per [State] Civil Code § [XXX], failure to return security deposit within [XX] days subjects landlord to statutory penalties of [X]x the deposit amount plus interest.')">📋 Copy Citation</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-header">
+                        <div>
+                            <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.2rem;">🔍</span>
+                                Normal Wear vs. Damage
+                                <span class="interactive-element" data-tooltip="See state-specific wear guidelines">📖</span>
+                            </h4>
+                            <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Improper deductions for normal wear and tear</p>
+                        </div>
+                        <span class="expand-icon">▶️</span>
+                    </div>
+                    <div class="scenario-content">
+                        <div class="legal-tip">
+                            <strong>🏆 Legal Standard:</strong> Tenant is NOT liable for reasonable wear from ordinary use.
+                        </div>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">✅ Normal Wear (NOT chargeable):</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                            <li><strong>Carpet:</strong> Traffic patterns, minor stains (10+ year lifespan)</li>
+                            <li><strong>Paint:</strong> Fading, nail holes <2mm (3-5 year lifespan)</li>
+                            <li><strong>Appliances:</strong> Normal mechanical wear</li>
+                        </ul>
+                        
+                        <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">❌ Damage (Chargeable):</h5>
+                        <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                            <li><strong>Carpet:</strong> Burns, pet damage, excessive stains</li>
+                            <li><strong>Paint:</strong> Crayon marks, large holes, excessive nail holes</li>
+                            <li><strong>Fixtures:</strong> Broken items beyond normal wear</li>
+                        </ul>
+                        
+                        <div class="statute-reference">
+                            <strong>Legal Precedent Template:</strong><br>
+                            "The deduction for [carpet cleaning/paint] violates [State] law as this constitutes normal wear and tear under [Case Name/Statute]. Tenant is entitled to full refund plus penalties."
+                            <button class="copy-button" onclick="copyText('The deduction for [carpet cleaning/paint] violates [State] law as this constitutes normal wear and tear under [Case Name/Statute]. Tenant is entitled to full refund plus penalties.')">📋 Copy Template</button>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
