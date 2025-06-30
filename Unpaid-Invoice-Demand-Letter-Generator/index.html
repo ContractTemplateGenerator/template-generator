@@ -128,6 +128,7 @@
             // State management
             const [currentTab, setCurrentTab] = useState(0);
             const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
+            const [eSignLoading, setESignLoading] = useState(false);
             const previewRef = useRef(null);
             
             // Form data state
@@ -160,16 +161,26 @@
                 collectionAgency: true,
                 legalAction: true,
                 lienRights: false,
+                stopServices: true,
+                copyrightClaim: false,
+                industryReporting: false,
+                
+                // Business Type (for specialized strategies)
+                businessType: 'general',
                 
                 // Previous Communication
-                previousAttempts: ''
+                previousAttempts: '',
+                
+                // Urgency Level
+                urgencyLevel: 'standard'
+                
             });
 
             // Tab definitions
             const tabs = [
                 { id: 'details', label: 'Invoice Details', icon: 'file-text' },
                 { id: 'collection', label: 'Collection Strategy', icon: 'target' },
-                { id: 'preview', label: 'Review & Send', icon: 'send' }
+                { id: 'assessment', label: 'Case Assessment', icon: 'bar-chart-2' }
             ];
 
             // Paywall integration
@@ -246,6 +257,15 @@
                 }
                 if (formData.lienRights) {
                     consequences.push('Filing of mechanic\'s lien against your property (where applicable)');
+                }
+                if (formData.stopServices) {
+                    consequences.push('Immediate suspension of all services and access');
+                }
+                if (formData.copyrightClaim) {
+                    consequences.push('Copyright infringement claim and removal of creative work');
+                }
+                if (formData.industryReporting) {
+                    consequences.push('Reporting to industry associations and professional networks');
                 }
                 consequences.unshift(`Late fees and interest charges at ${formData.interestRate || '1.5'}% per month`);
 
@@ -394,6 +414,113 @@
                 link.download = `Demand_Letter_Invoice_${formData.invoiceNumber || 'Draft'}.doc`;
                 link.click();
                 URL.revokeObjectURL(url);
+            };
+
+            // E-Sign Document Function
+            const eSignDocument = async () => {
+                if (!hasPaywallAccess) {
+                    if (window.PaywallSystem) {
+                        window.PaywallSystem.showAccessDenied('esign');
+                        window.PaywallSystem.createPaywallModal(() => {
+                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                                setHasPaywallAccess(true);
+                                window.PaywallSystem.enablePreviewInteraction();
+                                eSignDocument();
+                            }
+                        });
+                    }
+                    return;
+                }
+                
+                // Check eSignature click limit (5 clicks per payment)
+                if (window.PaywallSystem && !window.PaywallSystem.canClickESignature()) {
+                    const paymentStatus = window.PaywallSystem.getPaymentStatus();
+                    const clickCount = paymentStatus.esignatureClicks || 0;
+                    alert(`🚫 eSignature Click Limit Reached\\n\\nYou have used ${clickCount}/5 eSignature clicks for this payment.\\n\\n⚠️ Each click sends a document to our API and regenerates it, costing us API fees even if you don't ultimately sign.\\n\\nTo create more eSignatures, please make a new payment.`);
+                    return;
+                }
+
+                // Show warning about API costs
+                const proceed = confirm(`📝 eSignature API Notice\\n\\n⚠️ IMPORTANT: This button sends your document to eSignatures.com API and costs us money for each click, even if you don't complete the signing.\\n\\n✅ Please ensure your document is complete and correct before proceeding.\\n\\n🔢 You have ${5 - (window.PaywallSystem?.getPaymentStatus()?.esignatureClicks || 0)} API calls remaining.\\n\\nProceed with eSignature creation?`);
+                
+                if (!proceed) {
+                    return;
+                }
+
+                // Increment click counter
+                if (window.PaywallSystem) {
+                    window.PaywallSystem.incrementESignatureClicks();
+                }
+                
+                // Use pre-filled test credentials for quick testing
+                const testEmail = 'owner@terms.law';
+                const testName = formData.businessName || 'Test Business Owner';
+                
+                // Validate required fields (use test data if not provided)
+                const signerEmail = formData.businessEmail || testEmail;
+                const signerName = formData.businessName || testName;
+                
+                if (!signerEmail || !signerName) {
+                    alert('Please fill in your business name and email address before signing the document.');
+                    return;
+                }
+                
+                try {
+                    setESignLoading(true);
+                    console.log("eSignature button clicked with test mode");
+                    
+                    const finalDocumentText = generateLetterContent().replace(/<[^>]*>/g, '');
+                    const documentTitle = `Unpaid Invoice Demand Letter - Invoice #${formData.invoiceNumber || 'Draft'}`;
+
+                    // eSignatures.com API call with test mode
+                    const apiData = {
+                        test: "yes", // TEST MODE - no charges
+                        template: {
+                            title: documentTitle,
+                            content: finalDocumentText,
+                            content_type: "text"
+                        },
+                        signers: [{
+                            email: signerEmail,
+                            name: signerName,
+                            role: "signer"
+                        }]
+                    };
+
+                    console.log("Sending to eSignatures.com API (TEST MODE):", apiData);
+
+                    // Use API endpoint (compatible with Vercel/Netlify deployment)
+                    const response = await fetch('/api/esignatures-api', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(apiData)
+                    });
+
+                    const result = await response.json();
+                    console.log("eSignatures.com API response:", result);
+                    
+                    if (response.ok && result.signing_url) {
+                        // Open signing URL in new window
+                        window.open(result.signing_url, '_blank', 'width=1000,height=800,scrollbars=yes,resizable=yes');
+                        
+                        // Show success message
+                        alert(`✅ eSignature Created Successfully!\\n\\n📧 Document sent to: ${signerEmail}\\n\\n🔗 Signing link opened in new window\\n\\n⚠️ TEST MODE: This is a test signature and won't create legal obligations.\\n\\n💡 For production use, contact support to enable live mode.`);
+                        
+                    } else {
+                        throw new Error(result.message || 'Failed to create eSignature contract');
+                    }
+
+                } catch (error) {
+                    console.error("eSignature error:", error);
+                    
+                    // Fallback demo mode
+                    alert(`⚠️ eSignature API Error\\n\\n${error.message}\\n\\n🔄 Demo Mode Activated\\n\\nThis would create a real eSignature in production. For testing, please ensure:\\n\\n1. API endpoint is configured\\n2. eSignatures.com credentials are set\\n3. CORS settings allow API calls\\n\\nContact support for production setup.`);
+                    
+                } finally {
+                    setESignLoading(false);
+                }
             };
 
             // Tab content renderers
@@ -606,43 +733,108 @@
                                 })
                             ])
                         ]),
+                        React.createElement('div', { key: 'business-type', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Business Type 📊'),
+                            React.createElement('select', {
+                                key: 'input',
+                                value: formData.businessType,
+                                onChange: (e) => updateFormData('businessType', e.target.value),
+                                title: 'Different business types have different collection leverage and legal advantages'
+                            }, [
+                                React.createElement('option', { key: 'general', value: 'general' }, 'General Business'),
+                                React.createElement('option', { key: 'saas', value: 'saas' }, 'SaaS/Software'),
+                                React.createElement('option', { key: 'creative', value: 'creative' }, 'Creative/Design Services'),
+                                React.createElement('option', { key: 'construction', value: 'construction' }, 'Construction/Contracting'),
+                                React.createElement('option', { key: 'consulting', value: 'consulting' }, 'Consulting Services'),
+                                React.createElement('option', { key: 'freelance', value: 'freelance' }, 'Freelance Services')
+                            ])
+                        ]),
+                        React.createElement('div', { key: 'urgency', className: 'form-group' }, [
+                            React.createElement('label', { key: 'label' }, 'Collection Urgency ⏰'),
+                            React.createElement('select', {
+                                key: 'input',
+                                value: formData.urgencyLevel,
+                                onChange: (e) => updateFormData('urgencyLevel', e.target.value),
+                                title: 'Urgency level affects the tone and escalation timeline of your demand letter'
+                            }, [
+                                React.createElement('option', { key: 'standard', value: 'standard' }, 'Standard Collection'),
+                                React.createElement('option', { key: 'urgent', value: 'urgent' }, 'Urgent - Client Unresponsive'),
+                                React.createElement('option', { key: 'critical', value: 'critical' }, 'Critical - Suspected Insolvency')
+                            ])
+                        ]),
                         React.createElement('div', { key: 'consequences', className: 'form-group' }, [
-                            React.createElement('label', { key: 'label' }, 'Additional Consequences'),
-                            React.createElement('div', { key: 'credit', className: 'checkbox-group' }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    checked: formData.reportCredit,
-                                    onChange: (e) => updateFormData('reportCredit', e.target.checked)
-                                }),
-                                React.createElement('label', { key: 'label' }, 'Report to Credit Agencies')
-                            ]),
-                            React.createElement('div', { key: 'collection', className: 'checkbox-group' }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    checked: formData.collectionAgency,
-                                    onChange: (e) => updateFormData('collectionAgency', e.target.checked)
-                                }),
-                                React.createElement('label', { key: 'label' }, 'Refer to Collection Agency')
-                            ]),
-                            React.createElement('div', { key: 'legal', className: 'checkbox-group' }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    checked: formData.legalAction,
-                                    onChange: (e) => updateFormData('legalAction', e.target.checked)
-                                }),
-                                React.createElement('label', { key: 'label' }, 'Pursue Legal Action')
-                            ]),
-                            React.createElement('div', { key: 'lien', className: 'checkbox-group' }, [
-                                React.createElement('input', {
-                                    key: 'input',
-                                    type: 'checkbox',
-                                    checked: formData.lienRights,
-                                    onChange: (e) => updateFormData('lienRights', e.target.checked)
-                                }),
-                                React.createElement('label', { key: 'label' }, 'File Mechanic\'s Lien (if applicable)')
+                            React.createElement('label', { key: 'label' }, 'Collection Actions ⚙️'),
+                            React.createElement('div', { key: 'grid', style: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' } }, [
+                                React.createElement('div', { key: 'credit', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.reportCredit,
+                                        onChange: (e) => updateFormData('reportCredit', e.target.checked),
+                                        title: 'Report unpaid debt to business credit agencies (Experian, Dun & Bradstreet)'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Credit Reporting 📊')
+                                ]),
+                                React.createElement('div', { key: 'collection', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.collectionAgency,
+                                        onChange: (e) => updateFormData('collectionAgency', e.target.checked),
+                                        title: 'Refer to professional collection agency (typically 25-50% of collected amount)'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Collection Agency 🏢')
+                                ]),
+                                React.createElement('div', { key: 'legal', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.legalAction,
+                                        onChange: (e) => updateFormData('legalAction', e.target.checked),
+                                        title: 'Pursue legal action through small claims court or civil litigation'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Legal Action ⚖️')
+                                ]),
+                                React.createElement('div', { key: 'lien', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.lienRights,
+                                        onChange: (e) => updateFormData('lienRights', e.target.checked),
+                                        title: 'For construction/improvement work - file mechanic\'s lien against property'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Mechanic\'s Lien 🔨')
+                                ]),
+                                React.createElement('div', { key: 'services', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.stopServices,
+                                        onChange: (e) => updateFormData('stopServices', e.target.checked),
+                                        title: 'Suspend ongoing services, access, or support until payment received'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Service Suspension 🚫')
+                                ]),
+                                React.createElement('div', { key: 'copyright', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.copyrightClaim,
+                                        onChange: (e) => updateFormData('copyrightClaim', e.target.checked),
+                                        title: 'For creative work - retain copyright and demand removal of work until payment'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Copyright Retention ©️')
+                                ]),
+                                React.createElement('div', { key: 'industry', className: 'checkbox-group' }, [
+                                    React.createElement('input', {
+                                        key: 'input',
+                                        type: 'checkbox',
+                                        checked: formData.industryReporting,
+                                        onChange: (e) => updateFormData('industryReporting', e.target.checked),
+                                        title: 'Report non-payment to industry groups, professional associations, or review sites'
+                                    }),
+                                    React.createElement('label', { key: 'label' }, 'Industry Reporting 📢')
+                                ])
                             ])
                         ])
                     ]),
@@ -661,12 +853,258 @@
                 ]);
             };
 
-            // Review Tab
-            const renderReviewTab = () => {
+            // Case Assessment & Legal Strategy Tab
+            const renderAssessmentTab = () => {
+                // Calculate case strength
+                const calculateCaseStrength = () => {
+                    let score = 0;
+                    let factors = [];
+                    
+                    // Basic contract elements
+                    if (formData.invoiceNumber && formData.totalAmount) {
+                        score += 20;
+                        factors.push('✅ Clear invoice documentation');
+                    }
+                    
+                    // Time factor
+                    if (formData.dueDate) {
+                        const daysOverdue = Math.ceil((new Date() - new Date(formData.dueDate)) / (1000 * 60 * 60 * 24));
+                        if (daysOverdue > 30) {
+                            score += 15;
+                            factors.push(`✅ Significantly overdue (${daysOverdue} days)`);
+                        } else if (daysOverdue > 0) {
+                            score += 10;
+                            factors.push(`✅ Past due (${daysOverdue} days)`);
+                        }
+                    }
+                    
+                    // Communication attempts
+                    if (formData.previousAttempts && formData.previousAttempts.length > 20) {
+                        score += 15;
+                        factors.push('✅ Documented collection attempts');
+                    }
+                    
+                    // Business relationship
+                    if (formData.workDescription && formData.workDescription.length > 30) {
+                        score += 10;
+                        factors.push('✅ Clear scope of work documented');
+                    }
+                    
+                    // Business contact info
+                    if (formData.clientEmail || formData.contactPerson) {
+                        score += 10;
+                        factors.push('✅ Client contact information available');
+                    }
+                    
+                    // Collection leverage
+                    if (formData.stopServices) score += 10;
+                    if (formData.lienRights) score += 15;
+                    if (formData.copyrightClaim) score += 15;
+                    
+                    // Business type advantages
+                    if (formData.businessType === 'saas') {
+                        score += 10;
+                        factors.push('✅ SaaS leverage (service suspension)');
+                    } else if (formData.businessType === 'construction') {
+                        score += 15;
+                        factors.push('✅ Construction leverage (lien rights)');
+                    } else if (formData.businessType === 'creative') {
+                        score += 12;
+                        factors.push('✅ Creative leverage (copyright retention)');
+                    }
+                    
+                    return { score: Math.min(score, 100), factors };
+                };
+                
+                const assessment = calculateCaseStrength();
+                
+                const getStrengthColor = (score) => {
+                    if (score >= 80) return '#10b981';
+                    if (score >= 60) return '#f59e0b';
+                    if (score >= 40) return '#ef4444';
+                    return '#6b7280';
+                };
+                
+                const getStrengthLabel = (score) => {
+                    if (score >= 80) return 'Very Strong';
+                    if (score >= 60) return 'Strong';
+                    if (score >= 40) return 'Moderate';
+                    return 'Weak';
+                };
+                
                 return React.createElement('div', { className: 'tab-content' }, [
-                    React.createElement('div', { key: 'review-info', className: 'form-section' }, [
-                        React.createElement('h3', { key: 'title' }, '📋 Review Your Demand Letter'),
-                        React.createElement('p', { key: 'subtitle' }, 'Review the generated letter in the preview pane. Make any final adjustments using the previous tabs, then download or copy your professional demand letter.')
+                    // Case Strength Assessment
+                    React.createElement('div', { key: 'strength-section', className: 'form-section' }, [
+                        React.createElement('h3', { key: 'title' }, '⚖️ Case Strength Assessment'),
+                        React.createElement('div', { 
+                            key: 'strength-meter',
+                            style: {
+                                background: '#f3f4f6',
+                                borderRadius: '12px',
+                                padding: '1.5rem',
+                                marginBottom: '1rem'
+                            }
+                        }, [
+                            React.createElement('div', {
+                                key: 'score-display',
+                                style: {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '1rem'
+                                }
+                            }, [
+                                React.createElement('span', {
+                                    key: 'score-text',
+                                    style: { fontSize: '1.2rem', fontWeight: '600' }
+                                }, `Case Strength: ${assessment.score}/100`),
+                                React.createElement('span', {
+                                    key: 'strength-label',
+                                    style: {
+                                        background: getStrengthColor(assessment.score),
+                                        color: 'white',
+                                        padding: '0.5rem 1rem',
+                                        borderRadius: '6px',
+                                        fontWeight: '600'
+                                    }
+                                }, getStrengthLabel(assessment.score))
+                            ]),
+                            React.createElement('div', {
+                                key: 'progress-bar',
+                                style: {
+                                    background: '#e5e7eb',
+                                    height: '12px',
+                                    borderRadius: '6px',
+                                    overflow: 'hidden'
+                                }
+                            }, [
+                                React.createElement('div', {
+                                    key: 'progress-fill',
+                                    style: {
+                                        background: getStrengthColor(assessment.score),
+                                        height: '100%',
+                                        width: `${assessment.score}%`,
+                                        transition: 'width 0.3s ease'
+                                    }
+                                })
+                            ])
+                        ]),
+                        React.createElement('div', { key: 'factors' }, [
+                            React.createElement('h4', { key: 'factors-title' }, 'Strength Factors:'),
+                            React.createElement('ul', { 
+                                key: 'factors-list',
+                                style: { listStyle: 'none', padding: 0 }
+                            }, assessment.factors.map((factor, index) => 
+                                React.createElement('li', {
+                                    key: index,
+                                    style: {
+                                        padding: '0.25rem 0',
+                                        color: '#059669'
+                                    }
+                                }, factor)
+                            ))
+                        ])
+                    ]),
+                    
+                    // Legal Strategy Recommendations
+                    React.createElement('div', { key: 'strategy-section', className: 'form-section' }, [
+                        React.createElement('h3', { key: 'title' }, '🎯 Recommended Legal Strategy'),
+                        React.createElement('div', { key: 'strategy-grid', style: { display: 'grid', gap: '1rem' } }, [
+                            // Immediate Actions
+                            React.createElement('div', {
+                                key: 'immediate',
+                                style: {
+                                    background: '#fef3c7',
+                                    border: '1px solid #f59e0b',
+                                    borderRadius: '8px',
+                                    padding: '1rem'
+                                }
+                            }, [
+                                React.createElement('h4', { key: 'title', style: { margin: '0 0 0.5rem 0', color: '#92400e' } }, '⚡ Immediate Actions'),
+                                React.createElement('ul', { key: 'list', style: { margin: 0 } }, [
+                                    React.createElement('li', { key: '1' }, 'Send demand letter via certified mail with return receipt'),
+                                    React.createElement('li', { key: '2' }, 'Email PDF copy for immediate delivery'),
+                                    formData.stopServices && React.createElement('li', { key: '3' }, 'Suspend services/access immediately'),
+                                    React.createElement('li', { key: '4' }, `Set ${formData.paymentDeadline}-day deadline for response`)
+                                ].filter(Boolean))
+                            ]),
+                            
+                            // Business-Specific Leverage
+                            formData.businessType !== 'general' && React.createElement('div', {
+                                key: 'leverage',
+                                style: {
+                                    background: '#dbeafe',
+                                    border: '1px solid #3b82f6',
+                                    borderRadius: '8px',
+                                    padding: '1rem'
+                                }
+                            }, [
+                                React.createElement('h4', { key: 'title', style: { margin: '0 0 0.5rem 0', color: '#1e40af' } }, '🔧 Industry-Specific Leverage'),
+                                React.createElement('div', { key: 'content' }, 
+                                    formData.businessType === 'saas' ? 'SaaS businesses have strong leverage through service suspension and data retention policies. Clients typically depend on your service for daily operations.' :
+                                    formData.businessType === 'construction' ? 'Construction/contracting has the strongest collection rights through mechanic\'s liens, which create property liens that must be resolved before sale or refinancing.' :
+                                    formData.businessType === 'creative' ? 'Creative professionals can leverage copyright retention and portfolio/reference removal as powerful collection tools.' :
+                                    'General business collection strategies apply.'
+                                )
+                            ]),
+                            
+                            // Next Steps Timeline
+                            React.createElement('div', {
+                                key: 'timeline',
+                                style: {
+                                    background: '#ecfdf5',
+                                    border: '1px solid #10b981',
+                                    borderRadius: '8px',
+                                    padding: '1rem'
+                                }
+                            }, [
+                                React.createElement('h4', { key: 'title', style: { margin: '0 0 0.5rem 0', color: '#059669' } }, '📅 Collection Timeline'),
+                                React.createElement('ul', { key: 'list', style: { margin: 0 } }, [
+                                    React.createElement('li', { key: '1' }, `Days 1-${formData.paymentDeadline}: Initial demand period`),
+                                    React.createElement('li', { key: '2' }, `Day ${parseInt(formData.paymentDeadline) + 1}: Follow-up demand if no response`),
+                                    React.createElement('li', { key: '3' }, `Day ${parseInt(formData.paymentDeadline) + 15}: Consider collection agency referral`),
+                                    React.createElement('li', { key: '4' }, `Day ${parseInt(formData.paymentDeadline) + 30}: Prepare for legal action if amount > $1,000`)
+                                ])
+                            ])
+                        ])
+                    ]),
+                    
+                    // Risk Assessment
+                    React.createElement('div', { key: 'risk-section', className: 'form-section' }, [
+                        React.createElement('h3', { key: 'title' }, '⚠️ Risk Assessment & Considerations'),
+                        React.createElement('div', { key: 'risks' }, [
+                            React.createElement('div', {
+                                key: 'cost-benefit',
+                                style: {
+                                    background: '#f3f4f6',
+                                    borderRadius: '6px',
+                                    padding: '1rem',
+                                    marginBottom: '1rem'
+                                }
+                            }, [
+                                React.createElement('h4', { key: 'title' }, '💰 Cost-Benefit Analysis'),
+                                React.createElement('p', { key: 'content', style: { margin: 0 } }, 
+                                    `Amount: $${formData.totalAmount || '[Amount]'} | ${parseFloat(formData.totalAmount || 0) > 5000 ? 'High-value case - attorney consultation recommended' : parseFloat(formData.totalAmount || 0) > 1000 ? 'Medium-value case - consider small claims court' : 'Low-value case - focus on quick resolution strategies'}`
+                                )
+                            ]),
+                            React.createElement('div', {
+                                key: 'recommendations',
+                                style: {
+                                    background: '#f0f9ff',
+                                    borderRadius: '6px',
+                                    padding: '1rem'
+                                }
+                            }, [
+                                React.createElement('h4', { key: 'title' }, '📋 Professional Recommendations'),
+                                React.createElement('ul', { key: 'list', style: { margin: 0 } }, [
+                                    React.createElement('li', { key: '1' }, 'Document all communications and delivery confirmations'),
+                                    React.createElement('li', { key: '2' }, 'Keep detailed records of services provided and client benefits received'),
+                                    React.createElement('li', { key: '3' }, 'Consider settlement offers for 70-80% if client responds positively'),
+                                    parseFloat(formData.totalAmount || 0) > 3000 && React.createElement('li', { key: '4' }, 'Consult with collection attorney for amounts over $3,000'),
+                                    React.createElement('li', { key: '5' }, 'Report successful collections to business credit bureaus')
+                                ].filter(Boolean))
+                            ])
+                        ])
                     ])
                 ]);
             };
@@ -676,7 +1114,7 @@
                 switch(currentTab) {
                     case 0: return renderDetailsTab();
                     case 1: return renderCollectionTab();
-                    case 2: return renderReviewTab();
+                    case 2: return renderAssessmentTab();
                     default: return renderDetailsTab();
                 }
             };
@@ -751,6 +1189,22 @@
                             }, [
                                 React.createElement(Icon, { key: 'icon', name: 'download' }),
                                 React.createElement('span', { key: 'text' }, 'Word Doc')
+                            ]),
+                            
+                            React.createElement('button', {
+                                key: 'esign',
+                                className: 'btn btn-accent',
+                                disabled: eSignLoading,
+                                onClick: eSignDocument,
+                                title: 'Send for electronic signature - uses API calls (limit 5 per payment)',
+                                style: { backgroundColor: '#dc2626', color: 'white' }
+                            }, [
+                                React.createElement(Icon, { 
+                                    key: 'icon', 
+                                    name: eSignLoading ? 'loader' : 'edit-3',
+                                    style: eSignLoading ? { animation: 'spin 1s linear infinite' } : {}
+                                }),
+                                React.createElement('span', { key: 'text' }, eSignLoading ? 'Processing...' : 'E-Sign')
                             ])
                         ])
                     ]),
