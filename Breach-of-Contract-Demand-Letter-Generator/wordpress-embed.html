@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Interactive Features -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Collapsible scenario cards
+            const scenarioCards = document.querySelectorAll('.scenario-card');
+            scenarioCards.forEach(card => {
+                const header = card.querySelector('.scenario-header');
+                const content = card.querySelector('.scenario-content');
+                
+                header.addEventListener('click', () => {
+                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    if (isExpanded) {
+                        content.style.maxHeight = '0px';
+                        header.querySelector('.expand-icon').textContent = '▶️';
+                        card.classList.remove('expanded');
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        header.querySelector('.expand-icon').textContent = '▼';
+                        card.classList.add('expanded');
+                    }
+                });
+            });
+            
+            // Interactive tooltips
+            const tooltips = document.querySelectorAll('[data-tooltip]');
+            tooltips.forEach(element => {
+                element.addEventListener('mouseenter', showTooltip);
+                element.addEventListener('mouseleave', hideTooltip);
+            });
+            
+            // Copy to clipboard functionality with fade-out success message
+            window.copyText = function(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showCopySuccess();
+                }).catch(() => {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showCopySuccess();
+                });
+            };
+            
+            // Show copy success message that fades away
+            window.showCopySuccess = function() {
+                const message = document.createElement('div');
+                message.textContent = '✅ Copied to clipboard!';
+                message.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 10000;
+                    background: #10b981; color: white; padding: 0.75rem 1.5rem;
+                    border-radius: 8px; font-weight: 600; font-size: 0.9rem;
+                    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+                    animation: copyFadeIn 0.3s ease, copyFadeOut 0.3s ease 2s forwards;
+                `;
+                document.body.appendChild(message);
+                setTimeout(() => {
+                    if (message.parentNode) message.remove();
+                }, 2500);
+            };
+            
+            // Show notification
+            window.showNotification = function(message) {
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.cssText = `
+                    position: fixed; top: 20px; right: 20px; z-index: 1000;
+                    background: #1e40af; color: white; padding: 1rem 2rem;
+                    border-radius: 8px; font-weight: 600; animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(notification);
+                setTimeout(() => notification.remove(), 3000);
+            };
+        });
+        
+        function showTooltip(e) {
+            const tooltip = document.createElement('div');
+            tooltip.textContent = e.target.getAttribute('data-tooltip');
+            tooltip.className = 'tooltip-popup';
+            tooltip.style.cssText = `
+                position: absolute; background: #1f2937; color: white; padding: 0.5rem 1rem;
+                border-radius: 6px; font-size: 0.8rem; white-space: nowrap; z-index: 1000;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3); pointer-events: none;
+            `;
+            document.body.appendChild(tooltip);
+            
+            const rect = e.target.getBoundingClientRect();
+            tooltip.style.left = rect.left + (rect.width / 2) - (tooltip.offsetWidth / 2) + 'px';
+            tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
+        }
+        
+        function hideTooltip(e) {
+            const tooltip = document.querySelector('.tooltip-popup');
+            if (tooltip) {
+                tooltip.remove();
+            }
+        }
+    </script>
+    
+    <style>
+        /* Copy fade animations */
+        @keyframes copyFadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes copyFadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        /* Blog styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            max-width: 100%;
+            margin: 0;
+            padding: 1rem;
+            background: #f7fafc;
+        }
+
+        .blog-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .blog-header {
+            background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+        }
+
+        .blog-header h1 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .blog-header p {
+            margin: 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .blog-content {
+            padding: 2rem;
+        }
+
+        .intro-section {
+            background: #edf2f7;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-left: 4px solid #4299e1;
+        }
+
+        .intro-section h2 {
+            margin-top: 0;
+            color: #2d3748;
+            font-size: 1.5rem;
+        }
+
+        .intro-section p {
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #4299e1 0%, #3182ce 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+            margin: 2rem 0;
+        }
+
+        .cta-box h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1.3rem;
+        }
+
+        .generator-button {
+            background: white;
+            color: #3182ce;
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .generator-button:hover {
+            background: #f7fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .scenarios-section {
+            margin: 2rem 0;
+        }
+
+        .scenarios-grid {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .scenario-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .scenario-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-color: #4299e1;
+        }
+
+        .scenario-card.expanded {
+            border-color: #4299e1;
+            box-shadow: 0 4px 12px rgba(66, 153, 225, 0.1);
+        }
+
+        .scenario-header {
+            padding: 1.5rem;
+            cursor: pointer;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .scenario-card.expanded .scenario-header {
+            background: #ebf8ff;
+            border-bottom-color: #4299e1;
+        }
+
+        .scenario-header h4 {
+            margin: 0;
+            color: #2d3748;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .scenario-header p {
+            margin: 0.5rem 0 0 0;
+            color: #718096;
+            font-size: 0.95rem;
+        }
+
+        .expand-icon {
+            font-size: 1.2rem;
+            color: #4299e1;
+            transition: transform 0.2s;
+        }
+
+        .scenario-card.expanded .expand-icon {
+            transform: rotate(90deg);
+        }
+
+        .scenario-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: white;
+        }
+
+        .scenario-content > div {
+            padding: 1.5rem;
+        }
+
+        .legal-tip {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 6px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .legal-tip strong {
+            color: #c53030;
+        }
+
+        .deadline-calculator {
+            background: #f0fff4;
+            border: 1px solid #9ae6b4;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .deadline-calculator h6 {
+            margin: 0 0 0.5rem 0;
+            color: #2f855a;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .statute-reference {
+            background: #fffaf0;
+            border: 1px solid #fbd38d;
+            border-radius: 6px;
+            padding: 1rem;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .copy-button {
+            background: #4299e1;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            transition: background 0.2s;
+        }
+
+        .copy-button:hover {
+            background: #3182ce;
+        }
+
+        .contract-types-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .contract-type-card {
+            background: #f8f9fa;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .contract-type-card h4 {
+            margin: 0 0 1rem 0;
+            color: #2d3748;
+            font-size: 1.1rem;
+        }
+
+        .contract-type-card p {
+            margin: 0;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+
+        .warning-box {
+            background: #fffaf0;
+            border: 1px solid #ed8936;
+            border-left: 4px solid #ed8936;
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .warning-box h4 {
+            margin: 0 0 1rem 0;
+            color: #c05621;
+        }
+
+        .warning-box p {
+            margin: 0;
+            color: #744210;
+        }
+
+        .interactive-element {
+            cursor: help;
+            color: #4299e1;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+            
+            .blog-header {
+                padding: 2rem 1rem;
+            }
+            
+            .blog-header h1 {
+                font-size: 2rem;
+            }
+            
+            .blog-content {
+                padding: 1rem;
+            }
+            
+            .contract-types-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .scenario-header {
+                padding: 1rem;
+            }
+            
+            .scenario-content > div {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="blog-container">
+        <div class="blog-header">
+            <h1>⚖️ Breach of Contract Demand Letter Generator</h1>
+            <p>Professional legal templates for service agreements, vendor contracts, and business relationships</p>
+        </div>
+        
+        <div class="blog-content">
+            <div class="intro-section">
+                <h2>🎯 Professional Contract Enforcement Tool</h2>
+                <p>When a business partner, vendor, or service provider fails to honor their contractual obligations, time is critical. Our breach of contract demand letter generator helps you create legally sound, professionally crafted demand letters that protect your rights and maximize recovery prospects.</p>
+                
+                <p><strong>Used by corporate legal departments, business owners, and legal professionals</strong> to address contract breaches across all industries - from SaaS agreements to construction contracts.</p>
+            </div>
+
+            <div class="cta-box">
+                <h3>🚀 Generate Your Demand Letter Now</h3>
+                <p>Professional legal templates with live preview and case assessment</p>
+                <a href="#generator" class="generator-button" onclick="document.querySelector('.generator-iframe').scrollIntoView({behavior: 'smooth'})">
+                    Start Generator →
+                </a>
+            </div>
+
+            <div class="scenarios-section">
+                <h2>📋 Common Breach of Contract Scenarios</h2>
+                <p style="color: #6b7280; margin-bottom: 2rem;">Click each scenario to explore professional legal strategies and sample language. These represent the most frequent contract enforcement situations in business today.</p>
+                
+                <div class="scenarios-grid">
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">💻</span>
+                                    SaaS/Software Contract Breach
+                                    <span class="interactive-element" data-tooltip="Most common in B2B technology agreements">🚨</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Service provider fails to meet uptime, performance, or feature delivery commitments</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 SaaS Strategy:</strong> Focus on measurable SLA violations, business impact documentation, and specific performance metrics that weren't met.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Key Legal Elements:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Service Level Agreements (SLAs):</strong> Document specific uptime, response time, or performance failures</li>
+                                    <li><strong>Business Impact Analysis:</strong> Quantify lost productivity, revenue, or customer satisfaction</li>
+                                    <li><strong>Alternative Costs:</strong> Cost of replacement services or workarounds implemented</li>
+                                    <li><strong>Data Security Breaches:</strong> Any failures in security, backup, or data protection obligations</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Leverage Points:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Customer Dependencies:</strong> Your reliance on their service for core business operations</li>
+                                    <li><strong>Integration Costs:</strong> High switching costs make monetary damages preferable to termination</li>
+                                    <li><strong>Competitive Damage:</strong> Service failures that affected your customer relationships</li>
+                                    <li><strong>Regulatory Compliance:</strong> Any compliance failures resulting from their service issues</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Generator Configuration</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Select <strong>"SaaS/Software Contract"</strong> as contract type. The generator automatically includes technology-specific breach language, SLA violation citations, and business continuity impact assessments.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Professional SaaS Demand Language:</strong><br>
+                                    "Your failure to maintain the guaranteed 99.9% uptime SLA, resulting in 47 hours of service interruption during our peak business period, constitutes material breach. This has caused quantifiable business losses of $15,000 in lost productivity and customer penalties, requiring immediate cure and compensation."
+                                    <button class="copy-button" onclick="copyText('Your failure to maintain the guaranteed 99.9% uptime SLA, resulting in 47 hours of service interruption during our peak business period, constitutes material breach. This has caused quantifiable business losses of $15,000 in lost productivity and customer penalties, requiring immediate cure and compensation.')">📋 Copy SaaS Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">🔧</span>
+                                    Development Contract Non-Performance
+                                    <span class="interactive-element" data-tooltip="Common in custom software and web development">⚠️</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Developer fails to deliver functional software, misses deadlines, or delivers substandard work</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 Development Strategy:</strong> Document scope deviations, functionality gaps, and acceptance criteria failures with technical specifications.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Critical Documentation:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Scope Creep Defense:</strong> Any unauthorized changes or feature omissions from original specifications</li>
+                                    <li><strong>Quality Standards:</strong> Bugs, performance issues, or failure to meet technical requirements</li>
+                                    <li><strong>Milestone Failures:</strong> Missed deadlines that triggered cascade delays in your business</li>
+                                    <li><strong>Intellectual Property Issues:</strong> Code ownership, licensing violations, or third-party IP problems</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Recovery Strategies:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Completion Costs:</strong> Cost to hire replacement developers to finish the project</li>
+                                    <li><strong>Business Delays:</strong> Lost revenue from delayed product launches or market opportunities</li>
+                                    <li><strong>Reputation Damage:</strong> Customer or stakeholder relationship harm from project failures</li>
+                                    <li><strong>Competitive Disadvantage:</strong> Market position losses due to development delays</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Technical Assessment</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">The generator includes technical breach assessment tools for development contracts, including code quality evaluation, milestone tracking, and acceptance criteria documentation.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Development Breach Language:</strong><br>
+                                    "The delivered software fails to meet 73% of the functional requirements specified in Exhibit A, contains critical security vulnerabilities, and is 8 weeks beyond the contracted delivery date. This fundamental breach requires immediate remediation and compensation for our $25,000 in additional development costs."
+                                    <button class="copy-button" onclick="copyText('The delivered software fails to meet 73% of the functional requirements specified in Exhibit A, contains critical security vulnerabilities, and is 8 weeks beyond the contracted delivery date. This fundamental breach requires immediate remediation and compensation for our $25,000 in additional development costs.')">📋 Copy Development Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">🏢</span>
+                                    Vendor/Supplier Contract Failure
+                                    <span class="interactive-element" data-tooltip="Critical for supply chain management">📦</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Supplier fails to deliver goods, services, or materials according to contract terms</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 Vendor Strategy:</strong> Emphasize supply chain disruption, customer impact, and replacement cost differentials in demand letters.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Supply Chain Impact:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Delivery Failures:</strong> Late, incomplete, or non-conforming product deliveries</li>
+                                    <li><strong>Quality Defects:</strong> Products that fail to meet specifications or industry standards</li>
+                                    <li><strong>Customer Commitments:</strong> Your inability to fulfill customer orders due to supplier failures</li>
+                                    <li><strong>Emergency Sourcing:</strong> Premium costs for alternative suppliers to meet deadlines</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Business Leverage:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Long-term Relationships:</strong> Multi-year contracts provide negotiation leverage</li>
+                                    <li><strong>Volume Commitments:</strong> Significant purchase volumes strengthen your position</li>
+                                    <li><strong>Exclusivity Arrangements:</strong> Sole supplier agreements create mutual dependencies</li>
+                                    <li><strong>Payment Terms:</strong> Withholding payment for non-conforming deliveries</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Vendor Assessment Tools</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Configure contract type as <strong>"Vendor/Supplier Contract"</strong> to access supply chain-specific breach analysis, including delivery tracking, quality standards, and customer impact calculations.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Vendor Breach Language:</strong><br>
+                                    "Your failure to deliver 2,500 units by the contracted date of March 15th has forced us to source emergency inventory at 40% premium pricing, costing $18,000 in additional procurement costs. This material breach disrupted our customer fulfillment commitments and requires immediate remedy."
+                                    <button class="copy-button" onclick="copyText('Your failure to deliver 2,500 units by the contracted date of March 15th has forced us to source emergency inventory at 40% premium pricing, costing $18,000 in additional procurement costs. This material breach disrupted our customer fulfillment commitments and requires immediate remedy.')">📋 Copy Vendor Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">🤝</span>
+                                    Partnership Agreement Violations
+                                    <span class="interactive-element" data-tooltip="Complex due to ongoing business relationships">⚖️</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Business partner fails to meet capital, operational, or strategic commitments</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 Partnership Strategy:</strong> Balance relationship preservation with legal enforcement, focusing on specific performance remedies where possible.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Partnership Breach Types:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Capital Contributions:</strong> Failure to provide promised funding or investment commitments</li>
+                                    <li><strong>Operational Duties:</strong> Non-performance of management, marketing, or operational responsibilities</li>
+                                    <li><strong>Profit Distribution:</strong> Improper allocation or withholding of partnership income</li>
+                                    <li><strong>Fiduciary Duties:</strong> Self-dealing, competition, or breach of loyalty obligations</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Resolution Approaches:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Specific Performance:</strong> Court orders requiring partner to fulfill specific obligations</li>
+                                    <li><strong>Buy-Out Mechanisms:</strong> Triggering forced sale or valuation procedures</li>
+                                    <li><strong>Management Controls:</strong> Temporary restrictions on decision-making authority</li>
+                                    <li><strong>Mediation First:</strong> Preserving business relationships through structured negotiation</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Partnership Protection</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Select <strong>"Partnership Agreement"</strong> to access specialized templates addressing fiduciary duties, capital obligations, and business relationship preservation strategies.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Partnership Breach Language:</strong><br>
+                                    "Your failure to contribute the committed $50,000 capital injection by Q2 deadline has prevented the partnership from securing the Johnson contract, resulting in $75,000 in lost profits. This material breach of Section 4.2 requires immediate capital contribution and profit sharing adjustment."
+                                    <button class="copy-button" onclick="copyText('Your failure to contribute the committed $50,000 capital injection by Q2 deadline has prevented the partnership from securing the Johnson contract, resulting in $75,000 in lost profits. This material breach of Section 4.2 requires immediate capital contribution and profit sharing adjustment.')">📋 Copy Partnership Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">📊</span>
+                                    Consulting Agreement Failures
+                                    <span class="interactive-element" data-tooltip="Professional services with measurable deliverables">💼</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Consultant fails to deliver expertise, reports, or strategic recommendations as contracted</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 Consulting Strategy:</strong> Focus on professional standards, missed deadlines, and the opportunity cost of delayed strategic decisions.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Professional Standards:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Deliverable Quality:</strong> Reports, analyses, or recommendations that fail professional standards</li>
+                                    <li><strong>Timeline Breaches:</strong> Critical strategic deadlines missed affecting business decisions</li>
+                                    <li><strong>Scope Abandonment:</strong> Incomplete project phases or premature termination of services</li>
+                                    <li><strong>Confidentiality Breaches:</strong> Unauthorized disclosure of proprietary business information</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Recovery Methods:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Replacement Costs:</strong> Premium fees for emergency consulting to meet deadlines</li>
+                                    <li><strong>Opportunity Losses:</strong> Delayed strategic initiatives or market opportunities</li>
+                                    <li><strong>Decision Delays:</strong> Cost of postponed business decisions due to missing analysis</li>
+                                    <li><strong>Professional Reputation:</strong> Industry standing affected by consultant failures</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Professional Services Assessment</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Choose <strong>"Consulting Agreement"</strong> contract type for professional services templates that address deliverable standards, timeline criticality, and strategic impact assessments.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Consulting Breach Language:</strong><br>
+                                    "The market analysis report delivered on June 15th lacks industry benchmarking, contains outdated data, and fails to address the competitive landscape requirements specified in our SOW. This substandard deliverable has delayed our product launch by 6 weeks, requiring immediate professional remediation."
+                                    <button class="copy-button" onclick="copyText('The market analysis report delivered on June 15th lacks industry benchmarking, contains outdated data, and fails to address the competitive landscape requirements specified in our SOW. This substandard deliverable has delayed our product launch by 6 weeks, requiring immediate professional remediation.')">📋 Copy Consulting Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="scenario-card">
+                        <div class="scenario-header">
+                            <div>
+                                <h4 style="margin: 0; color: #1f2937; display: flex; align-items: center; gap: 0.5rem;">
+                                    <span style="font-size: 1.2rem;">⏰</span>
+                                    Time-Critical Performance Failures
+                                    <span class="interactive-element" data-tooltip="When timing is essential to contract value">🚨</span>
+                                </h4>
+                                <p style="margin: 0.5rem 0 0 0; color: #6b7280; font-size: 0.9rem;">Performance delays in time-sensitive contracts where timing is of the essence</p>
+                            </div>
+                            <span class="expand-icon">▶️</span>
+                        </div>
+                        <div class="scenario-content">
+                            <div>
+                                <div class="legal-tip">
+                                    <strong>🎯 Time-Critical Strategy:</strong> Emphasize "time is of the essence" provisions and the unique value that timely performance provided.
+                                </div>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">⚡ Time-Sensitive Breaches:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #dc2626;">
+                                    <li><strong>Event-Based Contracts:</strong> Wedding, conference, or launch event services with fixed dates</li>
+                                    <li><strong>Seasonal Businesses:</strong> Holiday merchandise, tax preparation, or seasonal services</li>
+                                    <li><strong>Regulatory Deadlines:</strong> Compliance, filing, or certification requirements with legal deadlines</li>
+                                    <li><strong>Market Windows:</strong> Product launches, IPOs, or time-sensitive business opportunities</li>
+                                </ul>
+                                
+                                <h5 style="color: #1f2937; margin: 1.5rem 0 1rem 0;">💡 Urgency Leverage:</h5>
+                                <ul style="margin-left: 1.5rem; line-height: 1.6; color: #059669;">
+                                    <li><strong>Irreplaceable Timing:</strong> Missed opportunities that cannot be recovered or repeated</li>
+                                    <li><strong>Market Position:</strong> Competitive advantages lost due to delayed market entry</li>
+                                    <li><strong>Stakeholder Impact:</strong> Customer, investor, or partner relationships damaged by delays</li>
+                                    <li><strong>Liquidated Damages:</strong> Pre-agreed penalty clauses for time-based failures</li>
+                                </ul>
+                                
+                                <div class="deadline-calculator">
+                                    <h6 style="margin: 0 0 0.5rem 0; color: #92400e;">🛡️ Urgency Assessment</h6>
+                                    <p style="margin: 0; font-size: 0.85rem; line-height: 1.4;">Mark <strong>"Time is Critical"</strong> in the generator's additional factors section to automatically include urgency language and irreparable harm arguments in your demand letter.</p>
+                                </div>
+                                
+                                <div class="statute-reference">
+                                    <strong>Time-Critical Breach Language:</strong><br>
+                                    "Time was expressly of the essence for this contract. Your failure to complete website deployment by the December 1st product launch date has resulted in irreparable harm to our market position, lost first-mover advantage, and $40,000 in alternative marketing costs to compensate for the delayed launch."
+                                    <button class="copy-button" onclick="copyText('Time was expressly of the essence for this contract. Your failure to complete website deployment by the December 1st product launch date has resulted in irreparable harm to our market position, lost first-mover advantage, and $40,000 in alternative marketing costs to compensate for the delayed launch.')">📋 Copy Time-Critical Language</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 id="contract-types">📋 Contract Types Covered</h2>
+            <p>Our generator handles the most common business contract breaches with industry-specific legal language and enforcement strategies:</p>
+            
+            <div class="contract-types-grid">
+                <div class="contract-type-card">
+                    <h4>💻 SaaS & Technology</h4>
+                    <p><strong>Specializes in:</strong> SLA violations, uptime failures, feature delivery, data security breaches</p>
+                    <small style="color: #6b7280;">Includes technology-specific breach criteria and business impact analysis</small>
+                </div>
+                <div class="contract-type-card">
+                    <h4>🔧 Development & IT</h4>
+                    <p><strong>Specializes in:</strong> Code delivery, functionality gaps, milestone failures, IP violations</p>
+                    <small style="color: #6b7280;">Technical assessment tools and completion cost calculations</small>
+                </div>
+                <div class="contract-type-card">
+                    <h4>🏢 Vendor & Supply</h4>
+                    <p><strong>Specializes in:</strong> Delivery failures, quality defects, supply chain disruption</p>
+                    <small style="color: #6b7280;">Supply chain impact analysis and emergency sourcing cost recovery</small>
+                </div>
+                <div class="contract-type-card">
+                    <h4>🤝 Partnership & Joint Venture</h4>
+                    <p><strong>Specializes in:</strong> Capital commitments, operational duties, profit distribution</p>
+                    <small style="color: #6b7280;">Relationship preservation strategies and specific performance remedies</small>
+                </div>
+                <div class="contract-type-card">
+                    <h4>📊 Consulting & Professional</h4>
+                    <p><strong>Specializes in:</strong> Deliverable quality, timeline adherence, professional standards</p>
+                    <small style="color: #6b7280;">Professional liability assessment and opportunity cost analysis</small>
+                </div>
+                <div class="contract-type-card">
+                    <h4>⚖️ General Business</h4>
+                    <p><strong>Specializes in:</strong> Service agreements, licensing, distribution, employment</p>
+                    <small style="color: #6b7280;">Comprehensive breach analysis for any contract type</small>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <h4>⚖️ Professional Legal Standards</h4>
+                <p><strong>Corporate-Grade Templates:</strong> Our demand letters are designed by experienced corporate attorneys and include the legal precision expected in high-stakes business disputes. Each template incorporates industry-specific legal standards, proper breach classification, and strategic enforcement language that maximizes recovery prospects while preserving business relationships where possible.</p>
+            </div>
+
+            <h2>🎯 Why Professional Demand Letters Matter</h2>
+            <p><strong>Legal Leverage:</strong> A well-crafted demand letter often resolves contract disputes without litigation, saving significant time and legal costs. Our templates include the legal elements that courts expect to see in breach of contract cases, strengthening your position for both negotiation and potential litigation.</p>
+
+            <div class="cta-box">
+                <h3>🚀 Start Building Your Case</h3>
+                <p>Generate professional demand letters with live preview and legal strategy assessment</p>
+                <a href="#generator" class="generator-button" onclick="document.querySelector('.generator-iframe').scrollIntoView({behavior: 'smooth'})">
+                    Launch Generator →
+                </a>
+            </div>
+
+            <!-- Generator Iframe -->
+            <div class="generator-iframe" id="generator" style="margin: 2rem 0; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);">
+                <iframe 
+                    src="index.html" 
+                    width="100%" 
+                    height="800" 
+                    frameborder="0" 
+                    scrolling="yes"
+                    title="Breach of Contract Demand Letter Generator">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
