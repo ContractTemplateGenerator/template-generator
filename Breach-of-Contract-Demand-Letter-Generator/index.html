@@ -308,9 +308,165 @@
                 }
             }, []);
 
-            // Update form data
+            // Update form data with live preview highlighting
             const updateFormData = (field, value) => {
                 setFormData(prev => ({ ...prev, [field]: value }));
+                
+                // Add highlighting and scroll to updated content
+                setTimeout(() => {
+                    highlightUpdatedContent(field);
+                }, 100);
+            };
+
+            // Highlight updated content in preview
+            const highlightUpdatedContent = (field) => {
+                if (!previewRef.current) return;
+                
+                // Comprehensive field mapping to preview elements
+                const fieldMappings = {
+                    'yourCompanyName': ['FROM:', 'yourCompanyName', 'Company'],
+                    'yourContactName': ['FROM:', 'yourContactName', 'Name'],
+                    'yourEmail': ['Email:', '@'],
+                    'yourPhone': ['Phone:', '('],
+                    'yourCompanyAddress': ['Address:', 'FROM:'],
+                    'breachingPartyName': ['TO:', 'breachingPartyName', 'Party'],
+                    'breachingContactName': ['TO:', 'Contact'],
+                    'breachingPartyAddress': ['TO:', 'Address'],
+                    'contractType': ['Contract Type', 'RE: DEMAND FOR CURE', 'Agreement'],
+                    'contractDate': ['Contract Date', 'Execution Date', 'dated'],
+                    'contractValue': ['Contract Value', '$', 'value'],
+                    'breachDescription': ['Specific Breach:', 'BREACH OF CONTRACT', 'failure'],
+                    'breachDate': ['Breach Date', 'occurred on'],
+                    'yourPerformance': ['performance', 'fulfilled'],
+                    'theirFailure': ['failure', 'breach'],
+                    'directDamages': ['damages', '$', 'Direct'],
+                    'consequentialDamages': ['consequential', 'damages'],
+                    'lostProfits': ['lost profits', 'profits'],
+                    'cureDeadline': ['cure this breach within', 'days', 'deadline'],
+                    'governingLaw': ['governed by', 'Law', 'jurisdiction'],
+                    'legalRemedies': ['remedies', 'legal action'],
+                    'breachType': ['breach', 'violation'],
+                    'contractProvision': ['provision', 'section'],
+                    'priorNotices': ['notice', 'previously'],
+                    'mitigationEfforts': ['mitigation', 'efforts']
+                };
+                
+                const searchTerms = fieldMappings[field];
+                if (!searchTerms) return;
+                
+                // Find and highlight relevant content with improved matching
+                const previewContent = previewRef.current;
+                let foundMatch = false;
+                
+                searchTerms.forEach(term => {
+                    if (foundMatch) return; // Only highlight first successful match
+                    
+                    const elements = previewContent.querySelectorAll('*');
+                    elements.forEach(element => {
+                        if (foundMatch) return;
+                        
+                        if (element.textContent.toLowerCase().includes(term.toLowerCase()) && 
+                            element.children.length === 0) { // Only leaf nodes
+                            
+                            // Add highlighting with enhanced visibility
+                            element.style.backgroundColor = '#fde047';
+                            element.style.transition = 'background-color 0.3s ease';
+                            element.style.padding = '3px 6px';
+                            element.style.borderRadius = '4px';
+                            element.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                            
+                            // Smooth scroll to element
+                            element.scrollIntoView({ 
+                                behavior: 'smooth', 
+                                block: 'center',
+                                inline: 'nearest'
+                            });
+                            
+                            // Remove highlighting after delay
+                            setTimeout(() => {
+                                element.style.backgroundColor = '';
+                                element.style.padding = '';
+                                element.style.boxShadow = '';
+                            }, 3000);
+                            
+                            foundMatch = true;
+                            return;
+                        }
+                    });
+                });
+                
+                // If no specific match found, try broader search by field value
+                if (!foundMatch && formData[field]) {
+                    const fieldValue = formData[field].toString();
+                    if (fieldValue.length > 2) {
+                        const elements = previewContent.querySelectorAll('*');
+                        elements.forEach(element => {
+                            if (foundMatch) return;
+                            
+                            if (element.textContent.includes(fieldValue) && 
+                                element.children.length === 0) {
+                                
+                                element.style.backgroundColor = '#fde047';
+                                element.style.transition = 'background-color 0.3s ease';
+                                element.style.padding = '3px 6px';
+                                element.style.borderRadius = '4px';
+                                element.style.boxShadow = '0 2px 4px rgba(0,0,0,0.1)';
+                                
+                                element.scrollIntoView({ 
+                                    behavior: 'smooth', 
+                                    block: 'center',
+                                    inline: 'nearest'
+                                });
+                                
+                                setTimeout(() => {
+                                    element.style.backgroundColor = '';
+                                    element.style.padding = '';
+                                    element.style.boxShadow = '';
+                                }, 3000);
+                                
+                                foundMatch = true;
+                            }
+                        });
+                    }
+                }
+            };
+
+            // Highlight content when switching tabs
+            const highlightTabContent = (tabName) => {
+                if (!previewRef.current) return;
+                
+                const tabHighlights = {
+                    'contract': ['FROM:', 'TO:', 'Contract', 'Agreement'],
+                    'breach': ['BREACH', 'failure', 'violation', 'damages'],
+                    'strategy': ['remedies', 'legal action', 'cure', 'deadline'],
+                    'assessment': ['Case Strength', 'Analysis', 'Score']
+                };
+                
+                const highlights = tabHighlights[tabName];
+                if (!highlights) return;
+                
+                highlights.forEach((term, index) => {
+                    setTimeout(() => {
+                        const elements = previewRef.current.querySelectorAll('*');
+                        elements.forEach(element => {
+                            if (element.textContent.toLowerCase().includes(term.toLowerCase()) && 
+                                element.children.length === 0) {
+                                
+                                element.style.backgroundColor = '#dbeafe';
+                                element.style.transition = 'background-color 0.5s ease';
+                                element.style.padding = '2px 4px';
+                                element.style.borderRadius = '3px';
+                                
+                                setTimeout(() => {
+                                    element.style.backgroundColor = '';
+                                    element.style.padding = '';
+                                }, 1500);
+                                
+                                return; // Only highlight first match per term
+                            }
+                        });
+                    }, index * 200); // Stagger highlights
+                });
             };
 
             // Generate comprehensive breach demand letter
@@ -1673,7 +1829,13 @@
                                 React.createElement('button', {
                                     key: tab.id,
                                     className: `tab-button ${currentTab === index ? 'active' : ''}`,
-                                    onClick: () => setCurrentTab(index)
+                                    onClick: () => {
+                                        setCurrentTab(index);
+                                        // Highlight tab-specific content in preview
+                                        setTimeout(() => {
+                                            highlightTabContent(tab.id);
+                                        }, 150);
+                                    }
                                 }, [
                                     React.createElement(Icon, { key: 'icon', name: tab.icon }),
                                     React.createElement('span', { key: 'label' }, tab.label)
