@@ -300,11 +300,8 @@
                 };
                 
                 if (!checkPaymentStatus()) {
-                    setTimeout(() => {
-                        if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
-                            window.PaywallSystem.makePreviewNonCopyable();
-                        }
-                    }, 1000);
+                    // Note: We don't call makePreviewNonCopyable to allow scrolling
+                    // Copy/download protection is handled by individual button clicks
                 }
 
                 // Set default date to today
@@ -672,6 +669,34 @@
                 `;
             };
 
+            // PayPal transaction ID validation
+            window.validatePayPalTransaction = () => {
+                const input = document.getElementById('paypal-transaction-id');
+                if (!input) return;
+                
+                const paypalId = input.value.trim().toUpperCase();
+                
+                // Validate PayPal transaction ID format (17 characters, alphanumeric)
+                if (paypalId.length === 17 && 
+                    /^[A-Z0-9]+$/.test(paypalId) && 
+                    /[A-Z]/.test(paypalId) && 
+                    /[0-9]/.test(paypalId)) {
+                    
+                    // Close modal
+                    const modal = input.closest('[style*="position: fixed"]');
+                    if (modal) modal.remove();
+                    
+                    // Grant access
+                    setHasPaywallAccess(true);
+                    
+                    // Show success message
+                    alert('✅ Access unlocked! You can now copy and download your breach of contract demand letter.');
+                } else {
+                    alert('❌ Please enter a valid 17-character PayPal transaction ID (letters and numbers only).');
+                    input.focus();
+                }
+            };
+
             // Custom paywall for breach contract generator
             const showBreachContractPaywall = (action) => {
                 const modal = document.createElement('div');
@@ -692,66 +717,65 @@
                 const content = document.createElement('div');
                 content.style.cssText = `
                     background: white !important;
-                    padding: 2.5rem !important;
-                    border-radius: 16px !important;
-                    max-width: 500px !important;
+                    padding: 1.5rem !important;
+                    border-radius: 12px !important;
+                    max-width: 420px !important;
                     width: 90% !important;
                     text-align: center !important;
-                    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+                    max-height: 90vh !important;
+                    overflow-y: auto !important;
                 `;
                 
                 content.innerHTML = `
-                    <div style="margin-bottom: 2rem;">
-                        <h3 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.5rem;">⚖️ Professional Legal Document Access</h3>
-                        <p style="color: #6b7280; font-size: 1.1rem; line-height: 1.6;">
-                            Unlock ${action === 'copy' ? 'copy' : 'download'} access to your breach of contract demand letter
+                    <div style="margin-bottom: 1rem;">
+                        <h3 style="color: #1e40af; margin-bottom: 0.5rem; font-size: 1.3rem;">⚖️ Professional Legal Access</h3>
+                        <p style="color: #6b7280; font-size: 0.95rem; line-height: 1.4; margin: 0;">
+                            Unlock ${action === 'copy' ? 'copy' : 'download'} access to your demand letter
                         </p>
                     </div>
                     
-                    <div style="background: #f0f9ff; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #0ea5e9;">
-                        <h4 style="color: #0c4a6e; margin-bottom: 1rem; font-size: 1.2rem;">✨ What You Get:</h4>
-                        <ul style="text-align: left; padding-left: 0; list-style: none; color: #0c4a6e;">
-                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                                <span style="position: absolute; left: 0;">📄</span>
-                                Professional Word document download
-                            </li>
-                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                                <span style="position: absolute; left: 0;">📋</span>
-                                Copy to clipboard functionality
-                            </li>
-                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                                <span style="position: absolute; left: 0;">✍️</span>
-                                <strong>5 electronic signatures included</strong>
-                            </li>
-                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                                <span style="position: absolute; left: 0;">🎯</span>
-                                Professional case assessment tools
-                            </li>
-                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
-                                <span style="position: absolute; left: 0;">⚡</span>
-                                30-day unlimited access
-                            </li>
-                        </ul>
+                    <div style="background: #f0f9ff; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border: 1px solid #0ea5e9;">
+                        <div style="color: #0c4a6e; font-size: 0.85rem; text-align: left;">
+                            📄 Professional Word download<br>
+                            📋 Copy to clipboard<br>
+                            ✍️ <strong>5 electronic signatures included</strong><br>
+                            🎯 Case assessment tools<br>
+                            ⚡ 30-day unlimited access
+                        </div>
                     </div>
                     
-                    <div style="margin-bottom: 2rem;">
-                        <div style="font-size: 2rem; font-weight: bold; color: #059669; margin-bottom: 0.5rem;">$14.95</div>
-                        <div style="color: #6b7280; font-size: 0.9rem;">One-time payment • Instant access</div>
+                    <div style="margin-bottom: 1rem;">
+                        <div style="font-size: 1.8rem; font-weight: bold; color: #059669; margin-bottom: 0.25rem;">$14.95</div>
+                        <div style="color: #6b7280; font-size: 0.8rem;">One-time payment • Instant access</div>
                     </div>
                     
-                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 1.5rem;">
                         <button onclick="this.closest('[style*=\"position: fixed\"]').remove()" 
-                                style="padding: 1rem 2rem; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
-                            Maybe Later
+                                style="padding: 0.75rem 1.5rem; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                            ✕ Close
                         </button>
                         <button onclick="window.location.href='#payment'" 
-                                style="padding: 1rem 2rem; background: #059669; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                                style="padding: 0.75rem 1.5rem; background: #059669; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
                             💳 Get Access Now
                         </button>
                     </div>
                     
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
-                        <small style="color: #6b7280;">
+                    <div style="border-top: 1px solid #e5e7eb; padding-top: 1rem;">
+                        <div style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; color: #374151; font-weight: 500; text-align: left;">
+                                Already paid? Enter PayPal Transaction ID:
+                            </label>
+                            <div style="display: flex; gap: 0.5rem;">
+                                <input id="paypal-transaction-id" type="text" placeholder="17-character PayPal ID" maxlength="17"
+                                       style="flex: 1; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 6px; font-family: monospace; text-transform: uppercase;">
+                                <button onclick="validatePayPalTransaction()" 
+                                        style="padding: 0.5rem 1rem; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">
+                                    Unlock
+                                </button>
+                            </div>
+                        </div>
+                        <small style="color: #6b7280; display: block; text-align: center;">
                             Includes 5 e-signature API calls • Professional legal document • 30-day access
                         </small>
                     </div>
@@ -2182,8 +2206,26 @@
                                 React.createElement('h4', { key: 'title', style: { margin: '0 0 0.5rem 0', color: '#15803d' } }, 
                                     `🏛️ ${US_STATES.find(s => s.value === formData.governingLaw)?.label || 'California'} Law Notes`
                                 ),
-                                React.createElement('p', { key: 'notes', style: { margin: 0, fontSize: '0.9rem', color: '#15803d' } },
-                                    'Statute of limitations for contract breaches is typically 4-6 years. Consider state-specific requirements for notice and cure periods. Some states favor specific performance for unique contracts.'
+                                React.createElement('p', { key: 'notes', style: { margin: 0, fontSize: '0.9rem', color: '#15803d', lineHeight: '1.4' } },
+                                    (() => {
+                                        const stateInfo = {
+                                            'CA': 'California: 4 years for written contracts (CCP §337), 2 years for oral contracts. SOL runs from breach date or when party knew/should have known of breach. Discovery rule applies for hidden defects. No mandatory cure period unless contract specifies.',
+                                            'NY': 'New York: 6 years for written contracts (CPLR §213), 6 years for oral contracts. SOL begins on breach date. UCC Article 2 (sales): 4 years. Demand requirement may extend SOL for payment obligations.',
+                                            'TX': 'Texas: 4 years for written contracts (Civ. Prac. & Rem. Code §16.004), 2 years for oral contracts. SOL runs from accrual (when breach occurs + damages). Discovery rule for fraud/mistake. Notice requirements vary by contract type.',
+                                            'FL': 'Florida: 5 years for written contracts (FS §95.11), 4 years for oral contracts. SOL begins at breach or when last payment due. UCC contracts: 4 years. Construction contracts have specific notice requirements.',
+                                            'IL': 'Illinois: 10 years for written contracts (735 ILCS 5/13-206), 5 years for oral contracts. SOL runs from breach date. Discovery rule for latent defects. Notice requirements for construction contracts within 2 years.',
+                                            'MA': 'Massachusetts: 6 years for written contracts (MGL c. 260 §2), 6 years for oral contracts. SOL begins when cause of action accrues (breach occurs). UCC: 4 years. Chapter 93A claims: 4 years.',
+                                            'WA': 'Washington: 6 years for written contracts (RCW 4.16.040), 3 years for oral contracts. SOL runs from breach date or when performance due. Discovery rule applies to fraud/concealment. Notice requirements for construction.',
+                                            'CO': 'Colorado: 3 years for both written and oral contracts (CRS §13-80-101). SOL begins when claim accrues (breach + knowledge of harm). Shortest SOL in US. Notice requirements for mechanic\'s liens within 4 months.',
+                                            'MD': 'Maryland: 3 years for written contracts (Cts. & Jud. Proc. §5-101), 3 years for oral contracts. SOL runs from breach date. Discovery rule for fraud. UCC: 4 years. Notice required for home improvement contracts.',
+                                            'NC': 'North Carolina: 3 years for written contracts (NCGS §1-52), 3 years for oral contracts. SOL begins at breach. UCC contracts: 4 years. Construction: notice within 6 years of substantial completion.',
+                                            'PA': 'Pennsylvania: 4 years for written contracts (42 Pa. C.S. §5525), 4 years for oral contracts. SOL runs from breach date. Discovery rule for fraud/concealment. UCC: 4 years. Prompt notice required for defects.',
+                                            'OH': 'Ohio: 8 years for written contracts (ORC §2305.06), 6 years for oral contracts. SOL begins when cause of action accrues. Discovery rule applies to latent defects. Mechanic\'s liens: notice within 75 days.',
+                                            'MI': 'Michigan: 6 years for written contracts (MCL §600.5807), 6 years for oral contracts. SOL runs from breach date or when performance due. Discovery rule for fraud. UCC: 4 years. Notice requirements vary.',
+                                            'GA': 'Georgia: 6 years for written contracts (OCGA §9-3-24), 4 years for oral contracts. SOL begins at breach. Demand may be required for payment obligations. Construction: notice within 8 years of substantial completion.'
+                                        };
+                                        return stateInfo[formData.governingLaw] || `${US_STATES.find(s => s.value === formData.governingLaw)?.label || 'Selected State'}: Specific statute of limitations varies by state. Written contracts typically 3-10 years, oral contracts 2-6 years. SOL generally runs from breach date or when performance was due. Consult state-specific statutes for exact requirements, notice provisions, and discovery rules.`;
+                                    })()
                                 )
                             ])
                         ])
@@ -2322,7 +2364,8 @@
                                 msUserSelect: hasPaywallAccess ? 'text' : 'none',
                                 overflow: 'auto', // Always allow scrolling
                                 maxHeight: 'calc(100vh - 200px)',
-                                cursor: hasPaywallAccess ? 'text' : 'default'
+                                cursor: hasPaywallAccess ? 'text' : 'default',
+                                position: 'relative'
                             },
                             onContextMenu: (e) => {
                                 if (!hasPaywallAccess) {
