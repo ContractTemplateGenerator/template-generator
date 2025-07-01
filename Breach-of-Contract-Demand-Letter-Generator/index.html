@@ -217,7 +217,7 @@
                 { id: 'assessment', label: 'Case Assessment', icon: 'bar-chart-2' }
             ];
 
-            // Contract type options
+            // Contract type options - Enhanced with industry-specific templates
             const contractTypes = {
                 'service_agreement': 'Service Agreement',
                 'saas_contract': 'SaaS/Software Contract',
@@ -228,6 +228,22 @@
                 'employment_contract': 'Employment Contract',
                 'licensing_agreement': 'Licensing Agreement',
                 'distribution_agreement': 'Distribution Agreement',
+                'real_estate_purchase': 'Real Estate Purchase Agreement',
+                'real_estate_lease': 'Real Estate Lease Agreement',
+                'construction_contract': 'Construction Contract',
+                'ip_licensing': 'Intellectual Property License',
+                'franchise_agreement': 'Franchise Agreement',
+                'joint_venture': 'Joint Venture Agreement',
+                'merger_acquisition': 'Merger & Acquisition',
+                'loan_agreement': 'Loan/Financing Agreement',
+                'supply_chain': 'Supply Chain Contract',
+                'manufacturing': 'Manufacturing Agreement',
+                'international_trade': 'International Trade Contract',
+                'subscription_service': 'Subscription Service Agreement',
+                'marketplace_seller': 'Marketplace Seller Agreement',
+                'influencer_marketing': 'Influencer Marketing Contract',
+                'data_processing': 'Data Processing Agreement',
+                'cloud_services': 'Cloud Services Contract',
                 'other': 'Other Contract Type'
             };
 
@@ -656,21 +672,106 @@
                 `;
             };
 
+            // Custom paywall for breach contract generator
+            const showBreachContractPaywall = (action) => {
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed !important;
+                    top: 0 !important;
+                    left: 0 !important;
+                    width: 100% !important;
+                    height: 100% !important;
+                    background: rgba(0,0,0,0.9) !important;
+                    z-index: 999999 !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    align-items: center !important;
+                    overflow-y: auto !important;
+                `;
+                
+                const content = document.createElement('div');
+                content.style.cssText = `
+                    background: white !important;
+                    padding: 2.5rem !important;
+                    border-radius: 16px !important;
+                    max-width: 500px !important;
+                    width: 90% !important;
+                    text-align: center !important;
+                    box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+                `;
+                
+                content.innerHTML = `
+                    <div style="margin-bottom: 2rem;">
+                        <h3 style="color: #1e40af; margin-bottom: 1rem; font-size: 1.5rem;">⚖️ Professional Legal Document Access</h3>
+                        <p style="color: #6b7280; font-size: 1.1rem; line-height: 1.6;">
+                            Unlock ${action === 'copy' ? 'copy' : 'download'} access to your breach of contract demand letter
+                        </p>
+                    </div>
+                    
+                    <div style="background: #f0f9ff; padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px solid #0ea5e9;">
+                        <h4 style="color: #0c4a6e; margin-bottom: 1rem; font-size: 1.2rem;">✨ What You Get:</h4>
+                        <ul style="text-align: left; padding-left: 0; list-style: none; color: #0c4a6e;">
+                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">📄</span>
+                                Professional Word document download
+                            </li>
+                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">📋</span>
+                                Copy to clipboard functionality
+                            </li>
+                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">✍️</span>
+                                <strong>5 electronic signatures included</strong>
+                            </li>
+                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">🎯</span>
+                                Professional case assessment tools
+                            </li>
+                            <li style="margin-bottom: 0.5rem; padding-left: 1.5rem; position: relative;">
+                                <span style="position: absolute; left: 0;">⚡</span>
+                                30-day unlimited access
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div style="margin-bottom: 2rem;">
+                        <div style="font-size: 2rem; font-weight: bold; color: #059669; margin-bottom: 0.5rem;">$14.95</div>
+                        <div style="color: #6b7280; font-size: 0.9rem;">One-time payment • Instant access</div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button onclick="this.closest('[style*=\"position: fixed\"]').remove()" 
+                                style="padding: 1rem 2rem; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                            Maybe Later
+                        </button>
+                        <button onclick="window.location.href='#payment'" 
+                                style="padding: 1rem 2rem; background: #059669; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                            💳 Get Access Now
+                        </button>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+                        <small style="color: #6b7280;">
+                            Includes 5 e-signature API calls • Professional legal document • 30-day access
+                        </small>
+                    </div>
+                `;
+                
+                modal.appendChild(content);
+                document.body.appendChild(modal);
+                
+                // Add click outside to close
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.remove();
+                    }
+                });
+            };
+
             // Copy to clipboard functionality
             const copyToClipboard = () => {
                 if (!hasPaywallAccess) {
-                    if (window.PaywallSystem) {
-                        window.PaywallSystem.showAccessDenied('copy');
-                        window.PaywallSystem.createPaywallModal(() => {
-                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
-                                setHasPaywallAccess(true);
-                                window.PaywallSystem.enablePreviewInteraction();
-                                const content = generateLetterContent().replace(/<[^>]*>/g, '');
-                                navigator.clipboard.writeText(content);
-                                alert('Breach of contract demand letter copied to clipboard!');
-                            }
-                        });
-                    }
+                    showBreachContractPaywall('copy');
                     return;
                 }
                 const content = generateLetterContent().replace(/<[^>]*>/g, '');
@@ -682,16 +783,7 @@
             // Download letter
             const downloadLetter = () => {
                 if (!hasPaywallAccess) {
-                    if (window.PaywallSystem) {
-                        window.PaywallSystem.showAccessDenied('download');
-                        window.PaywallSystem.createPaywallModal(() => {
-                            if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
-                                setHasPaywallAccess(true);
-                                window.PaywallSystem.enablePreviewInteraction();
-                                downloadWordDoc();
-                            }
-                        });
-                    }
+                    showBreachContractPaywall('download');
                     return;
                 }
                 downloadWordDoc();
@@ -1426,12 +1518,210 @@
                                 React.createElement('label', { key: 'label' }, 'Third Party Impact 👥')
                             ])
                         ])
+                    ]),
+                    
+                    // Statute of Limitations Timer
+                    React.createElement('div', { key: 'statute-section', className: 'form-section' }, [
+                        React.createElement('h3', { key: 'title' }, '⏰ Statute of Limitations Timer'),
+                        React.createElement('div', { 
+                            key: 'statute-calculator',
+                            style: {
+                                background: '#fef2f2',
+                                borderRadius: '12px',
+                                padding: '1.5rem',
+                                border: '2px solid #fca5a5'
+                            }
+                        }, [
+                            React.createElement('div', {
+                                key: 'statute-info',
+                                style: {
+                                    display: 'grid',
+                                    gridTemplateColumns: '1fr 1fr',
+                                    gap: '2rem',
+                                    alignItems: 'center'
+                                }
+                            }, [
+                                React.createElement('div', { key: 'timer-display' }, [
+                                    React.createElement('h4', {
+                                        key: 'days-remaining',
+                                        style: {
+                                            fontSize: '2.5rem',
+                                            fontWeight: 'bold',
+                                            color: '#dc2626',
+                                            margin: '0 0 0.5rem 0',
+                                            textAlign: 'center'
+                                        }
+                                    }, (() => {
+                                        if (!formData.breachDate) return '???';
+                                        const breachDate = new Date(formData.breachDate);
+                                        const today = new Date();
+                                        const stateLimitation = (() => {
+                                            // State-specific statute of limitations (in years)
+                                            const stateLimitations = {
+                                                'AL': 6, 'AK': 6, 'AZ': 6, 'AR': 5, 'CA': 4, 'CO': 3, 'CT': 6, 'DE': 3, 'FL': 5,
+                                                'GA': 6, 'HI': 6, 'ID': 5, 'IL': 10, 'IN': 6, 'IA': 5, 'KS': 5, 'KY': 15,
+                                                'LA': 10, 'ME': 6, 'MD': 3, 'MA': 6, 'MI': 6, 'MN': 6, 'MS': 3, 'MO': 5,
+                                                'MT': 8, 'NE': 4, 'NV': 6, 'NH': 3, 'NJ': 6, 'NM': 6, 'NY': 6, 'NC': 3,
+                                                'ND': 6, 'OH': 8, 'OK': 5, 'OR': 6, 'PA': 4, 'RI': 10, 'SC': 3, 'SD': 6,
+                                                'TN': 6, 'TX': 4, 'UT': 6, 'VT': 6, 'VA': 5, 'WA': 6, 'WV': 5, 'WI': 6, 'WY': 10
+                                            };
+                                            return stateLimitations[formData.governingLaw] || 4;
+                                        })();
+                                        const limitationDate = new Date(breachDate);
+                                        limitationDate.setFullYear(limitationDate.getFullYear() + stateLimitation);
+                                        const daysRemaining = Math.ceil((limitationDate - today) / (1000 * 60 * 60 * 24));
+                                        return daysRemaining > 0 ? `${daysRemaining}` : 'EXPIRED';
+                                    })()),
+                                    React.createElement('p', {
+                                        key: 'days-label',
+                                        style: {
+                                            margin: 0,
+                                            textAlign: 'center',
+                                            color: '#6b7280',
+                                            fontSize: '0.9rem'
+                                        }
+                                    }, 'Days Remaining to File Lawsuit')
+                                ]),
+                                React.createElement('div', { key: 'statute-details' }, [
+                                    React.createElement('h4', {
+                                        key: 'state-info',
+                                        style: { margin: '0 0 0.5rem 0', color: '#374151' }
+                                    }, `${US_STATES.find(s => s.value === formData.governingLaw)?.label || 'California'} Law`),
+                                    React.createElement('p', {
+                                        key: 'limitation-period',
+                                        style: { margin: '0 0 0.5rem 0', color: '#6b7280', fontSize: '0.9rem' }
+                                    }, `${(() => {
+                                        const stateLimitations = {
+                                            'AL': 6, 'AK': 6, 'AZ': 6, 'AR': 5, 'CA': 4, 'CO': 3, 'CT': 6, 'DE': 3, 'FL': 5,
+                                            'GA': 6, 'HI': 6, 'ID': 5, 'IL': 10, 'IN': 6, 'IA': 5, 'KS': 5, 'KY': 15,
+                                            'LA': 10, 'ME': 6, 'MD': 3, 'MA': 6, 'MI': 6, 'MN': 6, 'MS': 3, 'MO': 5,
+                                            'MT': 8, 'NE': 4, 'NV': 6, 'NH': 3, 'NJ': 6, 'NM': 6, 'NY': 6, 'NC': 3,
+                                            'ND': 6, 'OH': 8, 'OK': 5, 'OR': 6, 'PA': 4, 'RI': 10, 'SC': 3, 'SD': 6,
+                                            'TN': 6, 'TX': 4, 'UT': 6, 'VT': 6, 'VA': 5, 'WA': 6, 'WV': 5, 'WI': 6, 'WY': 10
+                                        };
+                                        return stateLimitations[formData.governingLaw] || 4;
+                                    })()} year limitation period for contract breaches`),
+                                    React.createElement('div', {
+                                        key: 'urgency-indicator',
+                                        style: {
+                                            background: (() => {
+                                                if (!formData.breachDate) return '#6b7280';
+                                                const breachDate = new Date(formData.breachDate);
+                                                const today = new Date();
+                                                const stateLimitation = (() => {
+                                                    const stateLimitations = {
+                                                        'AL': 6, 'AK': 6, 'AZ': 6, 'AR': 5, 'CA': 4, 'CO': 3, 'CT': 6, 'DE': 3, 'FL': 5,
+                                                        'GA': 6, 'HI': 6, 'ID': 5, 'IL': 10, 'IN': 6, 'IA': 5, 'KS': 5, 'KY': 15,
+                                                        'LA': 10, 'ME': 6, 'MD': 3, 'MA': 6, 'MI': 6, 'MN': 6, 'MS': 3, 'MO': 5,
+                                                        'MT': 8, 'NE': 4, 'NV': 6, 'NH': 3, 'NJ': 6, 'NM': 6, 'NY': 6, 'NC': 3,
+                                                        'ND': 6, 'OH': 8, 'OK': 5, 'OR': 6, 'PA': 4, 'RI': 10, 'SC': 3, 'SD': 6,
+                                                        'TN': 6, 'TX': 4, 'UT': 6, 'VT': 6, 'VA': 5, 'WA': 6, 'WV': 5, 'WI': 6, 'WY': 10
+                                                    };
+                                                    return stateLimitations[formData.governingLaw] || 4;
+                                                })();
+                                                const limitationDate = new Date(breachDate);
+                                                limitationDate.setFullYear(limitationDate.getFullYear() + stateLimitation);
+                                                const daysRemaining = Math.ceil((limitationDate - today) / (1000 * 60 * 60 * 24));
+                                                
+                                                if (daysRemaining <= 0) return '#dc2626';
+                                                if (daysRemaining <= 90) return '#ea580c';
+                                                if (daysRemaining <= 365) return '#d97706';
+                                                return '#059669';
+                                            })(),
+                                            color: 'white',
+                                            padding: '0.5rem 1rem',
+                                            borderRadius: '6px',
+                                            fontSize: '0.85rem',
+                                            fontWeight: '600',
+                                            textAlign: 'center'
+                                        }
+                                    }, (() => {
+                                        if (!formData.breachDate) return 'Enter breach date for countdown';
+                                        const breachDate = new Date(formData.breachDate);
+                                        const today = new Date();
+                                        const stateLimitation = (() => {
+                                            const stateLimitations = {
+                                                'AL': 6, 'AK': 6, 'AZ': 6, 'AR': 5, 'CA': 4, 'CO': 3, 'CT': 6, 'DE': 3, 'FL': 5,
+                                                'GA': 6, 'HI': 6, 'ID': 5, 'IL': 10, 'IN': 6, 'IA': 5, 'KS': 5, 'KY': 15,
+                                                'LA': 10, 'ME': 6, 'MD': 3, 'MA': 6, 'MI': 6, 'MN': 6, 'MS': 3, 'MO': 5,
+                                                'MT': 8, 'NE': 4, 'NV': 6, 'NH': 3, 'NJ': 6, 'NM': 6, 'NY': 6, 'NC': 3,
+                                                'ND': 6, 'OH': 8, 'OK': 5, 'OR': 6, 'PA': 4, 'RI': 10, 'SC': 3, 'SD': 6,
+                                                'TN': 6, 'TX': 4, 'UT': 6, 'VT': 6, 'VA': 5, 'WA': 6, 'WV': 5, 'WI': 6, 'WY': 10
+                                            };
+                                            return stateLimitations[formData.governingLaw] || 4;
+                                        })();
+                                        const limitationDate = new Date(breachDate);
+                                        limitationDate.setFullYear(limitationDate.getFullYear() + stateLimitation);
+                                        const daysRemaining = Math.ceil((limitationDate - today) / (1000 * 60 * 60 * 24));
+                                        
+                                        if (daysRemaining <= 0) return '🚨 STATUTE EXPIRED - Consult Attorney Immediately';
+                                        if (daysRemaining <= 90) return '🚨 URGENT - File lawsuit within 90 days';
+                                        if (daysRemaining <= 365) return '⚠️ ACTION NEEDED - File within 1 year';
+                                        return '✅ Sufficient time remaining';
+                                    })())
+                                ])
+                            ])
+                        ])
                     ])
                 ]);
             };
 
             // Case Assessment Tab with Professional Legal Analysis
             const renderAssessmentTab = () => {
+                // Enhanced breach severity calculator
+                const calculateBreachSeverity = () => {
+                    const contractValue = parseFloat(formData.contractValue) || 0;
+                    const totalDamages = (parseFloat(formData.directDamages) || 0) + 
+                                       (parseFloat(formData.consequentialDamages) || 0) + 
+                                       (parseFloat(formData.lostProfits) || 0);
+                    
+                    if (contractValue === 0) return { severity: 'Unknown', ratio: 0, description: 'Contract value not specified' };
+                    
+                    const damageRatio = totalDamages / contractValue;
+                    
+                    if (damageRatio >= 1.0) {
+                        return { 
+                            severity: 'Catastrophic', 
+                            ratio: damageRatio, 
+                            description: 'Damages exceed contract value - extremely severe breach',
+                            color: '#dc2626',
+                            urgency: 'Immediate legal action recommended'
+                        };
+                    } else if (damageRatio >= 0.5) {
+                        return { 
+                            severity: 'Severe', 
+                            ratio: damageRatio, 
+                            description: 'Major damages relative to contract value',
+                            color: '#ea580c',
+                            urgency: 'Urgent resolution required'
+                        };
+                    } else if (damageRatio >= 0.25) {
+                        return { 
+                            severity: 'Moderate', 
+                            ratio: damageRatio, 
+                            description: 'Significant damages relative to contract value',
+                            color: '#d97706',
+                            urgency: 'Prompt action recommended'
+                        };
+                    } else if (damageRatio >= 0.1) {
+                        return { 
+                            severity: 'Minor', 
+                            ratio: damageRatio, 
+                            description: 'Limited damages relative to contract value',
+                            color: '#ca8a04',
+                            urgency: 'Standard resolution timeline'
+                        };
+                    } else {
+                        return { 
+                            severity: 'Minimal', 
+                            ratio: damageRatio, 
+                            description: 'Low damages relative to contract value',
+                            color: '#65a30d',
+                            urgency: 'Negotiated resolution preferred'
+                        };
+                    }
+                };
+
                 // Calculate comprehensive case strength
                 const calculateCaseStrength = () => {
                     let score = 0;
@@ -1446,6 +1736,18 @@
                     if (formData.contractValue && parseFloat(formData.contractValue) > 0) {
                         score += 10;
                         factors.push('✅ Quantifiable contract value');
+                    }
+                    
+                    // Breach Severity Bonus based on damage ratio
+                    const breachSeverity = calculateBreachSeverity();
+                    if (breachSeverity.ratio >= 0.5) {
+                        score += 15;
+                        factors.push('✅ High damage-to-value ratio strengthens case');
+                    } else if (breachSeverity.ratio >= 0.25) {
+                        score += 10;
+                        factors.push('✅ Moderate damage-to-value ratio');
+                    } else if (breachSeverity.ratio < 0.1 && breachSeverity.ratio > 0) {
+                        weaknesses.push('⚠️ Low damage-to-value ratio may limit remedies');
                     }
                     
                     // Performance Documentation (20 points max)
@@ -1519,6 +1821,7 @@
                 };
                 
                 const assessment = calculateCaseStrength();
+                const breachSeverity = calculateBreachSeverity();
                 
                 const getStrengthColor = (score) => {
                     if (score >= 85) return '#10b981';
@@ -1542,6 +1845,83 @@
                                    (parseFloat(formData.lostProfits) || 0);
                 
                 return React.createElement('div', { className: 'tab-content' }, [
+                    // Breach Severity Calculator
+                    React.createElement('div', { key: 'severity-section', className: 'form-section' }, [
+                        React.createElement('h3', { key: 'title' }, '📊 Breach Severity Analysis'),
+                        React.createElement('div', { 
+                            key: 'severity-calculator',
+                            style: {
+                                background: '#fefbf3',
+                                borderRadius: '12px',
+                                padding: '1.5rem',
+                                marginBottom: '1rem',
+                                border: `2px solid ${breachSeverity.color || '#e5e7eb'}`
+                            }
+                        }, [
+                            React.createElement('div', {
+                                key: 'severity-header',
+                                style: {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    marginBottom: '1rem'
+                                }
+                            }, [
+                                React.createElement('div', { key: 'severity-info' }, [
+                                    React.createElement('h4', {
+                                        key: 'severity-level',
+                                        style: { 
+                                            margin: '0 0 0.25rem 0', 
+                                            color: breachSeverity.color || '#374151',
+                                            fontSize: '1.3rem'
+                                        }
+                                    }, `${breachSeverity.severity} Breach`),
+                                    React.createElement('p', {
+                                        key: 'severity-desc',
+                                        style: { 
+                                            margin: 0, 
+                                            color: '#6b7280',
+                                            fontSize: '0.9rem'
+                                        }
+                                    }, breachSeverity.description)
+                                ]),
+                                React.createElement('div', {
+                                    key: 'ratio-display',
+                                    style: {
+                                        textAlign: 'right'
+                                    }
+                                }, [
+                                    React.createElement('div', {
+                                        key: 'ratio-number',
+                                        style: {
+                                            fontSize: '2rem',
+                                            fontWeight: 'bold',
+                                            color: breachSeverity.color || '#374151'
+                                        }
+                                    }, breachSeverity.ratio > 0 ? `${(breachSeverity.ratio * 100).toFixed(1)}%` : 'N/A'),
+                                    React.createElement('div', {
+                                        key: 'ratio-label',
+                                        style: {
+                                            fontSize: '0.8rem',
+                                            color: '#6b7280'
+                                        }
+                                    }, 'Damage/Value Ratio')
+                                ])
+                            ]),
+                            breachSeverity.ratio > 0 && React.createElement('div', {
+                                key: 'urgency-banner',
+                                style: {
+                                    background: breachSeverity.color || '#f3f4f6',
+                                    color: 'white',
+                                    padding: '0.75rem 1rem',
+                                    borderRadius: '6px',
+                                    textAlign: 'center',
+                                    fontWeight: '600',
+                                    fontSize: '0.9rem'
+                                }
+                            }, `⚡ ${breachSeverity.urgency}`)
+                        ])
+                    ]),
                     // Case Strength Meter
                     React.createElement('div', { key: 'strength-section', className: 'form-section' }, [
                         React.createElement('h3', { key: 'title' }, '⚖️ Professional Case Assessment'),
@@ -1766,15 +2146,26 @@
                                     `📋 ${contractTypes[formData.contractType]} Considerations`
                                 ),
                                 React.createElement('p', { key: 'advice', style: { margin: 0, fontSize: '0.9rem', color: '#a16207' } },
-                                    formData.contractType === 'saas_contract' ? 
-                                        'SaaS contracts often include specific performance metrics and service level agreements. Focus on quantifiable failures and business impact.' :
-                                    formData.contractType === 'development_contract' ?
-                                        'Development contracts require clear deliverable specifications. Document scope deviations and acceptance criteria violations.' :
-                                    formData.contractType === 'service_agreement' ?
-                                        'Service agreements focus on performance standards and timing. Emphasize business disruption and replacement costs.' :
-                                    formData.contractType === 'consulting_agreement' ?
-                                        'Consulting agreements often involve professional standards and confidentiality. Consider reputational damages and opportunity costs.' :
-                                        'Focus on specific contractual obligations and measurable performance standards.'
+                                    (() => {
+                                        const contractAdvice = {
+                                            'saas_contract': 'SaaS contracts often include specific performance metrics and service level agreements. Focus on quantifiable failures, uptime violations, and business impact from service disruptions.',
+                                            'development_contract': 'Development contracts require clear deliverable specifications. Document scope deviations, missed milestones, and acceptance criteria violations with technical evidence.',
+                                            'service_agreement': 'Service agreements focus on performance standards and timing. Emphasize business disruption, replacement costs, and quantifiable service failures.',
+                                            'consulting_agreement': 'Consulting agreements involve professional standards and confidentiality. Consider reputational damages, opportunity costs, and breach of professional duties.',
+                                            'real_estate_purchase': 'Real estate purchase agreements involve significant financial commitments. Focus on specific performance remedies, earnest money, and market condition changes.',
+                                            'real_estate_lease': 'Lease agreements require attention to notice periods, cure rights, and habitability issues. Document property condition and compliance failures.',
+                                            'construction_contract': 'Construction contracts involve complex performance standards and lien rights. Document delays, defective work, and change order disputes with detailed evidence.',
+                                            'ip_licensing': 'IP licensing agreements require careful attention to usage rights, royalty calculations, and territorial restrictions. Document unauthorized use and revenue impact.',
+                                            'franchise_agreement': 'Franchise agreements involve ongoing operational requirements and brand standards. Focus on territory violations, operational failures, and brand damage.',
+                                            'employment_contract': 'Employment contracts involve specific notice periods and restrictive covenants. Consider competition issues, confidentiality breaches, and compensation disputes.',
+                                            'loan_agreement': 'Loan agreements involve strict payment schedules and default provisions. Focus on payment history, collateral issues, and acceleration clauses.',
+                                            'supply_chain': 'Supply chain contracts involve delivery schedules and quality standards. Document delays, defective goods, and business disruption from supply failures.',
+                                            'international_trade': 'International contracts involve complex jurisdictional and currency issues. Consider trade regulations, force majeure clauses, and cross-border enforcement.',
+                                            'subscription_service': 'Subscription agreements involve recurring payment obligations and service levels. Focus on billing disputes, service interruptions, and cancellation procedures.',
+                                            'data_processing': 'Data processing agreements involve strict compliance and security requirements. Consider GDPR, privacy violations, and security breach implications.'
+                                        };
+                                        return contractAdvice[formData.contractType] || 'Focus on specific contractual obligations and measurable performance standards. Document breaches with clear evidence and quantify business impact.';
+                                    })()
                                 )
                             ]),
 
@@ -1910,12 +2301,35 @@
                     // Preview pane
                     React.createElement('div', { key: 'preview', className: 'preview-pane' }, [
                         React.createElement('div', { key: 'header', className: 'preview-header' }, [
-                            React.createElement('h3', { key: 'title' }, 'Live Preview')
+                            React.createElement('h3', { key: 'title' }, 'Live Preview'),
+                            !hasPaywallAccess && React.createElement('div', {
+                                key: 'preview-notice',
+                                style: {
+                                    fontSize: '0.8rem',
+                                    color: '#6b7280',
+                                    marginTop: '0.25rem'
+                                }
+                            }, '👀 Full preview available • Copy/download requires payment')
                         ]),
                         React.createElement('div', {
                             key: 'content',
                             className: 'preview-content',
                             ref: previewRef,
+                            style: {
+                                userSelect: hasPaywallAccess ? 'text' : 'none',
+                                WebkitUserSelect: hasPaywallAccess ? 'text' : 'none',
+                                MozUserSelect: hasPaywallAccess ? 'text' : 'none',
+                                msUserSelect: hasPaywallAccess ? 'text' : 'none',
+                                overflow: 'auto', // Always allow scrolling
+                                maxHeight: 'calc(100vh - 200px)',
+                                cursor: hasPaywallAccess ? 'text' : 'default'
+                            },
+                            onContextMenu: (e) => {
+                                if (!hasPaywallAccess) {
+                                    e.preventDefault();
+                                    return false;
+                                }
+                            },
                             dangerouslySetInnerHTML: { 
                                 __html: generateLetterContent()
                             }
