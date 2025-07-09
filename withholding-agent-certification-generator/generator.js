@@ -4,22 +4,30 @@ const treatyData = {
   germany: {
     article: 'Article 11',
     rate: '0%',
-    treatyName: 'U.S.–Germany tax treaty'
+    treatyName: 'U.S.–Germany tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/germany-tax-treaty-documents',
+    description: 'Germany has a 0% withholding rate on interest under Article 11 of the U.S.-Germany tax treaty. This provides for exclusive residence-based taxation of interest income.'
   },
   malta: {
     article: 'Article 11',
     rate: '10%',
-    treatyName: 'U.S.–Malta tax treaty'
+    treatyName: 'U.S.–Malta tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/malta-tax-treaty-documents',
+    description: 'Malta has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Malta tax treaty, reducing the standard 30% U.S. withholding tax.'
   },
   thailand: {
     article: 'Article 11',
     rate: '10%',
-    treatyName: 'U.S.–Thailand tax treaty'
+    treatyName: 'U.S.–Thailand tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/thailand-tax-treaty-documents',
+    description: 'Thailand has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Thailand tax treaty.'
   },
   cyprus: {
     article: 'Article 11(2)',
     rate: '10%',
-    treatyName: 'U.S.–Cyprus tax treaty (TIAS 11-167)'
+    treatyName: 'U.S.–Cyprus tax treaty (TIAS 11-167)',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/cyprus-tax-treaty-documents',
+    description: 'Cyprus has a 10% maximum withholding rate on interest under Article 11(2) of the U.S.-Cyprus tax treaty.'
   }
 };
 
@@ -179,15 +187,12 @@ Managing Member, ${formData.llcName}`;
       <head>
         <meta charset="UTF-8">
         <style>
-          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; margin: 1in; }
-          .letterhead { margin-bottom: 2em; }
-          .signature-line { margin-top: 2em; }
+          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; }
+          pre { font-family: 'Times New Roman', serif; white-space: pre-wrap; }
         </style>
       </head>
       <body>
-        <div class="letterhead">
-          <pre style="font-family: 'Times New Roman', serif; white-space: pre-wrap;">${letterContent}</pre>
-        </div>
+        <pre>${letterContent}</pre>
       </body>
       </html>
     `;
@@ -210,7 +215,7 @@ Managing Member, ${formData.llcName}`;
       <head>
         <title>Withholding-Agent Certification Letter</title>
         <style>
-          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; margin: 1in; }
+          body { font-family: 'Times New Roman', serif; font-size: 12pt; line-height: 1.5; }
           pre { font-family: 'Times New Roman', serif; white-space: pre-wrap; }
           @media print { body { margin: 0.5in; } }
         </style>
@@ -230,8 +235,16 @@ Managing Member, ${formData.llcName}`;
       <div className="form-section">
         <h1>Withholding-Agent Certification Letter Generator</h1>
         
+        <div className="help-section">
+          <h3>📋 What is this?</h3>
+          <p>This generator creates IRS ITIN Exception 1(c) withholding-agent certification letters for foreign LLC members. These letters are required when foreign individuals need an ITIN solely for tax treaty benefits on U.S.-source interest income.</p>
+        </div>
+
         <div className="form-group">
-          <label htmlFor="country">Country *</label>
+          <label htmlFor="country">
+            Country of Owner's Residence *
+            <span className="tooltip" title="Select the country where the LLC owner resides. This determines the applicable tax treaty and withholding rate.">ℹ️</span>
+          </label>
           <select
             id="country"
             value={formData.country}
@@ -245,37 +258,55 @@ Managing Member, ${formData.llcName}`;
             <option value="cyprus">Cyprus</option>
           </select>
           {errors.country && <span className="error-message">{errors.country}</span>}
+          {formData.country && treatyData[formData.country] && (
+            <div className="treaty-info">
+              <strong>Treaty Information:</strong>
+              <p>{treatyData[formData.country].description}</p>
+              <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
+                📄 View IRS Treaty Documents
+              </a>
+            </div>
+          )}
         </div>
 
         <div className="form-group">
-          <label htmlFor="llcName">LLC Name *</label>
+          <label htmlFor="llcName">
+            LLC Name *
+            <span className="tooltip" title="Enter the full legal name of the LLC as it appears on IRS documents.">ℹ️</span>
+          </label>
           <input
             type="text"
             id="llcName"
             value={formData.llcName}
             onChange={(e) => handleInputChange('llcName', e.target.value)}
             className={errors.llcName ? 'error' : ''}
-            placeholder="Enter LLC name"
+            placeholder="Enter LLC name (e.g., ABC Investment LLC)"
           />
           {errors.llcName && <span className="error-message">{errors.llcName}</span>}
         </div>
 
         <div className="form-group">
-          <label htmlFor="llcStreet">LLC Street Address *</label>
+          <label htmlFor="llcStreet">
+            LLC Street Address *
+            <span className="tooltip" title="Enter the LLC's registered address as filed with the state.">ℹ️</span>
+          </label>
           <input
             type="text"
             id="llcStreet"
             value={formData.llcStreet}
             onChange={(e) => handleInputChange('llcStreet', e.target.value)}
             className={errors.llcStreet ? 'error' : ''}
-            placeholder="Enter street address"
+            placeholder="Enter street address (e.g., 123 Main Street)"
           />
           {errors.llcStreet && <span className="error-message">{errors.llcStreet}</span>}
         </div>
 
         <div className="form-row">
           <div className="form-group">
-            <label htmlFor="llcCity">City *</label>
+            <label htmlFor="llcCity">
+              City *
+              <span className="tooltip" title="City where the LLC is registered.">ℹ️</span>
+            </label>
             <input
               type="text"
               id="llcCity"
@@ -287,7 +318,10 @@ Managing Member, ${formData.llcName}`;
             {errors.llcCity && <span className="error-message">{errors.llcCity}</span>}
           </div>
           <div className="form-group">
-            <label htmlFor="llcState">State *</label>
+            <label htmlFor="llcState">
+              State *
+              <span className="tooltip" title="State where the LLC is registered (e.g., DE, NY, FL).">ℹ️</span>
+            </label>
             <input
               type="text"
               id="llcState"
@@ -299,7 +333,10 @@ Managing Member, ${formData.llcName}`;
             {errors.llcState && <span className="error-message">{errors.llcState}</span>}
           </div>
           <div className="form-group">
-            <label htmlFor="llcZip">ZIP Code *</label>
+            <label htmlFor="llcZip">
+              ZIP Code *
+              <span className="tooltip" title="ZIP code for the LLC's registered address.">ℹ️</span>
+            </label>
             <input
               type="text"
               id="llcZip"
@@ -313,47 +350,68 @@ Managing Member, ${formData.llcName}`;
         </div>
 
         <div className="form-group">
-          <label htmlFor="ein">EIN *</label>
+          <label htmlFor="ein">
+            EIN (Employer Identification Number) *
+            <span className="tooltip" title="The LLC's 9-digit EIN in format XX-XXXXXXX as assigned by the IRS.">ℹ️</span>
+          </label>
           <input
             type="text"
             id="ein"
             value={formData.ein}
             onChange={(e) => handleInputChange('ein', e.target.value)}
             className={errors.ein ? 'error' : ''}
-            placeholder="XX-XXXXXXX"
+            placeholder="XX-XXXXXXX (e.g., 12-3456789)"
             maxLength="10"
           />
           {errors.ein && <span className="error-message">{errors.ein}</span>}
+          <div className="field-help">
+            <small>Format: Two digits, hyphen, seven digits (e.g., 12-3456789)</small>
+          </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="managingMember">Managing Member Name *</label>
+          <label htmlFor="managingMember">
+            Managing Member Name *
+            <span className="tooltip" title="Full legal name of the person authorized to sign on behalf of the LLC.">ℹ️</span>
+          </label>
           <input
             type="text"
             id="managingMember"
             value={formData.managingMember}
             onChange={(e) => handleInputChange('managingMember', e.target.value)}
             className={errors.managingMember ? 'error' : ''}
-            placeholder="Enter managing member name"
+            placeholder="Enter managing member name (e.g., John Smith)"
           />
           {errors.managingMember && <span className="error-message">{errors.managingMember}</span>}
+          <div className="field-help">
+            <small>This person will sign the certification letter under penalties of perjury</small>
+          </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="ownerName">Owner Name *</label>
+          <label htmlFor="ownerName">
+            Foreign Owner Name *
+            <span className="tooltip" title="Full legal name of the foreign individual who owns the LLC and needs the ITIN.">ℹ️</span>
+          </label>
           <input
             type="text"
             id="ownerName"
             value={formData.ownerName}
             onChange={(e) => handleInputChange('ownerName', e.target.value)}
             className={errors.ownerName ? 'error' : ''}
-            placeholder="Enter owner name"
+            placeholder="Enter foreign owner name (e.g., Maria Schmidt)"
           />
           {errors.ownerName && <span className="error-message">{errors.ownerName}</span>}
+          <div className="field-help">
+            <small>This is the person who needs the ITIN for tax treaty benefits</small>
+          </div>
         </div>
 
         <div className="form-group">
-          <label htmlFor="date">Date *</label>
+          <label htmlFor="date">
+            Signature Date *
+            <span className="tooltip" title="Date when the managing member will sign the certification letter.">ℹ️</span>
+          </label>
           <input
             type="date"
             id="date"
@@ -362,18 +420,38 @@ Managing Member, ${formData.llcName}`;
             className={errors.date ? 'error' : ''}
           />
           {errors.date && <span className="error-message">{errors.date}</span>}
+          <div className="field-help">
+            <small>Defaults to today's date</small>
+          </div>
         </div>
 
         <div className="button-group">
           <button onClick={copyToClipboard} className="btn btn-primary">
-            Copy to Clipboard
+            📋 Copy to Clipboard
           </button>
           <button onClick={exportToWord} className="btn btn-secondary">
-            Export to Word
+            📄 Export to Word
           </button>
           <button onClick={printLetter} className="btn btn-secondary">
-            Print Letter
+            🖨️ Print Letter
           </button>
+        </div>
+
+        <div className="help-section">
+          <h3>📖 Instructions</h3>
+          <ol>
+            <li>Fill out all required fields marked with an asterisk (*)</li>
+            <li>Review the live preview to ensure all information is correct</li>
+            <li>Use one of the export options to generate your letter</li>
+            <li>Submit the letter to the IRS along with Form W-7</li>
+          </ol>
+          
+          <h3>📚 Additional Resources</h3>
+          <ul>
+            <li><a href="https://www.irs.gov/forms-pubs/about-form-w-7" target="_blank">IRS Form W-7 Instructions</a></li>
+            <li><a href="https://www.irs.gov/individuals/international-taxpayers/taxpayer-identification-numbers-tin" target="_blank">ITIN Information</a></li>
+            <li><a href="https://www.irs.gov/businesses/international-businesses/united-states-income-tax-treaties-a-to-z" target="_blank">All U.S. Tax Treaties</a></li>
+          </ul>
         </div>
       </div>
 
