@@ -9,6 +9,12 @@ const translations = {
     countryTooltip: "Select the country where the LLC owner resides. This determines the applicable tax treaty and withholding rate.",
     treatyInfo: "Treaty Information:",
     viewTreaty: "📄 View IRS Treaty Documents",
+    countryOptions: {
+      germany: "Germany",
+      malta: "Malta",
+      thailand: "Thailand",
+      cyprus: "Cyprus"
+    },
     llcNameLabel: "LLC Name",
     llcNameTooltip: "Enter the full legal name of the LLC as it appears on IRS documents.",
     llcNamePlaceholder: "Enter LLC name (e.g., ABC Investment LLC)",
@@ -58,6 +64,12 @@ const translations = {
     countryTooltip: "Wählen Sie das Land, in dem der LLC-Eigentümer ansässig ist. Dies bestimmt das anwendbare Steuerabkommen und den Quellensteuerabzug.",
     treatyInfo: "Abkommensinformationen:",
     viewTreaty: "📄 IRS-Abkommensdokumente anzeigen",
+    countryOptions: {
+      germany: "Deutschland",
+      malta: "Malta",
+      thailand: "Thailand",
+      cyprus: "Zypern"
+    },
     llcNameLabel: "LLC-Name",
     llcNameTooltip: "Geben Sie den vollständigen rechtlichen Namen der LLC ein, wie er in den IRS-Dokumenten erscheint.",
     llcNamePlaceholder: "LLC-Name eingeben (z.B. ABC Investment LLC)",
@@ -107,28 +119,40 @@ const treatyData = {
     rate: '0%',
     treatyName: 'U.S.–Germany tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/germany-tax-treaty-documents',
-    description: 'Germany has a 0% withholding rate on interest under Article 11 of the U.S.-Germany tax treaty. This provides for exclusive residence-based taxation of interest income.'
+    description: {
+      en: 'Germany has a 0% withholding rate on interest under Article 11 of the U.S.-Germany tax treaty. This provides for exclusive residence-based taxation of interest income.',
+      de: 'Deutschland hat einen 0% Quellensteuerabzug auf Zinsen unter Artikel 11 des US-Deutschland-Steuerabkommens. Dies ermöglicht eine ausschließliche Besteuerung am Wohnsitz für Zinserträge.'
+    }
   },
   malta: {
     article: 'Article 11',
     rate: '10%',
     treatyName: 'U.S.–Malta tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/malta-tax-treaty-documents',
-    description: 'Malta has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Malta tax treaty, reducing the standard 30% U.S. withholding tax.'
+    description: {
+      en: 'Malta has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Malta tax treaty, reducing the standard 30% U.S. withholding tax.',
+      de: 'Malta hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11 des US-Malta-Steuerabkommens, was die standardmäßige 30% US-Quellensteuer reduziert.'
+    }
   },
   thailand: {
     article: 'Article 11',
     rate: '10%',
     treatyName: 'U.S.–Thailand tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/thailand-tax-treaty-documents',
-    description: 'Thailand has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Thailand tax treaty.'
+    description: {
+      en: 'Thailand has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Thailand tax treaty.',
+      de: 'Thailand hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11 des US-Thailand-Steuerabkommens.'
+    }
   },
   cyprus: {
     article: 'Article 11(2)',
     rate: '10%',
     treatyName: 'U.S.–Cyprus tax treaty (TIAS 11-167)',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/cyprus-tax-treaty-documents',
-    description: 'Cyprus has a 10% maximum withholding rate on interest under Article 11(2) of the U.S.-Cyprus tax treaty.'
+    description: {
+      en: 'Cyprus has a 10% maximum withholding rate on interest under Article 11(2) of the U.S.-Cyprus tax treaty.',
+      de: 'Zypern hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11(2) des US-Zypern-Steuerabkommens.'
+    }
   }
 };
 
@@ -385,16 +409,16 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
             className={errors.country ? 'error' : ''}
           >
             <option value="">{t.selectCountry}</option>
-            <option value="germany">Germany</option>
-            <option value="malta">Malta</option>
-            <option value="thailand">Thailand</option>
-            <option value="cyprus">Cyprus</option>
+            <option value="germany">{t.countryOptions.germany}</option>
+            <option value="malta">{t.countryOptions.malta}</option>
+            <option value="thailand">{t.countryOptions.thailand}</option>
+            <option value="cyprus">{t.countryOptions.cyprus}</option>
           </select>
           {errors.country && <span className="error-message">{errors.country}</span>}
           {formData.country && treatyData[formData.country] && (
             <div className="treaty-info">
               <strong>{t.treatyInfo}</strong>
-              <p>{treatyData[formData.country].description}</p>
+              <p>{treatyData[formData.country].description[language]}</p>
               <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
                 {t.viewTreaty}
               </a>
