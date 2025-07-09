@@ -375,7 +375,6 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
     <div className="container">
       <div className="form-section">
         <div className="header-section">
-          <h1>{t.title}</h1>
           <div className="language-toggle">
             <button 
               onClick={() => setLanguage('en')} 
