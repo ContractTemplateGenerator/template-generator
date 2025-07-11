@@ -8,7 +8,7 @@ const translations = {
     countryLabel: "Country of Owner's Residence",
     countryTooltip: "Select the country where the LLC owner resides. This determines the applicable tax treaty and withholding rate.",
     treatyInfo: "Treaty Information:",
-    viewTreaty: "📄 View IRS Treaty Documents",
+    viewTreaty: "📄 View US-{country} IRS Treaty Documents",
     countryOptions: {
       germany: "Germany",
       malta: "Malta",
@@ -63,7 +63,7 @@ const translations = {
     countryLabel: "Wohnsitzland des Eigentümers",
     countryTooltip: "Wählen Sie das Land, in dem der LLC-Eigentümer ansässig ist. Dies bestimmt das anwendbare Steuerabkommen und den Quellensteuerabzug.",
     treatyInfo: "Abkommensinformationen:",
-    viewTreaty: "📄 IRS-Abkommensdokumente anzeigen",
+    viewTreaty: "📄 US-{country} IRS-Abkommensdokumente anzeigen",
     countryOptions: {
       germany: "Deutschland",
       malta: "Malta",
@@ -419,7 +419,7 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
               <strong>{t.treatyInfo}</strong>
               <p>{treatyData[formData.country].description[language]}</p>
               <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
-                {t.viewTreaty}
+                {t.viewTreaty.replace('{country}', t.countryOptions[formData.country])}
               </a>
             </div>
           )}
