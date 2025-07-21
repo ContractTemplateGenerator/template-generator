@@ -1,251 +1,175 @@
-// Document generation functionality using docx.js
-const generateWordDocument = async (agreementData) => {
+// Word document generation function
+const generateWordDocument = async (documentText, formData) => {
     try {
-        const currentDate = new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', month: 'long', day: 'numeric' 
+        // Check if docx is available
+        if (!window.docx) {
+            throw new Error('DOCX library not loaded');
+        }
+
+        console.log('Generating Word document...');
+        
+        const currentDate = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long', 
+            day: 'numeric'
         });
 
-        // Create document using docx.js
-        const doc = new docx.Document({
-            sections: [{
-                properties: {},
+        // Create document sections
+        const children = [];
+
+        // Title
+        children.push(
+            new docx.Paragraph({
                 children: [
-                    // Title
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "MARKETPLACE SELLER AGREEMENT",
-                                bold: true,
-                                size: 32
-                            })
-                        ],
-                        alignment: docx.AlignmentType.CENTER,
-                        spacing: { after: 400 }
-                    }),
-                    
-                    // Date
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Date: ${currentDate}`,
-                                size: 24
-                            })
-                        ],
-                        alignment: docx.AlignmentType.CENTER,
-                        spacing: { after: 600 }
-                    }),
-                    
-                    // Section 1: Parties
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "1. PARTIES",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `This Marketplace Seller Agreement ("Agreement") is entered into between ${agreementData.marketplaceInfo.companyName || '[COMPANY NAME]'} ("Marketplace"), a company located at ${agreementData.marketplaceInfo.companyAddress || '[COMPANY ADDRESS]'}, and the individual or entity agreeing to these terms ("Seller") for the purpose of selling products or services on the ${agreementData.marketplaceInfo.marketplaceName || '[MARKETPLACE NAME]'} platform.`,
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Section 2: Commission Structure
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "2. COMMISSION STRUCTURE",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `The Marketplace will charge a commission of ${agreementData.commissionStructure.commissionPercentage}% of the gross sale price plus a flat transaction fee of $${agreementData.commissionStructure.flatFee} per transaction. Payments to the Seller will be made ${agreementData.commissionStructure.paymentSchedule || '[PAYMENT SCHEDULE]'} via ${agreementData.commissionStructure.paymentMethod || '[PAYMENT METHOD]'}.`,
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Section 3: Product Requirements
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "3. PRODUCT REQUIREMENTS",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: agreementData.productRequirements.prohibitedItems ? 
-                                    `Prohibited items and categories include: ${agreementData.productRequirements.prohibitedItems}. ` : 
-                                    'The Marketplace reserves the right to determine acceptable products and services. ',
-                                size: 22
-                            })
-                        ]
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: agreementData.productRequirements.listingRequirements ?
-                                    `Listing requirements: ${agreementData.productRequirements.listingRequirements}` :
-                                    'All product listings must comply with Marketplace standards and applicable laws.',
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Section 4: Fulfillment & Returns
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "4. FULFILLMENT & RETURNS",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Fulfillment responsibility lies with: ${agreementData.fulfillmentReturns.fulfillmentResponsibility || '[TO BE SPECIFIED]'}. Orders must be shipped within the agreed timeframe of ${agreementData.fulfillmentReturns.shippingTimeframe || '[TO BE SPECIFIED]'}. Returns will be processed within ${agreementData.fulfillmentReturns.returnTimeframe || 30} days according to the Marketplace return policy.`,
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Section 5: Termination
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "5. TERMINATION",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Either party may terminate this Agreement with ${agreementData.terminationTerms.noticePeriod || 30} days written notice. ${agreementData.terminationTerms.terminationReasons ? 'Grounds for immediate termination include: ' + agreementData.terminationTerms.terminationReasons : 'The Marketplace reserves the right to terminate immediately for material breach of this Agreement.'}`,
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Section 6: Legal Terms
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "6. GOVERNING LAW AND DISPUTES",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 400, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `This Agreement is governed by the laws of ${agreementData.legalTerms.governingLaw || '[GOVERNING LAW]'}. Any disputes arising under this Agreement shall be resolved through ${agreementData.legalTerms.disputeResolution || '[DISPUTE RESOLUTION METHOD]'}.`,
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 300 }
-                    }),
-                    
-                    // Signature section
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "7. SIGNATURES",
-                                bold: true,
-                                size: 26
-                            })
-                        ],
-                        spacing: { before: 600, after: 200 }
-                    }),
-                    
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: "By using the Marketplace platform, Seller agrees to be bound by these terms.",
-                                size: 22
-                            })
-                        ],
-                        spacing: { after: 400 }
-                    }),
-                    
-                    // Footer
-                    new docx.Paragraph({
-                        children: [
-                            new docx.TextRun({
-                                text: `Document generated on ${currentDate} using Marketplace Seller Agreement Generator`,
-                                italics: true,
-                                size: 20
-                            })
-                        ],
-                        alignment: docx.AlignmentType.CENTER,
-                        spacing: { before: 800 }
+                    new docx.TextRun({
+                        text: "MARKETPLACE SELLER AGREEMENT",
+                        bold: true,
+                        size: 28,
+                        font: "Calibri"
                     })
-                ]
+                ],
+                alignment: docx.AlignmentType.CENTER,
+                spacing: { before: 0, after: 400 }
+            })
+        );
+
+        // Date
+        children.push(
+            new docx.Paragraph({
+                children: [
+                    new docx.TextRun({
+                        text: `Date: ${currentDate}`,
+                        size: 22,
+                        font: "Calibri"
+                    })
+                ],
+                alignment: docx.AlignmentType.CENTER,
+                spacing: { after: 600 }
+            })
+        );
+
+        // Split document text into sections by double newlines
+        const sections = documentText.split('\n\n');
+        
+        sections.forEach(section => {
+            section = section.trim();
+            if (!section) return;
+            
+            // Check if this is a heading (starts with number or all caps)
+            const isHeading = /^(\d+\.|\d+\.\d+\.|\b[A-Z\s]{3,}\b)/.test(section);
+            
+            if (isHeading) {
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: section,
+                                bold: true,
+                                size: 24,
+                                font: "Calibri"
+                            })
+                        ],
+                        spacing: { before: 300, after: 200 }
+                    })
+                );
+            } else {
+                children.push(
+                    new docx.Paragraph({
+                        children: [
+                            new docx.TextRun({
+                                text: section,
+                                size: 22,
+                                font: "Calibri"
+                            })
+                        ],
+                        spacing: { after: 200 }
+                    })
+                );
+            }
+        });
+
+        // Create the document
+        const doc = new docx.Document({
+            styles: {
+                default: {
+                    document: {
+                        run: {
+                            font: "Calibri",
+                            size: 22
+                        },
+                        paragraph: {
+                            spacing: { line: 360, before: 0, after: 0 }
+                        }
+                    }
+                }
+            },
+            sections: [{
+                properties: {
+                    page: {
+                        margin: {
+                            top: 1440,    // 1 inch
+                            right: 1440,  // 1 inch  
+                            bottom: 1440, // 1 inch
+                            left: 1440    // 1 inch
+                        }
+                    }
+                },
+                children: children
             }]
         });
 
-        // Generate and download the document
+        // Generate the document buffer
+        console.log('Creating document buffer...');
         const buffer = await docx.Packer.toBuffer(doc);
+        
+        // Create blob and download
         const blob = new Blob([buffer], { 
             type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
         });
         
-        // Create filename with current date
-        const filename = `marketplace-seller-agreement-${new Date().toISOString().split('T')[0]}.docx`;
+        // Generate filename
+        const marketplaceName = (formData.marketplaceName || 'Marketplace').replace(/[^a-zA-Z0-9]/g, '_');
+        const dateString = new Date().toISOString().split('T')[0];
+        const filename = `${marketplaceName}_Seller_Agreement_${dateString}.docx`;
         
-        // Download the file
+        // Download using FileSaver.js if available, otherwise use fallback
         if (typeof saveAs === 'function') {
             saveAs(blob, filename);
+            console.log('Document downloaded successfully via FileSaver');
         } else {
             // Fallback download method
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
+            a.style.display = 'none';
             a.href = url;
             a.download = filename;
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
             document.body.removeChild(a);
+            console.log('Document downloaded successfully via fallback method');
         }
         
-        console.log('Document generated successfully');
+        // Show success message
+        alert('Word document generated and downloaded successfully!');
         
     } catch (error) {
-        console.error('Error generating document:', error);
-        alert('Error generating document. Please try again.');
+        console.error('Error generating Word document:', error);
+        
+        // Show helpful error message
+        let errorMessage = 'Error generating Word document. ';
+        
+        if (error.message.includes('DOCX library not loaded')) {
+            errorMessage += 'Document library failed to load. Please refresh the page and try again.';
+        } else if (error.name === 'SecurityError') {
+            errorMessage += 'Browser security restrictions. Please use the Copy button instead.';
+        } else {
+            errorMessage += 'Please try again or use the Copy button to get the text.';
+        }
+        
+        alert(errorMessage);
     }
 };
+
+// Make function available globally
+window.generateWordDocument = generateWordDocument;
