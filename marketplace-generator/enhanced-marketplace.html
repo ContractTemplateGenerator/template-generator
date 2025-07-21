@@ -87,6 +87,103 @@
             background: #007bff;
             border-color: #007bff;
         }
+
+        /* PayPal Paywall Styles */
+        .paywall-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .paywall-modal {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .paypal-section {
+            margin: 20px 0;
+        }
+
+        .paypal-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .paypal-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .paypal-section input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .paywall-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .unlock-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .unlock-button:hover {
+            background: #218838;
+        }
+
+        .cancel-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cancel-button:hover {
+            background: #5a6268;
+        }
+
+        .paypal-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #6c757d;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
@@ -104,7 +201,9 @@
             const [currentTab, setCurrentTab] = useState(0);
             const [isPaid, setIsPaid] = useState(false);
             const [showPaywall, setShowPaywall] = useState(false);
-            const [paypalEmail, setPaypalEmail] = useState('');
+            const [showManualEntry, setShowManualEntry] = useState(false);
+            const [paypalId, setPaypalId] = useState('');
+            const [paypalButtonRendered, setPaypalButtonRendered] = useState(false);
             const [formData, setFormData] = useState({
                 marketplaceName: 'Example Marketplace',
                 companyName: 'Example Marketplace LLC',
@@ -196,6 +295,43 @@
 
             const escapeRegExp = (string) => {
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            };
+
+            // PayPal validation function
+            const validatePayPalId = (id) => {
+                // Check for 17-character alphanumeric string with only CAPITAL letters
+                if (!id || id.trim().length !== 17) {
+                    return false;
+                }
+                
+                const trimmedId = id.trim();
+                
+                // Must contain only capital letters and numbers
+                const hasOnlyCapitalLettersAndNumbers = /^[A-Z0-9]+$/.test(trimmedId);
+                
+                // Must contain at least one capital letter (not all numbers)
+                const hasAtLeastOneCapitalLetter = /[A-Z]/.test(trimmedId);
+                
+                return hasOnlyCapitalLettersAndNumbers && hasAtLeastOneCapitalLetter;
+            };
+
+            // Handle manual PayPal unlock
+            const handlePayPalUnlock = () => {
+                if (validatePayPalId(paypalId)) {
+                    setIsPaid(true);
+                    setShowPaywall(false);
+                    setShowManualEntry(false);
+                    localStorage.setItem('marketplacePaid', 'true');
+                    localStorage.setItem('marketplacePaymentDetails', JSON.stringify({
+                        manualEntry: true,
+                        transactionId: paypalId,
+                        timestamp: new Date().toISOString()
+                    }));
+                    setPaypalId('');
+                    alert('Access unlocked! You can now copy and download the agreement.');
+                } else {
+                    alert('Please enter a valid PayPal transaction ID to unlock access.');
+                }
             };
 
             const generateDocumentText = () => {
@@ -389,12 +525,15 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                 if (isPaid) {
                     copyToClipboard();
                 } else {
+                    // Save form data before showing paywall
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
                     setShowPaywall(true);
                 }
             };
 
             const copyToClipboard = () => {
                 if (!isPaid) {
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
                     setShowPaywall(true);
                     return;
                 }
@@ -443,6 +582,7 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
 
             const downloadAsText = () => {
                 if (!isPaid) {
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
                     setShowPaywall(true);
                     return;
                 }
@@ -479,7 +619,13 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                 console.log('Payment completed:', details);
                 setIsPaid(true);
                 setShowPaywall(false);
-                localStorage.setItem('marketplace_generator_paid', 'true');
+                localStorage.setItem('marketplacePaid', 'true');
+                localStorage.setItem('marketplacePaymentDetails', JSON.stringify({
+                    paypalOrderId: data.orderID,
+                    paypalTransactionId: details.id,
+                    timestamp: new Date().toISOString(),
+                    amount: '14.95'
+                }));
                 alert('Payment successful! You now have full access to copy and download features.');
             };
 
@@ -489,9 +635,29 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
             };
 
             React.useEffect(() => {
-                const paidStatus = localStorage.getItem('marketplace_generator_paid');
-                if (paidStatus === 'true') {
+                const savedFormData = localStorage.getItem('marketplaceFormData');
+                if (savedFormData) {
+                    try {
+                        const parsedData = JSON.parse(savedFormData);
+                        setFormData(parsedData);
+                    } catch (error) {
+                        console.error('Error parsing saved form data:', error);
+                    }
+                }
+
+                // Check if user has already paid
+                const isPaidStatus = localStorage.getItem('marketplacePaid');
+                if (isPaidStatus === 'true') {
                     setIsPaid(true);
+                }
+                
+                // Check for payment success from URL params
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('payment') === 'success') {
+                    setIsPaid(true);
+                    localStorage.setItem('marketplacePaid', 'true');
+                    // Clean up URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }, []);
 
@@ -1067,72 +1233,52 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                     </div>
                     
                     {showPaywall && (
-                        <div style={{
-                            position: 'fixed',
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            background: 'rgba(0, 0, 0, 0.8)',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            zIndex: 1000
-                        }}>
-                            <div style={{
-                                background: 'white',
-                                padding: '2rem',
-                                borderRadius: '12px',
-                                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
-                                maxWidth: '500px',
-                                width: '90%',
-                                textAlign: 'center'
-                            }}>
-                                <h2 style={{ color: '#1f2937', marginBottom: '1rem' }}>Unlock Full Access</h2>
-                                <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
-                                    Get instant access to copy, download, and use your customized Marketplace Seller Agreement
-                                </p>
-                                <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', marginBottom: '1.5rem' }}>
-                                    <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>$14.95</div>
-                                    <div style={{ color: '#6b7280' }}>One-time payment</div>
-                                </div>
+                        <div className="paywall-overlay">
+                            <div className="paywall-modal">
+                                <h2>Unlock Full Access</h2>
+                                <p>Get instant access to copy, download, and use your customized Marketplace Seller Agreement for just $14.95</p>
                                 
-                                <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
-                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#374151' }}>
-                                        PayPal Email Address
-                                    </label>
+                                <div id="paypal-button-container" style={{ marginBottom: '20px' }}></div>
+                                
+                                <div className="paywall-buttons">
+                                    <button onClick={() => setShowManualEntry(true)} className="unlock-button">
+                                        Already Paid? Enter Transaction ID
+                                    </button>
+                                    <button onClick={() => setShowPaywall(false)} className="cancel-button">
+                                        Maybe Later
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showManualEntry && (
+                        <div className="paywall-overlay">
+                            <div className="paywall-modal">
+                                <h3>Enter PayPal Transaction ID</h3>
+                                <p>If you've already paid via PayPal, enter your transaction ID below to unlock access:</p>
+                                
+                                <div className="paypal-section">
+                                    <label>PayPal Transaction ID:</label>
                                     <input
-                                        type="email"
-                                        value={paypalEmail}
-                                        onChange={(e) => setPaypalEmail(e.target.value)}
-                                        placeholder="Enter your PayPal email"
-                                        style={{
-                                            width: '100%',
-                                            padding: '0.75rem',
-                                            border: '1px solid #d1d5db',
-                                            borderRadius: '6px',
-                                            fontSize: '1rem'
-                                        }}
+                                        type="text"
+                                        value={paypalId}
+                                        onChange={(e) => setPaypalId(e.target.value)}
+                                        placeholder="Enter PayPal transaction ID"
                                     />
-                                    <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                        This will be used for payment processing
-                                    </small>
+                                    <div className="paywall-buttons">
+                                        <button onClick={handlePayPalUnlock} className="unlock-button">
+                                            Unlock Access
+                                        </button>
+                                        <button onClick={() => {setShowManualEntry(false); setShowPaywall(true);}} className="cancel-button">
+                                            Back to Payment
+                                        </button>
+                                    </div>
                                 </div>
                                 
-                                <div id="paypal-button-container" style={{ marginBottom: '1rem' }}></div>
-                                
-                                <button 
-                                    onClick={() => setShowPaywall(false)}
-                                    style={{
-                                        background: 'transparent',
-                                        border: 'none',
-                                        color: '#6b7280',
-                                        cursor: 'pointer',
-                                        textDecoration: 'underline'
-                                    }}
-                                >
-                                    Maybe later
-                                </button>
+                                <div className="paypal-info">
+                                    <p><strong>Haven't Paid Yet?</strong> Go back to payment options to complete your purchase.</p>
+                                </div>
                             </div>
                         </div>
                     )}
