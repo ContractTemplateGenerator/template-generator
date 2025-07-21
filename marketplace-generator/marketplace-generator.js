@@ -1,51 +1,82 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useRef, useEffect } = React;
 
 const MarketplaceGenerator = () => {
-    // Form data state
+    // State management
+    const [currentTab, setCurrentTab] = useState(0);
+    const [lastChanged, setLastChanged] = useState(null);
+    const previewRef = useRef(null);
+    
+    // Form data state with better defaults
     const [formData, setFormData] = useState({
+        // Marketplace Information
         marketplaceName: 'Example Marketplace',
         marketplaceUrl: 'www.example-marketplace.com',
         companyName: 'Example Marketplace LLC',
         companyAddress: '123 Main Street, San Francisco, CA 94105',
         contactEmail: 'contact@example-marketplace.com',
         
+        // Commission & Fees
         commissionPercentage: '15',
         flatFee: '0.30',
         paymentSchedule: 'bi-weekly',
         paymentMethod: 'ACH Transfer',
         
+        // Product Requirements
         prohibitedItems: 'Illegal items, counterfeit goods, hazardous materials, weapons, adult content',
         listingRequirements: 'High-quality product images, detailed descriptions, accurate pricing, proper categorization',
         qualityStandards: 'All products must meet marketplace quality standards',
         
+        // Fulfillment & Returns
         fulfillmentResponsibility: 'seller',
         shippingTimeframe: '1-3 business days',
         returnPolicy: 'marketplace-standard',
         returnTimeframe: '30',
         customerServiceResponsibility: 'seller',
         
+        // Termination Terms
         noticePeriod: '30',
         terminationReasons: 'Breach of agreement, violation of policies, fraudulent activity',
         postTerminationObligations: 'Complete pending orders, honor return policy',
         
+        // Legal Terms
         governingLaw: 'State of California, USA',
         disputeResolution: 'arbitration',
         limitationOfLiability: 'standard',
         intellectualProperty: 'seller-retains'
     });
 
-    const [currentTab, setCurrentTab] = useState(0);
-    const previewRef = useRef(null);
-
-    // Handle form changes
-    const handleChange = (name, value) => {
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+    // Handle input changes properly to fix typing issues
+    const handleChange = (e) => {
+        const { name, value, type, checked } = e.target;
+        
+        // Record what field was changed for highlighting
+        setLastChanged(name);
+        
+        // Update form data
+        const newFormData = {
+            ...formData,
+            [name]: type === 'checkbox' ? checked : value
+        };
+        setFormData(newFormData);
+        
+        // Save form data to localStorage
+        localStorage.setItem('marketplaceFormData', JSON.stringify(newFormData));
     };
 
-    // Generate document text
+    // Load saved form data on component mount
+    useEffect(() => {
+        const savedData = localStorage.getItem('marketplaceFormData');
+        if (savedData) {
+            try {
+                const parsedData = JSON.parse(savedData);
+                setFormData(parsedData);
+            } catch (error) {
+                console.error('Error loading saved form data:', error);
+            }
+        }
+    }, []);
+
+    // Generate document text with highlighting support
     const generateDocumentText = () => {
         const currentDate = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -180,6 +211,143 @@ Date: _______________________
 This document was generated on ${currentDate} using the Marketplace Seller Agreement Generator at terms.law`;
     };
 
+    // Determine which section to highlight
+    const getSectionToHighlight = () => {
+        if (!lastChanged) return null;
+        
+        switch (currentTab) {
+            case 0: // Marketplace Info
+                if (['marketplaceName', 'marketplaceUrl', 'companyName', 'companyAddress', 'contactEmail'].includes(lastChanged)) {
+                    return 'marketplace-info';
+                }
+                break;
+            case 1: // Commission
+                if (['commissionPercentage', 'flatFee', 'paymentSchedule', 'paymentMethod'].includes(lastChanged)) {
+                    return 'commission';
+                }
+                break;
+            case 2: // Product Requirements
+                if (['prohibitedItems', 'listingRequirements', 'qualityStandards'].includes(lastChanged)) {
+                    return 'product-requirements';
+                }
+                break;
+            case 3: // Fulfillment
+                if (['fulfillmentResponsibility', 'shippingTimeframe', 'returnPolicy', 'returnTimeframe', 'customerServiceResponsibility'].includes(lastChanged)) {
+                    return 'fulfillment';
+                }
+                break;
+            case 4: // Termination
+                if (['noticePeriod', 'terminationReasons', 'postTerminationObligations'].includes(lastChanged)) {
+                    return 'termination';
+                }
+                break;
+            case 5: // Legal Terms
+                if (['governingLaw', 'disputeResolution', 'limitationOfLiability', 'intellectualProperty'].includes(lastChanged)) {
+                    return 'legal';
+                }
+                break;
+            default:
+                return null;
+        }
+        return null;
+    };
+
+    // Create highlighted document text
+    const createHighlightedText = () => {
+        const sectionToHighlight = getSectionToHighlight();
+        if (!sectionToHighlight || !lastChanged) return generateDocumentText();
+        
+        let highlightedText = generateDocumentText();
+        
+        // Highlight different sections based on what changed
+        switch (lastChanged) {
+            case 'marketplaceName':
+                if (formData.marketplaceName) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(formData.marketplaceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                        `<span class="highlighted-text">${formData.marketplaceName}</span>`
+                    );
+                }
+                break;
+            case 'companyName':
+                if (formData.companyName) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(formData.companyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                        `<span class="highlighted-text">${formData.companyName}</span>`
+                    );
+                }
+                break;
+            case 'commissionPercentage':
+                if (formData.commissionPercentage) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(`${formData.commissionPercentage}%`, 'g'),
+                        `<span class="highlighted-text">${formData.commissionPercentage}%</span>`
+                    );
+                }
+                break;
+            case 'flatFee':
+                if (formData.flatFee) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(`\\$${formData.flatFee}`, 'g'),
+                        `<span class="highlighted-text">$${formData.flatFee}</span>`
+                    );
+                }
+                break;
+            case 'returnTimeframe':
+                if (formData.returnTimeframe) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(`${formData.returnTimeframe} days`, 'g'),
+                        `<span class="highlighted-text">${formData.returnTimeframe} days</span>`
+                    );
+                }
+                break;
+            default:
+                // For other fields, highlight the relevant section
+                const sectionPatterns = {
+                    'marketplace-info': /(1\. MARKETPLACE PLATFORM.*?(?=2\.|$))/s,
+                    'commission': /(2\. COMMISSION STRUCTURE AND FEES.*?(?=3\.|$))/s,
+                    'product-requirements': /(3\. PRODUCT REQUIREMENTS AND RESTRICTIONS.*?(?=4\.|$))/s,
+                    'fulfillment': /(4\. FULFILLMENT AND SHIPPING.*?(?=5\.|$))/s,
+                    'termination': /(6\. TERM AND TERMINATION.*?(?=7\.|$))/s,
+                    'legal': /(10\. GOVERNING LAW AND DISPUTE RESOLUTION.*?(?=11\.|$))/s
+                };
+                
+                const pattern = sectionPatterns[sectionToHighlight];
+                if (pattern) {
+                    highlightedText = highlightedText.replace(pattern, '<span class="highlighted-text">$1</span>');
+                }
+                break;
+        }
+        
+        return highlightedText;
+    };
+
+    const documentText = generateDocumentText();
+    const highlightedText = createHighlightedText();
+
+    // Scroll to highlighted text
+    useEffect(() => {
+        if (previewRef.current && lastChanged) {
+            // Small delay to ensure the DOM has updated
+            setTimeout(() => {
+                const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                if (highlightedElement) {
+                    highlightedElement.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }
+            }, 100);
+
+            // Clear the highlight after 3 seconds
+            const timer = setTimeout(() => {
+                setLastChanged(null);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [highlightedText, lastChanged]);
+
     // Copy to clipboard function
     const copyToClipboard = async () => {
         try {
@@ -192,16 +360,35 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
         }
     };
 
+    // Help tooltip component
+    const HelpIcon = ({ tooltip }) => (
+        <span className="help-icon" title={tooltip}>
+            ⓘ
+        </span>
+    );
+
+    // Define tooltips
+    const tooltips = {
+        marketplaceName: "The public name of your marketplace platform that users will see",
+        commissionPercentage: "The percentage of each sale that your marketplace takes as commission",
+        flatFee: "A fixed fee charged per transaction in addition to the commission",
+        prohibitedItems: "List items that sellers are not allowed to sell on your marketplace",
+        fulfillmentResponsibility: "Who handles shipping - the seller, marketplace, or shared responsibility",
+        returnPolicy: "Whether you set a standard policy or let sellers define their own",
+        disputeResolution: "How legal disputes will be resolved - arbitration is typically faster and cheaper"
+    };
+
     // Tab content components
     const MarketplaceInfoTab = () => (
         <div>
             <h2>Marketplace Information</h2>
             <div className="form-group">
-                <label>Marketplace Name</label>
+                <label>Marketplace Name <HelpIcon tooltip={tooltips.marketplaceName} /></label>
                 <input
                     type="text"
+                    name="marketplaceName"
                     value={formData.marketplaceName}
-                    onChange={(e) => handleChange('marketplaceName', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Enter marketplace name"
                 />
             </div>
@@ -209,8 +396,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <label>Marketplace URL</label>
                 <input
                     type="text"
+                    name="marketplaceUrl"
                     value={formData.marketplaceUrl}
-                    onChange={(e) => handleChange('marketplaceUrl', e.target.value)}
+                    onChange={handleChange}
                     placeholder="www.example.com"
                 />
             </div>
@@ -218,16 +406,18 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <label>Company Name</label>
                 <input
                     type="text"
+                    name="companyName"
                     value={formData.companyName}
-                    onChange={(e) => handleChange('companyName', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Enter company name"
                 />
             </div>
             <div className="form-group">
                 <label>Company Address</label>
                 <textarea
+                    name="companyAddress"
                     value={formData.companyAddress}
-                    onChange={(e) => handleChange('companyAddress', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Enter company address"
                     rows="3"
                 />
@@ -236,8 +426,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <label>Contact Email</label>
                 <input
                     type="email"
+                    name="contactEmail"
                     value={formData.contactEmail}
-                    onChange={(e) => handleChange('contactEmail', e.target.value)}
+                    onChange={handleChange}
                     placeholder="contact@example.com"
                 />
             </div>
@@ -249,24 +440,26 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <h2>Commission & Fees</h2>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Commission Percentage (%)</label>
+                    <label>Commission Percentage (%) <HelpIcon tooltip={tooltips.commissionPercentage} /></label>
                     <input
                         type="number"
+                        name="commissionPercentage"
                         min="0"
                         max="50"
                         step="0.1"
                         value={formData.commissionPercentage}
-                        onChange={(e) => handleChange('commissionPercentage', e.target.value)}
+                        onChange={handleChange}
                     />
                 </div>
                 <div className="form-group">
-                    <label>Flat Fee per Transaction ($)</label>
+                    <label>Flat Fee per Transaction ($) <HelpIcon tooltip={tooltips.flatFee} /></label>
                     <input
                         type="number"
+                        name="flatFee"
                         min="0"
                         step="0.01"
                         value={formData.flatFee}
-                        onChange={(e) => handleChange('flatFee', e.target.value)}
+                        onChange={handleChange}
                     />
                 </div>
             </div>
@@ -274,8 +467,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <div className="form-group">
                     <label>Payment Schedule</label>
                     <select
+                        name="paymentSchedule"
                         value={formData.paymentSchedule}
-                        onChange={(e) => handleChange('paymentSchedule', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="weekly">Weekly</option>
                         <option value="bi-weekly">Bi-weekly</option>
@@ -286,8 +480,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <div className="form-group">
                     <label>Payment Method</label>
                     <select
+                        name="paymentMethod"
                         value={formData.paymentMethod}
-                        onChange={(e) => handleChange('paymentMethod', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="ACH Transfer">ACH Transfer</option>
                         <option value="Wire Transfer">Wire Transfer</option>
@@ -304,10 +499,11 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
         <div>
             <h2>Product Requirements</h2>
             <div className="form-group">
-                <label>Prohibited Items</label>
+                <label>Prohibited Items <HelpIcon tooltip={tooltips.prohibitedItems} /></label>
                 <textarea
+                    name="prohibitedItems"
                     value={formData.prohibitedItems}
-                    onChange={(e) => handleChange('prohibitedItems', e.target.value)}
+                    onChange={handleChange}
                     placeholder="List prohibited items or categories..."
                     rows="3"
                 />
@@ -315,8 +511,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <div className="form-group">
                 <label>Listing Requirements</label>
                 <textarea
+                    name="listingRequirements"
                     value={formData.listingRequirements}
-                    onChange={(e) => handleChange('listingRequirements', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Specify listing requirements..."
                     rows="3"
                 />
@@ -324,8 +521,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <div className="form-group">
                 <label>Quality Standards</label>
                 <textarea
+                    name="qualityStandards"
                     value={formData.qualityStandards}
-                    onChange={(e) => handleChange('qualityStandards', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Define quality standards..."
                     rows="2"
                 />
@@ -338,10 +536,11 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <h2>Fulfillment & Returns</h2>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Fulfillment Responsibility</label>
+                    <label>Fulfillment Responsibility <HelpIcon tooltip={tooltips.fulfillmentResponsibility} /></label>
                     <select
+                        name="fulfillmentResponsibility"
                         value={formData.fulfillmentResponsibility}
-                        onChange={(e) => handleChange('fulfillmentResponsibility', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="seller">Seller</option>
                         <option value="marketplace">Marketplace</option>
@@ -352,18 +551,20 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                     <label>Shipping Timeframe</label>
                     <input
                         type="text"
+                        name="shippingTimeframe"
                         value={formData.shippingTimeframe}
-                        onChange={(e) => handleChange('shippingTimeframe', e.target.value)}
+                        onChange={handleChange}
                         placeholder="e.g., 1-3 business days"
                     />
                 </div>
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Return Policy</label>
+                    <label>Return Policy <HelpIcon tooltip={tooltips.returnPolicy} /></label>
                     <select
+                        name="returnPolicy"
                         value={formData.returnPolicy}
-                        onChange={(e) => handleChange('returnPolicy', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="marketplace-standard">Marketplace Standard</option>
                         <option value="seller-defined">Seller Defined</option>
@@ -373,18 +574,20 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                     <label>Return Timeframe (days)</label>
                     <input
                         type="number"
+                        name="returnTimeframe"
                         min="0"
                         max="365"
                         value={formData.returnTimeframe}
-                        onChange={(e) => handleChange('returnTimeframe', e.target.value)}
+                        onChange={handleChange}
                     />
                 </div>
             </div>
             <div className="form-group">
                 <label>Customer Service Responsibility</label>
                 <select
+                    name="customerServiceResponsibility"
                     value={formData.customerServiceResponsibility}
-                    onChange={(e) => handleChange('customerServiceResponsibility', e.target.value)}
+                    onChange={handleChange}
                 >
                     <option value="seller">Seller</option>
                     <option value="marketplace">Marketplace</option>
@@ -401,17 +604,19 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <label>Notice Period (days)</label>
                 <input
                     type="number"
+                    name="noticePeriod"
                     min="0"
                     max="365"
                     value={formData.noticePeriod}
-                    onChange={(e) => handleChange('noticePeriod', e.target.value)}
+                    onChange={handleChange}
                 />
             </div>
             <div className="form-group">
                 <label>Termination Reasons</label>
                 <textarea
+                    name="terminationReasons"
                     value={formData.terminationReasons}
-                    onChange={(e) => handleChange('terminationReasons', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Specify reasons for termination..."
                     rows="3"
                 />
@@ -419,8 +624,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <div className="form-group">
                 <label>Post-Termination Obligations</label>
                 <textarea
+                    name="postTerminationObligations"
                     value={formData.postTerminationObligations}
-                    onChange={(e) => handleChange('postTerminationObligations', e.target.value)}
+                    onChange={handleChange}
                     placeholder="Specify post-termination obligations..."
                     rows="2"
                 />
@@ -435,17 +641,19 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <label>Governing Law</label>
                 <input
                     type="text"
+                    name="governingLaw"
                     value={formData.governingLaw}
-                    onChange={(e) => handleChange('governingLaw', e.target.value)}
+                    onChange={handleChange}
                     placeholder="e.g., State of California, USA"
                 />
             </div>
             <div className="form-row">
                 <div className="form-group">
-                    <label>Dispute Resolution</label>
+                    <label>Dispute Resolution <HelpIcon tooltip={tooltips.disputeResolution} /></label>
                     <select
+                        name="disputeResolution"
                         value={formData.disputeResolution}
-                        onChange={(e) => handleChange('disputeResolution', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="arbitration">Arbitration</option>
                         <option value="mediation">Mediation</option>
@@ -455,8 +663,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 <div className="form-group">
                     <label>Limitation of Liability</label>
                     <select
+                        name="limitationOfLiability"
                         value={formData.limitationOfLiability}
-                        onChange={(e) => handleChange('limitationOfLiability', e.target.value)}
+                        onChange={handleChange}
                     >
                         <option value="standard">Standard</option>
                         <option value="comprehensive">Comprehensive</option>
@@ -467,8 +676,9 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             <div className="form-group">
                 <label>Intellectual Property</label>
                 <select
+                    name="intellectualProperty"
                     value={formData.intellectualProperty}
-                    onChange={(e) => handleChange('intellectualProperty', e.target.value)}
+                    onChange={handleChange}
                 >
                     <option value="seller-retains">Seller Retains Rights</option>
                     <option value="shared">Shared Rights</option>
@@ -499,13 +709,11 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
         }
     };
 
-    const documentText = generateDocumentText();
-
     return (
         <div className="container">
             <div className="header">
                 <h1>Marketplace Seller Agreement Generator</h1>
-                <p>Create professional marketplace seller agreements</p>
+                <p>Create professional marketplace seller agreements with live preview</p>
             </div>
 
             <div className="main-content">
@@ -543,7 +751,7 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                             className="btn copy"
                             onClick={copyToClipboard}
                         >
-                            📋 Copy
+                            📋 Copy Agreement
                         </button>
                         
                         <button
@@ -581,9 +789,10 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                         <small>Updates as you type</small>
                     </div>
                     <div className="preview-content" ref={previewRef}>
-                        <pre style={{ whiteSpace: 'pre-wrap', fontFamily: 'Times, serif' }}>
-                            {documentText}
-                        </pre>
+                        <div 
+                            style={{ whiteSpace: 'pre-wrap', fontFamily: 'Times, serif' }}
+                            dangerouslySetInnerHTML={{ __html: highlightedText.replace(/\n/g, '<br>') }}
+                        />
                     </div>
                 </div>
             </div>
