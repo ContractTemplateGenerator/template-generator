@@ -211,60 +211,18 @@ Date: _______________________
 This document was generated on ${currentDate} using the Marketplace Seller Agreement Generator at terms.law`;
     };
 
-    // Determine which section to highlight
-    const getSectionToHighlight = () => {
-        if (!lastChanged) return null;
-        
-        switch (currentTab) {
-            case 0: // Marketplace Info
-                if (['marketplaceName', 'marketplaceUrl', 'companyName', 'companyAddress', 'contactEmail'].includes(lastChanged)) {
-                    return 'marketplace-info';
-                }
-                break;
-            case 1: // Commission
-                if (['commissionPercentage', 'flatFee', 'paymentSchedule', 'paymentMethod'].includes(lastChanged)) {
-                    return 'commission';
-                }
-                break;
-            case 2: // Product Requirements
-                if (['prohibitedItems', 'listingRequirements', 'qualityStandards'].includes(lastChanged)) {
-                    return 'product-requirements';
-                }
-                break;
-            case 3: // Fulfillment
-                if (['fulfillmentResponsibility', 'shippingTimeframe', 'returnPolicy', 'returnTimeframe', 'customerServiceResponsibility'].includes(lastChanged)) {
-                    return 'fulfillment';
-                }
-                break;
-            case 4: // Termination
-                if (['noticePeriod', 'terminationReasons', 'postTerminationObligations'].includes(lastChanged)) {
-                    return 'termination';
-                }
-                break;
-            case 5: // Legal Terms
-                if (['governingLaw', 'disputeResolution', 'limitationOfLiability', 'intellectualProperty'].includes(lastChanged)) {
-                    return 'legal';
-                }
-                break;
-            default:
-                return null;
-        }
-        return null;
-    };
-
-    // Create highlighted document text
+    // Create highlighted document text with PRECISE highlighting like AI generator
     const createHighlightedText = () => {
-        const sectionToHighlight = getSectionToHighlight();
-        if (!sectionToHighlight || !lastChanged) return generateDocumentText();
+        if (!lastChanged) return generateDocumentText();
         
         let highlightedText = generateDocumentText();
         
-        // Highlight different sections based on what changed
+        // Highlight only the specific phrase/value that changed, NOT whole paragraphs
         switch (lastChanged) {
             case 'marketplaceName':
                 if (formData.marketplaceName) {
                     highlightedText = highlightedText.replace(
-                        new RegExp(formData.marketplaceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                        new RegExp(formData.marketplaceName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
                         `<span class="highlighted-text">${formData.marketplaceName}</span>`
                     );
                 }
@@ -272,8 +230,32 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
             case 'companyName':
                 if (formData.companyName) {
                     highlightedText = highlightedText.replace(
-                        new RegExp(formData.companyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'),
+                        new RegExp(formData.companyName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
                         `<span class="highlighted-text">${formData.companyName}</span>`
+                    );
+                }
+                break;
+            case 'contactEmail':
+                if (formData.contactEmail) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(formData.contactEmail.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                        `<span class="highlighted-text">${formData.contactEmail}</span>`
+                    );
+                }
+                break;
+            case 'companyAddress':
+                if (formData.companyAddress) {
+                    highlightedText = highlightedText.replace(
+                        /located at .*/,
+                        `located at <span class="highlighted-text">${formData.companyAddress}</span>, and`
+                    );
+                }
+                break;
+            case 'marketplaceUrl':
+                if (formData.marketplaceUrl) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(formData.marketplaceUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                        `<span class="highlighted-text">${formData.marketplaceUrl}</span>`
                     );
                 }
                 break;
@@ -293,6 +275,18 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                     );
                 }
                 break;
+            case 'paymentSchedule':
+                highlightedText = highlightedText.replace(
+                    /Payments to sellers will be made .* via/,
+                    `Payments to sellers will be made <span class="highlighted-text">${formData.paymentSchedule}</span> via`
+                );
+                break;
+            case 'paymentMethod':
+                highlightedText = highlightedText.replace(
+                    /via .*/,
+                    `via <span class="highlighted-text">${formData.paymentMethod}</span>.`
+                );
+                break;
             case 'returnTimeframe':
                 if (formData.returnTimeframe) {
                     highlightedText = highlightedText.replace(
@@ -301,21 +295,77 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                     );
                 }
                 break;
-            default:
-                // For other fields, highlight the relevant section
-                const sectionPatterns = {
-                    'marketplace-info': /(1\. MARKETPLACE PLATFORM.*?(?=2\.|$))/s,
-                    'commission': /(2\. COMMISSION STRUCTURE AND FEES.*?(?=3\.|$))/s,
-                    'product-requirements': /(3\. PRODUCT REQUIREMENTS AND RESTRICTIONS.*?(?=4\.|$))/s,
-                    'fulfillment': /(4\. FULFILLMENT AND SHIPPING.*?(?=5\.|$))/s,
-                    'termination': /(6\. TERM AND TERMINATION.*?(?=7\.|$))/s,
-                    'legal': /(10\. GOVERNING LAW AND DISPUTE RESOLUTION.*?(?=11\.|$))/s
-                };
-                
-                const pattern = sectionPatterns[sectionToHighlight];
-                if (pattern) {
-                    highlightedText = highlightedText.replace(pattern, '<span class="highlighted-text">$1</span>');
+            case 'noticePeriod':
+                if (formData.noticePeriod) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(`${formData.noticePeriod} days written notice`, 'g'),
+                        `<span class="highlighted-text">${formData.noticePeriod} days</span> written notice`
+                    );
                 }
+                break;
+            case 'shippingTimeframe':
+                highlightedText = highlightedText.replace(
+                    /within .* of order placement/,
+                    `within <span class="highlighted-text">${formData.shippingTimeframe}</span> of order placement`
+                );
+                break;
+            case 'governingLaw':
+                highlightedText = highlightedText.replace(
+                    /laws of .*/,
+                    `laws of <span class="highlighted-text">${formData.governingLaw}</span>.`
+                );
+                break;
+            case 'disputeResolution':
+                const resolutionText = formData.disputeResolution === 'arbitration' ? 'binding arbitration' : 
+                                     formData.disputeResolution === 'mediation' ? 'mediation followed by arbitration if necessary' : 
+                                     'litigation in the appropriate courts';
+                highlightedText = highlightedText.replace(
+                    /resolved through .*/,
+                    `resolved through <span class="highlighted-text">${resolutionText}</span>.`
+                );
+                break;
+            case 'fulfillmentResponsibility':
+                const fulfillmentText = formData.fulfillmentResponsibility === 'seller' ? 'Seller is responsible for fulfilling all orders' :
+                                      formData.fulfillmentResponsibility === 'marketplace' ? 'Marketplace handles fulfillment' :
+                                      'Fulfillment responsibilities are shared between Seller and Marketplace';
+                highlightedText = highlightedText.replace(
+                    /4\.1 Fulfillment Responsibility: .*/,
+                    `4.1 Fulfillment Responsibility: <span class="highlighted-text">${fulfillmentText}</span>.`
+                );
+                break;
+            case 'returnPolicy':
+                const policyText = formData.returnPolicy === 'marketplace-standard' ? 
+                                 'All returns are subject to the Marketplace\'s standard return policy' :
+                                 'Sellers may set their own return policies subject to Marketplace approval';
+                highlightedText = highlightedText.replace(
+                    /5\.1 Return Policy: .*/,
+                    `5.1 Return Policy: <span class="highlighted-text">${policyText}</span>.`
+                );
+                break;
+            case 'customerServiceResponsibility':
+                const serviceText = formData.customerServiceResponsibility === 'seller' ? 
+                                  'Seller is responsible for customer service inquiries' :
+                                  'Marketplace handles customer service';
+                highlightedText = highlightedText.replace(
+                    /5\.4 Customer Service: .*/,
+                    `5.4 Customer Service: <span class="highlighted-text">${serviceText}</span>.`
+                );
+                break;
+            case 'prohibitedItems':
+            case 'listingRequirements':
+            case 'qualityStandards':
+            case 'terminationReasons':
+            case 'postTerminationObligations':
+                // For text areas, highlight the content that was just changed
+                const fieldValue = formData[lastChanged];
+                if (fieldValue) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(fieldValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                        `<span class="highlighted-text">${fieldValue}</span>`
+                    );
+                }
+                break;
+            default:
                 break;
         }
         
@@ -328,7 +378,6 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
     // Scroll to highlighted text
     useEffect(() => {
         if (previewRef.current && lastChanged) {
-            // Small delay to ensure the DOM has updated
             setTimeout(() => {
                 const highlightedElement = previewRef.current.querySelector('.highlighted-text');
                 if (highlightedElement) {
@@ -339,7 +388,6 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                 }
             }, 100);
 
-            // Clear the highlight after 3 seconds
             const timer = setTimeout(() => {
                 setLastChanged(null);
             }, 3000);
@@ -367,334 +415,180 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
         </span>
     );
 
-    // Define tooltips
+    // Define tooltips with practical legal advice
     const tooltips = {
         marketplaceName: "The public name of your marketplace platform that users will see",
-        commissionPercentage: "The percentage of each sale that your marketplace takes as commission",
-        flatFee: "A fixed fee charged per transaction in addition to the commission",
-        prohibitedItems: "List items that sellers are not allowed to sell on your marketplace",
-        fulfillmentResponsibility: "Who handles shipping - the seller, marketplace, or shared responsibility",
-        returnPolicy: "Whether you set a standard policy or let sellers define their own",
-        disputeResolution: "How legal disputes will be resolved - arbitration is typically faster and cheaper"
+        commissionPercentage: "Industry standard ranges from 3-15%. Higher rates may reduce seller participation",
+        flatFee: "Fixed fees help cover payment processing costs. Typical range is $0.30-$2.00",
+        prohibitedItems: "Clear restrictions reduce legal liability and protect your brand reputation",
+        fulfillmentResponsibility: "Seller fulfillment reduces your operational costs but may impact customer experience",
+        returnPolicy: "Standard policies provide consistency; seller-defined allows flexibility but increases complexity",
+        disputeResolution: "Arbitration is typically faster and cheaper than litigation for business disputes",
+        noticePeriod: "30-60 days is standard; longer periods provide more stability for sellers",
+        governingLaw: "Choose the jurisdiction where your business is incorporated for consistency"
     };
 
-    // Tab content components
-    const MarketplaceInfoTab = () => (
-        <div>
-            <h2>Marketplace Information</h2>
-            <div className="form-group">
-                <label>Marketplace Name <HelpIcon tooltip={tooltips.marketplaceName} /></label>
-                <input
-                    type="text"
-                    name="marketplaceName"
-                    value={formData.marketplaceName}
-                    onChange={handleChange}
-                    placeholder="Enter marketplace name"
-                />
-            </div>
-            <div className="form-group">
-                <label>Marketplace URL</label>
-                <input
-                    type="text"
-                    name="marketplaceUrl"
-                    value={formData.marketplaceUrl}
-                    onChange={handleChange}
-                    placeholder="www.example.com"
-                />
-            </div>
-            <div className="form-group">
-                <label>Company Name</label>
-                <input
-                    type="text"
-                    name="companyName"
-                    value={formData.companyName}
-                    onChange={handleChange}
-                    placeholder="Enter company name"
-                />
-            </div>
-            <div className="form-group">
-                <label>Company Address</label>
-                <textarea
-                    name="companyAddress"
-                    value={formData.companyAddress}
-                    onChange={handleChange}
-                    placeholder="Enter company address"
-                    rows="3"
-                />
-            </div>
-            <div className="form-group">
-                <label>Contact Email</label>
-                <input
-                    type="email"
-                    name="contactEmail"
-                    value={formData.contactEmail}
-                    onChange={handleChange}
-                    placeholder="contact@example.com"
-                />
-            </div>
-        </div>
-    );
+    // Generate comprehensive legal risk analysis
+    const generateRiskAnalysis = () => {
+        let highRisks = [];
+        let mediumRisks = [];
+        let lowRisks = [];
+        let recommendations = [];
 
-    const CommissionTab = () => (
-        <div>
-            <h2>Commission & Fees</h2>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Commission Percentage (%) <HelpIcon tooltip={tooltips.commissionPercentage} /></label>
-                    <input
-                        type="number"
-                        name="commissionPercentage"
-                        min="0"
-                        max="50"
-                        step="0.1"
-                        value={formData.commissionPercentage}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div className="form-group">
-                    <label>Flat Fee per Transaction ($) <HelpIcon tooltip={tooltips.flatFee} /></label>
-                    <input
-                        type="number"
-                        name="flatFee"
-                        min="0"
-                        step="0.01"
-                        value={formData.flatFee}
-                        onChange={handleChange}
-                    />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Payment Schedule</label>
-                    <select
-                        name="paymentSchedule"
-                        value={formData.paymentSchedule}
-                        onChange={handleChange}
-                    >
-                        <option value="weekly">Weekly</option>
-                        <option value="bi-weekly">Bi-weekly</option>
-                        <option value="monthly">Monthly</option>
-                        <option value="quarterly">Quarterly</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Payment Method</label>
-                    <select
-                        name="paymentMethod"
-                        value={formData.paymentMethod}
-                        onChange={handleChange}
-                    >
-                        <option value="ACH Transfer">ACH Transfer</option>
-                        <option value="Wire Transfer">Wire Transfer</option>
-                        <option value="Check">Check</option>
-                        <option value="PayPal">PayPal</option>
-                        <option value="Stripe">Stripe</option>
-                    </select>
-                </div>
-            </div>
-        </div>
-    );
+        // Commission Structure Analysis
+        const commission = parseFloat(formData.commissionPercentage);
+        if (commission > 20) {
+            highRisks.push('Commission rate above 20% may violate state usury laws');
+            recommendations.push('Consider reducing commission to industry standard 3-15%');
+        } else if (commission > 15) {
+            mediumRisks.push('High commission rate may reduce seller participation');
+            recommendations.push('Monitor competitor rates and seller feedback');
+        } else {
+            lowRisks.push('Commission rate within industry standards');
+        }
 
-    const ProductRequirementsTab = () => (
-        <div>
-            <h2>Product Requirements</h2>
-            <div className="form-group">
-                <label>Prohibited Items <HelpIcon tooltip={tooltips.prohibitedItems} /></label>
-                <textarea
-                    name="prohibitedItems"
-                    value={formData.prohibitedItems}
-                    onChange={handleChange}
-                    placeholder="List prohibited items or categories..."
-                    rows="3"
-                />
-            </div>
-            <div className="form-group">
-                <label>Listing Requirements</label>
-                <textarea
-                    name="listingRequirements"
-                    value={formData.listingRequirements}
-                    onChange={handleChange}
-                    placeholder="Specify listing requirements..."
-                    rows="3"
-                />
-            </div>
-            <div className="form-group">
-                <label>Quality Standards</label>
-                <textarea
-                    name="qualityStandards"
-                    value={formData.qualityStandards}
-                    onChange={handleChange}
-                    placeholder="Define quality standards..."
-                    rows="2"
-                />
-            </div>
-        </div>
-    );
+        // Fulfillment Analysis
+        if (formData.fulfillmentResponsibility === 'seller') {
+            lowRisks.push('Seller fulfillment reduces operational liability');
+        } else {
+            mediumRisks.push('Marketplace fulfillment increases operational complexity');
+            recommendations.push('Ensure adequate insurance coverage for fulfillment operations');
+        }
 
-    const FulfillmentTab = () => (
-        <div>
-            <h2>Fulfillment & Returns</h2>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Fulfillment Responsibility <HelpIcon tooltip={tooltips.fulfillmentResponsibility} /></label>
-                    <select
-                        name="fulfillmentResponsibility"
-                        value={formData.fulfillmentResponsibility}
-                        onChange={handleChange}
-                    >
-                        <option value="seller">Seller</option>
-                        <option value="marketplace">Marketplace</option>
-                        <option value="shared">Shared</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Shipping Timeframe</label>
-                    <input
-                        type="text"
-                        name="shippingTimeframe"
-                        value={formData.shippingTimeframe}
-                        onChange={handleChange}
-                        placeholder="e.g., 1-3 business days"
-                    />
-                </div>
-            </div>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Return Policy <HelpIcon tooltip={tooltips.returnPolicy} /></label>
-                    <select
-                        name="returnPolicy"
-                        value={formData.returnPolicy}
-                        onChange={handleChange}
-                    >
-                        <option value="marketplace-standard">Marketplace Standard</option>
-                        <option value="seller-defined">Seller Defined</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Return Timeframe (days)</label>
-                    <input
-                        type="number"
-                        name="returnTimeframe"
-                        min="0"
-                        max="365"
-                        value={formData.returnTimeframe}
-                        onChange={handleChange}
-                    />
-                </div>
-            </div>
-            <div className="form-group">
-                <label>Customer Service Responsibility</label>
-                <select
-                    name="customerServiceResponsibility"
-                    value={formData.customerServiceResponsibility}
-                    onChange={handleChange}
-                >
-                    <option value="seller">Seller</option>
-                    <option value="marketplace">Marketplace</option>
-                    <option value="shared">Shared</option>
-                </select>
-            </div>
-        </div>
-    );
+        // Return Policy Analysis
+        if (formData.returnPolicy === 'marketplace-standard') {
+            lowRisks.push('Standardized return policy provides consistency');
+        } else {
+            mediumRisks.push('Seller-defined returns may create customer confusion');
+            recommendations.push('Provide clear guidelines for seller return policies');
+        }
 
-    const TerminationTab = () => (
-        <div>
-            <h2>Termination Terms</h2>
-            <div className="form-group">
-                <label>Notice Period (days)</label>
-                <input
-                    type="number"
-                    name="noticePeriod"
-                    min="0"
-                    max="365"
-                    value={formData.noticePeriod}
-                    onChange={handleChange}
-                />
-            </div>
-            <div className="form-group">
-                <label>Termination Reasons</label>
-                <textarea
-                    name="terminationReasons"
-                    value={formData.terminationReasons}
-                    onChange={handleChange}
-                    placeholder="Specify reasons for termination..."
-                    rows="3"
-                />
-            </div>
-            <div className="form-group">
-                <label>Post-Termination Obligations</label>
-                <textarea
-                    name="postTerminationObligations"
-                    value={formData.postTerminationObligations}
-                    onChange={handleChange}
-                    placeholder="Specify post-termination obligations..."
-                    rows="2"
-                />
-            </div>
-        </div>
-    );
+        // Dispute Resolution Analysis
+        if (formData.disputeResolution === 'arbitration') {
+            lowRisks.push('Arbitration clause provides cost-effective dispute resolution');
+        } else if (formData.disputeResolution === 'litigation') {
+            mediumRisks.push('Litigation clauses increase legal costs');
+            recommendations.push('Consider arbitration for faster, cheaper dispute resolution');
+        }
 
-    const LegalTermsTab = () => (
-        <div>
-            <h2>Legal Terms</h2>
-            <div className="form-group">
-                <label>Governing Law</label>
-                <input
-                    type="text"
-                    name="governingLaw"
-                    value={formData.governingLaw}
-                    onChange={handleChange}
-                    placeholder="e.g., State of California, USA"
-                />
-            </div>
-            <div className="form-row">
-                <div className="form-group">
-                    <label>Dispute Resolution <HelpIcon tooltip={tooltips.disputeResolution} /></label>
-                    <select
-                        name="disputeResolution"
-                        value={formData.disputeResolution}
-                        onChange={handleChange}
-                    >
-                        <option value="arbitration">Arbitration</option>
-                        <option value="mediation">Mediation</option>
-                        <option value="litigation">Litigation</option>
-                    </select>
-                </div>
-                <div className="form-group">
-                    <label>Limitation of Liability</label>
-                    <select
-                        name="limitationOfLiability"
-                        value={formData.limitationOfLiability}
-                        onChange={handleChange}
-                    >
-                        <option value="standard">Standard</option>
-                        <option value="comprehensive">Comprehensive</option>
-                        <option value="limited">Limited</option>
-                    </select>
-                </div>
-            </div>
-            <div className="form-group">
-                <label>Intellectual Property</label>
-                <select
-                    name="intellectualProperty"
-                    value={formData.intellectualProperty}
-                    onChange={handleChange}
-                >
-                    <option value="seller-retains">Seller Retains Rights</option>
-                    <option value="shared">Shared Rights</option>
-                    <option value="marketplace-license">Marketplace License</option>
-                </select>
-            </div>
-        </div>
-    );
+        // Legal Terms Analysis
+        if (formData.limitationOfLiability === 'standard') {
+            lowRisks.push('Standard liability limitations provide adequate protection');
+        } else if (formData.limitationOfLiability === 'limited') {
+            mediumRisks.push('Limited liability clauses may not be enforceable in all jurisdictions');
+            recommendations.push('Consult local counsel on liability limitation enforceability');
+        }
 
+        // Notice Period Analysis
+        const noticeDays = parseInt(formData.noticePeriod);
+        if (noticeDays < 15) {
+            mediumRisks.push('Short termination notice may not provide adequate transition time');
+            recommendations.push('Consider 30-day notice period for seller stability');
+        } else if (noticeDays >= 30) {
+            lowRisks.push('Adequate termination notice period');
+        }
+
+        // Overall Risk Assessment
+        let overallRisk = 'low';
+        if (highRisks.length >= 1) {
+            overallRisk = 'high';
+        } else if (mediumRisks.length >= 2) {
+            overallRisk = 'medium';
+        }
+
+        return (
+            <div className="risk-analysis">
+                <div className={`overall-risk-card risk-${overallRisk}`}>
+                    <h4>Overall Risk Level: {overallRisk.toUpperCase()}</h4>
+                    <p>
+                        {overallRisk === 'high' && 'Your agreement has significant legal risks that should be addressed immediately.'}
+                        {overallRisk === 'medium' && 'Your agreement has moderate risks that should be reviewed with legal counsel.'}
+                        {overallRisk === 'low' && 'Your agreement follows industry best practices with minimal legal risk.'}
+                    </p>
+                </div>
+
+                {highRisks.length > 0 && (
+                    <div className="risk-section high-risk">
+                        <h4>🚨 High Priority Issues ({highRisks.length})</h4>
+                        <ul>
+                            {highRisks.map((risk, index) => (
+                                <li key={index}>{risk}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {mediumRisks.length > 0 && (
+                    <div className="risk-section medium-risk">
+                        <h4>⚠️ Medium Priority Issues ({mediumRisks.length})</h4>
+                        <ul>
+                            {mediumRisks.map((risk, index) => (
+                                <li key={index}>{risk}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                {lowRisks.length > 0 && (
+                    <div className="risk-section low-risk">
+                        <h4>✅ Well-Protected Areas ({lowRisks.length})</h4>
+                        <ul>
+                            {lowRisks.map((risk, index) => (
+                                <li key={index}>{risk}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
+
+                <div className="recommendations-section">
+                    <h4>📋 Legal Recommendations</h4>
+                    <ul>
+                        {recommendations.map((rec, index) => (
+                            <li key={index}>{rec}</li>
+                        ))}
+                        <li>Have the agreement reviewed by qualified legal counsel in your jurisdiction</li>
+                        <li>Update agreement periodically to reflect changing laws and business practices</li>
+                        <li>Maintain comprehensive insurance coverage appropriate for marketplace operations</li>
+                    </ul>
+                </div>
+
+                <div className="next-steps-section">
+                    <h4>🎯 Next Steps</h4>
+                    <ol>
+                        <li><strong>Address High Priority Issues:</strong> Resolve any high-risk items immediately</li>
+                        <li><strong>Legal Review:</strong> Have qualified counsel review the agreement</li>
+                        <li><strong>Test Agreement:</strong> Review with a sample of potential sellers</li>
+                        <li><strong>Implementation:</strong> Deploy with proper seller onboarding process</li>
+                        <li><strong>Monitor:</strong> Track seller acceptance rates and dispute patterns</li>
+                    </ol>
+                </div>
+
+                <div className="attorney-consultation">
+                    <h4>💼 Professional Legal Consultation</h4>
+                    <p>This automated analysis provides general guidance but cannot replace professional legal advice. 
+                    For comprehensive protection, schedule a consultation with our experienced marketplace attorneys.</p>
+                    <a
+                        href=""
+                        onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;"
+                        className="btn consult"
+                        style={{ marginTop: '1rem' }}
+                    >
+                        📞 Schedule Legal Consultation ($350/hour)
+                    </a>
+                </div>
+            </div>
+        );
+    };
+
+    // Tab definitions
     const tabs = [
-        { name: 'Marketplace Info', component: MarketplaceInfoTab },
-        { name: 'Commission & Fees', component: CommissionTab },
-        { name: 'Product Requirements', component: ProductRequirementsTab },
-        { name: 'Fulfillment & Returns', component: FulfillmentTab },
-        { name: 'Termination Terms', component: TerminationTab },
-        { name: 'Legal Terms', component: LegalTermsTab }
+        { name: 'Marketplace Info' },
+        { name: 'Commission & Fees' },
+        { name: 'Product Requirements' },
+        { name: 'Fulfillment & Returns' },
+        { name: 'Termination Terms' },
+        { name: 'Legal Terms' },
+        { name: 'Legal Analysis' }
     ];
 
     const nextTab = () => {
@@ -713,7 +607,7 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
         <div className="container">
             <div className="header">
                 <h1>Marketplace Seller Agreement Generator</h1>
-                <p>Create professional marketplace seller agreements with live preview</p>
+                <p>Create professional marketplace seller agreements with live legal analysis</p>
             </div>
 
             <div className="main-content">
@@ -732,9 +626,330 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                         ))}
                     </div>
 
-                    {/* Tab Content */}
+                    {/* Tab Content - Using conditional rendering like AI generator */}
                     <div className="tab-content">
-                        {React.createElement(tabs[currentTab].component)}
+                        {currentTab === 0 && (
+                            <div>
+                                <h2>Marketplace Information</h2>
+                                <div className="form-group">
+                                    <label>Marketplace Name <HelpIcon tooltip={tooltips.marketplaceName} /></label>
+                                    <input
+                                        type="text"
+                                        name="marketplaceName"
+                                        value={formData.marketplaceName}
+                                        onChange={handleChange}
+                                        placeholder="Enter marketplace name"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Marketplace URL</label>
+                                    <input
+                                        type="text"
+                                        name="marketplaceUrl"
+                                        value={formData.marketplaceUrl}
+                                        onChange={handleChange}
+                                        placeholder="www.example.com"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Company Name</label>
+                                    <input
+                                        type="text"
+                                        name="companyName"
+                                        value={formData.companyName}
+                                        onChange={handleChange}
+                                        placeholder="Enter company name"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Company Address</label>
+                                    <textarea
+                                        name="companyAddress"
+                                        value={formData.companyAddress}
+                                        onChange={handleChange}
+                                        placeholder="Enter company address"
+                                        rows="3"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Contact Email</label>
+                                    <input
+                                        type="email"
+                                        name="contactEmail"
+                                        value={formData.contactEmail}
+                                        onChange={handleChange}
+                                        placeholder="contact@example.com"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTab === 1 && (
+                            <div>
+                                <h2>Commission & Fees</h2>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Commission Percentage (%) <HelpIcon tooltip={tooltips.commissionPercentage} /></label>
+                                        <input
+                                            type="number"
+                                            name="commissionPercentage"
+                                            min="0"
+                                            max="50"
+                                            step="0.1"
+                                            value={formData.commissionPercentage}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Flat Fee per Transaction ($) <HelpIcon tooltip={tooltips.flatFee} /></label>
+                                        <input
+                                            type="number"
+                                            name="flatFee"
+                                            min="0"
+                                            step="0.01"
+                                            value={formData.flatFee}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Payment Schedule</label>
+                                        <select
+                                            name="paymentSchedule"
+                                            value={formData.paymentSchedule}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="weekly">Weekly</option>
+                                            <option value="bi-weekly">Bi-weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Payment Method</label>
+                                        <select
+                                            name="paymentMethod"
+                                            value={formData.paymentMethod}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="ACH Transfer">ACH Transfer</option>
+                                            <option value="Wire Transfer">Wire Transfer</option>
+                                            <option value="Check">Check</option>
+                                            <option value="PayPal">PayPal</option>
+                                            <option value="Stripe">Stripe</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTab === 2 && (
+                            <div>
+                                <h2>Product Requirements</h2>
+                                <div className="form-group">
+                                    <label>Prohibited Items <HelpIcon tooltip={tooltips.prohibitedItems} /></label>
+                                    <textarea
+                                        name="prohibitedItems"
+                                        value={formData.prohibitedItems}
+                                        onChange={handleChange}
+                                        placeholder="List prohibited items or categories..."
+                                        rows="3"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Listing Requirements</label>
+                                    <textarea
+                                        name="listingRequirements"
+                                        value={formData.listingRequirements}
+                                        onChange={handleChange}
+                                        placeholder="Specify listing requirements..."
+                                        rows="3"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Quality Standards</label>
+                                    <textarea
+                                        name="qualityStandards"
+                                        value={formData.qualityStandards}
+                                        onChange={handleChange}
+                                        placeholder="Define quality standards..."
+                                        rows="2"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTab === 3 && (
+                            <div>
+                                <h2>Fulfillment & Returns</h2>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Fulfillment Responsibility <HelpIcon tooltip={tooltips.fulfillmentResponsibility} /></label>
+                                        <select
+                                            name="fulfillmentResponsibility"
+                                            value={formData.fulfillmentResponsibility}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="seller">Seller</option>
+                                            <option value="marketplace">Marketplace</option>
+                                            <option value="shared">Shared</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Shipping Timeframe</label>
+                                        <input
+                                            type="text"
+                                            name="shippingTimeframe"
+                                            value={formData.shippingTimeframe}
+                                            onChange={handleChange}
+                                            placeholder="e.g., 1-3 business days"
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Return Policy <HelpIcon tooltip={tooltips.returnPolicy} /></label>
+                                        <select
+                                            name="returnPolicy"
+                                            value={formData.returnPolicy}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="marketplace-standard">Marketplace Standard</option>
+                                            <option value="seller-defined">Seller Defined</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Return Timeframe (days)</label>
+                                        <input
+                                            type="number"
+                                            name="returnTimeframe"
+                                            min="0"
+                                            max="365"
+                                            value={formData.returnTimeframe}
+                                            onChange={handleChange}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Customer Service Responsibility</label>
+                                    <select
+                                        name="customerServiceResponsibility"
+                                        value={formData.customerServiceResponsibility}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="seller">Seller</option>
+                                        <option value="marketplace">Marketplace</option>
+                                        <option value="shared">Shared</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTab === 4 && (
+                            <div>
+                                <h2>Termination Terms</h2>
+                                <div className="form-group">
+                                    <label>Notice Period (days) <HelpIcon tooltip={tooltips.noticePeriod} /></label>
+                                    <input
+                                        type="number"
+                                        name="noticePeriod"
+                                        min="0"
+                                        max="365"
+                                        value={formData.noticePeriod}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Termination Reasons</label>
+                                    <textarea
+                                        name="terminationReasons"
+                                        value={formData.terminationReasons}
+                                        onChange={handleChange}
+                                        placeholder="Specify reasons for termination..."
+                                        rows="3"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Post-Termination Obligations</label>
+                                    <textarea
+                                        name="postTerminationObligations"
+                                        value={formData.postTerminationObligations}
+                                        onChange={handleChange}
+                                        placeholder="Specify post-termination obligations..."
+                                        rows="2"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        {currentTab === 5 && (
+                            <div>
+                                <h2>Legal Terms</h2>
+                                <div className="form-group">
+                                    <label>Governing Law <HelpIcon tooltip={tooltips.governingLaw} /></label>
+                                    <input
+                                        type="text"
+                                        name="governingLaw"
+                                        value={formData.governingLaw}
+                                        onChange={handleChange}
+                                        placeholder="e.g., State of California, USA"
+                                    />
+                                </div>
+                                <div className="form-row">
+                                    <div className="form-group">
+                                        <label>Dispute Resolution <HelpIcon tooltip={tooltips.disputeResolution} /></label>
+                                        <select
+                                            name="disputeResolution"
+                                            value={formData.disputeResolution}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="arbitration">Arbitration</option>
+                                            <option value="mediation">Mediation</option>
+                                            <option value="litigation">Litigation</option>
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label>Limitation of Liability</label>
+                                        <select
+                                            name="limitationOfLiability"
+                                            value={formData.limitationOfLiability}
+                                            onChange={handleChange}
+                                        >
+                                            <option value="standard">Standard</option>
+                                            <option value="comprehensive">Comprehensive</option>
+                                            <option value="limited">Limited</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="form-group">
+                                    <label>Intellectual Property</label>
+                                    <select
+                                        name="intellectualProperty"
+                                        value={formData.intellectualProperty}
+                                        onChange={handleChange}
+                                    >
+                                        <option value="seller-retains">Seller Retains Rights</option>
+                                        <option value="shared">Shared Rights</option>
+                                        <option value="marketplace-license">Marketplace License</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Legal Analysis Tab */}
+                        {currentTab === 6 && (
+                            <div>
+                                <h2>Legal Analysis & Recommendations</h2>
+                                <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
+                                    Professional legal analysis of your marketplace agreement. This assessment identifies 
+                                    potential risks and provides recommendations to strengthen your legal position.
+                                </p>
+                                <div className="risk-analysis-content">
+                                    {generateRiskAnalysis()}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Navigation Buttons */}
@@ -769,24 +984,13 @@ This document was generated on ${currentDate} using the Marketplace Seller Agree
                             Next →
                         </button>
                     </div>
-
-                    {/* Consultation Link */}
-                    <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-                        <a
-                            href=""
-                            onClick="Calendly.initPopupWidget({url: 'https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting'});return false;"
-                            className="btn consult"
-                        >
-                            📞 Schedule Legal Consultation
-                        </a>
-                    </div>
                 </div>
 
                 {/* Preview Section */}
                 <div className="preview-section">
                     <div className="preview-header">
                         <h3>Live Preview</h3>
-                        <small>Updates as you type</small>
+                        <small>Updates as you type • Changes highlighted in yellow</small>
                     </div>
                     <div className="preview-content" ref={previewRef}>
                         <div 
