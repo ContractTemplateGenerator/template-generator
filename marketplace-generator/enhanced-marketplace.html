@@ -31,10 +31,67 @@
             -moz-user-select: text;
             -ms-user-select: text;
         }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .nav-button {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            gap: 8px;
+        }
+        
+        .nav-button:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+        
+        .nav-button.primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .nav-button.primary:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .nav-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .nav-button:disabled:hover {
+            background: white;
+            border-color: #dee2e6;
+        }
+        
+        .nav-button.primary:disabled:hover {
+            background: #007bff;
+            border-color: #007bff;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
 </head>
 <body style="margin: 0; background: #f8f9fa;">
@@ -465,6 +522,12 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                     }).render('#paypal-button-container');
                 }
             }, [showPaywall]);
+
+            React.useEffect(() => {
+                if (typeof window.feather !== 'undefined') {
+                    setTimeout(() => window.feather.replace(), 50);
+                }
+            }, [isPaid, currentTab]);
 
             const tabs = [
                 { name: 'Basic Info' },
@@ -960,37 +1023,21 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                     </div>
                                 )}
 
-                                <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #e9ecef' }}>
-                                    <div style={{ display: 'flex', gap: '10px' }}>
-                                        <button
-                                            onClick={isPaid ? copyToClipboard : handlePayment}
-                                            style={{ 
-                                                background: isPaid ? '#2563eb' : '#f59e0b', 
-                                                color: 'white', 
-                                                border: 'none', 
-                                                padding: '0.75rem 1rem', 
-                                                borderRadius: '6px', 
-                                                cursor: 'pointer',
-                                                flex: 1
-                                            }}
-                                        >
-                                            {isPaid ? '📋 Copy Agreement' : '🔒 Unlock Copy ($14.95)'}
-                                        </button>
-                                        <button
-                                            onClick={isPaid ? downloadAsText : handlePayment}
-                                            style={{ 
-                                                background: isPaid ? '#dc2626' : '#f59e0b', 
-                                                color: 'white', 
-                                                border: 'none', 
-                                                padding: '0.75rem 1rem', 
-                                                borderRadius: '6px', 
-                                                cursor: 'pointer',
-                                                flex: 1
-                                            }}
-                                        >
-                                            {isPaid ? '📄 Download TXT' : '🔒 Unlock Download ($14.95)'}
-                                        </button>
-                                    </div>
+                                <div className="navigation-buttons">
+                                    <button 
+                                        onClick={isPaid ? copyToClipboard : handlePayment}
+                                        className={`nav-button ${isPaid ? 'primary' : ''}`}
+                                    >
+                                        <i data-feather="copy"></i>
+                                        Copy
+                                    </button>
+                                    <button 
+                                        onClick={isPaid ? downloadAsText : handlePayment}
+                                        className="nav-button"
+                                    >
+                                        <i data-feather="download"></i>
+                                        Download
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1094,6 +1141,11 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
         };
 
         ReactDOM.render(<MarketplaceGenerator />, document.getElementById('root'));
+
+        // Initialize Feather icons after React renders
+        if (typeof feather !== 'undefined') {
+            setTimeout(() => feather.replace(), 100);
+        }
     </script>
 </body>
 </html>
