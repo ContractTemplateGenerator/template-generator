@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Marketplace Generator | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+</head>
+<body style="margin: 0; background: #f8f9fa;">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+
+        const MarketplaceGenerator = () => {
+            const [currentTab, setCurrentTab] = useState(0);
+            const [isPaid, setIsPaid] = useState(false);
+            const [showPaywall, setShowPaywall] = useState(false);
+            const [formData, setFormData] = useState({
+                marketplaceName: 'Example Marketplace',
+                companyName: 'Example Marketplace LLC',
+                contactEmail: 'contact@example-marketplace.com',
+                companyAddress: '123 Main Street, San Francisco, CA 94105',
+                commissionPercentage: '15',
+                paymentSchedule: 'bi-weekly',
+                returnTimeframe: '30',
+                governingState: 'California',
+                intellectualProperty: 'basic',
+                platformRole: 'limited-liability',
+                disputeResolution: 'courts',
+                listingFee: '0',
+                minimumOrderValue: '0',
+                shippingPolicy: 'seller-responsible'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+            };
+
+            const generateDocumentText = () => {
+                const currentDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const getIPSection = () => {
+                    switch(formData.intellectualProperty) {
+                        case 'basic':
+                            return `Sellers represent and warrant that all products listed comply with applicable intellectual property laws. Sellers grant the Platform a limited license to display product information for marketing purposes. The Platform reserves the right to remove listings that may infringe third-party intellectual property rights.`;
+                        case 'comprehensive':
+                            return `Sellers retain all intellectual property rights in their products and content. By listing products, Sellers grant the Platform a worldwide, non-exclusive, royalty-free license to use, reproduce, display, and distribute product information for Platform operations. Sellers must provide proper attribution for any licensed content and warrant they have all necessary rights. The Platform will respond to valid DMCA takedown notices and maintain a repeat infringer policy.`;
+                        case 'strict':
+                            return `All intellectual property rights remain with their respective owners. Sellers must provide detailed IP clearance documentation for each product. The Platform maintains a zero-tolerance policy for IP infringement and will immediately remove suspected infringing content. Sellers indemnify the Platform against IP claims and must participate in IP verification processes.`;
+                        default:
+                            return `Basic intellectual property compliance is required.`;
+                    }
+                };
+
+                const getPlatformRoleSection = () => {
+                    switch(formData.platformRole) {
+                        case 'limited-liability':
+                            return `The Platform acts solely as a technology intermediary connecting buyers and sellers. The Platform does not manufacture, store, or ship products, nor does it provide customer service for individual transactions. All sales contracts are directly between buyers and sellers. The Platform's liability is limited to the technology services provided.`;
+                        case 'marketplace-facilitator':
+                            return `The Platform facilitates transactions between independent sellers and buyers. While we provide payment processing and basic dispute resolution, sellers remain solely responsible for product quality, shipping, and customer service. The Platform may assist with transaction issues but is not liable for seller performance.`;
+                        default:
+                            return `The Platform provides technology services to facilitate marketplace transactions.`;
+                    }
+                };
+
+                const getDisputeSection = () => {
+                    if (formData.disputeResolution === 'courts') {
+                        return `Any disputes arising from this Agreement shall be resolved in the courts of ${formData.governingState}. Both parties consent to the jurisdiction of state and federal courts located in ${formData.governingState}.`;
+                    }
+                    return `Disputes shall be resolved through appropriate legal channels.`;
+                };
+
+                const getShippingSection = () => {
+                    switch(formData.shippingPolicy) {
+                        case 'seller-responsible':
+                            return `Sellers are solely responsible for packaging, shipping, and delivery of all products. Sellers must provide accurate shipping information and tracking details to buyers. The Platform is not responsible for shipping delays, damages, or lost packages.`;
+                        case 'platform-assisted':
+                            return `The Platform may provide shipping label services and preferred carrier relationships. Sellers remain responsible for timely fulfillment but may utilize Platform shipping tools. Shipping costs and delivery timeframes are managed through the Platform's shipping integration.`;
+                        default:
+                            return `Shipping responsibilities are defined by seller policies.`;
+                    }
+                };
+
+                return `MARKETPLACE SELLER AGREEMENT
+
+Date: ${currentDate}
+
+This Marketplace Seller Agreement ("Agreement") is entered into between ${formData.companyName}, a company located at ${formData.companyAddress} ("Platform"), and the individual or entity agreeing to these terms ("Seller") for the purpose of selling products on the ${formData.marketplaceName} platform.
+
+1. SELLER OBLIGATIONS AND RESPONSIBILITIES
+
+1.1 Product Listings: Sellers must provide accurate, complete, and truthful product descriptions, including all material information that would influence a buyer's purchasing decision. All product images must accurately represent the items being sold.
+
+1.2 Inventory Management: Sellers are responsible for maintaining accurate inventory levels and promptly updating product availability. Out-of-stock items must be removed or marked as unavailable within 24 hours.
+
+1.3 Order Fulfillment: Sellers must fulfill orders within the timeframe specified in their listings and maintain professional communication with buyers throughout the transaction process.
+
+2. FINANCIAL TERMS
+
+2.1 Commission Structure: The Platform charges a commission of ${formData.commissionPercentage}% of the gross sale price for each completed transaction. This commission covers payment processing, platform maintenance, and basic seller support services.
+
+2.2 Payment Schedule: Payments to Sellers will be made ${formData.paymentSchedule}, subject to successful completion of transactions and any applicable hold periods for new sellers or high-risk categories.
+
+${formData.listingFee !== '0' ? `2.3 Listing Fees: A listing fee of $${formData.listingFee} applies to each active product listing, charged monthly regardless of sales activity.` : ''}
+
+${formData.minimumOrderValue !== '0' ? `2.4 Minimum Order Value: Sellers must maintain a minimum order value of $${formData.minimumOrderValue} per transaction.` : ''}
+
+3. RETURN AND REFUND POLICY
+
+3.1 Return Timeframe: Customers may return items within ${formData.returnTimeframe} days of delivery for a full refund, provided items are in original, unused condition with all original packaging and tags.
+
+3.2 Return Process: Returns must be initiated through the Platform's return system. Sellers must provide prepaid return labels for defective items or items that do not match the description. For buyer remorse returns, return shipping costs may be deducted from the refund.
+
+3.3 Refund Processing: Refunds must be processed within 3 business days of receiving returned items. The Platform may issue immediate refunds to buyers and subsequently recover funds from Sellers for qualifying returns.
+
+4. INTELLECTUAL PROPERTY
+
+${getIPSection()}
+
+5. PLATFORM ROLE AND LIMITATIONS
+
+${getPlatformRoleSection()}
+
+6. SHIPPING AND FULFILLMENT
+
+${getShippingSection()}
+
+7. SELLER CONDUCT AND COMPLIANCE
+
+7.1 Prohibited Activities: Sellers may not engage in price manipulation, fake reviews, trademark infringement, or sale of prohibited items as defined in the Platform's prohibited items policy.
+
+7.2 Account Standing: Sellers must maintain good account standing, defined as order defect rate below 2%, on-time shipping rate above 95%, and customer service response time under 24 hours.
+
+7.3 Compliance Requirements: Sellers must comply with all applicable laws, regulations, and industry standards relevant to their products and business operations.
+
+8. TERMINATION
+
+8.1 Termination Rights: Either party may terminate this Agreement at any time with 30 days written notice. The Platform may immediately terminate for material breaches, including but not limited to IP infringement, fraud, or repeated policy violations.
+
+8.2 Effect of Termination: Upon termination, Sellers must complete all pending orders and may not list new products. The Platform will continue to collect commissions on transactions completed within 60 days of termination.
+
+9. GOVERNING LAW AND DISPUTES
+
+9.1 Governing Law: This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingState}, without regard to conflict of law principles.
+
+9.2 Dispute Resolution: ${getDisputeSection()}
+
+10. CONTACT INFORMATION
+
+For questions regarding this Agreement or Platform policies, contact us at ${formData.contactEmail}.
+
+11. ENTIRE AGREEMENT
+
+This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein. This Agreement may only be modified in writing, signed by authorized representatives of both parties.
+
+By using the Platform and listing products for sale, Seller acknowledges that they have read, understood, and agree to be bound by all terms and conditions of this Agreement.
+
+---
+
+Document generated on ${currentDate} using the Marketplace Seller Agreement Generator.
+Legal Notice: This document is for informational purposes only and does not constitute legal advice. Consult with a qualified attorney for legal guidance specific to your situation.`;
+            };
+
+            const handlePayment = () => {
+                if (isPaid) {
+                    copyToClipboard();
+                } else {
+                    setShowPaywall(true);
+                }
+            };
+
+            const copyToClipboard = () => {
+                if (!isPaid) {
+                    setShowPaywall(true);
+                    return;
+                }
+            
+                try {
+                    const text = generateDocumentText();
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            alert('Agreement copied to clipboard!');
+                        }).catch(err => {
+                            console.error('Modern clipboard failed:', err);
+                            fallbackCopy(text);
+                        });
+                    } else {
+                        fallbackCopy(text);
+                    }
+                } catch (err) {
+                    console.error('Copy error:', err);
+                    alert('Copy failed. Error: ' + err.message);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    if (successful) {
+                        alert('Agreement copied to clipboard!');
+                    } else {
+                        alert('Copy failed. Please select and copy the text manually from the preview.');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Copy not supported. Please select and copy the text manually from the preview.');
+                }
+            };
+
+            const downloadAsText = () => {
+                if (!isPaid) {
+                    setShowPaywall(true);
+                    return;
+                }
+                
+                try {
+                    const text = generateDocumentText();
+                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const marketplaceName = formData.marketplaceName.replace(/[^a-zA-Z0-9]/g, '_') || 'Marketplace';
+                    
+                    a.href = url;
+                    a.download = `${marketplaceName}_Seller_Agreement.txt`;
+                    a.style.display = 'none';
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(url);
+                        if (document.body.contains(a)) {
+                            document.body.removeChild(a);
+                        }
+                    }, 100);
+                    
+                    alert('Agreement download started! Check your downloads folder.');
+                } catch (err) {
+                    console.error('Download failed:', err);
+                    alert('Download failed: ' + err.message + '. Please copy the text manually from the preview.');
+                }
+            };
+
+            const handlePayPalSuccess = (details, data) => {
+                console.log('Payment completed:', details);
+                setIsPaid(true);
+                setShowPaywall(false);
+                localStorage.setItem('marketplace_generator_paid', 'true');
+                alert('Payment successful! You now have full access to copy and download features.');
+            };
+
+            const handlePayPalError = (err) => {
+                console.error('PayPal error:', err);
+                alert('Payment failed. Please try again.');
+            };
+
+            React.useEffect(() => {
+                const paidStatus = localStorage.getItem('marketplace_generator_paid');
+                if (paidStatus === 'true') {
+                    setIsPaid(true);
+                }
+            }, []);
+
+            React.useEffect(() => {
+                if (showPaywall && typeof window.paypal !== 'undefined') {
+                    window.paypal.Buttons({
+                        createOrder: (data, actions) => {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    amount: {
+                                        value: '14.95'
+                                    },
+                                    description: 'Marketplace Seller Agreement Generator - Full Access'
+                                }]
+                            });
+                        },
+                        onApprove: (data, actions) => {
+                            return actions.order.capture().then((details) => {
+                                handlePayPalSuccess(details, data);
+                            });
+                        },
+                        onError: handlePayPalError,
+                        style: {
+                            color: 'blue',
+                            shape: 'rect',
+                            label: 'paypal'
+                        }
+                    }).render('#paypal-button-container');
+                }
+            }, [showPaywall]);
+
+            const tabs = [
+                { name: 'Basic Info' },
+                { name: 'Business Terms' },
+                { name: 'Legal Settings' },
+                { name: 'Legal Analysis' },
+                { name: 'Preview' }
+            ];
+
+            const usStates = [
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+                'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+                'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+                'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+                'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+                'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+                'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+            ];
+
+            return (
+                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '2rem', background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                        <h1 style={{ color: '#2563eb', marginBottom: '0.5rem' }}>Enhanced Marketplace Seller Agreement Generator</h1>
+                        <p style={{ color: '#6b7280' }}>Create comprehensive, customizable marketplace seller agreements</p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                        <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                            <div style={{ background: '#f8f9fa', padding: '1rem', borderBottom: '1px solid #e9ecef' }}>
+                                {tabs.map((tab, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => setCurrentTab(index)}
+                                        style={{
+                                            padding: '0.75rem 1rem',
+                                            marginRight: '0.5rem',
+                                            background: currentTab === index ? 'white' : 'transparent',
+                                            border: 'none',
+                                            borderRadius: '4px',
+                                            cursor: 'pointer',
+                                            color: currentTab === index ? '#2563eb' : '#6b7280',
+                                            fontWeight: currentTab === index ? '600' : '400',
+                                            fontSize: '0.875rem'
+                                        }}
+                                    >
+                                        {tab.name}
+                                    </button>
+                                ))}
+                            </div>
+                            
+                            <div style={{ padding: '2rem', maxHeight: '600px', overflow: 'auto' }}>
+                                {currentTab === 0 && (
+                                    <div>
+                                        <h2>Basic Information</h2>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Marketplace Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="marketplaceName"
+                                                value={formData.marketplaceName}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Company Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="companyName"
+                                                value={formData.companyName}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Company Address
+                                            </label>
+                                            <textarea
+                                                name="companyAddress"
+                                                value={formData.companyAddress}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Contact Email
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="contactEmail"
+                                                value={formData.contactEmail}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 1 && (
+                                    <div>
+                                        <h2>Business Terms</h2>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Commission (%)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="commissionPercentage"
+                                                    value={formData.commissionPercentage}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    max="50"
+                                                    step="0.1"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Return Days
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="returnTimeframe"
+                                                    value={formData.returnTimeframe}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    max="365"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Payment Schedule
+                                            </label>
+                                            <select
+                                                name="paymentSchedule"
+                                                value={formData.paymentSchedule}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="weekly">Weekly</option>
+                                                <option value="bi-weekly">Bi-weekly</option>
+                                                <option value="monthly">Monthly</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Listing Fee ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="listingFee"
+                                                    value={formData.listingFee}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Min Order ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="minimumOrderValue"
+                                                    value={formData.minimumOrderValue}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Shipping Policy
+                                            </label>
+                                            <select
+                                                name="shippingPolicy"
+                                                value={formData.shippingPolicy}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="seller-responsible">Seller Responsible</option>
+                                                <option value="platform-assisted">Platform Assisted</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 2 && (
+                                    <div>
+                                        <h2>Legal Settings</h2>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Governing State
+                                            </label>
+                                            <select
+                                                name="governingState"
+                                                value={formData.governingState}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                {usStates.map(state => (
+                                                    <option key={state} value={state}>{state}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Intellectual Property Protection
+                                            </label>
+                                            <select
+                                                name="intellectualProperty"
+                                                value={formData.intellectualProperty}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="basic">Basic Protection</option>
+                                                <option value="comprehensive">Comprehensive Protection</option>
+                                                <option value="strict">Strict Enforcement</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Platform Role
+                                            </label>
+                                            <select
+                                                name="platformRole"
+                                                value={formData.platformRole}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="limited-liability">Limited Liability Intermediary</option>
+                                                <option value="marketplace-facilitator">Marketplace Facilitator</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Dispute Resolution
+                                            </label>
+                                            <select
+                                                name="disputeResolution"
+                                                value={formData.disputeResolution}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="courts">State/Federal Courts</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 3 && (
+                                    <div>
+                                        <h2>Legal Analysis & Business Metrics</h2>
+                                        <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '6px' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '0.5rem' }}>Agreement Completeness Score</h3>
+                                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                <div style={{ width: '200px', height: '10px', background: '#e5e7eb', borderRadius: '5px', marginRight: '1rem' }}>
+                                                    <div style={{ width: '85%', height: '100%', background: '#10b981', borderRadius: '5px' }}></div>
+                                                </div>
+                                                <span style={{ fontWeight: '600', color: '#10b981' }}>85% Complete</span>
+                                            </div>
+                                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>Your agreement includes comprehensive terms for marketplace operations</p>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Business Risk Assessment</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Intellectual Property Protection</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Strong</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Platform Liability Limitations</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Protected</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Seller Obligations Defined</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Comprehensive</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Dispute Resolution Mechanism</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Clear</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Revenue Protection Features</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ padding: '1rem', background: '#fef3c7', borderRadius: '6px', border: '1px solid #f59e0b' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <strong style={{ color: '#92400e' }}>Commission Structure</strong>
+                                                        <span style={{ color: '#92400e', fontWeight: '600' }}>{formData.commissionPercentage}%</span>
+                                                    </div>
+                                                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#92400e' }}>
+                                                        {parseFloat(formData.commissionPercentage) > 20 ? 'High commission rate may impact seller acquisition' : 
+                                                         parseFloat(formData.commissionPercentage) < 5 ? 'Low commission rate may impact profitability' :
+                                                         'Balanced commission rate for sustainable growth'}
+                                                    </p>
+                                                </div>
+                                                {formData.listingFee !== '0' && (
+                                                    <div style={{ padding: '1rem', background: '#dbeafe', borderRadius: '6px', border: '1px solid #3b82f6' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <strong style={{ color: '#1d4ed8' }}>Listing Fees</strong>
+                                                            <span style={{ color: '#1d4ed8', fontWeight: '600' }}>${formData.listingFee}/month</span>
+                                                        </div>
+                                                        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#1d4ed8' }}>
+                                                            Additional revenue stream from active listings
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Recommendations</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ padding: '1rem', background: '#e0f2fe', borderRadius: '6px', border: '1px solid #0369a1' }}>
+                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#0369a1' }}>💡 Business Growth</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#075985' }}>
+                                                        Consider implementing seller performance tiers with reduced commission rates for high-volume sellers
+                                                    </p>
+                                                </div>
+                                                <div style={{ padding: '1rem', background: '#f3e8ff', borderRadius: '6px', border: '1px solid #7c3aed' }}>
+                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#7c3aed' }}>⚖️ Legal Compliance</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b21a8' }}>
+                                                        Review state-specific marketplace facilitator tax obligations for {formData.governingState}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ padding: '1rem', background: '#fef2f2', borderRadius: '6px', border: '1px solid #ef4444' }}>
+                                            <h4 style={{ margin: '0 0 0.5rem', color: '#dc2626' }}>⚠️ Important Notice</h4>
+                                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#991b1b' }}>
+                                                This analysis is for informational purposes only. Consult with a qualified attorney before using this agreement in your business operations.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 4 && (
+                                    <div>
+                                        <h2>Document Preview</h2>
+                                        <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
+                                            <button
+                                                onClick={isPaid ? copyToClipboard : handlePayment}
+                                                style={{ 
+                                                    background: isPaid ? '#2563eb' : '#f59e0b', 
+                                                    color: 'white', 
+                                                    border: 'none', 
+                                                    padding: '0.75rem 1rem', 
+                                                    borderRadius: '6px', 
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {isPaid ? '📋 Copy Agreement' : '🔒 Unlock Copy ($14.95)'}
+                                            </button>
+                                            <button
+                                                onClick={isPaid ? downloadAsText : handlePayment}
+                                                style={{ 
+                                                    background: isPaid ? '#dc2626' : '#f59e0b', 
+                                                    color: 'white', 
+                                                    border: 'none', 
+                                                    padding: '0.75rem 1rem', 
+                                                    borderRadius: '6px', 
+                                                    cursor: 'pointer'
+                                                }}
+                                            >
+                                                {isPaid ? '📄 Download TXT' : '🔒 Unlock Download ($14.95)'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                            <div style={{ padding: '1.5rem 2rem 1rem', borderBottom: '1px solid #e9ecef', background: '#f8f9fa' }}>
+                                <h3 style={{ margin: 0, marginBottom: '0.25rem' }}>Live Preview</h3>
+                                <small style={{ color: '#6b7280' }}>Updates as you type</small>
+                            </div>
+                            <div style={{ padding: '2rem', height: '600px', overflow: 'auto' }}>
+                                <pre style={{ 
+                                    fontFamily: 'Times, serif', 
+                                    fontSize: '0.8rem', 
+                                    lineHeight: '1.5', 
+                                    whiteSpace: 'pre-wrap',
+                                    margin: 0,
+                                    userSelect: isPaid ? 'text' : 'none',
+                                    WebkitUserSelect: isPaid ? 'text' : 'none',
+                                    MozUserSelect: isPaid ? 'text' : 'none',
+                                    msUserSelect: isPaid ? 'text' : 'none',
+                                    position: 'relative'
+                                }}>
+                                    {generateDocumentText()}
+                                    {!isPaid && (
+                                        <div style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            background: 'rgba(255, 255, 255, 0.7)',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            backdropFilter: 'blur(2px)',
+                                            cursor: 'pointer'
+                                        }}
+                                        onClick={handlePayment}
+                                        >
+                                            <div style={{
+                                                background: '#f59e0b',
+                                                color: 'white',
+                                                padding: '1rem 2rem',
+                                                borderRadius: '8px',
+                                                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
+                                                textAlign: 'center',
+                                                fontSize: '1rem',
+                                                fontWeight: '600'
+                                            }}>
+                                                🔒 Unlock Full Access<br/>
+                                                <span style={{ fontSize: '0.875rem', opacity: '0.9' }}>$14.95 - Copy & Download</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                </pre>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {showPaywall && (
+                        <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'rgba(0, 0, 0, 0.8)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 1000
+                        }}>
+                            <div style={{
+                                background: 'white',
+                                padding: '2rem',
+                                borderRadius: '12px',
+                                boxShadow: '0 25px 50px rgba(0, 0, 0, 0.5)',
+                                maxWidth: '500px',
+                                width: '90%',
+                                textAlign: 'center'
+                            }}>
+                                <h2 style={{ color: '#1f2937', marginBottom: '1rem' }}>Unlock Full Access</h2>
+                                <p style={{ color: '#6b7280', marginBottom: '1.5rem' }}>
+                                    Get instant access to copy, download, and use your customized Marketplace Seller Agreement
+                                </p>
+                                <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', marginBottom: '1.5rem' }}>
+                                    <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>$14.95</div>
+                                    <div style={{ color: '#6b7280' }}>One-time payment</div>
+                                </div>
+                                
+                                <div id="paypal-button-container" style={{ marginBottom: '1rem' }}></div>
+                                
+                                <button 
+                                    onClick={() => setShowPaywall(false)}
+                                    style={{
+                                        background: 'transparent',
+                                        border: 'none',
+                                        color: '#6b7280',
+                                        cursor: 'pointer',
+                                        textDecoration: 'underline'
+                                    }}
+                                >
+                                    Maybe later
+                                </button>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MarketplaceGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
