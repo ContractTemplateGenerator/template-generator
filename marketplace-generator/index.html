@@ -270,14 +270,52 @@
                     returnTimeframe: formData.returnTimeframe,
                     returnPolicy: formData.returnPolicy,
                     governingState: formData.governingState,
+                    intellectualProperty: formData.intellectualProperty,
+                    platformRole: formData.platformRole,
+                    disputeResolution: formData.disputeResolution,
                     fulfillmentTimeframe: formData.fulfillmentTimeframe,
                     terminationNotice: formData.terminationNotice,
                     prohibitedItems: formData.prohibitedItems,
                     listingRequirements: formData.listingRequirements,
-                    qualityStandards: formData.qualityStandards
+                    qualityStandards: formData.qualityStandards,
+                    immediateTerminationReasons: formData.immediateTerminationReasons,
+                    shippingPolicy: formData.shippingPolicy,
+                    listingFee: formData.listingFee,
+                    minimumOrderValue: formData.minimumOrderValue
                 };
 
-                const valueToHighlight = fieldMappings[fieldName];
+                let valueToHighlight = fieldMappings[fieldName];
+                
+                // Special handling for dropdown fields that generate dynamic content
+                if (fieldName === 'intellectualProperty') {
+                    const ipSections = {
+                        'basic': 'Seller retains ownership of product IP but grants Marketplace basic rights',
+                        'comprehensive': 'Seller retains ownership of product IP but grants Marketplace shared rights',
+                        'strict': 'Seller retains full ownership and control of all intellectual property'
+                    };
+                    valueToHighlight = ipSections[formData.intellectualProperty] || formData.intellectualProperty;
+                } else if (fieldName === 'platformRole') {
+                    const roleSections = {
+                        'limited-liability': 'The Platform acts solely as a technology intermediary',
+                        'marketplace-facilitator': 'The Platform facilitates transactions between independent sellers'
+                    };
+                    valueToHighlight = roleSections[formData.platformRole] || formData.platformRole;
+                } else if (fieldName === 'returnPolicy') {
+                    const returnSections = {
+                        'full-refund': 'Returns are accepted within ' + formData.returnTimeframe + ' days of delivery for a full refund',
+                        'store-credit': 'Returns are accepted within ' + formData.returnTimeframe + ' days of delivery for store credit only',
+                        'exchange-only': 'Returns are accepted within ' + formData.returnTimeframe + ' days of delivery for exchange only'
+                    };
+                    valueToHighlight = returnSections[formData.returnPolicy] || formData.returnPolicy;
+                } else if (fieldName === 'shippingPolicy') {
+                    const shippingSections = {
+                        'seller-responsible': 'Sellers are solely responsible for packaging, shipping, and delivery',
+                        'shared': 'Fulfillment responsibilities are shared between Seller and Marketplace',
+                        'platform-managed': 'The Platform manages all shipping and fulfillment operations'
+                    };
+                    valueToHighlight = shippingSections[formData.shippingPolicy] || formData.shippingPolicy;
+                }
+
                 if (valueToHighlight && valueToHighlight.length > 0) {
                     // Simple highlighting - this could be enhanced with more sophisticated text matching
                     const textContent = previewElement.innerHTML;
@@ -698,10 +736,10 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
             }, [isPaid, currentTab]);
 
             const tabs = [
-                { name: 'Basic Info' },
-                { name: 'Business Terms' },
-                { name: 'Legal Settings' },
-                { name: 'Legal Analysis' }
+                { name: 'Basic' },
+                { name: 'Business' },
+                { name: 'Legal' },
+                { name: 'Analysis' }
             ];
 
             const usStates = [
@@ -724,21 +762,23 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
                         <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
                             <div style={{ background: '#f8f9fa', padding: '1rem', borderBottom: '1px solid #e9ecef', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <div>
+                                <div style={{ display: 'flex', flexWrap: 'nowrap', overflow: 'hidden' }}>
                                     {tabs.map((tab, index) => (
                                         <button
                                             key={index}
                                             onClick={() => setCurrentTab(index)}
                                             style={{
-                                                padding: '0.75rem 1rem',
-                                                marginRight: '0.5rem',
+                                                padding: '0.75rem 0.75rem',
+                                                marginRight: '0.25rem',
                                                 background: currentTab === index ? 'white' : 'transparent',
                                                 border: 'none',
                                                 borderRadius: '4px',
                                                 cursor: 'pointer',
                                                 color: currentTab === index ? '#2563eb' : '#6b7280',
                                                 fontWeight: currentTab === index ? '600' : '400',
-                                                fontSize: '0.875rem'
+                                                fontSize: '0.8rem',
+                                                whiteSpace: 'nowrap',
+                                                minWidth: 'fit-content'
                                             }}
                                         >
                                             {tab.name}
