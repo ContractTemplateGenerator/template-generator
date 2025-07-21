@@ -1,5 +1,5 @@
 import React from 'react';
-import { MarketplaceInfo } from '../../types';
+import type { MarketplaceInfo } from '../../types';
 
 interface MarketplaceInfoFormProps {
   data: MarketplaceInfo;

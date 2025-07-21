@@ -1,5 +1,5 @@
 import React from 'react';
-import { TerminationTerms } from '../../types';
+import type { TerminationTerms } from '../../types';
 
 interface TerminationTermsFormProps {
   data: TerminationTerms;

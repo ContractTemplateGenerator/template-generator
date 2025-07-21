@@ -1,5 +1,5 @@
 import React from 'react';
-import { AgreementData } from '../types';
+import type { AgreementData } from '../types';
 
 interface DocumentPreviewProps {
   data: AgreementData;

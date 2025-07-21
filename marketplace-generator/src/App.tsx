@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import PayPalPaywall from './components/PayPalPaywall';
 import DocumentPreview from './components/DocumentPreview';
 import ExportOptions from './components/ExportOptions';
@@ -8,7 +8,7 @@ import ProductRequirementsForm from './components/FormSections/ProductRequiremen
 import FulfillmentReturnsForm from './components/FormSections/FulfillmentReturnsForm';
 import TerminationTermsForm from './components/FormSections/TerminationTermsForm';
 import LegalTermsForm from './components/FormSections/LegalTermsForm';
-import { AgreementData, PaymentState } from './types';
+import type { AgreementData, PaymentState } from './types';
 
 const initialAgreementData: AgreementData = {
   marketplaceInfo: {

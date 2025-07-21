@@ -1,5 +1,5 @@
 import React from 'react';
-import { CommissionStructure } from '../../types';
+import type { CommissionStructure } from '../../types';
 
 interface CommissionStructureFormProps {
   data: CommissionStructure;

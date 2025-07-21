@@ -1,5 +1,5 @@
 import React from 'react';
-import { LegalTerms } from '../../types';
+import type { LegalTerms } from '../../types';
 
 interface LegalTermsFormProps {
   data: LegalTerms;

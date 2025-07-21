@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { PayPalScriptProvider, PayPalButtons } from '@paypal/react-paypal-js';
-import { PaymentState } from '../types';
+import type { PaymentState } from '../types';
 
 interface PayPalPaywallProps {
   onPaymentSuccess: (paymentData: PaymentState) => void;
@@ -77,7 +77,7 @@ const PayPalPaywall: React.FC<PayPalPaywallProps> = ({ onPaymentSuccess }) => {
         <PayPalScriptProvider options={paypalOptions}>
           <PayPalButtons
             disabled={isLoading}
-            createOrder={(data, actions) => {
+            createOrder={(_data, actions) => {
               setIsLoading(true);
               setError('');
               return actions.order.create({
@@ -91,7 +91,7 @@ const PayPalPaywall: React.FC<PayPalPaywallProps> = ({ onPaymentSuccess }) => {
                 intent: "CAPTURE"
               });
             }}
-            onApprove={async (data, actions) => {
+            onApprove={async (_data, actions) => {
               try {
                 if (actions.order) {
                   const details = await actions.order.capture();

@@ -1,5 +1,5 @@
 import React from 'react';
-import { FulfillmentReturns } from '../../types';
+import type { FulfillmentReturns } from '../../types';
 
 interface FulfillmentReturnsFormProps {
   data: FulfillmentReturns;

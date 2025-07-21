@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Document, Packer, Paragraph, HeadingLevel, TextRun, AlignmentType } from 'docx';
 import { saveAs } from 'file-saver';
-import { AgreementData } from '../types';
+import type { AgreementData } from '../types';
 
 interface ExportOptionsProps {
   data: AgreementData;
@@ -226,9 +226,13 @@ Document generated on ${currentDate} using Marketplace Seller Agreement Generato
             
             // Add more sections as needed...
             new Paragraph({
-              text: `Document generated on ${currentDate} using Marketplace Seller Agreement Generator`,
-              alignment: AlignmentType.CENTER,
-              italics: true
+              children: [
+                new TextRun({
+                  text: `Document generated on ${currentDate} using Marketplace Seller Agreement Generator`,
+                  italics: true
+                })
+              ],
+              alignment: AlignmentType.CENTER
             })
           ]
         }]

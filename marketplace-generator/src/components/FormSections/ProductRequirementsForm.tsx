@@ -1,5 +1,5 @@
 import React from 'react';
-import { ProductRequirements } from '../../types';
+import type { ProductRequirements } from '../../types';
 
 interface ProductRequirementsFormProps {
   data: ProductRequirements;
