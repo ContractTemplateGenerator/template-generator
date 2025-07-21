@@ -508,12 +508,12 @@ const MarketplaceGenerator = () => {
     }
 
     const sections = [
-        { title: 'Marketplace Information', component: MarketplaceInfoForm, data: agreementData.marketplaceInfo, onChange: updateMarketplaceInfo },
-        { title: 'Commission Structure', component: CommissionStructureForm, data: agreementData.commissionStructure, onChange: updateCommissionStructure },
-        { title: 'Product Requirements', component: ProductRequirementsForm, data: agreementData.productRequirements, onChange: updateProductRequirements },
-        { title: 'Fulfillment & Returns', component: FulfillmentReturnsForm, data: agreementData.fulfillmentReturns, onChange: updateFulfillmentReturns },
-        { title: 'Termination Terms', component: TerminationTermsForm, data: agreementData.terminationTerms, onChange: updateTerminationTerms },
-        { title: 'Legal Terms', component: LegalTermsForm, data: agreementData.legalTerms, onChange: updateLegalTerms }
+        { title: 'Marketplace Information' },
+        { title: 'Commission Structure' },
+        { title: 'Product Requirements' },
+        { title: 'Fulfillment & Returns' },
+        { title: 'Termination Terms' },
+        { title: 'Legal Terms' }
     ];
 
     const overallCompletion = Math.round((completionStatus.filter(Boolean).length / completionStatus.length) * 100);
@@ -559,10 +559,42 @@ const MarketplaceGenerator = () => {
                 </div>
                 
                 <div className="form-section">
-                    <sections[activeSection].component
-                        data={sections[activeSection].data}
-                        onChange={sections[activeSection].onChange}
-                    />
+                    {activeSection === 0 && (
+                        <MarketplaceInfoForm
+                            data={agreementData.marketplaceInfo}
+                            onChange={updateMarketplaceInfo}
+                        />
+                    )}
+                    {activeSection === 1 && (
+                        <CommissionStructureForm
+                            data={agreementData.commissionStructure}
+                            onChange={updateCommissionStructure}
+                        />
+                    )}
+                    {activeSection === 2 && (
+                        <ProductRequirementsForm
+                            data={agreementData.productRequirements}
+                            onChange={updateProductRequirements}
+                        />
+                    )}
+                    {activeSection === 3 && (
+                        <FulfillmentReturnsForm
+                            data={agreementData.fulfillmentReturns}
+                            onChange={updateFulfillmentReturns}
+                        />
+                    )}
+                    {activeSection === 4 && (
+                        <TerminationTermsForm
+                            data={agreementData.terminationTerms}
+                            onChange={updateTerminationTerms}
+                        />
+                    )}
+                    {activeSection === 5 && (
+                        <LegalTermsForm
+                            data={agreementData.legalTerms}
+                            onChange={updateLegalTerms}
+                        />
+                    )}
                     <div className="navigation-buttons">
                         <button
                             className="button secondary"
