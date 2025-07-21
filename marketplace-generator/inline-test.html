@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inline Marketplace Test | terms.law</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body style="margin: 0; background: #f8f9fa;">
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        const MarketplaceGenerator = () => {
+            const [formData, setFormData] = useState({
+                marketplaceName: 'Example Marketplace',
+                companyName: 'Example Marketplace LLC'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+            };
+
+            const generateDocumentText = () => {
+                return `MARKETPLACE SELLER AGREEMENT
+
+This agreement is between ${formData.companyName} and the Seller for ${formData.marketplaceName}.
+
+This is a test version.`;
+            };
+
+            const copyToClipboard = async () => {
+                try {
+                    const text = generateDocumentText();
+                    await navigator.clipboard.writeText(text);
+                    alert('Agreement copied to clipboard!');
+                } catch (err) {
+                    console.error('Copy failed:', err);
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = generateDocumentText();
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    try {
+                        document.execCommand('copy');
+                        alert('Agreement copied to clipboard!');
+                    } catch (fallbackErr) {
+                        alert('Copy failed. Please select and copy the text manually.');
+                    }
+                    document.body.removeChild(textArea);
+                }
+            };
+
+            return (
+                <div style={{ padding: '20px' }}>
+                    <h1>Marketplace Generator Test</h1>
+                    
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                        <div style={{ background: 'white', padding: '20px', borderRadius: '8px' }}>
+                            <h2>Form</h2>
+                            <div style={{ marginBottom: '15px' }}>
+                                <label>Marketplace Name:</label>
+                                <input
+                                    type="text"
+                                    name="marketplaceName"
+                                    value={formData.marketplaceName}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '8px', margin: '5px 0' }}
+                                />
+                            </div>
+                            <div style={{ marginBottom: '15px' }}>
+                                <label>Company Name:</label>
+                                <input
+                                    type="text"
+                                    name="companyName"
+                                    value={formData.companyName}
+                                    onChange={handleChange}
+                                    style={{ width: '100%', padding: '8px', margin: '5px 0' }}
+                                />
+                            </div>
+                        </div>
+                        
+                        <div style={{ background: 'white', padding: '20px', borderRadius: '8px' }}>
+                            <h2>Preview</h2>
+                            <button
+                                onClick={copyToClipboard}
+                                style={{
+                                    background: '#2563eb',
+                                    color: 'white',
+                                    border: 'none',
+                                    padding: '10px 20px',
+                                    borderRadius: '6px',
+                                    cursor: 'pointer',
+                                    marginBottom: '15px'
+                                }}
+                            >
+                                📋 Copy Agreement
+                            </button>
+                            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '14px' }}>
+                                {generateDocumentText()}
+                            </pre>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MarketplaceGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
