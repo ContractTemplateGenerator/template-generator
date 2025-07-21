@@ -4,6 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Enhanced Marketplace Generator | terms.law</title>
+    <style>
+        .highlight {
+            background-color: #fef08a !important;
+            padding: 2px 4px;
+            border-radius: 3px;
+            animation: highlightPulse 1s ease-in-out;
+        }
+        
+        @keyframes highlightPulse {
+            0% { background-color: #fbbf24; }
+            50% { background-color: #fef08a; }
+            100% { background-color: #fef08a; }
+        }
+        
+        .live-preview-content {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .live-preview-content.paid {
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
@@ -19,6 +47,7 @@
             const [currentTab, setCurrentTab] = useState(0);
             const [isPaid, setIsPaid] = useState(false);
             const [showPaywall, setShowPaywall] = useState(false);
+            const [paypalEmail, setPaypalEmail] = useState('');
             const [formData, setFormData] = useState({
                 marketplaceName: 'Example Marketplace',
                 companyName: 'Example Marketplace LLC',
@@ -42,6 +71,55 @@
                     ...formData,
                     [name]: value
                 });
+                
+                // Trigger highlighting after state update
+                setTimeout(() => {
+                    highlightChangedField(name);
+                }, 100);
+            };
+
+            const highlightChangedField = (fieldName) => {
+                const previewElement = document.querySelector('.live-preview-content');
+                if (!previewElement) return;
+
+                // Remove existing highlights
+                const existingHighlights = previewElement.querySelectorAll('.highlight');
+                existingHighlights.forEach(el => {
+                    el.classList.remove('highlight');
+                });
+
+                // Map field names to text patterns they affect in the document
+                const fieldMappings = {
+                    marketplaceName: formData.marketplaceName,
+                    companyName: formData.companyName,
+                    companyAddress: formData.companyAddress,
+                    contactEmail: formData.contactEmail,
+                    commissionPercentage: formData.commissionPercentage + '%',
+                    paymentSchedule: formData.paymentSchedule,
+                    returnTimeframe: formData.returnTimeframe,
+                    governingState: formData.governingState
+                };
+
+                const valueToHighlight = fieldMappings[fieldName];
+                if (valueToHighlight && valueToHighlight.length > 0) {
+                    // Simple highlighting - this could be enhanced with more sophisticated text matching
+                    const textContent = previewElement.innerHTML;
+                    const highlightedContent = textContent.replace(
+                        new RegExp(`(${escapeRegExp(valueToHighlight)})`, 'gi'),
+                        '<span class="highlight">$1</span>'
+                    );
+                    previewElement.innerHTML = highlightedContent;
+
+                    // Auto-scroll to first highlight
+                    const firstHighlight = previewElement.querySelector('.highlight');
+                    if (firstHighlight) {
+                        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            };
+
+            const escapeRegExp = (string) => {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             };
 
             const generateDocumentText = () => {
@@ -315,8 +393,7 @@ Legal Notice: This document is for informational purposes only and does not cons
                 { name: 'Basic Info' },
                 { name: 'Business Terms' },
                 { name: 'Legal Settings' },
-                { name: 'Legal Analysis' },
-                { name: 'Preview' }
+                { name: 'Legal Analysis' }
             ];
 
             const usStates = [
@@ -664,39 +741,38 @@ Legal Notice: This document is for informational purposes only and does not cons
                                     </div>
                                 )}
 
-                                {currentTab === 4 && (
-                                    <div>
-                                        <h2>Document Preview</h2>
-                                        <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem' }}>
-                                            <button
-                                                onClick={isPaid ? copyToClipboard : handlePayment}
-                                                style={{ 
-                                                    background: isPaid ? '#2563eb' : '#f59e0b', 
-                                                    color: 'white', 
-                                                    border: 'none', 
-                                                    padding: '0.75rem 1rem', 
-                                                    borderRadius: '6px', 
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                {isPaid ? '📋 Copy Agreement' : '🔒 Unlock Copy ($14.95)'}
-                                            </button>
-                                            <button
-                                                onClick={isPaid ? downloadAsText : handlePayment}
-                                                style={{ 
-                                                    background: isPaid ? '#dc2626' : '#f59e0b', 
-                                                    color: 'white', 
-                                                    border: 'none', 
-                                                    padding: '0.75rem 1rem', 
-                                                    borderRadius: '6px', 
-                                                    cursor: 'pointer'
-                                                }}
-                                            >
-                                                {isPaid ? '📄 Download TXT' : '🔒 Unlock Download ($14.95)'}
-                                            </button>
-                                        </div>
+                                <div style={{ marginTop: '2rem', paddingTop: '2rem', borderTop: '1px solid #e9ecef' }}>
+                                    <div style={{ display: 'flex', gap: '10px' }}>
+                                        <button
+                                            onClick={isPaid ? copyToClipboard : handlePayment}
+                                            style={{ 
+                                                background: isPaid ? '#2563eb' : '#f59e0b', 
+                                                color: 'white', 
+                                                border: 'none', 
+                                                padding: '0.75rem 1rem', 
+                                                borderRadius: '6px', 
+                                                cursor: 'pointer',
+                                                flex: 1
+                                            }}
+                                        >
+                                            {isPaid ? '📋 Copy Agreement' : '🔒 Unlock Copy ($14.95)'}
+                                        </button>
+                                        <button
+                                            onClick={isPaid ? downloadAsText : handlePayment}
+                                            style={{ 
+                                                background: isPaid ? '#dc2626' : '#f59e0b', 
+                                                color: 'white', 
+                                                border: 'none', 
+                                                padding: '0.75rem 1rem', 
+                                                borderRadius: '6px', 
+                                                cursor: 'pointer',
+                                                flex: 1
+                                            }}
+                                        >
+                                            {isPaid ? '📄 Download TXT' : '🔒 Unlock Download ($14.95)'}
+                                        </button>
                                     </div>
-                                )}
+                                </div>
                             </div>
                         </div>
 
@@ -706,51 +782,20 @@ Legal Notice: This document is for informational purposes only and does not cons
                                 <small style={{ color: '#6b7280' }}>Updates as you type</small>
                             </div>
                             <div style={{ padding: '2rem', height: '600px', overflow: 'auto' }}>
-                                <pre style={{ 
-                                    fontFamily: 'Times, serif', 
-                                    fontSize: '0.8rem', 
-                                    lineHeight: '1.5', 
-                                    whiteSpace: 'pre-wrap',
-                                    margin: 0,
-                                    userSelect: isPaid ? 'text' : 'none',
-                                    WebkitUserSelect: isPaid ? 'text' : 'none',
-                                    MozUserSelect: isPaid ? 'text' : 'none',
-                                    msUserSelect: isPaid ? 'text' : 'none',
-                                    position: 'relative'
-                                }}>
-                                    {generateDocumentText()}
-                                    {!isPaid && (
-                                        <div style={{
-                                            position: 'absolute',
-                                            top: 0,
-                                            left: 0,
-                                            right: 0,
-                                            bottom: 0,
-                                            background: 'rgba(255, 255, 255, 0.7)',
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: 'center',
-                                            backdropFilter: 'blur(2px)',
-                                            cursor: 'pointer'
-                                        }}
-                                        onClick={handlePayment}
-                                        >
-                                            <div style={{
-                                                background: '#f59e0b',
-                                                color: 'white',
-                                                padding: '1rem 2rem',
-                                                borderRadius: '8px',
-                                                boxShadow: '0 4px 20px rgba(0,0,0,0.3)',
-                                                textAlign: 'center',
-                                                fontSize: '1rem',
-                                                fontWeight: '600'
-                                            }}>
-                                                🔒 Unlock Full Access<br/>
-                                                <span style={{ fontSize: '0.875rem', opacity: '0.9' }}>$14.95 - Copy & Download</span>
-                                            </div>
-                                        </div>
-                                    )}
-                                </pre>
+                                <pre 
+                                    className={`live-preview-content ${isPaid ? 'paid' : ''}`}
+                                    style={{ 
+                                        fontFamily: 'Times, serif', 
+                                        fontSize: '0.8rem', 
+                                        lineHeight: '1.5', 
+                                        whiteSpace: 'pre-wrap',
+                                        margin: 0,
+                                        cursor: isPaid ? 'text' : 'not-allowed'
+                                    }}
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: generateDocumentText().replace(/</g, '&lt;').replace(/>/g, '&gt;') 
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
@@ -784,6 +829,28 @@ Legal Notice: This document is for informational purposes only and does not cons
                                 <div style={{ padding: '1rem', background: '#f3f4f6', borderRadius: '8px', marginBottom: '1.5rem' }}>
                                     <div style={{ fontSize: '2rem', fontWeight: '700', color: '#1f2937' }}>$14.95</div>
                                     <div style={{ color: '#6b7280' }}>One-time payment</div>
+                                </div>
+                                
+                                <div style={{ marginBottom: '1rem', textAlign: 'left' }}>
+                                    <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600', color: '#374151' }}>
+                                        PayPal Email Address
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={paypalEmail}
+                                        onChange={(e) => setPaypalEmail(e.target.value)}
+                                        placeholder="Enter your PayPal email"
+                                        style={{
+                                            width: '100%',
+                                            padding: '0.75rem',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '6px',
+                                            fontSize: '1rem'
+                                        }}
+                                    />
+                                    <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                                        This will be used for payment processing
+                                    </small>
                                 </div>
                                 
                                 <div id="paypal-button-container" style={{ marginBottom: '1rem' }}></div>
