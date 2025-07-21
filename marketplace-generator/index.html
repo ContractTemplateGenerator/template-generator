@@ -3,29 +3,1333 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace Seller Agreement Generator | terms.law</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Enhanced Marketplace Generator | terms.law</title>
+    <style>
+        .highlight {
+            background-color: #fef08a !important;
+            padding: 2px 4px;
+            border-radius: 3px;
+            animation: highlightPulse 1s ease-in-out;
+        }
+        
+        @keyframes highlightPulse {
+            0% { background-color: #fbbf24; }
+            50% { background-color: #fef08a; }
+            100% { background-color: #fef08a; }
+        }
+        
+        .live-preview-content {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        
+        .live-preview-content.paid {
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .nav-button {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            background: white;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            gap: 8px;
+        }
+        
+        .nav-button:hover {
+            background: #f8f9fa;
+            border-color: #007bff;
+        }
+        
+        .nav-button.primary {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .nav-button.primary:hover {
+            background: #0056b3;
+            border-color: #0056b3;
+        }
+        
+        .nav-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .nav-button:disabled:hover {
+            background: white;
+            border-color: #dee2e6;
+        }
+        
+        .nav-button.primary:disabled:hover {
+            background: #007bff;
+            border-color: #007bff;
+        }
+
+        /* PayPal Paywall Styles */
+        .paywall-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .paywall-modal {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            max-width: 450px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            text-align: center;
+        }
+
+        .paypal-section {
+            margin: 20px 0;
+        }
+
+        .paypal-section label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .paypal-section input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+        }
+
+        .paypal-section input:focus {
+            outline: none;
+            border-color: #007bff;
+        }
+
+        .paywall-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .unlock-button {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .unlock-button:hover {
+            background: #218838;
+        }
+
+        .cancel-button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .cancel-button:hover {
+            background: #5a6268;
+        }
+
+        .paypal-info {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
-    <script src="https://unpkg.com/docx@8.2.2/build/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
 </head>
-<body>
+<body style="margin: 0; background: #f8f9fa;">
     <div id="root"></div>
     
-    <script type="text/babel" src="docx-generator.js"></script>
-    <script type="text/babel" src="marketplace-generator.js"></script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            feather.replace();
-        });
-    </script>
+    <script type="text/babel">
+        const { useState } = React;
 
-    <!-- Calendly link widget -->
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
-    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+        const MarketplaceGenerator = () => {
+            const [currentTab, setCurrentTab] = useState(0);
+            const [isPaid, setIsPaid] = useState(false);
+            const [showPaywall, setShowPaywall] = useState(false);
+            const [showManualEntry, setShowManualEntry] = useState(false);
+            const [paypalId, setPaypalId] = useState('');
+            const [paypalButtonRendered, setPaypalButtonRendered] = useState(false);
+            const [formData, setFormData] = useState({
+                marketplaceName: 'Example Marketplace',
+                companyName: 'Example Marketplace LLC',
+                contactEmail: 'contact@example-marketplace.com',
+                companyAddress: '123 Main Street, San Francisco, CA 94105',
+                websiteUrl: 'www.example-marketplace.com',
+                commissionPercentage: '15',
+                transactionFee: '0.59',
+                paymentSchedule: 'monthly',
+                paymentMethod: 'paypal',
+                returnTimeframe: '30',
+                returnPolicy: 'store-credit',
+                governingState: 'California',
+                intellectualProperty: 'basic',
+                platformRole: 'limited-liability',
+                disputeResolution: 'courts',
+                listingFee: '0',
+                minimumOrderValue: '0',
+                shippingPolicy: 'shared',
+                fulfillmentTimeframe: '2-3 business days',
+                terminationNotice: '30',
+                prohibitedItems: 'Standard prohibited items list',
+                listingRequirements: 'Standard listing requirements',
+                qualityStandards: 'Standard quality standards',
+                immediateTerminationReasons: 'Breach of agreement, violation of policies, fraudulent activity'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData({
+                    ...formData,
+                    [name]: value
+                });
+                
+                // Trigger highlighting after state update
+                setTimeout(() => {
+                    highlightChangedField(name);
+                }, 100);
+            };
+
+            const highlightChangedField = (fieldName) => {
+                const previewElement = document.querySelector('.live-preview-content');
+                if (!previewElement) return;
+
+                // Remove existing highlights
+                const existingHighlights = previewElement.querySelectorAll('.highlight');
+                existingHighlights.forEach(el => {
+                    el.classList.remove('highlight');
+                });
+
+                // Map field names to text patterns they affect in the document
+                const fieldMappings = {
+                    marketplaceName: formData.marketplaceName,
+                    companyName: formData.companyName,
+                    companyAddress: formData.companyAddress,
+                    contactEmail: formData.contactEmail,
+                    websiteUrl: formData.websiteUrl,
+                    commissionPercentage: formData.commissionPercentage + '%',
+                    transactionFee: '$' + formData.transactionFee,
+                    paymentSchedule: formData.paymentSchedule,
+                    paymentMethod: formData.paymentMethod,
+                    returnTimeframe: formData.returnTimeframe,
+                    returnPolicy: formData.returnPolicy,
+                    governingState: formData.governingState,
+                    fulfillmentTimeframe: formData.fulfillmentTimeframe,
+                    terminationNotice: formData.terminationNotice,
+                    prohibitedItems: formData.prohibitedItems,
+                    listingRequirements: formData.listingRequirements,
+                    qualityStandards: formData.qualityStandards
+                };
+
+                const valueToHighlight = fieldMappings[fieldName];
+                if (valueToHighlight && valueToHighlight.length > 0) {
+                    // Simple highlighting - this could be enhanced with more sophisticated text matching
+                    const textContent = previewElement.innerHTML;
+                    const highlightedContent = textContent.replace(
+                        new RegExp(`(${escapeRegExp(valueToHighlight)})`, 'gi'),
+                        '<span class="highlight">$1</span>'
+                    );
+                    previewElement.innerHTML = highlightedContent;
+
+                    // Auto-scroll to first highlight
+                    const firstHighlight = previewElement.querySelector('.highlight');
+                    if (firstHighlight) {
+                        firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+            };
+
+            const escapeRegExp = (string) => {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            };
+
+            // PayPal validation function
+            const validatePayPalId = (id) => {
+                // Check for 17-character alphanumeric string with only CAPITAL letters
+                if (!id || id.trim().length !== 17) {
+                    return false;
+                }
+                
+                const trimmedId = id.trim();
+                
+                // Must contain only capital letters and numbers
+                const hasOnlyCapitalLettersAndNumbers = /^[A-Z0-9]+$/.test(trimmedId);
+                
+                // Must contain at least one capital letter (not all numbers)
+                const hasAtLeastOneCapitalLetter = /[A-Z]/.test(trimmedId);
+                
+                return hasOnlyCapitalLettersAndNumbers && hasAtLeastOneCapitalLetter;
+            };
+
+            // Handle manual PayPal unlock
+            const handlePayPalUnlock = () => {
+                if (validatePayPalId(paypalId)) {
+                    setIsPaid(true);
+                    setShowPaywall(false);
+                    setShowManualEntry(false);
+                    localStorage.setItem('marketplacePaid', 'true');
+                    localStorage.setItem('marketplacePaymentDetails', JSON.stringify({
+                        manualEntry: true,
+                        transactionId: paypalId,
+                        timestamp: new Date().toISOString()
+                    }));
+                    setPaypalId('');
+                    alert('Access unlocked! You can now copy and download the agreement.');
+                } else {
+                    alert('Please enter a valid PayPal transaction ID to unlock access.');
+                }
+            };
+
+            const generateDocumentText = () => {
+                const currentDate = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                const getReturnPolicySection = () => {
+                    switch(formData.returnPolicy) {
+                        case 'full-refund':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for a full refund. Items must be in original condition and packaging. Refunds will be processed within 3-5 business days of receiving the returned item.`;
+                        case 'store-credit':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for store credit only. Items must be in original condition and packaging. Store credit never expires and can be used for future purchases. Return shipping costs are the responsibility of the customer. Store credit will be issued within 3-5 business days of receiving the returned item.`;
+                        case 'exchange-only':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for exchange only. Items must be in original condition and packaging. Exchanges are processed within 5-7 business days of receiving the returned item.`;
+                        default:
+                            return `Returns are processed according to standard marketplace policies within ${formData.returnTimeframe} days.`;
+                    }
+                };
+
+                const getIPSection = () => {
+                    switch(formData.intellectualProperty) {
+                        case 'basic':
+                            return `Seller retains ownership of product IP but grants Marketplace basic rights to use product content for platform operations and marketing purposes.`;
+                        case 'comprehensive':
+                            return `Seller retains ownership of product IP but grants Marketplace shared rights to use, modify, and create derivative works of product content for platform operations and marketing purposes.`;
+                        case 'strict':
+                            return `Seller retains full ownership and control of all intellectual property. Marketplace receives only limited display rights necessary for platform operations.`;
+                        default:
+                            return `Standard intellectual property terms apply.`;
+                    }
+                };
+
+                const getShippingSection = () => {
+                    switch(formData.shippingPolicy) {
+                        case 'seller-responsible':
+                            return `Sellers are solely responsible for packaging, shipping, and delivery of all products. Sellers must provide accurate shipping information and tracking details to buyers. The Platform is not responsible for shipping delays, damages, or lost packages.`;
+                        case 'shared':
+                            return `Fulfillment responsibilities are shared between Seller and Marketplace according to product type and shipping destination. Specific arrangements will be detailed in separate fulfillment agreements.`;
+                        case 'platform-managed':
+                            return `The Platform manages all shipping and fulfillment operations. Sellers are responsible for providing accurate product information and maintaining inventory levels.`;
+                        default:
+                            return `Shipping responsibilities are defined by seller policies.`;
+                    }
+                };
+
+                return `MARKETPLACE SELLER AGREEMENT
+
+Date: ${currentDate}
+
+This Marketplace Seller Agreement ("Agreement") is entered into between ${formData.companyName} ("Marketplace" or "Company"), a company located at ${formData.companyAddress}, and the individual or entity agreeing to these terms ("Seller" or "you") for the purpose of selling products or services on the ${formData.marketplaceName} platform located at ${formData.websiteUrl}.
+
+WHEREAS, Marketplace operates an online platform that connects buyers with sellers; and WHEREAS, Seller desires to offer products for sale through the Marketplace platform; NOW, THEREFORE, in consideration of the mutual covenants contained herein, the parties agree as follows:
+
+1. MARKETPLACE PLATFORM AND SERVICES
+
+1.1 Platform Description: ${formData.marketplaceName} is an online marketplace that connects buyers with sellers of various products and services. The platform provides tools for product listing, order management, payment processing, and customer communication.
+
+1.2 Services Provided: Marketplace provides Seller with access to the platform's listing tools, payment processing systems, customer base, marketing opportunities, and technical support. The platform handles secure payment processing, provides basic analytics, and offers customer service support as specified in this Agreement.
+
+1.3 Contact Information: For questions regarding this Agreement or platform services, contact us at ${formData.contactEmail}. Business hours are Monday through Friday, 9:00 AM to 6:00 PM Pacific Time. Emergency support is available 24/7 for payment and security issues.
+
+1.4 Platform Modifications: Marketplace reserves the right to modify, update, or discontinue any aspect of the platform with reasonable notice to Sellers. Major changes affecting Seller operations will be communicated at least 30 days in advance.
+
+2. COMMISSION STRUCTURE AND FEES
+
+2.1 Commission Rate: The Marketplace will charge a commission of ${formData.commissionPercentage}% of the gross sale price (including shipping charges and taxes) for each completed transaction. Commission is calculated on the total amount paid by the customer, excluding any refunds or chargebacks.
+
+2.2 Transaction Fees: In addition to the commission, a flat transaction processing fee of $${formData.transactionFee} will be charged per completed transaction to cover payment processing costs, fraud protection, and administrative expenses.
+
+2.3 Payment Schedule and Method: Payments to Sellers will be made ${formData.paymentSchedule} via ${formData.paymentMethod}. Payments include all sales proceeds minus applicable commissions, fees, refunds, and chargebacks. Payment schedules may be subject to standard banking delays.
+
+2.4 Payment Processing and Holds: All payments are subject to Marketplace's standard payment processing procedures. Payments may be held or delayed for verification, fraud prevention, dispute resolution, or compliance with applicable laws. New sellers may experience longer hold periods during the initial 90-day evaluation period.
+
+2.5 Fee Changes: Marketplace may modify commission rates or fees with 60 days' written notice to Sellers. Continued use of the platform after such notice constitutes acceptance of the new fee structure.
+
+2.6 Chargebacks and Refunds: Sellers are responsible for all chargebacks, refunds, and disputed transactions. Such amounts will be deducted from future payments or charged to Seller's designated payment method.
+
+${formData.listingFee !== '0' ? `2.7 Listing Fees: A listing fee of $${formData.listingFee} applies to each active product listing, charged monthly regardless of sales activity.` : ''}
+
+${formData.minimumOrderValue !== '0' ? `2.8 Minimum Order Value: Sellers must maintain a minimum order value of $${formData.minimumOrderValue} per transaction.` : ''}
+
+3. PRODUCT REQUIREMENTS AND RESTRICTIONS
+
+3.1 Prohibited Items: The following items and categories are strictly prohibited on the Marketplace: ${formData.prohibitedItems}. This list is not exhaustive, and Marketplace reserves the right to prohibit additional items that violate applicable laws, infringe intellectual property rights, or are deemed inappropriate for the platform.
+
+3.2 Listing Requirements: All product listings must meet the following standards: ${formData.listingRequirements}. Listings must be accurate, complete, and regularly updated. False or misleading information may result in listing removal and account suspension.
+
+3.3 Quality Standards: All products must meet marketplace quality standards. Products must be authentic, legal, and safe for consumer use. ${formData.qualityStandards}. The Marketplace reserves the right to remove listings that do not meet these standards and may require additional documentation or certifications for certain product categories.
+
+3.4 Compliance Requirements: Sellers must ensure all products comply with applicable federal, state, and local laws, regulations, and safety standards. This includes but is not limited to product safety regulations, labeling requirements, import/export restrictions, and tax obligations.
+
+3.5 Intellectual Property: Sellers warrant that all listed products do not infringe upon any third-party intellectual property rights, including trademarks, copyrights, and patents. Sellers agree to indemnify Marketplace against any intellectual property claims related to their products.
+
+4. FULFILLMENT AND SHIPPING
+
+4.1 Fulfillment Responsibility: ${getShippingSection()}
+
+4.2 Shipping Timeframes: Orders must be processed and shipped within ${formData.fulfillmentTimeframe} of order confirmation, excluding weekends and holidays. Expedited orders may have shorter processing requirements as specified at the time of sale.
+
+4.3 Shipping Standards: Sellers must provide accurate tracking information within 24 hours of shipment, use appropriate packaging to prevent damage during transit, and include all necessary documentation. Insurance is recommended for high-value items.
+
+4.4 Shipping Costs: Shipping costs may be charged separately to customers or included in product pricing at Seller's discretion. Sellers are responsible for accurate shipping cost calculations and any shipping cost discrepancies.
+
+5. RETURNS AND REFUNDS
+
+5.1 Return Policy: ${getReturnPolicySection()}
+
+5.2 Return Processing: Returns must be processed promptly according to the applicable return policy. Sellers must inspect returned items within 2 business days of receipt and process refunds or exchanges within the specified timeframes.
+
+5.3 Customer Service Responsibility: Seller is responsible for providing customer service for their products, including answering customer inquiries, handling complaints, and resolving issues. Response time should be within 24 hours during business days.
+
+5.4 Damaged or Defective Items: Items damaged during shipping or found to be defective must be replaced or refunded at no cost to the customer, including return shipping expenses. Seller must investigate and respond to such claims within 48 hours.
+
+6. TERM AND TERMINATION
+
+6.1 Term: This Agreement shall commence upon acceptance and remain in effect until terminated by either party in accordance with the terms herein.
+
+6.2 Termination Notice: Either party may terminate this Agreement with ${formData.terminationNotice} days' written notice to the other party. Termination notice must be provided in writing via email or certified mail.
+
+6.3 Immediate Termination: Marketplace may terminate this Agreement immediately, without notice, for the following reasons: ${formData.immediateTerminationReasons}, repeated violation of platform policies, sale of prohibited items, or failure to maintain required seller performance metrics.
+
+6.4 Post-Termination Obligations: Upon termination, Seller must: Complete pending orders, honor return policy, provide customer service for previously sold items during any applicable warranty period, and cease use of Marketplace trademarks and proprietary information. All payment obligations survive termination.
+
+6.5 Effect of Termination: Upon termination, Seller's access to the platform will be revoked, active listings will be removed, and pending orders will be handled according to Marketplace policies. Outstanding payments will be processed according to normal payment schedules, subject to any holds or reserves.
+
+7. INTELLECTUAL PROPERTY
+
+7.1 Seller IP Ownership: ${getIPSection()}
+
+7.2 License to Marketplace: Seller grants Marketplace a non-exclusive, worldwide, royalty-free license to use, reproduce, display, and distribute Seller's product images, descriptions, and other content for the purpose of operating the marketplace, processing orders, marketing products, and providing customer service.
+
+7.3 Marketplace IP: All Marketplace platform technology, software, trademarks, trade names, logos, and proprietary information remain the exclusive property of Marketplace. Seller receives no ownership rights in Marketplace IP and may not use Marketplace trademarks except as specifically authorized.
+
+7.4 DMCA Compliance: Marketplace maintains a DMCA takedown policy for intellectual property violations. Sellers must promptly respond to any intellectual property complaints and may have listings removed for verified IP violations.
+
+8. REPRESENTATIONS AND WARRANTIES
+
+8.1 Seller Representations: Seller represents and warrants that: (a) they have full legal authority to enter into this Agreement; (b) they have the right to sell all listed products; (c) all product information provided is accurate, complete, and truthful; (d) they will comply with all applicable laws, regulations, and platform policies; (e) they have obtained all necessary licenses, permits, and approvals for their business operations; (f) their products do not infringe any third-party intellectual property rights; and (g) their products are safe for consumer use and comply with applicable safety standards.
+
+8.2 Marketplace Disclaimers: EXCEPT AS EXPRESSLY SET FORTH HEREIN, MARKETPLACE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. MARKETPLACE DOES NOT WARRANT UNINTERRUPTED PLATFORM AVAILABILITY, ERROR-FREE OPERATION, OR SPECIFIC SALES RESULTS.
+
+8.3 Product Warranties: Sellers are solely responsible for all product warranties and guarantees. Any warranties offered by Seller are independent of this Agreement and do not create obligations for Marketplace.
+
+9. LIMITATION OF LIABILITY
+
+9.1 Liability Limitations: Each party's liability under this Agreement is limited to direct damages only. Neither party excludes liability for death, personal injury, fraud, or any other liability that cannot be excluded by law. Maximum liability is capped at the fees paid under this Agreement in the preceding 12 months.
+
+9.2 Risk Allocation: Seller acknowledges that selling through an online marketplace involves inherent risks, including but not limited to payment processing risks, shipping risks, and customer satisfaction risks. Seller assumes these risks and agrees that Marketplace is not responsible for business losses or operational challenges.
+
+10. GOVERNING LAW AND DISPUTE RESOLUTION
+
+10.1 Governing Law: This Agreement shall be governed by and construed in accordance with the laws of ${formData.governingState}, without regard to conflict of law principles.
+
+10.2 Dispute Resolution: Any disputes arising under this Agreement shall be resolved through litigation in the state and federal courts located in ${formData.governingState}. Each party consents to the personal jurisdiction of such courts and waives any objection to venue. The prevailing party in any litigation shall be entitled to recover reasonable attorneys' fees and costs from the non-prevailing party.
+
+10.3 Class Action Waiver: Both parties waive any right to participate in class action lawsuits or class-wide arbitration regarding disputes under this Agreement.
+
+11. GENERAL PROVISIONS
+
+11.1 Entire Agreement: This Agreement, together with any referenced policies and terms, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein.
+
+11.2 Amendment: This Agreement may only be amended by written agreement signed by both parties, or by Marketplace providing 30 days' notice of changes to Seller.
+
+11.3 Severability: If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall remain in full force and effect.
+
+11.4 Assignment: Seller may not assign, transfer, or delegate this Agreement or any rights or obligations hereunder without the prior written consent of Marketplace. Marketplace may assign this Agreement without restriction.
+
+11.5 Force Majeure: Neither party shall be liable for any failure or delay in performance due to causes beyond their reasonable control, including but not limited to acts of God, war, terrorism, pandemics, government regulations, labor strikes, or technical failures.
+
+11.6 Independent Contractors: The parties are independent contractors. This Agreement does not create a partnership, joint venture, agency, or employment relationship.
+
+11.7 Waiver: The failure of either party to enforce any provision of this Agreement shall not constitute a waiver of that provision or any other provision.
+
+11.8 Survival: Provisions relating to payment obligations, intellectual property, confidentiality, limitation of liability, and dispute resolution shall survive termination of this Agreement.
+
+12. ACCEPTANCE
+
+By clicking to accept this Agreement or by using the Platform to sell Products, Seller acknowledges that they have read, understood, and agree to be bound by the terms and conditions of this Agreement.
+
+Electronic Signature: This Agreement may be executed electronically, and electronic signatures shall have the same legal effect as original signatures.
+
+---
+
+IMPORTANT NOTICE: This document was generated on ${currentDate} using the Marketplace Seller Agreement Generator at terms.law. This is a general template and should be reviewed by qualified legal counsel before use. Laws vary by jurisdiction and business circumstances.`;
+            };
+
+            const handlePayment = () => {
+                if (isPaid) {
+                    copyToClipboard();
+                } else {
+                    // Save form data before showing paywall
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
+                    setShowPaywall(true);
+                }
+            };
+
+            const copyToClipboard = () => {
+                if (!isPaid) {
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
+                    setShowPaywall(true);
+                    return;
+                }
+            
+                try {
+                    const text = generateDocumentText();
+                    
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(text).then(() => {
+                            alert('Agreement copied to clipboard!');
+                        }).catch(err => {
+                            console.error('Modern clipboard failed:', err);
+                            fallbackCopy(text);
+                        });
+                    } else {
+                        fallbackCopy(text);
+                    }
+                } catch (err) {
+                    console.error('Copy error:', err);
+                    alert('Copy failed. Error: ' + err.message);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                try {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    textArea.style.position = 'fixed';
+                    textArea.style.opacity = '0';
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    
+                    if (successful) {
+                        alert('Agreement copied to clipboard!');
+                    } else {
+                        alert('Copy failed. Please select and copy the text manually from the preview.');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Copy not supported. Please select and copy the text manually from the preview.');
+                }
+            };
+
+            const downloadAsText = () => {
+                if (!isPaid) {
+                    localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
+                    setShowPaywall(true);
+                    return;
+                }
+                
+                try {
+                    const text = generateDocumentText();
+                    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    const marketplaceName = formData.marketplaceName.replace(/[^a-zA-Z0-9]/g, '_') || 'Marketplace';
+                    
+                    a.href = url;
+                    a.download = `${marketplaceName}_Seller_Agreement.txt`;
+                    a.style.display = 'none';
+                    
+                    document.body.appendChild(a);
+                    a.click();
+                    
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(url);
+                        if (document.body.contains(a)) {
+                            document.body.removeChild(a);
+                        }
+                    }, 100);
+                    
+                    alert('Agreement download started! Check your downloads folder.');
+                } catch (err) {
+                    console.error('Download failed:', err);
+                    alert('Download failed: ' + err.message + '. Please copy the text manually from the preview.');
+                }
+            };
+
+            const handlePayPalSuccess = (details, data) => {
+                console.log('Payment completed:', details);
+                setIsPaid(true);
+                setShowPaywall(false);
+                localStorage.setItem('marketplacePaid', 'true');
+                localStorage.setItem('marketplacePaymentDetails', JSON.stringify({
+                    paypalOrderId: data.orderID,
+                    paypalTransactionId: details.id,
+                    timestamp: new Date().toISOString(),
+                    amount: '14.95'
+                }));
+                alert('Payment successful! You now have full access to copy and download features.');
+            };
+
+            const handlePayPalError = (err) => {
+                console.error('PayPal error:', err);
+                alert('Payment failed. Please try again.');
+            };
+
+            React.useEffect(() => {
+                const savedFormData = localStorage.getItem('marketplaceFormData');
+                if (savedFormData) {
+                    try {
+                        const parsedData = JSON.parse(savedFormData);
+                        setFormData(parsedData);
+                    } catch (error) {
+                        console.error('Error parsing saved form data:', error);
+                    }
+                }
+
+                // Check if user has already paid
+                const isPaidStatus = localStorage.getItem('marketplacePaid');
+                if (isPaidStatus === 'true') {
+                    setIsPaid(true);
+                }
+                
+                // Check for payment success from URL params
+                const urlParams = new URLSearchParams(window.location.search);
+                if (urlParams.get('payment') === 'success') {
+                    setIsPaid(true);
+                    localStorage.setItem('marketplacePaid', 'true');
+                    // Clean up URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                }
+            }, []);
+
+            React.useEffect(() => {
+                if (showPaywall && typeof window.paypal !== 'undefined') {
+                    window.paypal.Buttons({
+                        createOrder: (data, actions) => {
+                            return actions.order.create({
+                                purchase_units: [{
+                                    amount: {
+                                        value: '14.95'
+                                    },
+                                    description: 'Marketplace Seller Agreement Generator - Full Access'
+                                }]
+                            });
+                        },
+                        onApprove: (data, actions) => {
+                            return actions.order.capture().then((details) => {
+                                handlePayPalSuccess(details, data);
+                            });
+                        },
+                        onError: handlePayPalError,
+                        style: {
+                            color: 'blue',
+                            shape: 'rect',
+                            label: 'paypal'
+                        }
+                    }).render('#paypal-button-container');
+                }
+            }, [showPaywall]);
+
+            React.useEffect(() => {
+                if (typeof window.feather !== 'undefined') {
+                    setTimeout(() => window.feather.replace(), 50);
+                }
+            }, [isPaid, currentTab]);
+
+            const tabs = [
+                { name: 'Basic Info' },
+                { name: 'Business Terms' },
+                { name: 'Legal Settings' },
+                { name: 'Legal Analysis' }
+            ];
+
+            const usStates = [
+                'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware',
+                'Florida', 'Georgia', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky',
+                'Louisiana', 'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
+                'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico',
+                'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma', 'Oregon', 'Pennsylvania',
+                'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont',
+                'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming'
+            ];
+
+            return (
+                <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '2rem', background: 'white', padding: '2rem', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                        <h1 style={{ color: '#2563eb', marginBottom: '0.5rem' }}>Enhanced Marketplace Seller Agreement Generator</h1>
+                        <p style={{ color: '#6b7280' }}>Create comprehensive, customizable marketplace seller agreements</p>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+                        <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+                            <div style={{ background: '#f8f9fa', padding: '1rem', borderBottom: '1px solid #e9ecef', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <div>
+                                    {tabs.map((tab, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => setCurrentTab(index)}
+                                            style={{
+                                                padding: '0.75rem 1rem',
+                                                marginRight: '0.5rem',
+                                                background: currentTab === index ? 'white' : 'transparent',
+                                                border: 'none',
+                                                borderRadius: '4px',
+                                                cursor: 'pointer',
+                                                color: currentTab === index ? '#2563eb' : '#6b7280',
+                                                fontWeight: currentTab === index ? '600' : '400',
+                                                fontSize: '0.875rem'
+                                            }}
+                                        >
+                                            {tab.name}
+                                        </button>
+                                    ))}
+                                </div>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <button
+                                        onClick={() => setCurrentTab(Math.max(0, currentTab - 1))}
+                                        disabled={currentTab === 0}
+                                        style={{
+                                            padding: '0.5rem',
+                                            background: 'white',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '4px',
+                                            cursor: currentTab === 0 ? 'not-allowed' : 'pointer',
+                                            opacity: currentTab === 0 ? 0.5 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <i data-feather="chevron-left" style={{ width: '16px', height: '16px' }}></i>
+                                    </button>
+                                    <button
+                                        onClick={() => setCurrentTab(Math.min(tabs.length - 1, currentTab + 1))}
+                                        disabled={currentTab === tabs.length - 1}
+                                        style={{
+                                            padding: '0.5rem',
+                                            background: 'white',
+                                            border: '1px solid #d1d5db',
+                                            borderRadius: '4px',
+                                            cursor: currentTab === tabs.length - 1 ? 'not-allowed' : 'pointer',
+                                            opacity: currentTab === tabs.length - 1 ? 0.5 : 1,
+                                            display: 'flex',
+                                            alignItems: 'center'
+                                        }}
+                                    >
+                                        <i data-feather="chevron-right" style={{ width: '16px', height: '16px' }}></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div style={{ padding: '2rem', maxHeight: '600px', overflow: 'auto' }}>
+                                {currentTab === 0 && (
+                                    <div>
+                                        <h2>Basic Information</h2>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Marketplace Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="marketplaceName"
+                                                value={formData.marketplaceName}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Company Name
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="companyName"
+                                                value={formData.companyName}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Company Address
+                                            </label>
+                                            <textarea
+                                                name="companyAddress"
+                                                value={formData.companyAddress}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Contact Email
+                                            </label>
+                                            <input
+                                                type="email"
+                                                name="contactEmail"
+                                                value={formData.contactEmail}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Website URL
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="websiteUrl"
+                                                value={formData.websiteUrl}
+                                                onChange={handleChange}
+                                                placeholder="www.example.com"
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 1 && (
+                                    <div>
+                                        <h2>Business Terms</h2>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Commission (%)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="commissionPercentage"
+                                                    value={formData.commissionPercentage}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    max="50"
+                                                    step="0.1"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Transaction Fee ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="transactionFee"
+                                                    value={formData.transactionFee}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Payment Schedule
+                                                </label>
+                                                <select
+                                                    name="paymentSchedule"
+                                                    value={formData.paymentSchedule}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="weekly">Weekly</option>
+                                                    <option value="bi-weekly">Bi-weekly</option>
+                                                    <option value="monthly">Monthly</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Payment Method
+                                                </label>
+                                                <select
+                                                    name="paymentMethod"
+                                                    value={formData.paymentMethod}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="paypal">PayPal</option>
+                                                    <option value="bank-transfer">Bank Transfer</option>
+                                                    <option value="check">Check</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Return Days
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="returnTimeframe"
+                                                    value={formData.returnTimeframe}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    max="365"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Return Policy
+                                                </label>
+                                                <select
+                                                    name="returnPolicy"
+                                                    value={formData.returnPolicy}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="full-refund">Full Refund</option>
+                                                    <option value="store-credit">Store Credit Only</option>
+                                                    <option value="exchange-only">Exchange Only</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Listing Fee ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="listingFee"
+                                                    value={formData.listingFee}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Min Order ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="minimumOrderValue"
+                                                    value={formData.minimumOrderValue}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Shipping Policy
+                                                </label>
+                                                <select
+                                                    name="shippingPolicy"
+                                                    value={formData.shippingPolicy}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="seller-responsible">Seller Responsible</option>
+                                                    <option value="shared">Shared Responsibility</option>
+                                                    <option value="platform-managed">Platform Managed</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Fulfillment Timeframe
+                                                </label>
+                                                <select
+                                                    name="fulfillmentTimeframe"
+                                                    value={formData.fulfillmentTimeframe}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="1 business day">1 business day</option>
+                                                    <option value="2-3 business days">2-3 business days</option>
+                                                    <option value="3-5 business days">3-5 business days</option>
+                                                    <option value="5-7 business days">5-7 business days</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Termination Notice (Days)
+                                            </label>
+                                            <input
+                                                type="number"
+                                                name="terminationNotice"
+                                                value={formData.terminationNotice}
+                                                onChange={handleChange}
+                                                min="0"
+                                                max="180"
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Prohibited Items
+                                            </label>
+                                            <textarea
+                                                name="prohibitedItems"
+                                                value={formData.prohibitedItems}
+                                                onChange={handleChange}
+                                                placeholder="List prohibited items..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Listing Requirements
+                                            </label>
+                                            <textarea
+                                                name="listingRequirements"
+                                                value={formData.listingRequirements}
+                                                onChange={handleChange}
+                                                placeholder="Specify listing requirements..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Quality Standards
+                                            </label>
+                                            <textarea
+                                                name="qualityStandards"
+                                                value={formData.qualityStandards}
+                                                onChange={handleChange}
+                                                placeholder="Define quality standards..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Immediate Termination Reasons
+                                            </label>
+                                            <textarea
+                                                name="immediateTerminationReasons"
+                                                value={formData.immediateTerminationReasons}
+                                                onChange={handleChange}
+                                                placeholder="List reasons for immediate termination..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 2 && (
+                                    <div>
+                                        <h2>Legal Settings</h2>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Governing State
+                                            </label>
+                                            <select
+                                                name="governingState"
+                                                value={formData.governingState}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                {usStates.map(state => (
+                                                    <option key={state} value={state}>{state}</option>
+                                                ))}
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Intellectual Property Protection
+                                            </label>
+                                            <select
+                                                name="intellectualProperty"
+                                                value={formData.intellectualProperty}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="basic">Basic Protection</option>
+                                                <option value="comprehensive">Comprehensive Protection</option>
+                                                <option value="strict">Strict Enforcement</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Platform Role
+                                            </label>
+                                            <select
+                                                name="platformRole"
+                                                value={formData.platformRole}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="limited-liability">Limited Liability Intermediary</option>
+                                                <option value="marketplace-facilitator">Marketplace Facilitator</option>
+                                            </select>
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Dispute Resolution
+                                            </label>
+                                            <select
+                                                name="disputeResolution"
+                                                value={formData.disputeResolution}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="courts">State/Federal Courts</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {currentTab === 3 && (
+                                    <div>
+                                        <h2>Legal Analysis & Business Metrics</h2>
+                                        <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '6px' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '0.5rem' }}>Agreement Completeness Score</h3>
+                                            <div style={{ display: 'flex', alignItems: 'center', marginBottom: '0.5rem' }}>
+                                                <div style={{ width: '200px', height: '10px', background: '#e5e7eb', borderRadius: '5px', marginRight: '1rem' }}>
+                                                    <div style={{ width: '85%', height: '100%', background: '#10b981', borderRadius: '5px' }}></div>
+                                                </div>
+                                                <span style={{ fontWeight: '600', color: '#10b981' }}>85% Complete</span>
+                                            </div>
+                                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>Your agreement includes comprehensive terms for marketplace operations</p>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Business Risk Assessment</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Intellectual Property Protection</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Strong</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Platform Liability Limitations</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Protected</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Seller Obligations Defined</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Comprehensive</span>
+                                                </div>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
+                                                    <span>✅ Dispute Resolution Mechanism</span>
+                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Clear</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Revenue Protection Features</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ padding: '1rem', background: '#fef3c7', borderRadius: '6px', border: '1px solid #f59e0b' }}>
+                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                        <strong style={{ color: '#92400e' }}>Commission Structure</strong>
+                                                        <span style={{ color: '#92400e', fontWeight: '600' }}>{formData.commissionPercentage}%</span>
+                                                    </div>
+                                                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#92400e' }}>
+                                                        {parseFloat(formData.commissionPercentage) > 20 ? 'High commission rate may impact seller acquisition' : 
+                                                         parseFloat(formData.commissionPercentage) < 5 ? 'Low commission rate may impact profitability' :
+                                                         'Balanced commission rate for sustainable growth'}
+                                                    </p>
+                                                </div>
+                                                {formData.listingFee !== '0' && (
+                                                    <div style={{ padding: '1rem', background: '#dbeafe', borderRadius: '6px', border: '1px solid #3b82f6' }}>
+                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                                            <strong style={{ color: '#1d4ed8' }}>Listing Fees</strong>
+                                                            <span style={{ color: '#1d4ed8', fontWeight: '600' }}>${formData.listingFee}/month</span>
+                                                        </div>
+                                                        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#1d4ed8' }}>
+                                                            Additional revenue stream from active listings
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div style={{ marginBottom: '1.5rem' }}>
+                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Recommendations</h3>
+                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
+                                                <div style={{ padding: '1rem', background: '#e0f2fe', borderRadius: '6px', border: '1px solid #0369a1' }}>
+                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#0369a1' }}>💡 Business Growth</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#075985' }}>
+                                                        Consider implementing seller performance tiers with reduced commission rates for high-volume sellers
+                                                    </p>
+                                                </div>
+                                                <div style={{ padding: '1rem', background: '#f3e8ff', borderRadius: '6px', border: '1px solid #7c3aed' }}>
+                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#7c3aed' }}>⚖️ Legal Compliance</h4>
+                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b21a8' }}>
+                                                        Review state-specific marketplace facilitator tax obligations for {formData.governingState}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div style={{ padding: '1rem', background: '#fef2f2', borderRadius: '6px', border: '1px solid #ef4444' }}>
+                                            <h4 style={{ margin: '0 0 0.5rem', color: '#dc2626' }}>⚠️ Important Notice</h4>
+                                            <p style={{ margin: 0, fontSize: '0.875rem', color: '#991b1b' }}>
+                                                This analysis is for informational purposes only. Consult with a qualified attorney before using this agreement in your business operations.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="navigation-buttons">
+                                    <button 
+                                        onClick={isPaid ? copyToClipboard : handlePayment}
+                                        className={`nav-button ${isPaid ? 'primary' : ''}`}
+                                    >
+                                        <i data-feather="copy"></i>
+                                        Copy
+                                    </button>
+                                    <button 
+                                        onClick={isPaid ? downloadAsText : handlePayment}
+                                        className="nav-button"
+                                    >
+                                        <i data-feather="download"></i>
+                                        Download
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ background: 'white', borderRadius: '8px', boxShadow: '0 2px 10px rgba(0,0,0,0.1)' }}>
+                            <div style={{ padding: '1.5rem 2rem 1rem', borderBottom: '1px solid #e9ecef', background: '#f8f9fa' }}>
+                                <h3 style={{ margin: 0, marginBottom: '0.25rem' }}>Live Preview</h3>
+                                <small style={{ color: '#6b7280' }}>Updates as you type</small>
+                            </div>
+                            <div style={{ padding: '2rem', height: '600px', overflow: 'auto' }}>
+                                <pre 
+                                    className={`live-preview-content ${isPaid ? 'paid' : ''}`}
+                                    style={{ 
+                                        fontFamily: 'Times, serif', 
+                                        fontSize: '0.8rem', 
+                                        lineHeight: '1.5', 
+                                        whiteSpace: 'pre-wrap',
+                                        margin: 0,
+                                        cursor: isPaid ? 'text' : 'not-allowed'
+                                    }}
+                                    dangerouslySetInnerHTML={{ 
+                                        __html: generateDocumentText().replace(/</g, '&lt;').replace(/>/g, '&gt;') 
+                                    }}
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {showPaywall && (
+                        <div className="paywall-overlay">
+                            <div className="paywall-modal">
+                                <h2>Unlock Full Access</h2>
+                                <p>Get instant access to copy, download, and use your customized Marketplace Seller Agreement for just $14.95</p>
+                                
+                                <div id="paypal-button-container" style={{ marginBottom: '20px' }}></div>
+                                
+                                <div className="paywall-buttons">
+                                    <button onClick={() => setShowManualEntry(true)} className="unlock-button">
+                                        Already Paid? Enter Transaction ID
+                                    </button>
+                                    <button onClick={() => setShowPaywall(false)} className="cancel-button">
+                                        Maybe Later
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {showManualEntry && (
+                        <div className="paywall-overlay">
+                            <div className="paywall-modal">
+                                <h3>Enter PayPal Transaction ID</h3>
+                                <p>If you've already paid via PayPal, enter your transaction ID below to unlock access:</p>
+                                
+                                <div className="paypal-section">
+                                    <label>PayPal Transaction ID:</label>
+                                    <input
+                                        type="text"
+                                        value={paypalId}
+                                        onChange={(e) => setPaypalId(e.target.value)}
+                                        placeholder="Enter PayPal transaction ID"
+                                    />
+                                    <div className="paywall-buttons">
+                                        <button onClick={handlePayPalUnlock} className="unlock-button">
+                                            Unlock Access
+                                        </button>
+                                        <button onClick={() => {setShowManualEntry(false); setShowPaywall(true);}} className="cancel-button">
+                                            Back to Payment
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div className="paypal-info">
+                                    <p><strong>Haven't Paid Yet?</strong> Go back to payment options to complete your purchase.</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        ReactDOM.render(<MarketplaceGenerator />, document.getElementById('root'));
+
+        // Initialize Feather icons after React renders
+        if (typeof feather !== 'undefined') {
+            setTimeout(() => feather.replace(), 100);
+        }
+    </script>
 </body>
 </html>
