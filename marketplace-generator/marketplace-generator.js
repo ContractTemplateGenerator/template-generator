@@ -41,18 +41,10 @@ const MarketplaceGenerator = () => {
         postTerminationObligations: 'Complete pending orders, honor return policy, remove listings',
         
         // Legal Terms
-        governingLaw: 'California',
-        disputeResolution: 'litigation',
+        governingLaw: 'State of California, USA',
+        disputeResolution: 'arbitration',
         limitationOfLiability: 'standard',
-        intellectualProperty: 'seller-retains',
-        platformNeutrality: 'technology-only',
-        
-        // Additional Customizable Sections
-        dataProtection: 'standard-gdpr',
-        taxResponsibility: 'seller-responsible',
-        insuranceRequirements: 'none',
-        exclusiveDealing: 'non-exclusive',
-        territorialRestrictions: 'worldwide'
+        intellectualProperty: 'seller-retains'
     });
 
     // Handle input changes properly to fix typing issues
@@ -131,51 +123,12 @@ const MarketplaceGenerator = () => {
         // Generate dispute resolution text
         const getDisputeResolutionText = () => {
             switch (formData.disputeResolution) {
-                case 'mediation-first':
-                    return `The parties agree to first attempt to resolve any dispute through good faith mediation conducted by a qualified mediator. If mediation fails within 60 days, either party may proceed with litigation in the courts of ${formData.governingLaw}. Each party shall bear their own mediation costs initially.`;
+                case 'arbitration':
+                    return `Any dispute, claim, or controversy arising out of or relating to this Agreement shall be settled by binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules. The arbitration shall be conducted by a single arbitrator selected in accordance with AAA rules. The arbitration shall take place in ${formData.governingLaw}, and the arbitrator's decision shall be final and binding. Each party shall bear its own costs and attorneys' fees, and the parties shall split the arbitrator's fees equally. The arbitrator shall have no authority to award punitive damages.`;
+                case 'mediation':
+                    return `The parties agree to attempt to resolve any dispute through good faith mediation before pursuing other remedies. If mediation fails within 60 days, either party may proceed with binding arbitration as described above. Mediation shall be conducted by a qualified mediator selected by mutual agreement or through the AAA mediation process.`;
                 case 'litigation':
-                    return `Any disputes arising under this Agreement shall be resolved exclusively through litigation in the state and federal courts located in ${formData.governingLaw}. Each party consents to the personal jurisdiction of such courts and waives any objection to venue. The prevailing party in any litigation shall be entitled to recover reasonable attorneys' fees and costs from the non-prevailing party.`;
-                case 'informal-negotiation':
-                    return `Before pursuing formal legal action, the parties agree to engage in good faith informal negotiations for at least 30 days. If negotiations fail, disputes may be resolved through litigation in the courts of the State of ${formData.governingLaw}. This informal process is designed to resolve disputes efficiently and cost-effectively.`;
-        };
-
-        // Generate platform neutrality text
-        const getPlatformNeutralityText = () => {
-            switch (formData.platformNeutrality) {
-                case 'technology-only':
-                    return `Marketplace serves solely as a technology platform connecting buyers and sellers. Marketplace does not manufacture, sell, store, or distribute any products listed on the platform. All product listings, sales transactions, quality issues, warranties, and customer disputes are solely between Seller and the end customer. Marketplace disclaims any liability for product defects, merchantability, fitness for purpose, or any claims arising from products sold through the platform.`;
-                case 'limited-involvement':
-                    return `While Marketplace provides technology services and basic oversight, the primary relationship for product sales is between Seller and customers. Marketplace may provide customer service assistance but does not assume liability for product quality, delivery, or performance. Sellers remain primarily responsible for all aspects of their products and customer relationships.`;
-                case 'active-mediation':
-                    return `Marketplace actively participates in dispute resolution between sellers and customers. While sellers retain primary responsibility for their products, Marketplace may mediate disputes, enforce quality standards, and take corrective actions as necessary to protect the platform's reputation and customer experience.`;
-            }
-        };
-
-        // Generate data protection text
-        const getDataProtectionText = () => {
-            switch (formData.dataProtection) {
-                case 'standard-gdpr':
-                    return `Both parties shall comply with applicable data protection laws, including GDPR, CCPA, and other regional privacy regulations. Seller acknowledges that customer data collected through the platform remains subject to Marketplace's privacy policy. Seller agrees not to use customer data for purposes outside of fulfilling orders and providing customer service. Any data breach must be reported to Marketplace within 24 hours.`;
-                case 'minimal-data':
-                    return `Seller shall have access only to customer data necessary for order fulfillment (name, address, order details). No marketing use of customer data is permitted without explicit customer consent. All customer communications must comply with applicable anti-spam laws and platform policies.`;
-                case 'comprehensive-rights':
-                    return `Seller may collect and use customer data in accordance with their own privacy policy, provided it meets or exceeds platform standards and complies with applicable privacy laws. Seller must provide clear opt-out mechanisms and respect customer data preferences. Data sharing with third parties requires explicit customer consent.`;
-            }
-        };
-
-        // Generate enhanced IP text  
-        const getIntellectualPropertyText = () => {
-            switch (formData.intellectualProperty) {
-                case 'seller-retains':
-                    return `Seller retains complete ownership of all intellectual property rights in their products, content, images, trademarks, and other materials. This Agreement grants Marketplace only the minimal license necessary to display products and process orders. Marketplace may not use Seller's IP for any other purpose without written consent.`;
-                case 'platform-marketing-license':
-                    return `Seller grants Marketplace a non-exclusive license to use product images, descriptions, and trademarks for platform marketing, promotional activities, and advertising. This includes the right to feature products in newsletters, social media, and promotional campaigns. License terminates upon agreement termination.`;
-                case 'limited-derivative-rights':
-                    return `Marketplace may create derivative works from Seller's content for platform optimization, including resizing images, translating descriptions, and reformatting for mobile display. Seller retains ownership but grants necessary technical licenses for platform functionality.`;
-                case 'exclusive-platform-rights':
-                    return `Seller grants Marketplace exclusive rights to use and modify product content, images, and descriptions for platform purposes. This includes creating promotional materials, derivative content, and using seller branding in platform marketing. Seller may not use the same content on competing platforms.`;
-                case 'co-branding-rights':
-                    return `Both parties may use each other's trademarks and branding in connection with the marketplace relationship. Joint marketing materials may be created with shared approval rights. Both parties benefit from co-promotional opportunities while maintaining their respective brand ownership.`;
+                    return `Any disputes arising under this Agreement shall be resolved through litigation in the state and federal courts located in ${formData.governingLaw}. Each party consents to the personal jurisdiction of such courts and waives any objection to venue. The prevailing party in any litigation shall be entitled to recover reasonable attorneys' fees and costs from the non-prevailing party.`;
             }
         };
 
@@ -245,17 +198,19 @@ WHEREAS, Marketplace operates an online platform that connects buyers with selle
 
 6. TERM AND TERMINATION
 
-6.1 Termination Notice: Either party may terminate this Agreement with ${formData.noticePeriod} days' written notice to the other party. Termination notice must be provided in writing via email or certified mail.
+6.1 Term: This Agreement shall commence upon acceptance and remain in effect until terminated by either party in accordance with the terms herein.
 
-6.2 Immediate Termination: Marketplace may terminate this Agreement immediately, without notice, for the following reasons: ${formData.terminationReasons}, repeated violation of platform policies, sale of prohibited items, or failure to maintain required seller performance metrics.
+6.2 Termination Notice: Either party may terminate this Agreement with ${formData.noticePeriod} days' written notice to the other party. Termination notice must be provided in writing via email or certified mail.
 
-6.3 Post-Termination Obligations: Upon termination, Seller must: ${formData.postTerminationObligations}, provide customer service for previously sold items during any applicable warranty period, and cease use of Marketplace trademarks and proprietary information. All payment obligations survive termination.
+6.3 Immediate Termination: Marketplace may terminate this Agreement immediately, without notice, for the following reasons: ${formData.terminationReasons}, repeated violation of platform policies, sale of prohibited items, or failure to maintain required seller performance metrics.
 
-6.4 Effect of Termination: Upon termination, Seller's access to the platform will be revoked, active listings will be removed, and pending orders will be handled according to Marketplace policies. Outstanding payments will be processed according to normal payment schedules, subject to any holds or reserves.
+6.4 Post-Termination Obligations: Upon termination, Seller must: ${formData.postTerminationObligations}, provide customer service for previously sold items during any applicable warranty period, and cease use of Marketplace trademarks and proprietary information. All payment obligations survive termination.
+
+6.5 Effect of Termination: Upon termination, Seller's access to the platform will be revoked, active listings will be removed, and pending orders will be handled according to Marketplace policies. Outstanding payments will be processed according to normal payment schedules, subject to any holds or reserves.
 
 7. INTELLECTUAL PROPERTY
 
-7.1 Intellectual Property Rights: ${getIntellectualPropertyText()}
+7.1 Seller IP Ownership: ${formData.intellectualProperty === 'seller-retains' ? 'Seller retains all intellectual property rights in their products, content, images, and other materials provided to Marketplace. This Agreement does not transfer ownership of Seller IP to Marketplace.' : formData.intellectualProperty === 'shared' ? 'Seller retains ownership of product IP but grants Marketplace shared rights to use, modify, and create derivative works of product content for platform operations and marketing purposes.' : 'Seller grants Marketplace an exclusive license to use product content, images, and descriptions for marketing and operational purposes during the term of this Agreement.'}
 
 7.2 License to Marketplace: Seller grants Marketplace a non-exclusive, worldwide, royalty-free license to use, reproduce, display, and distribute Seller's product images, descriptions, and other content for the purpose of operating the marketplace, processing orders, marketing products, and providing customer service.
 
@@ -283,49 +238,27 @@ WHEREAS, Marketplace operates an online platform that connects buyers with selle
 
 10.2 Dispute Resolution: ${getDisputeResolutionText()}
 
-10.3 Class Action Waiver: Both parties waive any right to participate in class action lawsuits regarding disputes under this Agreement.
+10.3 Class Action Waiver: Both parties waive any right to participate in class action lawsuits or class-wide arbitration regarding disputes under this Agreement.
 
-11. PLATFORM NEUTRALITY AND LIABILITY LIMITATIONS
+11. GENERAL PROVISIONS
 
-11.1 Platform Role: ${getPlatformNeutralityText()}
+11.1 Entire Agreement: This Agreement, together with any referenced policies and terms, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein.
 
-11.2 Third-Party Relationships: Marketplace is not a party to any transaction between Seller and customers. All sales contracts are formed directly between Seller and the purchasing customer. Marketplace provides technology services only and does not guarantee the performance of any party.
+11.2 Amendment: This Agreement may only be amended by written agreement signed by both parties, or by Marketplace providing 30 days' notice of changes to Seller.
 
-12. DATA PROTECTION AND PRIVACY
+11.3 Severability: If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall remain in full force and effect.
 
-12.1 Data Protection Compliance: ${getDataProtectionText()}
+11.4 Assignment: Seller may not assign, transfer, or delegate this Agreement or any rights or obligations hereunder without the prior written consent of Marketplace. Marketplace may assign this Agreement without restriction.
 
-12.2 Data Security: Both parties shall implement appropriate technical and organizational measures to protect personal data against unauthorized access, alteration, disclosure, or destruction. Any suspected data breach must be reported immediately to the other party.
+11.5 Force Majeure: Neither party shall be liable for any failure or delay in performance due to causes beyond their reasonable control, including but not limited to acts of God, war, terrorism, pandemics, government regulations, labor strikes, or technical failures.
 
-13. ADDITIONAL BUSINESS TERMS
+11.6 Independent Contractors: The parties are independent contractors. This Agreement does not create a partnership, joint venture, agency, or employment relationship.
 
-13.1 Tax Responsibilities: ${formData.taxResponsibility === 'seller-responsible' ? 'Seller is solely responsible for all tax obligations, including sales tax, VAT, income tax, and any other applicable taxes related to their marketplace activities. Seller must provide valid tax documentation as required.' : formData.taxResponsibility === 'marketplace-assists' ? 'Marketplace will assist with tax collection where legally required, but Seller remains primarily responsible for tax compliance and reporting. Seller must provide necessary tax information and documentation.' : 'Marketplace handles tax collection and remittance for transactions, but Seller remains responsible for income tax reporting and other business tax obligations.'}
+11.7 Waiver: The failure of either party to enforce any provision of this Agreement shall not constitute a waiver of that provision or any other provision.
 
-13.2 Insurance Requirements: ${formData.insuranceRequirements === 'none' ? 'No specific insurance requirements apply to this Agreement, though Seller is encouraged to maintain appropriate business insurance coverage.' : formData.insuranceRequirements === 'general-liability' ? 'Seller must maintain general liability insurance with minimum coverage of $1,000,000 per occurrence and provide proof of coverage annually.' : 'Seller must maintain comprehensive business insurance including general liability ($1,000,000), product liability ($2,000,000), and errors & omissions coverage. Marketplace must be named as additional insured.'}
+11.8 Survival: Provisions relating to payment obligations, intellectual property, confidentiality, limitation of liability, and dispute resolution shall survive termination of this Agreement.
 
-13.3 Exclusive Dealing: ${formData.exclusiveDealing === 'non-exclusive' ? 'This Agreement is non-exclusive. Seller may sell products through other channels, marketplaces, and direct sales without restriction.' : formData.exclusiveDealing === 'category-exclusive' ? 'Seller agrees not to sell the same product categories through competing marketplaces, but may maintain direct sales channels and non-competing platforms.' : 'Seller grants Marketplace exclusive rights to sell Seller\\'s products online. Seller may not use competing marketplace platforms but may maintain direct sales and brick-and-mortar presence.'}
-
-13.4 Territorial Restrictions: ${formData.territorialRestrictions === 'worldwide' ? 'This Agreement applies to worldwide sales through the Marketplace platform, subject to applicable export controls and local laws.' : formData.territorialRestrictions === 'domestic-only' ? 'Sales are restricted to domestic customers within the United States only. International sales are prohibited without express written consent.' : 'Sales are permitted within specified geographic regions as agreed upon by both parties. Seller must comply with all local laws and regulations in approved territories.'}
-
-14. GENERAL PROVISIONS
-
-14.1 Entire Agreement: This Agreement, together with any referenced policies and terms, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein.
-
-14.2 Amendment: This Agreement may only be amended by written agreement signed by both parties, or by Marketplace providing 30 days' notice of changes to Seller.
-
-14.3 Severability: If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall remain in full force and effect.
-
-14.4 Assignment: Seller may not assign, transfer, or delegate this Agreement or any rights or obligations hereunder without the prior written consent of Marketplace. Marketplace may assign this Agreement without restriction.
-
-14.5 Force Majeure: Neither party shall be liable for any failure or delay in performance due to causes beyond their reasonable control, including but not limited to acts of God, war, terrorism, pandemics, government regulations, labor strikes, or technical failures.
-
-14.6 Independent Contractors: The parties are independent contractors. This Agreement does not create a partnership, joint venture, agency, or employment relationship.
-
-14.7 Waiver: The failure of either party to enforce any provision of this Agreement shall not constitute a waiver of that provision or any other provision.
-
-14.8 Survival: Provisions relating to payment obligations, intellectual property, confidentiality, limitation of liability, and dispute resolution shall survive termination of this Agreement.
-
-15. SIGNATURES AND ACCEPTANCE
+12. SIGNATURES AND ACCEPTANCE
 
 By using the Marketplace platform, creating seller listings, or completing transactions through the platform, Seller acknowledges that they have read, understood, and agree to be bound by all terms and conditions of this Agreement.
 
@@ -504,22 +437,13 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
             case 'qualityStandards':
             case 'terminationReasons':
             case 'postTerminationObligations':
-            case 'dataProtection':
-            case 'taxResponsibility': 
-            case 'insuranceRequirements':
-            case 'exclusiveDealing':
-            case 'territorialRestrictions':
-            case 'platformNeutrality':
-                // For text areas and select fields, highlight the content that was changed
+                // For text areas, highlight the content that was just changed
                 const fieldValue = formData[lastChanged];
-                if (fieldValue && fieldValue.length > 3) {
-                    // For longer text, highlight the content that was changed
-                    if (fieldValue.length > 10) {
-                        highlightedText = highlightedText.replace(
-                            new RegExp(fieldValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
-                            `<span class="highlighted-text">${fieldValue}</span>`
-                        );
-                    }
+                if (fieldValue && fieldValue.length > 10) {
+                    highlightedText = highlightedText.replace(
+                        new RegExp(fieldValue.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                        `<span class="highlighted-text">${fieldValue}</span>`
+                    );
                 }
                 break;
             default:
@@ -592,16 +516,10 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
         customerServiceResponsibility: "Marketplace-handled service provides consistency but increases costs. Seller responsibility reduces costs but may impact customer experience.",
         noticePeriod: "30-60 days is standard for contract termination. Longer periods provide stability for sellers but reduce your flexibility to remove poor performers.",
         terminationReasons: "Be specific about grounds for immediate termination. Include policy violations, fraudulent activity, poor performance metrics, legal violations.",
-        disputeResolution: "Mediation-first approaches reduce costs by 40-60% vs direct litigation. Informal negotiation preserves business relationships while maintaining legal options.",
+        disputeResolution: "Arbitration is typically 60-80% faster and cheaper than litigation. Costs average $3,000-$10,000 vs $50,000+ for court cases.",
         governingLaw: "Choose the jurisdiction where your business is incorporated for legal consistency. California, Delaware, and New York are business-friendly states.",
         limitationOfLiability: "Standard limitations protect against excessive damage claims while maintaining legal enforceability. Overly broad limitations may be unenforceable.",
-        intellectualProperty: "Seller-retained rights reduce your risks but limit marketing flexibility. Shared rights provide marketing benefits but increase IP management complexity.",
-        platformNeutrality: "Technology-only platforms minimize liability but limit control. Active mediation increases liability but improves customer experience and dispute resolution.",
-        dataProtection: "GDPR compliance is essential for EU customers. Minimal data access reduces privacy risks. Comprehensive rights require detailed privacy controls and regular audits.",
-        taxResponsibility: "Seller responsibility reduces platform compliance burden. Marketplace tax handling requires complex multi-jurisdiction systems but improves seller experience.",
-        insuranceRequirements: "Comprehensive coverage protects against seller-related claims. No requirements reduce seller barriers but increase platform risk exposure.",
-        exclusiveDealing: "Non-exclusive agreements attract more sellers but reduce platform differentiation. Exclusivity provides competitive advantage but limits seller participation.",
-        territorialRestrictions: "Worldwide sales maximize market reach but require international compliance. Domestic-only reduces complexity but limits growth potential."
+        intellectualProperty: "Seller-retained rights reduce your risks but limit marketing flexibility. Shared rights provide marketing benefits but increase IP management complexity."
     };
 
     // Generate comprehensive legal risk analysis
@@ -655,53 +573,11 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
         }
 
         // Legal Terms Analysis
-        if (formData.disputeResolution === 'mediation-first') {
-            lowRisks.push('Mediation-first approach provides cost-effective dispute resolution while maintaining litigation option');
+        if (formData.disputeResolution === 'arbitration') {
+            lowRisks.push('Arbitration clause provides cost-effective dispute resolution');
         } else if (formData.disputeResolution === 'litigation') {
-            mediumRisks.push('Direct litigation increases legal costs and case duration significantly');
-            recommendations.push('Consider mediation-first approach for 40-60% cost savings and faster initial resolution');
-        } else if (formData.disputeResolution === 'informal-negotiation') {
-            lowRisks.push('Informal negotiation approach minimizes legal costs and promotes business relationship preservation');
-        }
-
-        // Platform Neutrality Analysis
-        if (formData.platformNeutrality === 'technology-only') {
-            lowRisks.push('Technology-only model minimizes platform liability and regulatory compliance burden');
-        } else if (formData.platformNeutrality === 'active-mediation') {
-            mediumRisks.push('Active mediation role increases liability exposure and operational complexity');
-            recommendations.push('Ensure comprehensive insurance coverage and clear mediation procedures');
-        }
-
-        // Data Protection Analysis
-        if (formData.dataProtection === 'standard-gdpr') {
-            lowRisks.push('GDPR compliance framework provides robust data protection foundation');
-        } else if (formData.dataProtection === 'comprehensive-rights') {
-            mediumRisks.push('Comprehensive data rights increase privacy compliance complexity');
-            recommendations.push('Implement detailed privacy controls and regular compliance audits');
-        }
-
-        // Tax Responsibility Analysis
-        if (formData.taxResponsibility === 'seller-responsible') {
-            lowRisks.push('Seller tax responsibility reduces platform compliance burden');
-        } else if (formData.taxResponsibility === 'marketplace-handles') {
-            mediumRisks.push('Platform tax handling requires complex multi-jurisdiction compliance');
-            recommendations.push('Consult tax professionals and implement automated tax calculation systems');
-        }
-
-        // Insurance Requirements Analysis
-        if (formData.insuranceRequirements === 'comprehensive') {
-            lowRisks.push('Comprehensive insurance requirements provide strong liability protection');
-        } else if (formData.insuranceRequirements === 'none') {
-            mediumRisks.push('No insurance requirements increase platform exposure to seller-related claims');
-            recommendations.push('Consider requiring at least basic general liability coverage');
-        }
-
-        // Territorial Restrictions Analysis
-        if (formData.territorialRestrictions === 'domestic-only') {
-            lowRisks.push('Domestic-only sales reduce international compliance and shipping complexities');
-        } else if (formData.territorialRestrictions === 'worldwide') {
-            mediumRisks.push('Worldwide sales require compliance with multiple international regulations');
-            recommendations.push('Implement country-specific compliance checks and restricted shipping lists');
+            mediumRisks.push('Litigation clauses significantly increase legal costs and case duration');
+            recommendations.push('Consider arbitration for 60-80% cost savings and faster resolution');
         }
 
         if (formData.limitationOfLiability === 'standard') {
@@ -829,7 +705,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
         { name: 'Fulfillment & Returns' },
         { name: 'Termination Terms' },
         { name: 'Legal Terms' },
-        { name: 'Advanced Options' },
         { name: 'Legal Analysis' }
     ];
 
@@ -844,65 +719,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
             setCurrentTab(currentTab - 1);
         }
     };
-
-    // Payment validation function
-    const validatePayment = () => {
-        const transactionId = document.getElementById('transaction-id').value.trim();
-        
-        if (!transactionId) {
-            alert('Please enter your PayPal Transaction ID');
-            return;
-        }
-
-        // Basic validation for PayPal transaction ID format (17 characters, alphanumeric)
-        if (transactionId.length !== 17 || !/^[a-zA-Z0-9]+$/.test(transactionId)) {
-            alert('Invalid PayPal Transaction ID format. Please check and try again.');
-            return;
-        }
-
-        // Mark as paid and save to localStorage
-        setIsPaid(true);
-        localStorage.setItem('marketplacePaid', 'true');
-        setShowPaywall(false);
-        alert('Payment validated successfully! You now have full access.');
-    };
-
-    // PayPal integration effect
-    useEffect(() => {
-        if (showPaywall && window.paypal) {
-            // Clear existing PayPal buttons
-            const container = document.getElementById('paypal-button-container');
-            if (container) {
-                container.innerHTML = '';
-                
-                window.paypal.Buttons({
-                    createOrder: function(data, actions) {
-                        return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: '14.95'
-                                },
-                                description: 'Marketplace Seller Agreement Generator - Full Access'
-                            }]
-                        });
-                    },
-                    onApprove: function(data, actions) {
-                        return actions.order.capture().then(function(details) {
-                            // Mark as paid
-                            setIsPaid(true);
-                            localStorage.setItem('marketplacePaid', 'true');
-                            setShowPaywall(false);
-                            alert('Payment successful! You now have full access to copy and download features.');
-                        });
-                    },
-                    onError: function(err) {
-                        console.error('PayPal error:', err);
-                        alert('Payment failed. Please try again or use the alternative payment method.');
-                    }
-                }).render('#paypal-button-container');
-            }
-        }
-    }, [showPaywall]);
 
     return (
         <div className="container">
@@ -1191,63 +1007,13 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                 <h2>Legal Terms</h2>
                                 <div className="form-group">
                                     <label>Governing Law <HelpIcon tooltip={tooltips.governingLaw} /></label>
-                                    <select
+                                    <input
+                                        type="text"
                                         name="governingLaw"
                                         value={formData.governingLaw}
                                         onChange={handleChange}
-                                    >
-                                        <option value="Alabama">Alabama</option>
-                                        <option value="Alaska">Alaska</option>
-                                        <option value="Arizona">Arizona</option>
-                                        <option value="Arkansas">Arkansas</option>
-                                        <option value="California">California</option>
-                                        <option value="Colorado">Colorado</option>
-                                        <option value="Connecticut">Connecticut</option>
-                                        <option value="Delaware">Delaware</option>
-                                        <option value="Florida">Florida</option>
-                                        <option value="Georgia">Georgia</option>
-                                        <option value="Hawaii">Hawaii</option>
-                                        <option value="Idaho">Idaho</option>
-                                        <option value="Illinois">Illinois</option>
-                                        <option value="Indiana">Indiana</option>
-                                        <option value="Iowa">Iowa</option>
-                                        <option value="Kansas">Kansas</option>
-                                        <option value="Kentucky">Kentucky</option>
-                                        <option value="Louisiana">Louisiana</option>
-                                        <option value="Maine">Maine</option>
-                                        <option value="Maryland">Maryland</option>
-                                        <option value="Massachusetts">Massachusetts</option>
-                                        <option value="Michigan">Michigan</option>
-                                        <option value="Minnesota">Minnesota</option>
-                                        <option value="Mississippi">Mississippi</option>
-                                        <option value="Missouri">Missouri</option>
-                                        <option value="Montana">Montana</option>
-                                        <option value="Nebraska">Nebraska</option>
-                                        <option value="Nevada">Nevada</option>
-                                        <option value="New Hampshire">New Hampshire</option>
-                                        <option value="New Jersey">New Jersey</option>
-                                        <option value="New Mexico">New Mexico</option>
-                                        <option value="New York">New York</option>
-                                        <option value="North Carolina">North Carolina</option>
-                                        <option value="North Dakota">North Dakota</option>
-                                        <option value="Ohio">Ohio</option>
-                                        <option value="Oklahoma">Oklahoma</option>
-                                        <option value="Oregon">Oregon</option>
-                                        <option value="Pennsylvania">Pennsylvania</option>
-                                        <option value="Rhode Island">Rhode Island</option>
-                                        <option value="South Carolina">South Carolina</option>
-                                        <option value="South Dakota">South Dakota</option>
-                                        <option value="Tennessee">Tennessee</option>
-                                        <option value="Texas">Texas</option>
-                                        <option value="Utah">Utah</option>
-                                        <option value="Vermont">Vermont</option>
-                                        <option value="Virginia">Virginia</option>
-                                        <option value="Washington">Washington</option>
-                                        <option value="West Virginia">West Virginia</option>
-                                        <option value="Wisconsin">Wisconsin</option>
-                                        <option value="Wyoming">Wyoming</option>
-                                        <option value="District of Columbia">District of Columbia</option>
-                                    </select>
+                                        placeholder="e.g., State of California, USA"
+                                    />
                                 </div>
                                 <div className="form-row">
                                     <div className="form-group">
@@ -1257,9 +1023,9 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                             value={formData.disputeResolution}
                                             onChange={handleChange}
                                         >
-                                            <option value="mediation-first">Mediation First, Then Litigation</option>
-                                            <option value="litigation">Court Litigation</option>
-                                            <option value="informal-negotiation">Informal Negotiation, Then Litigation</option>
+                                            <option value="arbitration">Arbitration (faster, cheaper)</option>
+                                            <option value="mediation">Mediation then Arbitration</option>
+                                            <option value="litigation">Court Litigation (expensive)</option>
                                         </select>
                                     </div>
                                     <div className="form-group">
@@ -1282,101 +1048,16 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                         value={formData.intellectualProperty}
                                         onChange={handleChange}
                                     >
-                                        <option value="seller-retains">Seller Retains Full Rights (safest)</option>
-                                        <option value="platform-marketing-license">Platform Marketing License</option>
-                                        <option value="limited-derivative-rights">Limited Derivative Rights</option>
-                                        <option value="exclusive-platform-rights">Exclusive Platform Rights</option>
-                                        <option value="co-branding-rights">Co-Branding Rights</option>
-                                    </select>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Advanced Options Tab */}
-                        {currentTab === 6 && (
-                            <div>
-                                <h2>Advanced Business Options</h2>
-                                <div className="form-group">
-                                    <label>Platform Neutrality Model <HelpIcon tooltip={tooltips.platformNeutrality} /></label>
-                                    <select
-                                        name="platformNeutrality"
-                                        value={formData.platformNeutrality}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="technology-only">Technology Platform Only (minimal liability)</option>
-                                        <option value="limited-involvement">Limited Platform Involvement</option>
-                                        <option value="active-mediation">Active Dispute Mediation</option>
-                                    </select>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Data Protection Approach <HelpIcon tooltip={tooltips.dataProtection} /></label>
-                                        <select
-                                            name="dataProtection"
-                                            value={formData.dataProtection}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="standard-gdpr">Standard GDPR Compliance</option>
-                                            <option value="minimal-data">Minimal Data Access</option>
-                                            <option value="comprehensive-rights">Comprehensive Data Rights</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Tax Responsibility Model <HelpIcon tooltip={tooltips.taxResponsibility} /></label>
-                                        <select
-                                            name="taxResponsibility"
-                                            value={formData.taxResponsibility}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="seller-responsible">Seller Fully Responsible</option>
-                                            <option value="marketplace-assists">Marketplace Assists with Collection</option>
-                                            <option value="marketplace-handles">Marketplace Handles Tax Collection</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="form-row">
-                                    <div className="form-group">
-                                        <label>Insurance Requirements <HelpIcon tooltip={tooltips.insuranceRequirements} /></label>
-                                        <select
-                                            name="insuranceRequirements"
-                                            value={formData.insuranceRequirements}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="none">No Insurance Required</option>
-                                            <option value="general-liability">General Liability Required</option>
-                                            <option value="comprehensive">Comprehensive Coverage Required</option>
-                                        </select>
-                                    </div>
-                                    <div className="form-group">
-                                        <label>Exclusive Dealing Terms <HelpIcon tooltip={tooltips.exclusiveDealing} /></label>
-                                        <select
-                                            name="exclusiveDealing"
-                                            value={formData.exclusiveDealing}
-                                            onChange={handleChange}
-                                        >
-                                            <option value="non-exclusive">Non-Exclusive (seller can use other platforms)</option>
-                                            <option value="category-exclusive">Category Exclusive</option>
-                                            <option value="full-exclusive">Full Exclusivity Required</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div className="form-group">
-                                    <label>Territorial Sales Restrictions <HelpIcon tooltip={tooltips.territorialRestrictions} /></label>
-                                    <select
-                                        name="territorialRestrictions"
-                                        value={formData.territorialRestrictions}
-                                        onChange={handleChange}
-                                    >
-                                        <option value="worldwide">Worldwide Sales Allowed</option>
-                                        <option value="domestic-only">Domestic (US) Sales Only</option>
-                                        <option value="specified-regions">Specified Geographic Regions</option>
+                                        <option value="seller-retains">Seller Retains All Rights (safest)</option>
+                                        <option value="shared">Shared Marketing Rights</option>
+                                        <option value="marketplace-license">Marketplace License Rights</option>
                                     </select>
                                 </div>
                             </div>
                         )}
 
                         {/* Legal Analysis Tab */}
-                        {currentTab === 7 && (
+                        {currentTab === 6 && (
                             <div>
                                 <h2>Legal Analysis & Risk Assessment</h2>
                                 <p style={{ marginBottom: '1.5rem', color: '#6b7280' }}>
@@ -1409,13 +1090,7 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                         
                         <button
                             className="btn download"
-                            onClick={() => {
-                                if (!isPaid) {
-                                    setShowPaywall(true);
-                                    return;
-                                }
-                                window.generateWordDocument && window.generateWordDocument(documentText, formData);
-                            }}
+                            onClick={() => window.generateWordDocument && window.generateWordDocument(documentText, formData)}
                         >
                             📄 Download DOCX
                         </button>
@@ -1438,65 +1113,12 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                     </div>
                     <div className="preview-content" ref={previewRef}>
                         <div 
-                            className={`document-preview ${!isPaid ? 'non-copyable' : ''}`}
                             style={{ whiteSpace: 'pre-wrap', fontFamily: 'Times, serif', fontSize: '0.85rem', lineHeight: '1.6' }}
                             dangerouslySetInnerHTML={{ __html: highlightedText.replace(/\n/g, '<br>') }}
                         />
                     </div>
                 </div>
             </div>
-
-            {/* Paywall Modal */}
-            {showPaywall && (
-                <div className="paywall-overlay">
-                    <div className="paywall-modal">
-                        <div className="paywall-header">
-                            <h2>🔒 Unlock Full Access</h2>
-                            <button 
-                                className="close-btn"
-                                onClick={() => setShowPaywall(false)}
-                            >
-                                ×
-                            </button>
-                        </div>
-                        <div className="paywall-content">
-                            <div className="paywall-features">
-                                <h3>Get instant access to:</h3>
-                                <ul>
-                                    <li>✅ Copy the complete marketplace seller agreement</li>
-                                    <li>✅ Download professional Word document (.docx)</li>
-                                    <li>✅ Unlimited customizations and regenerations</li>
-                                    <li>✅ Professional legal document formatting</li>
-                                    <li>✅ Lifetime access to your agreement</li>
-                                </ul>
-                            </div>
-                            <div className="pricing">
-                                <div className="price">$14.95</div>
-                                <div className="price-subtitle">One-time payment • Instant access</div>
-                            </div>
-                            <div className="payment-options">
-                                <div id="paypal-button-container"></div>
-                                <div className="alternative-payment">
-                                    <p>Alternative payment: <a href="https://paypal.me/termslawowner/14.95" target="_blank" rel="noopener noreferrer">PayPal.me/termslawowner/14.95</a></p>
-                                    <p>Already paid? Enter your PayPal Transaction ID:</p>
-                                    <input 
-                                        type="text" 
-                                        id="transaction-id" 
-                                        placeholder="Enter PayPal Transaction ID" 
-                                        className="transaction-input"
-                                    />
-                                    <button 
-                                        onClick={validatePayment}
-                                        className="btn validate-btn"
-                                    >
-                                        Validate Payment
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };
