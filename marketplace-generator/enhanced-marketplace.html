@@ -35,7 +35,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=test&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
 </head>
 <body style="margin: 0; background: #f8f9fa;">
     <div id="root"></div>
@@ -53,16 +53,26 @@
                 companyName: 'Example Marketplace LLC',
                 contactEmail: 'contact@example-marketplace.com',
                 companyAddress: '123 Main Street, San Francisco, CA 94105',
+                websiteUrl: 'www.example-marketplace.com',
                 commissionPercentage: '15',
-                paymentSchedule: 'bi-weekly',
+                transactionFee: '0.59',
+                paymentSchedule: 'monthly',
+                paymentMethod: 'paypal',
                 returnTimeframe: '30',
+                returnPolicy: 'store-credit',
                 governingState: 'California',
                 intellectualProperty: 'basic',
                 platformRole: 'limited-liability',
                 disputeResolution: 'courts',
                 listingFee: '0',
                 minimumOrderValue: '0',
-                shippingPolicy: 'seller-responsible'
+                shippingPolicy: 'shared',
+                fulfillmentTimeframe: '2-3 business days',
+                terminationNotice: '30',
+                prohibitedItems: 'Standard prohibited items list',
+                listingRequirements: 'Standard listing requirements',
+                qualityStandards: 'Standard quality standards',
+                immediateTerminationReasons: 'Breach of agreement, violation of policies, fraudulent activity'
             });
 
             const handleChange = (e) => {
@@ -94,10 +104,19 @@
                     companyName: formData.companyName,
                     companyAddress: formData.companyAddress,
                     contactEmail: formData.contactEmail,
+                    websiteUrl: formData.websiteUrl,
                     commissionPercentage: formData.commissionPercentage + '%',
+                    transactionFee: '$' + formData.transactionFee,
                     paymentSchedule: formData.paymentSchedule,
+                    paymentMethod: formData.paymentMethod,
                     returnTimeframe: formData.returnTimeframe,
-                    governingState: formData.governingState
+                    returnPolicy: formData.returnPolicy,
+                    governingState: formData.governingState,
+                    fulfillmentTimeframe: formData.fulfillmentTimeframe,
+                    terminationNotice: formData.terminationNotice,
+                    prohibitedItems: formData.prohibitedItems,
+                    listingRequirements: formData.listingRequirements,
+                    qualityStandards: formData.qualityStandards
                 };
 
                 const valueToHighlight = fieldMappings[fieldName];
@@ -129,43 +148,40 @@
                     day: 'numeric'
                 });
 
+                const getReturnPolicySection = () => {
+                    switch(formData.returnPolicy) {
+                        case 'full-refund':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for a full refund. Items must be in original condition and packaging. Refunds will be processed within 3-5 business days of receiving the returned item.`;
+                        case 'store-credit':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for store credit only. Items must be in original condition and packaging. Store credit never expires and can be used for future purchases. Return shipping costs are the responsibility of the customer. Store credit will be issued within 3-5 business days of receiving the returned item.`;
+                        case 'exchange-only':
+                            return `Returns are accepted within ${formData.returnTimeframe} days of delivery for exchange only. Items must be in original condition and packaging. Exchanges are processed within 5-7 business days of receiving the returned item.`;
+                        default:
+                            return `Returns are processed according to standard marketplace policies within ${formData.returnTimeframe} days.`;
+                    }
+                };
+
                 const getIPSection = () => {
                     switch(formData.intellectualProperty) {
                         case 'basic':
-                            return `Sellers represent and warrant that all products listed comply with applicable intellectual property laws. Sellers grant the Platform a limited license to display product information for marketing purposes. The Platform reserves the right to remove listings that may infringe third-party intellectual property rights.`;
+                            return `Seller retains ownership of product IP but grants Marketplace basic rights to use product content for platform operations and marketing purposes.`;
                         case 'comprehensive':
-                            return `Sellers retain all intellectual property rights in their products and content. By listing products, Sellers grant the Platform a worldwide, non-exclusive, royalty-free license to use, reproduce, display, and distribute product information for Platform operations. Sellers must provide proper attribution for any licensed content and warrant they have all necessary rights. The Platform will respond to valid DMCA takedown notices and maintain a repeat infringer policy.`;
+                            return `Seller retains ownership of product IP but grants Marketplace shared rights to use, modify, and create derivative works of product content for platform operations and marketing purposes.`;
                         case 'strict':
-                            return `All intellectual property rights remain with their respective owners. Sellers must provide detailed IP clearance documentation for each product. The Platform maintains a zero-tolerance policy for IP infringement and will immediately remove suspected infringing content. Sellers indemnify the Platform against IP claims and must participate in IP verification processes.`;
+                            return `Seller retains full ownership and control of all intellectual property. Marketplace receives only limited display rights necessary for platform operations.`;
                         default:
-                            return `Basic intellectual property compliance is required.`;
+                            return `Standard intellectual property terms apply.`;
                     }
-                };
-
-                const getPlatformRoleSection = () => {
-                    switch(formData.platformRole) {
-                        case 'limited-liability':
-                            return `The Platform acts solely as a technology intermediary connecting buyers and sellers. The Platform does not manufacture, store, or ship products, nor does it provide customer service for individual transactions. All sales contracts are directly between buyers and sellers. The Platform's liability is limited to the technology services provided.`;
-                        case 'marketplace-facilitator':
-                            return `The Platform facilitates transactions between independent sellers and buyers. While we provide payment processing and basic dispute resolution, sellers remain solely responsible for product quality, shipping, and customer service. The Platform may assist with transaction issues but is not liable for seller performance.`;
-                        default:
-                            return `The Platform provides technology services to facilitate marketplace transactions.`;
-                    }
-                };
-
-                const getDisputeSection = () => {
-                    if (formData.disputeResolution === 'courts') {
-                        return `Any disputes arising from this Agreement shall be resolved in the courts of ${formData.governingState}. Both parties consent to the jurisdiction of state and federal courts located in ${formData.governingState}.`;
-                    }
-                    return `Disputes shall be resolved through appropriate legal channels.`;
                 };
 
                 const getShippingSection = () => {
                     switch(formData.shippingPolicy) {
                         case 'seller-responsible':
                             return `Sellers are solely responsible for packaging, shipping, and delivery of all products. Sellers must provide accurate shipping information and tracking details to buyers. The Platform is not responsible for shipping delays, damages, or lost packages.`;
-                        case 'platform-assisted':
-                            return `The Platform may provide shipping label services and preferred carrier relationships. Sellers remain responsible for timely fulfillment but may utilize Platform shipping tools. Shipping costs and delivery timeframes are managed through the Platform's shipping integration.`;
+                        case 'shared':
+                            return `Fulfillment responsibilities are shared between Seller and Marketplace according to product type and shipping destination. Specific arrangements will be detailed in separate fulfillment agreements.`;
+                        case 'platform-managed':
+                            return `The Platform manages all shipping and fulfillment operations. Sellers are responsible for providing accurate product information and maintaining inventory levels.`;
                         default:
                             return `Shipping responsibilities are defined by seller policies.`;
                     }
@@ -175,80 +191,141 @@
 
 Date: ${currentDate}
 
-This Marketplace Seller Agreement ("Agreement") is entered into between ${formData.companyName}, a company located at ${formData.companyAddress} ("Platform"), and the individual or entity agreeing to these terms ("Seller") for the purpose of selling products on the ${formData.marketplaceName} platform.
+This Marketplace Seller Agreement ("Agreement") is entered into between ${formData.companyName} ("Marketplace" or "Company"), a company located at ${formData.companyAddress}, and the individual or entity agreeing to these terms ("Seller" or "you") for the purpose of selling products or services on the ${formData.marketplaceName} platform located at ${formData.websiteUrl}.
 
-1. SELLER OBLIGATIONS AND RESPONSIBILITIES
+WHEREAS, Marketplace operates an online platform that connects buyers with sellers; and WHEREAS, Seller desires to offer products for sale through the Marketplace platform; NOW, THEREFORE, in consideration of the mutual covenants contained herein, the parties agree as follows:
 
-1.1 Product Listings: Sellers must provide accurate, complete, and truthful product descriptions, including all material information that would influence a buyer's purchasing decision. All product images must accurately represent the items being sold.
+1. MARKETPLACE PLATFORM AND SERVICES
 
-1.2 Inventory Management: Sellers are responsible for maintaining accurate inventory levels and promptly updating product availability. Out-of-stock items must be removed or marked as unavailable within 24 hours.
+1.1 Platform Description: ${formData.marketplaceName} is an online marketplace that connects buyers with sellers of various products and services. The platform provides tools for product listing, order management, payment processing, and customer communication.
 
-1.3 Order Fulfillment: Sellers must fulfill orders within the timeframe specified in their listings and maintain professional communication with buyers throughout the transaction process.
+1.2 Services Provided: Marketplace provides Seller with access to the platform's listing tools, payment processing systems, customer base, marketing opportunities, and technical support. The platform handles secure payment processing, provides basic analytics, and offers customer service support as specified in this Agreement.
 
-2. FINANCIAL TERMS
+1.3 Contact Information: For questions regarding this Agreement or platform services, contact us at ${formData.contactEmail}. Business hours are Monday through Friday, 9:00 AM to 6:00 PM Pacific Time. Emergency support is available 24/7 for payment and security issues.
 
-2.1 Commission Structure: The Platform charges a commission of ${formData.commissionPercentage}% of the gross sale price for each completed transaction. This commission covers payment processing, platform maintenance, and basic seller support services.
+1.4 Platform Modifications: Marketplace reserves the right to modify, update, or discontinue any aspect of the platform with reasonable notice to Sellers. Major changes affecting Seller operations will be communicated at least 30 days in advance.
 
-2.2 Payment Schedule: Payments to Sellers will be made ${formData.paymentSchedule}, subject to successful completion of transactions and any applicable hold periods for new sellers or high-risk categories.
+2. COMMISSION STRUCTURE AND FEES
 
-${formData.listingFee !== '0' ? `2.3 Listing Fees: A listing fee of $${formData.listingFee} applies to each active product listing, charged monthly regardless of sales activity.` : ''}
+2.1 Commission Rate: The Marketplace will charge a commission of ${formData.commissionPercentage}% of the gross sale price (including shipping charges and taxes) for each completed transaction. Commission is calculated on the total amount paid by the customer, excluding any refunds or chargebacks.
 
-${formData.minimumOrderValue !== '0' ? `2.4 Minimum Order Value: Sellers must maintain a minimum order value of $${formData.minimumOrderValue} per transaction.` : ''}
+2.2 Transaction Fees: In addition to the commission, a flat transaction processing fee of $${formData.transactionFee} will be charged per completed transaction to cover payment processing costs, fraud protection, and administrative expenses.
 
-3. RETURN AND REFUND POLICY
+2.3 Payment Schedule and Method: Payments to Sellers will be made ${formData.paymentSchedule} via ${formData.paymentMethod}. Payments include all sales proceeds minus applicable commissions, fees, refunds, and chargebacks. Payment schedules may be subject to standard banking delays.
 
-3.1 Return Timeframe: Customers may return items within ${formData.returnTimeframe} days of delivery for a full refund, provided items are in original, unused condition with all original packaging and tags.
+2.4 Payment Processing and Holds: All payments are subject to Marketplace's standard payment processing procedures. Payments may be held or delayed for verification, fraud prevention, dispute resolution, or compliance with applicable laws. New sellers may experience longer hold periods during the initial 90-day evaluation period.
 
-3.2 Return Process: Returns must be initiated through the Platform's return system. Sellers must provide prepaid return labels for defective items or items that do not match the description. For buyer remorse returns, return shipping costs may be deducted from the refund.
+2.5 Fee Changes: Marketplace may modify commission rates or fees with 60 days' written notice to Sellers. Continued use of the platform after such notice constitutes acceptance of the new fee structure.
 
-3.3 Refund Processing: Refunds must be processed within 3 business days of receiving returned items. The Platform may issue immediate refunds to buyers and subsequently recover funds from Sellers for qualifying returns.
+2.6 Chargebacks and Refunds: Sellers are responsible for all chargebacks, refunds, and disputed transactions. Such amounts will be deducted from future payments or charged to Seller's designated payment method.
 
-4. INTELLECTUAL PROPERTY
+${formData.listingFee !== '0' ? `2.7 Listing Fees: A listing fee of $${formData.listingFee} applies to each active product listing, charged monthly regardless of sales activity.` : ''}
 
-${getIPSection()}
+${formData.minimumOrderValue !== '0' ? `2.8 Minimum Order Value: Sellers must maintain a minimum order value of $${formData.minimumOrderValue} per transaction.` : ''}
 
-5. PLATFORM ROLE AND LIMITATIONS
+3. PRODUCT REQUIREMENTS AND RESTRICTIONS
 
-${getPlatformRoleSection()}
+3.1 Prohibited Items: The following items and categories are strictly prohibited on the Marketplace: ${formData.prohibitedItems}. This list is not exhaustive, and Marketplace reserves the right to prohibit additional items that violate applicable laws, infringe intellectual property rights, or are deemed inappropriate for the platform.
 
-6. SHIPPING AND FULFILLMENT
+3.2 Listing Requirements: All product listings must meet the following standards: ${formData.listingRequirements}. Listings must be accurate, complete, and regularly updated. False or misleading information may result in listing removal and account suspension.
 
-${getShippingSection()}
+3.3 Quality Standards: All products must meet marketplace quality standards. Products must be authentic, legal, and safe for consumer use. ${formData.qualityStandards}. The Marketplace reserves the right to remove listings that do not meet these standards and may require additional documentation or certifications for certain product categories.
 
-7. SELLER CONDUCT AND COMPLIANCE
+3.4 Compliance Requirements: Sellers must ensure all products comply with applicable federal, state, and local laws, regulations, and safety standards. This includes but is not limited to product safety regulations, labeling requirements, import/export restrictions, and tax obligations.
 
-7.1 Prohibited Activities: Sellers may not engage in price manipulation, fake reviews, trademark infringement, or sale of prohibited items as defined in the Platform's prohibited items policy.
+3.5 Intellectual Property: Sellers warrant that all listed products do not infringe upon any third-party intellectual property rights, including trademarks, copyrights, and patents. Sellers agree to indemnify Marketplace against any intellectual property claims related to their products.
 
-7.2 Account Standing: Sellers must maintain good account standing, defined as order defect rate below 2%, on-time shipping rate above 95%, and customer service response time under 24 hours.
+4. FULFILLMENT AND SHIPPING
 
-7.3 Compliance Requirements: Sellers must comply with all applicable laws, regulations, and industry standards relevant to their products and business operations.
+4.1 Fulfillment Responsibility: ${getShippingSection()}
 
-8. TERMINATION
+4.2 Shipping Timeframes: Orders must be processed and shipped within ${formData.fulfillmentTimeframe} of order confirmation, excluding weekends and holidays. Expedited orders may have shorter processing requirements as specified at the time of sale.
 
-8.1 Termination Rights: Either party may terminate this Agreement at any time with 30 days written notice. The Platform may immediately terminate for material breaches, including but not limited to IP infringement, fraud, or repeated policy violations.
+4.3 Shipping Standards: Sellers must provide accurate tracking information within 24 hours of shipment, use appropriate packaging to prevent damage during transit, and include all necessary documentation. Insurance is recommended for high-value items.
 
-8.2 Effect of Termination: Upon termination, Sellers must complete all pending orders and may not list new products. The Platform will continue to collect commissions on transactions completed within 60 days of termination.
+4.4 Shipping Costs: Shipping costs may be charged separately to customers or included in product pricing at Seller's discretion. Sellers are responsible for accurate shipping cost calculations and any shipping cost discrepancies.
 
-9. GOVERNING LAW AND DISPUTES
+5. RETURNS AND REFUNDS
 
-9.1 Governing Law: This Agreement shall be governed by and construed in accordance with the laws of the State of ${formData.governingState}, without regard to conflict of law principles.
+5.1 Return Policy: ${getReturnPolicySection()}
 
-9.2 Dispute Resolution: ${getDisputeSection()}
+5.2 Return Processing: Returns must be processed promptly according to the applicable return policy. Sellers must inspect returned items within 2 business days of receipt and process refunds or exchanges within the specified timeframes.
 
-10. CONTACT INFORMATION
+5.3 Customer Service Responsibility: Seller is responsible for providing customer service for their products, including answering customer inquiries, handling complaints, and resolving issues. Response time should be within 24 hours during business days.
 
-For questions regarding this Agreement or Platform policies, contact us at ${formData.contactEmail}.
+5.4 Damaged or Defective Items: Items damaged during shipping or found to be defective must be replaced or refunded at no cost to the customer, including return shipping expenses. Seller must investigate and respond to such claims within 48 hours.
 
-11. ENTIRE AGREEMENT
+6. TERM AND TERMINATION
 
-This Agreement constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein. This Agreement may only be modified in writing, signed by authorized representatives of both parties.
+6.1 Term: This Agreement shall commence upon acceptance and remain in effect until terminated by either party in accordance with the terms herein.
 
-By using the Platform and listing products for sale, Seller acknowledges that they have read, understood, and agree to be bound by all terms and conditions of this Agreement.
+6.2 Termination Notice: Either party may terminate this Agreement with ${formData.terminationNotice} days' written notice to the other party. Termination notice must be provided in writing via email or certified mail.
+
+6.3 Immediate Termination: Marketplace may terminate this Agreement immediately, without notice, for the following reasons: ${formData.immediateTerminationReasons}, repeated violation of platform policies, sale of prohibited items, or failure to maintain required seller performance metrics.
+
+6.4 Post-Termination Obligations: Upon termination, Seller must: Complete pending orders, honor return policy, provide customer service for previously sold items during any applicable warranty period, and cease use of Marketplace trademarks and proprietary information. All payment obligations survive termination.
+
+6.5 Effect of Termination: Upon termination, Seller's access to the platform will be revoked, active listings will be removed, and pending orders will be handled according to Marketplace policies. Outstanding payments will be processed according to normal payment schedules, subject to any holds or reserves.
+
+7. INTELLECTUAL PROPERTY
+
+7.1 Seller IP Ownership: ${getIPSection()}
+
+7.2 License to Marketplace: Seller grants Marketplace a non-exclusive, worldwide, royalty-free license to use, reproduce, display, and distribute Seller's product images, descriptions, and other content for the purpose of operating the marketplace, processing orders, marketing products, and providing customer service.
+
+7.3 Marketplace IP: All Marketplace platform technology, software, trademarks, trade names, logos, and proprietary information remain the exclusive property of Marketplace. Seller receives no ownership rights in Marketplace IP and may not use Marketplace trademarks except as specifically authorized.
+
+7.4 DMCA Compliance: Marketplace maintains a DMCA takedown policy for intellectual property violations. Sellers must promptly respond to any intellectual property complaints and may have listings removed for verified IP violations.
+
+8. REPRESENTATIONS AND WARRANTIES
+
+8.1 Seller Representations: Seller represents and warrants that: (a) they have full legal authority to enter into this Agreement; (b) they have the right to sell all listed products; (c) all product information provided is accurate, complete, and truthful; (d) they will comply with all applicable laws, regulations, and platform policies; (e) they have obtained all necessary licenses, permits, and approvals for their business operations; (f) their products do not infringe any third-party intellectual property rights; and (g) their products are safe for consumer use and comply with applicable safety standards.
+
+8.2 Marketplace Disclaimers: EXCEPT AS EXPRESSLY SET FORTH HEREIN, MARKETPLACE MAKES NO WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT. MARKETPLACE DOES NOT WARRANT UNINTERRUPTED PLATFORM AVAILABILITY, ERROR-FREE OPERATION, OR SPECIFIC SALES RESULTS.
+
+8.3 Product Warranties: Sellers are solely responsible for all product warranties and guarantees. Any warranties offered by Seller are independent of this Agreement and do not create obligations for Marketplace.
+
+9. LIMITATION OF LIABILITY
+
+9.1 Liability Limitations: Each party's liability under this Agreement is limited to direct damages only. Neither party excludes liability for death, personal injury, fraud, or any other liability that cannot be excluded by law. Maximum liability is capped at the fees paid under this Agreement in the preceding 12 months.
+
+9.2 Risk Allocation: Seller acknowledges that selling through an online marketplace involves inherent risks, including but not limited to payment processing risks, shipping risks, and customer satisfaction risks. Seller assumes these risks and agrees that Marketplace is not responsible for business losses or operational challenges.
+
+10. GOVERNING LAW AND DISPUTE RESOLUTION
+
+10.1 Governing Law: This Agreement shall be governed by and construed in accordance with the laws of ${formData.governingState}, without regard to conflict of law principles.
+
+10.2 Dispute Resolution: Any disputes arising under this Agreement shall be resolved through litigation in the state and federal courts located in ${formData.governingState}. Each party consents to the personal jurisdiction of such courts and waives any objection to venue. The prevailing party in any litigation shall be entitled to recover reasonable attorneys' fees and costs from the non-prevailing party.
+
+10.3 Class Action Waiver: Both parties waive any right to participate in class action lawsuits or class-wide arbitration regarding disputes under this Agreement.
+
+11. GENERAL PROVISIONS
+
+11.1 Entire Agreement: This Agreement, together with any referenced policies and terms, constitutes the entire agreement between the parties and supersedes all prior negotiations, representations, or agreements relating to the subject matter herein.
+
+11.2 Amendment: This Agreement may only be amended by written agreement signed by both parties, or by Marketplace providing 30 days' notice of changes to Seller.
+
+11.3 Severability: If any provision of this Agreement is held to be invalid, illegal, or unenforceable, the validity, legality, and enforceability of the remaining provisions shall remain in full force and effect.
+
+11.4 Assignment: Seller may not assign, transfer, or delegate this Agreement or any rights or obligations hereunder without the prior written consent of Marketplace. Marketplace may assign this Agreement without restriction.
+
+11.5 Force Majeure: Neither party shall be liable for any failure or delay in performance due to causes beyond their reasonable control, including but not limited to acts of God, war, terrorism, pandemics, government regulations, labor strikes, or technical failures.
+
+11.6 Independent Contractors: The parties are independent contractors. This Agreement does not create a partnership, joint venture, agency, or employment relationship.
+
+11.7 Waiver: The failure of either party to enforce any provision of this Agreement shall not constitute a waiver of that provision or any other provision.
+
+11.8 Survival: Provisions relating to payment obligations, intellectual property, confidentiality, limitation of liability, and dispute resolution shall survive termination of this Agreement.
+
+12. ACCEPTANCE
+
+By clicking to accept this Agreement or by using the Platform to sell Products, Seller acknowledges that they have read, understood, and agree to be bound by the terms and conditions of this Agreement.
+
+Electronic Signature: This Agreement may be executed electronically, and electronic signatures shall have the same legal effect as original signatures.
 
 ---
 
-Document generated on ${currentDate} using the Marketplace Seller Agreement Generator.
-Legal Notice: This document is for informational purposes only and does not constitute legal advice. Consult with a qualified attorney for legal guidance specific to your situation.`;
+IMPORTANT NOTICE: This document was generated on ${currentDate} using the Marketplace Seller Agreement Generator at terms.law. This is a general template and should be reviewed by qualified legal counsel before use. Laws vary by jurisdiction and business circumstances.`;
             };
 
             const handlePayment = () => {
@@ -488,6 +565,19 @@ Legal Notice: This document is for informational purposes only and does not cons
                                                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
                                             />
                                         </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Website URL
+                                            </label>
+                                            <input
+                                                type="text"
+                                                name="websiteUrl"
+                                                value={formData.websiteUrl}
+                                                onChange={handleChange}
+                                                placeholder="www.example.com"
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            />
+                                        </div>
                                     </div>
                                 )}
 
@@ -512,6 +602,54 @@ Legal Notice: This document is for informational purposes only and does not cons
                                             </div>
                                             <div>
                                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Transaction Fee ($)
+                                                </label>
+                                                <input
+                                                    type="number"
+                                                    name="transactionFee"
+                                                    value={formData.transactionFee}
+                                                    onChange={handleChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Payment Schedule
+                                                </label>
+                                                <select
+                                                    name="paymentSchedule"
+                                                    value={formData.paymentSchedule}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="weekly">Weekly</option>
+                                                    <option value="bi-weekly">Bi-weekly</option>
+                                                    <option value="monthly">Monthly</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Payment Method
+                                                </label>
+                                                <select
+                                                    name="paymentMethod"
+                                                    value={formData.paymentMethod}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="paypal">PayPal</option>
+                                                    <option value="bank-transfer">Bank Transfer</option>
+                                                    <option value="check">Check</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
                                                     Return Days
                                                 </label>
                                                 <input
@@ -524,21 +662,21 @@ Legal Notice: This document is for informational purposes only and does not cons
                                                     style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
                                                 />
                                             </div>
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Payment Schedule
-                                            </label>
-                                            <select
-                                                name="paymentSchedule"
-                                                value={formData.paymentSchedule}
-                                                onChange={handleChange}
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                            >
-                                                <option value="weekly">Weekly</option>
-                                                <option value="bi-weekly">Bi-weekly</option>
-                                                <option value="monthly">Monthly</option>
-                                            </select>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Return Policy
+                                                </label>
+                                                <select
+                                                    name="returnPolicy"
+                                                    value={formData.returnPolicy}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="full-refund">Full Refund</option>
+                                                    <option value="store-credit">Store Credit Only</option>
+                                                    <option value="exchange-only">Exchange Only</option>
+                                                </select>
+                                            </div>
                                         </div>
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                                             <div>
@@ -570,19 +708,100 @@ Legal Notice: This document is for informational purposes only and does not cons
                                                 />
                                             </div>
                                         </div>
+                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Shipping Policy
+                                                </label>
+                                                <select
+                                                    name="shippingPolicy"
+                                                    value={formData.shippingPolicy}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="seller-responsible">Seller Responsible</option>
+                                                    <option value="shared">Shared Responsibility</option>
+                                                    <option value="platform-managed">Platform Managed</option>
+                                                </select>
+                                            </div>
+                                            <div>
+                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                    Fulfillment Timeframe
+                                                </label>
+                                                <select
+                                                    name="fulfillmentTimeframe"
+                                                    value={formData.fulfillmentTimeframe}
+                                                    onChange={handleChange}
+                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                                >
+                                                    <option value="1 business day">1 business day</option>
+                                                    <option value="2-3 business days">2-3 business days</option>
+                                                    <option value="3-5 business days">3-5 business days</option>
+                                                    <option value="5-7 business days">5-7 business days</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                         <div style={{ marginBottom: '1rem' }}>
                                             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Shipping Policy
+                                                Termination Notice (Days)
                                             </label>
-                                            <select
-                                                name="shippingPolicy"
-                                                value={formData.shippingPolicy}
+                                            <input
+                                                type="number"
+                                                name="terminationNotice"
+                                                value={formData.terminationNotice}
                                                 onChange={handleChange}
+                                                min="0"
+                                                max="180"
                                                 style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                            >
-                                                <option value="seller-responsible">Seller Responsible</option>
-                                                <option value="platform-assisted">Platform Assisted</option>
-                                            </select>
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Prohibited Items
+                                            </label>
+                                            <textarea
+                                                name="prohibitedItems"
+                                                value={formData.prohibitedItems}
+                                                onChange={handleChange}
+                                                placeholder="List prohibited items..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Listing Requirements
+                                            </label>
+                                            <textarea
+                                                name="listingRequirements"
+                                                value={formData.listingRequirements}
+                                                onChange={handleChange}
+                                                placeholder="Specify listing requirements..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Quality Standards
+                                            </label>
+                                            <textarea
+                                                name="qualityStandards"
+                                                value={formData.qualityStandards}
+                                                onChange={handleChange}
+                                                placeholder="Define quality standards..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
+                                        </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Immediate Termination Reasons
+                                            </label>
+                                            <textarea
+                                                name="immediateTerminationReasons"
+                                                value={formData.immediateTerminationReasons}
+                                                onChange={handleChange}
+                                                placeholder="List reasons for immediate termination..."
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
+                                            />
                                         </div>
                                     </div>
                                 )}
