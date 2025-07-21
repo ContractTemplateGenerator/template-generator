@@ -1,7 +1,6 @@
 const { useState, useEffect, useCallback, useRef } = React;
 
 const MarketplaceGenerator = () => {
-    const [paymentState, setPaymentState] = useState({ isPaymentCompleted: false });
     const [agreementData, setAgreementData] = useState({
         marketplaceInfo: {
             marketplaceName: '',
@@ -45,20 +44,7 @@ const MarketplaceGenerator = () => {
     const [activeSection, setActiveSection] = useState(0);
     const [completionStatus, setCompletionStatus] = useState([false, false, false, false, false, false]);
 
-    // Check for existing payment on component mount
-    useEffect(() => {
-        const savedPayment = localStorage.getItem('marketplace-generator-payment');
-        if (savedPayment) {
-            try {
-                const payment = JSON.parse(savedPayment);
-                if (payment.isPaymentCompleted) {
-                    setPaymentState(payment);
-                }
-            } catch (error) {
-                console.error('Error parsing saved payment data:', error);
-            }
-        }
-    }, []);
+    // No payment required - generator is free
 
     // Update functions
     const updateMarketplaceInfo = useCallback((newData) => {
@@ -124,83 +110,7 @@ const MarketplaceGenerator = () => {
         setCompletionStatus(newCompletionStatus);
     }, [agreementData]);
 
-    const handlePaymentSuccess = (payment) => {
-        setPaymentState(payment);
-    };
-
-    // PayPal Paywall Component
-    const PayPalPaywall = () => {
-        const [isLoading, setIsLoading] = useState(false);
-        const [error, setError] = useState('');
-
-        useEffect(() => {
-            if (window.paypal && !isLoading) {
-                window.paypal.Buttons({
-                    createOrder: (_data, actions) => {
-                        setIsLoading(true);
-                        setError('');
-                        return actions.order.create({
-                            purchase_units: [{
-                                amount: {
-                                    value: "19.95",
-                                    currency_code: "USD"
-                                },
-                                description: "Marketplace Seller Agreement Generator"
-                            }],
-                            intent: "CAPTURE"
-                        });
-                    },
-                    onApprove: async (_data, actions) => {
-                        try {
-                            if (actions.order) {
-                                const details = await actions.order.capture();
-                                const paymentData = {
-                                    isPaymentCompleted: true,
-                                    transactionId: details.id,
-                                    paymentDate: new Date().toISOString()
-                                };
-                                
-                                localStorage.setItem('marketplace-generator-payment', JSON.stringify(paymentData));
-                                handlePaymentSuccess(paymentData);
-                            }
-                        } catch (error) {
-                            console.error('Payment capture error:', error);
-                            setError('Payment processing failed. Please try again.');
-                        } finally {
-                            setIsLoading(false);
-                        }
-                    },
-                    onError: (err) => {
-                        console.error('PayPal error:', err);
-                        setError('Payment failed. Please try again.');
-                        setIsLoading(false);
-                    }
-                }).render('#paypal-button-container');
-            }
-        }, []);
-
-        return (
-            <div className="paywall">
-                <h2>Marketplace Seller Agreement Generator</h2>
-                <p>Generate professional marketplace seller agreements with customizable terms</p>
-                <div className="price">$19.95</div>
-                <div>
-                    <ul style={{ textAlign: 'left', marginBottom: '2rem' }}>
-                        <li>✓ Professional marketplace agreement template</li>
-                        <li>✓ Customizable commission structures</li>
-                        <li>✓ Export to Word document</li>
-                        <li>✓ Legal terms and conditions</li>
-                        <li>✓ Instant download</li>
-                    </ul>
-                </div>
-                {error && <div className="error-message">{error}</div>}
-                <div id="paypal-button-container"></div>
-                <p style={{ fontSize: '0.9rem', color: '#6b7280', marginTop: '1rem' }}>
-                    Secure payment powered by PayPal
-                </p>
-            </div>
-        );
-    };
+    // PayPal components removed - generator is now free
 
     // Form Components
     const MarketplaceInfoForm = ({ data, onChange }) => {
@@ -494,18 +404,7 @@ const MarketplaceGenerator = () => {
         );
     };
 
-    // If payment not completed, show paywall
-    if (!paymentState.isPaymentCompleted) {
-        return (
-            <div className="container">
-                <div className="header">
-                    <h1>Marketplace Seller Agreement Generator</h1>
-                    <p>Create professional marketplace seller agreements</p>
-                </div>
-                <PayPalPaywall />
-            </div>
-        );
-    }
+    // Generator is now free - no paywall needed
 
     const sections = [
         { title: 'Marketplace Information' },
