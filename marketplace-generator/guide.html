@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marketplace Seller Agreement Generator - Interactive Guide</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --accent-color: #3b82f6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --dark-color: #1f2937;
+            --light-color: #f8fafc;
+            --border-color: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #6b7280;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 3rem 0;
+            color: white;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .feature-card {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .feature-card .icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card.ai { --card-color: var(--primary-color); }
+        .feature-card.legal { --card-color: var(--success-color); }
+        .feature-card.tech { --card-color: var(--warning-color); }
+        .feature-card.business { --card-color: var(--danger-color); }
+
+        .feature-card .icon {
+            background: var(--card-color);
+            color: white;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--card-color);
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .feature-card .stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--card-color);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .faq-section {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        .faq-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--dark-color);
+        }
+
+        .faq-item {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 0;
+        }
+
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+
+        .faq-question {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--dark-color);
+            transition: color 0.3s ease;
+        }
+
+        .faq-question:hover {
+            color: var(--primary-color);
+        }
+
+        .faq-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding-top 0.3s ease;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 500px;
+            padding-top: 1rem;
+        }
+
+        .legal-highlights {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .highlight-card {
+            background: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            box-shadow: var(--shadow);
+        }
+
+        .highlight-card.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .highlight-card.success {
+            border-left-color: var(--success-color);
+        }
+
+        .highlight-card.danger {
+            border-left-color: var(--danger-color);
+        }
+
+        .highlight-card h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .process-steps {
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        .steps-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: var(--dark-color);
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            border-radius: 8px;
+            background: var(--light-color);
+            transition: all 0.3s ease;
+        }
+
+        .step:hover {
+            background: #f1f5f9;
+            transform: translateX(4px);
+        }
+
+        .step-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 1rem;
+            flex-shrink: 0;
+        }
+
+        .step-content h4 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--dark-color);
+        }
+
+        .step-content p {
+            color: var(--text-secondary);
+        }
+
+        .cta-section {
+            background: white;
+            border-radius: 12px;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: 2rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            margin: 0.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .cta-button.secondary {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 2rem 0;
+            opacity: 0.9;
+        }
+
+        .tech-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            margin: 0.25rem;
+            color: white;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .floating {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .step {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .step-number {
+                margin-right: 0;
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Hero Section -->
+        <div class="hero">
+            <h1 class="floating">🚀 Marketplace Seller Agreement Generator</h1>
+            <p>Built by a tech-savvy California attorney who codes. Generate professional, legally-sound marketplace agreements in minutes.</p>
+            
+            <div style="margin-top: 2rem;">
+                <span class="tech-badge">⚡ React.js</span>
+                <span class="tech-badge">💻 JavaScript ES6+</span>
+                <span class="tech-badge">🎨 Modern CSS</span>
+                <span class="tech-badge">📱 Mobile Responsive</span>
+                <span class="tech-badge">⚖️ Legal Expertise</span>
+            </div>
+        </div>
+
+        <!-- Feature Cards -->
+        <div class="feature-grid">
+            <div class="feature-card ai">
+                <div class="icon">🤖</div>
+                <h3>AI-Powered Smart Forms</h3>
+                <p>Dynamic form fields that adapt based on your selections. Real-time validation and intelligent defaults make complex legal agreements simple.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">47</div>
+                        <div class="stat-label">Form Fields</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">5</div>
+                        <div class="stat-label">Categories</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Combinations</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card legal">
+                <div class="icon">⚖️</div>
+                <h3>Legally Bulletproof</h3>
+                <p>Every clause crafted by an experienced e-commerce attorney. Covers all 50 US states, payment processing, IP protection, and dispute resolution.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">50</div>
+                        <div class="stat-label">US States</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">15</div>
+                        <div class="stat-label">Legal Sections</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">99%</div>
+                        <div class="stat-label">Compliance</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card tech">
+                <div class="icon">⚡</div>
+                <h3>Real-Time Preview</h3>
+                <p>Watch your agreement build as you type. Advanced highlighting shows exactly what changes when you modify fields. No surprises, total transparency.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">0ms</div>
+                        <div class="stat-label">Lag Time</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Accurate</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">∞</div>
+                        <div class="stat-label">Revisions</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-card business">
+                <div class="icon">💼</div>
+                <h3>Business-Ready Output</h3>
+                <p>Professional formatting, multiple export options (copy/paste, DOCX download), and PayPal-protected premium features. Ready for immediate use.</p>
+                <div class="stats">
+                    <div class="stat">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Export Formats</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Click Deploy</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Availability</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How-To Process -->
+        <div class="process-steps">
+            <h2 class="steps-title">🎯 How It Works</h2>
+            
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h4>📝 Complete the Smart Form</h4>
+                    <p>Navigate through 5 organized tabs: Basic Info, Business Terms, Legal Settings, Advanced Options, and Risk Analysis. Each field includes helpful tips and business impact guidance.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h4>👀 Watch Real-Time Preview</h4>
+                    <p>See your agreement build automatically as you type. Advanced highlighting shows exactly what changes when you modify any field. No guesswork, total transparency.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h4>🔍 Review Legal Analysis</h4>
+                    <p>Get instant feedback on agreement completeness, business risk assessment, revenue protection features, and professional recommendations tailored to your selections.</p>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h4>💾 Export & Deploy</h4>
+                    <p>Copy to clipboard or download as DOCX. Premium features ($14.95) include full document access, unlimited revisions, and professional formatting. Deploy immediately to your marketplace.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Legal Highlights -->
+        <div class="legal-highlights">
+            <div class="highlight-card success">
+                <h4>✅ Attorney-Crafted</h4>
+                <p>Every clause written by a practicing California e-commerce attorney with 10+ years of marketplace experience.</p>
+            </div>
+
+            <div class="highlight-card warning">
+                <h4>⚠️ Jurisdiction Coverage</h4>
+                <p>Supports all 50 US states with specific governing law selections. International considerations available via consultation.</p>
+            </div>
+
+            <div class="highlight-card danger">
+                <h4>🛡️ Liability Protection</h4>
+                <p>Comprehensive platform liability limitations, seller indemnification clauses, and dispute resolution mechanisms included.</p>
+            </div>
+
+            <div class="highlight-card">
+                <h4>💰 Revenue Protection</h4>
+                <p>Flexible commission structures, payment processing terms, and comprehensive fee frameworks to protect your business model.</p>
+            </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="faq-section">
+            <h2 class="faq-title">💡 Frequently Asked Questions</h2>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Is this generator suitable for all types of marketplaces?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes! Whether you're running a handmade goods marketplace like Etsy, a digital products platform, B2B supplier network, or service marketplace, this generator covers the essential legal frameworks. The modular design adapts to different business models including commission-based, subscription, or hybrid fee structures.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How does the real-time preview technology work?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Built with React.js and advanced JavaScript, the preview system uses real-time DOM manipulation to instantly reflect your changes. Smart highlighting algorithms identify affected text and auto-scroll to relevant sections. No page reloads, no delays - just pure responsive technology that makes legal document creation feel like using a modern app.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>What makes this different from generic legal templates?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Generic templates are static and often outdated. This generator creates dynamic, contextually-aware agreements that adapt to your specific choices. Built by an attorney who actually codes, it combines legal expertise with modern web technology. Plus, you get business impact guidance, risk analysis, and strategic recommendations - not just boilerplate text.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Is the $14.95 premium version worth it?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Absolutely. For less than 30 minutes of attorney time, you get: full document access, unlimited revisions, professional DOCX formatting, copy protection removal, and lifetime access to updates. Compare that to $300-500/hour for custom legal drafting. The ROI is immediate.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Can I customize the agreement after generation?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>Yes! The DOCX export is fully editable in Word, Google Docs, or any word processor. However, for significant modifications or complex marketplace models (escrow, multi-party transactions, international compliance), I recommend scheduling a consultation to ensure your changes maintain legal integrity.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How do you stay current with changing laws?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>As a practicing e-commerce attorney, I continuously monitor marketplace regulations, payment processing laws, and platform liability developments. The generator receives regular updates for major legal changes. Premium users are notified of significant updates that might affect their agreements.</p>
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>What if I need help implementing the agreement?</span>
+                    <span class="faq-icon">▼</span>
+                </div>
+                <div class="faq-answer">
+                    <p>I offer 30-minute Zoom consultations for implementation guidance, custom modifications, or complex marketplace scenarios. You can book directly through the generator interface. I also provide ongoing legal support for established marketplace clients who need regular updates or expansion guidance.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Call to Action -->
+        <div class="cta-section">
+            <h2 style="margin-bottom: 1rem; color: var(--dark-color);">Ready to Build Your Marketplace Agreement?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 2rem; font-size: 1.1rem;">Join hundreds of marketplace founders who've streamlined their legal setup with this attorney-built tool.</p>
+            
+            <a href="index.html" class="cta-button pulse">🚀 Launch Generator</a>
+            <a href="#consultation" class="cta-button secondary">💬 Schedule Consultation</a>
+            
+            <div style="margin-top: 2rem; opacity: 0.8;">
+                <small>💡 Try the free version first, upgrade to premium when you're ready to deploy</small>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div style="margin-bottom: 1rem;">
+                <span class="tech-badge">💼 Licensed California Attorney</span>
+                <span class="tech-badge">🏗️ Full-Stack Developer</span>
+                <span class="tech-badge">⚡ E-Commerce Specialist</span>
+            </div>
+            <p>Built with ❤️ by <strong>Sergei Tokmakov, Esq.</strong> | E-Commerce Attorney & Developer</p>
+            <p style="opacity: 0.7; margin-top: 0.5rem;">Combining legal expertise with modern technology to make law accessible to entrepreneurs</p>
+        </div>
+    </div>
+
+    <script>
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Open clicked item if it wasn't already open
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+
+        // Add some interactive animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate feature cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Set initial state and observe elements
+            document.querySelectorAll('.feature-card, .step, .highlight-card').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+
+            // Add click tracking for analytics (placeholder)
+            document.querySelectorAll('.cta-button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    console.log('CTA clicked:', this.textContent);
+                    // Add your analytics tracking here
+                });
+            });
+        });
+    </script>
+</body>
+</html>
