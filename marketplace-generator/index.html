@@ -31,62 +31,6 @@
             -moz-user-select: text;
             -ms-user-select: text;
         }
-        
-        .navigation-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 30px;
-            background: #f8f9fa;
-            border-top: 1px solid #dee2e6;
-            border-radius: 0 0 8px 8px;
-        }
-        
-        .nav-button {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            background: white;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            gap: 8px;
-        }
-        
-        .nav-button:hover {
-            background: #f8f9fa;
-            border-color: #007bff;
-        }
-        
-        .nav-button.primary {
-            background: #007bff;
-            color: white;
-            border-color: #007bff;
-        }
-        
-        .nav-button.primary:hover {
-            background: #0056b3;
-            border-color: #0056b3;
-        }
-        
-        .nav-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-        
-        .nav-button:disabled:hover {
-            background: white;
-            border-color: #dee2e6;
-        }
-        
-        .nav-button.primary:disabled:hover {
-            background: #007bff;
-            border-color: #007bff;
-        }
 
         /* PayPal Paywall Styles */
         .paywall-overlay {
@@ -205,7 +149,6 @@
             const [showPaywall, setShowPaywall] = useState(false);
             const [showManualEntry, setShowManualEntry] = useState(false);
             const [paypalId, setPaypalId] = useState('');
-            const [paypalButtonRendered, setPaypalButtonRendered] = useState(false);
             const [formData, setFormData] = useState({
                 marketplaceName: 'Example Marketplace',
                 companyName: 'Example Marketplace LLC',
@@ -239,7 +182,6 @@
                     [name]: value
                 });
                 
-                // Trigger highlighting after state update
                 setTimeout(() => {
                     highlightChangedField(name);
                 }, 100);
@@ -249,13 +191,11 @@
                 const previewElement = document.querySelector('.live-preview-content');
                 if (!previewElement) return;
 
-                // Remove existing highlights
                 const existingHighlights = previewElement.querySelectorAll('.highlight');
                 existingHighlights.forEach(el => {
                     el.classList.remove('highlight');
                 });
 
-                // Map field names to text patterns they affect in the document
                 const fieldMappings = {
                     marketplaceName: formData.marketplaceName,
                     companyName: formData.companyName,
@@ -284,7 +224,6 @@
 
                 let valueToHighlight = fieldMappings[fieldName];
                 
-                // Special handling for dropdown fields that generate dynamic content
                 if (fieldName === 'intellectualProperty') {
                     const ipSections = {
                         'basic': 'Seller retains ownership of product IP but grants Marketplace basic rights',
@@ -315,7 +254,6 @@
                 }
 
                 if (valueToHighlight && valueToHighlight.length > 0) {
-                    // Simple highlighting - this could be enhanced with more sophisticated text matching
                     const textContent = previewElement.innerHTML;
                     const highlightedContent = textContent.replace(
                         new RegExp(`(${escapeRegExp(valueToHighlight)})`, 'gi'),
@@ -323,7 +261,6 @@
                     );
                     previewElement.innerHTML = highlightedContent;
 
-                    // Auto-scroll to first highlight
                     const firstHighlight = previewElement.querySelector('.highlight');
                     if (firstHighlight) {
                         firstHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -335,25 +272,18 @@
                 return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             };
 
-            // PayPal validation function
             const validatePayPalId = (id) => {
-                // Check for 17-character alphanumeric string with only CAPITAL letters
                 if (!id || id.trim().length !== 17) {
                     return false;
                 }
                 
                 const trimmedId = id.trim();
-                
-                // Must contain only capital letters and numbers
                 const hasOnlyCapitalLettersAndNumbers = /^[A-Z0-9]+$/.test(trimmedId);
-                
-                // Must contain at least one capital letter (not all numbers)
                 const hasAtLeastOneCapitalLetter = /[A-Z]/.test(trimmedId);
                 
                 return hasOnlyCapitalLettersAndNumbers && hasAtLeastOneCapitalLetter;
             };
 
-            // Handle manual PayPal unlock
             const handlePayPalUnlock = () => {
                 if (validatePayPalId(paypalId)) {
                     setIsPaid(true);
@@ -563,7 +493,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                 if (isPaid) {
                     copyToClipboard();
                 } else {
-                    // Save form data before showing paywall
                     localStorage.setItem('marketplaceFormData', JSON.stringify(formData));
                     setShowPaywall(true);
                 }
@@ -683,18 +612,15 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                     }
                 }
 
-                // Check if user has already paid
                 const isPaidStatus = localStorage.getItem('marketplacePaid');
                 if (isPaidStatus === 'true') {
                     setIsPaid(true);
                 }
                 
-                // Check for payment success from URL params
                 const urlParams = new URLSearchParams(window.location.search);
                 if (urlParams.get('payment') === 'success') {
                     setIsPaid(true);
                     localStorage.setItem('marketplacePaid', 'true');
-                    // Clean up URL
                     window.history.replaceState({}, document.title, window.location.pathname);
                 }
             }, []);
@@ -953,36 +879,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
                                             <div>
                                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Listing Fee ($)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="listingFee"
-                                                    value={formData.listingFee}
-                                                    onChange={handleChange}
-                                                    min="0"
-                                                    step="0.01"
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                />
-                                            </div>
-                                            <div>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Min Order ($)
-                                                </label>
-                                                <input
-                                                    type="number"
-                                                    name="minimumOrderValue"
-                                                    value={formData.minimumOrderValue}
-                                                    onChange={handleChange}
-                                                    min="0"
-                                                    step="0.01"
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                />
-                                            </div>
-                                        </div>
-                                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                                            <div>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
                                                     Shipping Policy
                                                 </label>
                                                 <select
@@ -1012,68 +908,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                                     <option value="5-7 business days">5-7 business days</option>
                                                 </select>
                                             </div>
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Termination Notice (Days)
-                                            </label>
-                                            <input
-                                                type="number"
-                                                name="terminationNotice"
-                                                value={formData.terminationNotice}
-                                                onChange={handleChange}
-                                                min="0"
-                                                max="180"
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                            />
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Prohibited Items
-                                            </label>
-                                            <textarea
-                                                name="prohibitedItems"
-                                                value={formData.prohibitedItems}
-                                                onChange={handleChange}
-                                                placeholder="List prohibited items..."
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
-                                            />
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Listing Requirements
-                                            </label>
-                                            <textarea
-                                                name="listingRequirements"
-                                                value={formData.listingRequirements}
-                                                onChange={handleChange}
-                                                placeholder="Specify listing requirements..."
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
-                                            />
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Quality Standards
-                                            </label>
-                                            <textarea
-                                                name="qualityStandards"
-                                                value={formData.qualityStandards}
-                                                onChange={handleChange}
-                                                placeholder="Define quality standards..."
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
-                                            />
-                                        </div>
-                                        <div style={{ marginBottom: '1rem' }}>
-                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                Immediate Termination Reasons
-                                            </label>
-                                            <textarea
-                                                name="immediateTerminationReasons"
-                                                value={formData.immediateTerminationReasons}
-                                                onChange={handleChange}
-                                                placeholder="List reasons for immediate termination..."
-                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', minHeight: '60px', resize: 'vertical' }}
-                                            />
                                         </div>
                                     </div>
                                 )}
@@ -1131,241 +965,67 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                 {currentTab === 3 && (
                                     <div>
                                         <h2>Additional Options</h2>
-                                        
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#374151' }}>Seller Eligibility & Verification</h3>
-                                            
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Eligible Seller Types
-                                                </label>
-                                                <select
-                                                    name="sellerEligibility"
-                                                    value={formData.sellerEligibility || 'all'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="all">All (Individuals and Businesses)</option>
-                                                    <option value="individuals">Individuals Only</option>
-                                                    <option value="businesses">Businesses Only</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    👥 Restricting to businesses only may improve quality but reduce scale
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Seller Verification Level
-                                                </label>
-                                                <select
-                                                    name="sellerVerification"
-                                                    value={formData.sellerVerification || 'basic'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="basic">Basic Verification (Email + Phone)</option>
-                                                    <option value="enhanced">Enhanced Verification (ID + Tax Info)</option>
-                                                    <option value="comprehensive">Comprehensive (Background Check + Business License)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    🔒 Higher verification reduces fraud but may slow seller onboarding
-                                                </small>
-                                            </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Seller Verification Level
+                                            </label>
+                                            <select
+                                                name="sellerVerification"
+                                                value={formData.sellerVerification || 'basic'}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="basic">Basic Verification</option>
+                                                <option value="enhanced">Enhanced Verification</option>
+                                                <option value="comprehensive">Comprehensive Verification</option>
+                                            </select>
+                                            <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                                                💡 Higher verification reduces fraud but may slow seller onboarding
+                                            </small>
                                         </div>
 
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#374151' }}>Fees & Payments</h3>
-                                            
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Fee Structure Type
-                                                </label>
-                                                <select
-                                                    name="feeStructureType"
-                                                    value={formData.feeStructureType || 'percentage'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="percentage">Percentage of Sale Only</option>
-                                                    <option value="flat">Flat Fee Per Transaction</option>
-                                                    <option value="subscription">Monthly Subscription Model</option>
-                                                    <option value="combined">Combined (Percentage + Flat Fee)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    💰 Subscription models provide predictable revenue but may deter small sellers
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Minimum Payout Amount
-                                                </label>
-                                                <select
-                                                    name="minimumPayout"
-                                                    value={formData.minimumPayout || '25'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="10">$10.00</option>
-                                                    <option value="25">$25.00</option>
-                                                    <option value="50">$50.00</option>
-                                                    <option value="100">$100.00</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    🏦 Higher minimums reduce processing costs but may frustrate small sellers
-                                                </small>
-                                            </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Quality Assurance Program
+                                            </label>
+                                            <select
+                                                name="qualityProgram"
+                                                value={formData.qualityProgram || 'seller-managed'}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="seller-managed">Seller Self-Managed</option>
+                                                <option value="random">Random Product Sampling</option>
+                                                <option value="comprehensive">Full Product Testing</option>
+                                            </select>
+                                            <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                                                🔍 Quality programs build customer trust but increase costs
+                                            </small>
                                         </div>
 
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#374151' }}>Quality & Communication</h3>
-                                            
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Quality Assurance Program
-                                                </label>
-                                                <select
-                                                    name="qualityProgram"
-                                                    value={formData.qualityProgram || 'seller-managed'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="seller-managed">Seller Self-Managed</option>
-                                                    <option value="random">Random Product Sampling</option>
-                                                    <option value="comprehensive">Full Product Testing Program</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    🔍 Quality programs build customer trust but increase operational costs
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Customer Communication Policy
-                                                </label>
-                                                <select
-                                                    name="communicationPolicy"
-                                                    value={formData.communicationPolicy || 'direct'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="direct">Direct Seller-Customer Contact</option>
-                                                    <option value="platform">Platform-Mediated Only</option>
-                                                    <option value="hybrid">Hybrid (Platform + Direct for Support)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    💬 Platform-mediated communication improves dispute resolution capability
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Seller Performance Tracking
-                                                </label>
-                                                <select
-                                                    name="performanceTracking"
-                                                    value={formData.performanceTracking || 'basic'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="basic">Basic Metrics (Sales, Returns)</option>
-                                                    <option value="detailed">Detailed Analytics (Response Time, Quality Scores)</option>
-                                                    <option value="comprehensive">Full Scorecard (All Metrics + Customer Feedback)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    📊 Comprehensive tracking enables performance-based incentives and tier systems
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#374151' }}>Risk Management</h3>
-                                            
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Insurance Requirements
-                                                </label>
-                                                <select
-                                                    name="insuranceRequirement"
-                                                    value={formData.insuranceRequirement || 'none'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="none">No Insurance Required</option>
-                                                    <option value="general">General Liability ($1M minimum)</option>
-                                                    <option value="comprehensive">General + Product Liability ($2M minimum)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    🛡️ Insurance requirements protect against major claims but may exclude smaller sellers
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Product Category Restrictions
-                                                </label>
-                                                <select
-                                                    name="categoryRestrictions"
-                                                    value={formData.categoryRestrictions || 'standard'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="minimal">Minimal Restrictions (Legal Items Only)</option>
-                                                    <option value="standard">Standard Restrictions (No Adult/Weapons/Hazardous)</option>
-                                                    <option value="strict">Strict Curation (Approved Categories Only)</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    ⚖️ Stricter curation improves brand safety but limits marketplace growth potential
-                                                </small>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#374151' }}>Business Model</h3>
-                                            
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Exclusivity Requirements
-                                                </label>
-                                                <select
-                                                    name="exclusivityLevel"
-                                                    value={formData.exclusivityLevel || 'none'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="none">No Exclusivity Required</option>
-                                                    <option value="category">Category-Specific Exclusivity</option>
-                                                    <option value="platform">Full Platform Exclusivity</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    🎯 Exclusivity enables premium positioning but may reduce seller acquisition
-                                                </small>
-                                            </div>
-
-                                            <div style={{ marginBottom: '1rem' }}>
-                                                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
-                                                    Marketplace Branding Rights
-                                                </label>
-                                                <select
-                                                    name="brandingRights"
-                                                    value={formData.brandingRights || 'limited'}
-                                                    onChange={handleChange}
-                                                    style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
-                                                >
-                                                    <option value="limited">Limited Use for Platform Operations</option>
-                                                    <option value="marketing">Marketing and Promotional Use</option>
-                                                    <option value="comprehensive">Full Marketing and Content Creation Rights</option>
-                                                </select>
-                                                <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
-                                                    📸 Broader rights enable better marketing but may concern privacy-focused sellers
-                                                </small>
-                                            </div>
+                                        <div style={{ marginBottom: '1rem' }}>
+                                            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '600' }}>
+                                                Insurance Requirements
+                                            </label>
+                                            <select
+                                                name="insuranceRequirement"
+                                                value={formData.insuranceRequirement || 'none'}
+                                                onChange={handleChange}
+                                                style={{ width: '100%', padding: '0.75rem', border: '1px solid #d1d5db', borderRadius: '6px' }}
+                                            >
+                                                <option value="none">No Insurance Required</option>
+                                                <option value="general">General Liability ($1M)</option>
+                                                <option value="comprehensive">General + Product Liability ($2M)</option>
+                                            </select>
+                                            <small style={{ color: '#6b7280', fontSize: '0.875rem' }}>
+                                                🛡️ Insurance protects against major claims
+                                            </small>
                                         </div>
                                     </div>
                                 )}
 
                                 {currentTab === 4 && (
+                                    <div>
                                         <h2>Legal Analysis & Business Metrics</h2>
                                         <div style={{ marginBottom: '1.5rem', padding: '1rem', background: '#f8f9fa', borderRadius: '6px' }}>
                                             <h3 style={{ color: '#2563eb', marginBottom: '0.5rem' }}>Agreement Completeness Score</h3>
@@ -1393,56 +1053,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                                     <span>✅ Seller Obligations Defined</span>
                                                     <span style={{ color: '#16a34a', fontWeight: '600' }}>Comprehensive</span>
                                                 </div>
-                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.5rem', background: '#f0fdf4', borderRadius: '4px' }}>
-                                                    <span>✅ Dispute Resolution Mechanism</span>
-                                                    <span style={{ color: '#16a34a', fontWeight: '600' }}>Clear</span>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Revenue Protection Features</h3>
-                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
-                                                <div style={{ padding: '1rem', background: '#fef3c7', borderRadius: '6px', border: '1px solid #f59e0b' }}>
-                                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                        <strong style={{ color: '#92400e' }}>Commission Structure</strong>
-                                                        <span style={{ color: '#92400e', fontWeight: '600' }}>{formData.commissionPercentage}%</span>
-                                                    </div>
-                                                    <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#92400e' }}>
-                                                        {parseFloat(formData.commissionPercentage) > 20 ? 'High commission rate may impact seller acquisition' : 
-                                                         parseFloat(formData.commissionPercentage) < 5 ? 'Low commission rate may impact profitability' :
-                                                         'Balanced commission rate for sustainable growth'}
-                                                    </p>
-                                                </div>
-                                                {formData.listingFee !== '0' && (
-                                                    <div style={{ padding: '1rem', background: '#dbeafe', borderRadius: '6px', border: '1px solid #3b82f6' }}>
-                                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                                            <strong style={{ color: '#1d4ed8' }}>Listing Fees</strong>
-                                                            <span style={{ color: '#1d4ed8', fontWeight: '600' }}>${formData.listingFee}/month</span>
-                                                        </div>
-                                                        <p style={{ margin: '0.5rem 0 0', fontSize: '0.875rem', color: '#1d4ed8' }}>
-                                                            Additional revenue stream from active listings
-                                                        </p>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div style={{ marginBottom: '1.5rem' }}>
-                                            <h3 style={{ color: '#2563eb', marginBottom: '1rem' }}>Recommendations</h3>
-                                            <div style={{ display: 'grid', gap: '0.75rem' }}>
-                                                <div style={{ padding: '1rem', background: '#e0f2fe', borderRadius: '6px', border: '1px solid #0369a1' }}>
-                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#0369a1' }}>💡 Business Growth</h4>
-                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#075985' }}>
-                                                        Consider implementing seller performance tiers with reduced commission rates for high-volume sellers
-                                                    </p>
-                                                </div>
-                                                <div style={{ padding: '1rem', background: '#f3e8ff', borderRadius: '6px', border: '1px solid #7c3aed' }}>
-                                                    <h4 style={{ margin: '0 0 0.5rem', color: '#7c3aed' }}>⚖️ Legal Compliance</h4>
-                                                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b21a8' }}>
-                                                        Review state-specific marketplace facilitator tax obligations for {formData.governingState}
-                                                    </p>
-                                                </div>
                                             </div>
                                         </div>
 
@@ -1455,12 +1065,26 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                     </div>
                                 )}
 
-                                <div className="navigation-buttons">
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 30px', background: '#f8f9fa', borderTop: '1px solid #dee2e6', borderRadius: '0 0 8px 8px' }}>
                                     <button 
                                         onClick={() => setCurrentTab(Math.max(0, currentTab - 1))}
                                         disabled={currentTab === 0}
-                                        className="nav-button"
-                                        style={{ marginRight: 'auto' }}
+                                        style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            padding: '12px 20px', 
+                                            border: '2px solid #dee2e6', 
+                                            borderRadius: '6px', 
+                                            background: 'white', 
+                                            cursor: currentTab === 0 ? 'not-allowed' : 'pointer', 
+                                            fontWeight: '500', 
+                                            transition: 'all 0.3s ease', 
+                                            fontFamily: 'Arial, sans-serif', 
+                                            fontSize: '14px', 
+                                            gap: '8px',
+                                            opacity: currentTab === 0 ? '0.6' : '1',
+                                            marginRight: 'auto'
+                                        }}
                                     >
                                         <i data-feather="chevron-left"></i>
                                         Previous
@@ -1469,14 +1093,41 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                     <div style={{ display: 'flex', gap: '8px' }}>
                                         <button 
                                             onClick={isPaid ? copyToClipboard : handlePayment}
-                                            className={`nav-button ${isPaid ? 'primary' : ''}`}
+                                            style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                padding: '12px 20px', 
+                                                border: '2px solid #007bff', 
+                                                borderRadius: '6px', 
+                                                background: isPaid ? '#007bff' : 'white', 
+                                                color: isPaid ? 'white' : '#007bff',
+                                                cursor: 'pointer', 
+                                                fontWeight: '500', 
+                                                transition: 'all 0.3s ease', 
+                                                fontFamily: 'Arial, sans-serif', 
+                                                fontSize: '14px', 
+                                                gap: '8px'
+                                            }}
                                         >
                                             <i data-feather="copy"></i>
                                             Copy
                                         </button>
                                         <button 
                                             onClick={isPaid ? downloadAsText : handlePayment}
-                                            className="nav-button"
+                                            style={{ 
+                                                display: 'flex', 
+                                                alignItems: 'center', 
+                                                padding: '12px 20px', 
+                                                border: '2px solid #dee2e6', 
+                                                borderRadius: '6px', 
+                                                background: 'white', 
+                                                cursor: 'pointer', 
+                                                fontWeight: '500', 
+                                                transition: 'all 0.3s ease', 
+                                                fontFamily: 'Arial, sans-serif', 
+                                                fontSize: '14px', 
+                                                gap: '8px'
+                                            }}
                                         >
                                             <i data-feather="download"></i>
                                             Download
@@ -1486,8 +1137,22 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
                                     <button 
                                         onClick={() => setCurrentTab(Math.min(tabs.length - 1, currentTab + 1))}
                                         disabled={currentTab === tabs.length - 1}
-                                        className="nav-button"
-                                        style={{ marginLeft: 'auto' }}
+                                        style={{ 
+                                            display: 'flex', 
+                                            alignItems: 'center', 
+                                            padding: '12px 20px', 
+                                            border: '2px solid #dee2e6', 
+                                            borderRadius: '6px', 
+                                            background: 'white', 
+                                            cursor: currentTab === tabs.length - 1 ? 'not-allowed' : 'pointer', 
+                                            fontWeight: '500', 
+                                            transition: 'all 0.3s ease', 
+                                            fontFamily: 'Arial, sans-serif', 
+                                            fontSize: '14px', 
+                                            gap: '8px',
+                                            opacity: currentTab === tabs.length - 1 ? '0.6' : '1',
+                                            marginLeft: 'auto'
+                                        }}
                                     >
                                         Next
                                         <i data-feather="chevron-right"></i>
@@ -1576,7 +1241,6 @@ IMPORTANT NOTICE: This document was generated on ${currentDate} using the Market
 
         ReactDOM.render(<MarketplaceGenerator />, document.getElementById('root'));
 
-        // Initialize Feather icons after React renders
         if (typeof feather !== 'undefined') {
             setTimeout(() => feather.replace(), 100);
         }
