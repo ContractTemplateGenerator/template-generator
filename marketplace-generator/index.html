@@ -219,7 +219,10 @@
                     immediateTerminationReasons: formData.immediateTerminationReasons,
                     shippingPolicy: formData.shippingPolicy,
                     listingFee: formData.listingFee,
-                    minimumOrderValue: formData.minimumOrderValue
+                    minimumOrderValue: formData.minimumOrderValue,
+                    sellerVerification: formData.sellerVerification || 'basic',
+                    qualityProgram: formData.qualityProgram || 'seller-managed',
+                    insuranceRequirement: formData.insuranceRequirement || 'none'
                 };
 
                 let valueToHighlight = fieldMappings[fieldName];
@@ -251,6 +254,27 @@
                         'platform-managed': 'The Platform manages all shipping and fulfillment operations'
                     };
                     valueToHighlight = shippingSections[formData.shippingPolicy] || formData.shippingPolicy;
+                } else if (fieldName === 'sellerVerification') {
+                    const verificationSections = {
+                        'basic': 'Basic Verification',
+                        'enhanced': 'Enhanced Verification',
+                        'comprehensive': 'Comprehensive Verification'
+                    };
+                    valueToHighlight = verificationSections[formData.sellerVerification] || formData.sellerVerification;
+                } else if (fieldName === 'qualityProgram') {
+                    const qualitySections = {
+                        'seller-managed': 'Seller Self-Managed',
+                        'random': 'Random Product Sampling',
+                        'comprehensive': 'Full Product Testing'
+                    };
+                    valueToHighlight = qualitySections[formData.qualityProgram] || formData.qualityProgram;
+                } else if (fieldName === 'insuranceRequirement') {
+                    const insuranceSections = {
+                        'none': 'No Insurance Required',
+                        'general': 'General Liability ($1M)',
+                        'comprehensive': 'General + Product Liability ($2M)'
+                    };
+                    valueToHighlight = insuranceSections[formData.insuranceRequirement] || formData.insuranceRequirement;
                 }
 
                 if (valueToHighlight && valueToHighlight.length > 0) {
@@ -348,6 +372,45 @@
                     }
                 };
 
+                const getSellerVerificationSection = () => {
+                    switch(formData.sellerVerification) {
+                        case 'basic':
+                            return 'Basic Verification requirements include identity confirmation and basic business documentation.';
+                        case 'enhanced':
+                            return 'Enhanced Verification includes comprehensive background checks, business registration verification, and financial standing confirmation.';
+                        case 'comprehensive':
+                            return 'Comprehensive Verification requires extensive documentation review, third-party validation, and ongoing compliance monitoring.';
+                        default:
+                            return 'Basic Verification requirements apply to all sellers.';
+                    }
+                };
+
+                const getQualityProgramSection = () => {
+                    switch(formData.qualityProgram) {
+                        case 'seller-managed':
+                            return 'Seller Self-Managed quality control with seller responsibility for product standards and customer satisfaction.';
+                        case 'random':
+                            return 'Random Product Sampling program includes periodic marketplace quality testing and review processes.';
+                        case 'comprehensive':
+                            return 'Full Product Testing program requires mandatory pre-listing quality verification and ongoing compliance monitoring.';
+                        default:
+                            return 'Standard quality assurance procedures apply.';
+                    }
+                };
+
+                const getInsuranceSection = () => {
+                    switch(formData.insuranceRequirement) {
+                        case 'none':
+                            return 'No Insurance Required for marketplace participation, though sellers may obtain coverage voluntarily.';
+                        case 'general':
+                            return 'General Liability ($1M) insurance coverage is required for all sellers to protect against standard business risks.';
+                        case 'comprehensive':
+                            return 'General + Product Liability ($2M) comprehensive insurance coverage is mandatory for enhanced risk protection.';
+                        default:
+                            return 'Standard insurance policies may apply based on product categories.';
+                    }
+                };
+
                 return `MARKETPLACE SELLER AGREEMENT
 
 Date: ${currentDate}
@@ -395,6 +458,12 @@ ${formData.minimumOrderValue !== '0' ? `2.8 Minimum Order Value: Sellers must ma
 3.4 Compliance Requirements: Sellers must ensure all products comply with applicable federal, state, and local laws, regulations, and safety standards. This includes but is not limited to product safety regulations, labeling requirements, import/export restrictions, and tax obligations.
 
 3.5 Intellectual Property: Sellers warrant that all listed products do not infringe upon any third-party intellectual property rights, including trademarks, copyrights, and patents. Sellers agree to indemnify Marketplace against any intellectual property claims related to their products.
+
+3.6 Seller Verification Requirements: ${getSellerVerificationSection()}
+
+3.7 Quality Assurance Program: ${getQualityProgramSection()}
+
+3.8 Insurance Requirements: ${getInsuranceSection()}
 
 4. FULFILLMENT AND SHIPPING
 
