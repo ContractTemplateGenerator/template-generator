@@ -158,12 +158,12 @@ const treatyData = {
   },
   switzerland: {
     article: 'Article 11',
-    rate: '15%',
+    rate: '0%',
     treatyName: 'U.S.–Switzerland tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/switzerland-tax-treaty-documents',
     description: {
-      en: 'Switzerland has a 15% maximum withholding rate on interest under Article 11 of the U.S.-Switzerland tax treaty, reducing the standard 30% U.S. withholding tax.',
-      de: 'Die Schweiz hat einen maximalen Quellensteuerabzug von 15% auf Zinsen unter Artikel 11 des US-Schweiz-Steuerabkommens, was die standardmäßige 30% US-Quellensteuer reduziert.'
+      en: 'Switzerland has a 0% withholding rate on interest under Article 11 of the U.S.-Switzerland tax treaty. Interest is taxable only in the residence state (Switzerland), providing complete exemption from U.S. withholding tax.',
+      de: 'Die Schweiz hat einen 0% Quellensteuerabzug auf Zinsen unter Artikel 11 des US-Schweiz-Steuerabkommens. Zinsen sind nur im Wohnsitzstaat (Schweiz) steuerpflichtig und vollständig von der US-Quellensteuer befreit.'
     }
   }
 };
