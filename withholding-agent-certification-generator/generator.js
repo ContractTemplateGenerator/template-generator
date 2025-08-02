@@ -137,13 +137,13 @@ const treatyData = {
     }
   },
   thailand: {
-    article: 'Article 11',
-    rate: '10%',
+    article: 'Article 11(2)',
+    rate: '15%',
     treatyName: 'U.S.–Thailand tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/thailand-tax-treaty-documents',
     description: {
-      en: 'Thailand has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Thailand tax treaty.',
-      de: 'Thailand hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11 des US-Thailand-Steuerabkommens.'
+      en: 'Thailand has a general 15% maximum withholding rate on interest under Article 11(2)(c) of the U.S.-Thailand tax treaty. A reduced 10% rate applies only to interest paid to banks/financial institutions (Art. 11(2)(a)) or on arm\'s-length credit sales (Art. 11(2)(b)).',
+      de: 'Thailand hat einen allgemeinen maximalen Quellensteuerabzug von 15% auf Zinsen unter Artikel 11(2)(c) des US-Thailand-Steuerabkommens. Ein reduzierter Satz von 10% gilt nur für Zinsen an Banken/Finanzinstitute (Art. 11(2)(a)) oder bei Kreditverkäufen unter marktüblichen Bedingungen (Art. 11(2)(b)).'
     }
   },
   cyprus: {
