@@ -13,7 +13,8 @@ const translations = {
       germany: "Germany",
       malta: "Malta",
       thailand: "Thailand",
-      cyprus: "Cyprus"
+      cyprus: "Cyprus",
+      switzerland: "Switzerland"
     },
     llcNameLabel: "LLC Name",
     llcNameTooltip: "Enter the full legal name of the LLC as it appears on IRS documents.",
@@ -68,7 +69,8 @@ const translations = {
       germany: "Deutschland",
       malta: "Malta",
       thailand: "Thailand",
-      cyprus: "Zypern"
+      cyprus: "Zypern",
+      switzerland: "Schweiz"
     },
     llcNameLabel: "LLC-Name",
     llcNameTooltip: "Geben Sie den vollständigen rechtlichen Namen der LLC ein, wie er in den IRS-Dokumenten erscheint.",
@@ -152,6 +154,16 @@ const treatyData = {
     description: {
       en: 'Cyprus has a 10% maximum withholding rate on interest under Article 11(2) of the U.S.-Cyprus tax treaty.',
       de: 'Zypern hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11(2) des US-Zypern-Steuerabkommens.'
+    }
+  },
+  switzerland: {
+    article: 'Article 11',
+    rate: '15%',
+    treatyName: 'U.S.–Switzerland tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/switzerland-tax-treaty-documents',
+    description: {
+      en: 'Switzerland has a 15% maximum withholding rate on interest under Article 11 of the U.S.-Switzerland tax treaty, reducing the standard 30% U.S. withholding tax.',
+      de: 'Die Schweiz hat einen maximalen Quellensteuerabzug von 15% auf Zinsen unter Artikel 11 des US-Schweiz-Steuerabkommens, was die standardmäßige 30% US-Quellensteuer reduziert.'
     }
   }
 };
@@ -412,6 +424,7 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
             <option value="malta">{t.countryOptions.malta}</option>
             <option value="thailand">{t.countryOptions.thailand}</option>
             <option value="cyprus">{t.countryOptions.cyprus}</option>
+            <option value="switzerland">{t.countryOptions.switzerland}</option>
           </select>
           {errors.country && <span className="error-message">{errors.country}</span>}
           {formData.country && treatyData[formData.country] && (
