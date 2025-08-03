@@ -97,16 +97,29 @@
         }
         
         .highlighted-section {
-            background: #fff3cd !important;
+            background: #ffc107 !important;
             padding: 10px;
             border-radius: 4px;
-            animation: highlightPulse 15s ease-out;
+            border: 2px solid #ff8c00 !important;
+            animation: highlightPulse 15s ease-out forwards;
         }
         
         @keyframes highlightPulse {
-            0% { background: #ffc107 !important; }
-            5% { background: #fff3cd !important; }
-            100% { background: transparent !important; }
+            0% { 
+                background: #ffc107 !important; 
+                border: 2px solid #ff8c00 !important;
+                box-shadow: 0 0 20px rgba(255, 193, 7, 0.8);
+            }
+            10% { 
+                background: #fff3cd !important; 
+                border: 2px solid #ffb347 !important;
+                box-shadow: 0 0 15px rgba(255, 193, 7, 0.6);
+            }
+            100% { 
+                background: transparent !important; 
+                border: none !important;
+                box-shadow: none;
+            }
         }
         
         .modified-section {
@@ -346,6 +359,7 @@ Title: CEO                     Title: CTO`;
             // State - Default to Llama (useClaudeAI = false)
             const [selectedRevisions, setSelectedRevisions] = useState({});
             const [highlightedSection, setHighlightedSection] = useState(null);
+            const [highlightTimeout, setHighlightTimeout] = useState(null);
             const [useClaudeAI, setUseClaudeAI] = useState(false); // Default to Llama
             const previewRef = useRef(null);
 
@@ -377,32 +391,46 @@ Title: CEO                     Title: CTO`;
 
             // Highlight section and scroll
             const highlightAndScrollToSection = (provisionKey) => {
-                setHighlightedSection(provisionKey);
-                
-                // Auto-scroll to section
-                if (previewRef.current) {
-                    const sectionNum = getSectionNumber(provisionKey);
-                    const element = previewRef.current.querySelector(`[data-section="${sectionNum}"]`);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                // Clear any existing timeout
+                if (highlightTimeout) {
+                    clearTimeout(highlightTimeout);
                 }
                 
-                // Clear highlight after 15 seconds
+                // Set new highlight
+                setHighlightedSection(provisionKey);
+                console.log('Highlighting section:', provisionKey, 'Section number:', getSectionNumber(provisionKey));
+                
+                // Auto-scroll to section
                 setTimeout(() => {
+                    if (previewRef.current) {
+                        const sectionNum = getSectionNumber(provisionKey);
+                        const element = previewRef.current.querySelector(`[data-section="${sectionNum}"]`);
+                        console.log('Scrolling to element:', element, 'for section:', sectionNum);
+                        if (element) {
+                            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                    }
+                }, 100);
+                
+                // Clear highlight after 15 seconds
+                const newTimeout = setTimeout(() => {
+                    console.log('Clearing highlight after 15 seconds');
                     setHighlightedSection(null);
                 }, 15000);
+                
+                setHighlightTimeout(newTimeout);
             };
 
             // Get section number for provision
             const getSectionNumber = (provisionKey) => {
                 const sectionMap = {
                     definition_confidential_info: '1',
-                    term_duration: '2',
+                    term_duration: '2', 
                     purpose_limitation: '4',
                     return_destruction: '5',
                     remedies: '6'
                 };
+                console.log('Getting section number for:', provisionKey, '-> Section:', sectionMap[provisionKey]);
                 return sectionMap[provisionKey];
             };
 
@@ -423,6 +451,80 @@ Title: CEO                     Title: CTO`;
                 });
                 
                 return previewText;
+            };
+
+            // Export function
+            const exportRevisedDocument = () => {
+                console.log('Export button clicked!');
+                
+                // Generate the revised text
+                const revisedText = generateLivePreview();
+                
+                // Create change log
+                const changeLog = Object.entries(selectedRevisions).map(([key, type]) => ({
+                    provision: PROVISIONS[key].name,
+                    type,
+                    description: `Changed to ${type} approach`,
+                    impact: PROVISIONS[key].variations[type].why
+                }));
+                
+                // Create a simple Word-compatible HTML document
+                const htmlContent = `
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Revised NDA Analysis</title>
+    <style>
+        body { font-family: 'Times New Roman', serif; margin: 1in; line-height: 1.5; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .section { margin: 20px 0; }
+        .change-log { border: 1px solid #ccc; padding: 15px; margin: 20px 0; }
+        .highlight-new { background-color: #90EE90; }
+        .change-item { margin: 10px 0; padding: 10px; background-color: #f0f8ff; border-left: 4px solid #007acc; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>NDA Risk Analysis & Revised Document</h1>
+        <p>Generated on ${new Date().toLocaleDateString()}</p>
+        <p>Analysis Model: ${useClaudeAI ? 'Claude 3.5 Sonnet' : 'Llama 3.3 70B'}</p>
+    </div>
+
+    <div class="section">
+        <h2>Selected Changes (${changeLog.length})</h2>
+        <div class="change-log">
+            ${changeLog.map(change => `
+                <div class="change-item">
+                    <strong>${change.provision}</strong> - ${change.type.replace('_', ' ')}<br>
+                    <em>${change.description}</em><br>
+                    <small>Impact: ${change.impact}</small>
+                </div>
+            `).join('')}
+        </div>
+    </div>
+
+    <div class="section">
+        <h2>Revised NDA Document</h2>
+        <div style="border: 1px solid #ddd; padding: 20px; background-color: #fafafa; white-space: pre-line;">
+            ${revisedText}
+        </div>
+    </div>
+</body>
+</html>`;
+                
+                // Create and download file
+                const blob = new Blob([htmlContent], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `NDA_Revised_${new Date().toISOString().split('T')[0]}.doc`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+                
+                alert(`✅ Export successful! Downloaded revised NDA with ${changeLog.length} changes.`);
             };
 
             // Render provision card
@@ -504,10 +606,12 @@ Title: CEO                     Title: CTO`;
                 const previewText = generateLivePreview();
                 const sections = previewText.split(/(\n\d+\..+)/);
                 
+                console.log('Rendering preview, highlighted section:', highlightedSection);
+                
                 return (
                     <div ref={previewRef} className="live-preview">
                         {sections.map((section, index) => {
-                            const sectionMatch = section.match(/^(\d+)\./);
+                            const sectionMatch = section.match(/(\d+)\./);
                             const sectionNum = sectionMatch ? sectionMatch[1] : null;
                             const isModified = sectionNum && Object.keys(selectedRevisions).some(key => 
                                 getSectionNumber(key) === sectionNum
@@ -515,11 +619,32 @@ Title: CEO                     Title: CTO`;
                             const isHighlighted = sectionNum && highlightedSection && 
                                                  getSectionNumber(highlightedSection) === sectionNum;
                             
+                            console.log(`Section ${sectionNum}: highlighted=${isHighlighted}, modified=${isModified}`);
+                            
+                            let className = '';
+                            if (isHighlighted) className += 'highlighted-section ';
+                            if (isModified) className += 'modified-section ';
+                            
                             return (
                                 <div
-                                    key={index}
+                                    key={`section-${index}`}
                                     data-section={sectionNum}
-                                    className={`${isHighlighted ? 'highlighted-section' : ''} ${isModified ? 'modified-section' : ''}`}
+                                    className={className.trim()}
+                                    style={{
+                                        marginBottom: '10px',
+                                        ...(isHighlighted ? {
+                                            background: '#ffc107',
+                                            padding: '10px',
+                                            borderRadius: '4px',
+                                            border: '2px solid #ff8c00',
+                                            boxShadow: '0 0 20px rgba(255, 193, 7, 0.8)'
+                                        } : {}),
+                                        ...(isModified && !isHighlighted ? {
+                                            background: '#e8f5e8',
+                                            borderLeft: '4px solid #28a745',
+                                            paddingLeft: '10px'
+                                        } : {})
+                                    }}
                                 >
                                     {section}
                                 </div>
@@ -579,6 +704,7 @@ Title: CEO                     Title: CTO`;
                             <button
                                 className="export-btn"
                                 disabled={Object.keys(selectedRevisions).length === 0}
+                                onClick={exportRevisedDocument}
                             >
                                 📄 Export Revised NDA ({Object.keys(selectedRevisions).length} changes)
                             </button>
