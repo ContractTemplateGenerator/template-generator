@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDA Risk Analyzer V2 - Test</title>
+    <link rel="stylesheet" href="styles-v2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- Test container for functionality -->
+    <div id="test-controls" style="position: fixed; top: 10px; right: 10px; background: #fff; padding: 15px; border: 2px solid #007acc; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); z-index: 1000;">
+        <h4 style="margin: 0 0 10px 0; color: #007acc;">🧪 Test Controls</h4>
+        <button onclick="testProvisionAnalysis()" style="display: block; width: 100%; margin: 5px 0; padding: 8px; background: #007acc; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Test Provision Analysis
+        </button>
+        <button onclick="testWordExport()" style="display: block; width: 100%; margin: 5px 0; padding: 8px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Test Word Export
+        </button>
+        <button onclick="loadSampleNDA()" style="display: block; width: 100%; margin: 5px 0; padding: 8px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;">
+            Load Sample NDA
+        </button>
+    </div>
+    
+    <!-- Load scripts -->
+    <script src="word-export-v2.js"></script>
+    <script type="text/babel" src="nda-analyzer-v2.js"></script>
+    
+    <!-- Test functions -->
+    <script>
+        // Sample NDA text for testing
+        const SAMPLE_NDA = `
+MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into on [DATE] by and between ABC Corp, a Delaware corporation ("ABC"), and XYZ LLC, a California limited liability company ("XYZ").
+
+1. CONFIDENTIAL INFORMATION
+For purposes of this Agreement, "Confidential Information" means all information disclosed by either party to the other party, whether orally, in writing, or in any other form, including but not limited to technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information.
+
+2. TERM
+This Agreement shall remain in effect for a period of three (3) years from the date first written above, unless earlier terminated in accordance with the provisions herein.
+
+3. PURPOSE
+The parties wish to explore a potential business relationship relating to software development services.
+
+4. OBLIGATIONS
+Each party agrees to hold and maintain in strict confidence all Confidential Information received from the other party. Each party agrees not to disclose any Confidential Information to third parties without the prior written consent of the disclosing party.
+
+5. RETURN OF MATERIALS
+Upon termination of this Agreement, each party shall promptly return or destroy all documents, materials, and other tangible manifestations of Confidential Information received from the other party.
+
+6. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of laws principles.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+ABC CORP                           XYZ LLC
+
+By: _____________________         By: _____________________
+Name: [Name]                      Name: [Name]
+Title: [Title]                    Title: [Title]
+`;
+
+        // Test provision analysis
+        function testProvisionAnalysis() {
+            console.log('🧪 Testing provision analysis...');
+            
+            // Simulate analysis results
+            const testAnalysis = {
+                definition_confidential_info: {
+                    present: true,
+                    favors: 'disclosing_party',
+                    characterization: 'broad',
+                    text_location: 'all information disclosed by either party to the other party',
+                    assessment: 'Very broad definition favoring disclosing parties'
+                },
+                term_duration: {
+                    present: true,
+                    favors: 'disclosing_party',
+                    characterization: 'standard',
+                    text_location: 'three (3) years',
+                    assessment: 'Standard 3-year term'
+                },
+                purpose_limitation: {
+                    present: true,
+                    favors: 'neutral',
+                    characterization: 'standard',
+                    text_location: 'relating to software development services',
+                    assessment: 'Reasonably specific purpose limitation'
+                }
+            };
+            
+            console.log('✅ Sample analysis results:', testAnalysis);
+            alert('Check console for test analysis results');
+        }
+        
+        // Test Word export
+        function testWordExport() {
+            console.log('🧪 Testing Word export...');
+            
+            const wordExporter = new WordExportV2();
+            const testChangeLog = [
+                {
+                    provision: 'Definition of Confidential Information',
+                    type: 'receiving_party',
+                    description: 'Narrow definition to marked information only',
+                    impact: 'Reduces scope of what constitutes confidential information'
+                },
+                {
+                    provision: 'Term Duration',
+                    type: 'receiving_party', 
+                    description: 'Reduce term to 2 years maximum',
+                    impact: 'Shorter obligation period for receiving party'
+                }
+            ];
+            
+            const testAnalysisData = {
+                provisions: {
+                    definition_confidential_info: {
+                        present: true,
+                        favors: 'disclosing_party',
+                        characterization: 'broad',
+                        assessment: 'Very broad definition'
+                    }
+                },
+                overall_assessment: {
+                    balance: 'favors_disclosing',
+                    risk_level: 'medium',
+                    recommendation: 'negotiate'
+                }
+            };
+            
+            wordExporter.exportToWord(
+                SAMPLE_NDA,
+                {},
+                testChangeLog,
+                testAnalysisData
+            );
+            
+            console.log('✅ Word export test completed - check downloads');
+        }
+        
+        // Load sample NDA into the analyzer
+        function loadSampleNDA() {
+            console.log('🧪 Loading sample NDA...');
+            
+            // Try multiple times to find the textarea (React might still be rendering)
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            function tryLoadSample() {
+                const textarea = document.querySelector('.nda-textarea');
+                if (textarea) {
+                    textarea.value = SAMPLE_NDA;
+                    // Trigger React onChange
+                    const event = new Event('input', { bubbles: true });
+                    textarea.dispatchEvent(event);
+                    console.log('✅ Sample NDA loaded into textarea');
+                    alert('✅ Sample NDA loaded! You can now continue with analysis.');
+                } else {
+                    attempts++;
+                    if (attempts < maxAttempts) {
+                        console.log(`❌ Textarea not found, attempt ${attempts}/${maxAttempts}. Retrying...`);
+                        setTimeout(tryLoadSample, 500);
+                    } else {
+                        console.log('❌ Textarea not found after maximum attempts');
+                        alert('❌ Could not find textarea. Make sure the app has loaded completely and try again.');
+                    }
+                }
+            }
+            
+            tryLoadSample();
+        }
+        
+        // Create app instance with global access for testing
+        let appInstance = null;
+        
+        const TestableNDAAnalyzer = () => {
+            const analyzer = React.createElement(NDAAnalyzerV2);
+            
+            // Store reference to the analyzer for testing
+            React.useEffect(() => {
+                appInstance = {
+                    loadSampleText: (text) => {
+                        const textarea = document.querySelector('.nda-textarea');
+                        if (textarea) {
+                            textarea.value = text;
+                            textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                            return true;
+                        }
+                        return false;
+                    }
+                };
+            }, []);
+            
+            return analyzer;
+        };
+        
+        // Initialize the app
+        const { createRoot } = ReactDOM;
+        const root = createRoot(document.getElementById('root'));
+        root.render(React.createElement(TestableNDAAnalyzer));
+        
+        console.log('🚀 NDA Risk Analyzer V2 Test Environment Loaded');
+        console.log('Use the test controls in the top-right corner to test functionality');
+    </script>
+</body>
+</html>

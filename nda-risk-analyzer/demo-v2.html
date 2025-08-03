@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDA Risk Analyzer V2 - Working Demo</title>
+    <link rel="stylesheet" href="styles-v2.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <!-- Demo banner -->
+    <div style="position: fixed; top: 0; left: 0; right: 0; background: #28a745; color: white; padding: 10px; text-align: center; z-index: 1000;">
+        <strong>🎯 DEMO MODE:</strong> Sample NDA pre-loaded. Click "Continue with Analysis" to test the full workflow!
+    </div>
+    
+    <!-- Load scripts -->
+    <script src="word-export-v2.js"></script>
+    <script type="text/babel" src="nda-analyzer-v2.js"></script>
+    
+    <!-- Demo version with pre-loaded content -->
+    <script type="text/babel">
+        const SAMPLE_NDA = `MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into on January 15, 2024 by and between TechCorp Inc., a Delaware corporation ("TechCorp"), and InnovateLLC, a California limited liability company ("Innovate").
+
+1. CONFIDENTIAL INFORMATION
+For purposes of this Agreement, "Confidential Information" means all information disclosed by either party to the other party, whether orally, in writing, or in any other form, including but not limited to technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information.
+
+2. TERM
+This Agreement shall remain in effect for a period of five (5) years from the date first written above, unless earlier terminated in accordance with the provisions herein.
+
+3. PURPOSE
+The parties wish to explore a potential business relationship relating to artificial intelligence software development and licensing services.
+
+4. OBLIGATIONS
+Each party agrees to hold and maintain in strict confidence all Confidential Information received from the other party. Each party agrees not to disclose any Confidential Information to third parties without the prior written consent of the disclosing party. The receiving party agrees to use the Confidential Information solely for the purpose of evaluating the potential business relationship.
+
+5. RETURN OF MATERIALS
+Upon termination of this Agreement or upon request by the disclosing party, each party shall promptly return or destroy all documents, materials, and other tangible manifestations of Confidential Information received from the other party within thirty (30) days.
+
+6. REMEDIES
+The parties acknowledge that any breach of this Agreement may cause irreparable harm for which monetary damages would be inadequate. Therefore, the non-breaching party shall be entitled to seek injunctive relief and other equitable remedies, in addition to all other remedies available at law or in equity.
+
+7. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of laws principles. Any disputes arising under this Agreement shall be subject to the exclusive jurisdiction of the courts of California.
+
+8. SURVIVAL
+The obligations of confidentiality set forth in this Agreement shall survive the termination of this Agreement for a period of three (3) years.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+TECHCORP INC.                    INNOVATELLC
+
+By: _____________________       By: _____________________
+Name: Sarah Johnson            Name: Michael Chen
+Title: CEO                     Title: CTO`;
+
+        // Demo version of the analyzer with pre-loaded content
+        const DemoNDAAnalyzer = () => {
+            const { useState, useRef, useEffect } = React;
+            
+            // Pre-load the sample NDA
+            const [ndaText, setNdaText] = useState(SAMPLE_NDA);
+            const [analysisResult, setAnalysisResult] = useState(null);
+            const [isAnalyzing, setIsAnalyzing] = useState(false);
+            const [analysisComplete, setAnalysisComplete] = useState(false);
+            const [currentStep, setCurrentStep] = useState('upload');
+            
+            // Analysis results - pre-populate for demo
+            const [provisionAnalysis, setProvisionAnalysis] = useState({});
+            const [overallAssessment, setOverallAssessment] = useState(null);
+            const [extractedParties, setExtractedParties] = useState(['TechCorp Inc.', 'InnovateLLC']);
+            
+            // Revision tracking
+            const [selectedRevisions, setSelectedRevisions] = useState({});
+            const [revisionText, setRevisionText] = useState('');
+            const [changeLog, setChangeLog] = useState([]);
+            
+            // Standard provisions (same as main app)
+            const STANDARD_PROVISIONS = {
+                definition_confidential_info: {
+                    name: "Definition of Confidential Information",
+                    description: "How broadly or narrowly confidential information is defined"
+                },
+                term_duration: {
+                    name: "Term Duration", 
+                    description: "How long the NDA obligations last"
+                },
+                purpose_limitation: {
+                    name: "Purpose Limitation",
+                    description: "How the receiving party can use the information"
+                },
+                return_destruction: {
+                    name: "Return/Destruction of Information",
+                    description: "Requirements for handling info after termination"
+                },
+                remedies: {
+                    name: "Remedies for Breach",
+                    description: "What happens if someone breaches the NDA"
+                },
+                jurisdiction: {
+                    name: "Governing Law & Jurisdiction",
+                    description: "Which courts and laws apply"
+                },
+                survival: {
+                    name: "Survival Clauses",
+                    description: "Which obligations survive termination"
+                }
+            };
+
+            // Demo analysis - simulate real analysis results
+            const performDemoAnalysis = () => {
+                setIsAnalyzing(true);
+                
+                // Simulate API delay
+                setTimeout(() => {
+                    const demoAnalysis = {
+                        definition_confidential_info: {
+                            present: true,
+                            favors: 'disclosing_party',
+                            characterization: 'broad',
+                            text_location: 'all information disclosed by either party to the other party',
+                            assessment: 'Very broad definition that favors disclosing parties - includes unmarked information',
+                            industry_comparison: 'Broader than 80% of NDAs - captures unmarked information',
+                            why_matters: 'Disclosing party gets maximum protection even for casual disclosures'
+                        },
+                        term_duration: {
+                            present: true,
+                            favors: 'disclosing_party',
+                            characterization: 'long',
+                            text_location: 'five (5) years',
+                            assessment: '5-year term is longer than typical 2-3 years, favors disclosing party',
+                            industry_comparison: 'Longer than 70% of NDAs - extends protection period',
+                            why_matters: 'Disclosing party gets extended protection for valuable information'
+                        },
+                        purpose_limitation: {
+                            present: true,
+                            favors: 'neutral',
+                            characterization: 'standard',
+                            text_location: 'solely for the purpose of evaluating the potential business relationship',
+                            assessment: 'Reasonable purpose limitation that is fairly standard',
+                            industry_comparison: 'Standard purpose limitation found in 60% of commercial NDAs',
+                            why_matters: 'Balanced approach allowing practical business evaluation'
+                        },
+                        return_destruction: {
+                            present: true,
+                            favors: 'disclosing_party',
+                            characterization: 'strict',
+                            text_location: 'within thirty (30) days',
+                            assessment: '30-day return period is quite strict, favors disclosing party',
+                            industry_comparison: 'Stricter than 60% of NDAs - short compliance window',
+                            why_matters: 'Disclosing party can quickly reclaim all confidential materials'
+                        },
+                        remedies: {
+                            present: true,
+                            favors: 'disclosing_party',
+                            characterization: 'harsh',
+                            text_location: 'entitled to seek injunctive relief and other equitable remedies',
+                            assessment: 'Allows broad injunctive relief, strongly favors disclosing party',
+                            industry_comparison: 'More aggressive than 75% of NDAs - broad enforcement tools',
+                            why_matters: 'Creates strong deterrent with powerful legal remedies'
+                        },
+                        jurisdiction: {
+                            present: true,
+                            favors: 'neutral',
+                            characterization: 'standard',
+                            text_location: 'laws of the State of California',
+                            assessment: 'California law is generally balanced for NDAs',
+                            industry_comparison: 'California is neutral commercial jurisdiction used in many NDAs',
+                            why_matters: 'Neither party gets significant home court advantage'
+                        },
+                        survival: {
+                            present: true,
+                            favors: 'disclosing_party',
+                            characterization: 'standard',
+                            text_location: 'survive the termination of this Agreement for a period of three (3) years',
+                            assessment: '3-year survival period is standard but still favors disclosing party',
+                            industry_comparison: 'Standard survival period found in 65% of commercial NDAs',
+                            why_matters: 'Ensures key protections continue after main agreement ends'
+                        }
+                    };
+                    
+                    const demoOverallAssessment = {
+                        balance: 'favors_disclosing',
+                        risk_level: 'medium',
+                        recommendation: 'negotiate'
+                    };
+                    
+                    setProvisionAnalysis(demoAnalysis);
+                    setOverallAssessment(demoOverallAssessment);
+                    setIsAnalyzing(false);
+                    setAnalysisComplete(true);
+                    setCurrentStep('matrix');
+                }, 2000);
+            };
+
+            // Handle revision selection
+            const handleRevisionSelect = (provisionKey, revisionType, isSelected) => {
+                setSelectedRevisions(prev => ({
+                    ...prev,
+                    [provisionKey]: isSelected ? revisionType : null
+                }));
+            };
+
+            // Generate revised document
+            const generateRevisedDocument = () => {
+                const changes = [];
+                
+                Object.entries(selectedRevisions).forEach(([provisionKey, revisionType]) => {
+                    if (revisionType) {
+                        const provision = STANDARD_PROVISIONS[provisionKey];
+                        changes.push({
+                            provision: provision.name,
+                            type: revisionType,
+                            description: `Make ${provision.name} favor ${revisionType.replace('_', ' ')}`,
+                            impact: `Adjusts the provision to benefit the ${revisionType.replace('_', ' ')}`
+                        });
+                    }
+                });
+                
+                setChangeLog(changes);
+                setCurrentStep('revise');
+            };
+
+            // Export to Word
+            const exportToWord = () => {
+                const wordExporter = new WordExportV2();
+                wordExporter.exportToWord(
+                    ndaText,
+                    selectedRevisions,
+                    changeLog,
+                    {
+                        provisions: provisionAnalysis,
+                        overall_assessment: overallAssessment
+                    }
+                );
+            };
+
+            // Render upload step
+            const renderUploadStep = () => (
+                <div className="step-container">
+                    <div className="step-header">
+                        <h2>📄 Demo: Sample NDA Pre-Loaded</h2>
+                        <p>This demo shows the complete NDA analysis workflow with a realistic sample</p>
+                    </div>
+                    
+                    <div className="extracted-info">
+                        <h3>✅ Sample NDA Loaded:</h3>
+                        <p><strong>Parties:</strong> TechCorp Inc. & InnovateLLC</p>
+                        <p><strong>Purpose:</strong> AI software development partnership</p>
+                        <p><strong>Document Length:</strong> {ndaText.length} characters</p>
+                    </div>
+                    
+                    <div style={{textAlign: 'center', marginTop: '30px'}}>
+                        <button 
+                            className="btn btn-primary"
+                            onClick={() => setCurrentStep('analyze')}
+                            style={{fontSize: '18px', padding: '15px 30px'}}
+                        >
+                            🚀 Continue with Analysis
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Render analysis step  
+            const renderAnalysisStep = () => (
+                <div className="step-container">
+                    <div className="step-header">
+                        <h2>🔍 Analyzing NDA Provisions</h2>
+                        <p>Systematically analyzing all standard NDA provisions...</p>
+                    </div>
+                    
+                    <div className="extracted-info">
+                        <h3>Document Details:</h3>
+                        <ul>
+                            <li><strong>Parties:</strong> {extractedParties.join(' & ')}</li>
+                            <li><strong>Type:</strong> Mutual Non-Disclosure Agreement</li>
+                            <li><strong>Provisions to analyze:</strong> {Object.keys(STANDARD_PROVISIONS).length}</li>
+                        </ul>
+                    </div>
+                    
+                    <div className="analysis-actions">
+                        <button 
+                            className="btn btn-primary"
+                            onClick={performDemoAnalysis}
+                            disabled={isAnalyzing}
+                            style={{fontSize: '16px', padding: '12px 24px'}}
+                        >
+                            {isAnalyzing ? '⏳ Analyzing Provisions...' : '🎯 Start Provision Analysis'}
+                        </button>
+                    </div>
+                    
+                    {isAnalyzing && (
+                        <div style={{textAlign: 'center', marginTop: '20px'}}>
+                            <p>Analyzing standard provisions for party favorability...</p>
+                        </div>
+                    )}
+                </div>
+            );
+
+            // Render matrix step (same as main app but simplified)
+            const renderMatrixStep = () => (
+                <div className="step-container">
+                    <div className="step-header">
+                        <h2>📊 Provision Analysis Matrix</h2>
+                        <p>Review how each provision currently favors one party or another</p>
+                    </div>
+                    
+                    <div className="matrix-container">
+                        <table className="provisions-matrix">
+                            <thead>
+                                <tr>
+                                    <th>Provision</th>
+                                    <th>Present</th>
+                                    <th>Current Stance</th>
+                                    <th>Favors</th>
+                                    <th>Select Revision</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {Object.entries(STANDARD_PROVISIONS).map(([key, provision]) => {
+                                    const analysis = provisionAnalysis[key] || {};
+                                    return (
+                                        <tr key={key}>
+                                            <td>
+                                                <strong>{provision.name}</strong>
+                                                <br />
+                                                <small>{provision.description}</small>
+                                            </td>
+                                            <td>
+                                                <span className={`status ${analysis.present ? 'present' : 'missing'}`}>
+                                                    {analysis.present ? '✅' : '❌'}
+                                                </span>
+                                            </td>
+                                            <td>{analysis.characterization || 'Unknown'}</td>
+                                            <td>
+                                                <span className={`favor-${analysis.favors}`}>
+                                                    {analysis.favors?.replace('_', ' ') || 'Unknown'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div className="revision-options">
+                                                    {['disclosing_party', 'receiving_party', 'neutral'].map(type => (
+                                                        <label key={type} className="revision-checkbox">
+                                                            <input
+                                                                type="radio"
+                                                                name={`revision-${key}`}
+                                                                checked={selectedRevisions[key] === type}
+                                                                onChange={(e) => handleRevisionSelect(key, type, e.target.checked)}
+                                                            />
+                                                            {type === 'disclosing_party' ? '🔒 Disclosing' : 
+                                                             type === 'receiving_party' ? '🔓 Receiving' : '⚖️ Neutral'}
+                                                        </label>
+                                                    ))}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div className="matrix-actions">
+                        <button 
+                            className="btn btn-primary"
+                            onClick={generateRevisedDocument}
+                            disabled={Object.keys(selectedRevisions).length === 0}
+                            style={{fontSize: '16px', padding: '12px 24px'}}
+                        >
+                            📝 Generate Revised Document ({Object.keys(selectedRevisions).length} changes)
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Render revision step
+            const renderRevisionStep = () => (
+                <div className="step-container">
+                    <div className="step-header">
+                        <h2>📝 Document Revisions & Export</h2>
+                        <p>Your selected changes and professional export options</p>
+                    </div>
+                    
+                    <div className="revision-summary">
+                        <h3>Selected Changes ({changeLog.length})</h3>
+                        {changeLog.map((change, index) => (
+                            <div key={index} className="change-item">
+                                <strong>{change.provision}</strong> - {change.type.replace('_', ' ')}
+                                <br />
+                                <em>{change.description}</em>
+                                <br />
+                                <small>Impact: {change.impact}</small>
+                            </div>
+                        ))}
+                        {changeLog.length === 0 && (
+                            <p><em>No changes selected. Go back to the matrix to select revisions.</em></p>
+                        )}
+                    </div>
+                    
+                    <div className="export-actions">
+                        <button 
+                            className="btn btn-primary"
+                            onClick={exportToWord}
+                            style={{fontSize: '16px', padding: '12px 24px'}}
+                        >
+                            📄 Export Professional Report
+                        </button>
+                        
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => setCurrentStep('matrix')}
+                        >
+                            ← Back to Matrix
+                        </button>
+                        
+                        <button 
+                            className="btn btn-secondary"
+                            onClick={() => {
+                                setCurrentStep('upload');
+                                setSelectedRevisions({});
+                                setChangeLog([]);
+                            }}
+                        >
+                            🔄 Start Over
+                        </button>
+                    </div>
+                </div>
+            );
+
+            // Main render
+            return (
+                <div className="nda-analyzer-v2" style={{marginTop: '60px'}}>
+                    <div className="analyzer-header">
+                        <h1>⚖️ NDA Risk Analyzer V2 - Demo</h1>
+                        <p>Complete workflow demonstration with sample NDA</p>
+                        
+                        <div className="progress-steps">
+                            <div className={`step ${currentStep === 'upload' ? 'active' : ''} ${currentStep !== 'upload' ? 'completed' : ''}`}>
+                                1. Sample
+                            </div>
+                            <div className={`step ${currentStep === 'analyze' ? 'active' : ''} ${['matrix', 'revise'].includes(currentStep) ? 'completed' : ''}`}>
+                                2. Analyze
+                            </div>
+                            <div className={`step ${currentStep === 'matrix' ? 'active' : ''} ${currentStep === 'revise' ? 'completed' : ''}`}>
+                                3. Matrix
+                            </div>
+                            <div className={`step ${currentStep === 'revise' ? 'active' : ''}`}>
+                                4. Export
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="analyzer-content">
+                        {currentStep === 'upload' && renderUploadStep()}
+                        {currentStep === 'analyze' && renderAnalysisStep()}
+                        {currentStep === 'matrix' && renderMatrixStep()}
+                        {currentStep === 'revise' && renderRevisionStep()}
+                    </div>
+                </div>
+            );
+        };
+
+        // Initialize demo
+        const { createRoot } = ReactDOM;
+        const root = createRoot(document.getElementById('root'));
+        root.render(React.createElement(DemoNDAAnalyzer));
+        
+        console.log('🎯 NDA Risk Analyzer V2 Demo Loaded');
+        console.log('Sample NDA pre-loaded. Follow the 4-step workflow to test all features!');
+    </script>
+</body>
+</html>
