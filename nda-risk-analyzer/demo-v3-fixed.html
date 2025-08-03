@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDA Risk Analyzer V3 - Working Version</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+        }
+        
+        .analyzer-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #007acc, #0056b3);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .provision-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .provision-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 122, 204, 0.15);
+        }
+        
+        .revision-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        
+        .revision-btn {
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 8px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 11px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+        
+        .revision-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .revision-btn.selected {
+            border: 2px solid #007acc;
+            background: #e3f2fd;
+        }
+        
+        .revision-btn.current {
+            border: 2px solid #28a745;
+            background: #e8f5e8;
+            opacity: 0.7;
+            cursor: default;
+        }
+        
+        .live-preview {
+            height: 600px;
+            overflow: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: white;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        
+        .highlighted-section {
+            background: #fff3cd !important;
+            padding: 10px;
+            border-radius: 4px;
+            animation: highlightPulse 15s ease-out;
+        }
+        
+        @keyframes highlightPulse {
+            0% { background: #ffc107 !important; }
+            5% { background: #fff3cd !important; }
+            100% { background: transparent !important; }
+        }
+        
+        .modified-section {
+            background: #e8f5e8 !important;
+            border-left: 4px solid #28a745;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 5px 0;
+        }
+        
+        .export-btn {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .export-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        
+        .ai-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+        
+        .ai-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: white;
+        }
+        
+        .sample-language {
+            margin-top: 6px;
+            padding: 4px;
+            background: white;
+            border-radius: 2px;
+            fontSize: 10px;
+            font-family: monospace;
+            border: 1px solid #007acc;
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div style="text-align: center; padding: 50px; color: #666;">
+            Loading NDA Risk Analyzer V3...
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useRef, useEffect } = React;
+
+        // Sample NDA text
+        const SAMPLE_NDA = `MUTUAL NON-DISCLOSURE AGREEMENT
+
+This Mutual Non-Disclosure Agreement ("Agreement") is entered into on January 15, 2024 by and between TechCorp Inc., a Delaware corporation ("TechCorp"), and InnovateLLC, a California limited liability company ("Innovate").
+
+1. CONFIDENTIAL INFORMATION
+For purposes of this Agreement, "Confidential Information" means all information disclosed by either party to the other party, whether orally, in writing, or in any other form, including but not limited to technical data, trade secrets, know-how, research, product plans, products, services, customers, customer lists, markets, software, developments, inventions, processes, formulas, technology, designs, drawings, engineering, hardware configuration information, marketing, finances, or other business information.
+
+2. TERM
+This Agreement shall remain in effect for a period of five (5) years from the date first written above, unless earlier terminated in accordance with the provisions herein.
+
+3. PURPOSE
+The parties wish to explore a potential business relationship relating to artificial intelligence software development and licensing services.
+
+4. OBLIGATIONS
+Each party agrees to hold and maintain in strict confidence all Confidential Information received from the other party. Each party agrees not to disclose any Confidential Information to third parties without the prior written consent of the disclosing party. The receiving party agrees to use the Confidential Information solely for the purpose of evaluating the potential business relationship.
+
+5. RETURN OF MATERIALS
+Upon termination of this Agreement or upon request by the disclosing party, each party shall promptly return or destroy all documents, materials, and other tangible manifestations of Confidential Information received from the other party within thirty (30) days.
+
+6. REMEDIES
+The parties acknowledge that any breach of this Agreement may cause irreparable harm for which monetary damages would be inadequate. Therefore, the non-breaching party shall be entitled to seek injunctive relief and other equitable remedies, in addition to all other remedies available at law or in equity.
+
+7. GOVERNING LAW
+This Agreement shall be governed by and construed in accordance with the laws of the State of California, without regard to its conflict of laws principles. Any disputes arising under this Agreement shall be subject to the exclusive jurisdiction of the courts of California.
+
+8. SURVIVAL
+The obligations of confidentiality set forth in this Agreement shall survive the termination of this Agreement for a period of three (3) years.
+
+IN WITNESS WHEREOF, the parties have executed this Agreement as of the date first written above.
+
+TECHCORP INC.                    INNOVATELLC
+
+By: _____________________       By: _____________________
+Name: Sarah Johnson            Name: Michael Chen
+Title: CEO                     Title: CTO`;
+
+        // Provision definitions
+        const PROVISIONS = {
+            definition_confidential_info: {
+                name: "Definition of Confidential Information",
+                current: 'broad',
+                location: 'Section 1',
+                industryStandard: "Industry standard requires marking or clear identification",
+                variations: {
+                    narrow: {
+                        description: "LIMITED SCOPE - Only marked information",
+                        tilts: "Receiving Party",
+                        why: "Clear boundaries reduce accidental breaches",
+                        language: "Information specifically marked as 'Confidential' at time of disclosure"
+                    },
+                    standard: {
+                        description: "INDUSTRY STANDARD - Reasonable identification",
+                        tilts: "Balanced",
+                        why: "Standard business practice balancing protection with clarity",
+                        language: "Non-public information disclosed in connection with this relationship"
+                    },
+                    broad: {
+                        description: "EXPANSIVE SCOPE - All information disclosed",
+                        tilts: "Disclosing Party",
+                        why: "Maximum protection even for unmarked disclosures",
+                        language: "All information disclosed, whether or not marked confidential"
+                    }
+                }
+            },
+            term_duration: {
+                name: "Term Duration",
+                current: 'long',
+                location: 'Section 2',
+                industryStandard: "Industry standard is 3-5 years for commercial relationships",
+                variations: {
+                    short: {
+                        description: "SHORT TERM - 1-2 years",
+                        tilts: "Receiving Party",
+                        why: "Reduces long-term compliance burden",
+                        language: "This Agreement shall remain in effect for two (2) years"
+                    },
+                    standard: {
+                        description: "INDUSTRY STANDARD - 3-5 years",
+                        tilts: "Balanced",
+                        why: "Balances protection with reasonable time limits",
+                        language: "This Agreement shall remain in effect for three (3) years"
+                    },
+                    long: {
+                        description: "EXTENDED TERM - 5+ years",
+                        tilts: "Disclosing Party",
+                        why: "Extended protection for valuable information",
+                        language: "This Agreement shall remain in effect for ten (10) years"
+                    }
+                }
+            },
+            purpose_limitation: {
+                name: "Purpose Limitation",
+                current: 'standard',
+                location: 'Section 4',
+                industryStandard: "Industry standard allows evaluation and related business purposes",
+                variations: {
+                    strict: {
+                        description: "HIGHLY RESTRICTED - Specific evaluation only",
+                        tilts: "Disclosing Party",
+                        why: "Severely limits receiving party's use options",
+                        language: "Solely for evaluating the specific transaction described"
+                    },
+                    standard: {
+                        description: "INDUSTRY STANDARD - Evaluation and related purposes",
+                        tilts: "Balanced",
+                        why: "Practical business use while maintaining protection",
+                        language: "For evaluating potential business opportunities and related purposes"
+                    },
+                    broad: {
+                        description: "PERMISSIVE USE - Any lawful business purpose",
+                        tilts: "Receiving Party",
+                        why: "Maximum flexibility in using information",
+                        language: "For any lawful business purpose not competing with disclosing party"
+                    }
+                }
+            },
+            return_destruction: {
+                name: "Return/Destruction Requirements",
+                current: 'standard',
+                location: 'Section 5',
+                industryStandard: "Industry standard is 30-60 days for return/destruction",
+                variations: {
+                    strict: {
+                        description: "IMMEDIATE RETURN - Must return/destroy promptly",
+                        tilts: "Disclosing Party",
+                        why: "Ensures quick reclaim of all materials",
+                        language: "Immediately return or destroy all materials and provide certification"
+                    },
+                    standard: {
+                        description: "INDUSTRY STANDARD - 30-60 day window",
+                        tilts: "Balanced",
+                        why: "Reasonable time for practical compliance",
+                        language: "Within thirty (30) days, return or destroy all confidential information"
+                    },
+                    lenient: {
+                        description: "FLEXIBLE TERMS - May retain for legitimate purposes",
+                        tilts: "Receiving Party",
+                        why: "Reduces compliance burden, allows some retention",
+                        language: "May retain information as required by law or document policies"
+                    }
+                }
+            },
+            remedies: {
+                name: "Remedies for Breach",
+                current: 'standard',
+                location: 'Section 6',
+                industryStandard: "Industry standard includes both damages and injunctive relief",
+                variations: {
+                    limited: {
+                        description: "MONETARY DAMAGES ONLY - No injunctions",
+                        tilts: "Receiving Party",
+                        why: "Limits consequences to provable financial harm",
+                        language: "Remedies limited to actual monetary damages proven at law"
+                    },
+                    standard: {
+                        description: "INDUSTRY STANDARD - Damages plus injunctive relief",
+                        tilts: "Balanced",
+                        why: "Balanced enforcement options for different breach types",
+                        language: "Both monetary damages and injunctive relief available"
+                    },
+                    harsh: {
+                        description: "MAXIMUM ENFORCEMENT - Liquidated damages, fees",
+                        tilts: "Disclosing Party",
+                        why: "Creates maximum deterrent effect",
+                        language: "Injunctive relief, liquidated damages, and attorneys' fees available"
+                    }
+                }
+            }
+        };
+
+        const NDAAnalyzerV3 = () => {
+            // State - Default to Llama (useClaudeAI = false)
+            const [selectedRevisions, setSelectedRevisions] = useState({});
+            const [highlightedSection, setHighlightedSection] = useState(null);
+            const [useClaudeAI, setUseClaudeAI] = useState(false); // Default to Llama
+            const previewRef = useRef(null);
+
+            // Handle revision selection
+            const handleRevisionSelect = (provisionKey, revisionType) => {
+                const wasSelected = selectedRevisions[provisionKey] === revisionType;
+                const isCurrent = PROVISIONS[provisionKey].current === revisionType;
+                
+                if (isCurrent) return; // Can't select current option
+                
+                if (wasSelected) {
+                    // Deselect
+                    setSelectedRevisions(prev => {
+                        const newRevisions = { ...prev };
+                        delete newRevisions[provisionKey];
+                        return newRevisions;
+                    });
+                } else {
+                    // Select
+                    setSelectedRevisions(prev => ({
+                        ...prev,
+                        [provisionKey]: revisionType
+                    }));
+                    
+                    // Highlight and scroll
+                    highlightAndScrollToSection(provisionKey);
+                }
+            };
+
+            // Highlight section and scroll
+            const highlightAndScrollToSection = (provisionKey) => {
+                setHighlightedSection(provisionKey);
+                
+                // Auto-scroll to section
+                if (previewRef.current) {
+                    const sectionNum = getSectionNumber(provisionKey);
+                    const element = previewRef.current.querySelector(`[data-section="${sectionNum}"]`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }
+                
+                // Clear highlight after 15 seconds
+                setTimeout(() => {
+                    setHighlightedSection(null);
+                }, 15000);
+            };
+
+            // Get section number for provision
+            const getSectionNumber = (provisionKey) => {
+                const sectionMap = {
+                    definition_confidential_info: '1',
+                    term_duration: '2',
+                    purpose_limitation: '4',
+                    return_destruction: '5',
+                    remedies: '6'
+                };
+                return sectionMap[provisionKey];
+            };
+
+            // Generate live preview
+            const generateLivePreview = () => {
+                let previewText = SAMPLE_NDA;
+                
+                Object.entries(selectedRevisions).forEach(([provisionKey, revisionType]) => {
+                    const provision = PROVISIONS[provisionKey];
+                    const variation = provision.variations[revisionType];
+                    const sectionNum = getSectionNumber(provisionKey);
+                    
+                    if (variation && sectionNum) {
+                        const sectionRegex = new RegExp(`(${sectionNum}\\.[^\\n]*[\\s\\S]*?)(?=\\n\\d+\\.|$)`, 'i');
+                        const newSectionText = `${sectionNum}. ${provision.name.toUpperCase()}\n${variation.language}`;
+                        previewText = previewText.replace(sectionRegex, newSectionText);
+                    }
+                });
+                
+                return previewText;
+            };
+
+            // Render provision card
+            const renderProvisionCard = (provisionKey, provision) => {
+                const currentVariation = provision.variations[provision.current];
+                const isHighlighted = highlightedSection === provisionKey;
+                
+                return (
+                    <div key={provisionKey} className={`provision-card ${isHighlighted ? 'highlighted-change' : ''}`}>
+                        {/* Header */}
+                        <div style={{ borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '10px' }}>
+                            <h4 style={{ margin: '0 0 5px 0', color: '#007acc' }}>
+                                ✅ {provision.name}
+                            </h4>
+                            <p style={{ margin: '0', fontSize: '12px', color: '#666' }}>
+                                📍 {provision.location} | 📊 {provision.industryStandard}
+                            </p>
+                        </div>
+                        
+                        {/* Current Analysis */}
+                        <div style={{ background: '#f8f9fa', padding: '10px', borderRadius: '4px', marginBottom: '10px' }}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', fontSize: '13px' }}>
+                                <div>
+                                    <strong>Current:</strong> {currentVariation.description}
+                                </div>
+                                <div>
+                                    <strong>Tilts:</strong> <span style={{
+                                        color: currentVariation.tilts === 'Disclosing Party' ? '#dc3545' :
+                                              currentVariation.tilts === 'Receiving Party' ? '#007bff' : '#28a745',
+                                        fontWeight: '600'
+                                    }}>{currentVariation.tilts}</span>
+                                </div>
+                            </div>
+                            <div style={{ marginTop: '5px', fontSize: '12px', fontStyle: 'italic' }}>
+                                💡 {currentVariation.why}
+                            </div>
+                        </div>
+                        
+                        {/* Revision Options */}
+                        <div className="revision-options">
+                            {Object.entries(provision.variations).map(([variationKey, variation]) => {
+                                const isSelected = selectedRevisions[provisionKey] === variationKey;
+                                const isCurrent = provision.current === variationKey;
+                                
+                                return (
+                                    <div
+                                        key={variationKey}
+                                        className={`revision-btn ${isSelected ? 'selected' : ''} ${isCurrent ? 'current' : ''}`}
+                                        onClick={() => handleRevisionSelect(provisionKey, variationKey)}
+                                    >
+                                        <div style={{ fontWeight: '600', marginBottom: '4px' }}>
+                                            {variationKey === 'strict' || variationKey === 'long' || variationKey === 'broad' || variationKey === 'harsh' ? '🔒 Disclosing' :
+                                             variationKey === 'lenient' || variationKey === 'short' || variationKey === 'narrow' || variationKey === 'limited' ? '🔓 Receiving' : 
+                                             '⚖️ Balanced'}
+                                        </div>
+                                        <div style={{ color: '#666', fontSize: '10px' }}>
+                                            {variation.tilts}
+                                        </div>
+                                        {isSelected && (
+                                            <div className="sample-language">
+                                                "{variation.language}"
+                                            </div>
+                                        )}
+                                        {isCurrent && (
+                                            <div style={{ marginTop: '4px', color: '#28a745', fontWeight: '600', fontSize: '10px' }}>
+                                                CURRENT
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                );
+            };
+
+            // Render live preview
+            const renderLivePreview = () => {
+                const previewText = generateLivePreview();
+                const sections = previewText.split(/(\n\d+\..+)/);
+                
+                return (
+                    <div ref={previewRef} className="live-preview">
+                        {sections.map((section, index) => {
+                            const sectionMatch = section.match(/^(\d+)\./);
+                            const sectionNum = sectionMatch ? sectionMatch[1] : null;
+                            const isModified = sectionNum && Object.keys(selectedRevisions).some(key => 
+                                getSectionNumber(key) === sectionNum
+                            );
+                            const isHighlighted = sectionNum && highlightedSection && 
+                                                 getSectionNumber(highlightedSection) === sectionNum;
+                            
+                            return (
+                                <div
+                                    key={index}
+                                    data-section={sectionNum}
+                                    className={`${isHighlighted ? 'highlighted-section' : ''} ${isModified ? 'modified-section' : ''}`}
+                                >
+                                    {section}
+                                </div>
+                            );
+                        })}
+                    </div>
+                );
+            };
+
+            return (
+                <div className="analyzer-container">
+                    {/* Header */}
+                    <div className="header">
+                        <h1 style={{ margin: '0 0 10px 0' }}>⚖️ NDA Risk Analyzer V3 - Live Analysis</h1>
+                        <p style={{ margin: '0', opacity: 0.9 }}>
+                            Instant provision analysis with live preview and real-time highlighting
+                        </p>
+                        
+                        {/* AI Model Toggle - Default Llama */}
+                        <div className="ai-toggle">
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="aiModel"
+                                    checked={!useClaudeAI}
+                                    onChange={() => setUseClaudeAI(false)}
+                                />
+                                <span>🦙 Llama 3.3 70B (Default)</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="aiModel"
+                                    checked={useClaudeAI}
+                                    onChange={() => setUseClaudeAI(true)}
+                                />
+                                <span>🧠 Claude 3.5 Sonnet</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="main-grid">
+                        {/* Left: Analysis Matrix */}
+                        <div>
+                            <h3 style={{ margin: '0 0 15px 0', color: '#007acc' }}>
+                                📊 Provision Analysis & Revision Options
+                            </h3>
+                            
+                            <div style={{ maxHeight: '600px', overflow: 'auto' }}>
+                                {Object.entries(PROVISIONS).map(([key, provision]) => 
+                                    renderProvisionCard(key, provision)
+                                )}
+                            </div>
+                            
+                            {/* Export Button */}
+                            <button
+                                className="export-btn"
+                                disabled={Object.keys(selectedRevisions).length === 0}
+                            >
+                                📄 Export Revised NDA ({Object.keys(selectedRevisions).length} changes)
+                            </button>
+                        </div>
+
+                        {/* Right: Live Preview */}
+                        <div>
+                            <h3 style={{ margin: '0 0 15px 0', color: '#007acc' }}>
+                                👁️ Live NDA Preview
+                                {Object.keys(selectedRevisions).length > 0 && (
+                                    <span style={{ fontSize: '14px', color: '#28a745', marginLeft: '10px' }}>
+                                        ({Object.keys(selectedRevisions).length} changes applied)
+                                    </span>
+                                )}
+                            </h3>
+                            
+                            {renderLivePreview()}
+                            
+                            <div style={{ 
+                                marginTop: '10px', 
+                                fontSize: '12px', 
+                                color: '#666',
+                                textAlign: 'center'
+                            }}>
+                                💡 Click revision options on the left to see instant changes highlighted here
+                                <br />
+                                🟡 Yellow = Currently highlighted | 🟢 Green = Modified sections
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // Initialize app
+        const { createRoot } = ReactDOM;
+        const root = createRoot(document.getElementById('root'));
+        root.render(<NDAAnalyzerV3 />);
+        
+        console.log('🚀 NDA Risk Analyzer V3 - Working Version Loaded!');
+        console.log('✅ Default AI: Llama 3.3 70B');
+        console.log('✅ Live preview with highlighting');
+        console.log('✅ Instant analysis on load');
+    </script>
+</body>
+</html>
