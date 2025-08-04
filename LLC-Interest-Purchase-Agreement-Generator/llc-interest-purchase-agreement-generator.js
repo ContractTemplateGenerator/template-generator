@@ -114,7 +114,61 @@ const App = () => {
   const [currentTab, setCurrentTab] = React.useState(0);
   const [lastChanged, setLastChanged] = React.useState(null);
   const [documentText, setDocumentText] = React.useState('');
+  const [hasPaywallAccess, setHasPaywallAccess] = React.useState(false);
   
+  // Ref for preview content div
+  const previewRef = React.useRef(null);
+
+  // Paywall integration
+  React.useEffect(() => {
+    // Function to check and update payment status
+    const checkPaymentStatus = () => {
+      if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+        setHasPaywallAccess(true);
+        return true;
+      }
+      return false;
+    };
+    
+    // Initial check
+    if (!checkPaymentStatus()) {
+      // Apply non-copyable restrictions to preview if not paid
+      setTimeout(() => {
+        if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
+          window.PaywallSystem.makePreviewNonCopyable();
+        }
+      }, 1000);
+    }
+    
+    // Listen for payment success events
+    const handlePaymentSuccess = () => {
+      console.log('Payment success event received, updating access state');
+      setHasPaywallAccess(true);
+      if (window.PaywallSystem && window.PaywallSystem.enablePreviewInteraction) {
+        window.PaywallSystem.enablePreviewInteraction();
+      }
+    };
+    
+    // Add event listener for payment success
+    window.addEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+    
+    // Also poll payment status every 2 seconds as backup
+    const pollInterval = setInterval(() => {
+      if (!hasPaywallAccess && checkPaymentStatus()) {
+        console.log('Payment status changed, updating access state');
+        if (window.PaywallSystem && window.PaywallSystem.enablePreviewInteraction) {
+          window.PaywallSystem.enablePreviewInteraction();
+        }
+      }
+    }, 2000);
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('paywallPaymentSuccess', handlePaymentSuccess);
+      clearInterval(pollInterval);
+    };
+  }, [hasPaywallAccess]);
+
   // Ref for preview content div
   const previewRef = React.useRef(null);
 
@@ -151,6 +205,30 @@ const App = () => {
 
   // Copy document to clipboard
   const copyToClipboard = () => {
+    if (!hasPaywallAccess) {
+      if (window.PaywallSystem) {
+        window.PaywallSystem.showAccessDenied('copy');
+        window.PaywallSystem.createPaywallModal(() => {
+          // Double-check access status after modal closes
+          if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+            setHasPaywallAccess(true);
+            window.PaywallSystem.enablePreviewInteraction();
+            copyToClipboard();
+          } else {
+            console.log('Payment not confirmed, retrying access check...');
+            setTimeout(() => {
+              if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                setHasPaywallAccess(true);
+                window.PaywallSystem.enablePreviewInteraction();
+                copyToClipboard();
+              }
+            }, 1000);
+          }
+        });
+      }
+      return;
+    }
+
     try {
       navigator.clipboard.writeText(documentText);
       alert('Document copied to clipboard!');
@@ -162,6 +240,30 @@ const App = () => {
 
   // Download document as Word
   const downloadAsWord = () => {
+    if (!hasPaywallAccess) {
+      if (window.PaywallSystem) {
+        window.PaywallSystem.showAccessDenied('download');
+        window.PaywallSystem.createPaywallModal(() => {
+          // Double-check access status after modal closes
+          if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+            setHasPaywallAccess(true);
+            window.PaywallSystem.enablePreviewInteraction();
+            downloadAsWord();
+          } else {
+            console.log('Payment not confirmed, retrying access check...');
+            setTimeout(() => {
+              if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
+                setHasPaywallAccess(true);
+                window.PaywallSystem.enablePreviewInteraction();
+                downloadAsWord();
+              }
+            }, 1000);
+          }
+        });
+      }
+      return;
+    }
+
     try {
       console.log("Download MS Word button clicked");
       
@@ -630,6 +732,18 @@ const App = () => {
     
     setDocumentText(generateDocument());
   }, [formData]);
+
+  // Apply preview restrictions on component mount
+  React.useEffect(() => {
+    if (!hasPaywallAccess) {
+      // Apply non-copyable restrictions to preview
+      setTimeout(() => {
+        if (window.PaywallSystem && window.PaywallSystem.makePreviewNonCopyable) {
+          window.PaywallSystem.makePreviewNonCopyable();
+        }
+      }, 500);
+    }
+  }, [documentText, hasPaywallAccess]);
 
   // Function to determine which section to highlight based on the last changed field
   const getSectionToHighlight = () => {
