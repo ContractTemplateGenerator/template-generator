@@ -1,5 +1,8 @@
 // LLC Interest Purchase Agreement Generator
 const App = () => {
+  // Destructure React hooks for better compatibility
+  const { useState, useEffect, useRef } = React;
+  
   // Icon component
   const Icon = ({ name, ...props }) => {
     return (
@@ -110,17 +113,17 @@ const App = () => {
   };
 
   // React state hooks
-  const [formData, setFormData] = React.useState(initialFormData);
-  const [currentTab, setCurrentTab] = React.useState(0);
-  const [lastChanged, setLastChanged] = React.useState(null);
-  const [documentText, setDocumentText] = React.useState('');
-  const [hasPaywallAccess, setHasPaywallAccess] = React.useState(false);
+  const [formData, setFormData] = useState(initialFormData);
+  const [currentTab, setCurrentTab] = useState(0);
+  const [lastChanged, setLastChanged] = useState(null);
+  const [documentText, setDocumentText] = useState('');
+  const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
   
   // Ref for preview content div
-  const previewRef = React.useRef(null);
+  const previewRef = useRef(null);
 
   // Paywall integration
-  React.useEffect(() => {
+  useEffect(() => {
     // Function to check and update payment status
     const checkPaymentStatus = () => {
       if (window.PaywallSystem && window.PaywallSystem.hasAccess()) {
@@ -170,7 +173,7 @@ const App = () => {
   }, [hasPaywallAccess]);
 
   // Ref for preview content div
-  const previewRef = React.useRef(null);
+  const previewRef = useRef(null);
 
   // Navigation functions
   const nextTab = () => {
@@ -283,7 +286,7 @@ const App = () => {
   };
 
   // Generate document text based on form data
-  React.useEffect(() => {
+  useEffect(() => {
     const generateDocument = () => {
       let text = '';
       
@@ -734,7 +737,7 @@ const App = () => {
   }, [formData]);
 
   // Apply preview restrictions on component mount
-  React.useEffect(() => {
+  useEffect(() => {
     if (!hasPaywallAccess) {
       // Apply non-copyable restrictions to preview
       setTimeout(() => {
@@ -887,7 +890,7 @@ const App = () => {
   const highlightedText = createHighlightedText();
 
   // Effect to scroll to highlighted text
-  React.useEffect(() => {
+  useEffect(() => {
     if (previewRef.current) {
       const highlightedElement = previewRef.current.querySelector('.highlighted-text');
       if (highlightedElement) {
@@ -2124,5 +2127,28 @@ const App = () => {
   );
 };
 
-// Render the App component
-ReactDOM.render(<App />, document.getElementById('root'));
+// Render the App component using React 18 syntax
+console.log('🚀 LLC Interest Purchase Agreement Generator - Starting initialization...');
+console.log('✅ React loaded:', typeof React !== 'undefined');
+console.log('✅ ReactDOM loaded:', typeof ReactDOM !== 'undefined');
+console.log('✅ Root element exists:', !!document.getElementById('root'));
+
+try {
+  const { createRoot } = ReactDOM;
+  const root = createRoot(document.getElementById('root'));
+  console.log('✅ React root created successfully');
+  
+  root.render(<App />);
+  console.log('✅ LLC generator app rendered successfully!');
+} catch (error) {
+  console.error('❌ Error rendering LLC generator app:', error);
+  // Fallback to basic error display
+  document.getElementById('root').innerHTML = `
+    <div style="padding: 20px; color: red; font-family: Arial, sans-serif;">
+      <h3>Error Loading LLC Generator</h3>
+      <p>There was an error initializing the application.</p>
+      <p>Error: ${error.message}</p>
+      <p>Please refresh the page or contact support.</p>
+    </div>
+  `;
+}
