@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLC Interest Purchase Agreement Generator | terms.law</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.1/feather.min.js"></script>
+    <!-- Calendly widget -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <!-- PayPal SDK for Paywall -->
+    <script src="https://www.paypal.com/sdk/js?client-id=ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx&currency=USD"></script>
+</head>
+<body>
+    <div id="root">
+        <div style="text-align: center; padding: 50px; color: #666;">
+            Loading LLC Interest Purchase Agreement Generator...
+        </div>
+    </div>
+    
+    <script src="docx-generator.js"></script>
+    <script src="paywall-system.js"></script>
+    
+    <script type="text/babel">
+        console.log('🚀 LLC Interest Purchase Agreement Generator - Starting...');
+        
+        const { useState, useEffect, useRef } = React;
+        
+        const App = () => {
+            // Basic state for testing
+            const [currentTab, setCurrentTab] = useState(0);
+            const [hasPaywallAccess, setHasPaywallAccess] = useState(false);
+            const [formData, setFormData] = useState({
+                sellerName: '',
+                buyerName: '',
+                companyName: '',
+                purchasePrice: ''
+            });
+            
+            // Test paywall integration
+            useEffect(() => {
+                if (window.PaywallSystem) {
+                    const hasAccess = window.PaywallSystem.hasAccess();
+                    setHasPaywallAccess(hasAccess);
+                }
+            }, []);
+            
+            const tabs = [
+                { id: 'parties', label: 'Parties' },
+                { id: 'transaction', label: 'Transaction Details' },
+                { id: 'finalize', label: 'Finalize & Review' }
+            ];
+            
+            const handleInputChange = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+            
+            const copyToClipboard = () => {
+                if (!hasPaywallAccess && window.PaywallSystem) {
+                    window.PaywallSystem.showAccessDenied('copy');
+                    window.PaywallSystem.createPaywallModal();
+                    return;
+                }
+                
+                const text = generateDocument();
+                navigator.clipboard.writeText(text);
+                alert('Document copied to clipboard!');
+            };
+            
+            const downloadDocument = () => {
+                if (!hasPaywallAccess && window.PaywallSystem) {
+                    window.PaywallSystem.showAccessDenied('download');
+                    window.PaywallSystem.createPaywallModal();
+                    return;
+                }
+                
+                const text = generateDocument();
+                if (window.generateWordDoc) {
+                    window.generateWordDoc(text, formData);
+                }
+            };
+            
+            const generateDocument = () => {
+                return `LLC INTEREST PURCHASE AGREEMENT
+
+This Agreement is entered into between:
+
+SELLER: ${formData.sellerName || '[Seller Name]'}
+BUYER: ${formData.buyerName || '[Buyer Name]'}  
+COMPANY: ${formData.companyName || '[LLC Name]'}
+
+PURCHASE PRICE: $${formData.purchasePrice || '[Amount]'}
+
+[Additional terms and conditions would be generated based on user selections...]
+
+This is a simplified version for testing. The full generator would include all provisions based on user inputs.`;
+            };
+            
+            const renderTabContent = () => {
+                switch (currentTab) {
+                    case 0: // Parties
+                        return (
+                            <div className="tab-content">
+                                <h3>Party Information</h3>
+                                <div className="form-group">
+                                    <label>Seller Name:</label>
+                                    <input
+                                        type="text"
+                                        value={formData.sellerName}
+                                        onChange={(e) => handleInputChange('sellerName', e.target.value)}
+                                        placeholder="Enter seller name"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>Buyer Name:</label>
+                                    <input
+                                        type="text"
+                                        value={formData.buyerName}
+                                        onChange={(e) => handleInputChange('buyerName', e.target.value)}
+                                        placeholder="Enter buyer name"
+                                    />
+                                </div>
+                                <div className="form-group">
+                                    <label>LLC Name:</label>
+                                    <input
+                                        type="text"
+                                        value={formData.companyName}
+                                        onChange={(e) => handleInputChange('companyName', e.target.value)}
+                                        placeholder="Enter LLC name"
+                                    />
+                                </div>
+                            </div>
+                        );
+                    
+                    case 1: // Transaction
+                        return (
+                            <div className="tab-content">
+                                <h3>Transaction Details</h3>
+                                <div className="form-group">
+                                    <label>Purchase Price:</label>
+                                    <input
+                                        type="text"
+                                        value={formData.purchasePrice}
+                                        onChange={(e) => handleInputChange('purchasePrice', e.target.value)}
+                                        placeholder="Enter purchase price"
+                                    />
+                                </div>
+                                <p>Additional transaction details would be configured here...</p>
+                            </div>
+                        );
+                    
+                    case 2: // Finalize
+                        return (
+                            <div className="tab-content">
+                                <h3>Document Preview</h3>
+                                <div className="document-preview" style={{
+                                    background: '#f9f9f9',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '5px',
+                                    padding: '15px',
+                                    marginBottom: '20px',
+                                    fontFamily: 'monospace',
+                                    fontSize: '12px',
+                                    whiteSpace: 'pre-wrap',
+                                    maxHeight: '300px',
+                                    overflow: 'auto'
+                                }}>
+                                    {generateDocument()}
+                                </div>
+                                <div style={{ display: 'flex', gap: '10px' }}>
+                                    <button onClick={copyToClipboard} className="action-button">
+                                        📋 Copy to Clipboard
+                                    </button>
+                                    <button onClick={downloadDocument} className="action-button">
+                                        📄 Download Word Document
+                                    </button>
+                                </div>
+                                {!hasPaywallAccess && (
+                                    <p style={{ color: '#dc3545', marginTop: '10px' }}>
+                                        🔒 Payment required to copy or download the full document.
+                                    </p>
+                                )}
+                            </div>
+                        );
+                    
+                    default:
+                        return <div>Select a tab</div>;
+                }
+            };
+            
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>🏢 LLC Interest Purchase Agreement Generator</h1>
+                        <p>Generate professional LLC interest purchase agreements</p>
+                        {hasPaywallAccess && (
+                            <div style={{ color: '#28a745', marginTop: '10px' }}>
+                                ✅ Full access unlocked
+                            </div>
+                        )}
+                    </div>
+                    
+                    <div className="tabs">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                onClick={() => setCurrentTab(index)}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+                    
+                    <div className="content">
+                        {renderTabContent()}
+                    </div>
+                    
+                    <div className="navigation">
+                        <button
+                            onClick={() => setCurrentTab(Math.max(0, currentTab - 1))}
+                            disabled={currentTab === 0}
+                            className="nav-button"
+                        >
+                            ← Previous
+                        </button>
+                        
+                        <button
+                            onClick={() => setCurrentTab(Math.min(tabs.length - 1, currentTab + 1))}
+                            disabled={currentTab === tabs.length - 1}
+                            className="nav-button"
+                        >
+                            Next →
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+        
+        // Render the app
+        try {
+            const { createRoot } = ReactDOM;
+            const root = createRoot(document.getElementById('root'));
+            root.render(<App />);
+            console.log('✅ LLC generator loaded successfully!');
+        } catch (error) {
+            console.error('❌ Error loading LLC generator:', error);
+            document.getElementById('root').innerHTML = `
+                <div style="padding: 20px; color: red;">
+                    <h3>Error Loading Generator</h3>
+                    <p>${error.message}</p>
+                </div>
+            `;
+        }
+        
+        // Initialize feather icons
+        document.addEventListener("DOMContentLoaded", function() {
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+        });
+    </script>
+</body>
+</html>
