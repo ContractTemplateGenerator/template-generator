@@ -197,6 +197,7 @@ function WithholdingAgentGenerator() {
   const [lastChanged, setLastChanged] = useState(null);
   const [errors, setErrors] = useState({});
   const [language, setLanguage] = useState('en');
+  const [showContingentDetails, setShowContingentDetails] = useState(false);
   const previewRef = useRef(null);
   
   const t = translations[language];
@@ -447,6 +448,30 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
               <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
                 {t.viewTreaty.replace('{country}', t.countryOptions[formData.country])}
               </a>
+              {formData.country === 'bulgaria' && (
+                <div className="contingent-interest-info">
+                  <button 
+                    type="button"
+                    className="learn-more-btn" 
+                    onClick={() => setShowContingentDetails(!showContingentDetails)}
+                  >
+                    ℹ️ What is "contingent interest"? {showContingentDetails ? '▲' : '▼'}
+                  </button>
+                  {showContingentDetails && (
+                    <div className="contingent-details">
+                      <h4>{language === 'en' ? 'Contingent Interest (10% Rate)' : 'Bedingte Zinsen (10% Satz)'}</h4>
+                      <p><strong>{language === 'en' ? 'Applies when interest is tied to business performance:' : 'Gilt wenn Zinsen an Geschäftserfolg gekoppelt sind:'}</strong></p>
+                      <ul>
+                        <li>{language === 'en' ? 'Interest based on profits, revenues, or cash flow' : 'Zinsen basierend auf Gewinnen, Einnahmen oder Cashflow'}</li>
+                        <li>{language === 'en' ? 'Interest linked to property value changes' : 'Zinsen gekoppelt an Immobilienwertveränderungen'}</li>
+                        <li>{language === 'en' ? 'Interest tied to dividend/distribution payments' : 'Zinsen gekoppelt an Dividenden-/Ausschüttungszahlungen'}</li>
+                      </ul>
+                      <p><strong>{language === 'en' ? 'Example:' : 'Beispiel:'}</strong> {language === 'en' ? '"5% base rate plus 2% of annual net profits"' : '"5% Basiszins plus 2% der jährlichen Nettogewinne"'}</p>
+                      <p><strong>{language === 'en' ? 'Why higher rate?' : 'Warum höherer Satz?'}</strong> {language === 'en' ? 'Contingent interest resembles equity participation more than pure debt, so it\'s taxed more like dividends.' : 'Bedingte Zinsen ähneln mehr einer Kapitalbeteiligung als reinen Schulden, daher werden sie eher wie Dividenden besteuert.'}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
