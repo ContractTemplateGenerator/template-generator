@@ -14,7 +14,8 @@ const translations = {
       malta: "Malta",
       thailand: "Thailand",
       cyprus: "Cyprus",
-      switzerland: "Switzerland"
+      switzerland: "Switzerland",
+      bulgaria: "Bulgaria"
     },
     llcNameLabel: "LLC Name",
     llcNameTooltip: "Enter the full legal name of the LLC as it appears on IRS documents.",
@@ -70,7 +71,8 @@ const translations = {
       malta: "Malta",
       thailand: "Thailand",
       cyprus: "Zypern",
-      switzerland: "Schweiz"
+      switzerland: "Schweiz",
+      bulgaria: "Bulgarien"
     },
     llcNameLabel: "LLC-Name",
     llcNameTooltip: "Geben Sie den vollständigen rechtlichen Namen der LLC ein, wie er in den IRS-Dokumenten erscheint.",
@@ -132,8 +134,8 @@ const treatyData = {
     treatyName: 'U.S.–Malta tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/malta-tax-treaty-documents',
     description: {
-      en: 'Malta has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Malta tax treaty, reducing the standard 30% U.S. withholding tax.',
-      de: 'Malta hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11 des US-Malta-Steuerabkommens, was die standardmäßige 30% US-Quellensteuer reduziert.'
+      en: 'Malta has a 10% maximum withholding rate on interest under Article 11 of the U.S.-Malta tax treaty, with 0% exemptions for government entities, banks/financial institutions, and installment sales of goods/services.',
+      de: 'Malta hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11 des US-Malta-Steuerabkommens, mit 0% Befreiungen für Regierungsstellen, Banken/Finanzinstitute und Ratenkäufe von Waren/Dienstleistungen.'
     }
   },
   thailand: {
@@ -147,13 +149,13 @@ const treatyData = {
     }
   },
   cyprus: {
-    article: 'Article 11(2)',
+    article: 'Article 13',
     rate: '10%',
     treatyName: 'U.S.–Cyprus tax treaty (TIAS 11-167)',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/cyprus-tax-treaty-documents',
     description: {
-      en: 'Cyprus has a 10% maximum withholding rate on interest under Article 11(2) of the U.S.-Cyprus tax treaty.',
-      de: 'Zypern hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 11(2) des US-Zypern-Steuerabkommens.'
+      en: 'Cyprus has a 10% maximum withholding rate on interest under Article 13 of the U.S.-Cyprus tax treaty, with 0% exemptions for government entities, banks, and commercial credit transactions.',
+      de: 'Zypern hat einen maximalen Quellensteuerabzug von 10% auf Zinsen unter Artikel 13 des US-Zypern-Steuerabkommens, mit 0% Befreiungen für Regierungsstellen, Banken und gewerbliche Kredittransaktionen.'
     }
   },
   switzerland: {
@@ -164,6 +166,16 @@ const treatyData = {
     description: {
       en: 'Switzerland has a 0% withholding rate on interest under Article 11 of the U.S.-Switzerland tax treaty. Interest is taxable only in the residence state (Switzerland), providing complete exemption from U.S. withholding tax.',
       de: 'Die Schweiz hat einen 0% Quellensteuerabzug auf Zinsen unter Artikel 11 des US-Schweiz-Steuerabkommens. Zinsen sind nur im Wohnsitzstaat (Schweiz) steuerpflichtig und vollständig von der US-Quellensteuer befreit.'
+    }
+  },
+  bulgaria: {
+    article: 'Article 11(2)',
+    rate: '5%',
+    treatyName: 'U.S.–Bulgaria tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/bulgaria-tax-treaty-documents',
+    description: {
+      en: 'Bulgaria has a 5% maximum withholding rate on interest under Article 11(2) of the U.S.-Bulgaria tax treaty, with certain contingent interest potentially taxed up to 10% under Article 11(8).',
+      de: 'Bulgarien hat einen maximalen Quellensteuerabzug von 5% auf Zinsen unter Artikel 11(2) des US-Bulgarien-Steuerabkommens, mit bestimmten bedingten Zinsen, die unter Artikel 11(8) möglicherweise bis zu 10% besteuert werden.'
     }
   }
 };
@@ -425,6 +437,7 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
             <option value="thailand">{t.countryOptions.thailand}</option>
             <option value="cyprus">{t.countryOptions.cyprus}</option>
             <option value="switzerland">{t.countryOptions.switzerland}</option>
+            <option value="bulgaria">{t.countryOptions.bulgaria}</option>
           </select>
           {errors.country && <span className="error-message">{errors.country}</span>}
           {formData.country && treatyData[formData.country] && (
