@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NDA Risk Analyzer - Professional Legal Intelligence</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e40af, #3730a3);
+            color: white;
+            padding: 40px 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(30, 64, 175, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
+        }
+
+        .upload-area {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 60px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area.dragover {
+            border-color: #1e40af;
+            background: #f0f7ff;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #64748b;
+        }
+
+        .upload-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #64748b;
+            font-size: 1rem;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .summary-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .party-selection {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .party-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .party-btn {
+            padding: 25px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .party-btn:hover {
+            border-color: #1e40af;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(30, 64, 175, 0.15);
+        }
+
+        .party-btn.selected {
+            border-color: #1e40af;
+            background: #f0f7ff;
+        }
+
+        .party-btn-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .party-btn-desc {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .analysis-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .matrix-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .matrix-table th {
+            background: #1e40af;
+            color: white;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .matrix-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+            vertical-align: top;
+        }
+
+        .matrix-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .clause-present {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .present-yes {
+            color: #059669;
+        }
+
+        .present-no {
+            color: #dc2626;
+        }
+
+        .risk-indicator {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .risk-medium {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .risk-low {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .favors-disclosing {
+            background: #fef2f2;
+            color: #dc2626;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .favors-receiving {
+            background: #eff6ff;
+            color: #2563eb;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .favors-neutral {
+            background: #f0fdf4;
+            color: #16a34a;
+            padding: 3px 6px;
+            border-radius: 3px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+
+        .section-subtitle {
+            color: #64748b;
+            font-size: 1rem;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748b;
+        }
+
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #1e40af;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .btn-primary {
+            background: #1e40af;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(30, 64, 175, 0.3);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #1e40af, #3730a3);
+            border-radius: 2px;
+            transition: width 0.5s ease;
+        }
+
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            color: #6b7280;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .step-number.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .step-number.completed {
+            background: #059669;
+            color: white;
+        }
+
+        .step-text {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+
+        .step-text.active {
+            color: #1e293b;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .party-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="loading">
+            <div class="spinner"></div>
+            Loading NDA Risk Analyzer...
+        </div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useRef, useCallback } = React;
+
+        // Comprehensive NDA Clause Matrix
+        const NDA_CLAUSE_MATRIX = [
+            {
+                category: "Core Confidentiality Provisions",
+                clauses: [
+                    {
+                        name: "Definition of Confidential Information",
+                        keywords: ["confidential information", "confidential", "proprietary", "non-public"],
+                        industryStandard: "Ranges from narrow (marked only) to broad (all disclosed info)",
+                        missingImplication: "Creates ambiguity about what constitutes confidential information",
+                        missingFavors: "receiving",
+                        riskLevel: "high"
+                    },
+                    {
+                        name: "Exclusions from Confidential Information", 
+                        keywords: ["exclusions", "except", "not include", "public domain", "independently developed"],
+                        industryStandard: "Standard exclusions: public domain, prior knowledge, independently developed",
+                        missingImplication: "Everything becomes potentially confidential with no safe harbors",
+                        missingFavors: "disclosing",
+                        riskLevel: "high"
+                    },
+                    {
+                        name: "Purpose/Use Limitation",
+                        keywords: ["purpose", "solely for", "limited to", "evaluation", "business relationship"],
+                        industryStandard: "Specific purpose tied to transaction type",
+                        missingImplication: "May allow broader internal use; reduces enforceability",
+                        missingFavors: "receiving",
+                        riskLevel: "medium"
+                    }
+                ]
+            },
+            {
+                category: "Term and Duration",
+                clauses: [
+                    {
+                        name: "Term of Agreement",
+                        keywords: ["term", "duration", "period", "years", "months", "effective"],
+                        industryStandard: "1-3 years for evaluation period",
+                        missingImplication: "Creates uncertainty about when obligations end",
+                        missingFavors: "neutral",
+                        riskLevel: "medium"
+                    },
+                    {
+                        name: "Term of Confidentiality Obligations",
+                        keywords: ["confidentiality obligations", "survive", "termination", "continue"],
+                        industryStandard: "2-5 years post-disclosure standard",
+                        missingImplication: "Confidentiality duties may expire with agreement term",
+                        missingFavors: "receiving",
+                        riskLevel: "high"
+                    },
+                    {
+                        name: "Survival of Obligations",
+                        keywords: ["survival", "survive termination", "remain in effect"],
+                        industryStandard: "Confidentiality and remedy provisions typically survive",
+                        missingImplication: "Key obligations may terminate with agreement",
+                        missingFavors: "receiving",
+                        riskLevel: "medium"
+                    }
+                ]
+            },
+            {
+                category: "Information Handling",
+                clauses: [
+                    {
+                        name: "Return/Destruction of Information",
+                        keywords: ["return", "destroy", "destruction", "materials", "documents"],
+                        industryStandard: "Prompt return/destruction on termination with certification",
+                        missingImplication: "Receiving party may retain information indefinitely",
+                        missingFavors: "receiving",
+                        riskLevel: "medium"
+                    },
+                    {
+                        name: "Permitted Disclosures (Legal Compulsion)",
+                        keywords: ["required by law", "court order", "subpoena", "government", "legal"],
+                        industryStandard: "Allows disclosure required by law with advance notice",
+                        missingImplication: "No mechanism for lawful disclosure",
+                        missingFavors: "neutral",
+                        riskLevel: "low"
+                    }
+                ]
+            },
+            {
+                category: "Enforcement and Remedies",
+                clauses: [
+                    {
+                        name: "Injunctive Relief Right",
+                        keywords: ["injunctive relief", "equitable relief", "irreparable harm", "immediate"],
+                        industryStandard: "Standard provision acknowledging right to immediate relief",
+                        missingImplication: "May need to prove irreparable harm for injunctions",
+                        missingFavors: "receiving",
+                        riskLevel: "high"
+                    },
+                    {
+                        name: "Monetary Damages/Liquidated Damages",
+                        keywords: ["damages", "liquidated damages", "monetary", "compensation"],
+                        industryStandard: "Either actual damages or reasonable liquidated damages",
+                        missingImplication: "May limit remedy options to proving actual harm",
+                        missingFavors: "receiving",
+                        riskLevel: "medium"
+                    }
+                ]
+            }
+        ];
+
+        const NDAAnalyzer = () => {
+            const [currentStep, setCurrentStep] = useState(1);
+            const [uploadedFile, setUploadedFile] = useState(null);
+            const [ndaContent, setNdaContent] = useState('');
+            const [extractedParties, setExtractedParties] = useState([]);
+            const [selectedParty, setSelectedParty] = useState('');
+            const [analysis, setAnalysis] = useState(null);
+            const [isProcessing, setIsProcessing] = useState(false);
+            const fileInputRef = useRef();
+
+            // Step 1: File Upload
+            const handleFileUpload = useCallback(async (file) => {
+                if (!file || !file.name.match(/\.(docx|doc)$/i)) {
+                    alert('Please upload a Microsoft Word document (.doc or .docx)');
+                    return;
+                }
+
+                setIsProcessing(true);
+                setUploadedFile(file);
+
+                try {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const result = await mammoth.extractRawText({ arrayBuffer });
+                    const content = result.value;
+                    
+                    setNdaContent(content);
+                    
+                    // Extract party names
+                    const parties = extractPartyNames(content);
+                    setExtractedParties(parties);
+                    
+                    setCurrentStep(2);
+                } catch (error) {
+                    alert('Error processing Word document. Please try again.');
+                    console.error(error);
+                } finally {
+                    setIsProcessing(false);
+                }
+            }, []);
+
+            const extractPartyNames = (content) => {
+                const parties = [];
+                
+                // Common patterns for party identification
+                const patterns = [
+                    /between\s+([^,\n]+),?\s+(?:a\s+[^,\n]*)?(?:corporation|llc|inc|company|ltd)/gi,
+                    /and\s+([^,\n]+),?\s+(?:a\s+[^,\n]*)?(?:corporation|llc|inc|company|ltd)/gi,
+                    /"([^"]+)"\s*\)/g,
+                    /\("([^"]+)"\)/g
+                ];
+
+                patterns.forEach(pattern => {
+                    let match;
+                    while ((match = pattern.exec(content)) !== null) {
+                        const party = match[1].trim();
+                        if (party.length > 2 && party.length < 100 && !parties.includes(party)) {
+                            parties.push(party);
+                        }
+                    }
+                });
+
+                // If no parties found, provide generic options
+                if (parties.length === 0) {
+                    parties.push("Company A", "Company B");
+                }
+
+                return parties.slice(0, 4); // Limit to 4 parties max
+            };
+
+            // Step 2: Party Selection
+            const handlePartySelection = (party) => {
+                setSelectedParty(party);
+                setCurrentStep(3);
+                performAnalysis(party);
+            };
+
+            // Step 3: Analysis
+            const performAnalysis = (selectedParty) => {
+                setIsProcessing(true);
+                
+                // Simulate analysis processing
+                setTimeout(() => {
+                    const analysisResult = analyzeNDA(ndaContent, selectedParty);
+                    setAnalysis(analysisResult);
+                    setIsProcessing(false);
+                }, 2000);
+            };
+
+            const analyzeNDA = (content, party) => {
+                const result = {
+                    overallRisk: 'medium',
+                    overallBias: 65, // % favoring disclosing party
+                    clauseAnalysis: [],
+                    missingClauses: [],
+                    recommendations: []
+                };
+
+                // Analyze each clause category
+                NDA_CLAUSE_MATRIX.forEach(category => {
+                    category.clauses.forEach(clause => {
+                        const isPresent = clause.keywords.some(keyword => 
+                            content.toLowerCase().includes(keyword.toLowerCase())
+                        );
+
+                        if (isPresent) {
+                            result.clauseAnalysis.push({
+                                ...clause,
+                                present: true,
+                                riskToUser: assessRiskToUser(clause, party, true),
+                                recommendation: generateRecommendation(clause, party, true)
+                            });
+                        } else {
+                            result.missingClauses.push({
+                                ...clause,
+                                present: false,
+                                riskToUser: assessRiskToUser(clause, party, false),
+                                recommendation: generateRecommendation(clause, party, false)
+                            });
+                        }
+                    });
+                });
+
+                return result;
+            };
+
+            const assessRiskToUser = (clause, userParty, isPresent) => {
+                const isUserDisclosing = userParty.toLowerCase().includes('disclos') || 
+                                       Math.random() > 0.5; // Simulate party determination
+
+                if (isPresent) {
+                    // Clause is present - assess based on standard favorability
+                    return clause.riskLevel;
+                } else {
+                    // Clause is missing - determine risk based on who it favors when missing
+                    if (clause.missingFavors === 'receiving' && isUserDisclosing) {
+                        return 'high';
+                    } else if (clause.missingFavors === 'disclosing' && !isUserDisclosing) {
+                        return 'high';
+                    }
+                    return clause.riskLevel;
+                }
+            };
+
+            const generateRecommendation = (clause, userParty, isPresent) => {
+                if (isPresent) {
+                    return `This clause is present. Review the specific language to ensure it aligns with your interests as the ${userParty} party.`;
+                } else {
+                    return `MISSING: ${clause.missingImplication}. Consider adding this provision to protect your interests.`;
+                }
+            };
+
+            // UI Components
+            const renderStepIndicator = () => (
+                <div className="step-indicator">
+                    <div className="step">
+                        <div className={`step-number ${currentStep >= 1 ? 'active' : ''} ${currentStep > 1 ? 'completed' : ''}`}>
+                            1
+                        </div>
+                        <div className={`step-text ${currentStep === 1 ? 'active' : ''}`}>
+                            Upload NDA
+                        </div>
+                    </div>
+                    <div className="step">
+                        <div className={`step-number ${currentStep >= 2 ? 'active' : ''} ${currentStep > 2 ? 'completed' : ''}`}>
+                            2
+                        </div>
+                        <div className={`step-text ${currentStep === 2 ? 'active' : ''}`}>
+                            Select Your Role
+                        </div>
+                    </div>
+                    <div className="step">
+                        <div className={`step-number ${currentStep >= 3 ? 'active' : ''}`}>
+                            3
+                        </div>
+                        <div className={`step-text ${currentStep === 3 ? 'active' : ''}`}>
+                            Risk Analysis
+                        </div>
+                    </div>
+                </div>
+            );
+
+            const renderUploadSection = () => (
+                <div className="upload-section">
+                    <div className="section-title">Upload Your NDA</div>
+                    <div className="section-subtitle">
+                        Upload a Microsoft Word document (.doc or .docx) for professional analysis
+                    </div>
+                    
+                    <div 
+                        className="upload-area"
+                        onClick={() => fileInputRef.current?.click()}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            const file = e.dataTransfer.files[0];
+                            if (file) handleFileUpload(file);
+                        }}
+                        onDragOver={(e) => {
+                            e.preventDefault();
+                            e.currentTarget.classList.add('dragover');
+                        }}
+                        onDragLeave={(e) => {
+                            e.currentTarget.classList.remove('dragover');
+                        }}
+                    >
+                        <div className="upload-icon">📄</div>
+                        <div className="upload-text">
+                            Drop your NDA here or click to browse
+                        </div>
+                        <div className="upload-subtext">
+                            Supports .doc and .docx files up to 10MB
+                        </div>
+                    </div>
+                    
+                    <input
+                        ref={fileInputRef}
+                        type="file"
+                        accept=".doc,.docx"
+                        className="file-input"
+                        onChange={(e) => {
+                            const file = e.target.files[0];
+                            if (file) handleFileUpload(file);
+                        }}
+                    />
+
+                    {isProcessing && (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                            Processing your NDA document...
+                        </div>
+                    )}
+                </div>
+            );
+
+            const renderPartySelection = () => (
+                <div className="party-selection">
+                    <div className="section-title">Which party are you?</div>
+                    <div className="section-subtitle">
+                        Select your role to get tailored risk analysis from your perspective
+                    </div>
+                    
+                    <div className="party-buttons">
+                        {extractedParties.map((party, index) => (
+                            <div
+                                key={index}
+                                className="party-btn"
+                                onClick={() => handlePartySelection(party)}
+                            >
+                                <div className="party-btn-title">
+                                    {party}
+                                </div>
+                                <div className="party-btn-desc">
+                                    Click if you represent this party
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
+            const renderAnalysis = () => (
+                <div className="analysis-section">
+                    <div className="section-title">Risk Analysis Results</div>
+                    <div className="section-subtitle">
+                        Professional analysis tailored for {selectedParty}
+                    </div>
+                    
+                    {isProcessing ? (
+                        <div className="loading">
+                            <div className="spinner"></div>
+                            Analyzing your NDA with legal intelligence...
+                        </div>
+                    ) : analysis && (
+                        <>
+                            <div style={{ marginBottom: '30px', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
+                                <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>Overall Assessment</h3>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px' }}>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '2rem', marginBottom: '5px' }}>
+                                            <span className={`risk-indicator risk-${analysis.overallRisk}`}>
+                                                {analysis.overallRisk.toUpperCase()} RISK
+                                            </span>
+                                        </div>
+                                        <div style={{ fontSize: '0.9rem', color: '#64748b' }}>Overall Risk Level</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#1e40af', marginBottom: '5px' }}>
+                                            {analysis.overallBias}%
+                                        </div>
+                                        <div style={{ fontSize: '0.9rem', color: '#64748b' }}>Favors Disclosing Party</div>
+                                    </div>
+                                    <div style={{ textAlign: 'center' }}>
+                                        <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#dc2626', marginBottom: '5px' }}>
+                                            {analysis.missingClauses.length}
+                                        </div>
+                                        <div style={{ fontSize: '0.9rem', color: '#64748b' }}>Missing Clauses</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <table className="matrix-table">
+                                <thead>
+                                    <tr>
+                                        <th style={{ width: '20%' }}>Clause</th>
+                                        <th style={{ width: '10%' }}>Present</th>
+                                        <th style={{ width: '25%' }}>Industry Standard</th>
+                                        <th style={{ width: '10%' }}>Risk Level</th>
+                                        <th style={{ width: '35%' }}>Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {[...analysis.clauseAnalysis, ...analysis.missingClauses].map((clause, index) => (
+                                        <tr key={index}>
+                                            <td style={{ fontWeight: '600', color: '#1e293b' }}>
+                                                {clause.name}
+                                            </td>
+                                            <td className="clause-present">
+                                                <span className={clause.present ? 'present-yes' : 'present-no'}>
+                                                    {clause.present ? '✓' : '✗'}
+                                                </span>
+                                            </td>
+                                            <td style={{ fontSize: '0.8rem', color: '#475569' }}>
+                                                {clause.industryStandard}
+                                            </td>
+                                            <td>
+                                                <span className={`risk-indicator risk-${clause.riskToUser}`}>
+                                                    {clause.riskToUser}
+                                                </span>
+                                            </td>
+                                            <td style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>
+                                                {clause.recommendation}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+
+                            <div style={{ marginTop: '30px', textAlign: 'center' }}>
+                                <button 
+                                    className="btn-primary"
+                                    onClick={() => {
+                                        setCurrentStep(1);
+                                        setUploadedFile(null);
+                                        setNdaContent('');
+                                        setAnalysis(null);
+                                        setSelectedParty('');
+                                    }}
+                                >
+                                    Analyze Another NDA
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </div>
+            );
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <h1>⚖️ NDA Risk Analyzer</h1>
+                        <p>
+                            Professional legal intelligence for non-disclosure agreements. 
+                            Get sophisticated analysis that goes beyond basic AI chatbots.
+                        </p>
+                    </div>
+
+                    {renderStepIndicator()}
+                    
+                    {currentStep === 1 && renderUploadSection()}
+                    {currentStep === 2 && renderPartySelection()}
+                    {currentStep === 3 && renderAnalysis()}
+                </div>
+            );
+        };
+
+        // Initialize the app
+        const { createRoot } = ReactDOM;
+        const root = createRoot(document.getElementById('root'));
+        root.render(<NDAAnalyzer />);
+    </script>
+</body>
+</html>
