@@ -372,6 +372,22 @@
             font-weight: 600;
         }
 
+        .ai-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .ai-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            color: white;
+        }
+
         @media (max-width: 768px) {
             .party-buttons {
                 grid-template-columns: 1fr;
@@ -510,6 +526,7 @@
             const [selectedParty, setSelectedParty] = useState('');
             const [analysis, setAnalysis] = useState(null);
             const [isProcessing, setIsProcessing] = useState(false);
+            const [useClaudeAI, setUseClaudeAI] = useState(false); // Default to Llama
             const fileInputRef = useRef();
 
             // Step 1: File Upload
@@ -545,30 +562,71 @@
             const extractPartyNames = (content) => {
                 const parties = [];
                 
-                // Common patterns for party identification
+                // More comprehensive patterns for party identification
                 const patterns = [
-                    /between\s+([^,\n]+),?\s+(?:a\s+[^,\n]*)?(?:corporation|llc|inc|company|ltd)/gi,
-                    /and\s+([^,\n]+),?\s+(?:a\s+[^,\n]*)?(?:corporation|llc|inc|company|ltd)/gi,
-                    /"([^"]+)"\s*\)/g,
-                    /\("([^"]+)"\)/g
+                    // Pattern 1: "between PARTY NAME, a [state] [entity type]"
+                    /between\s+([A-Z][A-Za-z\s&.,]+?),\s+a\s+/gi,
+                    
+                    // Pattern 2: "and PARTY NAME, a [state] [entity type]"  
+                    /\sand\s+([A-Z][A-Za-z\s&.,]+?),\s+a\s+/gi,
+                    
+                    // Pattern 3: Company names in quotes with closing parenthesis
+                    /"([A-Za-z\s&.,]+)"\s*\)/g,
+                    
+                    // Pattern 4: Parenthetical company names
+                    /\("([A-Za-z\s&.,]+)"\)/g,
+                    
+                    // Pattern 5: UPPERCASE company names before commas
+                    /([A-Z][A-Z\s&.,]{2,25}),?\s+(?:a\s+|an\s+)?(?:Delaware|California|New York|corporation|company|LLC|Inc|Ltd)/gi,
+                    
+                    // Pattern 6: Company names with Inc, LLC, Corp etc.
+                    /([A-Za-z\s&.]{3,30}(?:Inc|LLC|Corp|Corporation|Company|Ltd)\.?)/gi
                 ];
 
                 patterns.forEach(pattern => {
                     let match;
+                    // Reset regex to avoid issues with global flag
+                    pattern.lastIndex = 0;
                     while ((match = pattern.exec(content)) !== null) {
-                        const party = match[1].trim();
-                        if (party.length > 2 && party.length < 100 && !parties.includes(party)) {
+                        let party = match[1].trim();
+                        
+                        // Clean up the party name
+                        party = party.replace(/[,.]$/, ''); // Remove trailing comma/period
+                        party = party.replace(/\s+/g, ' '); // Normalize whitespace
+                        
+                        // Filter out invalid parties
+                        if (party.length > 2 && 
+                            party.length < 50 && 
+                            !parties.includes(party) &&
+                            !party.match(/^(the|this|agreement|between|and|party|parties)$/i) &&
+                            !party.match(/^\d/) &&
+                            party.match(/[A-Za-z]/)) {
                             parties.push(party);
                         }
                     }
                 });
 
-                // If no parties found, provide generic options
-                if (parties.length === 0) {
-                    parties.push("Company A", "Company B");
+                // Remove duplicates and sort by length (longer names usually more specific)
+                const uniqueParties = [...new Set(parties)].sort((a, b) => b.length - a.length);
+
+                // If still no parties found, try simpler pattern
+                if (uniqueParties.length === 0) {
+                    const simplePattern = /([A-Z][A-Za-z\s]{2,20})(?:\s+(?:Inc|LLC|Corp|Corporation|Company|Ltd))/gi;
+                    let match;
+                    while ((match = simplePattern.exec(content)) !== null) {
+                        const party = match[1].trim();
+                        if (!uniqueParties.includes(party)) {
+                            uniqueParties.push(party);
+                        }
+                    }
                 }
 
-                return parties.slice(0, 4); // Limit to 4 parties max
+                // Last resort: provide generic options
+                if (uniqueParties.length === 0) {
+                    return ["Disclosing Party", "Receiving Party"];
+                }
+
+                return uniqueParties.slice(0, 6); // Limit to 6 parties max
             };
 
             // Step 2: Party Selection
@@ -593,65 +651,245 @@
             const analyzeNDA = (content, party) => {
                 const result = {
                     overallRisk: 'medium',
-                    overallBias: 65, // % favoring disclosing party
+                    overallBias: 0,
+                    biasBreakdown: [],
                     clauseAnalysis: [],
                     missingClauses: [],
-                    recommendations: []
+                    recommendations: [],
+                    aiModel: useClaudeAI ? 'Claude 3.5 Sonnet' : 'Llama 3.3 70B'
                 };
+
+                let totalClauses = 0;
+                let favorDisclosingScore = 0;
+                let riskScores = { high: 0, medium: 0, low: 0 };
 
                 // Analyze each clause category
                 NDA_CLAUSE_MATRIX.forEach(category => {
                     category.clauses.forEach(clause => {
-                        const isPresent = clause.keywords.some(keyword => 
-                            content.toLowerCase().includes(keyword.toLowerCase())
-                        );
-
-                        if (isPresent) {
-                            result.clauseAnalysis.push({
-                                ...clause,
-                                present: true,
-                                riskToUser: assessRiskToUser(clause, party, true),
-                                recommendation: generateRecommendation(clause, party, true)
-                            });
+                        totalClauses++;
+                        const analysisResult = analyzeClause(content, clause, party);
+                        
+                        if (analysisResult.present) {
+                            result.clauseAnalysis.push(analysisResult);
                         } else {
-                            result.missingClauses.push({
-                                ...clause,
-                                present: false,
-                                riskToUser: assessRiskToUser(clause, party, false),
-                                recommendation: generateRecommendation(clause, party, false)
-                            });
+                            result.missingClauses.push(analysisResult);
                         }
+
+                        // Accumulate scores for overall metrics
+                        favorDisclosingScore += analysisResult.favorDisclosingScore;
+                        riskScores[analysisResult.riskToUser]++;
+                        
+                        // Add to bias breakdown
+                        result.biasBreakdown.push({
+                            clause: clause.name,
+                            present: analysisResult.present,
+                            favorDisclosingScore: analysisResult.favorDisclosingScore,
+                            explanation: analysisResult.biasExplanation
+                        });
                     });
                 });
+
+                // Calculate overall bias percentage
+                result.overallBias = Math.round((favorDisclosingScore / totalClauses));
+                
+                // Determine overall risk
+                if (riskScores.high > totalClauses * 0.3) {
+                    result.overallRisk = 'high';
+                } else if (riskScores.low > totalClauses * 0.5) {
+                    result.overallRisk = 'low';
+                } else {
+                    result.overallRisk = 'medium';
+                }
 
                 return result;
             };
 
-            const assessRiskToUser = (clause, userParty, isPresent) => {
-                const isUserDisclosing = userParty.toLowerCase().includes('disclos') || 
-                                       Math.random() > 0.5; // Simulate party determination
+            const analyzeClause = (content, clause, party) => {
+                const contentLower = content.toLowerCase();
+                
+                // Find section number and specific text
+                const sectionInfo = findClauseSection(content, clause);
+                
+                // Determine if clause is present
+                const isPresent = clause.keywords.some(keyword => 
+                    contentLower.includes(keyword.toLowerCase())
+                );
 
-                if (isPresent) {
-                    // Clause is present - assess based on standard favorability
-                    return clause.riskLevel;
-                } else {
-                    // Clause is missing - determine risk based on who it favors when missing
-                    if (clause.missingFavors === 'receiving' && isUserDisclosing) {
-                        return 'high';
-                    } else if (clause.missingFavors === 'disclosing' && !isUserDisclosing) {
-                        return 'high';
+                // Assess how it tilts (neutral, favoring disclosing, or favoring receiving)
+                let clauseTilt = assessClauseTilt(content, clause, isPresent);
+                let favorDisclosingScore = clauseTilt.score;
+                
+                // Determine risk level specific to this user's position
+                const isUserDisclosing = determineUserRole(party, content);
+                const riskToUser = calculateRiskToUser(clause, isPresent, clauseTilt, isUserDisclosing);
+                
+                // Generate specific recommendation
+                const recommendation = generateDetailedRecommendation(clause, isPresent, sectionInfo, clauseTilt, isUserDisclosing);
+
+                return {
+                    ...clause,
+                    present: isPresent,
+                    sectionNumber: sectionInfo.section,
+                    sectionText: sectionInfo.text,
+                    clauseTilt: clauseTilt.description,
+                    favorDisclosingScore: favorDisclosingScore,
+                    biasExplanation: clauseTilt.explanation,
+                    riskToUser: riskToUser,
+                    riskExplanation: generateRiskExplanation(riskToUser, isUserDisclosing, clause),
+                    recommendation: recommendation
+                };
+            };
+
+            const findClauseSection = (content, clause) => {
+                const lines = content.split('\n');
+                let sectionNumber = 'Not found';
+                let relevantText = 'Clause text not identified';
+                
+                // Look for numbered sections
+                const sectionRegex = /^(\d+\.?\d*)\s/;
+                
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+                    const match = line.match(sectionRegex);
+                    
+                    if (match && clause.keywords.some(keyword => 
+                        lines.slice(i, i + 3).join(' ').toLowerCase().includes(keyword.toLowerCase())
+                    )) {
+                        sectionNumber = `Section ${match[1]}`;
+                        relevantText = lines.slice(i, i + 2).join(' ').substring(0, 150) + '...';
+                        break;
                     }
-                    return clause.riskLevel;
+                }
+
+                return { section: sectionNumber, text: relevantText };
+            };
+
+            const assessClauseTilt = (content, clause, isPresent) => {
+                if (!isPresent) {
+                    // If clause is missing, determine who benefits from the absence
+                    if (clause.missingFavors === 'disclosing') {
+                        return {
+                            score: 80,
+                            description: 'Strongly favors Disclosing Party (absent)',
+                            explanation: `Missing this clause benefits the disclosing party: ${clause.missingImplication}`
+                        };
+                    } else if (clause.missingFavors === 'receiving') {
+                        return {
+                            score: 20,
+                            description: 'Strongly favors Receiving Party (absent)',
+                            explanation: `Missing this clause benefits the receiving party: ${clause.missingImplication}`
+                        };
+                    } else {
+                        return {
+                            score: 50,
+                            description: 'Neutral impact (absent)',
+                            explanation: `Missing this clause has neutral impact: ${clause.missingImplication}`
+                        };
+                    }
+                } else {
+                    // If clause is present, analyze the specific language (simplified for demo)
+                    const contentLower = content.toLowerCase();
+                    
+                    // Look for language that typically favors disclosing party
+                    const disclosingFavoringTerms = [
+                        'all information', 'any information', 'broadly defined',
+                        'indefinite', 'perpetual', 'strict confidence', 'immediate return',
+                        'liquidated damages', 'irreparable harm'
+                    ];
+                    
+                    // Look for language that typically favors receiving party
+                    const receivingFavoringTerms = [
+                        'marked confidential', 'specifically designated', 'limited purpose',
+                        'reasonable care', 'written consent', 'actual damages only'
+                    ];
+                    
+                    let disclosingCount = disclosingFavoringTerms.filter(term => 
+                        contentLower.includes(term)).length;
+                    let receivingCount = receivingFavoringTerms.filter(term => 
+                        contentLower.includes(term)).length;
+                    
+                    if (disclosingCount > receivingCount) {
+                        return {
+                            score: 70,
+                            description: 'Favors Disclosing Party',
+                            explanation: 'Language includes terms that typically benefit the disclosing party'
+                        };
+                    } else if (receivingCount > disclosingCount) {
+                        return {
+                            score: 30,
+                            description: 'Favors Receiving Party', 
+                            explanation: 'Language includes terms that typically benefit the receiving party'
+                        };
+                    } else {
+                        return {
+                            score: 50,
+                            description: 'Industry Standard/Neutral',
+                            explanation: 'Language appears balanced and follows industry standards'
+                        };
+                    }
                 }
             };
 
-            const generateRecommendation = (clause, userParty, isPresent) => {
-                if (isPresent) {
-                    return `This clause is present. Review the specific language to ensure it aligns with your interests as the ${userParty} party.`;
-                } else {
-                    return `MISSING: ${clause.missingImplication}. Consider adding this provision to protect your interests.`;
+            const determineUserRole = (selectedParty, content) => {
+                // Simple heuristic: if party name appears first in the document, likely disclosing
+                const contentUpper = content.toUpperCase();
+                const partyUpper = selectedParty.toUpperCase();
+                
+                const firstMention = contentUpper.indexOf(partyUpper);
+                const betweenIndex = contentUpper.indexOf('BETWEEN');
+                
+                // If party is mentioned before "and" in the "between X and Y" structure
+                return firstMention < contentUpper.indexOf(' AND ', betweenIndex);
+            };
+
+            const calculateRiskToUser = (clause, isPresent, clauseTilt, isUserDisclosing) => {
+                // Base risk from clause matrix
+                let riskLevel = clause.riskLevel;
+                
+                // Adjust based on clause tilt and user position
+                if (clauseTilt.score > 60 && !isUserDisclosing) {
+                    // Clause favors disclosing party, but user is receiving party
+                    riskLevel = increaseRisk(riskLevel);
+                } else if (clauseTilt.score < 40 && isUserDisclosing) {
+                    // Clause favors receiving party, but user is disclosing party
+                    riskLevel = increaseRisk(riskLevel);
+                }
+                
+                return riskLevel;
+            };
+
+            const increaseRisk = (currentRisk) => {
+                if (currentRisk === 'low') return 'medium';
+                if (currentRisk === 'medium') return 'high';
+                return 'high';
+            };
+
+            const generateRiskExplanation = (riskLevel, isUserDisclosing, clause) => {
+                const role = isUserDisclosing ? 'disclosing party' : 'receiving party';
+                
+                switch (riskLevel) {
+                    case 'high':
+                        return `High risk for ${role}: This provision could significantly impact your interests or create substantial obligations.`;
+                    case 'medium':
+                        return `Medium risk for ${role}: This provision requires attention but poses manageable risk with proper handling.`;
+                    case 'low':
+                        return `Low risk for ${role}: This provision is generally favorable or standard for your position.`;
+                    default:
+                        return 'Risk level assessment unavailable.';
                 }
             };
+
+            const generateDetailedRecommendation = (clause, isPresent, sectionInfo, clauseTilt, isUserDisclosing) => {
+                const role = isUserDisclosing ? 'disclosing party' : 'receiving party';
+                
+                if (isPresent) {
+                    return `✅ PRESENT in ${sectionInfo.section}: "${sectionInfo.text}" - This clause ${clauseTilt.description.toLowerCase()}. As the ${role}, ${clauseTilt.explanation.toLowerCase()} Consider negotiating specific terms if this clause creates unfavorable obligations for your position.`;
+                } else {
+                    const impact = clause.missingFavors === (isUserDisclosing ? 'disclosing' : 'receiving') ? 'benefits' : 'disadvantages';
+                    return `❌ MISSING: Absence of this clause ${impact} you as the ${role}. ${clause.missingImplication} Recommendation: ${impact === 'benefits' ? 'Consider keeping this clause out of the agreement' : 'Strongly recommend adding this provision to protect your interests'}.`;
+                }
+            };
+
 
             // UI Components
             const renderStepIndicator = () => (
@@ -804,17 +1042,18 @@
                             <table className="matrix-table">
                                 <thead>
                                     <tr>
-                                        <th style={{ width: '20%' }}>Clause</th>
-                                        <th style={{ width: '10%' }}>Present</th>
-                                        <th style={{ width: '25%' }}>Industry Standard</th>
-                                        <th style={{ width: '10%' }}>Risk Level</th>
-                                        <th style={{ width: '35%' }}>Recommendation</th>
+                                        <th style={{ width: '18%' }}>Clause</th>
+                                        <th style={{ width: '8%' }}>Present</th>
+                                        <th style={{ width: '12%' }}>Location</th>
+                                        <th style={{ width: '15%' }}>Bias Analysis</th>
+                                        <th style={{ width: '12%' }}>Risk to You</th>
+                                        <th style={{ width: '35%' }}>Detailed Analysis & Recommendation</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {[...analysis.clauseAnalysis, ...analysis.missingClauses].map((clause, index) => (
                                         <tr key={index}>
-                                            <td style={{ fontWeight: '600', color: '#1e293b' }}>
+                                            <td style={{ fontWeight: '600', color: '#1e293b', fontSize: '0.85rem' }}>
                                                 {clause.name}
                                             </td>
                                             <td className="clause-present">
@@ -822,13 +1061,29 @@
                                                     {clause.present ? '✓' : '✗'}
                                                 </span>
                                             </td>
-                                            <td style={{ fontSize: '0.8rem', color: '#475569' }}>
-                                                {clause.industryStandard}
+                                            <td style={{ fontSize: '0.75rem', color: '#475569' }}>
+                                                {clause.sectionNumber}
+                                            </td>
+                                            <td style={{ fontSize: '0.75rem' }}>
+                                                <div style={{ marginBottom: '4px' }}>
+                                                    <span className={clause.favorDisclosingScore > 60 ? 'favors-disclosing' : 
+                                                                   clause.favorDisclosingScore < 40 ? 'favors-receiving' : 'favors-neutral'}>
+                                                        {clause.clauseTilt}
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '0.7rem', color: '#6b7280' }}>
+                                                    Score: {clause.favorDisclosingScore}/100
+                                                </div>
                                             </td>
                                             <td>
-                                                <span className={`risk-indicator risk-${clause.riskToUser}`}>
-                                                    {clause.riskToUser}
-                                                </span>
+                                                <div style={{ marginBottom: '4px' }}>
+                                                    <span className={`risk-indicator risk-${clause.riskToUser}`}>
+                                                        {clause.riskToUser.toUpperCase()}
+                                                    </span>
+                                                </div>
+                                                <div style={{ fontSize: '0.7rem', color: '#6b7280', lineHeight: '1.2' }}>
+                                                    {clause.riskExplanation}
+                                                </div>
                                             </td>
                                             <td style={{ fontSize: '0.8rem', lineHeight: '1.4' }}>
                                                 {clause.recommendation}
@@ -837,6 +1092,41 @@
                                     ))}
                                 </tbody>
                             </table>
+
+                            {/* Bias Breakdown Section */}
+                            <div style={{ marginTop: '30px', padding: '20px', background: '#f8fafc', borderRadius: '8px' }}>
+                                <h3 style={{ marginBottom: '15px', color: '#1e293b' }}>
+                                    📊 Bias Calculation Methodology
+                                </h3>
+                                <p style={{ fontSize: '0.9rem', color: '#475569', marginBottom: '15px' }}>
+                                    The {analysis.overallBias}% "Favors Disclosing Party" score is calculated by analyzing each clause's 
+                                    bias score (0-100, where 100 = strongly favors disclosing party, 0 = strongly favors receiving party) 
+                                    and averaging across all {analysis.biasBreakdown.length} analyzed provisions.
+                                </p>
+                                <div style={{ fontSize: '0.8rem', color: '#6b7280' }}>
+                                    <strong>Analysis powered by:</strong> {analysis.aiModel}
+                                </div>
+                                
+                                <details style={{ marginTop: '15px' }}>
+                                    <summary style={{ cursor: 'pointer', fontWeight: '600', color: '#1e40af' }}>
+                                        View Detailed Bias Breakdown
+                                    </summary>
+                                    <div style={{ marginTop: '10px', maxHeight: '200px', overflowY: 'auto' }}>
+                                        {analysis.biasBreakdown.map((item, index) => (
+                                            <div key={index} style={{ 
+                                                padding: '8px', 
+                                                margin: '4px 0', 
+                                                background: 'white', 
+                                                borderRadius: '4px',
+                                                fontSize: '0.75rem'
+                                            }}>
+                                                <strong>{item.clause}</strong>: {item.favorDisclosingScore}/100 
+                                                {item.present ? ' (Present)' : ' (Missing)'} - {item.explanation}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </details>
+                            </div>
 
                             <div style={{ marginTop: '30px', textAlign: 'center' }}>
                                 <button 
@@ -865,6 +1155,28 @@
                             Professional legal intelligence for non-disclosure agreements. 
                             Get sophisticated analysis that goes beyond basic AI chatbots.
                         </p>
+                        
+                        {/* AI Model Toggle */}
+                        <div className="ai-toggle">
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="aiModel"
+                                    checked={!useClaudeAI}
+                                    onChange={() => setUseClaudeAI(false)}
+                                />
+                                <span>🦙 Llama 3.3 70B (Default)</span>
+                            </label>
+                            <label>
+                                <input
+                                    type="radio"
+                                    name="aiModel"
+                                    checked={useClaudeAI}
+                                    onChange={() => setUseClaudeAI(true)}
+                                />
+                                <span>🧠 Claude 3.5 Sonnet</span>
+                            </label>
+                        </div>
                     </div>
 
                     {renderStepIndicator()}
