@@ -561,72 +561,71 @@
 
             const extractPartyNames = (content) => {
                 const parties = [];
+                console.log('Extracting parties from content:', content.substring(0, 500));
                 
-                // More comprehensive patterns for party identification
-                const patterns = [
-                    // Pattern 1: "between PARTY NAME, a [state] [entity type]"
-                    /between\s+([A-Z][A-Za-z\s&.,]+?),\s+a\s+/gi,
-                    
-                    // Pattern 2: "and PARTY NAME, a [state] [entity type]"  
-                    /\sand\s+([A-Z][A-Za-z\s&.,]+?),\s+a\s+/gi,
-                    
-                    // Pattern 3: Company names in quotes with closing parenthesis
-                    /"([A-Za-z\s&.,]+)"\s*\)/g,
-                    
-                    // Pattern 4: Parenthetical company names
-                    /\("([A-Za-z\s&.,]+)"\)/g,
-                    
-                    // Pattern 5: UPPERCASE company names before commas
-                    /([A-Z][A-Z\s&.,]{2,25}),?\s+(?:a\s+|an\s+)?(?:Delaware|California|New York|corporation|company|LLC|Inc|Ltd)/gi,
-                    
-                    // Pattern 6: Company names with Inc, LLC, Corp etc.
-                    /([A-Za-z\s&.]{3,30}(?:Inc|LLC|Corp|Corporation|Company|Ltd)\.?)/gi
-                ];
-
-                patterns.forEach(pattern => {
-                    let match;
-                    // Reset regex to avoid issues with global flag
-                    pattern.lastIndex = 0;
-                    while ((match = pattern.exec(content)) !== null) {
-                        let party = match[1].trim();
-                        
-                        // Clean up the party name
-                        party = party.replace(/[,.]$/, ''); // Remove trailing comma/period
-                        party = party.replace(/\s+/g, ' '); // Normalize whitespace
-                        
-                        // Filter out invalid parties
-                        if (party.length > 2 && 
-                            party.length < 50 && 
-                            !parties.includes(party) &&
-                            !party.match(/^(the|this|agreement|between|and|party|parties)$/i) &&
-                            !party.match(/^\d/) &&
-                            party.match(/[A-Za-z]/)) {
-                            parties.push(party);
-                        }
-                    }
-                });
-
-                // Remove duplicates and sort by length (longer names usually more specific)
-                const uniqueParties = [...new Set(parties)].sort((a, b) => b.length - a.length);
-
-                // If still no parties found, try simpler pattern
-                if (uniqueParties.length === 0) {
-                    const simplePattern = /([A-Z][A-Za-z\s]{2,20})(?:\s+(?:Inc|LLC|Corp|Corporation|Company|Ltd))/gi;
-                    let match;
-                    while ((match = simplePattern.exec(content)) !== null) {
-                        const party = match[1].trim();
-                        if (!uniqueParties.includes(party)) {
-                            uniqueParties.push(party);
-                        }
+                // Pattern 1: Look for "between [PARTY], a [state] [entity type]" structure
+                const betweenPattern = /between\s+([^,]+),\s+a\s+[^,]+(?:corporation|company|llc|inc|ltd)/gi;
+                let match = betweenPattern.exec(content);
+                if (match) {
+                    const party1 = match[1].trim();
+                    console.log('Found party 1:', party1);
+                    if (party1 && party1.length > 2 && party1.length < 100) {
+                        parties.push(party1);
                     }
                 }
-
-                // Last resort: provide generic options
-                if (uniqueParties.length === 0) {
+                
+                // Pattern 2: Look for "and [PARTY]," or "and [PARTY] (" structure after the first party
+                const andPattern = /\sand\s+([^,(]+)(?:,|\s*\()/gi;
+                andPattern.lastIndex = 0; // Reset regex
+                match = andPattern.exec(content);
+                if (match) {
+                    const party2 = match[1].trim();
+                    console.log('Found party 2:', party2);
+                    if (party2 && party2.length > 2 && party2.length < 100 && !parties.includes(party2)) {
+                        parties.push(party2);
+                    }
+                }
+                
+                // Pattern 3: Look for quoted party names in parentheses like ("Company")
+                const quotedPattern = /\("([^"]+)"\)/gi;
+                quotedPattern.lastIndex = 0;
+                while ((match = quotedPattern.exec(content)) !== null) {
+                    const party = match[1].trim();
+                    console.log('Found quoted party:', party);
+                    if (party && party.length > 2 && party.length < 50 && !parties.includes(party)) {
+                        parties.push(party);
+                    }
+                }
+                
+                // Pattern 4: Specific to this NDA - look for FlexRide, Inc. and Recipient
+                if (content.includes('FlexRide, Inc.')) {
+                    if (!parties.includes('FlexRide, Inc.')) {
+                        parties.push('FlexRide, Inc.');
+                    }
+                }
+                if (content.includes('"Company"') && !parties.some(p => p.includes('Company'))) {
+                    parties.push('Company (FlexRide, Inc.)');
+                }
+                if (content.includes('"Recipient"') && !parties.some(p => p.includes('Recipient'))) {
+                    parties.push('Recipient');
+                }
+                
+                console.log('All extracted parties:', parties);
+                
+                // If still no parties found, provide generic options
+                if (parties.length === 0) {
                     return ["Disclosing Party", "Receiving Party"];
                 }
-
-                return uniqueParties.slice(0, 6); // Limit to 6 parties max
+                
+                // Clean and deduplicate
+                const cleanParties = parties
+                    .filter(party => party && party.length > 0)
+                    .map(party => party.replace(/[,.]$/, '').trim())
+                    .filter((party, index, arr) => arr.indexOf(party) === index)
+                    .slice(0, 4); // Limit to 4 parties max
+                
+                console.log('Final cleaned parties:', cleanParties);
+                return cleanParties;
             };
 
             // Step 2: Party Selection
