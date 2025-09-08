@@ -637,13 +637,16 @@
                     <p>Any dispute arising out of or relating to this Agreement shall be resolved through binding arbitration in accordance with the rules of the American Arbitration Association. The arbitration shall take place in the county and state of the non-breaching Party's residence at the time the dispute arises, unless otherwise agreed to in writing. The arbitration shall be conducted by a single arbitrator with experience in confidentiality matters, and judgment on the award may be entered in any court having jurisdiction thereof.</p>
                     
                     <p><strong>10. GOVERNING LAW</strong></p>
-                    <p>This Agreement shall be governed by the laws of the State of _______________, without regard to its conflict of laws principles. The Parties consent to the exclusive jurisdiction and venue in the state and federal courts sitting in the aforementioned state for the resolution of all disputes arising under this Agreement.</p>
+                    <p>This Agreement shall be governed by the laws of the State of _______________, without regard to its conflict of laws principles.</p>
                     
                     <p><strong>11. SEVERABILITY</strong></p>
                     <p>If any provision of this Agreement is found to be unenforceable, the remainder shall continue in full force and effect. The unenforceable provision shall be reformed to the extent possible to give effect to the Parties' intentions and to make the provision enforceable.</p>
                     
                     <p><strong>12. ENTIRE AGREEMENT</strong></p>
                     <p>This Agreement constitutes the entire understanding between the Parties concerning the subject matter hereof and supersedes all prior agreements, understandings, or negotiations. This Agreement may not be modified except in a writing signed by both Parties.</p>
+                    
+                    <p><strong>13. COUNTERPARTS</strong></p>
+                    <p>This Agreement may be executed in separate counterparts, each of which shall be deemed an original and all of which together shall constitute one agreement. Digital signatures and electronically transmitted signatures (including by email) shall have the same legal effect as original signatures.</p>
                     
                     <p style="margin-top: 40px;">IN WITNESS WHEREOF, the Parties have executed this Agreement as of the Effective Date.</p>
                     
@@ -771,7 +774,8 @@
         
         document.getElementById('stateJurisdiction').addEventListener('change', function() {
             const state = this.value || "_______________";
-            updatePreviewText(/State of (.*)\./, `State of ${state}.`, 'previewState');
+            const jurisdictionText = state === "District of Columbia" ? state : `State of ${state}`;
+            updatePreviewText(/(State of [^\.]*|District of Columbia)\./, `${jurisdictionText}.`, 'previewState');
         });
         
         document.getElementById('effectiveDate').addEventListener('change', function() {
@@ -1108,17 +1112,17 @@
             
             // Check if attorney fees section already exists
             const previewContent = document.getElementById('previewContent');
-            if (previewContent.innerHTML.includes("<strong>13. ATTORNEY'S FEES</strong>")) {
+            if (previewContent.innerHTML.includes("<strong>14. ATTORNEY'S FEES</strong>")) {
                 // Update existing section
-                const regex = /<p><strong>13\. ATTORNEY'S FEES<\/strong><\/p>\s*<p>.*?<\/p>/;
-                const newHTML = `<p><strong>13. ATTORNEY'S FEES</strong></p>\n<p>${feesText}</p>`;
+                const regex = /<p><strong>14\. ATTORNEY'S FEES<\/strong><\/p>\s*<p>.*?<\/p>/;
+                const newHTML = `<p><strong>14. ATTORNEY'S FEES</strong></p>\n<p>${feesText}</p>`;
                 
                 const updatedContent = previewContent.innerHTML.replace(regex, newHTML);
                 previewContent.innerHTML = updatedContent;
             } else {
                 // Add new section before the signature block
                 const signatureBlockRegex = /<p style="margin-top: 40px;">IN WITNESS WHEREOF/;
-                const newSection = `<p><strong>13. ATTORNEY'S FEES</strong></p>\n<p>${feesText}</p>\n\n`;
+                const newSection = `<p><strong>14. ATTORNEY'S FEES</strong></p>\n<p>${feesText}</p>\n\n`;
                 
                 const updatedContent = previewContent.innerHTML.replace(signatureBlockRegex, newSection + '<p style="margin-top: 40px;">IN WITNESS WHEREOF');
                 previewContent.innerHTML = updatedContent;
@@ -1135,17 +1139,17 @@
             if (additionalText) {
                 // Check if additional terms section already exists
                 const previewContent = document.getElementById('previewContent');
-                if (previewContent.innerHTML.includes("<strong>14. ADDITIONAL TERMS</strong>")) {
+                if (previewContent.innerHTML.includes("<strong>15. ADDITIONAL TERMS</strong>")) {
                     // Update existing section
-                    const regex = /<p><strong>14\. ADDITIONAL TERMS<\/strong><\/p>\s*<p>.*?<\/p>/;
-                    const newHTML = `<p><strong>14. ADDITIONAL TERMS</strong></p>\n<p>${additionalText}</p>`;
+                    const regex = /<p><strong>15\. ADDITIONAL TERMS<\/strong><\/p>\s*<p>.*?<\/p>/;
+                    const newHTML = `<p><strong>15. ADDITIONAL TERMS</strong></p>\n<p>${additionalText}</p>`;
                     
                     const updatedContent = previewContent.innerHTML.replace(regex, newHTML);
                     previewContent.innerHTML = updatedContent;
                 } else {
                     // Add new section before the signature block
                     const signatureBlockRegex = /<p style="margin-top: 40px;">IN WITNESS WHEREOF/;
-                    const newSection = `<p><strong>14. ADDITIONAL TERMS</strong></p>\n<p>${additionalText}</p>\n\n`;
+                    const newSection = `<p><strong>15. ADDITIONAL TERMS</strong></p>\n<p>${additionalText}</p>\n\n`;
                     
                     const updatedContent = previewContent.innerHTML.replace(signatureBlockRegex, newSection + '<p style="margin-top: 40px;">IN WITNESS WHEREOF');
                     previewContent.innerHTML = updatedContent;
@@ -1156,8 +1160,8 @@
             } else {
                 // Remove the section if it exists and input is empty
                 const previewContent = document.getElementById('previewContent');
-                if (previewContent.innerHTML.includes("<strong>14. ADDITIONAL TERMS</strong>")) {
-                    const regex = /<p><strong>14\. ADDITIONAL TERMS<\/strong><\/p>\s*<p>.*?<\/p>\s*\n*/;
+                if (previewContent.innerHTML.includes("<strong>15. ADDITIONAL TERMS</strong>")) {
+                    const regex = /<p><strong>15\. ADDITIONAL TERMS<\/strong><\/p>\s*<p>.*?<\/p>\s*\n*/;
                     
                     const updatedContent = previewContent.innerHTML.replace(regex, '');
                     previewContent.innerHTML = updatedContent;
