@@ -139,13 +139,24 @@
         .form-section, .preview-section {
             background: var(--bg-card);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: var(--radius-xl);
             box-shadow: var(--shadow-xl);
             border: 1px solid rgba(255, 255, 255, 0.2);
             overflow: hidden;
-            height: calc(100vh - 12rem);
+            height: 800px;
+            min-height: 600px;
             display: flex;
             flex-direction: column;
+        }
+        
+        /* Fallback for browsers that support calc() */
+        @supports (height: calc(100vh - 12rem)) {
+            .form-section, .preview-section {
+                height: calc(100vh - 12rem);
+                min-height: calc(100vh - 12rem);
+                max-height: calc(100vh - 12rem);
+            }
         }
         
         .section-header {
@@ -748,6 +759,8 @@
             padding: 2rem;
             background: white;
             margin: 0;
+            min-height: 0;
+            position: relative;
         }
         
         .preview-content {
@@ -756,6 +769,8 @@
             line-height: 1.6;
             color: #000;
             max-width: none;
+            min-height: 200px;
+            width: 100%;
         }
         
         .preview-container::-webkit-scrollbar {
@@ -908,8 +923,13 @@
                 margin: 0.5rem;
             }
             
+            .form-section, .preview-section {
+                min-height: 600px;
+                max-height: none;
+            }
+            
             .preview-container {
-                height: 500px;
+                min-height: 500px;
             }
             
             /* Touch-friendly templates on tablet */
@@ -926,7 +946,8 @@
         /* iPad Pro and large tablets */
         @media (min-width: 768px) and (max-width: 1400px) {
             .form-section, .preview-section {
-                height: calc(100vh - 16rem);
+                min-height: calc(100vh - 16rem);
+                max-height: calc(100vh - 16rem);
             }
             
             .tab-nav {
@@ -1954,6 +1975,13 @@
             initializeTabs();
             initializeParties();
             initializeEventListeners();
+            
+            // Add fallback content and then generate preview
+            const previewElement = document.getElementById('previewContent');
+            if (previewElement) {
+                previewElement.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">Loading document preview...</p>';
+            }
+            
             generatePreview();
             generateRiskAssessment();
             updateProgress();
@@ -2616,6 +2644,7 @@
 
         // Generate document preview
         function generatePreview() {
+            try {
             const jurisdictionText = formData.stateJurisdiction === "District of Columbia" 
                 ? "District of Columbia" 
                 : formData.stateJurisdiction ? `State of ${formData.stateJurisdiction}` : '_______________';
@@ -2810,7 +2839,19 @@
                 </div>
             `;
 
-            document.getElementById('previewContent').innerHTML = content;
+            const previewElement = document.getElementById('previewContent');
+            if (previewElement) {
+                previewElement.innerHTML = content;
+            } else {
+                console.error('Preview content element not found');
+            }
+            } catch (error) {
+                console.error('Error generating preview:', error);
+                const previewElement = document.getElementById('previewContent');
+                if (previewElement) {
+                    previewElement.innerHTML = '<p style="color: red;">Error generating preview. Please check the console for details.</p>';
+                }
+            }
         }
 
         // Generate risk assessment
