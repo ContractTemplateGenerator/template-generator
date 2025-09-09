@@ -1275,10 +1275,6 @@
                         <div class="tab-content" id="risk">
                             <h2><i class="fas fa-balance-scale"></i> Legal Risk Assessment</h2>
                             
-                            <div class="risk-overview">
-                                <h3>Attorney Analysis & Recommendations</h3>
-                                <p>This assessment identifies potential legal risks based on your selections. Review these carefully before finalizing your agreement.</p>
-                            </div>
 
                             <div id="riskAssessments"></div>
                         </div>
@@ -1300,7 +1296,15 @@
 
                             <div class="button-group">
                                 <button class="btn-primary download-btn" id="downloadNDA">
-                                    <i class="fas fa-file-download"></i> Download Privacy NDA
+                                    <i class="fas fa-file-word"></i> Download Word Document
+                                </button>
+                                
+                                <button class="btn-secondary download-btn" id="copyToClipboard">
+                                    <i class="fas fa-copy"></i> Copy to Clipboard
+                                </button>
+                                
+                                <button class="btn-secondary download-btn" id="downloadTXT">
+                                    <i class="fas fa-file-alt"></i> Download Text File
                                 </button>
                                 
                                 <button class="btn-secondary download-btn" id="downloadJoinder">
@@ -1689,7 +1693,36 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    downloadDocument(false);
+                    downloadWordDocument(false);
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                }, 1000);
+            });
+            
+            document.getElementById('copyToClipboard').addEventListener('click', () => {
+                const btn = document.getElementById('copyToClipboard');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<span class="loading"></span> Copying...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    copyToClipboard();
+                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => {
+                        btn.innerHTML = originalHTML;
+                        btn.disabled = false;
+                    }, 2000);
+                }, 500);
+            });
+            
+            document.getElementById('downloadTXT').addEventListener('click', () => {
+                const btn = document.getElementById('downloadTXT');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '<span class="loading"></span> Generating...';
+                btn.disabled = true;
+                
+                setTimeout(() => {
+                    downloadTextFile();
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                 }, 1000);
@@ -1702,7 +1735,7 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    downloadDocument(true);
+                    downloadWordDocument(true);
                     btn.innerHTML = originalHTML;
                     btn.disabled = false;
                 }, 1000);
@@ -2232,30 +2265,47 @@
             `;
         }
 
-        // Enhanced download function
-        function downloadDocument(isJoinder = false) {
+        // Generate clean text content
+        function generateCleanTextContent(isJoinder = false) {
             const content = isJoinder ? generateJoinderForm() : document.getElementById('previewContent').innerHTML;
-            const filename = isJoinder ? 'Polyamorous-Swinger-Joinder-Agreement.html' : 'Polyamorous-Swinger-Privacy-NDA.html';
+            // Strip HTML tags and clean up formatting
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = content;
+            return tempDiv.textContent || tempDiv.innerText || '';
+        }
+        
+        // Download Word document
+        function downloadWordDocument(isJoinder = false) {
+            const content = isJoinder ? generateJoinderForm() : document.getElementById('previewContent').innerHTML;
+            const filename = isJoinder ? 'Polyamorous-Swinger-Joinder-Agreement.doc' : 'Polyamorous-Swinger-Privacy-NDA.doc';
             
-            const htmlDoc = `
-                <!DOCTYPE html>
-                <html>
+            const wordDoc = `
+                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                      xmlns:w="urn:schemas-microsoft-com:office:word" 
+                      xmlns="http://www.w3.org/TR/REC-html40">
                 <head>
-                    <meta charset="UTF-8">
+                    <meta charset="utf-8">
                     <title>${isJoinder ? 'Polyamorous & Swinger Joinder Agreement' : 'Polyamorous & Swinger Privacy NDA'}</title>
+                    <!--[if gte mso 9]>
+                    <xml>
+                        <w:WordDocument>
+                            <w:View>Print</w:View>
+                            <w:Zoom>90</w:Zoom>
+                            <w:DoNotPromptForConvert/>
+                            <w:DoNotShowInsertionsAndDeletions/>
+                        </w:WordDocument>
+                    </xml>
+                    <![endif]-->
                     <style>
+                        @page { margin: 1in; }
                         body { 
                             font-family: 'Times New Roman', serif; 
-                            line-height: 1.6; 
-                            margin: 20px;
-                            font-size: 11pt;
+                            font-size: 12pt;
+                            line-height: 1.6;
                             color: #000;
                         }
-                        @media print { 
-                            body { margin: 0; } 
-                        }
-                        h1 { font-size: 14pt; font-weight: bold; }
-                        p { margin-bottom: 10px; }
+                        h1 { font-size: 14pt; font-weight: bold; text-align: center; }
+                        p { margin-bottom: 12pt; }
                         strong { font-weight: bold; }
                     </style>
                 </head>
@@ -2263,7 +2313,40 @@
                 </html>
             `;
             
-            const blob = new Blob([htmlDoc], { type: 'text/html' });
+            const blob = new Blob([wordDoc], { type: 'application/msword' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            const textContent = generateCleanTextContent();
+            navigator.clipboard.writeText(textContent).then(() => {
+                console.log('Content copied to clipboard');
+            }).catch(err => {
+                console.error('Failed to copy to clipboard:', err);
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = textContent;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+            });
+        }
+        
+        // Download text file
+        function downloadTextFile() {
+            const textContent = generateCleanTextContent();
+            const filename = 'Polyamorous-Swinger-Privacy-NDA.txt';
+            
+            const blob = new Blob([textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
