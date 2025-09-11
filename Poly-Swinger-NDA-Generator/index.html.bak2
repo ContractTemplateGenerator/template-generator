@@ -195,7 +195,7 @@
         }
         
         .form-content {
-            padding: 1rem 1.5rem;
+            padding: 2rem;
             flex: 1;
             overflow-y: auto;
         }
@@ -833,7 +833,7 @@
         .preview-container {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem 1.5rem;
+            padding: 2rem;
             background: white;
             margin: 0;
             min-height: 0;
@@ -993,12 +993,54 @@
         
         
         
+        .instruction-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: var(--radius-xl);
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
         
+        .instruction-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--bg-gradient);
+        }
         
+        .instruction-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
         
+        .instruction-card.featured {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 2px solid #0369a1;
+        }
         
+        .instruction-card.practical {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 2px solid #16a34a;
+        }
         
+        .instruction-card.warning {
+            background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+            border: 2px solid #d97706;
+        }
         
+        .instruction-card.centered-card {
+            max-width: 800px;
+            margin: 0 auto;
+            grid-column: 1 / -1;
+            text-align: center;
+        }
         
         .centered-card .card-icon {
             margin: 0 auto 1.5rem auto;
@@ -1027,10 +1069,49 @@
             color: white;
         }
         
+        .instruction-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            line-height: 1.3;
+        }
         
+        .instruction-card p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
         
+        .instruction-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
         
+        .instruction-card li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
         
+        .instruction-card li::before {
+            content: '✓';
+            color: #16a34a;
+            font-weight: bold;
+            background: #dcfce7;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            flex-shrink: 0;
+            margin-top: 0.125rem;
+        }
         
         /* Legal Points */
         .legal-points {
@@ -1382,6 +1463,9 @@
             
             
             
+            .instruction-card {
+                padding: 1.5rem;
+            }
             
             .card-icon {
                 width: 50px;
@@ -1392,6 +1476,9 @@
                 font-size: 1.25rem;
             }
             
+            .instruction-card h3 {
+                font-size: 1.25rem;
+            }
             
             .complexity-diagram {
                 flex-direction: column;
@@ -2218,12 +2305,15 @@
             // Set default form values for immediate preview
             setDefaultFormValues();
             
-            // Generate initial preview with a small delay to ensure all elements are ready
-            setTimeout(() => {
-                generatePreview();
-                generateRiskAssessment();
-                updateProgress();
-            }, 100);
+            // Add fallback content and then generate preview
+            const previewElement = document.getElementById('previewContent');
+            if (previewElement) {
+                previewElement.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">Loading document preview...</p>';
+            }
+            
+            generatePreview();
+            generateRiskAssessment();
+            updateProgress();
             
             // Smooth scrolling for better UX
             document.documentElement.style.scrollBehavior = 'smooth';
@@ -3454,16 +3544,6 @@
             document.getElementById('duration').value = formData.duration;
             document.getElementById('liquidatedDamages').value = formData.liquidatedDamages;
             document.getElementById('disputeResolution').value = formData.disputeResolution;
-            document.getElementById('digitalContentHandling').value = formData.digitalContentHandling;
-            
-            // Set checkboxes to match formData defaults
-            document.getElementById('includeSTIProtection').checked = formData.includeSTIProtection;
-            document.getElementById('includeSocialMediaRestrictions').checked = formData.includeSocialMediaRestrictions;
-            document.getElementById('includeVenueProtection').checked = formData.includeVenueProtection;
-            document.getElementById('includeGroupChatProtection').checked = formData.includeGroupChatProtection;
-            document.getElementById('includeUnanimousConsent').checked = formData.includeUnanimousConsent;
-            document.getElementById('includeReturnProvision').checked = formData.includeReturnProvision;
-            document.getElementById('includeJoinderForm').checked = formData.includeJoinderForm;
             
             // Update party inputs with default names
             renderParties();
