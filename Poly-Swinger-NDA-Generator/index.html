@@ -2304,18 +2304,18 @@
                     <div class="nda-type-selector">
                         <h3><i class="fas fa-cog"></i> NDA Type & Scope</h3>
                         <div class="nda-options">
-                            <label class="nda-option active" for="generalNDA">
-                                <input type="radio" id="generalNDA" name="ndaType" value="general" checked>
-                                <div class="nda-option-content">
-                                    <h4><i class="fas fa-users"></i> Ongoing Relationship</h4>
-                                    <p>For established relationships with multiple parties or regular arrangements</p>
-                                </div>
-                            </label>
-                            <label class="nda-option" for="casualNDA">
-                                <input type="radio" id="casualNDA" name="ndaType" value="casual">
+                            <label class="nda-option active" for="casualNDA">
+                                <input type="radio" id="casualNDA" name="ndaType" value="casual" checked>
                                 <div class="nda-option-content">
                                     <h4><i class="fas fa-user-plus"></i> Casual Arrangement</h4>
                                     <p>For couples exploring new arrangements or casual group experiences</p>
+                                </div>
+                            </label>
+                            <label class="nda-option" for="generalNDA">
+                                <input type="radio" id="generalNDA" name="ndaType" value="general">
+                                <div class="nda-option-content">
+                                    <h4><i class="fas fa-users"></i> Ongoing Relationship</h4>
+                                    <p>For established relationships with multiple parties or regular arrangements</p>
                                 </div>
                             </label>
                             <label class="nda-option" for="eventNDA">
@@ -2686,7 +2686,7 @@
     <script>
         // Application state with defaults for immediate preview
         let formData = {
-            ndaType: 'general',
+            ndaType: 'casual',
             eventName: '',
             eventDate: '',
             eventLocation: '',
@@ -2698,7 +2698,7 @@
             ],
             stateJurisdiction: 'California',
             effectiveDate: new Date().toISOString().split('T')[0],
-            duration: '3',
+            duration: '1',
             liquidatedDamages: '15000',
             disputeResolution: 'arbitration',
             includeSTIProtection: true,
@@ -3443,6 +3443,7 @@
         // Generate document preview
         function updatePreview() {
             try {
+                console.log('updatePreview called, ndaType:', formData.ndaType);
             const jurisdictionText = formData.stateJurisdiction === "District of Columbia" 
                 ? "District of Columbia" 
                 : formData.stateJurisdiction ? `State of ${formData.stateJurisdiction}` : '_______________';
@@ -3641,6 +3642,7 @@
             const previewElement = document.getElementById('previewContent');
             if (previewElement) {
                 previewElement.innerHTML = content;
+                console.log('Preview updated with content length:', content.length);
             } else {
                 console.error('Preview content element not found');
             }
@@ -4107,6 +4109,19 @@
         
         // Set default form values
         function setDefaultFormValues() {
+            // Set NDA type radio buttons
+            const ndaTypeRadios = document.querySelectorAll('input[name="ndaType"]');
+            ndaTypeRadios.forEach(radio => {
+                radio.checked = radio.value === formData.ndaType;
+            });
+            
+            // Update visual state for NDA type selector
+            document.querySelectorAll('.nda-option').forEach(opt => opt.classList.remove('active'));
+            const activeOption = document.querySelector(`input[value="${formData.ndaType}"]`)?.closest('.nda-option');
+            if (activeOption) {
+                activeOption.classList.add('active');
+            }
+            
             // Set form fields to match formData defaults
             document.getElementById('stateJurisdiction').value = formData.stateJurisdiction;
             document.getElementById('effectiveDate').value = formData.effectiveDate;
