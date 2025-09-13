@@ -2383,9 +2383,14 @@
                         formData.duration = 'event-only';
                     } else {
                         eventDetails.classList.remove('show');
-                        // Reset duration to default for general NDAs
-                        document.getElementById('duration').value = '3';
-                        formData.duration = '3';
+                        // Reset duration based on type
+                        if (e.target.value === 'casual') {
+                            document.getElementById('duration').value = '1';
+                            formData.duration = '1';
+                        } else {
+                            document.getElementById('duration').value = '3';
+                            formData.duration = '3';
+                        }
                     }
                     
                     updatePreview();
@@ -2892,10 +2897,10 @@
 
             // Event-specific content
             let eventSection = '';
-            let documentTitle = 'POLYAMOROUS/SWINGER RELATIONSHIP PRIVACY NON-DISCLOSURE AGREEMENT';
+            let documentTitle = 'MULTI-PARTNER PRIVACY NON-DISCLOSURE AGREEMENT';
             
             if (formData.ndaType === 'event') {
-                documentTitle = 'EVENT-SPECIFIC POLYAMOROUS/SWINGER PRIVACY NON-DISCLOSURE AGREEMENT';
+                documentTitle = 'EVENT-SPECIFIC MULTI-PARTNER PRIVACY NON-DISCLOSURE AGREEMENT';
                 
                 const eventDateFormatted = formData.eventDate 
                     ? new Date(formData.eventDate).toLocaleDateString('en-US', { 
@@ -2911,6 +2916,8 @@
                     ${formData.eventDescription ? `Event Description: ${formData.eventDescription}<br>` : ''}
                     </p>
                 `;
+            } else if (formData.ndaType === 'casual') {
+                documentTitle = 'INTIMATE ENCOUNTER PRIVACY NON-DISCLOSURE AGREEMENT';
             }
 
             const disputeText = formData.disputeResolution === 'arbitration'
@@ -2954,7 +2961,7 @@
 
             const durationText = formData.duration === 'event-only' 
                 ? "This Agreement shall remain in effect for the duration of the specified event and for a period of three (3) years thereafter for any confidential information disclosed during or in connection with the event."
-                : `This Agreement shall remain in effect for ${formData.duration} years from the Effective Date.`;
+                : `This Agreement shall remain in effect for ${formData.duration} ${formData.duration === '1' ? 'year' : 'years'} from the Effective Date.`;
 
             const joinderFormSection = formData.includeJoinderForm && formData.ndaType === 'general'
                 ? `<p><strong>15. JOINDER OF ADDITIONAL PARTIES</strong></p>
@@ -2964,6 +2971,9 @@
             const eventSpecificScope = formData.ndaType === 'event' 
                 ? `<p><strong>EVENT-SPECIFIC SCOPE</strong></p>
                    <p>This Agreement applies specifically to the event described above and all activities, communications, and interactions related to or occurring during such event. The confidentiality obligations extend to all information shared in preparation for, during, and after the event, including but not limited to planning communications, participant lists, and any follow-up interactions.</p>`
+                : formData.ndaType === 'casual'
+                ? `<p><strong>ENCOUNTER-SPECIFIC SCOPE</strong></p>
+                   <p>This Agreement applies specifically to the intimate encounter(s) between the Parties and all activities, communications, and interactions related thereto. The confidentiality obligations extend to all information shared before, during, and after the encounter, including but not limited to communications regarding arrangements, expectations, and any ongoing interactions.</p>`
                 : '';
 
             const content = `
@@ -2977,7 +2987,7 @@
                 ${eventSection}
                 
                 <p><strong>1. PURPOSE</strong></p>
-                <p>The Parties wish to protect the confidentiality and privacy of information related to their consensual adult activities, relationships, and interactions${formData.ndaType === 'event' ? ' in connection with the specified event' : ''}. This Agreement ensures that all Parties can engage in private activities with confidence that their privacy, dignity, and personal information will be protected.</p>
+                <p>The Parties wish to protect the confidentiality and privacy of information related to their consensual adult intimate activities, relationships, and interactions${formData.ndaType === 'event' ? ' in connection with the specified event' : formData.ndaType === 'casual' ? ' during their experimental encounter' : ''}. This Agreement ensures that all Parties can engage in private activities with confidence that their privacy, dignity, and personal information will be protected.</p>
                 
                 ${eventSpecificScope}
                 
@@ -3240,9 +3250,9 @@
 
             return `
                 <h1 style="text-align: center; font-size: 14pt; margin-bottom: 30px;">JOINDER AGREEMENT</h1>
-                <p style="text-align: center;"><em>Polyamorous/Swinger Relationship Privacy Non-Disclosure Agreement</em></p>
+                <p style="text-align: center;"><em>Multi-Partner Privacy Non-Disclosure Agreement</em></p>
                 
-                <p>This Joinder Agreement ("Joinder") is entered into by _________________ ("New Party") to join the Polyamorous/Swinger Relationship Privacy Non-Disclosure Agreement dated ${formData.effectiveDate || '_______________'} (the "Original Agreement").</p>
+                <p>This Joinder Agreement ("Joinder") is entered into by _________________ ("New Party") to join the Multi-Partner Privacy Non-Disclosure Agreement dated ${formData.effectiveDate || '_______________'} (the "Original Agreement").</p>
                 
                 <p><strong>JOINDER TERMS:</strong></p>
                 
@@ -3299,7 +3309,7 @@
         // Download Word document
         function downloadWordDocument(isJoinder = false) {
             const content = isJoinder ? generateJoinderForm() : document.getElementById('previewContent').innerHTML;
-            const filename = isJoinder ? 'Polyamorous-Swinger-Joinder-Agreement.doc' : 'Polyamorous-Swinger-Privacy-NDA.doc';
+            const filename = isJoinder ? 'Multi-Partner-Joinder-Agreement.doc' : 'Multi-Partner-Privacy-NDA.doc';
             
             const wordDoc = `
                 <html xmlns:o="urn:schemas-microsoft-com:office:office" 
@@ -3366,7 +3376,7 @@
         // Download text file
         function downloadTextFile() {
             const textContent = generateCleanTextContent();
-            const filename = 'Polyamorous-Swinger-Privacy-NDA.txt';
+            const filename = 'Multi-Partner-Privacy-NDA.txt';
             
             const blob = new Blob([textContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
