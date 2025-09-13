@@ -2720,12 +2720,19 @@
                 btn.disabled = true;
                 
                 setTimeout(() => {
-                    copyToClipboard();
-                    btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.disabled = false;
-                    }, 2000);
+                    copyToClipboard().then(() => {
+                        btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.disabled = false;
+                        }, 2000);
+                    }).catch(() => {
+                        btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Copy Failed';
+                        setTimeout(() => {
+                            btn.innerHTML = originalHTML;
+                            btn.disabled = false;
+                        }, 2000);
+                    });
                 }, 500);
             });
             
@@ -3304,85 +3311,165 @@
         
         // Download Word document
         function downloadWordDocument(isJoinder = false) {
-            const content = isJoinder ? generateJoinderForm() : document.getElementById('previewContent').innerHTML;
-            const filename = isJoinder ? 'Multi-Partner-Joinder-Agreement.doc' : 'Multi-Partner-Privacy-NDA.doc';
-            
-            const wordDoc = `
-                <html xmlns:o="urn:schemas-microsoft-com:office:office" 
-                      xmlns:w="urn:schemas-microsoft-com:office:word" 
-                      xmlns="http://www.w3.org/TR/REC-html40">
-                <head>
-                    <meta charset="utf-8">
-                    <title>${isJoinder ? 'Polyamorous & Swinger Joinder Agreement' : 'Polyamorous & Swinger Privacy NDA'}</title>
-                    <!--[if gte mso 9]>
-                    <xml>
-                        <w:WordDocument>
-                            <w:View>Print</w:View>
-                            <w:Zoom>90</w:Zoom>
-                            <w:DoNotPromptForConvert/>
-                            <w:DoNotShowInsertionsAndDeletions/>
-                        </w:WordDocument>
-                    </xml>
-                    <![endif]-->
-                    <style>
-                        @page { margin: 1in; }
-                        body { 
-                            font-family: 'Times New Roman', serif; 
-                            font-size: 11pt;
-                            line-height: 1.6;
-                            color: #000;
-                        }
-                        h1 { font-size: 13pt; font-weight: bold; text-align: center; }
-                        p { margin-bottom: 11pt; }
-                        strong { font-weight: bold; }
-                    </style>
-                </head>
-                <body>${content}</body>
-                </html>
-            `;
-            
-            const blob = new Blob([wordDoc], { type: 'application/msword' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            try {
+                const content = isJoinder ? generateJoinderForm() : document.getElementById('previewContent').innerHTML;
+                
+                if (!content || content.trim() === '') {
+                    alert('Error: No content available to download. Please generate the document first.');
+                    return;
+                }
+                
+                const filename = isJoinder ? 'Multi-Partner-Joinder-Agreement.doc' : 'Multi-Partner-Privacy-NDA.doc';
+                
+                const wordDoc = `
+                    <html xmlns:o="urn:schemas-microsoft-com:office:office" 
+                          xmlns:w="urn:schemas-microsoft-com:office:word" 
+                          xmlns="http://www.w3.org/TR/REC-html40">
+                    <head>
+                        <meta charset="utf-8">
+                        <title>${isJoinder ? 'Polyamorous & Swinger Joinder Agreement' : 'Polyamorous & Swinger Privacy NDA'}</title>
+                        <!--[if gte mso 9]>
+                        <xml>
+                            <w:WordDocument>
+                                <w:View>Print</w:View>
+                                <w:Zoom>90</w:Zoom>
+                                <w:DoNotPromptForConvert/>
+                                <w:DoNotShowInsertionsAndDeletions/>
+                            </w:WordDocument>
+                        </xml>
+                        <![endif]-->
+                        <style>
+                            @page { margin: 1in; }
+                            body { 
+                                font-family: 'Times New Roman', serif; 
+                                font-size: 11pt;
+                                line-height: 1.6;
+                                color: #000;
+                            }
+                            h1 { font-size: 13pt; font-weight: bold; text-align: center; }
+                            p { margin-bottom: 11pt; }
+                            strong { font-weight: bold; }
+                        </style>
+                    </head>
+                    <body>${content}</body>
+                    </html>
+                `;
+                
+                // Use proper MIME type for better compatibility
+                const blob = new Blob([wordDoc], { 
+                    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' 
+                });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                console.log('Document download initiated successfully');
+            } catch (error) {
+                console.error('Error downloading document:', error);
+                alert('Error downloading document. Please try again.');
+            }
         }
         
         // Copy to clipboard
         function copyToClipboard() {
-            const textContent = generateCleanTextContent();
-            navigator.clipboard.writeText(textContent).then(() => {
-                console.log('Content copied to clipboard');
-            }).catch(err => {
-                console.error('Failed to copy to clipboard:', err);
-                // Fallback for older browsers
+            try {
+                const textContent = generateCleanTextContent();
+                
+                if (!textContent || textContent.trim() === '') {
+                    alert('Error: No content available to copy. Please generate the document first.');
+                    return Promise.reject('No content');
+                }
+                
+                // Try modern clipboard API first
+                if (navigator.clipboard && window.isSecureContext) {
+                    return navigator.clipboard.writeText(textContent).then(() => {
+                        console.log('Content copied to clipboard successfully');
+                        return true;
+                    }).catch(err => {
+                        console.warn('Modern clipboard API failed, trying fallback:', err);
+                        return fallbackCopyToClipboard(textContent);
+                    });
+                } else {
+                    // Use fallback method
+                    return fallbackCopyToClipboard(textContent);
+                }
+            } catch (error) {
+                console.error('Error in copyToClipboard:', error);
+                alert('Error copying to clipboard. Please try again.');
+                return Promise.reject(error);
+            }
+        }
+        
+        // Fallback copy method for older browsers or insecure contexts
+        function fallbackCopyToClipboard(text) {
+            try {
                 const textArea = document.createElement('textarea');
-                textArea.value = textContent;
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
                 document.body.appendChild(textArea);
+                textArea.focus();
                 textArea.select();
-                document.execCommand('copy');
+                
+                const successful = document.execCommand('copy');
                 document.body.removeChild(textArea);
-            });
+                
+                if (successful) {
+                    console.log('Content copied to clipboard using fallback method');
+                    return Promise.resolve(true);
+                } else {
+                    throw new Error('Fallback copy method failed');
+                }
+            } catch (err) {
+                console.error('Fallback copy method failed:', err);
+                alert('Unable to copy to clipboard. Please manually select and copy the text.');
+                return Promise.reject(err);
+            }
         }
         
         // Download text file
         function downloadTextFile() {
-            const textContent = generateCleanTextContent();
-            const filename = 'Multi-Partner-Privacy-NDA.txt';
-            
-            const blob = new Blob([textContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
+            try {
+                const textContent = generateCleanTextContent();
+                
+                if (!textContent || textContent.trim() === '') {
+                    alert('Error: No content available to download. Please generate the document first.');
+                    return;
+                }
+                
+                const filename = 'Multi-Partner-Privacy-NDA.txt';
+                
+                const blob = new Blob([textContent], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = filename;
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                
+                // Clean up
+                setTimeout(() => {
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(url);
+                }, 100);
+                
+                console.log('Text file download initiated successfully');
+            } catch (error) {
+                console.error('Error downloading text file:', error);
+                alert('Error downloading text file. Please try again.');
+            }
         }
 
         // Progress tracking
