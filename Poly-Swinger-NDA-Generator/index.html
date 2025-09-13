@@ -2735,9 +2735,12 @@
             // Set default form values for immediate preview
             setDefaultFormValues();
             
-            // Generate initial preview immediately (no delay)
-            updatePreview();
-            generateRiskAssessment();
+            // Generate initial preview with small delay to ensure DOM is ready
+            setTimeout(() => {
+                console.log('Initializing preview after DOM ready');
+                updatePreview();
+                generateRiskAssessment();
+            }, 100);
             
             // Smooth scrolling for better UX
             document.documentElement.style.scrollBehavior = 'smooth';
@@ -2964,6 +2967,18 @@
         function initializeTabs() {
             const tabButtons = document.querySelectorAll('.tab-btn');
             const tabContents = document.querySelectorAll('.tab-content');
+
+            // Initialize first tab as active
+            if (tabButtons.length > 0 && tabContents.length > 0) {
+                const firstTab = tabButtons[0];
+                const firstTabId = firstTab.getAttribute('data-tab');
+                const firstContent = document.getElementById(firstTabId);
+                
+                if (firstContent) {
+                    firstTab.classList.add('active');
+                    firstContent.classList.add('active');
+                }
+            }
 
             tabButtons.forEach(button => {
                 button.addEventListener('click', () => {
@@ -3643,8 +3658,24 @@
             if (previewElement) {
                 previewElement.innerHTML = content;
                 console.log('Preview updated with content length:', content.length);
+                
+                // Ensure preview is visible
+                previewElement.style.display = 'block';
+                previewElement.style.visibility = 'visible';
             } else {
                 console.error('Preview content element not found');
+                // Retry after a short delay if element not found
+                setTimeout(() => {
+                    const retryElement = document.getElementById('previewContent');
+                    if (retryElement) {
+                        retryElement.innerHTML = content;
+                        retryElement.style.display = 'block';
+                        retryElement.style.visibility = 'visible';
+                        console.log('Preview updated on retry');
+                    } else {
+                        console.error('Preview element still not found on retry');
+                    }
+                }, 200);
             }
         } catch (error) {
                 console.error('Error generating preview:', error);
