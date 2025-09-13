@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Polyamorous & Swinger Privacy NDA Generator | Terms.Law</title>
+    <title>Multi-Partner Privacy NDA Generator | Terms.Law</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -1781,8 +1781,8 @@
 <body>
     <div class="app">
         <div class="header-section">
-            <h1><i class="fas fa-heart"></i> Polyamorous & Swinger Privacy NDA Generator</h1>
-            <p>Create comprehensive privacy agreements for polyamorous relationships, swinger activities, consensual multi-partner encounters, and exclusive events. Professional-grade legal protection for all participants.</p>
+            <h1><i class="fas fa-heart"></i> Multi-Partner Privacy NDA Generator</h1>
+            <p>Create comprehensive privacy agreements for intimate relationships involving multiple consenting adults. Professional-grade legal protection for all participants in various relationship arrangements and private encounters.</p>
         </div>
         
         
@@ -1801,15 +1801,22 @@
                             <label class="nda-option active" for="generalNDA">
                                 <input type="radio" id="generalNDA" name="ndaType" value="general" checked>
                                 <div class="nda-option-content">
-                                    <h4><i class="fas fa-users"></i> General Relationship NDA</h4>
-                                    <p>For ongoing polyamorous relationships and regular swinger activities</p>
+                                    <h4><i class="fas fa-users"></i> Ongoing Multi-Partner Relationship</h4>
+                                    <p>For established relationships with multiple partners or regular intimate encounters</p>
+                                </div>
+                            </label>
+                            <label class="nda-option" for="casualNDA">
+                                <input type="radio" id="casualNDA" name="ndaType" value="casual">
+                                <div class="nda-option-content">
+                                    <h4><i class="fas fa-user-plus"></i> Experimental Encounter</h4>
+                                    <p>For couples exploring with a third partner or casual multi-partner experiences</p>
                                 </div>
                             </label>
                             <label class="nda-option" for="eventNDA">
                                 <input type="radio" id="eventNDA" name="ndaType" value="event">
                                 <div class="nda-option-content">
-                                    <h4><i class="fas fa-calendar-alt"></i> Event-Specific NDA</h4>
-                                    <p>For specific parties, gatherings, or one-time events with limited scope</p>
+                                    <h4><i class="fas fa-calendar-alt"></i> Specific Event or Gathering</h4>
+                                    <p>For parties, gatherings, or one-time events with multiple participants</p>
                                 </div>
                             </label>
                         </div>
@@ -2209,18 +2216,9 @@
             // Set default form values for immediate preview
             setDefaultFormValues();
             
-            // Generate initial preview with a small delay to ensure all elements are ready
-            setTimeout(() => {
-                // Add immediate placeholder content
-                const previewElement = document.getElementById('previewContent');
-                if (previewElement) {
-                    previewElement.innerHTML = '<p style="color: #666; text-align: center; padding: 2rem;">Loading document preview...</p>';
-                }
-                
-                generatePreview();
-                generateRiskAssessment();
-                // updateProgress(); // Removed progress bar
-            }, 100);
+            // Generate initial preview immediately (no delay)
+            updatePreview();
+            generateRiskAssessment();
             
             // Smooth scrolling for better UX
             document.documentElement.style.scrollBehavior = 'smooth';
@@ -2305,7 +2303,7 @@
             setSmartDefaults(templateId);
             
             // Update everything
-            generatePreview();
+            updatePreview();
             generateRiskAssessment();
             updateProgress();
             
@@ -2390,7 +2388,7 @@
                         formData.duration = '3';
                     }
                     
-                    generatePreview();
+                    updatePreview();
                     generateRiskAssessment();
                     // updateProgress(); // Removed progress bar
                     
@@ -2467,7 +2465,7 @@
             document.getElementById('addPartyBtn').addEventListener('click', () => {
                 formData.parties.push({ name: '' });
                 renderParties();
-                generatePreview();
+                updatePreview();
                 
                 // Scroll to new party with animation
                 setTimeout(() => {
@@ -2510,7 +2508,7 @@
                     const partyIndex = parseInt(e.target.getAttribute('data-party'));
                     const field = e.target.getAttribute('data-field');
                     formData.parties[partyIndex][field] = e.target.value;
-                    generatePreview();
+                    updatePreview();
                     generateRiskAssessment();
                     // updateProgress(); // Removed progress bar
                     if (field === 'name') {
@@ -2538,7 +2536,7 @@
                 setTimeout(() => {
                     formData.parties.splice(index, 1);
                     renderParties();
-                    generatePreview();
+                    updatePreview();
                 }, 200);
             }
         }
@@ -2548,7 +2546,7 @@
             // Event details
             document.getElementById('eventName').addEventListener('input', (e) => {
                 formData.eventName = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 highlightPreview(/Event Name: .+?(?=<br>)/i);
@@ -2556,7 +2554,7 @@
 
             document.getElementById('eventDate').addEventListener('change', (e) => {
                 formData.eventDate = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 highlightPreview(/Event Date: .+?(?=<br>)/i);
@@ -2564,14 +2562,14 @@
 
             document.getElementById('eventLocation').addEventListener('input', (e) => {
                 formData.eventLocation = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 highlightPreview(/Event Location: .+?(?=<br>)/i);
             });
 
             document.getElementById('eventDescription').addEventListener('input', (e) => {
                 formData.eventDescription = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 highlightPreview(/Event Description: .+?(?=<br>)/i);
             });
@@ -2579,7 +2577,7 @@
             // State jurisdiction
             document.getElementById('stateJurisdiction').addEventListener('change', (e) => {
                 formData.stateJurisdiction = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 addInputAnimation(e.target);
@@ -2589,7 +2587,7 @@
             // Effective date
             document.getElementById('effectiveDate').addEventListener('change', (e) => {
                 formData.effectiveDate = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 addInputAnimation(e.target);
@@ -2599,7 +2597,7 @@
             // Duration
             document.getElementById('duration').addEventListener('change', (e) => {
                 formData.duration = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 addInputAnimation(e.target);
                 highlightPreview(/remain in effect for .+?(?=\.|from)/i);
@@ -2608,7 +2606,7 @@
             // Liquidated damages
             document.getElementById('liquidatedDamages').addEventListener('input', (e) => {
                 formData.liquidatedDamages = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 highlightPreview(/\$[\d,]+(?:\.\d{2})? per breach/i);
@@ -2617,7 +2615,7 @@
             // Dispute resolution
             document.getElementById('disputeResolution').addEventListener('change', (e) => {
                 formData.disputeResolution = e.target.value;
-                generatePreview();
+                updatePreview();
                 generateRiskAssessment();
                 // updateProgress(); // Removed progress bar
                 addInputAnimation(e.target);
@@ -2634,7 +2632,7 @@
             checkboxes.forEach(checkboxId => {
                 document.getElementById(checkboxId).addEventListener('change', (e) => {
                     formData[checkboxId] = e.target.checked;
-                    generatePreview();
+                    updatePreview();
                     generateRiskAssessment();
                     
                     // Add visual feedback
@@ -2679,7 +2677,7 @@
                     }, 200);
                 }
                 
-                generatePreview();
+                updatePreview();
                 addInputAnimation(e.target);
                 highlightPreview(/6\. DIGITAL CONTENT AND MEDIA[\s\S]*?(?=<p><strong>[789]\.|$)/i);
             });
@@ -2687,13 +2685,13 @@
             // Custom digital handling
             document.getElementById('customDigitalHandling').addEventListener('input', (e) => {
                 formData.customDigitalHandling = e.target.value;
-                generatePreview();
+                updatePreview();
             });
 
             // Additional terms
             document.getElementById('additionalTerms').addEventListener('input', (e) => {
                 formData.additionalTerms = e.target.value;
-                generatePreview();
+                updatePreview();
             });
 
             // Download buttons with loading states
@@ -2872,7 +2870,7 @@
         }
 
         // Generate document preview
-        function generatePreview() {
+        function updatePreview() {
             try {
             const jurisdictionText = formData.stateJurisdiction === "District of Columbia" 
                 ? "District of Columbia" 
