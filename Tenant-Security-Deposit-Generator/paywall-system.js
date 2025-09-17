@@ -8,7 +8,7 @@ const PaywallSystem = (() => {
         secretKey: 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI',
         currency: 'USD',
         amount: '14.95', // Price for the tenant deposit letter generator
-        description: 'Tenant Security Deposit Demand Letter Generator - Professional Legal Document'
+        description: 'Tenant Security Deposit Generator - Full Access'
     };
 
     // Persistent payment status tracking using localStorage
@@ -97,7 +97,10 @@ const PaywallSystem = (() => {
                             currency_code: PAYPAL_CONFIG.currency
                         },
                         description: PAYPAL_CONFIG.description
-                    }]
+                    }],
+                    application_context: {
+                        shipping_preference: "NO_SHIPPING"
+                    }
                 });
             },
             onApprove: async (data, actions) => {

@@ -964,8 +964,12 @@ Date: ____________________________        Date: ____________________________`;
                     createOrder: (data, actions) => {
                         return actions.order.create({
                             purchase_units: [{
-                                amount: { value: '14.95' }
-                            }]
+                                amount: { value: '14.95' },
+                                description: 'Interior Design Agreement Generator - Full Access'
+                            }],
+                            application_context: {
+                                shipping_preference: "NO_SHIPPING"
+                            }
                         });
                     },
                     onApprove: (data, actions) => {

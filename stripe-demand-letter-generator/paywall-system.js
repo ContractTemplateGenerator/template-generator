@@ -8,7 +8,7 @@ const PaywallSystem = (() => {
         secretKey: 'EKqfxP31dZw2wFl1xNiVIPZm9LmgrL9OyyinQdESLAHInrhXU0Lkte2Sh0b3zgxxdlIJNBt0SkCgTVjI',
         currency: 'USD',
         amount: '29.95', // Updated price for the demand letter generator
-        description: 'Stripe Demand Letter Generator - Professional Legal Document'
+        description: 'Stripe Demand Letter Generator - Full Access'
     };
 
     // Persistent payment status tracking using localStorage
@@ -98,7 +98,10 @@ const PaywallSystem = (() => {
                             currency_code: PAYPAL_CONFIG.currency
                         },
                         description: PAYPAL_CONFIG.description
-                    }]
+                    }],
+                    application_context: {
+                        shipping_preference: "NO_SHIPPING"
+                    }
                 });
             },
             onApprove: async (data, actions) => {
