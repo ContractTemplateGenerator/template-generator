@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real Estate LLC Operating Agreement Generator</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="app-header">
+      <h1>Real Estate LLC Operating Agreement Generator</h1>
+      <p>Create a tailored operating agreement outline with live preview and change tracking.</p>
+    </header>
+    <main class="app-main">
+      <section class="builder" aria-label="Operating agreement builder">
+        <form id="oa-form" autocomplete="off">
+          <div class="form-section">
+            <h2>LLC Details</h2>
+            <label class="field">
+              <span class="field-label">LLC Name</span>
+              <input type="text" id="llcName" name="llcName" data-field-key="llcName" placeholder="Example Property Holdings, LLC" required />
+            </label>
+            <label class="field">
+              <span class="field-label">Effective Date</span>
+              <input type="date" id="effectiveDate" name="effectiveDate" data-field-key="effectiveDate" />
+            </label>
+            <label class="field">
+              <span class="field-label">Governing State</span>
+              <input type="text" id="state" name="state" data-field-key="state" placeholder="Delaware" />
+            </label>
+            <label class="field">
+              <span class="field-label">Principal Office Address</span>
+              <input type="text" id="principalOffice" name="principalOffice" data-field-key="principalOffice" placeholder="123 Main Street, City, State" />
+            </label>
+            <label class="field">
+              <span class="field-label">Registered Agent Name</span>
+              <input type="text" id="registeredAgentName" name="registeredAgentName" data-field-key="registeredAgentName" placeholder="Registered Agent Name" />
+            </label>
+            <label class="field">
+              <span class="field-label">Registered Agent Address</span>
+              <input type="text" id="registeredAgentAddress" name="registeredAgentAddress" data-field-key="registeredAgentAddress" placeholder="456 Agent Ave, City, State" />
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h2>Property Information</h2>
+            <label class="field">
+              <span class="field-label">Primary Property Address</span>
+              <input type="text" id="propertyAddress" name="propertyAddress" data-field-key="propertyAddress" placeholder="789 Rental Road, City, State" />
+            </label>
+            <label class="field">
+              <span class="field-label">Property Description</span>
+              <textarea id="propertyDescription" name="propertyDescription" data-field-key="propertyDescription" rows="3" placeholder="Two-unit residential property currently leased to long-term tenants."></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Business Purpose</span>
+              <textarea id="businessPurpose" name="businessPurpose" data-field-key="businessPurpose" rows="3" placeholder="Acquire, own, lease, and manage residential rental properties and related assets."></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h2>Management</h2>
+            <fieldset class="field">
+              <legend>Management Structure</legend>
+              <label class="option">
+                <input type="radio" name="managementStructure" value="member" data-field-key="managementStructure" checked />
+                Member-managed
+              </label>
+              <label class="option">
+                <input type="radio" name="managementStructure" value="manager" data-field-key="managementStructure" />
+                Manager-managed
+              </label>
+            </fieldset>
+            <label class="field" id="managerNameField" hidden>
+              <span class="field-label">Designated Manager Name</span>
+              <input type="text" id="managerName" name="managerName" data-field-key="managerName" placeholder="Manager Name" />
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h2>Members</h2>
+            <div id="members-container"></div>
+            <button type="button" id="add-member" class="button-secondary">Add Member</button>
+          </div>
+
+          <div class="form-section">
+            <h2>Capital & Distributions</h2>
+            <label class="field">
+              <span class="field-label">Initial Capital Contributions</span>
+              <textarea id="capitalContributions" name="capitalContributions" data-field-key="capitalContributions" rows="3" placeholder="Members contribute cash and property listed in Schedule A."></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Distribution Policy</span>
+              <textarea id="distributionPolicy" name="distributionPolicy" data-field-key="distributionPolicy" rows="3" placeholder="Distributions will be made quarterly in proportion to membership interests after reserving funds for expenses."></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h2>Operational Provisions</h2>
+            <label class="field">
+              <span class="field-label">Decision-Making Process</span>
+              <textarea id="decisionProcess" name="decisionProcess" data-field-key="decisionProcess" rows="3" placeholder="Major decisions require approval of members holding at least 66% of the membership interests."></textarea>
+            </label>
+            <label class="field">
+              <span class="field-label">Dissolution Plan</span>
+              <textarea id="dissolutionPlan" name="dissolutionPlan" data-field-key="dissolutionPlan" rows="3" placeholder="Upon dissolution, assets will be sold and proceeds distributed after satisfying liabilities in accordance with membership interests."></textarea>
+            </label>
+          </div>
+
+          <div class="form-section">
+            <h2>Execution</h2>
+            <label class="field">
+              <span class="field-label">Agreement Signing Location</span>
+              <input type="text" id="signingLocation" name="signingLocation" data-field-key="signingLocation" placeholder="City, State" />
+            </label>
+            <label class="field">
+              <span class="field-label">Signature Block Notes</span>
+              <textarea id="signatureBlock" name="signatureBlock" data-field-key="signatureBlock" rows="3" placeholder="IN WITNESS WHEREOF, the Members execute this Operating Agreement as of the Effective Date."></textarea>
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <section class="preview" aria-label="Live operating agreement preview">
+        <div class="preview-toolbar">
+          <h2>Agreement Preview</h2>
+          <button type="button" id="reset-form" class="button-ghost">Reset Form</button>
+        </div>
+        <div id="preview-content" class="preview-content"></div>
+      </section>
+    </main>
+
+    <template id="member-template">
+      <div class="member-card" data-member-card>
+        <div class="member-card-header">
+          <h3>Member <span data-member-index></span></h3>
+          <button type="button" class="remove-member" data-remove-member aria-label="Remove member">Remove</button>
+        </div>
+        <label class="field">
+          <span class="field-label">Member Name</span>
+          <input type="text" data-member-input="name" placeholder="Member Name" />
+        </label>
+        <label class="field">
+          <span class="field-label">Capital Contribution</span>
+          <input type="text" data-member-input="contribution" placeholder="$50,000 cash" />
+        </label>
+        <label class="field">
+          <span class="field-label">Ownership Percentage</span>
+          <input type="text" data-member-input="percentage" placeholder="50%" />
+        </label>
+        <label class="field">
+          <span class="field-label">Role / Responsibilities</span>
+          <input type="text" data-member-input="role" placeholder="Handles acquisitions and financing" />
+        </label>
+      </div>
+    </template>
+
+    <script src="app.js"></script>
+  </body>
+</html>

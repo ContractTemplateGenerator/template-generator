@@ -1,0 +1,2074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Merchant Stablecoin Acceptance Generator</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f6f7fb;
+      --sidebar: #0f172a;
+      --sidebar-accent: rgba(255, 255, 255, 0.12);
+      --primary: #2563eb;
+      --primary-soft: rgba(37, 99, 235, 0.12);
+      --accent: #0ea5e9;
+      --danger: #dc2626;
+      --card: #ffffff;
+      --border: #d6d9e7;
+      --muted: #6b7280;
+      --chip-bg: rgba(15, 23, 42, 0.08);
+      font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: #111827;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 300px auto;
+    }
+
+    aside.sidebar {
+      background: var(--sidebar);
+      color: #e2e8f0;
+      padding: 28px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    aside.sidebar h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      line-height: 1.2;
+    }
+
+    aside.sidebar p {
+      margin: 0;
+      font-size: 0.92rem;
+      color: rgba(226, 232, 240, 0.72);
+    }
+
+    .sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sidebar nav button {
+      background: transparent;
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: inherit;
+      text-align: left;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.2s ease, border 0.2s ease;
+    }
+
+    .sidebar nav button.active,
+    .sidebar nav button:hover {
+      background: var(--sidebar-accent);
+      border-color: rgba(255, 255, 255, 0.32);
+    }
+
+    .sidebar .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .sidebar .toolbar button {
+      padding: 10px 14px;
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: transparent;
+      color: inherit;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.2s ease, border 0.2s ease;
+    }
+
+    .sidebar .toolbar button:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    main.workspace {
+      display: grid;
+      grid-template-columns: minmax(360px, 520px) minmax(520px, 1fr);
+      gap: 24px;
+      padding: 28px 32px;
+    }
+
+    .forms-pane {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-height: calc(100vh - 56px);
+      overflow: hidden;
+    }
+
+    .forms-scroll {
+      overflow-y: auto;
+      padding-right: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .tab-section {
+      display: none;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 22px;
+      border: 1px solid rgba(15, 23, 42, 0.06);
+      box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+    }
+
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.28rem;
+      color: #0b1220;
+    }
+
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.95rem;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: #fff;
+      width: 100%;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      gap: 16px;
+    }
+
+    .row.two {
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+
+    .row.three {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .notice {
+      background: var(--primary-soft);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      color: #1f305b;
+    }
+
+    .token-matrix {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .token-card {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .token-card header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+
+    .token-card header button {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--primary);
+      color: #fff;
+      border: 1px solid var(--primary);
+      border-radius: 9px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    button.primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.2);
+    }
+
+    .checkbox-grid {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      font-size: 0.88rem;
+    }
+
+    .preview-pane {
+      background: #f9f9ff;
+      border-radius: 18px;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      overflow: hidden;
+    }
+
+    .preview-header {
+      padding: 18px 24px 16px;
+      border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #fff;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      background: var(--chip-bg);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      color: #0f1c39;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .preview-controls button {
+      border: 1px solid rgba(15, 23, 42, 0.18);
+      background: #fff;
+      color: #0f172a;
+      border-radius: 8px;
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .preview-controls button.active {
+      background: var(--primary);
+      border-color: var(--primary);
+      color: #fff;
+    }
+
+    .issues-panel {
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+      padding-top: 12px;
+      margin-top: 12px;
+    }
+
+    .issues-panel h4 {
+      margin: 0 0 8px;
+      font-size: 0.92rem;
+      color: #0b1220;
+    }
+
+    .issues-panel ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+      font-size: 0.86rem;
+      color: #b91c1c;
+    }
+
+    .issues-panel button {
+      border: none;
+      background: transparent;
+      color: var(--primary);
+      cursor: pointer;
+      font-size: 0.8rem;
+      padding: 0;
+    }
+
+    .preview-body {
+      overflow-y: auto;
+      padding: 26px 28px 140px;
+    }
+
+    .doc-container {
+      background: #fff;
+      border-radius: 14px;
+      border: 1px solid rgba(15, 23, 42, 0.05);
+      padding: 26px 30px 34px;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.06);
+      display: grid;
+      gap: 22px;
+    }
+
+    .doc-heading {
+      text-align: center;
+    }
+
+    .doc-heading h2 {
+      margin: 0;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .toc {
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 12px;
+      padding: 16px;
+      background: #f9fafc;
+      font-size: 0.92rem;
+    }
+
+    .toc ul {
+      margin: 0;
+      padding-left: 18px;
+      display: grid;
+      gap: 6px;
+    }
+
+    .toc a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .doc-section {
+      border-top: 1px solid rgba(15, 23, 42, 0.08);
+      padding-top: 18px;
+    }
+
+    .doc-section:first-of-type {
+      border-top: none;
+      padding-top: 0;
+    }
+
+    .doc-section h3 {
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+    }
+
+    .clause-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 14px;
+    }
+
+    .clause {
+      position: relative;
+      padding-left: 48px;
+      line-height: 1.55;
+    }
+
+    .clause::before {
+      content: attr(data-number);
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .clause[data-delta="true"] {
+      animation: deltaFlash 1.4s ease;
+      background: linear-gradient(90deg, rgba(250, 204, 21, 0.32), rgba(250, 204, 21, 0.02));
+      border-radius: 10px;
+      padding: 12px 18px 12px 48px;
+    }
+
+    @keyframes deltaFlash {
+      0% { background-color: rgba(250, 204, 21, 0.6); }
+      100% { background-color: transparent; }
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      background: var(--chip-bg);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      color: #0b1220;
+    }
+
+    .defined-term {
+      position: relative;
+      cursor: help;
+      border-bottom: 1px dotted rgba(37, 99, 235, 0.6);
+    }
+
+    .defined-term:hover::after {
+      content: attr(data-definition);
+      position: absolute;
+      left: 0;
+      top: 115%;
+      background: rgba(15, 23, 42, 0.96);
+      color: #fff;
+      padding: 8px 10px;
+      border-radius: 6px;
+      width: min(280px, 70vw);
+      font-size: 0.82rem;
+      line-height: 1.4;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.35);
+      z-index: 10;
+    }
+
+    .annex-preview {
+      margin-top: 26px;
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 14px;
+      background: #fff;
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+    }
+
+    .annex-preview h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .refund-explainer,
+    .psp-card,
+    .sanctions-board {
+      border: 1px solid rgba(15, 23, 42, 0.08);
+      border-radius: 10px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      font-size: 0.88rem;
+      display: grid;
+      gap: 6px;
+    }
+
+    .depeg-badge {
+      background: rgba(234, 179, 8, 0.18);
+      color: #92400e;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      display: inline-flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      border: 1px solid rgba(15, 23, 42, 0.1);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(15, 23, 42, 0.06);
+      font-weight: 600;
+    }
+
+    .preview-footer {
+      border-top: 1px solid rgba(15, 23, 42, 0.1);
+      padding: 12px 22px;
+      background: #fff;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .outputs-card textarea {
+      min-height: 220px;
+      font-family: "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace;
+      font-size: 0.88rem;
+      background: #fbfbfd;
+    }
+
+    @media (max-width: 1280px) {
+      main.workspace {
+        grid-template-columns: 1fr;
+      }
+      .forms-pane {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 920px) {
+      body {
+        grid-template-columns: 1fr;
+      }
+      aside.sidebar {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      main.workspace {
+        padding: 20px;
+      }
+      .preview-pane {
+        order: -1;
+      }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div>
+      <h1>Stablecoin Acceptance Addendum</h1>
+      <p>Side-by-side generator with live preview, clause tracking, and annex outputs.</p>
+    </div>
+    <nav id="nav"></nav>
+    <div class="toolbar">
+      <button id="save-draft">Save draft</button>
+      <button id="load-draft">Load draft</button>
+      <button id="clear-draft">Clear draft</button>
+    </div>
+  </aside>
+  <main class="workspace">
+    <div class="forms-pane">
+      <div class="card" style="flex:0 0 auto;">
+        <h2>Configuration</h2>
+        <p style="margin:0;font-size:0.9rem;color:var(--muted);">Complete each tab. Preview updates automatically with debounced rendering.</p>
+      </div>
+      <div class="forms-scroll" id="form-scroll">
+        <section id="sections"></section>
+      </div>
+    </div>
+    <div class="preview-pane">
+      <div class="preview-header">
+        <div class="badges" id="preview-badges"></div>
+        <div class="preview-controls">
+          <button type="button" data-preview-mode="clean" class="active">Clean final</button>
+          <button type="button" data-preview-mode="explained">Explained</button>
+        </div>
+        <div class="issues-panel" id="issues-panel"></div>
+      </div>
+      <div class="preview-body">
+        <div class="doc-container" id="doc-preview"></div>
+        <div class="annex-preview" id="customer-preview"></div>
+      </div>
+      <div class="preview-footer">
+        <span>Preview only — binding text is the exported file generated at <span id="preview-timestamp">--:--</span></span>
+        <span id="preview-performance"></span>
+      </div>
+    </div>
+  </main>
+
+  <template id="section-template">
+    <div class="card tab-section" data-tab-section>
+      <h2 data-title></h2>
+      <div data-content></div>
+    </div>
+  </template>
+
+  <script>
+    const uuid = () => (window.crypto && window.crypto.randomUUID ? window.crypto.randomUUID() : `id-${Math.random().toString(36).slice(2, 10)}`);
+
+    const defaultState = {
+      merchant: {
+        name: "",
+        governing_law: "California",
+        forum: "State and Federal courts located in San Francisco, California",
+        tax_nexus: "California",
+        acceptance_model: "psp",
+        psp_name: "Coinbase Commerce",
+        psp_relationship_note: "Merchant appoints the PSP to provide conversion and settlement services with fiat settlement within two business days.",
+        self_custody_provider: "",
+        ship_risk_toggle: false
+      },
+      tokens: [
+        {
+          id: uuid(),
+          token: "USDC",
+          networks: ["Ethereum Mainnet", "Base"],
+          reference_price: "PSP rate",
+          oracle_fallbacks: "Chainlink USDC/USD",
+          notes: ""
+        }
+      ],
+      pricing: {
+        model: "quote_locked",
+        quote_minutes: 10,
+        confs_low: 1,
+        grace_minutes: 15,
+        confirmation_locked_confs: 3,
+        immediate_convert_note: "Conversion occurs upon PSP Confirmation with settlement to Merchant in USD within T+1 business day.",
+        underpay_policy: "request_top_up",
+        underpay_grace_percent: 2,
+        overpay_policy: "refund",
+        dust_threshold: "3.00",
+        gas_statement: "Customer bears on-chain network fees. Merchant discloses PSP spread and off-ramp fees separately at checkout.",
+        reference_price_source: "PSP published rate",
+        oracle_list: "Chainlink USDC/USD; Kaiko VWAP"
+      },
+      finality: {
+        bands: [
+          { id: uuid(), label: "≤ $100", confirmations: 1 },
+          { id: uuid(), label: "$100.01 – $5,000", confirmations: 6 },
+          { id: uuid(), label: "> $5,000", confirmations: 25 }
+        ],
+        ship_on_risk: false,
+        ship_on_risk_note: ""
+      },
+      refunds: {
+        basis: "original_usd",
+        window_days: 30,
+        allow_new_address: true,
+        idv_requirement: "Signed message proving control or government ID as requested by Merchant/PSP.",
+        partials: true,
+        store_credit: true,
+        stale_days: 90
+      },
+      compliance: {
+        screen_via_psp: true,
+        vendor: "Chainalysis KYT",
+        triggers: {
+          mixing: true,
+          sanctioned_address: true,
+          structuring: true,
+          rapid_split: true,
+          geo_anomaly: true,
+          device_mismatch: true
+        },
+        geo_blocks: "Cuba; Iran; North Korea; Syria; Crimea; Donetsk; Luhansk",
+        address_lists: "https://example.com/blocklist.csv",
+        reporting_note: "Merchant cooperates with lawful requests, including potential 26 U.S.C. §6050I filings where applicable."
+      },
+      operations: {
+        sweep_cadence: "Daily at 17:00 UTC",
+        custody_provider: "PSP-managed hot wallet with daily fiat sweeps",
+        explorer_links: "https://etherscan.io; https://basescan.org",
+        break_glass_contacts: "Treasury lead; Compliance lead",
+        incident_sla_hours: 24,
+        ledger_fields: "transaction_hash, quote_usd, confirm_usd, token_amount, network_fees, spreads, deltas",
+        stale_invoice_minutes: 30
+      },
+      liability: {
+        cap_amount: "12 months of fees paid under the master agreement",
+        include_psp: false,
+        carveouts: "willful misconduct, fraud, bodily injury, IP infringement"
+      },
+      disclosures: {
+        tone: "neutral",
+        show_fees: true,
+        psp_badges: true,
+        risk_language: "Transactions are final once confirmed on the applicable blockchain."
+      },
+      optional: {
+        marketplace: false,
+        subscription: false,
+        security_annex: false,
+        ccpa: false,
+        vat: false
+      }
+    };
+
+    let state = structuredClone(defaultState);
+    let previewMode = "clean";
+    let renderTimer = null;
+    let autoSaveTimer = null;
+    let previousClauseHtml = new Map();
+
+    const nav = document.getElementById("nav");
+    const sectionsContainer = document.getElementById("sections");
+    const sectionTemplate = document.getElementById("section-template");
+    const previewContainer = document.getElementById("doc-preview");
+    const badgesContainer = document.getElementById("preview-badges");
+    const issuesPanel = document.getElementById("issues-panel");
+    const previewTs = document.getElementById("preview-timestamp");
+    const previewPerf = document.getElementById("preview-performance");
+    const customerPreview = document.getElementById("customer-preview");
+
+    const tabs = [
+      { id: "merchant", label: "Merchant Profile", render: renderMerchantSection },
+      { id: "tokens", label: "Tokens & Networks", render: renderTokensSection },
+      { id: "pricing", label: "Pricing & Volatility", render: renderPricingSection },
+      { id: "finality", label: "Finality & Risk", render: renderFinalitySection },
+      { id: "refunds", label: "Refunds & Reversals", render: renderRefundsSection },
+      { id: "compliance", label: "Sanctions & AML", render: renderComplianceSection },
+      { id: "ops", label: "Ops & Reconciliation", render: renderOpsSection },
+      { id: "liability", label: "Liability & Indemnity", render: renderLiabilitySection },
+      { id: "disclosures", label: "Customer Notices", render: renderDisclosuresSection },
+      { id: "optional", label: "Optional Modules", render: renderOptionalSection },
+      { id: "output", label: "Outputs", render: renderOutputSection }
+    ];
+
+    function init() {
+      previousClauseHtml = new Map();
+      nav.innerHTML = "";
+      sectionsContainer.innerHTML = "";
+      tabs.forEach((tab, index) => {
+        const button = document.createElement("button");
+        button.textContent = tab.label;
+        button.dataset.tab = tab.id;
+        if (index === 0) button.classList.add("active");
+        button.addEventListener("click", () => setActiveTab(tab.id));
+        nav.appendChild(button);
+
+        const sectionEl = sectionTemplate.content.firstElementChild.cloneNode(true);
+        sectionEl.dataset.tabSection = tab.id;
+        if (index === 0) sectionEl.classList.add("active");
+        sectionEl.querySelector("[data-title]").textContent = tab.label;
+        tab.render(sectionEl.querySelector("[data-content]"));
+        sectionsContainer.appendChild(sectionEl);
+      });
+
+      document.querySelectorAll('[data-preview-mode]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          previewMode = btn.dataset.previewMode;
+          document.querySelectorAll('[data-preview-mode]').forEach(b => b.classList.toggle('active', b === btn));
+          scheduleRender();
+        });
+      });
+
+      attachDraftHandlers();
+      scheduleRender();
+    }
+
+    function setActiveTab(tabId) {
+      document.querySelectorAll('nav button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+      });
+      document.querySelectorAll('[data-tab-section]').forEach(section => {
+        const active = section.dataset.tabSection === tabId;
+        section.classList.toggle('active', active);
+      });
+      const tab = tabs.find(t => t.id === tabId);
+      if (tab && tab.render) {
+        const sectionEl = document.querySelector(`[data-tab-section="${tabId}"] [data-content]`);
+        sectionEl.innerHTML = "";
+        tab.render(sectionEl);
+      }
+      document.getElementById('form-scroll').scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function scheduleRender() {
+      if (renderTimer) clearTimeout(renderTimer);
+      renderTimer = setTimeout(() => {
+        renderTimer = null;
+        const start = performance.now();
+        const docPackage = buildDocPackage(state);
+        renderPreview(docPackage);
+        previewPerf.textContent = `Render ${Math.round(performance.now() - start)} ms`;
+        scheduleAutoSave();
+      }, 250);
+    }
+
+    function scheduleAutoSave() {
+      if (autoSaveTimer) clearTimeout(autoSaveTimer);
+      autoSaveTimer = setTimeout(() => {
+        localStorage.setItem('stablecoin-acceptance-generator', JSON.stringify(state));
+      }, 2000);
+    }
+
+    window.addEventListener('blur', () => {
+      localStorage.setItem('stablecoin-acceptance-generator', JSON.stringify(state));
+    });
+
+    function bindInput(el, path, type = "text") {
+      const value = getStateValue(path);
+      if (type === "checkbox") {
+        el.checked = Boolean(value);
+      } else if (type === "number") {
+        el.value = value ?? "";
+      } else {
+        el.value = value ?? "";
+      }
+      const handler = (event) => {
+        const raw = type === "checkbox" ? event.target.checked : event.target.value;
+        const coerced = type === "number" ? Number(raw) : raw;
+        setStateValue(path, coerced);
+        scheduleRender();
+      };
+      el.addEventListener(type === "checkbox" ? "change" : "input", handler);
+      if (type === "number" || type === "text") el.addEventListener('blur', handler);
+    }
+
+    function getStateValue(path) {
+      return path.split('.').reduce((acc, key) => acc?.[key], state);
+    }
+
+    function setStateValue(path, value) {
+      const keys = path.split('.');
+      let ref = state;
+      for (let i = 0; i < keys.length - 1; i += 1) {
+        if (!(keys[i] in ref)) ref[keys[i]] = {};
+        ref = ref[keys[i]];
+      }
+      ref[keys[keys.length - 1]] = value;
+    }
+
+    function renderMerchantSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Merchant legal name
+              <input type="text" data-path="merchant.name" placeholder="Example: Acme Retail LLC" />
+            </label>
+            <label>Governing law
+              <input type="text" data-path="merchant.governing_law" />
+            </label>
+          </div>
+          <div class="row two">
+            <label>Forum / venue
+              <input type="text" data-path="merchant.forum" />
+            </label>
+            <label>Tax nexus jurisdictions
+              <input type="text" data-path="merchant.tax_nexus" placeholder="Comma-separated" />
+            </label>
+          </div>
+          <div class="row two">
+            <label>Acceptance model
+              <select data-path="merchant.acceptance_model">
+                <option value="psp">PSP / custodian handles conversion</option>
+                <option value="self">Light self-custody / PSP hybrid</option>
+              </select>
+            </label>
+            <label id="psp-name-label">PSP / Custodian name
+              <input type="text" data-path="merchant.psp_name" placeholder="Example: Coinbase Commerce" />
+            </label>
+          </div>
+          <label id="psp-note-label">PSP relationship note
+            <textarea data-path="merchant.psp_relationship_note" placeholder="Describe PSP role, fees, and disclaimers."></textarea>
+          </label>
+          <label id="custody-provider-label" style="display:none;">Self-custody provider or wallet stack
+            <input type="text" data-path="merchant.self_custody_provider" placeholder="Example: Fireblocks + cold storage" />
+          </label>
+        </fieldset>
+        <div class="notice">Set the acceptance model to trigger PSP disclosures or the Security Annex.</div>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+      });
+      adjustMerchantVisibility(card);
+      card.querySelector('[data-path="merchant.acceptance_model"]').addEventListener('change', () => {
+        adjustMerchantVisibility(card);
+        scheduleRender();
+      });
+    }
+
+    function adjustMerchantVisibility(container) {
+      const model = state.merchant.acceptance_model;
+      container.querySelector('#psp-name-label').style.display = model === 'psp' ? 'flex' : 'none';
+      container.querySelector('#psp-note-label').style.display = model === 'psp' ? 'flex' : 'none';
+      container.querySelector('#custody-provider-label').style.display = model === 'psp' ? 'none' : 'flex';
+    }
+
+    function renderTokensSection(container) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'token-matrix';
+      state.tokens.forEach((row, idx) => {
+        const tokenCard = document.createElement('div');
+        tokenCard.className = 'token-card';
+        tokenCard.innerHTML = `
+          <header>
+            <strong>Token ${idx + 1}</strong>
+            <button data-remove="${row.id}">Remove</button>
+          </header>
+          <div class="row two">
+            <label>Token symbol / name
+              <input type="text" data-field="token" value="${row.token}" placeholder="USDC, PYUSD" />
+            </label>
+            <label>Reference price source
+              <input type="text" data-field="reference_price" value="${row.reference_price}" placeholder="PSP rate or oracle" />
+            </label>
+          </div>
+          <label>Supported networks (comma-separated)
+            <input type="text" data-field="networks" value="${row.networks.join(', ')}" placeholder="Ethereum Mainnet, Base, Solana" />
+          </label>
+          <label>Oracle fallbacks (optional)
+            <input type="text" data-field="oracle_fallbacks" value="${row.oracle_fallbacks || ''}" placeholder="Chainlink feed IDs" />
+          </label>
+          <label>Additional notes
+            <textarea data-field="notes" placeholder="Geo blocks, maintenance windows, etc.">${row.notes || ''}</textarea>
+          </label>
+        `;
+        tokenCard.querySelectorAll('[data-field]').forEach(input => {
+          input.addEventListener('input', event => {
+            const field = event.target.dataset.field;
+            if (field === 'networks') {
+              state.tokens[idx][field] = event.target.value.split(',').map(n => n.trim()).filter(Boolean);
+            } else {
+              state.tokens[idx][field] = event.target.value;
+            }
+            scheduleRender();
+          });
+        });
+        tokenCard.querySelector('[data-remove]').addEventListener('click', () => {
+          if (state.tokens.length === 1) return;
+          state.tokens = state.tokens.filter(token => token.id !== row.id);
+          setActiveTab('tokens');
+          scheduleRender();
+        });
+        wrapper.appendChild(tokenCard);
+      });
+      const addBtn = document.createElement('button');
+      addBtn.className = 'primary';
+      addBtn.type = 'button';
+      addBtn.textContent = 'Add token';
+      addBtn.addEventListener('click', () => {
+        state.tokens.push({ id: uuid(), token: "", networks: [], reference_price: "PSP rate", oracle_fallbacks: "", notes: "" });
+        setActiveTab('tokens');
+        scheduleRender();
+      });
+      wrapper.appendChild(addBtn);
+      container.appendChild(wrapper);
+      const disclosure = document.createElement('div');
+      disclosure.className = 'notice';
+      disclosure.textContent = 'Schedule A auto-whitelists the tokens and networks you list here; remove support any time without customer notice.';
+      container.appendChild(disclosure);
+    }
+
+    function renderPricingSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <label>Pricing model
+            <select data-path="pricing.model">
+              <option value="quote_locked">Quote-Locked</option>
+              <option value="confirmation_locked">Confirmation-Locked</option>
+              <option value="immediate_convert">Immediate-Convert</option>
+            </select>
+          </label>
+          <div class="row three" data-block="quote">
+            <label>Quote validity (minutes)
+              <input type="number" min="1" data-path="pricing.quote_minutes" />
+            </label>
+            <label>Min confirmations before expiry
+              <input type="number" min="0" data-path="pricing.confs_low" />
+            </label>
+            <label>Underpayment grace (minutes)
+              <input type="number" min="0" data-path="pricing.grace_minutes" />
+            </label>
+          </div>
+          <div class="row two" data-block="confirmation">
+            <label>Confirmations for lock
+              <input type="number" min="1" data-path="pricing.confirmation_locked_confs" />
+            </label>
+            <label>Reference price source at Confirmation
+              <input type="text" data-path="pricing.reference_price_source" />
+            </label>
+          </div>
+          <label data-block="immediate">Immediate convert notes
+            <textarea data-path="pricing.immediate_convert_note"></textarea>
+          </label>
+          <div class="row two">
+            <label>Underpayment policy
+              <select data-path="pricing.underpay_policy">
+                <option value="request_top_up">Request make-whole within window</option>
+                <option value="auto_cancel">Auto-cancel and refund</option>
+              </select>
+            </label>
+            <label>Underpayment grace (% of quote)
+              <input type="number" min="0" data-path="pricing.underpay_grace_percent" />
+            </label>
+          </div>
+          <div class="row two">
+            <label>Overpayment policy
+              <select data-path="pricing.overpay_policy">
+                <option value="refund">Refund excess</option>
+                <option value="credit">Issue store credit</option>
+                <option value="retain_dust">Retain dust threshold</option>
+              </select>
+            </label>
+            <label>Dust threshold (USD)
+              <input type="text" data-path="pricing.dust_threshold" />
+            </label>
+          </div>
+          <label>Oracle / rate list
+            <input type="text" data-path="pricing.oracle_list" placeholder="Chainlink USDC/USD; Kaiko VWAP" />
+          </label>
+          <label>Gas & fee statement
+            <textarea data-path="pricing.gas_statement"></textarea>
+          </label>
+        </fieldset>
+        <div class="notice">Pricing ribbons and cross-references update automatically in preview and exports.</div>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+      });
+      adjustPricingBlocks(card);
+      card.querySelector('[data-path="pricing.model"]').addEventListener('change', () => {
+        adjustPricingBlocks(card);
+        scheduleRender();
+      });
+    }
+
+    function adjustPricingBlocks(container) {
+      const model = state.pricing.model;
+      container.querySelector('[data-block="quote"]').style.display = model === 'quote_locked' ? 'grid' : 'none';
+      container.querySelector('[data-block="confirmation"]').style.display = model === 'confirmation_locked' ? 'grid' : 'none';
+      container.querySelector('[data-block="immediate"]').style.display = model === 'immediate_convert' ? 'flex' : 'none';
+    }
+
+    function renderFinalitySection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div id="finality-bands"></div>
+          <button type="button" class="primary" id="add-band">Add order value band</button>
+          <div class="row two">
+            <label>Ship-on-risk toggle
+              <select data-path="finality.ship_on_risk">
+                <option value="false">Only after full Finality</option>
+                <option value="true">Permitted for trusted customers</option>
+              </select>
+            </label>
+            <label>Ship-on-risk note (if enabled)
+              <textarea data-path="finality.ship_on_risk_note" placeholder="Trusted customer criteria or manual override process."></textarea>
+            </label>
+          </div>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      renderFinalityBands(card.querySelector('#finality-bands'));
+      card.querySelector('#add-band').addEventListener('click', () => {
+        state.finality.bands.push({ id: uuid(), label: "", confirmations: 1 });
+        renderFinalityBands(card.querySelector('#finality-bands'));
+        scheduleRender();
+      });
+      const shipSelect = card.querySelector('[data-path="finality.ship_on_risk"]');
+      bindInput(shipSelect, 'finality.ship_on_risk');
+      shipSelect.addEventListener('change', event => {
+        setStateValue('finality.ship_on_risk', event.target.value === 'true');
+        scheduleRender();
+      });
+      bindInput(card.querySelector('[data-path="finality.ship_on_risk_note"]'), 'finality.ship_on_risk_note');
+    }
+
+    function renderFinalityBands(container) {
+      container.innerHTML = "";
+      state.finality.bands.forEach((band, idx) => {
+        const row = document.createElement('div');
+        row.className = 'row two';
+        row.style.alignItems = 'flex-end';
+        row.innerHTML = `
+          <label>Order value band
+            <input type="text" value="${band.label}" placeholder="Example: ≤ $100" />
+          </label>
+          <div style="display:flex;gap:10px;align-items:flex-end;">
+            <label style="flex:1;">Confirmations required
+              <input type="number" min="0" value="${band.confirmations}" />
+            </label>
+            <button type="button" data-remove="${band.id}">Remove</button>
+          </div>
+        `;
+        const [labelInput, confInput] = row.querySelectorAll('input');
+        labelInput.addEventListener('input', event => {
+          state.finality.bands[idx].label = event.target.value;
+          scheduleRender();
+        });
+        confInput.addEventListener('input', event => {
+          state.finality.bands[idx].confirmations = Number(event.target.value || 0);
+          scheduleRender();
+        });
+        row.querySelector('[data-remove]').addEventListener('click', () => {
+          if (state.finality.bands.length === 1) return;
+          state.finality.bands = state.finality.bands.filter(b => b.id !== band.id);
+          renderFinalityBands(container);
+          scheduleRender();
+        });
+        container.appendChild(row);
+      });
+    }
+
+    function renderRefundsSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Refund basis
+              <select data-path="refunds.basis">
+                <option value="original_usd">USD at original sale less fees</option>
+                <option value="authorization_usd">USD at refund authorization</option>
+              </select>
+            </label>
+            <label>Refund window (days)
+              <input type="number" min="0" data-path="refunds.window_days" />
+            </label>
+          </div>
+          <div class="row two">
+            <label>Allow refunds to new address?
+              <select data-path="refunds.allow_new_address">
+                <option value="true">Yes, with verification</option>
+                <option value="false">No, return-to-origin only</option>
+              </select>
+            </label>
+            <label>Verification requirement
+              <textarea data-path="refunds.idv_requirement"></textarea>
+            </label>
+          </div>
+          <div class="row three">
+            <label>Partial refunds allowed?
+              <select data-path="refunds.partials">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </label>
+            <label>Store credit option?
+              <select data-path="refunds.store_credit">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </label>
+            <label>Stale refund closure (days)
+              <input type="number" min="0" data-path="refunds.stale_days" />
+            </label>
+          </div>
+          <div class="notice">Refund engine preview recomputes basis and displays sample math with these settings.</div>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+        if (input.tagName === 'SELECT') {
+          input.addEventListener('change', event => {
+            const val = event.target.value;
+            setStateValue(input.dataset.path, val === 'true' ? true : val === 'false' ? false : val);
+            scheduleRender();
+          });
+        }
+      });
+    }
+
+    function renderComplianceSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Screen via PSP?
+              <select data-path="compliance.screen_via_psp">
+                <option value="true">Yes</option>
+                <option value="false">No (merchant direct)</option>
+              </select>
+            </label>
+            <label>Sanctions / AML vendor
+              <input type="text" data-path="compliance.vendor" placeholder="Chainalysis, Elliptic" />
+            </label>
+          </div>
+          <label>Geo block list (semicolon-separated)
+            <textarea data-path="compliance.geo_blocks"></textarea>
+          </label>
+          <label>Address list URLs (one per line)
+            <textarea data-path="compliance.address_lists"></textarea>
+          </label>
+          <div>
+            <div style="font-size:0.85rem;color:var(--muted);margin-bottom:6px;">Risk triggers</div>
+            <div class="checkbox-grid" id="trigger-grid"></div>
+          </div>
+          <label>Reporting & SAR notes
+            <textarea data-path="compliance.reporting_note"></textarea>
+          </label>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+        if (input.tagName === 'SELECT') {
+          input.addEventListener('change', event => {
+            const val = event.target.value;
+            setStateValue(input.dataset.path, val === 'true' ? true : val === 'false' ? false : val);
+            scheduleRender();
+          });
+        }
+        if (input.tagName === 'TEXTAREA') input.addEventListener('blur', () => scheduleRender());
+      });
+      const triggerLabels = {
+        mixing: "Mixing services / tumblers",
+        sanctioned_address: "Sanctioned or blocked address",
+        structuring: "Structuring or many small splits",
+        rapid_split: "Rapid split payments",
+        geo_anomaly: "Geo / IP anomaly",
+        device_mismatch: "Wallet or device mismatch"
+      };
+      const grid = card.querySelector('#trigger-grid');
+      grid.innerHTML = "";
+      Object.entries(triggerLabels).forEach(([key, label]) => {
+        const wrapper = document.createElement('label');
+        wrapper.style.cssText = 'display:flex;gap:8px;align-items:center;font-size:0.84rem;';
+        wrapper.innerHTML = `<input type="checkbox" data-trigger="${key}" ${state.compliance.triggers[key] ? 'checked' : ''}/> ${label}`;
+        wrapper.querySelector('input').addEventListener('change', event => {
+          state.compliance.triggers[key] = event.target.checked;
+          scheduleRender();
+        });
+        grid.appendChild(wrapper);
+      });
+    }
+
+    function renderOpsSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Sweep cadence
+              <input type="text" data-path="operations.sweep_cadence" placeholder="Example: Daily at 17:00 UTC" />
+            </label>
+            <label>Stale invoice timeout (minutes)
+              <input type="number" min="0" data-path="operations.stale_invoice_minutes" />
+            </label>
+          </div>
+          <div class="row two">
+            <label>Custody provider / wallet stack
+              <input type="text" data-path="operations.custody_provider" placeholder="PSP-managed, Fireblocks, etc." />
+            </label>
+            <label>Explorer links
+              <textarea data-path="operations.explorer_links"></textarea>
+            </label>
+          </div>
+          <div class="row two">
+            <label>Break-glass contacts
+              <textarea data-path="operations.break_glass_contacts"></textarea>
+            </label>
+            <label>Incident response SLA (hours)
+              <input type="number" min="1" data-path="operations.incident_sla_hours" />
+            </label>
+          </div>
+          <label>Ledger export fields
+            <textarea data-path="operations.ledger_fields"></textarea>
+          </label>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+        if (input.tagName === 'TEXTAREA') input.addEventListener('blur', () => scheduleRender());
+      });
+    }
+
+    function renderLiabilitySection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Liability cap amount
+              <input type="text" data-path="liability.cap_amount" placeholder="12 months of fees, order value, etc." />
+            </label>
+            <label>Include PSP as party?
+              <select data-path="liability.include_psp">
+                <option value="false">No</option>
+                <option value="true">Yes</option>
+              </select>
+            </label>
+          </div>
+          <label>Carve-outs
+            <textarea data-path="liability.carveouts"></textarea>
+          </label>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+        if (input.tagName === 'SELECT') {
+          input.addEventListener('change', event => {
+            setStateValue(input.dataset.path, event.target.value === 'true');
+            scheduleRender();
+          });
+        }
+        if (input.tagName === 'TEXTAREA') input.addEventListener('blur', () => scheduleRender());
+      });
+    }
+
+    function renderDisclosuresSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="row two">
+            <label>Copy tone
+              <select data-path="disclosures.tone">
+                <option value="formal">Formal</option>
+                <option value="neutral">Neutral</option>
+                <option value="friendly">Friendly</option>
+              </select>
+            </label>
+            <label>Show fees separately at checkout?
+              <select data-path="disclosures.show_fees">
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+            </label>
+          </div>
+          <label>PSP / status badges
+            <select data-path="disclosures.psp_badges">
+              <option value="true">Display PSP badges</option>
+              <option value="false">Hide badges</option>
+            </select>
+          </label>
+          <label>Risk language snippet
+            <textarea data-path="disclosures.risk_language"></textarea>
+          </label>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-path]').forEach(input => {
+        const type = input.type === 'number' ? 'number' : input.type === 'checkbox' ? 'checkbox' : 'text';
+        bindInput(input, input.dataset.path, type);
+        if (input.tagName === 'SELECT') {
+          input.addEventListener('change', event => {
+            const val = event.target.value;
+            setStateValue(input.dataset.path, val === 'true' ? true : val === 'false' ? false : val);
+            scheduleRender();
+          });
+        }
+        if (input.tagName === 'TEXTAREA') input.addEventListener('blur', () => scheduleRender());
+      });
+    }
+
+    function renderOptionalSection(container) {
+      const card = document.createElement('div');
+      card.innerHTML = `
+        <fieldset>
+          <div class="checkbox-grid">
+            <label><input type="checkbox" data-option="marketplace" ${state.optional.marketplace ? 'checked' : ''}/> Marketplace / platform mode</label>
+            <label><input type="checkbox" data-option="subscription" ${state.optional.subscription ? 'checked' : ''}/> Subscription billing module</label>
+            <label><input type="checkbox" data-option="security_annex" ${state.optional.security_annex ? 'checked' : ''}/> Self-custody security annex</label>
+            <label><input type="checkbox" data-option="ccpa" ${state.optional.ccpa ? 'checked' : ''}/> California consumer updates (CCPA/CPRA)</label>
+            <label><input type="checkbox" data-option="vat" ${state.optional.vat ? 'checked' : ''}/> International tax/VAT flags</label>
+          </div>
+          <div class="notice">Optional modules append clauses and annex commentary in both preview and exports.</div>
+        </fieldset>
+      `;
+      container.appendChild(card);
+      card.querySelectorAll('[data-option]').forEach(box => {
+        box.addEventListener('change', event => {
+          const key = event.target.dataset.option;
+          state.optional[key] = event.target.checked;
+          scheduleRender();
+        });
+      });
+    }
+
+    function renderOutputSection(container) {
+      const card = document.createElement('div');
+      const validation = validateState(state);
+      card.innerHTML = `
+        <div class="notice" style="background:${validation.valid ? 'rgba(22,163,74,0.12)' : 'rgba(220,38,38,0.12)'};color:${validation.valid ? '#166534' : '#991b1b'};">
+          ${validation.valid ? 'Ready to export. Preview and generated files stay in sync.' : 'Fix the highlighted issues before export: ' + validation.messages.join('; ')}
+        </div>
+        <div class="toolbar" style="margin-top:16px;display:flex;gap:12px;">
+          <button type="button" class="primary" id="generate-docs">Generate documents</button>
+        </div>
+        <div class="output-panel" id="outputs-panel" style="margin-top:18px;display:grid;gap:18px;"></div>
+      `;
+      container.appendChild(card);
+      card.querySelector('#generate-docs').addEventListener('click', () => {
+        const latestValidation = validateState(state);
+        if (!latestValidation.valid) {
+          alert('Cannot generate until the following are resolved:\n' + latestValidation.messages.join('\n'));
+          return;
+        }
+        const package = buildDocPackage(state);
+        renderOutputs(package);
+      });
+    }
+
+    function renderOutputs(docPackage) {
+      const panel = document.getElementById('outputs-panel');
+      panel.innerHTML = '';
+      buildOutputs(docPackage).forEach(item => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'card outputs-card';
+        wrapper.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <strong>${item.label}</strong>
+            <button type="button" data-copy="${item.id}">Copy</button>
+          </div>
+          <textarea data-output-id="${item.id}">${item.value}</textarea>
+        `;
+        wrapper.querySelector('[data-copy]').addEventListener('click', () => copyToClipboard(item.value));
+        panel.appendChild(wrapper);
+      });
+    }
+
+    function buildOutputs(docPackage) {
+      const addendumText = docPackage.sections.map(section => {
+        const heading = `${section.number}. ${section.title}`;
+        const clauses = section.clauses.map(clause => `${clause.number} ${stripHtml(clause.html)}`).join('\n');
+        return `${heading}\n${clauses}`;
+      }).join('\n\n');
+      const annexAText = stripHtml(docPackage.annexes.operationsHtml);
+      const annexBText = stripHtml(docPackage.annexes.finalityTableHtml);
+      const annexCText = stripHtml(docPackage.annexes.customerNoticeHtml);
+      const outputs = [
+        { label: 'Addendum', id: 'addendum', value: addendumText },
+        { label: 'Annex A - Operations SOP', id: 'annexA', value: annexAText },
+        { label: 'Annex B - Finality Schedule', id: 'annexB', value: annexBText },
+        { label: 'Annex C - Customer Notices', id: 'annexC', value: annexCText },
+        { label: 'Checkout Config CSV', id: 'csv', value: docPackage.csv }
+      ];
+      if (docPackage.annexes.securityHtml) outputs.push({ label: 'Security Annex', id: 'security', value: stripHtml(docPackage.annexes.securityHtml) });
+      return outputs;
+    }
+
+    function stripHtml(html) {
+      const tmp = document.createElement('div');
+      tmp.innerHTML = html;
+      return tmp.textContent || '';
+    }
+
+    function buildDocPackage(state) {
+      const meta = deriveMeta(state);
+      const definitions = buildDefinitions(state);
+      const sections = buildSections(state, meta, definitions);
+      const annexes = buildAnnexes(state, meta);
+      const csv = buildCsv(state);
+      const refundMeta = buildRefundMeta(state);
+      const triggers = Object.entries(state.compliance.triggers).filter(([, val]) => val).map(([key]) => triggerLabel(key));
+      return { meta, definitions, sections, annexes, csv, refund: refundMeta, complianceTriggers: triggers };
+    }
+
+    function deriveMeta(state) {
+      const law = state.merchant.governing_law || 'Governing law TBD';
+      const forumCity = (state.merchant.forum || '').split(',')[0] || 'Forum TBD';
+      const modelLabel = state.merchant.acceptance_model === 'psp' ? 'PSP settlement' : 'Self-custody hybrid';
+      const pricingRibbon = state.pricing.model === 'quote_locked'
+        ? `Quote-Locked • Valid ${state.pricing.quote_minutes} min • ${state.pricing.confs_low} confs`
+        : state.pricing.model === 'confirmation_locked'
+          ? `Confirmation-Locked • Oracle: ${state.pricing.reference_price_source || 'TBD'}`
+          : `Immediate-Convert • PSP rate`;
+      const psp = state.merchant.acceptance_model === 'psp' ? state.merchant.psp_name : 'Self-custody';
+      const depeg = { bps: 50, minutes: 5, sources: 2, actionLabel: state.pricing.model === 'immediate_convert' ? 'Accept / convert' : 'Re-quote' };
+      return {
+        governingLaw: law,
+        forumCity,
+        modelLabel,
+        pricingRibbon,
+        psp,
+        depeg,
+        riskHolder: state.pricing.model === 'immediate_convert' ? 'PSP bears FX risk post-confirmation' : 'Merchant bears FX risk post-finality',
+        pspSummary: state.merchant.acceptance_model === 'psp'
+          ? `${state.merchant.psp_name || 'The PSP'} converts tokens to fiat at Confirmation and holds custody until settlement.`
+          : `Merchant uses ${state.merchant.self_custody_provider || 'its designated wallet stack'} for custody and settlement.`,
+        spreadStatement: state.pricing.gas_statement || 'PSP spread disclosed separately.',
+        settlementWindow: state.merchant.acceptance_model === 'psp' ? 'Fiat settlement within two business days.' : 'Merchant converts according to SOP.',
+        outageSla: 'Outage monitoring per PSP status page; escalate after 30 minutes.'
+      };
+    }
+
+    function buildDefinitions(state) {
+      const tokensList = state.tokens.map(token => `${token.token} on ${token.networks.join(', ')}`).join('; ');
+      return {
+        'Accepted Tokens': tokensList || 'Tokens defined in Schedule A.',
+        'Accepted Networks': 'The blockchain networks listed in Schedule A.',
+        'Quote Time': 'The timestamp when Merchant issues a token payment request.',
+        'Confirmation': 'Inclusion of the Customer transaction in a block meeting the applicable confirmation threshold.',
+        'Finality': 'The confirmation threshold set out in Annex B or PSP fiat settlement, as applicable.',
+        'Reference Price': state.pricing.reference_price_source || 'The PSP published rate.',
+        'De-peg Event': 'A deviation greater than ±0.50% for five minutes across two independent price sources.',
+        'Payment Address': 'The blockchain address generated for the Customer payment invoice.',
+        'PSP': state.merchant.psp_name || 'The designated payment service provider.'
+      };
+    }
+
+    function buildSections(state, meta, definitions) {
+      const sections = [];
+      const addSection = (id, title, clauses) => {
+        const number = sections.length + 1;
+        const anchor = `section-${id}`;
+        clauses.forEach((clause, idx) => {
+          clause.number = `${number}.${idx + 1}`;
+          clause.anchor = `${anchor}-${idx + 1}`;
+        });
+        sections.push({ id, title, clauses, number, anchor });
+      };
+
+      addSection('purpose', 'Purpose & Scope', [
+        clause('purpose-scope', 'This Addendum governs acceptance of USD-denominated stablecoins under the Master Services Agreement. If any payment term conflicts with the MSA, this Addendum controls.', ['Law: ' + meta.governingLaw])
+      ]);
+
+      addSection('definitions', 'Definitions', [
+        clause('definitions-body', buildDefinitionsHtml(definitions), [], null, true)
+      ]);
+
+      const tokenClause = state.tokens.map(token => `${escapeHtml(token.token)} (${escapeHtml(token.networks.join(' | '))})`).join('; ');
+      addSection('tokens', 'Accepted Tokens & Networks', [
+        clause('tokens-schedule', `Merchant accepts the tokens and networks set out in Schedule A: ${tokenClause || 'TBD tokens to be supplied.'} Merchant may update the whitelist without notice and may reject payments originating from sanctioned jurisdictions or addresses.`, [`Tokens: ${tokenClause || 'TBD'}`])
+      ]);
+
+      addSection('pricing', 'Pricing, FX & Volatility', [
+        clause('pricing-model', buildPricingClause(state), [`Model: ${pricingLabel(state.pricing.model)}`], pricingExplainer(state, meta)),
+        clause('pricing-underpay', buildUnderpayClause(state), [`Underpay policy: ${underpayLabel(state.pricing.underpay_policy)}`]),
+        clause('pricing-overpay', buildOverpayClause(state), [`Overpay policy: ${overpayLabel(state.pricing.overpay_policy)}`]),
+        clause('pricing-fees', escapeHtml(state.pricing.gas_statement || 'Customer bears on-chain network fees. Merchant discloses PSP spread separately.'), ['Fees disclosure'])
+      ]);
+
+      addSection('finality', 'Payment Finality & Delivery', [
+        clause('finality-core', buildFinalityText(state), ['Finality schedule']),
+        clause('finality-risk', meta.riskHolder, ['Risk holder: ' + meta.riskHolder])
+      ]);
+
+      addSection('refunds', 'Refunds, Returns & Reversals', [
+        clause('refunds-method', buildRefundMethod(state), ['Refund basis: ' + refundBasisLabel(state.refunds.basis)]),
+        clause('refunds-scenarios', 'Limited reversal mechanisms include confirmed fraud, duplicate payment, or operational error. No card-network chargebacks apply; the parties rely solely on this Section.', ['Limited reversals']),
+        clause('refunds-options', buildRefundOptions(state), ['Partial refunds: ' + (state.refunds.partials ? 'allowed' : 'not allowed')])
+      ]);
+
+      addSection('depeg', 'De-peg & Market Disruption', [
+        clause('depeg-clause', buildDepegClause(state, meta), ['Tolerance: ±50 bps', 'Action: ' + meta.depeg.actionLabel])
+      ]);
+
+      addSection('compliance', 'Fraud, AML & Sanctions', [
+        clause('compliance-core', buildComplianceClause(state), ['Screening: ' + (state.compliance.screen_via_psp ? 'PSP' : 'Merchant direct')])
+      ]);
+
+      addSection('psp', 'On- / Off-Ramp Disclosures', [
+        clause('psp-disclosure', buildPspDisclosure(state), ['PSP: ' + (state.merchant.psp_name || 'Self-custody')])
+      ]);
+
+      addSection('ops', 'Operations', [
+        clause('ops-reference', 'Operational controls are documented in Annex A, including address screening, confirmation thresholds, stale invoice timeouts, emergency procedures, reconciliation cadence, and incident response.', ['Annex A'])
+      ]);
+
+      addSection('notices', 'Customer Notices', [
+        clause('notices-summary', 'Checkout disclosures in Annex C cover finality, fees, supported tokens, refund methods, geo blocks, and risk statements.', ['Annex C'])
+      ]);
+
+      addSection('indemnity', 'Allocations & Indemnities', buildIndemnityClauses(state));
+
+      addSection('liability', 'Liability Cap', [
+        clause('liability-cap', `Except for ${escapeHtml(state.liability.carveouts || 'carve-outs TBD')}, each party's aggregate liability under this Addendum is capped at ${escapeHtml(state.liability.cap_amount || 'the amounts paid under the applicable Order')}.`, ['Cap defined'])
+      ]);
+
+      addSection('marketing', 'Warranties & Marketing', [
+        clause('marketing-language', 'Merchant makes no representation that Accepted Tokens are legal tender or risk-free. Token and PSP marks may be used only per brand guidelines.', ['Marketing guardrail'])
+      ]);
+
+      addSection('governing', 'Governing Law & Forum', [
+        clause('governing-law', `This Addendum follows the governing law (${escapeHtml(state.merchant.governing_law || 'TBD')}) and forum (${escapeHtml(state.merchant.forum || 'TBD')}) selected in the MSA. Audit rights for crypto controls apply where self-custody is used.`, ['Law / forum'])
+      ]);
+
+      if (state.optional.marketplace) {
+        addSection('marketplace', 'Marketplace Module', [
+          clause('marketplace-escrow', 'Where Merchant operates as facilitator, it may freeze or claw back funds tied to platform fraud and will allocate settlements per Annex A. Split-pay rules align with PSP capabilities.', ['Marketplace mode'])
+        ]);
+      }
+
+      if (state.optional.subscription) {
+        addSection('subscription', 'Subscription Billing Module', [
+          clause('subscription-rules', 'Merchant may store PSP-instrumented wallet identifiers for recurring billing. Missed payments trigger a 7-day grace and auto-suspension.', ['Subscription enabled'])
+        ]);
+      }
+
+      if (state.optional.ccpa) {
+        addSection('ccpa', 'California Consumer Updates', [
+          clause('ccpa-language', 'Wallet addresses are treated as personal data; Merchant honors CCPA/CPRA deletion and access requests while retaining data as needed to investigate fraud.', ['CCPA/CPRA'])
+        ]);
+      }
+
+      if (state.optional.vat) {
+        addSection('vat', 'International Tax / VAT Flags', [
+          clause('vat-language', 'Ship-to addresses flagged in Annex C include VAT/GST prompts. Merchant remains responsible for tax determination and reporting.', ['VAT guidance'])
+        ]);
+      }
+
+      sections.forEach(section => {
+        section.clauses.forEach(clause => {
+          clause.html = resolveCrossRefs(clause.html, sections);
+        });
+      });
+
+      return sections;
+    }
+
+    function clause(id, html, chips = [], explainer = null, skipEscaping = false) {
+      const safeHtml = skipEscaping ? html : escapeHtml(html);
+      return { id, html: safeHtml, chips, explainer };
+    }
+
+    function resolveCrossRefs(html, sections) {
+      return html.replace(/\[xref:([a-z0-9_-]+)\]/gi, (_, targetId) => {
+        const target = sections.find(section => section.id === targetId);
+        if (!target) return 'Section ?';
+        return `<a href="#${target.anchor}" data-xref="${target.id}">Section ${target.number}</a>`;
+      });
+    }
+
+    function buildDefinitionsHtml(definitions) {
+      const entries = Object.entries(definitions).map(([term, definition]) => `<dt>${escapeHtml(term)}</dt><dd>${escapeHtml(definition)}</dd>`).join('');
+      return `<dl>${entries}</dl>`;
+    }
+
+    function buildPricingClause(state) {
+      if (state.pricing.model === 'quote_locked') {
+        return `The USD Price displayed at Quote Time remains valid for ${state.pricing.quote_minutes} minutes. Customer must transmit the quoted token amount within the Validity Window. If fewer than ${state.pricing.confs_low} confirmations occur before expiry, the Quote lapses and Merchant may cancel or re-issue. Underpayments are handled in [xref:refunds].`;
+      }
+      if (state.pricing.model === 'confirmation_locked') {
+        return `The definitive USD Price is determined at Confirmation, defined as the first block at or above ${state.pricing.confirmation_locked_confs} confirmations using the Reference Price published by ${escapeHtml(state.pricing.reference_price_source || 'PSP rate')}. Merchant fulfills upon Confirmation; excess amounts route to [xref:refunds].`;
+      }
+      return `Upon Confirmation, the PSP converts the Token Amount to USD at its displayed rate and settles fiat to Merchant. Customer acknowledges PSP fees and spreads are embedded. ${escapeHtml(state.pricing.immediate_convert_note || '')}`;
+    }
+
+    function pricingExplainer(state, meta) {
+      return `FX risk: ${meta.riskHolder}. Reference sources: ${escapeHtml(state.pricing.oracle_list || 'TBD')}.`;
+    }
+
+    function buildUnderpayClause(state) {
+      return state.pricing.underpay_policy === 'request_top_up'
+        ? `If the blockchain confirms an amount lower than the quoted token amount, Merchant may request a make-whole payment within ${state.pricing.grace_minutes} minutes or cancel and refund per [xref:refunds].`
+        : 'Underpaid transactions are auto-cancelled and refunded per [xref:refunds].';
+    }
+
+    function buildOverpayClause(state) {
+      if (state.pricing.overpay_policy === 'refund') return 'Overpayments are refunded per [xref:refunds].';
+      if (state.pricing.overpay_policy === 'credit') return 'Overpayments may be converted into store credit with Customer consent.';
+      return `Amounts less than or equal to ${escapeHtml(state.pricing.dust_threshold || '$3.00')} may be retained as dust.`;
+    }
+
+    function buildFinalityText(state) {
+      const schedule = state.finality.bands.map(band => `${escapeHtml(band.label || 'Value band TBD')}: ${band.confirmations} confirmations`).join('; ');
+      const shipRisk = state.finality.ship_on_risk ? `Merchant may ship-on-risk for trusted customers subject to ${escapeHtml(state.finality.ship_on_risk_note || 'documented approval')}.` : 'Merchant does not deliver prior to Finality.';
+      const convertDependency = state.pricing.model === 'immediate_convert' ? ' or PSP fiat settlement, whichever occurs later' : '';
+      return `Merchant fulfills only upon Finality per Annex B${convertDependency}. Schedule: ${schedule}. ${shipRisk}`;
+    }
+
+    function buildRefundMethod(state) {
+      const allowAlt = state.refunds.allow_new_address ? `A different address requires ${escapeHtml(state.refunds.idv_requirement || 'identity verification')}.` : 'No alternate address requests are honored.';
+      const basis = state.refunds.basis === 'original_usd' ? 'Refunds are processed at USD at the original sale less non-recoverable network or PSP fees.' : 'Refunds are processed at USD at the time the refund is authorised.';
+      return `Refunds default to the origin address. ${allowAlt} ${basis}`;
+    }
+
+    function buildRefundOptions(state) {
+      const partials = state.refunds.partials ? 'Partial refunds are permitted.' : 'Partial refunds are not permitted.';
+      const credit = state.refunds.store_credit ? 'Store credit may be offered when mutually agreed.' : 'Store credit is not offered.';
+      return `${partials} ${credit} Refund requests expire after ${state.refunds.stale_days} days.`;
+    }
+
+    function buildDepegClause(state, meta) {
+      return `Prior to Confirmation, if the Reference Price deviates from USD by more than ${meta.depeg.bps} basis points for at least ${meta.depeg.minutes} minutes on two sources, Merchant may cancel, re-quote, or require a USD make-whole. After Confirmation, ${state.pricing.model === 'immediate_convert' ? 'the PSP' : 'Merchant'} bears market risk consistent with the selected model.`;
+    }
+
+    function buildComplianceClause(state) {
+      const triggers = Object.entries(state.compliance.triggers).filter(([, enabled]) => enabled).map(([key]) => triggerLabel(key)).join(', ');
+      return `Merchant or the PSP may hold, investigate, or refuse suspicious payments. Triggers include ${triggers || 'operator-defined risk events'}. Customer must provide information reasonably requested for diligence. Merchant may freeze funds per lawful order and maintains records consistent with applicable regulations. ${escapeHtml(state.compliance.reporting_note || '')}`;
+    }
+
+    function buildPspDisclosure(state) {
+      return state.merchant.acceptance_model === 'psp'
+        ? `Conversion and settlement are performed by ${escapeHtml(state.merchant.psp_name || 'the PSP')}. Merchant does not custody digital assets and relies on the PSP for fiat settlement.`
+        : `Merchant maintains direct custody using ${escapeHtml(state.merchant.self_custody_provider || 'its designated wallet infrastructure')}. Security controls are detailed in the Security Annex.`;
+    }
+
+    function buildIndemnityClauses(state) {
+      const clauses = [
+        clause('indemnity-customer', 'Customer indemnifies Merchant against losses caused by sanctions violations, transmissions to unsupported networks or addresses, double-spend attempts, or unlawful use.', ['Customer indemnity']),
+        clause('indemnity-merchant', 'Merchant indemnifies Customer for direct losses from failure to deliver goods/services after Finality or misapplied refunds resulting from Merchant gross negligence or willful misconduct.', ['Merchant indemnity'])
+      ];
+      if (state.liability.include_psp) {
+        clauses.push(clause('indemnity-psp', 'The PSP is liable only for its gross negligence or willful misconduct and disclaims all other implied warranties.', ['PSP limited liability']));
+      }
+      return clauses;
+    }
+
+    function buildAnnexes(state, meta) {
+      return {
+        operationsHtml: buildAnnexA(state),
+        finalityTableHtml: buildFinalityTable(state),
+        customerNoticeHtml: buildCustomerNotices(state),
+        securityHtml: (state.optional.security_annex || state.merchant.acceptance_model === 'self') ? buildSecurityAnnex(state) : null
+      };
+    }
+
+    function buildAnnexA(state) {
+      return `
+        <h3>Annex A — Operations SOP</h3>
+        <p><strong>Address Screening.</strong> Screen payments via ${state.compliance.screen_via_psp ? 'PSP tooling' : 'merchant tooling'}${state.compliance.vendor ? ` (vendor: ${escapeHtml(state.compliance.vendor)})` : ''}. Blocked jurisdictions: ${escapeHtml(state.compliance.geo_blocks || 'TBD')}. Reference lists: ${escapeHtml(state.compliance.address_lists || 'TBD URLs')}.</p>
+        <p><strong>Confirmation Thresholds.</strong> Apply Annex B schedule per order value. Stale invoices expire after ${state.operations.stale_invoice_minutes} minutes.</p>
+        <p><strong>Settlement & Sweeps.</strong> Sweep cadence: ${escapeHtml(state.operations.sweep_cadence || 'TBD')}. Custody provider: ${escapeHtml(state.operations.custody_provider || 'PSP-managed')}. Break-glass contacts: ${escapeHtml(state.operations.break_glass_contacts || 'TBD contacts')}.</p>
+        <p><strong>Reconciliation.</strong> Explorer references: ${escapeHtml(state.operations.explorer_links || 'TBD links')}. Ledger fields: ${escapeHtml(state.operations.ledger_fields || 'TBD fields')}.</p>
+        <p><strong>Incident Response.</strong> SLA: acknowledge within ${state.operations.incident_sla_hours} hours. Escalation tree maintained in internal playbook.</p>
+      `;
+    }
+
+    function buildFinalityTable(state) {
+      const rows = state.finality.bands.map(band => `<tr><td>${escapeHtml(band.label || 'Value band')}</td><td>${band.confirmations}</td></tr>`).join('');
+      return `<table><thead><tr><th>Order value</th><th>Confirmations</th></tr></thead><tbody>${rows}</tbody></table>`;
+    }
+
+    function buildCustomerNotices(state) {
+      const tokens = state.tokens.map(token => `${escapeHtml(token.token)} (${escapeHtml(token.networks.join(', '))})`).join('; ');
+      const fees = state.disclosures.show_fees ? 'Fees and spreads are shown separately.' : 'Conversion fees are included in the displayed price.';
+      const tone = state.disclosures.tone === 'formal' ? 'Please review these notices before submitting payment.' : state.disclosures.tone === 'friendly' ? 'Thanks for choosing crypto checkout!' : '';
+      const badge = state.disclosures.psp_badges ? `PSP badges confirm ${escapeHtml(state.merchant.psp_name || 'the PSP')}'s role.` : '';
+      return `
+        <p>Crypto payments use public blockchains. <strong>Transactions are final</strong> once confirmed. ${fees}</p>
+        <p>Supported tokens: ${tokens || 'TBD'}. Refunds return to the origin address unless additional verification is completed. ${escapeHtml(state.disclosures.risk_language || '')}</p>
+        <p>${badge}</p>
+        <p>${tone}</p>
+      `;
+    }
+
+    function buildSecurityAnnex(state) {
+      return `
+        <h3>Security Annex</h3>
+        <p><strong>Wallet architecture.</strong> ${escapeHtml(state.merchant.self_custody_provider || 'Documented multi-sig or hosted wallet')}.</p>
+        <p><strong>Key management.</strong> Multi-signature quorum 2-of-3 with hardware keys; quarterly key rotation.</p>
+        <p><strong>Access controls.</strong> Role-based access, hardware security modules, logging retained 7 years.</p>
+        <p><strong>Emergency procedures.</strong> Emergency revocation procedure documented with 24/7 contacts.</p>
+      `;
+    }
+
+    function buildCsv(state) {
+      const headers = ['token','network','pricing_model','quote_window_minutes','confirmation_threshold','underpay_policy','overpay_policy','dust_threshold','refund_basis'];
+      const rows = state.tokens.map(token => [
+        token.token,
+        token.networks.join(' | '),
+        state.pricing.model,
+        state.pricing.model === 'quote_locked' ? state.pricing.quote_minutes : '',
+        state.pricing.model === 'confirmation_locked' ? state.pricing.confirmation_locked_confs : '',
+        state.pricing.underpay_policy,
+        state.pricing.overpay_policy,
+        state.pricing.dust_threshold,
+        state.refunds.basis
+      ]);
+      return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+    }
+
+    function buildRefundMeta(state) {
+      const basisLabel = refundBasisLabel(state.refunds.basis);
+      const example = state.refunds.basis === 'original_usd' ? '$100 less non-recoverable fees.' : '$100 converted at authorization rate.';
+      return { basisLabel, window: state.refunds.window_days, example };
+    }
+
+    function refundBasisLabel(basis) {
+      return basis === 'original_usd' ? 'USD at original sale less fees' : 'USD at refund authorization';
+    }
+
+    function pricingLabel(model) {
+      return model === 'quote_locked' ? 'Quote-Locked' : model === 'confirmation_locked' ? 'Confirmation-Locked' : 'Immediate-Convert';
+    }
+
+    function underpayLabel(policy) {
+      return policy === 'request_top_up' ? 'Make-whole window' : 'Auto-cancel';
+    }
+
+    function overpayLabel(policy) {
+      if (policy === 'refund') return 'Refund';
+      if (policy === 'credit') return 'Store credit';
+      return 'Retain dust';
+    }
+
+    function triggerLabel(key) {
+      const map = {
+        mixing: 'mixing services',
+        sanctioned_address: 'sanctioned addresses',
+        structuring: 'structuring pattern',
+        rapid_split: 'rapid split payments',
+        geo_anomaly: 'geo/device anomaly',
+        device_mismatch: 'wallet mismatch'
+      };
+      return map[key] || key;
+    }
+
+    function validateState(state) {
+      const messages = [];
+      if (!state.merchant.name) messages.push('Merchant name required');
+      if (!state.tokens.length) messages.push('At least one token must be configured');
+      if (state.tokens.some(token => !token.token || !token.networks.length)) messages.push('Each token needs at least one network');
+      if (!state.pricing.oracle_list) messages.push('Provide oracle / rate sources');
+      if (!state.refunds.basis) messages.push('Select refund basis');
+      return { valid: messages.length === 0, messages };
+    }
+
+    function escapeHtml(str) {
+      return (str || '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch] || ch));
+    }
+
+    function renderPreview(docPackage) {
+      previewContainer.innerHTML = '';
+      badgesContainer.innerHTML = '';
+      customerPreview.innerHTML = '';
+
+      renderBadges(docPackage.meta);
+      renderIssues(validateState(state));
+
+      const docHeading = document.createElement('div');
+      docHeading.className = 'doc-heading';
+      docHeading.innerHTML = `
+        <h2>Merchant Addendum for Stablecoin Acceptance</h2>
+        <div style="font-size:0.9rem;color:var(--muted);">Generated ${new Date().toLocaleString()}</div>
+      `;
+
+      const toc = document.createElement('div');
+      toc.className = 'toc';
+      const tocList = document.createElement('ul');
+      docPackage.sections.forEach(section => {
+        const li = document.createElement('li');
+        li.innerHTML = `<a href="#${section.anchor}">${section.number}. ${section.title}</a>`;
+        tocList.appendChild(li);
+      });
+      toc.innerHTML = '<strong>Contents</strong>';
+      toc.appendChild(tocList);
+
+      previewContainer.appendChild(docHeading);
+      previewContainer.appendChild(toc);
+
+      docPackage.sections.forEach(section => {
+        const sectionEl = document.createElement('section');
+        sectionEl.className = 'doc-section';
+        sectionEl.id = section.anchor;
+        sectionEl.dataset.sectionId = section.id;
+        sectionEl.dataset.sectionNumber = section.number;
+        const title = document.createElement('h3');
+        title.textContent = `${section.number}. ${section.title}`;
+        sectionEl.appendChild(title);
+        const list = document.createElement('ul');
+        list.className = 'clause-list';
+        section.clauses.forEach(clause => {
+          const li = document.createElement('li');
+          li.className = 'clause';
+          li.id = clause.anchor;
+          li.dataset.clauseId = clause.id;
+          li.dataset.number = clause.number;
+          li.innerHTML = clause.html;
+          if (previewMode === 'explained' && clause.explainer) {
+            const explainer = document.createElement('div');
+            explainer.style.cssText = 'margin-top:10px;font-size:0.82rem;color:var(--muted);border-left:3px solid var(--primary);padding-left:12px;';
+            explainer.innerHTML = clause.explainer;
+            li.appendChild(explainer);
+          }
+          if (clause.chips?.length) {
+            const chipWrap = document.createElement('div');
+            chipWrap.className = 'chips';
+            clause.chips.forEach(text => {
+              const chip = document.createElement('span');
+              chip.className = 'chip';
+              chip.textContent = text;
+              chipWrap.appendChild(chip);
+            });
+            li.appendChild(chipWrap);
+          }
+         const previousHtml = previousClauseHtml.get(clause.id);
+         const normalized = li.innerHTML;
+          if (!previousHtml || previousHtml !== normalized) {
+            li.dataset.delta = 'true';
+          } else {
+            li.removeAttribute('data-delta');
+          }
+          previousClauseHtml.set(clause.id, normalized);
+          list.appendChild(li);
+        });
+        sectionEl.appendChild(list);
+        previewContainer.appendChild(sectionEl);
+      });
+
+      decorateDefinedTerms(previewContainer, docPackage.definitions);
+      renderCustomerPreview(docPackage);
+      previewTs.textContent = new Date().toLocaleTimeString();
+    }
+
+    function renderBadges(meta) {
+      [
+        `${meta.governingLaw} law`,
+        `Forum: ${meta.forumCity}`,
+        meta.modelLabel,
+        `PSP: ${meta.psp || 'Self-custody'}`,
+        meta.pricingRibbon
+      ].forEach(text => {
+        const badge = document.createElement('span');
+        badge.className = 'badge';
+        badge.textContent = text;
+        badgesContainer.appendChild(badge);
+      });
+    }
+
+    function renderIssues(validation) {
+      issuesPanel.innerHTML = '';
+      const title = document.createElement('h4');
+      title.textContent = validation.valid ? 'All validation tests passed' : 'Issues to fix';
+      issuesPanel.appendChild(title);
+      const list = document.createElement('ul');
+      if (validation.valid) {
+        const li = document.createElement('li');
+        li.style.color = '#166534';
+        li.textContent = 'Document is export-ready.';
+        list.appendChild(li);
+      } else {
+        validation.messages.forEach(msg => {
+          const li = document.createElement('li');
+          li.innerHTML = `${msg} <button type="button" data-fix="${inferFixTab(msg)}">Fix</button>`;
+          list.appendChild(li);
+        });
+      }
+      issuesPanel.appendChild(list);
+      issuesPanel.querySelectorAll('[data-fix]').forEach(btn => {
+        btn.addEventListener('click', () => setActiveTab(btn.dataset.fix));
+      });
+    }
+
+    function inferFixTab(message) {
+      if (message.includes('token')) return 'tokens';
+      if (message.includes('oracle')) return 'pricing';
+      if (message.includes('refund')) return 'refunds';
+      return 'merchant';
+    }
+
+    function decorateDefinedTerms(container, definitions) {
+      const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT, {
+        acceptNode(node) {
+          if (!node.parentElement) return NodeFilter.FILTER_REJECT;
+          if (node.parentElement.closest('#section-definitions')) return NodeFilter.FILTER_REJECT;
+          if (!node.textContent.trim()) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      });
+      const terms = Object.keys(definitions).sort((a, b) => b.length - a.length);
+      while (walker.nextNode()) {
+        const node = walker.currentNode;
+        let text = node.textContent;
+        let changed = false;
+        terms.forEach(term => {
+          const pattern = new RegExp(`\\b${term.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&').replace(/\s+/g, ' \\s*')}\\b`, 'g');
+          if (pattern.test(text)) {
+            changed = true;
+            text = text.replace(pattern, `@@TERM_${term}@@`);
+          }
+        });
+        if (changed) {
+          const span = document.createElement('span');
+          span.innerHTML = escapeHtml(text).replace(/@@TERM_(.*?)@@/g, (_, term) => {
+            const clean = term.replace(/\s+/g, ' ');
+            return `<span class="defined-term" data-term="${clean}" data-definition="${escapeHtml(definitions[clean] || '')}">${clean}</span>`;
+          });
+          node.parentElement.replaceChild(span, node);
+        }
+      }
+      container.querySelectorAll('.defined-term').forEach(el => {
+        el.addEventListener('click', () => {
+          const def = container.querySelector('#section-definitions');
+          if (def) def.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      });
+    }
+
+    function renderCustomerPreview(docPackage) {
+      customerPreview.innerHTML = `
+        <h4>Customer Notices</h4>
+        ${docPackage.annexes.customerNoticeHtml}
+        <div class="refund-explainer">
+          <strong>Refund engine example</strong>
+          <span>Basis: ${docPackage.refund.basisLabel}</span>
+          <span>Window: ${docPackage.refund.window} days</span>
+          <span>Scenario: $100 sale → refund ${docPackage.refund.example}</span>
+        </div>
+        <div class="psp-card">
+          <strong>PSP disclosures</strong>
+          <span>${docPackage.meta.pspSummary}</span>
+          <span>Settlement window: ${docPackage.meta.settlementWindow}</span>
+          <span>Spread statement: ${docPackage.meta.spreadStatement}</span>
+          <span>Outage SLA: ${docPackage.meta.outageSla}</span>
+        </div>
+        <div class="sanctions-board">
+          <strong>Sanctions / fraud triggers</strong>
+          <div>${docPackage.complianceTriggers.join(' • ') || 'Triggers TBD'}</div>
+        </div>
+        <div>
+          <strong>Finality schedule</strong>
+          ${docPackage.annexes.finalityTableHtml}
+        </div>
+        <span class="depeg-badge">De-peg contingency: ±${docPackage.meta.depeg.bps} bps / ${docPackage.meta.depeg.minutes} min / ${docPackage.meta.depeg.sources} sources • Action: ${docPackage.meta.depeg.actionLabel}</span>
+      `;
+    }
+
+    function copyToClipboard(text) {
+      navigator.clipboard.writeText(text).then(() => alert('Copied to clipboard')).catch(() => alert('Unable to copy automatically; copy manually.'));
+    }
+
+    function attachDraftHandlers() {
+      document.getElementById('save-draft').addEventListener('click', () => {
+        localStorage.setItem('stablecoin-acceptance-generator', JSON.stringify(state));
+        alert('Draft saved to this browser');
+      });
+      document.getElementById('load-draft').addEventListener('click', () => {
+        const stored = localStorage.getItem('stablecoin-acceptance-generator');
+        if (!stored) {
+          alert('No draft found');
+          return;
+        }
+        state = JSON.parse(stored);
+        previousClauseHtml = new Map();
+        init();
+      });
+      document.getElementById('clear-draft').addEventListener('click', () => {
+        localStorage.removeItem('stablecoin-acceptance-generator');
+        state = structuredClone(defaultState);
+        previousClauseHtml = new Map();
+        init();
+      });
+    }
+
+    init();
+  </script>
+</body>
+</html>

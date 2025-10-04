@@ -1,54 +1,48 @@
-const { useState, useEffect } = React;
+const { useState, useEffect, useMemo, useRef, useCallback } = React;
 
-// Pre-compiled templates for instant loading
-const TEMPLATES = {
-    basic: {
-        title: "NONDISCLOSURE AGREEMENT",
-        introduction: "This Nondisclosure Agreement establishes mutual understanding regarding the protection of personal and private information shared between the parties in the context of their personal relationship.",
-        confidentialInfo: [
-            "Personal identity information including full names, addresses, contact details, and social media profiles",
-            "Details of personal activities, preferences, and private arrangements",
-            "Health information, medical conditions, and related personal matters",
-            "Professional information including employment details and career concerns",
-            "Private communications including messages, emails, and recorded conversations",
-            "Photographic, video, or other recorded materials created together",
-            "Information about private venues, events, or gatherings attended",
-            "Personal boundaries, limits, and individual preferences discussed"
-        ]
+const NDA_TITLE = "NONDISCLOSURE AGREEMENT";
+
+const BASE_CONFIDENTIAL_INFO = [
+    'Personal identity information such as legal names, preferred names, addresses, phone numbers, and contact handles',
+    'Private relationship details, preferences, negotiated boundaries, and agreed-upon protocols',
+    'Verbal, written, and digital communications exchanged between the parties in any medium',
+    'Photographs, audio, video, or other recordings created or shared in connection with the relationship',
+    'Health history, wellness disclosures, and any medical or therapeutic information shared in confidence',
+    'Professional status, employment details, licensing concerns, or reputation-sensitive information discussed in confidence',
+    'Locations of private gatherings, shared venues, meeting logistics, and travel plans coordinated between the parties',
+    'Financial or logistical information relating to relationship activities, shared expenses, or discretion-related costs'
+];
+
+const PRIVACY_PROFILE_DETAILS = {
+    1: {
+        key: 'basic',
+        introduction: 'This Nondisclosure Agreement establishes mutual understanding regarding the protection of personal and private information shared between the parties in the context of their personal relationship.',
+        additions: [
+            'Summaries of agreements, schedules, calendars, or planning documents derived from the above categories'
+        ],
+        reinforcement: null
     },
-    enhanced: {
-        title: "NONDISCLOSURE AGREEMENT",
-        introduction: "This Nondisclosure Agreement establishes strict confidentiality protocols for the protection of sensitive personal information, private activities, and reputational interests of all parties involved in personal arrangements.",
-        confidentialInfo: [
-            "Complete personal identity including legal names, aliases, contact information, and all social media accounts",
-            "Detailed information about consensual adult activities, personal exploration, and lifestyle choices",
-            "Comprehensive health and medical information including testing results, conditions, and treatment details",
-            "Professional reputation matters including employment, business interests, and public standing",
-            "All forms of private communication including digital messages, voice recordings, and written correspondence",
-            "Visual and audio documentation including photographs, videos, and recordings of any nature",
-            "Information about private venues, exclusive events, community participation, and social networks",
-            "Personal boundaries, negotiated limits, safe practices, and individual consent frameworks",
-            "Financial information related to lifestyle activities, venue memberships, or related expenses",
-            "Therapeutic disclosures made to qualified professionals within the scope of treatment"
-        ]
+    2: {
+        key: 'enhanced',
+        introduction: 'This Nondisclosure Agreement establishes strict confidentiality protocols for the protection of sensitive personal information, private activities, and reputational interests of all parties involved in personal arrangements.',
+        additions: [
+            'Detailed records, logs, or documentation that expand upon the categories listed above, including written journals or digital planning tools',
+            'Professional licensing, disciplinary, or reputational information that could affect a party’s livelihood or public standing',
+            'Health testing records, laboratory results, or treatment plans connected to the activities contemplated by the parties',
+            'Curated digital archives such as cloud folders, collaborative documents, or encrypted message exports containing Confidential Information'
+        ],
+        reinforcement: 'Selecting Enhanced Privacy expands upon, and does not limit, the categories covered at Basic Discretion. All summaries, detailed records, and derivative materials remain protected to the fullest extent.'
     },
-    professional: {
-        title: "NONDISCLOSURE AGREEMENT",
-        introduction: "This Nondisclosure Agreement provides maximum privacy protection for individuals whose professional standing, public reputation, or career advancement could be materially affected by disclosure of private personal information.",
-        confidentialInfo: [
-            "Complete personal and professional identity including all names, titles, positions, and affiliations",
-            "Detailed documentation of all consensual adult activities, personal practices, and lifestyle participation",
-            "Comprehensive health, medical, and wellness information including all testing, treatments, and conditions",
-            "Professional reputation elements including career details, business relationships, and public image concerns",
-            "All communication methods including encrypted messages, secure platforms, and confidential correspondence",
-            "Complete visual and audio documentation with advanced protection protocols",
-            "Information about exclusive venues, high-discretion events, and selective community involvement",
-            "Detailed personal boundaries, negotiated frameworks, safety protocols, and consent structures",
-            "Financial privacy including lifestyle-related expenses, memberships, and investment in discretion",
-            "Protected therapeutic communications with verified kink-aware mental health professionals",
-            "Travel information related to lifestyle activities or discreet venues",
-            "Technology usage including specialized applications, secure communication methods, and privacy tools"
-        ]
+    3: {
+        key: 'professional',
+        introduction: 'This Nondisclosure Agreement provides maximum privacy protection for individuals whose professional standing, public reputation, or career advancement could be materially affected by disclosure of private personal information.',
+        additions: [
+            'Any due diligence materials, legal analyses, or crisis-management plans prepared to preserve professional standing or public reputation',
+            'Security practices, authentication tools, or technology stacks used to safeguard Confidential Information, including password vaults or secure communication platforms',
+            'Travel itineraries, concierge arrangements, or lifestyle services retained to facilitate discreet engagement between the parties',
+            'Communications with counselors, coaches, or advisors who support the parties in managing alternative lifestyle commitments'
+        ],
+        reinforcement: 'High-Profile Protection layers additional safeguards over every category identified at the Basic and Enhanced tiers. All general, detailed, and strategic materials remain fully confidential unless expressly permitted in writing.'
     }
 };
 
@@ -95,45 +89,298 @@ const RISK_ASSESSMENTS = {
     }
 };
 
+const PRIVACY_TOGGLE_LABELS = {
+    healthPrivacy: 'Health Information Privacy',
+    professionalProtection: 'Professional Reputation Protection',
+    mediaProtection: 'Photos and Media Protection',
+    venuePrivacy: 'Private Venue Information',
+    communityPrivacy: 'Community Participation Details',
+    therapeuticException: 'Therapeutic Communication Exception',
+    financialPrivacy: 'Financial Information'
+};
+
+const PRIVACY_LEVEL_RECOMMENDATIONS = {
+    1: {
+        on: [],
+        off: ['healthPrivacy', 'professionalProtection', 'mediaProtection', 'venuePrivacy', 'communityPrivacy', 'therapeuticException', 'financialPrivacy']
+    },
+    2: {
+        on: ['healthPrivacy', 'professionalProtection', 'mediaProtection'],
+        off: ['venuePrivacy', 'communityPrivacy', 'therapeuticException', 'financialPrivacy']
+    },
+    3: {
+        on: ['healthPrivacy', 'professionalProtection', 'mediaProtection', 'venuePrivacy', 'communityPrivacy', 'therapeuticException', 'financialPrivacy'],
+        off: []
+    }
+};
+
+const RETENTION_OPTIONS = [
+    {
+        value: '7_days',
+        label: '7-day purge after each gathering',
+        summary: 'Delete all shared digital materials within seven (7) days of creation unless both parties agree otherwise in writing.'
+    },
+    {
+        value: '30_days',
+        label: '30-day rotation',
+        summary: 'Review and remove stored materials at least every thirty (30) days.'
+    },
+    {
+        value: 'quarterly',
+        label: 'Quarterly review',
+        summary: 'Conduct a comprehensive destruction review at least once every ninety (90) days.'
+    },
+    {
+        value: 'upon_request',
+        label: '72-hour response to written request',
+        summary: 'Purge protected materials within seventy-two (72) hours of a written request from either party.'
+    },
+    {
+        value: 'custom',
+        label: 'Custom timeline',
+        summary: ''
+    }
+];
+
+const RETENTION_SUMMARY = RETENTION_OPTIONS.reduce((acc, option) => {
+    if (option.summary) {
+        acc[option.value] = option.summary;
+    }
+    return acc;
+}, {});
+
+const INDUSTRY_GUIDANCE = {
+    healthcare: {
+        label: 'Healthcare / HIPAA-covered professional',
+        warning: 'Confirm HIPAA, state health privacy, and infection-control obligations. Document mandated disclosures made to protect patient safety.',
+        recommended: ['healthPrivacy', 'therapeuticException'],
+        clauseText: 'Healthcare professionals remain responsible for HIPAA and mandated reporting requirements. Any disclosure must be limited to the minimum necessary information and logged when required by regulation.'
+    },
+    government: {
+        label: 'Government clearance / security-sensitive role',
+        warning: 'Security clearance holders may need to report certain relationships or foreign contacts. Coordinate with security officers before execution.',
+        recommended: ['professionalProtection', 'mediaProtection'],
+        clauseText: 'Individuals holding government clearances or sensitive positions shall comply with agency reporting protocols and ensure this Agreement does not restrict lawful disclosures to security officials.'
+    },
+    education: {
+        label: 'Educator / childcare professional',
+        warning: 'Educators and childcare workers are mandated reporters. Review employer conduct policies and reporting triggers.',
+        recommended: ['communityPrivacy', 'therapeuticException'],
+        clauseText: 'Educators and childcare professionals acknowledge that mandated reporting statutes governing suspected abuse, neglect, or imminent harm supersede confidentiality promises.'
+    },
+    finance: {
+        label: 'Finance / regulated fiduciary',
+        warning: 'Financial professionals must observe fiduciary, anti-bribery, and client privacy rules. Flag lifestyle expenses that could trigger compliance reviews.',
+        recommended: ['financialPrivacy', 'professionalProtection'],
+        clauseText: 'Regulated financial professionals agree to maintain compliance with fiduciary duties and financial disclosure laws while minimising dissemination of Confidential Information.'
+    }
+};
+
+const INDUSTRY_KEYS = Object.keys(INDUSTRY_GUIDANCE);
+
+const toIndustryStateKey = (key) => `industry${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+
+const createEmptyParticipant = () => ({
+    id: `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+    name: '',
+    role: '',
+    requiresNDA: true,
+    requiresNotice: true,
+    notes: ''
+});
+
+const normalizeParticipants = (participants = []) => {
+    if (!Array.isArray(participants) || participants.length === 0) {
+        return [createEmptyParticipant()];
+    }
+
+    return participants.map((participant) => ({
+        ...createEmptyParticipant(),
+        ...participant,
+        id: participant && participant.id ? participant.id : `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`,
+        requiresNDA: typeof participant?.requiresNDA === 'boolean' ? participant.requiresNDA : true,
+        requiresNotice: typeof participant?.requiresNotice === 'boolean' ? participant.requiresNotice : true
+    }));
+};
+
+const createInitialFormData = () => ({
+    party1Name: '',
+    party2Name: '',
+    effectiveDate: '',
+    duration: '5',
+    jurisdiction: 'California',
+    healthPrivacy: false,
+    professionalProtection: false,
+    mediaProtection: false,
+    venuePrivacy: false,
+    communityPrivacy: false,
+    therapeuticException: false,
+    financialPrivacy: false,
+    careerSensitive: false,
+    publicFigure: false,
+    securityClearance: false,
+    educationField: false,
+    liquidatedDamages: '',
+    arbitration: true,
+    additionalTerms: '',
+    retentionTimeline: '30_days',
+    customRetentionTimeline: '',
+    storagePractices: '',
+    assetInventory: '',
+    thirdPartyParticipants: [createEmptyParticipant()],
+    industryHealthcare: false,
+    industryGovernment: false,
+    industryEducation: false,
+    industryFinance: false,
+    industryNotes: ''
+});
+
+const normalizeFormData = (data = {}) => {
+    const base = createInitialFormData();
+    const merged = { ...base, ...data };
+    merged.thirdPartyParticipants = normalizeParticipants(data.thirdPartyParticipants);
+    if (!RETENTION_OPTIONS.some((option) => option.value === merged.retentionTimeline)) {
+        merged.retentionTimeline = base.retentionTimeline;
+    }
+    return merged;
+};
+
+const FIELD_TO_CLAUSE_MAP = {
+    party1Name: 'parties-section',
+    party2Name: 'parties-section',
+    effectiveDate: 'effective-date-section',
+    duration: 'duration-section',
+    jurisdiction: 'general-provisions',
+    healthPrivacy: 'confidential-info-section',
+    professionalProtection: 'confidential-info-section',
+    mediaProtection: 'confidential-info-section',
+    venuePrivacy: 'confidential-info-section',
+    communityPrivacy: 'confidential-info-section',
+    therapeuticException: 'permitted-disclosures',
+    financialPrivacy: 'confidential-info-section',
+    liquidatedDamages: 'liquidated-damages-clause',
+    arbitration: 'arbitration-clause',
+    additionalTerms: 'additional-terms',
+    retentionTimeline: 'return-destruction-clause',
+    customRetentionTimeline: 'return-destruction-clause',
+    storagePractices: 'return-destruction-clause',
+    assetInventory: 'annex-protected-materials',
+    industryHealthcare: 'industry-compliance-clause',
+    industryGovernment: 'industry-compliance-clause',
+    industryEducation: 'industry-compliance-clause',
+    industryFinance: 'industry-compliance-clause',
+    careerSensitive: 'industry-compliance-clause',
+    publicFigure: 'industry-compliance-clause',
+    securityClearance: 'industry-compliance-clause',
+    educationField: 'industry-compliance-clause',
+    industryNotes: 'industry-compliance-clause'
+};
+
 function AlternativeLifestyleNDAGenerator() {
     const [activeTab, setActiveTab] = useState('basics');
     const [privacyLevel, setPrivacyLevel] = useState(1);
     const [autoSaved, setAutoSaved] = useState(false);
 
-    const [formData, setFormData] = useState({
-        party1Name: '',
-        party2Name: '',
-        party1Email: '',
-        party2Email: '',
-        effectiveDate: '',
-        duration: '5',
-        jurisdiction: 'California',
+    const [formData, setFormData] = useState(() => createInitialFormData());
 
-        // Privacy Level Options
-        basicDiscretion: true,
-        healthPrivacy: false,
-        professionalProtection: false,
-        mediaProtection: false,
-        venuePrivacy: false,
-        communityPrivacy: false,
-        therapeuticException: false,
-        financialPrivacy: false,
+    const [highlightedClause, setHighlightedClause] = useState(null);
+    const [sliderAdjustmentNote, setSliderAdjustmentNote] = useState('');
 
-        // Professional Risk Assessment
-        careerSensitive: false,
-        publicFigure: false,
-        securityClearance: false,
-        educationField: false,
+    const previewContainerRef = useRef(null);
+    const clauseRefs = useRef({});
+    const clauseRefCallbacks = useRef({});
+    const highlightTimeoutRef = useRef(null);
+    const sliderNoteTimeoutRef = useRef(null);
 
-        // Additional Protections
-        liquidatedDamages: '',
-        arbitration: true,
+    const getClauseRefCallback = useCallback((id) => {
+        if (!clauseRefCallbacks.current[id]) {
+            clauseRefCallbacks.current[id] = (node) => {
+                if (node) {
+                    clauseRefs.current[id] = node;
+                } else {
+                    delete clauseRefs.current[id];
+                }
+            };
+        }
+        return clauseRefCallbacks.current[id];
+    }, []);
 
-        // Custom additions
-        additionalTerms: ''
-    });
+    useEffect(() => {
+        return () => {
+            if (highlightTimeoutRef.current) {
+                clearTimeout(highlightTimeoutRef.current);
+            }
+            if (sliderNoteTimeoutRef.current) {
+                clearTimeout(sliderNoteTimeoutRef.current);
+            }
+        };
+    }, []);
 
-    const [previewContent, setPreviewContent] = useState('');
+    const applyPrivacyRecommendations = useCallback((level, { emitNote = true } = {}) => {
+        const recommendations = PRIVACY_LEVEL_RECOMMENDATIONS[level] || { on: [], off: [] };
+        const toggledOn = [];
+        const toggledOff = [];
+
+        setFormData((prev) => {
+            const next = { ...prev };
+
+            recommendations.on.forEach((field) => {
+                if (!next[field]) {
+                    next[field] = true;
+                    if (PRIVACY_TOGGLE_LABELS[field]) {
+                        toggledOn.push(PRIVACY_TOGGLE_LABELS[field]);
+                    }
+                }
+            });
+
+            recommendations.off.forEach((field) => {
+                if (next[field]) {
+                    next[field] = false;
+                    if (PRIVACY_TOGGLE_LABELS[field]) {
+                        toggledOff.push(PRIVACY_TOGGLE_LABELS[field]);
+                    }
+                }
+            });
+
+            return next;
+        });
+
+        if (emitNote) {
+            if (sliderNoteTimeoutRef.current) {
+                clearTimeout(sliderNoteTimeoutRef.current);
+            }
+
+            if (toggledOn.length || toggledOff.length) {
+                const parts = [];
+                if (toggledOn.length) {
+                    parts.push(`enabled: ${toggledOn.join(', ')}`);
+                }
+                if (toggledOff.length) {
+                    parts.push(`disabled: ${toggledOff.join(', ')}`);
+                }
+                setSliderAdjustmentNote(`Recommended settings applied — ${parts.join(' / ')}`);
+                sliderNoteTimeoutRef.current = setTimeout(() => setSliderAdjustmentNote(''), 5000);
+            } else {
+                setSliderAdjustmentNote('');
+            }
+        }
+
+        return { toggledOn, toggledOff };
+    }, [setFormData, setSliderAdjustmentNote]);
+
+    const renderTextWithBreaks = useCallback((text) => {
+        if (!text) {
+            return null;
+        }
+
+        return text.split('\n').reduce((nodes, line, index) => {
+            if (index > 0) {
+                nodes.push(<br key={`br-${index}`} />);
+            }
+            nodes.push(line);
+            return nodes;
+        }, []);
+    }, []);
 
     // Auto-save functionality
     useEffect(() => {
@@ -149,14 +396,18 @@ function AlternativeLifestyleNDAGenerator() {
     useEffect(() => {
         const saved = localStorage.getItem('nda-draft');
         if (saved) {
-            setFormData(JSON.parse(saved));
+            try {
+                const parsed = JSON.parse(saved);
+                setFormData(normalizeFormData(parsed));
+            } catch (error) {
+                console.warn('Failed to load saved NDA draft', error);
+            }
         }
     }, []);
 
-    // Generate preview with optimized performance
     useEffect(() => {
-        generateNDA();
-    }, [formData, privacyLevel]);
+        applyPrivacyRecommendations(privacyLevel, { emitNote: false });
+    }, []);
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -165,151 +416,333 @@ function AlternativeLifestyleNDAGenerator() {
             [name]: type === 'checkbox' ? checked : value
         }));
 
-        // Auto-scroll and temporarily highlight relevant sections for ALL inputs
-        setTimeout(() => {
-            let targetClause = null;
-
-            // Map inputs to their corresponding clauses
-            if (name === 'arbitration' && (checked || value)) targetClause = 'arbitration-clause';
-            if (name === 'liquidatedDamages' && value) targetClause = 'liquidated-damages-clause';
-            if (name === 'party1Name' || name === 'party2Name') targetClause = 'parties-section';
-            if (name === 'effectiveDate') targetClause = 'effective-date-section';
-            if (name === 'duration') targetClause = 'duration-section';
-            if (name === 'jurisdiction') targetClause = 'general-provisions';
-            if (name === 'therapeuticException' && checked) targetClause = 'permitted-disclosures';
-            if (name.includes('Privacy') && checked) targetClause = 'confidential-info-section';
-
-            if (targetClause) {
-                scrollToClauseWithTempHighlight(targetClause);
-            }
-        }, 300); // Delay to allow DOM update
+        const clauseId = FIELD_TO_CLAUSE_MAP[name];
+        if (clauseId) {
+            setTimeout(() => scrollToClauseWithTempHighlight(clauseId), 300);
+        }
     };
 
     const handlePrivacyLevelChange = (e) => {
-        const level = parseInt(e.target.value);
+        const level = parseInt(e.target.value, 10);
         setPrivacyLevel(level);
-
-        // Auto-adjust form options based on privacy level
-        if (level >= 2) {
-            setFormData(prev => ({
-                ...prev,
-                healthPrivacy: true,
-                mediaProtection: true,
-                professionalProtection: true
-            }));
-        }
-        if (level >= 3) {
-            setFormData(prev => ({
-                ...prev,
-                venuePrivacy: true,
-                communityPrivacy: true,
-                financialPrivacy: true,
-                therapeuticException: true
-            }));
-        }
+        applyPrivacyRecommendations(level);
+        setTimeout(() => scrollToClauseWithTempHighlight('confidential-info-section'), 300);
     };
 
-    const getTemplate = () => {
-        if (privacyLevel === 1) return TEMPLATES.basic;
-        if (privacyLevel === 2) return TEMPLATES.enhanced;
-        return TEMPLATES.professional;
+    const handleParticipantChange = (participantId, field, value) => {
+        setFormData((prev) => {
+            const updated = prev.thirdPartyParticipants.map((participant) =>
+                participant.id === participantId ? { ...participant, [field]: value } : participant
+            );
+            return { ...prev, thirdPartyParticipants: updated };
+        });
+        setTimeout(() => scrollToClauseWithTempHighlight('third-party-obligations'), 300);
     };
 
-    const generateNDA = () => {
-        const template = getTemplate();
+    const addParticipant = () => {
+        setFormData((prev) => ({
+            ...prev,
+            thirdPartyParticipants: [...prev.thirdPartyParticipants, createEmptyParticipant()]
+        }));
+        setTimeout(() => scrollToClauseWithTempHighlight('third-party-obligations'), 300);
+    };
+
+    const removeParticipant = (participantId) => {
+        setFormData((prev) => {
+            const remaining = prev.thirdPartyParticipants.filter((participant) => participant.id !== participantId);
+            return {
+                ...prev,
+                thirdPartyParticipants: remaining.length ? remaining : [createEmptyParticipant()]
+            };
+        });
+        setTimeout(() => scrollToClauseWithTempHighlight('third-party-obligations'), 300);
+    };
+
+    const ndaData = useMemo(() => {
+        const profile = PRIVACY_PROFILE_DETAILS[privacyLevel] || PRIVACY_PROFILE_DETAILS[1];
         const party1 = formData.party1Name || '[Party 1 Name]';
         const party2 = formData.party2Name || '[Party 2 Name]';
         const effectiveDate = formData.effectiveDate || '[Date]';
+        const jurisdictionText = formData.jurisdiction === 'District of Columbia' ? 'the District of Columbia' : `the State of ${formData.jurisdiction}`;
 
-        let confidentialInfo = [...template.confidentialInfo];
-
-        // Add conditional clauses based on selections
+        const confidentialInfoSet = new Set([...BASE_CONFIDENTIAL_INFO, ...(profile.additions || [])]);
         if (formData.healthPrivacy) {
-            confidentialInfo.push('Specific health screenings, medical test results, and ongoing health monitoring');
+            confidentialInfoSet.add('Specific health screenings, medical test results, and ongoing health monitoring');
         }
         if (formData.professionalProtection) {
-            confidentialInfo.push('Professional associations, workplace policies, and career advancement considerations');
+            confidentialInfoSet.add('Professional associations, workplace policies, and career advancement considerations');
         }
         if (formData.mediaProtection) {
-            confidentialInfo.push('Digital footprints, online presence, and social media activity related to personal lifestyle');
+            confidentialInfoSet.add('Digital footprints, online presence, and social media activity related to personal lifestyle');
         }
         if (formData.venuePrivacy) {
-            confidentialInfo.push('Private club memberships, exclusive venue access, and location-specific activities');
+            confidentialInfoSet.add('Private club memberships, exclusive venue access, and location-specific activities');
         }
         if (formData.communityPrivacy) {
-            confidentialInfo.push('Community relationships, mentor connections, and social network participation');
+            confidentialInfoSet.add('Community relationships, mentor connections, and social network participation');
         }
         if (formData.financialPrivacy) {
-            confidentialInfo.push('Lifestyle-related expenses, specialized equipment, and privacy investment costs');
+            confidentialInfoSet.add('Lifestyle-related expenses, specialized equipment, and privacy investment costs');
         }
 
-        const ndaContent = `
-            <h3>${template.title}</h3>
+        const confidentialInfo = Array.from(confidentialInfoSet);
 
-            <p id="effective-date-section"><strong>Effective Date:</strong> ${effectiveDate}</p>
-            <p id="parties-section"><strong>Parties:</strong> ${party1} ("First Party") and ${party2} ("Second Party")</p>
+        const permittedDisclosures = [
+            'Required by law, court order, or valid legal process (provided the disclosing party gives prior notice when legally permissible)',
+            'To law enforcement regarding suspected criminal activity',
+            'To medical professionals for emergency healthcare situations'
+        ];
+        if (formData.therapeuticException) {
+            permittedDisclosures.push('To licensed mental health professionals bound by professional confidentiality obligations');
+        }
+        permittedDisclosures.push('Disclosures required of mandated reporters (including healthcare providers, educators, therapists, or other professionals legally obligated to report safety concerns).');
+        permittedDisclosures.push(
+            'To attorneys for legal counsel (who are bound by attorney-client privilege)',
+            'With prior written consent of both parties'
+        );
 
-            <p id="introduction-section"><strong>1. INTRODUCTION AND PURPOSE.</strong> ${template.introduction} This Agreement acknowledges that in the course of personal relationships involving alternative lifestyle activities, sensitive and highly personal information may be shared that requires maximum protection and discretion.</p>
+        const selectedIndustryKeys = INDUSTRY_KEYS.filter((key) => formData[toIndustryStateKey(key)]);
+        const industryDetails = selectedIndustryKeys.map((key) => ({ key, ...INDUSTRY_GUIDANCE[key] }));
 
-            <p id="confidential-info-section"><strong>2. CONFIDENTIAL INFORMATION DEFINED.</strong> For purposes of this Agreement, "Confidential Information" includes, but is not limited to:</p>
-            <ul>
-                ${confidentialInfo.map(item => `<li>${item}</li>`).join('')}
-            </ul>
-            <p>Confidential Information specifically excludes: (a) information that is publicly known through no breach of this Agreement; (b) information independently developed without reference to Confidential Information; (c) information rightfully received from third parties without breach of confidentiality; and (d) information that becomes non-confidential through no fault of the receiving party.</p>
+        const sensitivityItems = [];
+        if (formData.careerSensitive) {
+            sensitivityItems.push('Career-sensitive duties flagged; parties agree to consult counsel before any public disclosures or policy conflicts.');
+        }
+        if (formData.publicFigure) {
+            sensitivityItems.push('Public figure or media exposure risk identified; plan media strategy and tighten access controls.');
+        }
+        if (formData.securityClearance) {
+            sensitivityItems.push('Security clearance obligations apply; coordinate with the appropriate security or compliance officer before signing.');
+        }
+        if (formData.educationField) {
+            sensitivityItems.push('Education or childcare professional responsibilities trigger heightened mandated-reporting duties.');
+        }
+        const industryNotes = formData.industryNotes.trim();
 
-            <p id="confidentiality-obligations"><strong>3. CONFIDENTIALITY OBLIGATIONS.</strong> Each party mutually agrees to maintain the confidentiality of all Confidential Information shared by the other party and shall not disclose, publish, or otherwise reveal such information to any third party without prior written consent of the disclosing party. This creates reciprocal obligations ensuring both parties are equally bound by confidentiality duties. Both parties acknowledge the sensitive nature of alternative lifestyle information and agree to exercise the highest degree of care in protecting such information.</p>
+        const retentionOption = RETENTION_OPTIONS.find((option) => option.value === formData.retentionTimeline) || RETENTION_OPTIONS[0];
+        const retentionSummary = formData.retentionTimeline === 'custom'
+            ? (formData.customRetentionTimeline.trim() || 'The parties will document a custom retention/destruction plan in writing and update Annex A accordingly.')
+            : RETENTION_SUMMARY[retentionOption.value];
+        const retentionLabel = retentionOption.label;
+        const storagePractices = formData.storagePractices.trim();
 
-            <p id="standard-of-care"><strong>4. STANDARD OF CARE.</strong> Each party agrees to use the same degree of care to protect Confidential Information as they would use to protect their own most sensitive personal information, but in no event less than reasonable care. This includes implementing appropriate physical, technical, and administrative safeguards to prevent unauthorized access or disclosure.</p>
+        const assetInventoryEntries = formData.assetInventory
+            .split('
+')
+            .map((line) => line.trim())
+            .filter(Boolean);
 
-            <p id="permitted-disclosures"><strong>5. PERMITTED DISCLOSURES.</strong> This Agreement does not prevent disclosure:</p>
-            <ul>
-                <li>Required by law, court order, or valid legal process (provided the disclosing party gives prior notice when legally permissible)</li>
-                <li>To law enforcement regarding suspected criminal activity</li>
-                <li>To medical professionals for emergency healthcare situations</li>
-                ${formData.therapeuticException ? '<li>To licensed mental health professionals bound by professional confidentiality obligations</li>' : ''}
-                <li>To attorneys for legal counsel (who are bound by attorney-client privilege)</li>
-                <li>With prior written consent of both parties</li>
-            </ul>
+        const activeParticipants = (formData.thirdPartyParticipants || []).map((participant) => ({
+            id: participant.id,
+            name: (participant.name || '').trim(),
+            role: (participant.role || '').trim(),
+            requiresNDA: typeof participant.requiresNDA === 'boolean' ? participant.requiresNDA : true,
+            requiresNotice: typeof participant.requiresNotice === 'boolean' ? participant.requiresNotice : true,
+            notes: (participant.notes || '').trim()
+        })).filter((participant) => participant.name || participant.role || participant.notes);
 
-            <p id="return-destruction-clause"><strong>6. RETURN AND DESTRUCTION OF CONFIDENTIAL MATERIALS.</strong> Upon termination of the personal relationship or upon written request by the disclosing party, each party agrees to: (a) return all tangible materials containing Confidential Information; (b) permanently delete all electronic files, photographs, videos, messages, and other digital materials containing Confidential Information from all devices, cloud storage, and backup systems; (c) provide written certification of such deletion within thirty (30) days of the request; and (d) not retain any copies, excerpts, or derivatives of Confidential Information in any form. This obligation includes materials stored on personal devices, social media accounts, email systems, and any third-party storage services.</p>
+        const formatParticipant = (participant) => {
+            const displayName = participant.name || 'Approved participant';
+            const roleSegment = participant.role ? ` (${participant.role})` : '';
+            const conditions = [];
+            if (participant.requiresNDA) {
+                conditions.push('separate NDA required');
+            }
+            if (participant.requiresNotice) {
+                conditions.push('advance notice to the other party');
+            }
+            if (participant.notes) {
+                conditions.push(participant.notes);
+            }
+            const conditionText = conditions.length ? ` – ${conditions.join('; ')}` : ' – Limited disclosure for logistical coordination only.';
+            return `${displayName}${roleSegment}${conditionText}`;
+        };
 
-            <p id="duration-section"><strong>7. DURATION AND SURVIVAL.</strong> This Agreement shall remain in effect for ${formData.duration === 'indefinite' ? 'an indefinite period' : formData.duration + ' years'} from the effective date, unless terminated by mutual written consent. The obligations of confidentiality shall survive termination of this Agreement and any personal relationship between the parties. Certain provisions, including the return and destruction of materials, shall remain binding indefinitely.</p>
+        const clauses = [];
+        let clauseCounter = 1;
+        const addClause = (id, title, body) => {
+            clauses.push({ id, number: clauseCounter, title, body });
+            clauseCounter += 1;
+        };
 
-            <p id="consequences-breach"><strong>8. CONSEQUENCES OF BREACH.</strong> The parties acknowledge that any breach of this Agreement may cause irreparable harm to the non-breaching party for which monetary damages would be inadequate. Therefore, the non-breaching party shall be entitled to seek immediate injunctive relief and specific performance without the necessity of proving actual damages or posting bond.</p>
+        addClause('introduction-section', 'INTRODUCTION AND PURPOSE', [
+            { type: 'text', text: `${profile.introduction} This Agreement acknowledges that in the course of personal relationships involving alternative lifestyle activities, sensitive and highly personal information may be shared that requires maximum protection and discretion.` }
+        ]);
 
-            ${formData.liquidatedDamages ? `
-            <p id="liquidated-damages-clause"><strong>9. LIQUIDATED DAMAGES.</strong> In addition to injunctive relief, any material breach of this Agreement may result in liquidated damages of $${formData.liquidatedDamages} per violation. This amount represents a reasonable estimate of potential harm considering the sensitive nature of the information, potential reputational damage, emotional distress, and difficulty in calculating actual damages. This remedy is in addition to, not in lieu of, other available legal remedies.</p>
-            ` : ''}
+        addClause('mutual-representations', 'MUTUAL REPRESENTATIONS AND CONSENT', [
+            { type: 'text', text: 'Each party confirms that participation in the personal arrangements contemplated by this Agreement is voluntary, based on mutual, informed consent, and free from coercion or undue influence.' },
+            { type: 'text', text: 'The parties further represent that no wages, professional benefits, or employment decisions are conditioned on the personal relationship, and that any shared expenses are solely for mutual benefit rather than compensation for intimate conduct.' }
+        ]);
 
-            ${formData.arbitration ? `
-            <p id="arbitration-clause"><strong>${formData.liquidatedDamages ? '10' : '9'}. DISPUTE RESOLUTION.</strong> Any disputes arising under this Agreement shall be resolved through confidential binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules, conducted by a single arbitrator experienced in privacy and confidentiality matters in ${formData.jurisdiction}. All arbitration proceedings, documents, and awards shall remain strictly confidential. The prevailing party shall be entitled to reasonable attorneys' fees and costs. Nothing in this clause shall prevent either party from seeking immediate injunctive relief in a court of competent jurisdiction to prevent ongoing or threatened breaches.</p>
-            ` : ''}
+        const confidentialBody = [
+            { type: 'text', text: 'For purposes of this Agreement, "Confidential Information" includes, but is not limited to:' },
+            { type: 'list', items: confidentialInfo },
+            { type: 'text', text: 'Confidential Information specifically excludes: (a) information that is publicly known through no breach of this Agreement; (b) information independently developed without reference to Confidential Information; (c) information rightfully received from third parties without breach of confidentiality; and (d) information that becomes non-confidential through no fault of the receiving party.' }
+        ];
+        if (profile.reinforcement) {
+            confidentialBody.push({ type: 'text', text: profile.reinforcement });
+        }
+        addClause('confidential-info-section', 'CONFIDENTIAL INFORMATION DEFINED', confidentialBody);
 
-            <p id="social-media-privacy"><strong>${formData.arbitration ? (formData.liquidatedDamages ? '11' : '10') : (formData.liquidatedDamages ? '10' : '9')}. SOCIAL MEDIA AND DIGITAL PRIVACY.</strong> Each party specifically agrees not to post, share, or reference any Confidential Information on social media platforms, dating applications, online forums, or any other digital platforms. This includes but is not limited to photographs, location check-ins, status updates, stories, or any other content that could directly or indirectly reveal Confidential Information. The parties acknowledge that digital information can be easily copied, screenshotted, or forwarded, and agree to exercise extreme caution in all digital communications.</p>
+        addClause('confidentiality-obligations', 'CONFIDENTIALITY OBLIGATIONS', [
+            { type: 'text', text: 'Each party mutually agrees to maintain the confidentiality of all Confidential Information shared by the other party and shall not disclose, publish, or otherwise reveal such information to any third party without prior written consent of the disclosing party. This creates reciprocal obligations ensuring both parties are equally bound by confidentiality duties. Both parties acknowledge the sensitive nature of alternative lifestyle information and agree to exercise the highest degree of care in protecting such information.' }
+        ]);
 
-            <p id="third-party-obligations"><strong>${formData.arbitration ? (formData.liquidatedDamages ? '12' : '11') : (formData.liquidatedDamages ? '11' : '10')}. THIRD-PARTY OBLIGATIONS.</strong> If either party must disclose Confidential Information to authorized third parties (such as trusted friends, therapists, or legal counsel as permitted herein), they shall ensure such third parties understand the confidential nature of the information and are bound by similar obligations of confidentiality.</p>
+        addClause('standard-of-care', 'STANDARD OF CARE', [
+            { type: 'text', text: 'Each party agrees to use the same degree of care to protect Confidential Information as they would use to protect their own most sensitive personal information, but in no event less than reasonable care. This includes implementing appropriate physical, technical, and administrative safeguards to prevent unauthorized access or disclosure.' }
+        ]);
 
-            <p id="general-provisions"><strong>${formData.arbitration ? (formData.liquidatedDamages ? '13' : '12') : (formData.liquidatedDamages ? '12' : '11')}. GENERAL PROVISIONS.</strong> This Agreement shall be governed by the laws of ${formData.jurisdiction === 'District of Columbia' ? 'the District of Columbia' : 'the State of ' + formData.jurisdiction} without regard to conflict of law principles. If any provision is found unenforceable, the remainder shall remain in full force and effect. This Agreement constitutes the entire understanding between the parties regarding confidentiality obligations and supersedes all prior negotiations, representations, or agreements relating to this subject matter. Any modifications must be in writing and signed by both parties. The failure to enforce any provision shall not constitute a waiver of that provision or any other provision.</p>
+        addClause('permitted-disclosures', 'PERMITTED DISCLOSURES', [
+            { type: 'text', text: 'This Agreement does not prevent disclosure:' },
+            { type: 'list', items: permittedDisclosures }
+        ]);
 
-            ${formData.additionalTerms ? `
-            <p id="additional-terms"><strong>${formData.arbitration ? (formData.liquidatedDamages ? '14' : '13') : (formData.liquidatedDamages ? '13' : '12')}. ADDITIONAL TERMS.</strong> ${formData.additionalTerms}</p>
-            ` : ''}
+        const returnBody = [
+            { type: 'text', text: 'Upon termination of the personal relationship or upon written request by the disclosing party, each party agrees to: (a) return all tangible materials containing Confidential Information; (b) permanently delete all electronic files, photographs, videos, messages, and other digital materials containing Confidential Information from all devices, cloud storage, and backup systems; (c) provide written certification of such deletion within thirty (30) days of the request; and (d) not retain any copies, excerpts, or derivatives of Confidential Information in any form. This obligation includes materials stored on personal devices, social media accounts, email systems, and any third-party storage services.' }
+        ];
+        if (retentionSummary) {
+            returnBody.push({ type: 'text', text: `Retention Protocol: ${retentionSummary}` });
+        }
+        if (storagePractices) {
+            returnBody.push({ type: 'text', text: `Secure Storage Methods: ${storagePractices}` });
+        }
+        addClause('return-destruction-clause', 'RETURN AND DESTRUCTION OF CONFIDENTIAL MATERIALS', returnBody);
 
-            <p id="acknowledgment-execution" style="margin-top: 30px; page-break-inside: avoid;">
-                <strong>ACKNOWLEDGMENT AND EXECUTION.</strong> By signing below, each party acknowledges that they have read, understood, and agree to be bound by all terms of this Agreement.
-            </p>
+        addClause('duration-section', 'DURATION AND SURVIVAL', [
+            { type: 'text', text: `This Agreement shall remain in effect for ${formData.duration === 'indefinite' ? 'an indefinite period' : formData.duration + ' years'} from the effective date, unless terminated by mutual written consent. The obligations of confidentiality shall survive termination of this Agreement and any personal relationship between the parties. Certain provisions, including the return and destruction of materials, shall remain binding indefinitely.` }
+        ]);
 
-            <div style="page-break-inside: avoid; margin-top: 20px;">
-                <p><strong>First Party:</strong> _________________________ Date: _________<br/>
-                ${party1}</p>
-                <br/>
-                <p><strong>Second Party:</strong> _________________________ Date: _________<br/>
-                ${party2}</p>
-            </div>
-        `;
+        addClause('consequences-breach', 'CONSEQUENCES OF BREACH', [
+            { type: 'text', text: 'The parties acknowledge that any breach of this Agreement may cause irreparable harm to the non-breaching party for which monetary damages would be inadequate. Therefore, the non-breaching party shall be entitled to seek immediate injunctive relief and specific performance without the necessity of proving actual damages or posting bond.' }
+        ]);
 
-        setPreviewContent(ndaContent);
-    };
+        if (formData.liquidatedDamages) {
+            addClause('liquidated-damages-clause', 'LIQUIDATED DAMAGES', [
+                { type: 'text', text: `In addition to injunctive relief, any material breach of this Agreement may result in liquidated damages of $${formData.liquidatedDamages} per violation. This amount represents a reasonable estimate of potential harm considering the sensitive nature of the information, potential reputational damage, emotional distress, and difficulty in calculating actual damages. This remedy is in addition to, not in lieu of, other available legal remedies.` }
+            ]);
+        }
+
+        if (formData.arbitration) {
+            addClause('arbitration-clause', 'DISPUTE RESOLUTION', [
+                { type: 'text', text: `Any disputes arising under this Agreement shall be resolved through confidential binding arbitration administered by the American Arbitration Association (AAA) under its Commercial Arbitration Rules, conducted by a single arbitrator experienced in privacy and confidentiality matters in ${formData.jurisdiction}. All arbitration proceedings, documents, and awards shall remain strictly confidential. The prevailing party shall be entitled to reasonable attorneys' fees and costs. Nothing in this clause shall prevent either party from seeking immediate injunctive relief in a court of competent jurisdiction to prevent ongoing or threatened breaches.` }
+            ]);
+        }
+
+        addClause('social-media-privacy', 'SOCIAL MEDIA AND DIGITAL PRIVACY', [
+            { type: 'text', text: 'Each party specifically agrees not to post, share, or reference any Confidential Information on social media platforms, dating applications, online forums, or any other digital platforms. This includes but is not limited to photographs, location check-ins, status updates, stories, or any other content that could directly or indirectly reveal Confidential Information. The parties acknowledge that digital information can be easily copied, screenshotted, or forwarded, and agree to exercise extreme caution in all digital communications.' }
+        ]);
+
+        const thirdPartyBody = [
+            { type: 'text', text: 'If either party must disclose Confidential Information to authorized third parties (such as trusted confidants, wellness professionals, or legal counsel as permitted herein), they shall ensure such third parties understand the confidential nature of the information and are bound by similar obligations of confidentiality.' }
+        ];
+        if (activeParticipants.length) {
+            thirdPartyBody.push({ type: 'text', text: 'Approved confidants and conditions:' });
+            thirdPartyBody.push({ type: 'list', items: activeParticipants.map(formatParticipant) });
+            thirdPartyBody.push({ type: 'text', text: 'Each approved recipient must limit use of Confidential Information to the stated purpose and, where feasible, sign a comparable confidentiality undertaking.' });
+        } else {
+            thirdPartyBody.push({ type: 'text', text: 'No specific third-party recipients are authorised at this time. Any future disclosure requires prior written consent from both parties and a comparable confidentiality commitment.' });
+        }
+        addClause('third-party-obligations', 'THIRD-PARTY OBLIGATIONS', thirdPartyBody);
+
+        if (industryDetails.length || sensitivityItems.length || industryNotes) {
+            const industryBody = [];
+            if (industryDetails.length) {
+                industryBody.push({ type: 'text', text: 'Industry-specific compliance considerations selected:' });
+                industryBody.push({ type: 'list', items: industryDetails.map((detail) => `${detail.label}: ${detail.clauseText}`) });
+            }
+            if (sensitivityItems.length) {
+                industryBody.push({ type: 'text', text: 'Additional risk indicators flagged by the parties:' });
+                industryBody.push({ type: 'list', items: sensitivityItems });
+            }
+            if (industryNotes) {
+                industryBody.push({ type: 'text', text: `Additional notes: ${industryNotes}` });
+            }
+            addClause('industry-compliance-clause', 'COMPLIANCE WITH PROFESSIONAL OBLIGATIONS', industryBody);
+        }
+
+        addClause('general-provisions', 'GENERAL PROVISIONS', [
+            { type: 'text', text: `This Agreement shall be governed by the laws of ${jurisdictionText} without regard to conflict of law principles. If any provision is found unenforceable, the remainder shall remain in full force and effect. This Agreement constitutes the entire understanding between the parties regarding confidentiality obligations and supersedes all prior negotiations, representations, or agreements relating to this subject matter. Any modifications must be in writing and signed by both parties. The failure to enforce any provision shall not constitute a waiver of that provision or any other provision.` }
+        ]);
+
+        if (formData.additionalTerms) {
+            addClause('additional-terms', 'ADDITIONAL TERMS', [
+                { type: 'text', text: formData.additionalTerms }
+            ]);
+        }
+
+        const acknowledgement = 'By signing below, each party acknowledges that they have read, understood, and agree to be bound by all terms of this Agreement.';
+
+        const plainTextLines = [
+            NDA_TITLE,
+            `Effective Date: ${effectiveDate}`,
+            `Parties: ${party1} ("First Party") and ${party2} ("Second Party")`,
+            ''
+        ];
+
+        clauses.forEach((clause) => {
+            plainTextLines.push(`${clause.number}. ${clause.title}.`);
+            clause.body.forEach((segment) => {
+                if (segment.type === 'text') {
+                    plainTextLines.push(segment.text);
+                } else if (segment.type === 'list') {
+                    segment.items.forEach((item) => {
+                        plainTextLines.push(`- ${item}`);
+                    });
+                }
+            });
+            plainTextLines.push('');
+        });
+
+        plainTextLines.push('ACKNOWLEDGMENT AND EXECUTION.');
+        plainTextLines.push(acknowledgement);
+        plainTextLines.push('');
+        plainTextLines.push('First Party: _________________________ Date: _________');
+        plainTextLines.push(party1);
+        plainTextLines.push('');
+        plainTextLines.push('Second Party: _________________________ Date: _________');
+        plainTextLines.push(party2);
+
+        if (assetInventoryEntries.length) {
+            plainTextLines.push('');
+            plainTextLines.push('ANNEX A – PROTECTED MATERIALS INVENTORY');
+            assetInventoryEntries.forEach((item) => {
+                plainTextLines.push(`- ${item}`);
+            });
+        } else {
+            plainTextLines.push('');
+            plainTextLines.push('ANNEX A – PROTECTED MATERIALS INVENTORY (to be completed jointly by the parties as protected materials are identified).');
+        }
+
+        return {
+            title: NDA_TITLE,
+            effectiveDate,
+            party1,
+            party2,
+            clauses,
+            metadata: [
+                { id: 'effective-date-section', label: 'Effective Date:', value: effectiveDate },
+                { id: 'parties-section', label: 'Parties:', value: `${party1} ("First Party") and ${party2} ("Second Party")` }
+            ],
+            acknowledgement,
+            plainText: plainTextLines.join('
+').trim(),
+            signatureBlock: [
+                { id: 'first-party-signature', label: 'First Party', name: party1 },
+                { id: 'second-party-signature', label: 'Second Party', name: party2 }
+            ],
+            annex: {
+                items: assetInventoryEntries,
+                placeholder: 'Use this annex to list cloud folders, shared drives, storage devices, or physical binders that must be returned or destroyed when the relationship ends.'
+            },
+            retention: {
+                label: retentionLabel,
+                summary: retentionSummary
+            },
+            storagePractices,
+            industryDetails,
+            sensitivityItems
+        };
+    }, [formData, privacyLevel]);
 
     const getPrivacyLevelText = () => {
         if (privacyLevel === 1) return "Basic Discretion";
@@ -317,52 +750,138 @@ function AlternativeLifestyleNDAGenerator() {
         return "High-Profile Protection";
     };
 
-    const generateWordDoc = () => {
-        // Remove all highlighting and styling for Word document
-        const cleanContent = previewContent
-            .replace(/class="[^"]*"/g, '')  // Remove all class attributes
-            .replace(/<span[^>]*>/g, '')    // Remove span tags
-            .replace(/<\/span>/g, '');      // Remove closing span tags
+    const generateWordDoc = async () => {
+        const docxLib = window.docx;
 
-        const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-                <head>
-                    <meta charset="utf-8">
-                    <title>Nondisclosure Agreement</title>
-                    <style>
-                        body { font-family: Times, serif; padding: 40px; line-height: 1.6; font-size: 11pt; }
-                        h3 { text-align: center; margin-bottom: 30px; font-size: 11pt; font-weight: bold; }
-                        h4 { margin-top: 25px; margin-bottom: 10px; font-size: 11pt; font-weight: bold; }
-                        ul { margin-left: 20px; }
-                        li { margin-bottom: 5px; font-size: 11pt; }
-                        p { margin-bottom: 10px; font-size: 11pt; }
-                        strong { font-size: 11pt; }
-                    </style>
-                </head>
-                <body>${cleanContent}</body>
-            </html>
-        `;
+        if (!docxLib) {
+            alert('Document exporter is still loading. Please try again in a moment.');
+            return;
+        }
 
-        const blob = new Blob([htmlContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Nondisclosure_Agreement.doc';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+        const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docxLib;
+
+        const docParagraphs = [];
+
+        docParagraphs.push(new Paragraph({
+            text: ndaData.title,
+            heading: HeadingLevel.HEADING_3,
+            alignment: AlignmentType.CENTER,
+            spacing: { after: 200 }
+        }));
+
+        ndaData.metadata.forEach((meta) => {
+            docParagraphs.push(new Paragraph({
+                children: [
+                    new TextRun({ text: `${meta.label} `, bold: true }),
+                    new TextRun({ text: meta.value })
+                ],
+                spacing: { after: 120 }
+            }));
+        });
+
+        ndaData.clauses.forEach((clause) => {
+            const [firstSegment, ...restSegments] = clause.body;
+
+            if (firstSegment) {
+                if (firstSegment.type === 'text') {
+                    docParagraphs.push(new Paragraph({
+                        children: [
+                            new TextRun({ text: `${clause.number}. ${clause.title}. `, bold: true }),
+                            new TextRun({ text: firstSegment.text })
+                        ],
+                        spacing: { after: restSegments.length ? 100 : 200 }
+                    }));
+                } else if (firstSegment.type === 'list') {
+                    docParagraphs.push(new Paragraph({
+                        children: [new TextRun({ text: `${clause.number}. ${clause.title}.`, bold: true })],
+                        spacing: { after: 60 }
+                    }));
+                    firstSegment.items.forEach((item) => {
+                        docParagraphs.push(new Paragraph({
+                            text: item,
+                            bullet: { level: 0 },
+                            spacing: { after: 60 }
+                        }));
+                    });
+                }
+            }
+
+            restSegments.forEach((segment) => {
+                if (segment.type === 'text') {
+                    docParagraphs.push(new Paragraph({
+                        text: segment.text,
+                        spacing: { after: 120 }
+                    }));
+                } else if (segment.type === 'list') {
+                    segment.items.forEach((item) => {
+                        docParagraphs.push(new Paragraph({
+                            text: item,
+                            bullet: { level: 0 },
+                            spacing: { after: 60 }
+                        }));
+                    });
+                }
+            });
+        });
+
+        docParagraphs.push(new Paragraph({
+            children: [new TextRun({ text: 'ACKNOWLEDGMENT AND EXECUTION.', bold: true })],
+            spacing: { before: 200, after: 100 }
+        }));
+
+        docParagraphs.push(new Paragraph({
+            text: ndaData.acknowledgement,
+            spacing: { after: 200 }
+        }));
+
+        ndaData.signatureBlock.forEach((entry) => {
+            docParagraphs.push(new Paragraph({
+                children: [new TextRun({ text: `${entry.label}: _________________________ Date: _________` })],
+                spacing: { after: 60 }
+            }));
+            docParagraphs.push(new Paragraph({
+                text: entry.name,
+                spacing: { after: 160 }
+            }));
+        });
+
+        try {
+            const doc = new Document({
+                sections: [
+                    {
+                        properties: {},
+                        children: docParagraphs
+                    }
+                ]
+            });
+
+            const blob = await Packer.toBlob(doc);
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Nondisclosure_Agreement.docx';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Failed to generate Word document', error);
+            alert('Unable to generate the Word document. Please try again.');
+        }
     };
 
     const copyToClipboard = async () => {
-        const textContent = previewContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        const textContent = ndaData.plainText;
+
+        if (!textContent) {
+            return;
+        }
+
         try {
             await navigator.clipboard.writeText(textContent);
             alert('NDA text copied to clipboard!');
         } catch (err) {
             console.error('Failed to copy: ', err);
-            // Fallback for older browsers
             const textArea = document.createElement('textarea');
             textArea.value = textContent;
             document.body.appendChild(textArea);
@@ -374,22 +893,26 @@ function AlternativeLifestyleNDAGenerator() {
     };
 
     const scrollToClauseWithTempHighlight = (clauseId) => {
-        const previewContainer = document.querySelector('.preview-content');
-        const element = previewContainer.querySelector(`#${clauseId}`);
-        if (element && previewContainer) {
-            // Calculate position relative to the preview container
-            const elementTop = element.offsetTop;
-            const containerHeight = previewContainer.clientHeight;
+        const previewContainer = previewContainerRef.current;
+        const element = clauseRefs.current[clauseId];
 
-            // Scroll to center the element
+        if (element && previewContainer) {
+            const containerRect = previewContainer.getBoundingClientRect();
+            const targetRect = element.getBoundingClientRect();
+            const targetOffset = targetRect.top - containerRect.top + previewContainer.scrollTop;
+            const scrollTop = Math.max(targetOffset - previewContainer.clientHeight / 2, 0);
+
             previewContainer.scrollTo({
-                top: elementTop - (containerHeight / 2),
+                top: scrollTop,
                 behavior: 'smooth'
             });
 
-            // Add temporary highlighting (flash effect)
-            element.classList.add('temp-highlight');
-            setTimeout(() => element.classList.remove('temp-highlight'), 2000);
+            if (highlightTimeoutRef.current) {
+                clearTimeout(highlightTimeoutRef.current);
+            }
+
+            setHighlightedClause(clauseId);
+            highlightTimeoutRef.current = setTimeout(() => setHighlightedClause(null), 2000);
         }
     };
 
@@ -426,6 +949,12 @@ function AlternativeLifestyleNDAGenerator() {
                             onClick={() => setActiveTab('professional')}
                         >
                             Risk Assessment
+                        </button>
+                        <button
+                            className={`tab ${activeTab === 'participants' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('participants')}
+                        >
+                            Participants
                         </button>
                         <button
                             className={`tab ${activeTab === 'advanced' ? 'active' : ''}`}
@@ -554,6 +1083,9 @@ function AlternativeLifestyleNDAGenerator() {
                                     <span>Maximum</span>
                                 </div>
                             </div>
+                            {sliderAdjustmentNote && (
+                                <div className="slider-note">{sliderAdjustmentNote}</div>
+                            )}
                         </div>
 
                         <div className="checkbox-group">
@@ -770,10 +1302,89 @@ function AlternativeLifestyleNDAGenerator() {
 
                 <div className="preview-section">
                     <h2>Live Preview</h2>
-                    <div
-                        className="preview-content"
-                        dangerouslySetInnerHTML={{ __html: previewContent }}
-                    />
+                    <div className="preview-content" ref={previewContainerRef}>
+                        <h3>{ndaData.title}</h3>
+                        {ndaData.metadata.map((meta) => (
+                            <p
+                                key={meta.id}
+                                id={meta.id}
+                                ref={getClauseRefCallback(meta.id)}
+                                className={highlightedClause === meta.id ? 'temp-highlight' : ''}
+                            >
+                                <strong>{meta.label}</strong> {renderTextWithBreaks(meta.value)}
+                            </p>
+                        ))}
+
+                        {ndaData.clauses.map((clause) => {
+                            const [firstSegment, ...restSegments] = clause.body;
+
+                            return (
+                                <div
+                                    key={clause.id}
+                                    id={clause.id}
+                                    ref={getClauseRefCallback(clause.id)}
+                                    className={`clause-block ${highlightedClause === clause.id ? 'temp-highlight' : ''}`}
+                                >
+                                    {firstSegment && firstSegment.type === 'text' ? (
+                                        <p>
+                                            <strong>{`${clause.number}. ${clause.title}.`}</strong>{' '}
+                                            {renderTextWithBreaks(firstSegment.text)}
+                                        </p>
+                                    ) : (
+                                        <p>
+                                            <strong>{`${clause.number}. ${clause.title}.`}</strong>
+                                        </p>
+                                    )}
+
+                                    {firstSegment && firstSegment.type === 'list' && (
+                                        <ul>
+                                            {firstSegment.items.map((item, index) => (
+                                                <li key={`first-${clause.id}-${index}`}>{item}</li>
+                                            ))}
+                                        </ul>
+                                    )}
+
+                                    {restSegments.map((segment, segmentIndex) => {
+                                        if (segment.type === 'text') {
+                                            return (
+                                                <p key={`text-${clause.id}-${segmentIndex}`}>
+                                                    {renderTextWithBreaks(segment.text)}
+                                                </p>
+                                            );
+                                        }
+                                        return (
+                                            <ul key={`list-${clause.id}-${segmentIndex}`}>
+                                                {segment.items.map((item, itemIndex) => (
+                                                    <li key={`list-${clause.id}-${segmentIndex}-${itemIndex}`}>{item}</li>
+                                                ))}
+                                            </ul>
+                                        );
+                                    })}
+                                </div>
+                            );
+                        })}
+
+                        <p
+                            id="acknowledgment-execution"
+                            ref={getClauseRefCallback('acknowledgment-execution')}
+                            className={highlightedClause === 'acknowledgment-execution' ? 'temp-highlight' : ''}
+                            style={{ marginTop: '30px', pageBreakInside: 'avoid' }}
+                        >
+                            <strong>ACKNOWLEDGMENT AND EXECUTION.</strong>{' '}
+                            {renderTextWithBreaks(ndaData.acknowledgement)}
+                        </p>
+
+                        <div style={{ pageBreakInside: 'avoid', marginTop: '20px' }}>
+                            {ndaData.signatureBlock.map((entry) => (
+                                <div key={entry.id} className="signature-entry">
+                                    <p>
+                                        <strong>{entry.label}:</strong> _________________________ Date: _________
+                                    </p>
+                                    <p>{entry.name}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
 

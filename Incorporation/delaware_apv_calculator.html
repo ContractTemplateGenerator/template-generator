@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Delaware Franchise Tax — Assumed Par Value Calculator</title>
+<style>
+  :root {
+    --maxw: 980px;
+  }
+  html, body {
+    margin: 0; padding: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+    color: #111; background: #fafafa;
+  }
+  header { background: #111; color: #fff; padding: 18px; }
+  header h1 { margin: 0; font-size: 18px; letter-spacing: .3px; }
+  main { max-width: var(--maxw); margin: 20px auto; padding: 0 14px 28px; }
+  .card {
+    background: #fff; border: 1px solid #e4e4e7; border-radius: 10px; padding: 16px 16px;
+    box-shadow: 0 1px 0 rgba(0,0,0,.03);
+  }
+  .grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+  @media (min-width: 860px) { .grid-2 { grid-template-columns: 1fr 1fr; gap: 18px; } }
+  h2 { margin: 0 0 8px; font-size: 18px; }
+  h3 { margin: 12px 0 6px; font-size: 15px; }
+  label { font-size: 13px; color: #444; display: block; margin-bottom: 6px; }
+  .row { display: grid; grid-template-columns: 1fr 140px; gap: 10px; align-items: center; }
+  input[type="number"] {
+    width: 100%; padding: 8px 10px; border: 1px solid #d4d4d8; border-radius: 8px; font-size: 14px;
+  }
+  input[type="range"] { width: 100%; }
+  .muted { color: #6b7280; font-size: 12px; }
+  .result { font-weight: 600; font-size: 16px; }
+  .pill {
+    display: inline-block; padding: 4px 8px; font-size: 12px; border-radius: 999px;
+    border: 1px solid #e5e7eb; background: #f3f4f6; color: #111;
+  }
+  .pill.ok { background: #ecfdf5; border-color: #10b98133; color: #065f46; }
+  .pill.warn { background: #fff7ed; border-color: #f59e0b33; color: #7c2d12; }
+  .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; }
+  .right { text-align: right; }
+  .split { display: grid; grid-template-columns: 1fr auto; gap: 8px; align-items: center; }
+  .footer { font-size: 12px; color: #6b7280; margin-top: 12px; }
+  .totals { font-size: 24px; font-weight: 700; }
+  .small { font-size: 12px; }
+  .section-title { margin-top: 4px; margin-bottom: 12px; }
+  .hr { height: 1px; background: #eee; margin: 12px 0; }
+  button.copy { border: 1px solid #d4d4d8; border-radius: 8px; padding: 8px 10px; font-size: 13px; background: #fff; cursor: pointer; }
+</style>
+</head>
+<body>
+<header><h1>Delaware Franchise Tax — Assumed Par Value (APV) Method</h1></header>
+<main class="grid grid-2">
+  <section class="card">
+    <h2 class="section-title">Inputs</h2>
+
+    <h3>Authorized shares</h3>
+    <div class="row">
+      <input id="authRange" type="range" min="5001" max="500000000" step="1" value="300000000" />
+      <input id="authNum" type="number" min="5001" max="500000000" step="1" value="300000000" class="mono">
+    </div>
+    <div class="muted">Range: 5,001 to 500,000,000</div>
+
+    <h3>Issued shares</h3>
+    <div class="row">
+      <input id="issuedRange" type="range" min="1" max="500000000" step="1" value="100000000" />
+      <input id="issuedNum" type="number" min="1" max="500000000" step="1" value="100000000" class="mono">
+    </div>
+    <div class="muted">Range: 1 to 500,000,000</div>
+
+    <h3>Gross assets (USD)</h3>
+    <div class="row">
+      <input id="assetsRange" type="range" min="1" max="500000000" step="1" value="333334" />
+      <input id="assetsNum" type="number" min="1" max="500000000" step="1" value="333334" class="mono">
+    </div>
+    <div class="muted">Range: $1 to $500,000,000</div>
+
+    <div class="hr"></div>
+    <div class="split">
+      <div class="muted small">Share ratio (issued / authorized)</div>
+      <div class="mono" id="ratio">—</div>
+    </div>
+    <div class="split">
+      <div class="muted small">Breakpoint for tax &gt; $400 (gross assets)</div>
+      <div><span class="mono" id="breakpoint">—</span> <span id="bpBadge" class="pill">—</span></div>
+    </div>
+    <div class="footer small">Breakpoint formula: $1,000,000 × (issued ÷ authorized). APV tax rises above $400 when assets exceed this amount.</div>
+    <div class="hr"></div>
+    <div class="split">
+      <div class="muted small">Permalink with current inputs</div>
+      <button class="copy" id="copyLink">Copy link</button>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2 class="section-title">Results (APV Method)</h2>
+    <div class="split">
+      <div class="muted">Assumed Par (assets ÷ issued)</div>
+      <div class="mono" id="assumedPar">—</div>
+    </div>
+    <div class="split">
+      <div class="muted">Assumed Par Value Capital (APVC)</div>
+      <div class="mono" id="apvc">—</div>
+    </div>
+    <div class="split">
+      <div class="muted">$1M units (ceil(APVC ÷ 1,000,000))</div>
+      <div class="mono" id="units">—</div>
+    </div>
+    <div class="hr"></div>
+    <div class="split">
+      <div class="muted">Delaware franchise tax (APV)</div>
+      <div class="mono result" id="tax">$400</div>
+    </div>
+    <div class="split">
+      <div class="muted">+ Annual Report fee</div>
+      <div class="mono" id="report">$50</div>
+    </div>
+    <div class="split totals">
+      <div>Total due (APV method)</div>
+      <div class="mono" id="total">$450</div>
+    </div>
+    <div class="footer small">Tax under APV is <strong>$400 per $1,000,000 (or fraction)</strong> of APVC; minimum $400, plus a $50 Annual Report fee.</div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const authRange = $("authRange");
+  const authNum = $("authNum");
+  const issuedRange = $("issuedRange");
+  const issuedNum = $("issuedNum");
+  const assetsRange = $("assetsRange");
+  const assetsNum = $("assetsNum");
+
+  const ratio = $("ratio");
+  const breakpoint = $("breakpoint");
+  const bpBadge = $("bpBadge");
+  const assumedPar = $("assumedPar");
+  const apvc = $("apvc");
+  const units = $("units");
+  const tax = $("tax");
+  const report = $("report");
+  const total = $("total");
+  const copyLink = $("copyLink");
+
+  const fmtInt = (n) => new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 }).format(Math.round(n));
+  const fmtMoney = (n) => "$" + new Intl.NumberFormat('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(n));
+  const fmtMoney2 = (n) => "$" + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  const clamp = (x, min, max) => Math.max(min, Math.min(max, x));
+
+  function sync(a, b) {
+    a.addEventListener("input", () => { b.value = a.value; recalc(); });
+    b.addEventListener("input", () => {
+      const v = clamp(Number(b.value || 0), Number(b.min), Number(b.max));
+      b.value = v; a.value = v; recalc();
+    });
+  }
+
+  sync(authRange, authNum);
+  sync(issuedRange, issuedNum);
+  sync(assetsRange, assetsNum);
+
+  function parseHash() {
+    const h = new URLSearchParams(location.hash.slice(1));
+    const A = Number(h.get("auth"));
+    const I = Number(h.get("issued"));
+    const G = Number(h.get("assets"));
+    if (A) authRange.value = authNum.value = clamp(A, +authNum.min, +authNum.max);
+    if (I) issuedRange.value = issuedNum.value = clamp(I, +issuedNum.min, +issuedNum.max);
+    if (G) assetsRange.value = assetsNum.value = clamp(G, +assetsNum.min, +assetsNum.max);
+  }
+
+  function updateHash() {
+    const params = new URLSearchParams();
+    params.set("auth", authNum.value);
+    params.set("issued", issuedNum.value);
+    params.set("assets", assetsNum.value);
+    history.replaceState(null, "", "#" + params.toString());
+  }
+
+  copyLink.addEventListener("click", async () => {
+    updateHash();
+    try {
+      await navigator.clipboard.writeText(location.href);
+      copyLink.textContent = "Copied!";
+      setTimeout(() => copyLink.textContent = "Copy link", 1200);
+    } catch {
+      copyLink.textContent = "Press Ctrl/Cmd+C";
+      setTimeout(() => copyLink.textContent = "Copy link", 1500);
+    }
+  });
+
+  function recalc() {
+    const authorized = Number(authNum.value);
+    const issued = Number(issuedNum.value);
+    const assets = Number(assetsNum.value);
+
+    // Guard
+    const issuedSafe = Math.max(issued, 1);
+    const authorizedSafe = Math.max(authorized, 1);
+
+    // Ratio & breakpoint
+    const r = issuedSafe / authorizedSafe;
+    const bp = 1000000 * r; // assets threshold to exceed $400 tax
+
+    ratio.textContent = (r).toLocaleString('en-US', { maximumFractionDigits: 6 });
+    breakpoint.textContent = fmtMoney(bp);
+
+    // Badge: below or above threshold?
+    if (assets > bp) {
+      bpBadge.textContent = "above threshold";
+      bpBadge.className = "pill warn";
+    } else {
+      bpBadge.textContent = "at/min threshold";
+      bpBadge.className = "pill ok";
+    }
+
+    // Assumed Par = assets / issued
+    const ap = assets / issuedSafe;
+    assumedPar.textContent = "$" + ap.toLocaleString('en-US', { maximumFractionDigits: 6 });
+
+    // APVC = Assumed Par * authorized
+    const apvCapital = ap * authorizedSafe;
+    apvc.textContent = fmtMoney2(apvCapital);
+
+    // Units (ceil to next million), min tax 400
+    const unitsCount = Math.max(1, Math.ceil(apvCapital / 1_000_000));
+    units.textContent = fmtInt(unitsCount);
+
+    const apvTax = Math.max(400, unitsCount * 400);
+    tax.textContent = fmtMoney(apvTax);
+
+    report.textContent = fmtMoney(50);
+    total.textContent = fmtMoney(apvTax + 50);
+
+    updateHash();
+  }
+
+  parseHash();
+  recalc();
+</script>
+</body>
+</html>
