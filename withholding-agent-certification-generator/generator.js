@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useRef } = React;
 
 const translations = {
   en: {
@@ -20,6 +20,26 @@ const translations = {
     },
     austriaTriangularNote: "Article 11(4) removes the 0% benefit if the interest is attributable to a low-tax third-country PE (unless the treaty carve-outs apply).",
     austriaTriangularTooltip: "Applies when the Austrian beneficial owner earns the interest through a permanent establishment in another country with a preferential regime.",
+    incomeTypeLabel: "Income Type",
+    incomeTypeHelp: "Show Article 10 and 12 treaty rates for Austria when income differs from pure interest.",
+    incomeTypeOptions: {
+      interest: "Interest",
+      dividends: "Dividends",
+      royalties: "Royalties"
+    },
+    ownerTypeLabel: "Beneficial Owner Type",
+    ownerTypeHelp: "Pick the treaty claimant's classification so the letter references the right Form W-8 and documentation.",
+    ownerTypeOptions: {
+      individual: "Individual (Form W-7 + Form W-8BEN)",
+      entity: "Entity (Form W-8BEN-E)"
+    },
+    individualNote: "Individuals must supply an ITIN on Form W-8BEN for the treaty claim.",
+    entityNote: "Entities do not require an ITIN but should document FATCA status and GIIN on Form W-8BEN-E.",
+    fatcaStatusLabel: "FATCA Status",
+    fatcaStatusPlaceholder: "e.g., Reporting Model 1 FFI",
+    giinLabel: "GIIN",
+    giinPlaceholder: "Enter GIIN or N/A if not assigned",
+    giinHelp: "Typical GIIN format is 123456.12345.12.123; enter 'N/A' if the entity is exempt without a GIIN.",
     llcNameLabel: "LLC Name",
     llcNameTooltip: "Enter the full legal name of the LLC as it appears on IRS documents.",
     llcNamePlaceholder: "Enter LLC name (e.g., ABC Investment LLC)",
@@ -80,6 +100,26 @@ const translations = {
     },
     austriaTriangularNote: "Artikel 11(4) streicht den 0%-Satz, wenn die Zinsen einer Betriebsstätte in einem Niedrigsteuer-Drittland zuzurechnen sind (sofern keine Ausnahmen greifen).",
     austriaTriangularTooltip: "Gilt, wenn der österreichische Nutzungsberechtigte die Zinsen über eine Betriebsstätte in einem anderen Staat mit Präferenzregime erzielt.",
+    incomeTypeLabel: "Einkommensart",
+    incomeTypeHelp: "Zeigt für Österreich die Artikel-10- und Artikel-12-Sätze an, wenn keine reinen Zinsen vorliegen.",
+    incomeTypeOptions: {
+      interest: "Zinsen",
+      dividends: "Dividenden",
+      royalties: "Lizenzgebühren"
+    },
+    ownerTypeLabel: "Art des Nutzungsberechtigten",
+    ownerTypeHelp: "Wählen Sie die Einstufung des Abkommensberechtigten, damit im Schreiben das richtige W-8-Formular genannt wird.",
+    ownerTypeOptions: {
+      individual: "Natürliche Person (Formular W-7 + Formular W-8BEN)",
+      entity: "Juristische Person (Formular W-8BEN-E)"
+    },
+    individualNote: "Natürliche Personen müssen für den Abkommensanspruch eine ITIN auf Formular W-8BEN angeben.",
+    entityNote: "Juristische Personen benötigen keine ITIN, sollten aber FATCA-Status und GIIN auf Formular W-8BEN-E dokumentieren.",
+    fatcaStatusLabel: "FATCA-Status",
+    fatcaStatusPlaceholder: "z. B. Reporting Model 1 FFI",
+    giinLabel: "GIIN",
+    giinPlaceholder: "GIIN eingeben oder N/A, falls nicht vergeben",
+    giinHelp: "Das GIIN folgt üblicherweise dem Format 123456.12345.12.123; geben Sie 'N/A' an, falls nicht erforderlich.",
     llcNameLabel: "LLC-Name",
     llcNameTooltip: "Geben Sie den vollständigen rechtlichen Namen der LLC ein, wie er in den IRS-Dokumenten erscheint.",
     llcNamePlaceholder: "LLC-Name eingeben (z.B. ABC Investment LLC)",
@@ -135,13 +175,39 @@ const treatyData = {
     }
   },
   austria: {
-    article: 'Article 11',
+    article: 'Article 11(1)',
     rate: '0%',
     treatyName: 'U.S.–Austria tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/austria-tax-treaty-documents',
     description: {
       en: 'Austria exempts interest from U.S. withholding under Article 11 when the Austrian resident is the beneficial owner. Dividends are 5% with ≥10% voting control or 15% otherwise, and royalties are generally taxable only in the residence state (films/TV up to 10%). Article 11(4) contains a triangular permanent establishment limitation.',
       de: 'Österreich befreit Zinsen gemäß Artikel 11 des US-Österreich-Steuerabkommens von der US-Quellensteuer, sofern der österreichische Nutzungsberechtigte Eigentümer der Einkünfte ist. Dividenden unterliegen 5% bei ≥10% Stimmrechtsbeteiligung oder 15% sonst, und Lizenzgebühren sind grundsätzlich nur im Wohnsitzstaat steuerpflichtig (Film/Fernsehen bis zu 10%). Artikel 11(4) enthält eine Dreiecksbetriebsstätten-Beschränkung.'
+    },
+    incomeTypes: {
+      interest: {
+        article: 'Article 11(1)',
+        rate: '0%',
+        description: {
+          en: 'Interest paid to Austrian residents is taxable only in Austria under Article 11(1), so U.S. withholding drops to 0% when the beneficial owner qualifies. Article 11(4) can deny the exemption if the income is allocable to a low-taxed third-country permanent establishment.',
+          de: 'Zinsen an in Österreich ansässige Personen sind nach Artikel 11(1) nur in Österreich steuerpflichtig, sodass die US-Quellensteuer bei erfüllten Voraussetzungen auf 0% sinkt. Artikel 11(4) kann die Befreiung versagen, wenn die Einkünfte einer niedrig besteuerten Drittlands-Betriebsstätte zuzurechnen sind.'
+        }
+      },
+      dividends: {
+        article: 'Article 10',
+        rate: '5% (direct ≥10% vote) / 15% otherwise',
+        description: {
+          en: 'Article 10 limits dividend withholding to 5% when the Austrian parent owns at least 10% of the U.S. subsidiary’s voting stock; the standard ceiling is 15% for other shareholders.',
+          de: 'Artikel 10 begrenzt die Quellensteuer auf Dividenden auf 5%, wenn die österreichische Mutter mindestens 10% der Stimmrechte der US-Tochter hält; ansonsten gilt der Standardsatz von 15%.'
+        }
+      },
+      royalties: {
+        article: 'Article 12',
+        rate: '0% (films/TV up to 10%)',
+        description: {
+          en: 'Article 12 generally grants exclusive residence-state taxation for royalties, producing a 0% U.S. withholding rate. Film and TV payments may be taxed at source up to 10%.',
+          de: 'Artikel 12 sieht grundsätzlich eine ausschließliche Besteuerung im Wohnsitzstaat für Lizenzgebühren vor, wodurch der US-Quellensteuersatz 0% beträgt. Film- und Fernsehvergütungen können allerdings mit bis zu 10% an der Quelle besteuert werden.'
+        }
+      }
     }
   },
   malta: {
@@ -207,7 +273,11 @@ function WithholdingAgentGenerator() {
     ein: '',
     managingMember: '',
     ownerName: '',
-    date: new Date().toISOString().split('T')[0]
+    date: new Date().toISOString().split('T')[0],
+    ownerType: 'individual',
+    incomeType: 'interest',
+    fatcaStatus: '',
+    giin: ''
   });
 
   const [lastChanged, setLastChanged] = useState(null);
@@ -219,16 +289,44 @@ function WithholdingAgentGenerator() {
   const t = translations[language];
 
   const handleInputChange = (fieldName, value) => {
-    setFormData(prev => ({ ...prev, [fieldName]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [fieldName]: value };
+
+      if (fieldName === 'country' && value !== 'austria') {
+        updated.incomeType = 'interest';
+      }
+
+      if (fieldName === 'ownerType' && value === 'individual') {
+        updated.fatcaStatus = '';
+        updated.giin = '';
+      }
+
+      return updated;
+    });
+
     setLastChanged(fieldName);
     
     // Clear highlighting after 2 seconds
     setTimeout(() => setLastChanged(null), 2000);
     
     // Clear errors for this field
-    if (errors[fieldName]) {
-      setErrors(prev => ({ ...prev, [fieldName]: '' }));
-    }
+    setErrors(prev => {
+      const updatedErrors = { ...prev };
+      if (updatedErrors[fieldName]) {
+        updatedErrors[fieldName] = '';
+      }
+
+      if (fieldName === 'ownerType' && value === 'individual') {
+        updatedErrors.fatcaStatus = '';
+        updatedErrors.giin = '';
+      }
+
+      if (fieldName === 'country' && value !== 'austria') {
+        updatedErrors.incomeType = '';
+      }
+
+      return updatedErrors;
+    });
   };
 
   const validateEIN = (ein) => {
@@ -240,6 +338,8 @@ function WithholdingAgentGenerator() {
     const newErrors = {};
     
     if (!formData.country) newErrors.country = 'Please select a country';
+    if (!formData.ownerType) newErrors.ownerType = 'Please select the beneficial owner type';
+    if (formData.country === 'austria' && !formData.incomeType) newErrors.incomeType = 'Please choose an income type';
     if (!formData.llcName) newErrors.llcName = 'LLC name is required';
     if (!formData.llcStreet) newErrors.llcStreet = 'Street address is required';
     if (!formData.llcCity) newErrors.llcCity = 'City is required';
@@ -252,36 +352,98 @@ function WithholdingAgentGenerator() {
     }
     if (!formData.managingMember) newErrors.managingMember = 'Managing member name is required';
     if (!formData.ownerName) newErrors.ownerName = 'Owner name is required';
+    if (formData.ownerType === 'entity') {
+      if (!formData.fatcaStatus) newErrors.fatcaStatus = 'FATCA status is required for entities';
+      if (!formData.giin) newErrors.giin = 'GIIN (or N/A) is required for entities';
+    }
     if (!formData.date) newErrors.date = 'Date is required';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const generateLetter = () => {
+  const getActiveTreatyDetails = () => {
     const treaty = treatyData[formData.country];
+    if (!treaty) return null;
+
+    if (treaty.incomeTypes) {
+      const activeType = formData.incomeType || 'interest';
+      const fallbackType = treaty.incomeTypes.interest ? 'interest' : Object.keys(treaty.incomeTypes)[0];
+      const selectedType = treaty.incomeTypes[activeType] ? activeType : fallbackType;
+      const incomeDetails = treaty.incomeTypes[selectedType];
+
+      return {
+        ...treaty,
+        article: incomeDetails.article,
+        rate: incomeDetails.rate,
+        description: incomeDetails.description,
+        activeIncomeType: selectedType
+      };
+    }
+
+    return {
+      ...treaty,
+      activeIncomeType: 'interest'
+    };
+  };
+
+  const generateLetter = () => {
+    const treatyDetails = getActiveTreatyDetails();
     const countryName = formData.country ? formData.country.charAt(0).toUpperCase() + formData.country.slice(1) : '[Country]';
-    
-    return `${formData.llcName || '[LLC Name]'}
+    const incomeMetaMap = {
+      interest: { nounPhrase: 'interest income', withholdingLabel: 'interest', codeRef: 'IRC § 861(a)(1)' },
+      dividends: { nounPhrase: 'dividend income', withholdingLabel: 'dividends', codeRef: 'IRC § 861(a)(2)' },
+      royalties: { nounPhrase: 'royalty income', withholdingLabel: 'royalties', codeRef: 'IRC § 861(a)(4)' }
+    };
+    const activeIncomeType = treatyDetails ? treatyDetails.activeIncomeType : (formData.incomeType || 'interest');
+    const incomeMeta = incomeMetaMap[activeIncomeType] || incomeMetaMap.interest;
+    const ownerIsIndividual = formData.ownerType !== 'entity';
+    const llcName = formData.llcName || '[LLC Name]';
+    const fatcaStatusText = formData.fatcaStatus || '[FATCA Status]';
+    const giinText = formData.giin || 'N/A';
+    const treatyArticle = treatyDetails ? treatyDetails.article : '[Treaty Article]';
+    const treatyName = treatyDetails ? treatyDetails.treatyName : '[Treaty Name]';
+    const treatyRate = treatyDetails ? treatyDetails.rate : '[Rate]';
+    const formReference = ownerIsIndividual ? 'Form W-8BEN' : 'Form W-8BEN-E';
+    const subjectLine = ownerIsIndividual && activeIncomeType === 'interest'
+      ? 'Re: Certification of anticipated U.S.-source income – W-7 Exception 1(c)'
+      : 'Re: Certification of anticipated U.S.-source income – Treaty documentation';
+
+    const points = [];
+    points.push(`1. ${formData.ownerName || '[Owner Name]'}, a resident of ${countryName} and sole member of ${llcName}, will receive payments that constitute U.S.-source ${incomeMeta.nounPhrase} within the meaning of ${incomeMeta.codeRef}.`);
+
+    if (ownerIsIndividual) {
+      points.push(`2. The payments are subject to withholding under IRC § 1441 unless the owner provides a valid ${formReference} with a U.S. ITIN to claim benefits of ${treatyArticle} of the ${treatyName}, which limits withholding on ${incomeMeta.withholdingLabel} to ${treatyRate}.`);
+    } else {
+      points.push(`2. The payments are subject to withholding under IRC § 1441 unless the owner provides a valid ${formReference} to claim benefits of ${treatyArticle} of the ${treatyName}, which limits withholding on ${incomeMeta.withholdingLabel} to ${treatyRate}.`);
+    }
+
+    points.push(`3. ${llcName} will act as withholding agent and will file Form 1042-S reporting those amounts.`);
+
+    if (!ownerIsIndividual) {
+      points.push(`4. For FATCA purposes, the owner certifies a status of ${fatcaStatusText} and will provide GIIN ${giinText} (or other documentation where a GIIN is not required).`);
+    }
+
+    const conclusion = ownerIsIndividual
+      ? 'Accordingly, an ITIN is required solely to furnish on Form W-8BEN and Form 1042-S; the owner is not otherwise required to file a U.S. income-tax return.'
+      : `${llcName} will maintain the owner’s Form W-8BEN-E and FATCA documentation noted above in support of the treaty claim; an ITIN is not required for entity beneficial owners.`;
+
+    return `${llcName}
 ${formData.llcStreet || '[Street Address]'}
 ${formData.llcCity || '[City]'}, ${formData.llcState || '[State]'} ${formData.llcZip || '[ZIP]'}
 
 To: Internal Revenue Service, ITIN Operations
-Re: Certification of anticipated U.S.-source income – W-7 Exception 1(c)
+${subjectLine}
 
-I, ${formData.managingMember || '[Managing Member Name]'}, Managing Member of ${formData.llcName || '[LLC Name]'} (EIN ${formData.ein || '[EIN]'}), certify under penalties of perjury that:
+I, ${formData.managingMember || '[Managing Member Name]'}, Managing Member of ${llcName} (EIN ${formData.ein || '[EIN]'}), certify under penalties of perjury that:
 
-1. ${formData.ownerName || '[Owner Name]'}, a resident of ${countryName} and sole member of ${formData.llcName || '[LLC Name]'}, will receive periodic capital-account distributions that constitute U.S.-source interest income within the meaning of IRC § 861(a)(1).
+${points.join('\n\n')}
 
-2. The distributions are subject to withholding under IRC § 1441 unless the owner provides a valid Form W-8BEN with a U.S. ITIN to claim benefits of ${treaty ? treaty.article : '[Treaty Article]'} of the ${treaty ? treaty.treatyName : '[Treaty Name]'}, which limits withholding on interest to ${treaty ? treaty.rate : '[Rate]'}.
-
-3. ${formData.llcName || '[LLC Name]'} will act as withholding agent and will file Form 1042-S reporting those amounts.
-
-Accordingly, an ITIN is required solely to furnish on Form W-8BEN and Form 1042-S; the owner is not otherwise required to file a U.S. income-tax return.
+${conclusion}
 
 ________________________ Date: ${formData.date || '[Date]'}
 ${formData.managingMember || '[Managing Member Name]'}
-Managing Member, ${formData.llcName || '[LLC Name]'}`;
+Managing Member, ${llcName}`;
   };
 
   const getHighlightedText = () => {
@@ -290,7 +452,7 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
     if (!lastChanged || !text) return text;
     
     const highlightValue = (value) => {
-      if (!value) return '';
+      if (!value) return text;
       const escapedValue = value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       return text.replace(new RegExp(`\\b${escapedValue}\\b`, 'g'), `<span class="highlighted-text">${value}</span>`);
     };
@@ -324,16 +486,32 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
         text = highlightValue(formData.date);
         break;
       case 'country':
-        if (formData.country && treatyData[formData.country]) {
-          const treaty = treatyData[formData.country];
+        if (formData.country) {
           const countryName = formData.country.charAt(0).toUpperCase() + formData.country.slice(1);
           text = text.replace(new RegExp(`\\b${countryName}\\b`, 'g'), `<span class="highlighted-text">${countryName}</span>`);
-          text = text.replace(new RegExp(`\\b${treaty.rate}\\b`, 'g'), `<span class="highlighted-text">${treaty.rate}</span>`);
-          text = text.replace(new RegExp(`\\b${treaty.article}\\b`, 'g'), `<span class="highlighted-text">${treaty.article}</span>`);
+        }
+
+        const countryDetails = getActiveTreatyDetails();
+        if (countryDetails) {
+          text = text.replace(new RegExp(`\\b${countryDetails.rate}\\b`, 'g'), `<span class="highlighted-text">${countryDetails.rate}</span>`);
+          text = text.replace(new RegExp(`\\b${countryDetails.article}\\b`, 'g'), `<span class="highlighted-text">${countryDetails.article}</span>`);
         }
         break;
+      case 'incomeType':
+        const incomeDetails = getActiveTreatyDetails();
+        if (incomeDetails) {
+          text = text.replace(new RegExp(`\\b${incomeDetails.rate}\\b`, 'g'), `<span class="highlighted-text">${incomeDetails.rate}</span>`);
+          text = text.replace(new RegExp(`\\b${incomeDetails.article}\\b`, 'g'), `<span class="highlighted-text">${incomeDetails.article}</span>`);
+        }
+        break;
+      case 'fatcaStatus':
+        text = highlightValue(formData.fatcaStatus);
+        break;
+      case 'giin':
+        text = highlightValue(formData.giin);
+        break;
     }
-    
+
     return text;
   };
 
@@ -412,6 +590,8 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
     printWindow.print();
   };
 
+  const activeTreatyDetails = getActiveTreatyDetails();
+
   return (
     <div className="container">
       <div className="form-section">
@@ -458,14 +638,37 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
             <option value="bulgaria">{t.countryOptions.bulgaria}</option>
           </select>
           {errors.country && <span className="error-message">{errors.country}</span>}
-          {formData.country && treatyData[formData.country] && (
+          {formData.country && activeTreatyDetails && (
             <div className="treaty-info">
               <strong>{t.treatyInfo}</strong>
-              <p>{treatyData[formData.country].description[language]}</p>
-              <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
+              {formData.country === 'austria' && (
+                <div className="income-type-toggle">
+                  <div className="toggle-label">
+                    <span>{t.incomeTypeLabel} {t.required}</span>
+                    <span className="tooltip" title={t.incomeTypeHelp}>ℹ️</span>
+                  </div>
+                  <div className="toggle-group">
+                    {Object.keys(t.incomeTypeOptions).map((type) => (
+                      <label key={type} className={`toggle-option ${formData.incomeType === type ? 'active' : ''}`}>
+                        <input
+                          type="radio"
+                          name="incomeType"
+                          value={type}
+                          checked={formData.incomeType === type}
+                          onChange={(e) => handleInputChange('incomeType', e.target.value)}
+                        />
+                        {t.incomeTypeOptions[type]}
+                      </label>
+                    ))}
+                  </div>
+                  {errors.incomeType && <span className="error-message">{errors.incomeType}</span>}
+                </div>
+              )}
+              <p>{activeTreatyDetails.description[language]}</p>
+              <a href={activeTreatyDetails.irsLink} target="_blank" rel="noopener noreferrer">
                 {t.viewTreaty.replace('{country}', t.countryOptions[formData.country])}
               </a>
-              {formData.country === 'austria' && (
+              {formData.country === 'austria' && activeTreatyDetails.activeIncomeType === 'interest' && (
                 <div className="triangular-note">
                   <span className="tooltip" title={t.austriaTriangularTooltip}>ℹ️</span>
                   <span>{t.austriaTriangularNote}</span>
@@ -617,6 +820,68 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
             <small>{t.managingMemberHelp}</small>
           </div>
         </div>
+
+        <div className="form-group">
+          <label>
+            {t.ownerTypeLabel} {t.required}
+            <span className="tooltip" title={t.ownerTypeHelp}>ℹ️</span>
+          </label>
+          <div className="toggle-group">
+            {Object.keys(t.ownerTypeOptions).map((type) => (
+              <label key={type} className={`toggle-option ${formData.ownerType === type ? 'active' : ''}`}>
+                <input
+                  type="radio"
+                  name="ownerType"
+                  value={type}
+                  checked={formData.ownerType === type}
+                  onChange={(e) => handleInputChange('ownerType', e.target.value)}
+                />
+                {t.ownerTypeOptions[type]}
+              </label>
+            ))}
+          </div>
+          {errors.ownerType && <span className="error-message">{errors.ownerType}</span>}
+          <div className="field-help">
+            <small>{formData.ownerType === 'entity' ? t.entityNote : t.individualNote}</small>
+          </div>
+        </div>
+
+        {formData.ownerType === 'entity' && (
+          <>
+            <div className="form-group">
+              <label htmlFor="fatcaStatus">
+                {t.fatcaStatusLabel} {t.required}
+              </label>
+              <input
+                type="text"
+                id="fatcaStatus"
+                value={formData.fatcaStatus}
+                onChange={(e) => handleInputChange('fatcaStatus', e.target.value)}
+                className={errors.fatcaStatus ? 'error' : ''}
+                placeholder={t.fatcaStatusPlaceholder}
+              />
+              {errors.fatcaStatus && <span className="error-message">{errors.fatcaStatus}</span>}
+            </div>
+
+            <div className="form-group">
+              <label htmlFor="giin">
+                {t.giinLabel} {t.required}
+              </label>
+              <input
+                type="text"
+                id="giin"
+                value={formData.giin}
+                onChange={(e) => handleInputChange('giin', e.target.value)}
+                className={errors.giin ? 'error' : ''}
+                placeholder={t.giinPlaceholder}
+              />
+              {errors.giin && <span className="error-message">{errors.giin}</span>}
+              <div className="field-help">
+                <small>{t.giinHelp}</small>
+              </div>
+            </div>
+          </>
+        )}
 
         <div className="form-group">
           <label htmlFor="ownerName">
