@@ -11,12 +11,15 @@ const translations = {
     viewTreaty: "📄 View US-{country} IRS Treaty Documents",
     countryOptions: {
       germany: "Germany",
+      austria: "Austria",
       malta: "Malta",
       thailand: "Thailand",
       cyprus: "Cyprus",
       switzerland: "Switzerland",
       bulgaria: "Bulgaria"
     },
+    austriaTriangularNote: "Article 11(4) removes the 0% benefit if the interest is attributable to a low-tax third-country PE (unless the treaty carve-outs apply).",
+    austriaTriangularTooltip: "Applies when the Austrian beneficial owner earns the interest through a permanent establishment in another country with a preferential regime.",
     llcNameLabel: "LLC Name",
     llcNameTooltip: "Enter the full legal name of the LLC as it appears on IRS documents.",
     llcNamePlaceholder: "Enter LLC name (e.g., ABC Investment LLC)",
@@ -68,12 +71,15 @@ const translations = {
     viewTreaty: "📄 US-{country} IRS-Abkommensdokumente anzeigen",
     countryOptions: {
       germany: "Deutschland",
+      austria: "Österreich",
       malta: "Malta",
       thailand: "Thailand",
       cyprus: "Zypern",
       switzerland: "Schweiz",
       bulgaria: "Bulgarien"
     },
+    austriaTriangularNote: "Artikel 11(4) streicht den 0%-Satz, wenn die Zinsen einer Betriebsstätte in einem Niedrigsteuer-Drittland zuzurechnen sind (sofern keine Ausnahmen greifen).",
+    austriaTriangularTooltip: "Gilt, wenn der österreichische Nutzungsberechtigte die Zinsen über eine Betriebsstätte in einem anderen Staat mit Präferenzregime erzielt.",
     llcNameLabel: "LLC-Name",
     llcNameTooltip: "Geben Sie den vollständigen rechtlichen Namen der LLC ein, wie er in den IRS-Dokumenten erscheint.",
     llcNamePlaceholder: "LLC-Name eingeben (z.B. ABC Investment LLC)",
@@ -119,7 +125,7 @@ const translations = {
 
 const treatyData = {
   germany: {
-    article: 'Article 11',
+    article: 'Article 11(1)',
     rate: '0%',
     treatyName: 'U.S.–Germany tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/germany-tax-treaty-documents',
@@ -128,8 +134,18 @@ const treatyData = {
       de: 'Deutschland hat einen 0% Quellensteuerabzug auf Zinsen unter Artikel 11 des US-Deutschland-Steuerabkommens. Dies ermöglicht eine ausschließliche Besteuerung am Wohnsitz für Zinserträge.'
     }
   },
-  malta: {
+  austria: {
     article: 'Article 11',
+    rate: '0%',
+    treatyName: 'U.S.–Austria tax treaty',
+    irsLink: 'https://www.irs.gov/businesses/international-businesses/austria-tax-treaty-documents',
+    description: {
+      en: 'Austria exempts interest from U.S. withholding under Article 11 when the Austrian resident is the beneficial owner. Dividends are 5% with ≥10% voting control or 15% otherwise, and royalties are generally taxable only in the residence state (films/TV up to 10%). Article 11(4) contains a triangular permanent establishment limitation.',
+      de: 'Österreich befreit Zinsen gemäß Artikel 11 des US-Österreich-Steuerabkommens von der US-Quellensteuer, sofern der österreichische Nutzungsberechtigte Eigentümer der Einkünfte ist. Dividenden unterliegen 5% bei ≥10% Stimmrechtsbeteiligung oder 15% sonst, und Lizenzgebühren sind grundsätzlich nur im Wohnsitzstaat steuerpflichtig (Film/Fernsehen bis zu 10%). Artikel 11(4) enthält eine Dreiecksbetriebsstätten-Beschränkung.'
+    }
+  },
+  malta: {
+    article: 'Article 11(2)',
     rate: '10%',
     treatyName: 'U.S.–Malta tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/malta-tax-treaty-documents',
@@ -149,7 +165,7 @@ const treatyData = {
     }
   },
   cyprus: {
-    article: 'Article 13',
+    article: 'Article 13(2)',
     rate: '10%',
     treatyName: 'U.S.–Cyprus tax treaty (TIAS 11-167)',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/cyprus-tax-treaty-documents',
@@ -159,7 +175,7 @@ const treatyData = {
     }
   },
   switzerland: {
-    article: 'Article 11',
+    article: 'Article 11(1)',
     rate: '0%',
     treatyName: 'U.S.–Switzerland tax treaty',
     irsLink: 'https://www.irs.gov/businesses/international-businesses/switzerland-tax-treaty-documents',
@@ -434,6 +450,7 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
           >
             <option value="">{t.selectCountry}</option>
             <option value="germany">{t.countryOptions.germany}</option>
+            <option value="austria">{t.countryOptions.austria}</option>
             <option value="malta">{t.countryOptions.malta}</option>
             <option value="thailand">{t.countryOptions.thailand}</option>
             <option value="cyprus">{t.countryOptions.cyprus}</option>
@@ -448,6 +465,12 @@ Managing Member, ${formData.llcName || '[LLC Name]'}`;
               <a href={treatyData[formData.country].irsLink} target="_blank" rel="noopener noreferrer">
                 {t.viewTreaty.replace('{country}', t.countryOptions[formData.country])}
               </a>
+              {formData.country === 'austria' && (
+                <div className="triangular-note">
+                  <span className="tooltip" title={t.austriaTriangularTooltip}>ℹ️</span>
+                  <span>{t.austriaTriangularNote}</span>
+                </div>
+              )}
               {formData.country === 'bulgaria' && (
                 <div className="contingent-interest-info">
                   <button 
