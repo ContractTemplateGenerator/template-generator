@@ -10,7 +10,20 @@ Automate tedious tracked-changes edits in Microsoft Word documents. Paste your u
 
 ## Quick Start
 
-### Option 1 – Fast edits (preferred)
+### Option 1 – Track-change output (new)
+
+When you want a Word doc that already contains tracked changes:
+
+```bash
+python3 track_redliner.py /path/to/contract.docx
+```
+
+- Reads instructions from the clipboard (or `--instructions file.txt`).
+- Writes `/path/to/contract_redline.docx` with Word `w:ins` / `w:del` markup, ready for accept/reject workflows.
+- Operates at paragraph text level; if a clause has heavy inline styling, review the output and tidy formatting after generating the redline.
+- Stamp your name with `--author "Jane Lawyer"`.
+
+### Option 2 – Fast edits + manual Compare
 
 1. Copy your instructions (format below) to the clipboard.
 2. From Terminal, run:
@@ -24,7 +37,7 @@ Automate tedious tracked-changes edits in Microsoft Word documents. Paste your u
 
 This sidesteps the brittle macOS automation and usually finishes faster.
 
-### Option 2 – Experimental Word automation
+### Option 3 – Experimental Word automation
 
 `redliner.py` contains the AppleScript/VBA approach. It remains for reference but proved unreliable on macOS Word; use only if you want to continue that investigation.
 

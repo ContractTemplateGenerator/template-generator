@@ -99,6 +99,16 @@ const PRIVACY_TOGGLE_LABELS = {
     financialPrivacy: 'Financial Information'
 };
 
+const TOGGLE_TO_RISK_KEY = {
+    healthPrivacy: 'healthInfo',
+    professionalProtection: 'professionalRep',
+    mediaProtection: 'visualMedia',
+    venuePrivacy: 'venueInformation',
+    communityPrivacy: 'alternativeLifestyle',
+    therapeuticException: 'therapeuticDisclosure',
+    financialPrivacy: 'financialInfo'
+};
+
 const PRIVACY_LEVEL_RECOMMENDATIONS = {
     1: {
         on: [],
@@ -113,6 +123,12 @@ const PRIVACY_LEVEL_RECOMMENDATIONS = {
         off: []
     }
 };
+
+const PAYWALL_PRICE = '14.95';
+const PAYWALL_STORAGE_KEY = 'al-nda-paywall-paid';
+const PAYWALL_PRODUCT_LABEL = 'Alternative Lifestyle NDA Generator – Export Unlock';
+const PAYPAL_CLIENT_ID = 'ASmwKug6zVE_78S-152YKAzzh2iH8VgSjs-P6RkrWcfqdznNjeE_UYwKJkuJ3BvIJrxCotS8GtXEJ2fx';
+const PAYPAL_SDK_URL = `https://www.paypal.com/sdk/js?client-id=${PAYPAL_CLIENT_ID}&currency=USD`;
 
 const RETENTION_OPTIONS = [
     {
@@ -148,6 +164,14 @@ const RETENTION_SUMMARY = RETENTION_OPTIONS.reduce((acc, option) => {
     }
     return acc;
 }, {});
+
+const TAB_CONFIG = [
+    { key: 'basics', label: 'Basic Info', className: 'tab-basics' },
+    { key: 'privacy', label: 'Privacy Level', className: 'tab-privacy' },
+    { key: 'trusted', label: 'Trusted Support', className: 'tab-trusted' },
+    { key: 'advanced', label: 'Advanced Options', className: 'tab-advanced' },
+    { key: 'risk', label: 'Risk Assessment', className: 'tab-risk' }
+];
 
 const INDUSTRY_GUIDANCE = {
     healthcare: {
@@ -201,6 +225,23 @@ const normalizeParticipants = (participants = []) => {
         requiresNDA: typeof participant?.requiresNDA === 'boolean' ? participant.requiresNDA : true,
         requiresNotice: typeof participant?.requiresNotice === 'boolean' ? participant.requiresNotice : true
     }));
+};
+
+const sanitizeParticipantEntries = (participants = []) => {
+    if (!Array.isArray(participants)) {
+        return [];
+    }
+
+    return participants
+        .map((participant) => ({
+            id: participant?.id,
+            name: (participant?.name || '').trim(),
+            role: (participant?.role || '').trim(),
+            requiresNDA: typeof participant?.requiresNDA === 'boolean' ? participant.requiresNDA : true,
+            requiresNotice: typeof participant?.requiresNotice === 'boolean' ? participant.requiresNotice : true,
+            notes: (participant?.notes || '').trim()
+        }))
+        .filter((participant) => participant.name || participant.role || participant.notes);
 };
 
 const createInitialFormData = () => ({
@@ -265,15 +306,15 @@ const FIELD_TO_CLAUSE_MAP = {
     customRetentionTimeline: 'return-destruction-clause',
     storagePractices: 'return-destruction-clause',
     assetInventory: 'annex-protected-materials',
-    industryHealthcare: 'industry-compliance-clause',
-    industryGovernment: 'industry-compliance-clause',
-    industryEducation: 'industry-compliance-clause',
-    industryFinance: 'industry-compliance-clause',
-    careerSensitive: 'industry-compliance-clause',
-    publicFigure: 'industry-compliance-clause',
-    securityClearance: 'industry-compliance-clause',
-    educationField: 'industry-compliance-clause',
-    industryNotes: 'industry-compliance-clause'
+    industryHealthcare: null,
+    industryGovernment: null,
+    industryEducation: null,
+    industryFinance: null,
+    careerSensitive: null,
+    publicFigure: null,
+    securityClearance: null,
+    educationField: null,
+    industryNotes: null
 };
 
 function AlternativeLifestyleNDAGenerator() {
@@ -282,6 +323,27 @@ function AlternativeLifestyleNDAGenerator() {
     const [autoSaved, setAutoSaved] = useState(false);
 
     const [formData, setFormData] = useState(() => createInitialFormData());
+    const [isPaid, setIsPaid] = useState(false);
+    const [showPaywall, setShowPaywall] = useState(false);
+    const [paypalReady, setPaypalReady] = useState(false);
+
+    const activeTrustedParticipants = useMemo(
+        () => sanitizeParticipantEntries(formData.thirdPartyParticipants),
+        [formData.thirdPartyParticipants]
+    );
+
+    const selectedPrivacyToggles = useMemo(
+        () => Object.keys(PRIVACY_TOGGLE_LABELS).filter((key) => formData[key]),
+        [
+            formData.healthPrivacy,
+            formData.professionalProtection,
+            formData.mediaProtection,
+            formData.venuePrivacy,
+            formData.communityPrivacy,
+            formData.therapeuticException,
+            formData.financialPrivacy
+        ]
+    );
 
     const [highlightedClause, setHighlightedClause] = useState(null);
     const [sliderAdjustmentNote, setSliderAdjustmentNote] = useState('');
@@ -291,6 +353,151 @@ function AlternativeLifestyleNDAGenerator() {
     const clauseRefCallbacks = useRef({});
     const highlightTimeoutRef = useRef(null);
     const sliderNoteTimeoutRef = useRef(null);
+    const paypalButtonsInstanceRef = useRef(null);
+    const paypalContainerRef = useRef(null);
+
+    const persistPaywallStatus = useCallback((status) => {
+        try {
+            localStorage.setItem(PAYWALL_STORAGE_KEY, JSON.stringify(status));
+        } catch (error) {
+            console.warn('Failed to persist paywall status', error);
+        }
+    }, []);
+
+    const loadStoredPaywallStatus = useCallback(() => {
+        try {
+            const saved = localStorage.getItem(PAYWALL_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                return Boolean(parsed?.paid);
+            }
+        } catch (error) {
+            console.warn('Failed to load paywall status', error);
+        }
+        return false;
+    }, []);
+
+    const markPaid = useCallback((transactionId = null) => {
+        const status = {
+            paid: true,
+            transactionId,
+            paidAt: Date.now()
+        };
+        setIsPaid(true);
+        persistPaywallStatus(status);
+    }, [persistPaywallStatus]);
+
+    const ensurePaypalScript = useCallback(() => {
+        if (window.paypal) {
+            setPaypalReady(true);
+            return Promise.resolve();
+        }
+
+        return new Promise((resolve, reject) => {
+            const existing = document.querySelector('script[data-paypal-sdk="al-nda"]');
+            const handleLoad = () => {
+                setPaypalReady(true);
+                resolve();
+            };
+            const handleError = () => {
+                setPaypalReady(false);
+                reject(new Error('PayPal SDK failed to load'));
+            };
+
+            if (existing) {
+                existing.addEventListener('load', handleLoad, { once: true });
+                existing.addEventListener('error', handleError, { once: true });
+                return;
+            }
+
+            const script = document.createElement('script');
+            script.src = PAYPAL_SDK_URL;
+            script.async = true;
+            script.dataset.paypalSdk = 'al-nda';
+            script.addEventListener('load', handleLoad, { once: true });
+            script.addEventListener('error', handleError, { once: true });
+            document.head.appendChild(script);
+        });
+    }, []);
+
+    const handlePaymentSuccess = useCallback((order) => {
+        const transactionId = order?.id || null;
+        markPaid(transactionId);
+        setShowPaywall(false);
+    }, [markPaid]);
+
+    const handlePaywallOpen = useCallback(() => {
+        setShowPaywall(true);
+    }, []);
+
+    const handlePaywallClose = useCallback(() => {
+        setShowPaywall(false);
+    }, []);
+
+    const handlePreviewCopy = useCallback((event) => {
+        if (!isPaid) {
+            event.preventDefault();
+            setShowPaywall(true);
+        }
+    }, [isPaid]);
+
+    const renderPaypalButtons = useCallback(() => {
+        if (!window.paypal || !paypalContainerRef.current) {
+            return;
+        }
+
+        if (paypalButtonsInstanceRef.current && typeof paypalButtonsInstanceRef.current.close === 'function') {
+            paypalButtonsInstanceRef.current.close();
+        }
+
+        paypalContainerRef.current.innerHTML = '';
+
+        try {
+            const buttons = window.paypal.Buttons({
+                style: {
+                    layout: 'vertical',
+                    color: 'blue',
+                    shape: 'rect',
+                    label: 'pay'
+                },
+                createOrder: (data, actions) => actions.order.create({
+                    purchase_units: [
+                        {
+                            amount: {
+                                value: PAYWALL_PRICE,
+                                currency_code: 'USD'
+                            },
+                            description: PAYWALL_PRODUCT_LABEL
+                        }
+                    ],
+                    application_context: {
+                        shipping_preference: 'NO_SHIPPING'
+                    }
+                }),
+                onApprove: async (data, actions) => {
+                    try {
+                        const order = await actions.order.capture();
+                        handlePaymentSuccess(order);
+                    } catch (error) {
+                        console.error('Unable to capture PayPal order', error);
+                        alert('Payment capture failed. Please try again.');
+                    }
+                },
+                onError: (error) => {
+                    console.error('PayPal payment error', error);
+                    alert('Payment failed. Please try again or contact support.');
+                },
+                onCancel: () => {
+                    console.info('PayPal payment cancelled by user');
+                }
+            });
+
+            paypalButtonsInstanceRef.current = buttons;
+            buttons.render(paypalContainerRef.current);
+        } catch (error) {
+            console.error('Failed to initialise PayPal buttons', error);
+        }
+    }, [handlePaymentSuccess]);
 
     const getClauseRefCallback = useCallback((id) => {
         if (!clauseRefCallbacks.current[id]) {
@@ -304,6 +511,48 @@ function AlternativeLifestyleNDAGenerator() {
         }
         return clauseRefCallbacks.current[id];
     }, []);
+
+    useEffect(() => {
+        if (loadStoredPaywallStatus()) {
+            setIsPaid(true);
+        }
+    }, [loadStoredPaywallStatus]);
+
+    useEffect(() => {
+        const handleStorageEvent = (event) => {
+            if (event.key === PAYWALL_STORAGE_KEY) {
+                setIsPaid(loadStoredPaywallStatus());
+            }
+        };
+
+        window.addEventListener('storage', handleStorageEvent);
+        return () => window.removeEventListener('storage', handleStorageEvent);
+    }, [loadStoredPaywallStatus]);
+
+    useEffect(() => {
+        if (!showPaywall) {
+            return;
+        }
+
+        ensurePaypalScript().catch((error) => {
+            console.error('Unable to load PayPal SDK', error);
+        });
+    }, [showPaywall, ensurePaypalScript]);
+
+    useEffect(() => {
+        if (!showPaywall || !paypalReady) {
+            return undefined;
+        }
+
+        renderPaypalButtons();
+
+        return () => {
+            if (paypalButtonsInstanceRef.current && typeof paypalButtonsInstanceRef.current.close === 'function') {
+                paypalButtonsInstanceRef.current.close();
+            }
+            paypalButtonsInstanceRef.current = null;
+        };
+    }, [showPaywall, paypalReady, renderPaypalButtons]);
 
     useEffect(() => {
         return () => {
@@ -532,14 +781,7 @@ function AlternativeLifestyleNDAGenerator() {
             .map((line) => line.trim())
             .filter(Boolean);
 
-        const activeParticipants = (formData.thirdPartyParticipants || []).map((participant) => ({
-            id: participant.id,
-            name: (participant.name || '').trim(),
-            role: (participant.role || '').trim(),
-            requiresNDA: typeof participant.requiresNDA === 'boolean' ? participant.requiresNDA : true,
-            requiresNotice: typeof participant.requiresNotice === 'boolean' ? participant.requiresNotice : true,
-            notes: (participant.notes || '').trim()
-        })).filter((participant) => participant.name || participant.role || participant.notes);
+        const activeParticipants = sanitizeParticipantEntries(formData.thirdPartyParticipants);
 
         const formatParticipant = (participant) => {
             const displayName = participant.name || 'Approved participant';
@@ -644,22 +886,6 @@ function AlternativeLifestyleNDAGenerator() {
         }
         addClause('third-party-obligations', 'THIRD-PARTY OBLIGATIONS', thirdPartyBody);
 
-        if (industryDetails.length || sensitivityItems.length || industryNotes) {
-            const industryBody = [];
-            if (industryDetails.length) {
-                industryBody.push({ type: 'text', text: 'Industry-specific compliance considerations selected:' });
-                industryBody.push({ type: 'list', items: industryDetails.map((detail) => `${detail.label}: ${detail.clauseText}`) });
-            }
-            if (sensitivityItems.length) {
-                industryBody.push({ type: 'text', text: 'Additional risk indicators flagged by the parties:' });
-                industryBody.push({ type: 'list', items: sensitivityItems });
-            }
-            if (industryNotes) {
-                industryBody.push({ type: 'text', text: `Additional notes: ${industryNotes}` });
-            }
-            addClause('industry-compliance-clause', 'COMPLIANCE WITH PROFESSIONAL OBLIGATIONS', industryBody);
-        }
-
         addClause('general-provisions', 'GENERAL PROVISIONS', [
             { type: 'text', text: `This Agreement shall be governed by the laws of ${jurisdictionText} without regard to conflict of law principles. If any provision is found unenforceable, the remainder shall remain in full force and effect. This Agreement constitutes the entire understanding between the parties regarding confidentiality obligations and supersedes all prior negotiations, representations, or agreements relating to this subject matter. Any modifications must be in writing and signed by both parties. The failure to enforce any provision shall not constitute a waiver of that provision or any other provision.` }
         ]);
@@ -751,6 +977,11 @@ function AlternativeLifestyleNDAGenerator() {
     };
 
     const generateWordDoc = async () => {
+        if (!isPaid) {
+            setShowPaywall(true);
+            return;
+        }
+
         const docxLib = window.docx;
 
         if (!docxLib) {
@@ -760,10 +991,17 @@ function AlternativeLifestyleNDAGenerator() {
 
         const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docxLib;
 
+        const createRun = (text, overrides = {}) => new TextRun({
+            text,
+            size: 22,
+            font: 'Times New Roman',
+            ...overrides
+        });
+
         const docParagraphs = [];
 
         docParagraphs.push(new Paragraph({
-            text: ndaData.title,
+            children: [createRun(ndaData.title, { bold: true })],
             heading: HeadingLevel.HEADING_3,
             alignment: AlignmentType.CENTER,
             spacing: { after: 200 }
@@ -772,8 +1010,8 @@ function AlternativeLifestyleNDAGenerator() {
         ndaData.metadata.forEach((meta) => {
             docParagraphs.push(new Paragraph({
                 children: [
-                    new TextRun({ text: `${meta.label} `, bold: true }),
-                    new TextRun({ text: meta.value })
+                    createRun(`${meta.label} `, { bold: true }),
+                    createRun(meta.value)
                 ],
                 spacing: { after: 120 }
             }));
@@ -786,19 +1024,19 @@ function AlternativeLifestyleNDAGenerator() {
                 if (firstSegment.type === 'text') {
                     docParagraphs.push(new Paragraph({
                         children: [
-                            new TextRun({ text: `${clause.number}. ${clause.title}. `, bold: true }),
-                            new TextRun({ text: firstSegment.text })
+                            createRun(`${clause.number}. ${clause.title}. `, { bold: true }),
+                            createRun(firstSegment.text)
                         ],
                         spacing: { after: restSegments.length ? 100 : 200 }
                     }));
                 } else if (firstSegment.type === 'list') {
                     docParagraphs.push(new Paragraph({
-                        children: [new TextRun({ text: `${clause.number}. ${clause.title}.`, bold: true })],
+                        children: [createRun(`${clause.number}. ${clause.title}.`, { bold: true })],
                         spacing: { after: 60 }
                     }));
                     firstSegment.items.forEach((item) => {
                         docParagraphs.push(new Paragraph({
-                            text: item,
+                            children: [createRun(item)],
                             bullet: { level: 0 },
                             spacing: { after: 60 }
                         }));
@@ -809,13 +1047,13 @@ function AlternativeLifestyleNDAGenerator() {
             restSegments.forEach((segment) => {
                 if (segment.type === 'text') {
                     docParagraphs.push(new Paragraph({
-                        text: segment.text,
+                        children: [createRun(segment.text)],
                         spacing: { after: 120 }
                     }));
                 } else if (segment.type === 'list') {
                     segment.items.forEach((item) => {
                         docParagraphs.push(new Paragraph({
-                            text: item,
+                            children: [createRun(item)],
                             bullet: { level: 0 },
                             spacing: { after: 60 }
                         }));
@@ -825,28 +1063,38 @@ function AlternativeLifestyleNDAGenerator() {
         });
 
         docParagraphs.push(new Paragraph({
-            children: [new TextRun({ text: 'ACKNOWLEDGMENT AND EXECUTION.', bold: true })],
+            children: [createRun('ACKNOWLEDGMENT AND EXECUTION.', { bold: true })],
             spacing: { before: 200, after: 100 }
         }));
 
         docParagraphs.push(new Paragraph({
-            text: ndaData.acknowledgement,
+            children: [createRun(ndaData.acknowledgement)],
             spacing: { after: 200 }
         }));
 
         ndaData.signatureBlock.forEach((entry) => {
             docParagraphs.push(new Paragraph({
-                children: [new TextRun({ text: `${entry.label}: _________________________ Date: _________` })],
+                children: [createRun(`${entry.label}: _________________________ Date: _________`)],
                 spacing: { after: 60 }
             }));
             docParagraphs.push(new Paragraph({
-                text: entry.name,
+                children: [createRun(entry.name)],
                 spacing: { after: 160 }
             }));
         });
 
         try {
             const doc = new Document({
+                styles: {
+                    default: {
+                        document: {
+                            run: {
+                                font: 'Times New Roman',
+                                size: 22
+                            }
+                        }
+                    }
+                },
                 sections: [
                     {
                         properties: {},
@@ -871,6 +1119,11 @@ function AlternativeLifestyleNDAGenerator() {
     };
 
     const copyToClipboard = async () => {
+        if (!isPaid) {
+            setShowPaywall(true);
+            return;
+        }
+
         const textContent = ndaData.plainText;
 
         if (!textContent) {
@@ -932,36 +1185,16 @@ function AlternativeLifestyleNDAGenerator() {
                     <h2>Agreement Configuration</h2>
 
                     <div className="tabs">
-                        <button
-                            className={`tab ${activeTab === 'basics' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('basics')}
-                        >
-                            Basic Info
-                        </button>
-                        <button
-                            className={`tab ${activeTab === 'privacy' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('privacy')}
-                        >
-                            Privacy Level
-                        </button>
-                        <button
-                            className={`tab ${activeTab === 'professional' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('professional')}
-                        >
-                            Risk Assessment
-                        </button>
-                        <button
-                            className={`tab ${activeTab === 'participants' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('participants')}
-                        >
-                            Participants
-                        </button>
-                        <button
-                            className={`tab ${activeTab === 'advanced' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('advanced')}
-                        >
-                            Advanced
-                        </button>
+                        {TAB_CONFIG.map(({ key, label, className }) => (
+                            <button
+                                key={key}
+                                className={`tab ${className} ${activeTab === key ? 'active' : ''}`}
+                                onClick={() => setActiveTab(key)}
+                                type="button"
+                            >
+                                {label}
+                            </button>
+                        ))}
                     </div>
 
                     <div className={`tab-content ${activeTab === 'basics' ? 'active' : ''}`}>
@@ -1088,221 +1321,397 @@ function AlternativeLifestyleNDAGenerator() {
                             )}
                         </div>
 
-                        <div className="checkbox-group">
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="healthPrivacy"
-                                    checked={formData.healthPrivacy}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Health Information Privacy</label>
-                                <span className={`risk-level risk-${getRiskAssessment('healthInfo').level}`}>
-                                    {getRiskAssessment('healthInfo').level.toUpperCase()}
-                                </span>
-                            </div>
+                        <div className="hint-box info">
+                            <strong>Heads-up:</strong> Adjusting the slider will enable or disable recommended safeguards so Section 2 keeps building instead of shrinking.
+                        </div>
 
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="professionalProtection"
-                                    checked={formData.professionalProtection}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Professional Reputation Protection</label>
-                                <span className={`risk-level risk-${getRiskAssessment('professionalRep').level}`}>
-                                    {getRiskAssessment('professionalRep').level.toUpperCase()}
-                                </span>
-                            </div>
-
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="mediaProtection"
-                                    checked={formData.mediaProtection}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Photos and Media Protection</label>
-                                <span className={`risk-level risk-${getRiskAssessment('visualMedia').level}`}>
-                                    {getRiskAssessment('visualMedia').level.toUpperCase()}
-                                </span>
-                            </div>
-
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="venuePrivacy"
-                                    checked={formData.venuePrivacy}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Private Venue Information</label>
-                                <span className={`risk-level risk-${getRiskAssessment('venueInformation').level}`}>
-                                    {getRiskAssessment('venueInformation').level.toUpperCase()}
-                                </span>
-                            </div>
-
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="communityPrivacy"
-                                    checked={formData.communityPrivacy}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Community Participation Details</label>
-                                <span className={`risk-level risk-${getRiskAssessment('alternativeLifestyle').level}`}>
-                                    {getRiskAssessment('alternativeLifestyle').level.toUpperCase()}
-                                </span>
-                            </div>
-
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="financialPrivacy"
-                                    checked={formData.financialPrivacy}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Financial Information</label>
-                                <span className={`risk-level risk-${getRiskAssessment('financialInfo').level}`}>
-                                    {getRiskAssessment('financialInfo').level.toUpperCase()}
-                                </span>
-                            </div>
-
-                            <div className="checkbox-item">
-                                <input
-                                    type="checkbox"
-                                    name="therapeuticException"
-                                    checked={formData.therapeuticException}
-                                    onChange={handleInputChange}
-                                />
-                                <label>Therapeutic Communication Exception</label>
-                                <span className={`risk-level risk-${getRiskAssessment('therapeuticDisclosure').level}`}>
-                                    {getRiskAssessment('therapeuticDisclosure').level.toUpperCase()}
-                                </span>
-                            </div>
+                        <div className="checkbox-group privacy-toggle-list">
+                            {Object.entries(PRIVACY_TOGGLE_LABELS).map(([key, label]) => {
+                                const riskKey = TOGGLE_TO_RISK_KEY[key] || 'basicInfo';
+                                const riskMeta = getRiskAssessment(riskKey);
+                                return (
+                                    <label key={key} className={`checkbox-item ${formData[key] ? 'checked' : ''}`}>
+                                        <input
+                                            type="checkbox"
+                                            name={key}
+                                            checked={formData[key]}
+                                            onChange={handleInputChange}
+                                        />
+                                        <span>{label}</span>
+                                        <span className={`risk-level risk-${riskMeta.level}`}>
+                                            {riskMeta.level.toUpperCase()}
+                                        </span>
+                                    </label>
+                                );
+                            })}
                         </div>
                     </div>
 
-                    <div className={`tab-content ${activeTab === 'professional' ? 'active' : ''}`}>
-                        <h3>Professional Risk Assessment</h3>
-                        <p>This tool helps assess potential enforceability issues. <strong>This is educational information only, not legal advice.</strong></p>
+                    <div className={`tab-content ${activeTab === 'trusted' ? 'active' : ''}`}>
+                        <h3>Trusted Support Network</h3>
+                        <p className="tab-hint">List confidants such as therapists, pro-dommes, or logistics managers who may receive limited disclosures. Their obligations are reflected in the Third-Party clause and Annex.</p>
 
-                        <div className="risk-assessment">
-                            <h4>Career Sensitivity Factors</h4>
-                            <div className="checkbox-group">
-                                <div className="checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        name="careerSensitive"
-                                        checked={formData.careerSensitive}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label>Career could be affected by lifestyle disclosure</label>
-                                </div>
-                                <div className="checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        name="publicFigure"
-                                        checked={formData.publicFigure}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label>Public figure or media attention possible</label>
-                                </div>
-                                <div className="checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        name="securityClearance"
-                                        checked={formData.securityClearance}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label>Security clearance or government position</label>
-                                </div>
-                                <div className="checkbox-item">
-                                    <input
-                                        type="checkbox"
-                                        name="educationField"
-                                        checked={formData.educationField}
-                                        onChange={handleInputChange}
-                                    />
-                                    <label>Education or child-related profession</label>
-                                </div>
-                            </div>
-                        </div>
+                        {(formData.thirdPartyParticipants || []).map((participant, index) => {
+                            const disableRemoval = (formData.thirdPartyParticipants || []).length === 1;
+                            return (
+                                <div key={participant.id} className="participant-card">
+                                    <div className="participant-card-header">
+                                        <h4>Trusted Contact #{index + 1}</h4>
+                                        <button
+                                            type="button"
+                                            className="link-button"
+                                            onClick={() => removeParticipant(participant.id)}
+                                            disabled={disableRemoval}
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
 
-                        {(formData.careerSensitive || formData.publicFigure) && (
-                            <div className="warning-box">
-                                <strong>Recommendation:</strong> Consider maximum privacy level and professional legal consultation for high-stakes situations.
-                            </div>
-                        )}
+                                    <div className="form-grid two-column">
+                                        <div className="form-group">
+                                            <label>Name or Alias</label>
+                                            <input
+                                                type="text"
+                                                value={participant.name}
+                                                onChange={(e) => handleParticipantChange(participant.id, 'name', e.target.value)}
+                                                placeholder="e.g. Sam Therapist"
+                                            />
+                                        </div>
+                                        <div className="form-group">
+                                            <label>Role / Relationship</label>
+                                            <input
+                                                type="text"
+                                                value={participant.role}
+                                                onChange={(e) => handleParticipantChange(participant.id, 'role', e.target.value)}
+                                                placeholder="Therapist, Dungeon Monitor, etc."
+                                            />
+                                        </div>
+                                    </div>
 
-                        {formData.securityClearance && (
-                            <div className="error-box">
-                                <strong>Security Clearance Notice:</strong> Government security clearance holders should consult with security officers before signing any confidentiality agreements that could conflict with disclosure obligations.
-                            </div>
-                        )}
+                                    <div className="toggle-row">
+                                        <label className="toggle-control">
+                                            <input
+                                                type="checkbox"
+                                                checked={participant.requiresNDA}
+                                                onChange={(e) => handleParticipantChange(participant.id, 'requiresNDA', e.target.checked)}
+                                            />
+                                            <span>Separate NDA must be signed</span>
+                                        </label>
+                                        <label className="toggle-control">
+                                            <input
+                                                type="checkbox"
+                                                checked={participant.requiresNotice}
+                                                onChange={(e) => handleParticipantChange(participant.id, 'requiresNotice', e.target.checked)}
+                                            />
+                                            <span>Give the other party advance notice</span>
+                                        </label>
+                                    </div>
 
-                        <div className="risk-assessment">
-                            <h4>Key Legal Considerations</h4>
-                            <ul>
-                                <li><span className="risk-level risk-low">LOW RISK</span> Basic personal privacy - well-established legal protection</li>
-                                <li><span className="risk-level risk-low">LOW RISK</span> Consensual adult activities - protected private conduct</li>
-                                <li><span className="risk-level risk-medium">MEDIUM RISK</span> Health information - ensure HIPAA compliance considerations</li>
-                                <li><span className="risk-level risk-medium">MEDIUM RISK</span> Photos/media - requires clear consent documentation</li>
-                                <li><span className="risk-level risk-high">HIGH RISK</span> Financial details - avoid language suggesting commercial arrangements</li>
-                            </ul>
+                                    <div className="form-group">
+                                        <label>Disclosure Conditions / Notes</label>
+                                        <textarea
+                                            value={participant.notes}
+                                            onChange={(e) => handleParticipantChange(participant.id, 'notes', e.target.value)}
+                                            rows="2"
+                                            placeholder="Limit to crisis planning, coordinate scene safety, require copy of third-party NDA, etc."
+                                        />
+                                    </div>
+                                </div>
+                            );
+                        })}
+
+                        <button type="button" className="add-entry-btn" onClick={addParticipant}>
+                            + Add Trusted Contact
+                        </button>
+
+                        <div className="hint-box subtle">
+                            <strong>Reminder:</strong> Only contacts listed here (or approved later in writing) should receive Confidential Information.
                         </div>
                     </div>
 
                     <div className={`tab-content ${activeTab === 'advanced' ? 'active' : ''}`}>
+                        <h3>Advanced Safeguards</h3>
+                        <p className="tab-hint">Lock in destruction timelines and enforcement mechanics so the agreement stays tight if things go sideways.</p>
+
                         <div className="form-group">
-                            <label>Liquidated Damages ($ per violation - optional):</label>
+                            <label>Retention / Destruction Timeline</label>
+                            <select name="retentionTimeline" value={formData.retentionTimeline} onChange={handleInputChange}>
+                                {RETENTION_OPTIONS.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
+                            </select>
+                            <small className="help-text">Mirrors the Return & Destruction clause and appears in the risk summary.</small>
+                        </div>
+
+                        {formData.retentionTimeline === 'custom' && (
+                            <div className="form-group">
+                                <label>Custom Timeline Instructions</label>
+                                <textarea
+                                    name="customRetentionTimeline"
+                                    value={formData.customRetentionTimeline}
+                                    onChange={handleInputChange}
+                                    rows="3"
+                                    placeholder="Describe the purge cadence, checkpoints, and who certifies destruction."
+                                />
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label>Secure Storage Methods</label>
+                            <textarea
+                                name="storagePractices"
+                                value={formData.storagePractices}
+                                onChange={handleInputChange}
+                                rows="3"
+                                placeholder="Encrypted drive, locked cabinet, zero-retention messaging app, etc."
+                            />
+                            <small className="help-text">We mirror this in the Return & Destruction clause.</small>
+                        </div>
+
+                        <div className="form-group">
+                            <label>Protected Materials Inventory (Annex A)</label>
+                            <textarea
+                                name="assetInventory"
+                                value={formData.assetInventory}
+                                onChange={handleInputChange}
+                                rows="3"
+                                placeholder="One item per line: 'Shared photo vault (Dropbox)', 'Scene negotiation doc (Notion)', etc."
+                            />
+                        </div>
+
+                        <div className="form-group">
+                            <label>Liquidated Damages ($ per violation - optional)</label>
                             <input
                                 type="number"
                                 name="liquidatedDamages"
                                 value={formData.liquidatedDamages}
                                 onChange={handleInputChange}
                                 placeholder="e.g. 10000"
+                                min="0"
+                                step="100"
                             />
                         </div>
 
                         <div className="checkbox-group">
-                            <div className="checkbox-item">
+                            <label className="checkbox-item">
                                 <input
                                     type="checkbox"
                                     name="arbitration"
                                     checked={formData.arbitration}
                                     onChange={handleInputChange}
                                 />
-                                <label>Include arbitration clause (recommended for privacy)</label>
-                            </div>
-
-
+                                <span>Keep disputes in confidential arbitration (recommended)</span>
+                            </label>
                         </div>
 
                         <div className="form-group">
-                            <label>Additional Custom Terms:</label>
+                            <label>Additional Custom Terms</label>
                             <textarea
                                 name="additionalTerms"
                                 value={formData.additionalTerms}
                                 onChange={handleInputChange}
                                 rows="4"
-                                placeholder="Any additional specific terms or clarifications..."
+                                placeholder="Add fallback protocols, reference companion agreements, or record bespoke restrictions."
                             />
                         </div>
                     </div>
 
-                    <div style={{display: 'flex', gap: '10px', marginTop: '20px'}}>
-                        <button className="generate-btn" onClick={generateWordDoc} style={{flex: 1}}>
+                    <div className={`tab-content ${activeTab === 'risk' ? 'active' : ''}`}>
+                        <h3>Risk Assessment & Advisory</h3>
+                        <p className="tab-hint">This advisory is not part of the signed NDA. Use it to flag industry rules, mandated reporters, and reputation hotspots.</p>
+
+                        <div className="risk-summary-grid">
+                            <div className="risk-card">
+                                <h4>Current Safeguards</h4>
+                                <ul>
+                                    <li><strong>Privacy Level:</strong> {getPrivacyLevelText()}</li>
+                                    <li><strong>Enabled Protections:</strong> {selectedPrivacyToggles.length ? selectedPrivacyToggles.map((key) => PRIVACY_TOGGLE_LABELS[key]).join(', ') : 'None selected yet'}</li>
+                                    <li><strong>Trusted Contacts Configured:</strong> {activeTrustedParticipants.length}</li>
+                                    <li><strong>Retention Plan:</strong> {ndaData.retention.summary || 'Default 30-day rotation'}</li>
+                                </ul>
+                            </div>
+
+                            {ndaData.storagePractices && (
+                                <div className="risk-card">
+                                    <h4>Secure Storage Notes</h4>
+                                    <p>{ndaData.storagePractices}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="risk-card">
+                            <h4>Reputation & Clearance Flags</h4>
+                            <p>Check anything that could trigger PR crises, employment policies, or government reporting before you disclose.</p>
+                            <div className="checkbox-group">
+                                <label className={`checkbox-item ${formData.careerSensitive ? 'checked' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="careerSensitive"
+                                        checked={formData.careerSensitive}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>Career could be impacted if lifestyle details leak</span>
+                                </label>
+                                <label className={`checkbox-item ${formData.publicFigure ? 'checked' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="publicFigure"
+                                        checked={formData.publicFigure}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>Public figure / media exposure risk</span>
+                                </label>
+                                <label className={`checkbox-item ${formData.securityClearance ? 'checked' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="securityClearance"
+                                        checked={formData.securityClearance}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>Security clearance or government reporting obligations</span>
+                                </label>
+                                <label className={`checkbox-item ${formData.educationField ? 'checked' : ''}`}>
+                                    <input
+                                        type="checkbox"
+                                        name="educationField"
+                                        checked={formData.educationField}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>Educator / childcare professional (mandated reporter)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {(formData.careerSensitive || formData.publicFigure) && (
+                            <div className="risk-card warning">
+                                <h4>High-Visibility Reminder</h4>
+                                <p>Consider using the maximum privacy tier, tighten who appears in Annex A, and pre-draft media or HR statements in case of leaks.</p>
+                            </div>
+                        )}
+
+                        {formData.securityClearance && (
+                            <div className="risk-card caution">
+                                <h4>Security Clearance Notice</h4>
+                                <p>Coordinate with your security/compliance officer before execution. Clearance rules may require reporting certain relationships or NDAs.</p>
+                            </div>
+                        )}
+
+                        {formData.educationField && (
+                            <div className="risk-card warning">
+                                <h4>Mandated Reporter Reminder</h4>
+                                <p>Education and childcare professionals must report suspected abuse or imminent harm even if an NDA says otherwise. Document any disclosures in writing.</p>
+                            </div>
+                        )}
+
+                        <div className="risk-card">
+                            <h4>Industry & Reputation Safeguards</h4>
+                            <p>Select any industry triggers so we can highlight mandated disclosures and best practices.</p>
+                            <div className="industry-grid">
+                                {INDUSTRY_KEYS.map((key) => {
+                                    const stateKey = toIndustryStateKey(key);
+                                    const detail = INDUSTRY_GUIDANCE[key];
+                                    return (
+                                        <label key={key} className={`industry-pill ${formData[stateKey] ? 'selected' : ''}`}>
+                                            <input
+                                                type="checkbox"
+                                                name={stateKey}
+                                                checked={formData[stateKey]}
+                                                onChange={handleInputChange}
+                                            />
+                                            <span>{detail.label}</span>
+                                        </label>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        {ndaData.industryDetails.length > 0 && (
+                            <div className="risk-card warning">
+                                <h4>Tailored Warnings</h4>
+                                <ul>
+                                    {ndaData.industryDetails.map((detail) => (
+                                        <li key={detail.key}>
+                                            <strong>{detail.label}:</strong> {detail.warning}
+                                            {detail.recommended && detail.recommended.length > 0 && (
+                                                <div className="recommended-note">
+                                                    Recommended safeguards: {detail.recommended.map((toggle) => PRIVACY_TOGGLE_LABELS[toggle]).join(', ')}
+                                                </div>
+                                            )}
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        {(ndaData.sensitivityItems && ndaData.sensitivityItems.length > 0) && (
+                            <div className="risk-card caution">
+                                <h4>Additional Risk Flags</h4>
+                                <ul>
+                                    {ndaData.sensitivityItems.map((item, index) => (
+                                        <li key={`sensitivity-${index}`}>{item}</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        )}
+
+                        <div className="form-group">
+                            <label>Internal Notes (not in agreement)</label>
+                            <textarea
+                                name="industryNotes"
+                                value={formData.industryNotes}
+                                onChange={handleInputChange}
+                                rows="3"
+                                placeholder="Document compliance officers, PR plans, or reminders to loop in counsel."
+                            />
+                        </div>
+                    </div>
+
+                    <div className="export-actions">
+                        <button
+                            className="generate-btn"
+                            data-locked={!isPaid}
+                            onClick={generateWordDoc}
+                            type="button"
+                        >
                             Download MS Word
                         </button>
-                        <button className="generate-btn" onClick={copyToClipboard} style={{flex: 1, backgroundColor: '#27ae60'}}>
+                        <button
+                            className="generate-btn green"
+                            data-locked={!isPaid}
+                            onClick={copyToClipboard}
+                            type="button"
+                        >
                             Copy to Clipboard
                         </button>
                     </div>
+
+                    {!isPaid && (
+                        <div className="paywall-callout">
+                            <div>
+                                <strong>Locked:</strong> Copy and download unlock after a one-time ${PAYWALL_PRICE} secure payment.
+                            </div>
+                            <button type="button" className="paywall-trigger" onClick={handlePaywallOpen}>
+                                Unlock Now
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="preview-section">
                     <h2>Live Preview</h2>
-                    <div className="preview-content" ref={previewContainerRef}>
+                    <div
+                        className={`preview-content ${isPaid ? '' : 'locked'}`.trim()}
+                        ref={previewContainerRef}
+                        onCopy={handlePreviewCopy}
+                        onCut={handlePreviewCopy}
+                    >
+                        {!isPaid && (
+                            <div className="preview-lock-banner">
+                                🔒 Copy and download are locked until payment is completed.
+                            </div>
+                        )}
                         <h3>{ndaData.title}</h3>
                         {ndaData.metadata.map((meta) => (
                             <p
@@ -1397,6 +1806,36 @@ function AlternativeLifestyleNDAGenerator() {
             <div className={`auto-save-indicator ${autoSaved ? 'show' : ''}`}>
                 ✓ Draft auto-saved
             </div>
+
+            {showPaywall && (
+                <div className="paywall-modal-overlay" role="dialog" aria-modal="true">
+                    <div className="paywall-modal">
+                        <button
+                            type="button"
+                            className="paywall-close"
+                            aria-label="Close payment window"
+                            onClick={handlePaywallClose}
+                        >
+                            ×
+                        </button>
+                        <h3>Unlock Copy & Download</h3>
+                        <p>
+                            Complete a secure PayPal checkout to enable Word export and clipboard copying. Your live preview remains available regardless of payment.
+                        </p>
+                        <ul className="paywall-benefits">
+                            <li>Full .docx download with consistent 11 pt formatting</li>
+                            <li>Copy-ready plain text for redlining or email</li>
+                            <li>Persistent access on this device after payment</li>
+                        </ul>
+                        <div className="paypal-placeholder" ref={paypalContainerRef}>
+                            {!paypalReady && <p>Loading PayPal checkout…</p>}
+                        </div>
+                        <span className="paywall-note">
+                            Secured by PayPal · One-time payment of ${PAYWALL_PRICE} USD for {PAYWALL_PRODUCT_LABEL}
+                        </span>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
