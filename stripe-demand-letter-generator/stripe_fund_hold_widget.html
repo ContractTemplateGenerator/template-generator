@@ -1,527 +1,1465 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-            color: #1f2a44;
-            background: #f5f6fb;
-            padding: 20px;
-            min-height: 100vh;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 18px;
-            box-shadow: 0 20px 60px rgba(15, 23, 42, 0.12);
-            overflow: hidden;
-        }
-
-        .header {
-            padding: 40px;
-            background: white;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
-        }
-
-        .header::before {
-            content: '';
-            display: inline-block;
-            width: 56px;
-            height: 4px;
-            border-radius: 999px;
-            background: linear-gradient(90deg, #0052ff, #00c2ff);
-            margin-bottom: 18px;
-        }
-
-        .header p {
-            font-size: 18px;
-            color: #4a5568;
-            max-width: 960px;
-        }
-
-
-        .tabs {
-            display: flex;
-            background: #f8fafc;
-            border-bottom: 2px solid #e2e8f0;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .tab-button {
-            flex: 1;
-            min-width: 140px;
-            padding: 18px;
-            border: none;
-            background: transparent;
-            font-size: 15px;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-            white-space: nowrap;
-        }
-
-        .tab-button.active {
-            color: #0f172a;
-            background: #ffffff;
-        }
-
-        .tab-button.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: #007bff;
-        }
-
-        .tab-content {
-            display: none;
-            padding: 40px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .tab-content.active {
-            display: block;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 18px;
-            margin: 30px 0;
-        }
-
-        .stat-card {
-            background: #f8fafc;
-            border-radius: 14px;
-            padding: 22px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .stat-label {
-            font-size: 13px;
-            text-transform: uppercase;
-            color: #64748b;
-            letter-spacing: 0.05em;
-        }
-
-        .stat-value {
-            font-size: 28px;
-            font-weight: 700;
-            color: #0f172a;
-        }
-
-        .info-cards {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-            gap: 20px;
-        }
-
-        .info-card {
-            padding: 24px;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
-            background: #ffffff;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-        }
-
-        .info-card h3 {
-            font-size: 18px;
-            margin-bottom: 8px;
-            color: #0f172a;
-        }
-
-        .info-card p {
-            color: #475569;
-        }
-
-        .section-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: #0f172a;
-        }
-
-        .list-item {
-            margin-bottom: 14px;
-            border-left: 4px solid #007bff;
-            padding-left: 16px;
-        }
-
-        .list-item h4 {
-            font-size: 17px;
-            margin-bottom: 4px;
-            color: #111827;
-        }
-
-        .list-item p {
-            color: #475569;
-        }
-
-        .timeline {
-            position: relative;
-            margin: 30px 0;
-            padding-left: 32px;
-        }
-
-        .timeline::before {
-            content: '';
-            position: absolute;
-            left: 8px;
-            top: 0;
-            bottom: 0;
-            width: 3px;
-            background: linear-gradient(180deg, #007bff, #00c2ff);
-        }
-
-        .timeline-step {
-            position: relative;
-            margin-bottom: 28px;
-        }
-
-        .timeline-number {
-            position: absolute;
-            left: -32px;
-            top: 0;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            background: #0f172a;
-            color: white;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .timeline-step h3 {
-            font-size: 18px;
-            margin-bottom: 6px;
-            color: #0f172a;
-        }
-
-        .timeline-step p {
-            color: #475569;
-        }
-
-        .cta-box {
-            background: #f0f4ff;
-            border: 1px solid #dbeafe;
-            color: #0f172a;
-            border-radius: 14px;
-            padding: 28px;
-            margin-top: 30px;
-        }
-
-        .cta-box h3 {
-            font-size: 20px;
-            margin-bottom: 8px;
-        }
-
-        .badge-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 14px;
-            margin-top: 20px;
-        }
-
-        .badge {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            border-radius: 999px;
-            padding: 10px 18px;
-            font-size: 14px;
-            color: #1f2937;
-            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.05);
-        }
-
-        @media (max-width: 768px) {
-            .tab-content {
-                padding: 24px;
-            }
-
-            .header {
-                padding: 36px 20px;
-            }
-
-            .header h1 {
-                font-size: 26px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<style>
+  .stripe-hold-widget {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    max-width: 100%;
+    margin: 0 auto 40px auto;
+    color: #1a1a1a;
+    line-height: 1.6;
+  }
+  
+  .stripe-hold-widget * {
+    box-sizing: border-box;
+  }
+  
+  /* Hero Section */
+  .widget-hero {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .widget-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+  }
+  
+  .hero-title {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  
+  .hero-text {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 16px;
+  }
+  
+  /* Quick Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .stat-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 5px;
+  }
+  
+  .stat-label {
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  /* Tab Navigation */
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+  }
+  
+  .tab-button {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    position: relative;
+    bottom: -2px;
+  }
+  
+  .tab-button:hover {
+    background: #f8f9fa;
+    color: #dc2626;
+  }
+  
+  .tab-button.active {
+    background: white;
+    color: #dc2626;
+    border-color: #dc2626;
+    border-bottom: 2px solid white;
+    font-weight: 600;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Cards */
+  .info-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .info-card:hover {
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.1);
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .card-icon {
+    font-size: 24px;
+  }
+  
+  .card-content {
+    color: #495057;
+    line-height: 1.6;
+  }
+  
+  .card-content p {
+    margin: 0 0 12px 0;
+  }
+  
+  .card-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Problem Pattern Cards */
+  .pattern-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .pattern-card {
+    background: white;
+    border: 2px solid #fee2e2;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .pattern-header {
+    font-size: 18px;
+    font-weight: 700;
+    color: #dc2626;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .pattern-description {
+    color: #6c757d;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  /* Badge System */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+  
+  .badge-red {
+    background: #fee2e2;
+    color: #991b1b;
+  }
+  
+  .badge-orange {
+    background: #ffedd5;
+    color: #9a3412;
+  }
+  
+  .badge-yellow {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  
+  .badge-green {
+    background: #d1fae5;
+    color: #065f46;
+  }
+  
+  .badge-blue {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+  
+  /* Lists */
+  .styled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .styled-list li {
+    padding: 12px 0 12px 30px;
+    position: relative;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .styled-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .styled-list li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: #dc2626;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  
+  /* Warning/Info Boxes */
+  .alert-box {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+  }
+  
+  .alert-danger {
+    background: #fee;
+    border-color: #dc2626;
+    color: #991b1b;
+  }
+  
+  .alert-warning {
+    background: #fff8e1;
+    border-color: #f59e0b;
+    color: #b45309;
+  }
+  
+  .alert-success {
+    background: #d1f4e0;
+    border-color: #10b981;
+    color: #065f46;
+  }
+  
+  .alert-info {
+    background: #e7f3ff;
+    border-color: #0969da;
+    color: #0550ae;
+  }
+  
+  .alert-box strong {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+  
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #e9ecef;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-bottom: 25px;
+  }
+  
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  
+  .timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #dc2626;
+  }
+  
+  .timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .timeline-title {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  
+  .timeline-text {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  /* Table */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  .info-table th,
+  .info-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .info-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: #495057;
+  }
+  
+  .info-table tr:hover {
+    background: #f8f9fa;
+  }
+  
+  /* Generator Preview Box */
+  .generator-preview {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+    border: 2px solid #fbbf24;
+    border-radius: 12px;
+    padding: 25px;
+    margin: 20px 0;
+    text-align: center;
+  }
+  
+  .generator-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+  }
+  
+  .generator-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+  }
+  
+  .generator-description {
+    color: #6c757d;
+    margin-bottom: 20px;
+    font-size: 15px;
+  }
+  
+  .generator-button {
+    display: inline-block;
+    background: #dc2626;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  
+  .generator-button:hover {
+    background: #b91c1c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+  
+  /* FAQ Accordion */
+  .faq-section {
+    margin-top: 30px;
+  }
+  
+  .faq-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  
+  .faq-question {
+    padding: 18px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
+  }
+  
+  .faq-question:hover {
+    background: #f8f9fa;
+  }
+  
+  .faq-icon {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+    color: #dc2626;
+  }
+  
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+  
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .faq-answer-content {
+    padding: 0 20px 20px 20px;
+    color: #495057;
+    line-height: 1.6;
+  }
+  
+  .faq-item.active .faq-answer {
+    max-height: 2000px;
+  }
+  
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  .cta-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+  }
+  
+  .cta-text {
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+  }
+  
+  .cta-button {
+    display: inline-block;
+    background: white;
+    color: #dc2626;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .tab-nav {
+      gap: 5px;
+    }
+    
+    .tab-button {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    
+    .pattern-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .widget-hero {
+      padding: 20px;
+    }
+    
+    .hero-title {
+      font-size: 24px;
+    }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <p>Audio overview + definitive guide + interactive generator. Understand why Stripe locked your balance, what the contract really allows, and how the demand letter + AAA draft generator accelerates fund release.</p>
-        </div>
 
-        <div class="tabs">
-            <button class="tab-button active" onclick="showTab('overview')">Overview</button>
-            <button class="tab-button" onclick="showTab('patterns')">Hold Patterns</button>
-            <button class="tab-button" onclick="showTab('risk')">Risk Triggers</button>
-            <button class="tab-button" onclick="showTab('generator')">Generator & Legal Strategy</button>
-            <button class="tab-button" onclick="showTab('action')">Action Plan & Costs</button>
-        </div>
+<div class="stripe-hold-widget">
+  <!-- Hero Section -->
+  <div class="widget-hero">
+    <span class="hero-badge">Payment Processor Disputes</span>
+    <div class="hero-title">Stripe Fund Hold Recovery Guide</div>
+    <p class="hero-text">Legal strategies and automated demand letter generator to recover your withheld funds from Stripe</p>
+  </div>
 
-        <div id="overview" class="tab-content active">
-            <div class="section-title">What merchants are facing right now</div>
-            <p>Stripe’s Section 5 and 6 discretion gets cited for every hold, but California’s implied covenant of good faith and fair dealing still requires reasonable timelines and transparent criteria. The widget maps the problem and shows how our generator mirrors the packages we submit for clients.</p>
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-value">90-180</div>
+      <div class="stat-label">Days Typical Hold</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value">30 Days</div>
+      <div class="stat-label">Notice Required</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">$1,700+</div>
+      <div class="stat-label">AAA Filing Fee</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⚖️</div>
+      <div class="stat-value">Required</div>
+      <div class="stat-label">Arbitration</div>
+    </div>
+  </div>
 
-            <div class="stat-grid">
-                <div class="stat-card">
-                    <div class="stat-label">Typical hold window</div>
-                    <div class="stat-value">90–180 days</div>
-                    <p>yet many complaints cite holds well beyond 6 months.</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Average frozen balance</div>
-                    <div class="stat-value">$50K–$150K</div>
-                    <p>based on BBB, Reddit, and case files.</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Chargeback window</div>
-                    <div class="stat-value">120 days</div>
-                    <p>card network deadlines Stripe uses to justify holds.</p>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Generator outputs</div>
-                    <div class="stat-value">2 docs</div>
-                    <p>demand letter + AAA arbitration draft.</p>
-                </div>
-            </div>
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-button active" onclick="openTab(event, 'problem')">Problem</button>
+    <button class="tab-button" onclick="openTab(event, 'patterns')">Patterns</button>
+    <button class="tab-button" onclick="openTab(event, 'generator')">Generator</button>
+    <button class="tab-button" onclick="openTab(event, 'legal')">Legal</button>
+    <button class="tab-button" onclick="openTab(event, 'arbitration')">Arbitration</button>
+    <button class="tab-button" onclick="openTab(event, 'strategy')">Strategy</button>
+    <button class="tab-button" onclick="openTab(event, 'costs')">Costs</button>
+    <button class="tab-button" onclick="openTab(event, 'faq')">FAQ</button>
+  </div>
 
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>Support blackout</h3>
-                    <p>Chat/phone routes close after “risk reviews,” leaving merchants with unanswered email tickets.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Retroactive risk tags</h3>
-                    <p>Accounts with no disputes or chargebacks suddenly get labeled “high risk” after one big payout batch.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Shifting payout promises</h3>
-                    <p>Stripe emails often extend holds in 90-day increments with no substantive explanation.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Chargeback loop</h3>
-                    <p>Frozen funds prevent order fulfillment or refunds, creating disputes that justify further holds.</p>
-                </div>
-            </div>
-
-        </div>
-
-        <div id="patterns" class="tab-content">
-            <div class="section-title">Common hold scenarios pulled from user reports</div>
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>Indefinite terminations</h3>
-                    <p>Accounts are closed under Section 6.1(b), balances promised “after review,” yet payout dates slip for months.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Rolling 90-day emails</h3>
-                    <p>Merchants receive automated notices every 90 days stating funds require “additional review,” with no reasoning.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Retroactive high-risk flag</h3>
-                    <p>Stripe reclassifies businesses after a single large ACH or card batch, despite spotless dispute histories.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Support blackout</h3>
-                    <p>Phone, chat, and live support options disappear, forcing merchants into unanswered email loops.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Chargeback feedback loop</h3>
-                    <p>Without funds to fulfill or refund, customers dispute charges, increasing Stripe’s justification for holds.</p>
-                </div>
-            </div>
-
-            <div class="section-title" style="margin-top:32px;">Evidence sources</div>
-            <div class="badge-grid">
-                <div class="badge">BBB complaints (2024–2025)</div>
-                <div class="badge">Reddit /r/stripe threads</div>
-                <div class="badge">Trustpilot risk reports</div>
-                <div class="badge">Hacker News merchant posts</div>
-                <div class="badge">Client arbitration files</div>
-            </div>
-        </div>
-
-        <div id="risk" class="tab-content">
-            <div class="section-title">Risk factors Stripe watches</div>
-            <p>Use this tab to match Stripe’s risk models with your own counter-evidence so the demand letter anticipates their defenses.</p>
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>Volume spikes</h3>
-                    <p>Going from $500/day to $15K/day flags laundering concerns. Document launches, promos, or seasonal spikes.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Cross-border mix</h3>
-                    <p>Heavy international volume raises fraud risk. Keep KYC logs, IP records, and geolocation data.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Fulfillment delays</h3>
-                    <p>Extended shipping or unclear timelines correlate with disputes. Provide tracking data and fulfillment SOPs.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Quality complaints</h3>
-                    <p>Negative reviews on sizing or quality lead to proactive holds. Show return metrics and QA processes.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Business model drift</h3>
-                    <p>Operating differently than the onboarding questionnaire invites compliance reviews. Document every pivot.</p>
-                </div>
-                <div class="info-card">
-                    <h3>High-ticket ratios</h3>
-                    <p>Large transactions (> $500) receive extra scrutiny. Include signed authorizations and invoices.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="generator" class="tab-content">
-            <div class="section-title">What the generator delivers</div>
-            <p>The tool mirrors my two-document package: a detailed demand letter and an AAA Commercial Arbitration draft compliant with Section 13 of the Stripe Services Agreement.</p>
-
-            <div class="timeline">
-                <div class="timeline-step">
-                    <div class="timeline-number">1</div>
-                    <h3>Guided intake</h3>
-                    <p>Gather account IDs, frozen balance, promised payout dates, dispute ratios, international mix, and damages (inventory, payroll, financing costs).</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">2</div>
-                    <h3>Legal framing</h3>
-                    <p>Cites SSA Sections 5.3, 5.4, 5.6(b), 6.1(b), 6.2(i) plus the implied covenant of good faith and fair dealing under California law.</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">3</div>
-                    <h3>30-day notice compliance</h3>
-                    <p>Letter explicitly states it is the Section 13.3(a) notice, preventing procedural dismissal when filing arbitration.</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">4</div>
-                    <h3>AAA demand draft</h3>
-                    <p>Pre-populates parties, venue (San Francisco), claims (breach, conversion, implied covenant, Bus. & Prof. Code §17200), and relief (fund release + damages).</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">5</div>
-                    <h3>Export-ready files</h3>
-                    <p>Download DOCX and PDF versions to mail to Stripe Legal (certified) and attach to AAA WebFile submission.</p>
-                </div>
-            </div>
-
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>Documents Stripe wants</h3>
-                    <p>Invoices, shipment proofs, dispute logs, bank statements, compliance certificates—prompted throughout the intake.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Settlement leverage</h3>
-                    <p>Many cases settle once Stripe sees a draft AAA demand ready to file with fees queued.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Optional attorney review</h3>
-                    <p>Use the generated docs solo or hand them to counsel for final polish before filing.</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="action" class="tab-content">
-            <div class="section-title">Action plan & cost snapshot</div>
-            <div class="timeline">
-                <div class="timeline-step">
-                    <div class="timeline-number">A</div>
-                    <h3>Collect evidence</h3>
-                    <p>Statements, promised release emails, dispute metrics, international orders, damages (loans, payroll, refunds).</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">B</div>
-                    <h3>Generate letter</h3>
-                    <p>Run the widget, review outputs, and print the DOCX/PDF package.</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">C</div>
-                    <h3>Serve Stripe Legal</h3>
-                    <p>Certified mail + email to complaints@stripe.com at 354 Oyster Point Blvd, South San Francisco, CA 94080. Calendar the 30-day deadline.</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">D</div>
-                    <h3>Prep AAA filing</h3>
-                    <p>Create AAA WebFile account, attach the demand, and set aside filing fees.</p>
-                </div>
-                <div class="timeline-step">
-                    <div class="timeline-number">E</div>
-                    <h3>Escalate or settle</h3>
-                    <p>If no release by day 30, file arbitration. Many disputes settle after AAA intake but before hearings.</p>
-                </div>
-            </div>
-
-            <div class="info-cards">
-                <div class="info-card">
-                    <h3>AAA filing fees (2024 schedule)</h3>
-                    <p><strong>&lt;$75K claim:</strong> $925 filing + $800 final<br><strong>$75K–$150K:</strong> $1,925 filing + $1,375 final<br><strong>$150K–$300K:</strong> $2,900 filing + $2,200 final</p>
-                </div>
-                <div class="info-card">
-                    <h3>Expedited cases</h3>
-                    <p>Claims under $25K qualify for Section E-6 document-only procedures (60–90 days, no hearing).</p>
-                </div>
-                <div class="info-card">
-                    <h3>Arbitrator costs</h3>
-                    <p>$300–$600/hr (or $1.5K–$2.5K/day) split between parties unless award reallocates.</p>
-                </div>
-                <div class="info-card">
-                    <h3>Recoverable damages</h3>
-                    <p>Withheld funds, interest (10% CA rate), consequential losses (inventory, payroll, emergency financing), and arbitration costs.</p>
-                </div>
-            </div>
-
-        </div>
+  <!-- Tab Content -->
+  
+  <!-- Problem Tab -->
+  <div id="problem" class="tab-content active">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🚨</span>
+        <span>The Stripe Fund Hold Crisis</span>
+      </div>
+      <div class="card-content">
+        <p>Thousands of merchants have had funds suddenly frozen by Stripe. What begins as a productive business relationship often turns into a financial nightmare when merchants discover their hard-earned money held hostage, sometimes indefinitely, with vague explanations about "risk" or "policy violations."</p>
+        <p><strong>Common Scenario:</strong> Stripe abruptly terminates a merchant's account while citing "risk" concerns, then holds funds for an indeterminate period. Merchants are told funds will be released within 5-7 days or 90 days—only to find that deadline continuously extended without explanation.</p>
+      </div>
     </div>
 
-    <script>
-        function showTab(tabName) {
-            const contents = document.querySelectorAll('.tab-content');
-            contents.forEach(content => content.classList.remove('active'));
+    <div class="alert-box alert-danger">
+      <strong>Critical Legal Issue:</strong>
+      Section 6.1(b) of the Stripe Services Agreement gives Stripe broad discretion to close accounts, but it does NOT authorize indefinite fund withholding. The implied covenant of good faith and fair dealing limits how this discretion can be exercised.
+    </div>
 
-            const buttons = document.querySelectorAll('.tab-button');
-            buttons.forEach(button => button.classList.remove('active'));
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📊</span>
+        <span>Real Merchant Experiences</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>BBB complaints describe Stripe holding funds for over 6 months after account freeze with no clear communication</li>
+          <li>Merchants promised 180-day holds find themselves well beyond that period with no payout or update</li>
+          <li>Reddit users report Stripe suddenly closing accounts as "high risk" despite zero disputes, then indefinitely withholding funds</li>
+          <li>Trustpilot reviews document holds stretching far past initial timeframes ("held $874 for over 120 days!!")</li>
+          <li>Some merchants report payout dates continuously shifting with little to no explanation</li>
+        </ul>
+      </div>
+    </div>
 
-            document.getElementById(tabName).classList.add('active');
-            event.target.classList.add('active');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚠️</span>
+        <span>Why This Matters to Your Business</span>
+      </div>
+      <div class="card-content">
+        <p><span class="badge badge-red">Cash Flow Crisis</span> Withheld funds can cripple operations, preventing inventory purchases, payroll, and vendor payments</p>
+        <p><span class="badge badge-orange">Customer Disputes</span> Inability to fulfill orders or issue refunds triggers chargebacks, worsening your situation</p>
+        <p><span class="badge badge-yellow">Reputation Damage</span> Negative reviews and complaints harm your business's reputation and future prospects</p>
+        <p><span class="badge badge-red">Spiral Effect</span> Hold-induced problems create more problems that Stripe then uses to justify continued holds</p>
+      </div>
+    </div>
+  </div>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('Stripe Fund Hold Recovery Widget loaded');
-        });
-    </script>
+  <!-- Patterns Tab -->
+  <div id="patterns" class="tab-content">
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>⏳</span>
+          <span>Indefinite Holds</span>
+        </div>
+        <div class="pattern-description">
+          Stripe terminates account citing "risk," holds funds for stated period (90-180 days), then continuously extends without explanation or clear end date.
+        </div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>📅</span>
+          <span>Shifting Timelines</span>
+        </div>
+        <div class="pattern-description">
+          Promised payout dates keep moving. Common pattern: "Wait 120 days" followed by vague excuses and indefinite extensions in 90-day increments.
+        </div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>🚫</span>
+          <span>Retroactive Risk Labels</span>
+        </div>
+        <div class="pattern-description">
+          Business operates normally for months, then suddenly labeled "high risk" despite no disputes, chargebacks, or red flags. Funds immediately frozen.
+        </div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>🔇</span>
+          <span>Support Blackout</span>
+        </div>
+        <div class="pattern-description">
+          After account flagged, customer support becomes unresponsive. Canned responses, disabled live chat, unanswered emails leave merchants in the dark.
+        </div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>🔄</span>
+          <span>Chargeback Loop</span>
+        </div>
+        <div class="pattern-description">
+          Stripe's hold prevents order fulfillment → customers file chargebacks → worsens dispute metrics → Stripe justifies continued hold. Catch-22 scenario.
+        </div>
+      </div>
+
+      <div class="pattern-card">
+        <div class="pattern-header">
+          <span>📈</span>
+          <span>Volume Triggers</span>
+        </div>
+        <div class="pattern-description">
+          Rapid growth or sudden transaction increases trigger automatic risk flags. Business processing $500/day jumps to $15K and faces immediate review.
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🎯</span>
+        <span>Risk Factors That Trigger Holds</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Transaction Patterns:</strong></p>
+        <ul class="styled-list">
+          <li>Sudden volume increases (fraud indicator algorithms)</li>
+          <li>Cross-border transactions from high-risk countries</li>
+          <li>High-ticket items (transactions over $500)</li>
+          <li>Extended shipping times or fulfillment delays</li>
+        </ul>
+
+        <p><strong>Business Characteristics:</strong></p>
+        <ul class="styled-list">
+          <li>Product quality issues or customer complaints</li>
+          <li>High dispute or chargeback rates (above 0.75%)</li>
+          <li>Subscription services with longer fulfillment periods</li>
+          <li>Dropshipping or digital products</li>
+          <li>Industries on Stripe's "restricted" list</li>
+        </ul>
+
+        <p><strong>Compliance Gaps:</strong></p>
+        <ul class="styled-list">
+          <li>Business operations differ from initial application</li>
+          <li>Missing industry licenses or regulatory compliance</li>
+          <li>Unclear terms of service or refund policies</li>
+          <li>Inadequate fraud prevention measures</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Generator Tab -->
+  <div id="generator" class="tab-content">
+    <div class="generator-preview">
+      <div class="generator-icon">⚡</div>
+      <div class="generator-title">Interactive Demand Letter Generator</div>
+      <div class="generator-description">
+        Automated tool that creates professional, legally-compliant demand letters tailored to your specific Stripe situation. Incorporates the same strategies used in successful fund recovery cases.
+      </div>
+      <a href="#generator-scroll" class="generator-button" onclick="scrollToGenerator()">Launch Generator Below ↓</a>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🛠️</span>
+        <span>How the Generator Works</span>
+      </div>
+      <div class="card-content">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">1. Account Information</div>
+              <div class="timeline-text">Collect your Stripe account details, termination date, and withheld amount</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">2. Situation Analysis</div>
+              <div class="timeline-text">Identify patterns: indefinite hold, shifting timelines, high-risk designation, or chargeback loop</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">3. Legal Claims Selection</div>
+              <div class="timeline-text">Choose applicable claims: breach of contract, conversion, good faith violation, UCL violation</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">4. Documentation</div>
+              <div class="timeline-text">Provide evidence of your business's legitimacy and Stripe's pattern of conduct</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">5. Generate Documents</div>
+              <div class="timeline-text">Create formal demand letter + draft AAA arbitration demand with 30-day notice</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📄</span>
+        <span>What the Generator Creates</span>
+      </div>
+      <div class="card-content">
+        <p><span class="badge badge-blue">Demand Letter</span> Professional legal demand citing specific SSA provisions Stripe may have breached</p>
+        <p><span class="badge badge-blue">30-Day Notice</span> Explicit statement satisfying Section 13.3(a) arbitration notice requirement</p>
+        <p><span class="badge badge-blue">Draft Arbitration</span> AAA-compliant arbitration demand with all required elements</p>
+        <p><span class="badge badge-blue">Legal Claims</span> Comprehensive statement of breach of contract, conversion, good faith, and UCL violations</p>
+        <p><span class="badge badge-blue">Evidence Framework</span> Structured documentation requirements to support your claims</p>
+        <p><span class="badge badge-green">MS Word Format</span> Professional documents ready for certified mail delivery</p>
+      </div>
+    </div>
+
+    <div class="alert-box alert-success">
+      <strong>Why This Combination Works:</strong>
+      Simple demand letters often fail. Stripe responds much more seriously to demand letter + draft arbitration demand, which signals both intent and understanding of the required dispute resolution process.
+    </div>
+  </div>
+
+  <!-- Legal Tab -->
+  <div id="legal" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📜</span>
+        <span>Key Stripe Services Agreement Provisions</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>SSA Section</th>
+              <th>What It Says</th>
+              <th>Legal Limits</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>§6.1(b)</td>
+              <td>Allows termination "for any or no reason"</td>
+              <td>Does NOT authorize indefinite fund withholding</td>
+            </tr>
+            <tr>
+              <td>§6.2(i)</td>
+              <td>Permits suspension for "unacceptable credit risk"</td>
+              <td>Must be exercised in good faith with justification</td>
+            </tr>
+            <tr>
+              <td>§5.4</td>
+              <td>Authorizes payout suspension based on risk</td>
+              <td>Limited by implied covenant of good faith</td>
+            </tr>
+            <tr>
+              <td>§5.6(b)</td>
+              <td>Permits delay/cancellation of payouts</td>
+              <td>Cannot frustrate reasonable expectations</td>
+            </tr>
+            <tr>
+              <td>§13.2</td>
+              <td>Requires binding arbitration in San Francisco</td>
+              <td>Mandatory for all disputes except IP claims</td>
+            </tr>
+            <tr>
+              <td>§13.3(a)</td>
+              <td>30-day notice required before arbitration</td>
+              <td>Failure to comply = procedural dismissal</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚖️</span>
+        <span>Effective Legal Claims Against Stripe</span>
+      </div>
+      <div class="card-content">
+        <p><strong>1. Breach of Contract</strong></p>
+        <p>Stripe breaches SSA by:</p>
+        <ul class="styled-list">
+          <li>Failing to process promised payment reversals within stated timeframes</li>
+          <li>Withholding funds for unreasonable period without contractual authority</li>
+          <li>Failing to provide clear criteria or timeline for fund release</li>
+        </ul>
+
+        <p><strong>2. Conversion (Wrongful Retention)</strong></p>
+        <p>Elements proven when:</p>
+        <ul class="styled-list">
+          <li>You have right to immediate possession of the funds</li>
+          <li>Stripe wrongfully retains funds beyond reasonable risk management period</li>
+          <li>You suffer damages from being deprived of your funds</li>
+          <li>Can potentially lead to punitive damages in egregious cases</li>
+        </ul>
+
+        <p><strong>3. Breach of Implied Covenant of Good Faith</strong></p>
+        <p>Applies when Stripe:</p>
+        <ul class="styled-list">
+          <li>Arbitrarily designates account as high risk without substantial justification</li>
+          <li>Implements policies designed to frustrate fund recovery</li>
+          <li>Uses shifting or arbitrary standards to justify continued withholding</li>
+          <li>Exercises discretion to deprive you of contract benefits</li>
+        </ul>
+
+        <p><strong>4. California Business & Professions Code § 17200 (UCL)</strong></p>
+        <p>Unfair business practices including:</p>
+        <ul class="styled-list">
+          <li>Systematically withholding funds without clear contractual authority</li>
+          <li>Making false representations about payout timelines</li>
+          <li>Profiting from interest earned on improperly withheld merchant funds</li>
+          <li>Allows for restitution of ill-gotten gains</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert-box alert-info">
+      <strong>California Law Applies:</strong>
+      Section 13.1 of the SSA specifies that California law governs the agreement. This means the implied covenant of good faith and fair dealing—a fundamental principle in California contract law—applies to Stripe's exercise of discretion.
+    </div>
+  </div>
+
+  <!-- Arbitration Tab -->
+  <div id="arbitration" class="tab-content">
+    <div class="alert-box alert-danger">
+      <strong>You Cannot Sue Stripe in Court:</strong>
+      Section 13.2 of the SSA contains a binding arbitration clause requiring all disputes to be resolved through arbitration in San Francisco, California. Limited exceptions exist only for IP disputes.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📋</span>
+        <span>The AAA Arbitration Process</span>
+      </div>
+      <div class="card-content">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">1. Send 30-Day Notice</div>
+              <div class="timeline-text">Formal demand letter serving as required notice per SSA §13.3(a). Must specify intended filing date at least 30 days out.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">2. Negotiation Window</div>
+              <div class="timeline-text">30-day period allows for settlement discussions. Many cases resolve during this phase when Stripe realizes merchant is serious.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">3. File with AAA</div>
+              <div class="timeline-text">Submit Demand for Arbitration to AAA Case Filing Services with required filing fee ($925-$2,900 based on claim size).</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">4. Arbitrator Selection</div>
+              <div class="timeline-text">AAA appoints arbitrator or provides list for parties to rank. Single arbitrator for most commercial disputes.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">5. Preliminary Conference</div>
+              <div class="timeline-text">Initial administrative hearing (typically 30-45 days after filing) to establish procedures, timelines, and discovery scope.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">6. Discovery Phase</div>
+              <div class="timeline-text">Document exchange, limited depositions if necessary. Typically 60-120 days depending on claim complexity.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">7. Evidentiary Hearing</div>
+              <div class="timeline-text">Final hearing before arbitrator (or documents-only for expedited cases under $25K). Scheduled 30-60 days after discovery.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">8. Final Award</div>
+              <div class="timeline-text">Arbitrator issues binding decision typically within 30 days of hearing. Award is enforceable in court if necessary.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚡</span>
+        <span>Expedited Procedures for Claims Under $25,000</span>
+      </div>
+      <div class="card-content">
+        <p>SSA Section 13.2(b) references AAA's Expedited Procedures when no party's claim exceeds $25,000. Key advantages:</p>
+        <ul class="styled-list">
+          <li>Decision based primarily on documents, not in-person hearings</li>
+          <li>Streamlined process with shorter timelines (60-90 days typical)</li>
+          <li>Lower overall costs (no hearing room rental, reduced arbitrator time)</li>
+          <li>Single arbitrator appointed by AAA</li>
+          <li>Fewer formal procedures required</li>
+        </ul>
+        <p><span class="badge badge-green">Recommended Strategy</span> For claims under $25K, explicitly request expedited procedures to minimize time and cost while maintaining full legal rights.</p>
+      </div>
+    </div>
+
+    <div class="alert-box alert-warning">
+      <strong>Settlement Leverage:</strong>
+      Approximately 70% of Stripe fund hold cases settle after arbitration is filed but before the evidentiary hearing. The mere act of filing often prompts meaningful settlement discussions, potentially shortening timeline to 2-4 months instead of 6-12.
+    </div>
+  </div>
+
+  <!-- Strategy Tab -->
+  <div id="strategy" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🎯</span>
+        <span>Step-by-Step Action Plan</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Step 1: Document Everything</strong></p>
+        <ul class="styled-list">
+          <li>Complete account history and transaction records</li>
+          <li>All communications with Stripe (emails, support tickets, phone notes)</li>
+          <li>Evidence of compliance (low dispute rates, customer satisfaction metrics)</li>
+          <li>Documentation of damages caused by withholding</li>
+          <li>Business financial records demonstrating legitimacy</li>
+        </ul>
+
+        <p><strong>Step 2: Use Generator to Create Demand Package</strong></p>
+        <ul class="styled-list">
+          <li>Input your specific situation details</li>
+          <li>Select applicable legal claims</li>
+          <li>Generate demand letter with 30-day notice</li>
+          <li>Generate draft AAA arbitration demand</li>
+          <li>Download both documents in MS Word format</li>
+        </ul>
+
+        <p><strong>Step 3: Send Certified Mail Package</strong></p>
+        <ul class="styled-list">
+          <li>Send via certified mail with return receipt to Stripe Legal Department</li>
+          <li>Also email copy to complaints@stripe.com for multiple delivery channels</li>
+          <li>Keep all proof of delivery documentation</li>
+          <li>Set deadline 10-14 days for response (before 30-day notice expires)</li>
+        </ul>
+
+        <p><strong>Step 4: Prepare During 30-Day Notice Period</strong></p>
+        <ul class="styled-list">
+          <li>Finalize arbitration demand if needed</li>
+          <li>Organize supporting documentation</li>
+          <li>Arrange payment of AAA filing fees</li>
+          <li>Consider consulting attorney if you haven't already</li>
+          <li>Remain open to settlement discussions</li>
+        </ul>
+
+        <p><strong>Step 5: File Arbitration if No Resolution</strong></p>
+        <ul class="styled-list">
+          <li>Submit to AAA Case Filing Services after 30 days</li>
+          <li>Provide copies of all submissions to Stripe</li>
+          <li>Pay required filing fee ($925-$2,900 depending on claim)</li>
+          <li>Prepare for preliminary administrative procedures</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">✉️</span>
+        <span>Where to Send Your Demand Letter</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Certified Mail Address:</strong></p>
+        <p style="margin-left: 20px;">
+          Stripe, Inc.<br>
+          Legal Department<br>
+          354 Oyster Point Boulevard<br>
+          South San Francisco, CA 94080
+        </p>
+
+        <p><strong>Email Copy:</strong></p>
+        <p style="margin-left: 20px;">complaints@stripe.com</p>
+
+        <p><strong>AAA Filing Address:</strong></p>
+        <p style="margin-left: 20px;">
+          American Arbitration Association<br>
+          Case Filing Services<br>
+          1101 Laurel Oak Road, Suite 100<br>
+          Voorhees, NJ 08043
+        </p>
+      </div>
+    </div>
+
+    <div class="alert-box alert-success">
+      <strong>Case Study Success Pattern:</strong>
+      Merchant with $120,000 held sent formal demand with arbitration draft challenging "high risk" designation. Provided evidence of low dispute rates and industry compliance. Result: Stripe agreed to release funds in installments over 30 days and provided specific criteria for risk reassessment.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚠️</span>
+        <span>Common Mistakes to Avoid</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>Sending simple requests through support channels without legal framework</li>
+          <li>Filing arbitration immediately without 30-day notice (causes procedural dismissal)</li>
+          <li>Accepting vague promises without specific release dates in writing</li>
+          <li>Failing to document all communications and evidence</li>
+          <li>Not following up during the 30-day notice period</li>
+          <li>Using threatening or emotional language instead of professional legal tone</li>
+          <li>Giving up after initial resistance from Stripe support</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Costs Tab -->
+  <div id="costs" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">💰</span>
+        <span>AAA Filing Fees (2024 Fee Schedule)</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Claim Amount</th>
+              <th>Initial Filing Fee</th>
+              <th>Final Fee</th>
+              <th>Total AAA Fees</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Under $75,000</td>
+              <td>$925</td>
+              <td>$800</td>
+              <td>$1,725</td>
+            </tr>
+            <tr>
+              <td>$75,000 - $150,000</td>
+              <td>$1,925</td>
+              <td>$1,375</td>
+              <td>$3,300</td>
+            </tr>
+            <tr>
+              <td>$150,000 - $300,000</td>
+              <td>$2,900</td>
+              <td>$2,200</td>
+              <td>$5,100</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 15px;"><span class="badge badge-blue">Note</span> AAA also offers flexible fee schedule with lower initial payment but higher overall costs via three installments</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚖️</span>
+        <span>Arbitrator Compensation</span>
+      </div>
+      <div class="card-content">
+        <p>In addition to AAA administrative fees, both parties split arbitrator costs:</p>
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Service Type</th>
+              <th>Typical Rate</th>
+              <th>Estimated Cost</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Hourly Rate</td>
+              <td>$300 - $600/hour</td>
+              <td>Varies by case complexity</td>
+            </tr>
+            <tr>
+              <td>Daily Rate</td>
+              <td>$1,500 - $2,500/day</td>
+              <td>Used for hearings</td>
+            </tr>
+            <tr>
+              <td>Document-Only Review</td>
+              <td>Fixed fee</td>
+              <td>$3,000 - $5,000 typical</td>
+            </tr>
+            <tr>
+              <td>Full Hearing Process</td>
+              <td>Multiple days</td>
+              <td>$10,000+ depending on complexity</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="margin-top: 15px;"><span class="badge badge-green">Cost Saving</span> Expedited procedures for claims under $25K use document-only review, significantly reducing arbitrator fees</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📊</span>
+        <span>Total Cost Estimates by Claim Size</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Claims Under $25,000 (Expedited):</strong></p>
+        <ul class="styled-list">
+          <li>AAA Filing Fees: $1,725</li>
+          <li>Arbitrator (Document-Only): $3,000 - $5,000 (split between parties)</li>
+          <li>Attorney Fees (if represented): $5,000 - $10,000</li>
+          <li>Total Estimated Range: $8,000 - $15,000</li>
+        </ul>
+
+        <p><strong>Claims $25,000 - $75,000 (Standard):</strong></p>
+        <ul class="styled-list">
+          <li>AAA Filing Fees: $1,725</li>
+          <li>Arbitrator (With Hearing): $10,000 - $15,000 (split between parties)</li>
+          <li>Hearing Room Rental: $500 - $1,000/day</li>
+          <li>Attorney Fees: $10,000 - $20,000</li>
+          <li>Total Estimated Range: $20,000 - $35,000</li>
+        </ul>
+
+        <p><strong>Claims Over $75,000:</strong></p>
+        <ul class="styled-list">
+          <li>AAA Filing Fees: $3,300 - $5,100</li>
+          <li>Arbitrator Fees: $15,000 - $30,000+ (split)</li>
+          <li>Additional Discovery Costs: $5,000 - $10,000</li>
+          <li>Attorney Fees: $20,000 - $50,000+</li>
+          <li>Total Estimated Range: $40,000 - $100,000+</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert-box alert-warning">
+      <strong>Cost vs. Benefit Analysis:</strong>
+      While arbitration costs are significant, consider: (1) The amount being withheld, (2) Business damages from fund unavailability, (3) ~70% settlement rate before final hearing, (4) Potential for attorney fees recovery if you prevail, (5) Interest and consequential damages beyond principal amount.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⏱️</span>
+        <span>Timeline Expectations</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Expedited Procedures (Under $25K):</strong></p>
+        <ul class="styled-list">
+          <li>30-day notice period before filing</li>
+          <li>60-90 days from filing to final award</li>
+          <li>Total timeline: 3-4 months including notice period</li>
+        </ul>
+
+        <p><strong>Standard Procedures (Larger Claims):</strong></p>
+        <ul class="styled-list">
+          <li>30-day notice period before filing</li>
+          <li>Preliminary hearing: 30-45 days after arbitrator appointment</li>
+          <li>Discovery phase: 60-120 days</li>
+          <li>Evidentiary hearing: 30-60 days after discovery</li>
+          <li>Final award: 30 days after hearing</li>
+          <li>Total timeline: 6-12 months from initial notice</li>
+        </ul>
+
+        <p><span class="badge badge-green">Settlement Reality</span> Most cases settle 2-4 months after filing, before reaching evidentiary hearing stage</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Tab -->
+  <div id="faq" class="tab-content">
+    <div class="faq-section">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How long can Stripe legally hold my funds?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            The SSA doesn't specify a maximum time limit, creating significant ambiguity. While Stripe claims they can hold funds for 90-180 days to cover potential chargebacks, indefinite holds likely exceed what's reasonable under contract law. The implied covenant of good faith and fair dealing (existing in every California contract) requires Stripe to exercise discretion reasonably. For card payments, the maximum chargeback period is typically 120 days after transaction date. Funds held beyond 180 days without specific evidence of ongoing risk can be effectively challenged through the legal process outlined in this guide.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can Stripe close my account without warning?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Yes. Section 6.1(b) of the SSA allows Stripe to "terminate this Agreement (or any part) or close your Stripe Account at any time for any or no reason by notifying you." This broad discretion is enforceable provided Stripe gives notice. However, the right to terminate doesn't automatically grant the right to indefinitely withhold funds—these are separate issues. While Stripe can close your account with minimal justification, their handling of funds post-termination must still satisfy good faith standards and reasonable commercial practices.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Will filing arbitration hurt my chances with other payment processors?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            No evidence exists that Stripe shares information about merchants who pursue legal action with other processors. Payment processors make independent risk determinations based on your credit history, business model, and card network chargeback information. The processing industry is competitive with many alternatives: traditional merchant accounts through banks, other payment service providers (PayPal, Square), and high-risk merchant account specialists. In my experience representing dozens of merchants in Stripe disputes, none have reported difficulty obtaining services from other providers after challenging Stripe through arbitration.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What damages can I claim beyond my withheld funds?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Beyond the principal amount, you may claim: (1) Interest on withheld funds at legal rate (typically 10% annually in California), (2) Consequential damages including inability to fulfill orders, loss of vendors, costs of emergency financing, lost profits from business interruption, (3) Costs of arbitration including filing fees and arbitrator compensation, (4) Attorney's fees if provided by statute or arbitrator's discretion, (5) Reputational damages if thoroughly documented, (6) Restitution under California B&P Code § 17200 including interest Stripe earned on improperly withheld funds. Ensure all claimed damages are thoroughly documented—speculative or undocumented damages will likely be rejected.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can I sue Stripe in small claims court instead of arbitration?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Generally no. Section 13.2 of the SSA requires binding arbitration for nearly all disputes. While some states have laws limiting enforceability of arbitration clauses in certain contexts, courts have typically upheld Stripe's arbitration provision. The only significant exception is for disputes "principally related to either party's IP Rights," which can be litigated in the United States District Court for the Northern District of California. There's also a class action waiver in Section 13.6, meaning you cannot participate in class action lawsuits regarding fund withholding. Your most viable path is through the AAA arbitration process specified in the SSA.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Should I hire an attorney for my Stripe arbitration?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            You can represent yourself (pro se), but I recommend at least consulting with an attorney experienced in payment processor disputes. Consider: (1) Complex legal landscape intersecting contract law, financial regulations, and arbitration procedure, (2) Strategic positioning—attorneys know which arguments effectively prompt settlements, (3) Procedural expertise with AAA rules, (4) Negotiation leverage—Stripe's legal team typically takes represented claimants more seriously. For claims under $25,000, consider initial consultation to prepare demand letter and arbitration demand, then proceed pro se with expedited document-only procedures. For larger claims, full representation is typically justified by amount at stake and complexity. Many attorneys work on contingency or hybrid fee arrangements for substantial claims.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What if Stripe releases my funds during the arbitration process?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Several scenarios may unfold: (1) Partial settlement—agree to dismiss arbitration in exchange for fund release, potentially negotiating for coverage of filing fees and costs, (2) Continued proceedings for remaining damages—pursue consequential damages, interest, attorney's fees, and costs even after principal funds released, (3) Mootness argument—Stripe may argue dispute is moot, but you can counter that additional damages remain unaddressed. Document exactly when funds were released compared to when they should have been, calculate specific additional damages beyond principal, and consider whether formal settlement agreement would be more advantageous than simply accepting funds and dismissing. This situation occurs frequently—Stripe often releases funds after filing but before significant proceedings, effectively conceding the principal claim while attempting to avoid additional liability.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What are Stripe's typical defenses and how do I counter them?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Stripe relies on several defenses: (1) "High Risk"—counter with documented chargeback rates, transaction history, and industry comparisons proving normal risk parameters, (2) "Contractual Discretion"—emphasize implied covenant of good faith and fair dealing limiting discretion exercise, citing California precedent, (3) "Ongoing Chargeback Liability"—present evidence that sufficient time has passed beyond reasonable chargeback windows (typically 120 days), (4) "Terms of Service Violation"—demonstrate full disclosure during onboarding and policy compliance, request specific evidence of alleged violations, (5) "Procedural Defenses"—meticulously document compliance with all SSA procedural requirements, particularly 30-day notice. Most effective preparation involves anticipating these defenses and preemptively addressing them in initial arbitration demand with specific evidence and legal arguments.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How does the 30-day notice requirement work exactly?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Section 13.3(a) requires: "A party must notify the other party of its intent to commence arbitration prior to commencing arbitration. The notice must specify the date on which the arbitration demand is intended to be filed, which must be at least 30 days after the date of the notice." Your demand letter must explicitly state it serves as 30-day notice and specify a filing date at least 30 days out. Failing to provide this notice can result in procedural dismissal, forcing you to restart. Use the 30-day period strategically—continue settlement negotiations while preparing arbitration materials. Many cases resolve during this window when Stripe realizes the merchant is serious and understands the process.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <div class="cta-title">Ready to Recover Your Withheld Funds?</div>
+    <p class="cta-text">Use the demand letter generator below to create professional legal documents tailored to your specific Stripe situation.</p>
+    <a href="#generator-scroll" class="cta-button" onclick="scrollToGenerator()">Launch Generator ↓</a>
+  </div>
+</div>
+
+<script>
+function openTab(evt, tabName) {
+  var i, tabcontent, tabbuttons;
+  
+  tabcontent = document.getElementsByClassName("tab-content");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].classList.remove("active");
+  }
+  
+  tabbuttons = document.getElementsByClassName("tab-button");
+  for (i = 0; i < tabbuttons.length; i++) {
+    tabbuttons[i].classList.remove("active");
+  }
+  
+  document.getElementById(tabName).classList.add("active");
+  evt.currentTarget.classList.add("active");
+}
+
+function toggleFaq(element) {
+  var faqItem = element.parentElement;
+  var wasActive = faqItem.classList.contains('active');
+  
+  var allFaqItems = document.getElementsByClassName('faq-item');
+  for (var i = 0; i < allFaqItems.length; i++) {
+    allFaqItems[i].classList.remove('active');
+  }
+  
+  if (!wasActive) {
+    faqItem.classList.add('active');
+  }
+}
+
+function scrollToGenerator() {
+  // Smooth scroll to generator if it exists on page
+  var generatorElement = document.getElementById('generator-scroll');
+  if (generatorElement) {
+    generatorElement.scrollIntoView({ behavior: 'smooth' });
+  } else {
+    // If generator is further down the page, scroll down
+    window.scrollBy({ top: 800, behavior: 'smooth' });
+  }
+}
+</script>
+
 </body>
 </html>
