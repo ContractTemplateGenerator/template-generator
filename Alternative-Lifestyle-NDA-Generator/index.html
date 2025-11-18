@@ -1,17 +1,478 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alternative Lifestyle NDA Generator</title>
-    <meta name="description" content="Alternative lifestyle NDA generator for personal relationships with enhanced privacy protections">
-    <link rel="stylesheet" href="public/styles.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alternative Lifestyle NDA Generator</title>
+<style>
+    :root {
+        --bg: #f8f9fb;
+        --card: #ffffff;
+        --border: #d0d7e2;
+        --primary: #4b4ded;
+        --text: #1f2a37;
+        --muted: #5f6b7c;
+    }
+    * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    body { background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+    .nda-shell { max-width: 1000px; margin: 0 auto; background: var(--card); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.08); padding: 20px; }
+    .nda-header { border-bottom: 1px solid var(--border); padding-bottom: 12px; margin-bottom: 16px; }
+    .nda-header h1 { margin: 0; font-size: 22px; }
+    .nda-flex { display: flex; gap: 20px; align-items: flex-start; }
+    .nda-form { flex: 0 0 45%; }
+    .nda-preview { flex: 1; }
+    .tab-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .tab-button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--border); background: #f4f5fb; font-size: 13px; cursor: pointer; color: var(--muted); }
+    .tab-button.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+    .nda-tab-panel { display: none; border: 1px solid var(--border); border-radius: 10px; padding: 14px; max-height: 70vh; overflow-y: auto; }
+    .nda-tab-panel.active { display: block; }
+    label { font-weight: 600; display: block; margin-top: 14px; margin-bottom: 6px; }
+    input[type="text"], select, textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; }
+    textarea { min-height: 80px; }
+    .inline-group { display: flex; gap: 8px; }
+    .inline-group input { flex: 1; }
+    .option-set { display: grid; gap: 8px; }
+    .option-set label { font-weight: 500; display: flex; align-items: center; gap: 8px; }
+    .preset-box { border: 1px solid var(--border); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+    .preset-box strong { display: block; }
+    .small-note { font-size: 12px; color: var(--muted); }
+    .scope-actions { margin: 8px 0; }
+    .preview-card { border: 1px solid var(--border); border-radius: 10px; padding: 12px; background: #fff; display: flex; flex-direction: column; height: 70vh; }
+    .preview-card textarea { flex: 1; resize: none; border: 1px solid var(--border); border-radius: 8px; padding: 12px; white-space: pre-wrap; font-size: 13px; line-height: 1.4; transition: text-shadow 0.3s; }
+    .preview-card textarea.highlight { background: #fff; text-shadow: 0 0 12px rgba(250, 204, 21, 0.6); }
+    .copy-btn { margin-top: 10px; padding: 10px 14px; border-radius: 8px; border: none; background: var(--primary); color: #fff; font-weight: 600; cursor: pointer; }
+    .checklist { list-style: none; padding-left: 16px; font-size: 13px; }
+    .checklist li { margin-bottom: 4px; }
+    @media (max-width: 900px) {
+        .nda-flex { flex-direction: column; }
+        .nda-form, .nda-preview { flex: 1 1 auto; width: 100%; }
+        .nda-tab-panel, .preview-card { max-height: none; height: auto; }
+    }
+</style>
 </head>
 <body>
-    <div id="root"></div>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <script type="text/babel" src="src/App.js"></script>
+<div class="nda-shell">
+    <div class="nda-header">
+        <h1>Alternative Lifestyle NDA Generator (Beta)</h1>
+        <p class="small-note">Customize party info, scope, and legal terms; preview updates in real time.</p>
+    </div>
+    <div class="nda-flex">
+        <div class="nda-form">
+            <div class="tab-row">
+                <button class="tab-button active" data-tab="basics" onclick="switchTab('basics', event)">Basics</button>
+                <button class="tab-button" data-tab="scope" onclick="switchTab('scope', event)">Scope & Media</button>
+                <button class="tab-button" data-tab="options" onclick="switchTab('options', event)">Options</button>
+                <button class="tab-button" data-tab="review" onclick="switchTab('review', event)">Review</button>
+            </div>
+            <div id="tab-basics" class="nda-tab-panel active">
+                <label>Preset Scenario</label>
+                <div class="preset-box">
+                    <label><input type="radio" name="preset" value="private_couple" checked> Private couple / dating</label>
+                    <label><input type="radio" name="preset" value="pro_provider_client"> Professional provider + client</label>
+                    <label><input type="radio" name="preset" value="event_club"> Event host + attendee</label>
+                    <label><input type="radio" name="preset" value="public_figure"> Public figure / high risk</label>
+                </div>
+                <label>Party A Legal Name</label>
+                <input type="text" id="partyAName">
+                <label>Party A Scene Name (optional)</label>
+                <input type="text" id="partyAScene">
+                <label>Party B Legal Name</label>
+                <input type="text" id="partyBName">
+                <label>Party B Scene Name (optional)</label>
+                <input type="text" id="partyBScene">
+                <label>Mutual vs One-Way</label>
+                <div class="preset-box">
+                    <label><input type="radio" name="direction" value="mutual" checked> Mutual NDA</label>
+                    <label><input type="radio" name="direction" value="a_to_b"> One-way (Party A protected)</label>
+                    <label><input type="radio" name="direction" value="b_to_a"> One-way (Party B protected)</label>
+                </div>
+                <label>Governing Law</label>
+                <select id="governingLaw">
+                    <option value="California" selected>California</option>
+                    <option value="New York">New York</option>
+                    <option value="England and Wales">England &amp; Wales</option>
+                    <option value="Other">Other (specify)</option>
+                </select>
+                <input type="text" id="customLaw" placeholder="If Other, enter jurisdiction" style="display:none;margin-top:6px;">
+                <label>Dispute Resolution</label>
+                <select id="forum">
+                    <option value="arbitration" selected>Private arbitration</option>
+                    <option value="court">Court litigation</option>
+                </select>
+            </div>
+            <div id="tab-scope" class="nda-tab-panel">
+                <label>Confidential Information Covers</label>
+                <div class="scope-actions">
+                    <button type="button" onclick="selectCommonScope()">Select common defaults</button>
+                </div>
+                <div class="option-set">
+                    <label><input type="checkbox" id="scope-identity"> Identity details</label>
+                    <label><input type="checkbox" id="scope-relationship"> Relationship nature</label>
+                    <label><input type="checkbox" id="scope-activities"> Activities / scenes</label>
+                    <label><input type="checkbox" id="scope-communications"> Communications</label>
+                    <label><input type="checkbox" id="scope-media"> Photos / recordings</label>
+                    <label><input type="checkbox" id="scope-health"> Health / finances</label>
+                </div>
+                <label>Media &amp; Recording Strictness</label>
+                <select id="mediaStrictness">
+                    <option value="basic_media">No sharing, personal reference only</option>
+                    <option value="strict_media">Strict – delete or disable access on request</option>
+                </select>
+                <label>Term / Duration</label>
+                <select id="term">
+                    <option value="3_years">3 years from end of relationship</option>
+                    <option value="5_years" selected>5 years from end of relationship</option>
+                    <option value="10_years">10 years from end of relationship</option>
+                    <option value="until_public">Until information becomes public</option>
+                </select>
+            </div>
+            <div id="tab-options" class="nda-tab-panel">
+                <label>Non-Disparagement</label>
+                <div class="option-set">
+                    <label><input type="radio" name="nonDisparagement" value="none" checked> None</label>
+                    <label><input type="radio" name="nonDisparagement" value="narrow"> Narrow – bans knowingly false statements</label>
+                    <label><input type="radio" name="nonDisparagement" value="broad"> Broad – bans public disparagement</label>
+                </div>
+                <label>Liquidated Damages</label>
+                <div class="option-set">
+                    <label><input type="radio" name="liquidatedDamages" value="none" checked> None (actual damages only)</label>
+                    <label><input type="radio" name="liquidatedDamages" value="2500"> $2,500 per breach</label>
+                    <label><input type="radio" name="liquidatedDamages" value="10000"> $10,000 per breach</label>
+                </div>
+                <p class="small-note">Liquidated damages must be reasonable to be enforceable.</p>
+                <label><input type="checkbox" id="powerExchange"> Relationship involves consensual power exchange</label>
+                <label><input type="checkbox" id="crossBorder"> Parties are in different countries</label>
+            </div>
+            <div id="tab-review" class="nda-tab-panel">
+                <p>Quick checklist:</p>
+                <ul class="checklist">
+                    <li>✔ Parties entered?</li>
+                    <li>✔ Scope selected?</li>
+                    <li>✔ Term and media rules chosen?</li>
+                    <li>✔ Options reviewed?</li>
+                </ul>
+                <p class="small-note">Adjust any tab before copying the agreement.</p>
+            </div>
+        </div>
+        <div class="nda-preview">
+            <div class="preview-card">
+                <textarea id="ndaOutput" rows="28" readonly></textarea>
+                <button class="copy-btn" onclick="copyNdaText()">Copy NDA Text</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+const ndaState = {
+    preset: 'private_couple',
+    partyAName: '',
+    partyAScene: '',
+    partyBName: '',
+    partyBScene: '',
+    direction: 'mutual',
+    governingLaw: 'California',
+    customLaw: '',
+    forum: 'arbitration',
+    scope: {
+        identity: true,
+        relationship: true,
+        activities: true,
+        communications: true,
+        media: true,
+        health: false
+    },
+    mediaStrictness: 'basic_media',
+    term: '5_years',
+    nonDisparagement: 'none',
+    liquidatedDamages: 'none',
+    powerExchange: false,
+    crossBorder: false
+};
+
+const presetProfiles = {
+    private_couple: {
+        direction: 'mutual',
+        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: false },
+        mediaStrictness: 'basic_media',
+        term: '5_years',
+        nonDisparagement: 'narrow',
+        liquidatedDamages: 'none'
+    },
+    pro_provider_client: {
+        direction: 'b_to_a',
+        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: true },
+        mediaStrictness: 'strict_media',
+        term: '5_years',
+        nonDisparagement: 'broad',
+        liquidatedDamages: '10000'
+    },
+    event_club: {
+        direction: 'mutual',
+        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: false },
+        mediaStrictness: 'basic_media',
+        term: '3_years',
+        nonDisparagement: 'none',
+        liquidatedDamages: 'none'
+    },
+    public_figure: {
+        direction: 'a_to_b',
+        scope: { identity: true, relationship: true, activities: true, communications: true, media: true, health: true },
+        mediaStrictness: 'strict_media',
+        term: '10_years',
+        nonDisparagement: 'broad',
+        liquidatedDamages: '10000'
+    }
+};
+
+function applyPreset(preset) {
+    ndaState.preset = preset;
+    const profile = presetProfiles[preset];
+    ndaState.direction = profile.direction;
+    ndaState.scope = { ...profile.scope };
+    ndaState.mediaStrictness = profile.mediaStrictness;
+    ndaState.term = profile.term;
+    ndaState.nonDisparagement = profile.nonDisparagement;
+    ndaState.liquidatedDamages = profile.liquidatedDamages;
+    updateInputsFromState();
+    renderNda();
+}
+
+function switchTab(tabId, evt) {
+    if (evt) evt.preventDefault();
+    document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+    document.querySelectorAll('.nda-tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === 'tab-' + tabId);
+    });
+}
+
+function selectCommonScope() {
+    ['identity','relationship','activities','communications','media'].forEach(key => {
+        ndaState.scope[key] = true;
+        document.getElementById('scope-' + key).checked = true;
+    });
+    renderNda();
+}
+
+function handleInputChanges() {
+    document.getElementById('partyAName').addEventListener('input', e => { ndaState.partyAName = e.target.value.trim(); renderNda(); });
+    document.getElementById('partyAScene').addEventListener('input', e => { ndaState.partyAScene = e.target.value.trim(); renderNda(); });
+    document.getElementById('partyBName').addEventListener('input', e => { ndaState.partyBName = e.target.value.trim(); renderNda(); });
+    document.getElementById('partyBScene').addEventListener('input', e => { ndaState.partyBScene = e.target.value.trim(); renderNda(); });
+
+    document.querySelectorAll('input[name="preset"]').forEach(radio => {
+        radio.addEventListener('change', e => applyPreset(e.target.value));
+    });
+
+    document.querySelectorAll('input[name="direction"]').forEach(radio => {
+        radio.addEventListener('change', e => { ndaState.direction = e.target.value; renderNda(); });
+    });
+
+    document.getElementById('governingLaw').addEventListener('change', e => {
+        const value = e.target.value;
+        ndaState.governingLaw = value;
+        document.getElementById('customLaw').style.display = value === 'Other' ? 'block' : 'none';
+        if (value !== 'Other') ndaState.customLaw = '';
+        renderNda();
+    });
+
+    document.getElementById('customLaw').addEventListener('input', e => { ndaState.customLaw = e.target.value.trim(); renderNda(); });
+    document.getElementById('forum').addEventListener('change', e => { ndaState.forum = e.target.value; renderNda(); });
+
+    ['identity','relationship','activities','communications','media','health'].forEach(key => {
+        document.getElementById('scope-' + key).addEventListener('change', e => {
+            ndaState.scope[key] = e.target.checked;
+            renderNda();
+        });
+    });
+
+    document.getElementById('mediaStrictness').addEventListener('change', e => { ndaState.mediaStrictness = e.target.value; renderNda(); });
+    document.getElementById('term').addEventListener('change', e => { ndaState.term = e.target.value; renderNda(); });
+
+    document.querySelectorAll('input[name="nonDisparagement"]').forEach(radio => {
+        radio.addEventListener('change', e => { ndaState.nonDisparagement = e.target.value; renderNda(); });
+    });
+    document.querySelectorAll('input[name="liquidatedDamages"]').forEach(radio => {
+        radio.addEventListener('change', e => { ndaState.liquidatedDamages = e.target.value; renderNda(); });
+    });
+
+    document.getElementById('powerExchange').addEventListener('change', e => { ndaState.powerExchange = e.target.checked; renderNda(); });
+    document.getElementById('crossBorder').addEventListener('change', e => { ndaState.crossBorder = e.target.checked; renderNda(); });
+}
+
+function updateInputsFromState() {
+    document.querySelectorAll('input[name="direction"]').forEach(radio => {
+        radio.checked = radio.value === ndaState.direction;
+    });
+    ['identity','relationship','activities','communications','media','health'].forEach(key => {
+        document.getElementById('scope-' + key).checked = ndaState.scope[key];
+    });
+    document.getElementById('mediaStrictness').value = ndaState.mediaStrictness;
+    document.getElementById('term').value = ndaState.term;
+    document.querySelectorAll('input[name="nonDisparagement"]').forEach(radio => {
+        radio.checked = radio.value === ndaState.nonDisparagement;
+    });
+    document.querySelectorAll('input[name="liquidatedDamages"]').forEach(radio => {
+        radio.checked = radio.value === ndaState.liquidatedDamages;
+    });
+}
+
+function getPartyLabels() {
+    const aFull = ndaState.partyAScene ? `${ndaState.partyAName} ("${ndaState.partyAScene}")` : ndaState.partyAName || 'Party A';
+    const bFull = ndaState.partyBScene ? `${ndaState.partyBName} ("${ndaState.partyBScene}")` : ndaState.partyBName || 'Party B';
+    let relationshipPhrase = 'each, a "Party" and together, the "Parties"';
+    let disclosing = 'Disclosing Party';
+    let receiving = 'Receiving Party';
+    if (ndaState.direction === 'a_to_b') {
+        relationshipPhrase = '(collectively, the "Parties")';
+        disclosing = ndaState.partyAName || 'Party A';
+        receiving = ndaState.partyBName || 'Party B';
+    } else if (ndaState.direction === 'b_to_a') {
+        relationshipPhrase = '(collectively, the "Parties")';
+        disclosing = ndaState.partyBName || 'Party B';
+        receiving = ndaState.partyAName || 'Party A';
+    }
+    return { aFull, bFull, relationshipPhrase, disclosing, receiving };
+}
+
+function buildDefinitions() {
+    const scopeLines = [];
+    if (ndaState.scope.identity) scopeLines.push('(a) the legal names, aliases, addresses, employers, and social media handles of either Party;');
+    if (ndaState.scope.relationship) scopeLines.push('(b) the existence or nature of any consensual BDSM, kink, or alternative relationship or scenes between the Parties;');
+    if (ndaState.scope.activities) scopeLines.push('(c) the specific activities, scenes, fantasies, limits, boundaries, and negotiations discussed or engaged in by the Parties;');
+    if (ndaState.scope.communications) scopeLines.push('(d) the content of communications between the Parties, including text messages, emails, direct messages, and voice notes;');
+    if (ndaState.scope.media) scopeLines.push('(e) any photographs, videos, audio recordings, screenshots, or screen recordings of either Party or their interactions;');
+    if (ndaState.scope.health) scopeLines.push('(f) any information concerning a Party’s physical or mental health, finances, immigration status, or other sensitive personal matters;');
+    scopeLines.push('(g) any other non-public personal or intimate information that a reasonable person would consider private in this context.');
+    return scopeLines.join('\n');
+}
+
+function mediaClause() {
+    if (!ndaState.scope.media) return '';
+    if (ndaState.mediaStrictness === 'basic_media') {
+        return '4. MEDIA AND RECORDINGS\nThe Parties agree that any photographs, videos, audio recordings, or similar media capturing either Party or their activities ("Media") are Confidential Information. Media shall not be posted or shared publicly and shall not be shown to third parties except as allowed in Section 5. Each Party retains ownership of their own likeness and may require that Media depicting them not be used commercially without written consent.\n';
+    }
+    return '4. MEDIA AND RECORDINGS\nThe Parties agree that any photographs, videos, audio recordings, or similar media capturing either Party or their activities ("Media") are Confidential Information subject to heightened protection. Media shall not be posted, forwarded, or shown to any third party (other than advisors permitted under Section 5). Upon written request, the other Party shall use reasonable efforts to delete or permanently disable access to Media in their possession, without prejudice to any backups that cannot feasibly be altered.\n';
+}
+
+function nonDisparagementClause() {
+    if (ndaState.nonDisparagement === 'none') return '';
+    if (ndaState.nonDisparagement === 'narrow') {
+        return '5. NON-DISPARAGEMENT\nSubject to the carve-outs in Section 5, each Party agrees not to make any knowingly false statement of fact about the other Party in any public forum that is reasonably likely to cause serious reputational harm. This clause does not limit disclosures permitted by law or Section 5.\n';
+    }
+    return '5. NON-DISPARAGEMENT\nSubject to the carve-outs in Section 5, each Party agrees not to publicly disparage or defame the other Party, including through social media. Truthful reports to authorities or disclosures permitted under Section 5 remain allowed.\n';
+}
+
+function powerExchangeClause() {
+    if (!ndaState.powerExchange) {
+        return '6. CONSENT AND SAFETY\nNothing in this Agreement obligates either Party to engage in any scene, relationship dynamic, or physical or sexual activity. Each Party may withdraw consent at any time.\n';
+    }
+    return '6. CONSENT AND POWER EXCHANGE\nIf the Parties engage in Dominant/submissive, Master/slave, or other power exchange dynamics, such power exchange is purely consensual and may be modified or ended at any time. Nothing in this Agreement requires participation in any act or waives the right to withdraw consent. This Agreement addresses confidentiality only.\n';
+}
+
+function termText() {
+    switch (ndaState.term) {
+        case '3_years': return 'This Agreement remains in effect until three (3) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
+        case '5_years': return 'This Agreement remains in effect until five (5) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
+        case '10_years': return 'This Agreement remains in effect until ten (10) years after the Parties’ relationship or interactions end, or until the relevant information becomes public through no breach, whichever occurs first.';
+        default: return 'This Agreement remains in effect for so long as the relevant Confidential Information remains non-public, subject to the exclusions in Section 1.';
+    }
+}
+
+function liquidatedText() {
+    if (ndaState.liquidatedDamages === 'none') {
+        return '9. REMEDIES\nEach Party acknowledges that unauthorized disclosure of Confidential Information may cause irreparable harm. The non-breaching Party may seek temporary, preliminary, and permanent injunctive relief, in addition to actual damages and other remedies available at law or equity.\n';
+    }
+    const amount = ndaState.liquidatedDamages === '2500' ? '$2,500' : '$10,000';
+    return `9. REMEDIES AND LIQUIDATED DAMAGES\nEach Party acknowledges that unauthorized disclosure of Confidential Information may cause irreparable harm. The non-breaching Party may seek temporary, preliminary, and permanent injunctive relief. In addition, if a court or arbitrator determines that a Party has materially breached this Agreement by making an unauthorized public disclosure, that Party shall pay the non-breaching Party liquidated damages of ${amount} per material breach, representing a reasonable estimate of anticipated harm. This provision does not limit injunctive relief.\n`;
+}
+
+function disputeClause(law) {
+    const location = law.includes('California') ? 'Los Angeles County, California' : 'a mutually agreed location';
+    if (ndaState.forum === 'arbitration') {
+        return `10. GOVERNING LAW AND DISPUTE RESOLUTION\nThis Agreement is governed by the laws of ${law}, without regard to conflicts-of-law rules. Any dispute arising out of or relating to this Agreement shall be resolved by confidential binding arbitration before a single neutral arbitrator in ${location}. Notwithstanding the foregoing, either Party may seek temporary or emergency injunctive relief in any court of competent jurisdiction.\n`;
+    }
+    return `10. GOVERNING LAW AND DISPUTE RESOLUTION\nThis Agreement is governed by the laws of ${law}, without regard to conflicts-of-law rules. Any dispute arising out of or relating to this Agreement shall be brought exclusively in the courts located in ${location}, and each Party consents to such jurisdiction. Either Party may still seek emergency injunctive relief as needed.\n`;
+}
+
+function crossBorderText() {
+    if (!ndaState.crossBorder) return '';
+    return 'The Parties understand that if they reside in different countries, enforcement may require recognition of this Agreement by local courts, and each Party may seek independent legal advice regarding cross-border enforcement.\n';
+}
+
+function renderNda() {
+    const { aFull, bFull, relationshipPhrase, disclosing, receiving } = getPartyLabels();
+    const law = ndaState.governingLaw === 'Other' ? (ndaState.customLaw || 'the selected jurisdiction') : ndaState.governingLaw;
+    const definitions = buildDefinitions();
+    const mediaSection = mediaClause();
+    const ndClause = nonDisparagementClause();
+    const powerClause = powerExchangeClause();
+    const termClause = termText();
+    const liquidated = liquidatedText();
+    const dispute = disputeClause(law);
+    const crossBorderClause = crossBorderText();
+
+    const intro = `CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT (ALTERNATIVE RELATIONSHIP)\n\nThis Agreement is entered into by and between ${aFull} and ${bFull} (${relationshipPhrase}), to protect the privacy of their consensual relationship and related activities.\n`;
+
+    const section1 = `1. DEFINITIONS\nConfidential Information includes:\n${definitions}\nConfidential Information does not include information that (i) becomes public through no breach, (ii) was lawfully known before disclosure, (iii) is independently developed, or (iv) is received from a third party without a duty of confidentiality.\n`;
+
+    const section2 = ndaState.direction === 'mutual'
+        ? '2. CONFIDENTIALITY OBLIGATIONS\nEach Party, as Receiving Party, shall use the other Party’s Confidential Information solely for maintaining their consensual interactions, shall not disclose it to anyone except as permitted in Section 5, and shall exercise reasonable care to protect it.\n'
+        : `2. CONFIDENTIALITY OBLIGATIONS\n${receiving} shall use ${disclosing}’s Confidential Information solely for maintaining their consensual interactions, shall not disclose it to anyone except as permitted in Section 5, and shall exercise reasonable care to protect it.\n`;
+
+    const section3 = '3. PERMITTED DISCLOSURES\nNothing in this Agreement prohibits either Party from: (a) seeking emergency assistance, medical care, or mental-health support; (b) consulting with their own attorney, therapist, or professional advisor, who must keep the information confidential; (c) reporting suspected crimes, abuse, or safety concerns to authorities, or cooperating with any subpoena or court order; or (d) making disclosures expressly required by law.\n';
+
+    const section4 = mediaSection || '4. MEDIA AND RECORDINGS\nAny Media depicting either Party shall be treated as Confidential Information and handled consistently with Section 3.\n';
+
+    const section5 = ndClause || '5. NON-DISPARAGEMENT\n(Reserved).\n';
+
+    const section6 = powerClause;
+
+    const section7 = `7. TERM\n${termClause}\n`;
+
+    const section8 = '8. SAFETY AND LEGAL RIGHTS\nNothing in this Agreement waives any Party’s right to withdraw consent at any time, to seek help, or to report unlawful conduct. This Agreement does not authorize illegal acts.\n';
+
+    const section9 = liquidated;
+
+    const section10 = dispute + crossBorderClause;
+
+    const section11 = '11. MISCELLANEOUS\nThis Agreement constitutes the entire understanding regarding confidentiality between the Parties and may be amended only in a signed writing (including electronic signatures). If any provision is held unenforceable, the remainder shall remain in effect. This Agreement may be executed in counterparts.\n\nSIGNATURES\n______________________________\n' + aFull + '\nDate: ________________________\n\n______________________________\n' + bFull + '\nDate: ________________________\n';
+
+    const fullText = [intro, section1, section2, section3, section4, section5, section6, section7, section8, section9, section10, section11].join('\n');
+    const output = document.getElementById('ndaOutput');
+    output.value = fullText.trim();
+    output.classList.add('highlight');
+    clearTimeout(renderNda.highlightTimer);
+    renderNda.highlightTimer = setTimeout(() => output.classList.remove('highlight'), 10000);
+}
+
+function copyNdaText() {
+    const text = document.getElementById('ndaOutput').value;
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(() => alert('NDA copied to clipboard.')).catch(() => fallbackCopy(text));
+    } else {
+        fallbackCopy(text);
+    }
+}
+
+function fallbackCopy(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('NDA copied to clipboard.');
+}
+
+function init() {
+    handleInputChanges();
+    applyPreset('private_couple');
+    renderNda();
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
 </body>
 </html>

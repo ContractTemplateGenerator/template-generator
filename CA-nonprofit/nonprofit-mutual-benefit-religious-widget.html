@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+  .nonprofit-mb-widget {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    max-width: 100%;
+    margin: 0 auto 40px auto;
+    color: #1a1a1a;
+    line-height: 1.6;
+  }
+  
+  .nonprofit-mb-widget * {
+    box-sizing: border-box;
+  }
+  
+  /* Hero Section */
+  .widget-hero {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .widget-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+  }
+  
+  .hero-title {
+    margin: 0 0 10px 0;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+  
+  .hero-text {
+    margin: 0;
+    opacity: 0.9;
+    font-size: 16px;
+  }
+  
+  /* Quick Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .stat-card {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .stat-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .stat-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #7c3aed;
+    margin-bottom: 5px;
+  }
+  
+  .stat-label {
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  /* Tab Navigation */
+  .tab-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 0;
+  }
+  
+  .tab-button {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-bottom: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    font-weight: 500;
+    color: #6c757d;
+    transition: all 0.2s ease;
+    position: relative;
+    bottom: -2px;
+  }
+  
+  .tab-button:hover {
+    background: #f8f9fa;
+    color: #7c3aed;
+  }
+  
+  .tab-button.active {
+    background: white;
+    color: #7c3aed;
+    border-color: #7c3aed;
+    border-bottom: 2px solid white;
+    font-weight: 600;
+  }
+  
+  .tab-content {
+    display: none;
+  }
+  
+  .tab-content.active {
+    display: block;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Cards */
+  .info-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    transition: box-shadow 0.2s ease;
+  }
+  
+  .info-card:hover {
+    box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+  }
+  
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 15px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .card-icon {
+    font-size: 24px;
+  }
+  
+  .card-content {
+    color: #495057;
+    line-height: 1.6;
+  }
+  
+  .card-content p {
+    margin: 0 0 12px 0;
+  }
+  
+  .card-content p:last-child {
+    margin-bottom: 0;
+  }
+  
+  /* Comparison Cards */
+  .comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  
+  .comparison-card {
+    background: white;
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 20px;
+    position: relative;
+  }
+  
+  .comparison-card.mutual-benefit {
+    border-color: #7c3aed;
+  }
+  
+  .comparison-card.religious {
+    border-color: #ec4899;
+  }
+  
+  .comparison-header {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid;
+  }
+  
+  .comparison-card.mutual-benefit .comparison-header {
+    color: #7c3aed;
+    border-color: #7c3aed;
+  }
+  
+  .comparison-card.religious .comparison-header {
+    color: #ec4899;
+    border-color: #ec4899;
+  }
+  
+  .comparison-item {
+    padding: 10px 0;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .comparison-item:last-child {
+    border-bottom: none;
+  }
+  
+  .comparison-label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 5px;
+  }
+  
+  .comparison-value {
+    color: #6c757d;
+    font-size: 14px;
+  }
+  
+  /* Badge System */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-right: 6px;
+    margin-bottom: 6px;
+  }
+  
+  .badge-green {
+    background: #d1f4e0;
+    color: #0d6832;
+  }
+  
+  .badge-yellow {
+    background: #fff3cd;
+    color: #856404;
+  }
+  
+  .badge-red {
+    background: #f8d7da;
+    color: #721c24;
+  }
+  
+  .badge-blue {
+    background: #cfe2ff;
+    color: #084298;
+  }
+  
+  .badge-purple {
+    background: #e0cffc;
+    color: #5a1e8f;
+  }
+  
+  /* Lists */
+  .styled-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .styled-list li {
+    padding: 12px 0 12px 30px;
+    position: relative;
+    border-bottom: 1px solid #f1f3f5;
+  }
+  
+  .styled-list li:last-child {
+    border-bottom: none;
+  }
+  
+  .styled-list li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #7c3aed;
+    font-weight: bold;
+    font-size: 18px;
+  }
+  
+  /* Warning/Info Boxes */
+  .alert-box {
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid;
+  }
+  
+  .alert-info {
+    background: #e7f3ff;
+    border-color: #0969da;
+    color: #0550ae;
+  }
+  
+  .alert-warning {
+    background: #fff8e1;
+    border-color: #f59e0b;
+    color: #b45309;
+  }
+  
+  .alert-success {
+    background: #d1f4e0;
+    border-color: #10b981;
+    color: #065f46;
+  }
+  
+  .alert-danger {
+    background: #fee;
+    border-color: #dc2626;
+    color: #991b1b;
+  }
+  
+  .alert-box strong {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 700;
+  }
+  
+  /* Accordion/FAQ */
+  .faq-section {
+    margin-top: 30px;
+  }
+  
+  .faq-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  
+  .faq-question {
+    padding: 18px 20px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #1a1a1a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
+  }
+  
+  .faq-question:hover {
+    background: #f8f9fa;
+  }
+  
+  .faq-icon {
+    font-size: 20px;
+    transition: transform 0.3s ease;
+    color: #7c3aed;
+  }
+  
+  .faq-item.active .faq-icon {
+    transform: rotate(180deg);
+  }
+  
+  .faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .faq-answer-content {
+    padding: 0 20px 20px 20px;
+    color: #495057;
+    line-height: 1.6;
+  }
+  
+  .faq-item.active .faq-answer {
+    max-height: 2000px;
+  }
+  
+  /* Timeline */
+  .timeline {
+    position: relative;
+    padding-left: 30px;
+  }
+  
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #e9ecef;
+  }
+  
+  .timeline-item {
+    position: relative;
+    padding-bottom: 25px;
+  }
+  
+  .timeline-item:last-child {
+    padding-bottom: 0;
+  }
+  
+  .timeline-marker {
+    position: absolute;
+    left: -26px;
+    top: 4px;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #7c3aed;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #7c3aed;
+  }
+  
+  .timeline-content {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .timeline-title {
+    font-weight: 700;
+    color: #1a1a1a;
+    margin-bottom: 8px;
+  }
+  
+  .timeline-text {
+    color: #6c757d;
+    font-size: 14px;
+    margin: 0;
+  }
+  
+  /* Table */
+  .info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  .info-table th,
+  .info-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .info-table th {
+    background: #f8f9fa;
+    font-weight: 700;
+    color: #495057;
+  }
+  
+  .info-table tr:hover {
+    background: #f8f9fa;
+  }
+  
+  /* CTA Section */
+  .cta-section {
+    background: linear-gradient(135deg, #7c3aed 0%, #a855f7 100%);
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 30px;
+  }
+  
+  .cta-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+  }
+  
+  .cta-text {
+    margin: 0 0 20px 0;
+    opacity: 0.9;
+  }
+  
+  .cta-button {
+    display: inline-block;
+    background: white;
+    color: #7c3aed;
+    padding: 12px 30px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .tab-nav {
+      gap: 5px;
+    }
+    
+    .tab-button {
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+    
+    .comparison-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .widget-hero {
+      padding: 20px;
+    }
+    
+    .hero-title {
+      font-size: 24px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="nonprofit-mb-widget">
+  <!-- Hero Section -->
+  <div class="widget-hero">
+    <span class="hero-badge">California Nonprofit Law</span>
+    <div class="hero-title">Mutual Benefit & Religious Corporations</div>
+    <p class="hero-text">Complete guide to forming nonprofit corporations for trade associations, social clubs, churches, and religious organizations in California</p>
+  </div>
+
+  <!-- Quick Stats -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value">$30</div>
+      <div class="stat-label">Articles Filing Fee</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value">$20</div>
+      <div class="stat-label">Statement of Info</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">⏱️</div>
+      <div class="stat-value">2-3 Days</div>
+      <div class="stat-label">Standard Processing</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🎯</div>
+      <div class="stat-value">90 Days</div>
+      <div class="stat-label">First SI-100 Deadline</div>
+    </div>
+  </div>
+
+  <!-- Tab Navigation -->
+  <div class="tab-nav">
+    <button class="tab-button active" onclick="openTab(event, 'overview')">Overview</button>
+    <button class="tab-button" onclick="openTab(event, 'distinction')">Choosing</button>
+    <button class="tab-button" onclick="openTab(event, 'costs')">Costs</button>
+    <button class="tab-button" onclick="openTab(event, 'formation')">Formation</button>
+    <button class="tab-button" onclick="openTab(event, 'federal')">Federal</button>
+    <button class="tab-button" onclick="openTab(event, 'state')">State</button>
+    <button class="tab-button" onclick="openTab(event, 'property')">Property</button>
+    <button class="tab-button" onclick="openTab(event, 'compliance')">Compliance</button>
+    <button class="tab-button" onclick="openTab(event, 'faq')">FAQ</button>
+  </div>
+
+  <!-- Tab Content -->
+  
+  <!-- Overview Tab -->
+  <div id="overview" class="tab-content active">
+    <div class="comparison-grid">
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">🤝 Mutual Benefit</div>
+        <div class="comparison-item">
+          <div class="comparison-label">Primary Purpose</div>
+          <div class="comparison-value">Serves members rather than public</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">Common Examples</div>
+          <div class="comparison-value">Trade associations, social clubs, HOAs, professional societies</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">Typical Tax Status</div>
+          <div class="comparison-value">501(c)(4), 501(c)(6), or 501(c)(7)</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">AG Registration</div>
+          <div class="comparison-value">Only if holding charitable assets</div>
+        </div>
+      </div>
+
+      <div class="comparison-card religious">
+        <div class="comparison-header">⛪ Religious</div>
+        <div class="comparison-item">
+          <div class="comparison-label">Primary Purpose</div>
+          <div class="comparison-value">Religious worship, teaching, mission</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">Common Examples</div>
+          <div class="comparison-value">Churches, synagogues, mosques, religious schools, ministries</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">Typical Tax Status</div>
+          <div class="comparison-value">501(c)(3) - often automatic for churches</div>
+        </div>
+        <div class="comparison-item">
+          <div class="comparison-label">AG Registration</div>
+          <div class="comparison-value">Generally exempt</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box alert-info">
+      <strong>Critical Decision:</strong>
+      The choice between mutual benefit and religious corporation determines your Attorney General oversight, federal tax options, property tax exemptions, and governance flexibility. This decision should be made based on your primary purpose and intended activities, not convenience.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📚</span>
+        <span>Governing Statutes</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Mutual Benefit Corporations:</strong> California Corporations Code §§7110-7690 (Part 3)</p>
+        <p><strong>Religious Corporations:</strong> California Corporations Code §§9110-9690 (Part 4)</p>
+        <p>Both are distinct from Public Benefit Corporations (Part 2), which are designed for charitable organizations serving the public rather than members.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Choosing Tab -->
+  <div id="distinction" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🤝</span>
+        <span>Use Mutual Benefit Corporation When:</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>Organization exists primarily to benefit its members</li>
+          <li>You're forming a trade or professional association</li>
+          <li>Creating a social, recreational, or hobby club</li>
+          <li>Establishing a homeowners association</li>
+          <li>Building a member-based business league or civic organization</li>
+          <li>Member services and advocacy are core activities</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⛪</span>
+        <span>Use Religious Corporation When:</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>Primary purpose is religious worship or teaching</li>
+          <li>Operating a church, synagogue, mosque, or temple</li>
+          <li>Forming a religious order or denominational organization</li>
+          <li>Establishing a religious school or ministry</li>
+          <li>Conducting faith-based missionary work</li>
+          <li>Religious activities are central to operations</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert-box alert-warning">
+      <strong>Common Mistake:</strong>
+      Don't form a mutual benefit corporation expecting 501(c)(3) status. Mutual benefit corporations serve members, not charitable classes. If your purpose is charitable, educational, or religious within the 501(c)(3) definition, form a public benefit or religious corporation instead.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚖️</span>
+        <span>Federal Tax Exemption Mapping</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Corporation Type</th>
+              <th>Typical Federal Status</th>
+              <th>Key Characteristic</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Mutual Benefit</strong></td>
+              <td>501(c)(6) Business League</td>
+              <td>Trade associations, chambers of commerce</td>
+            </tr>
+            <tr>
+              <td><strong>Mutual Benefit</strong></td>
+              <td>501(c)(7) Social Club</td>
+              <td>Pleasure, recreation, social purposes</td>
+            </tr>
+            <tr>
+              <td><strong>Mutual Benefit</strong></td>
+              <td>501(c)(4) Social Welfare</td>
+              <td>Civic leagues, community organizations</td>
+            </tr>
+            <tr>
+              <td><strong>Religious</strong></td>
+              <td>501(c)(3) Religious/Charitable</td>
+              <td>Churches, religious organizations</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Costs Tab -->
+  <div id="costs" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">💵</span>
+        <span>Formation & Filing Fees</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Cost</th>
+              <th>When Due</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Articles of Incorporation (ARTS-MU or ARTS-RE)</td>
+              <td>$30</td>
+              <td>At formation</td>
+            </tr>
+            <tr>
+              <td>Name Reservation (optional)</td>
+              <td>$10</td>
+              <td>Before filing Articles</td>
+            </tr>
+            <tr>
+              <td>Certified Copy (optional)</td>
+              <td>$5</td>
+              <td>With Articles filing</td>
+            </tr>
+            <tr>
+              <td>24-Hour Expedite (optional)</td>
+              <td>$350</td>
+              <td>With Articles filing</td>
+            </tr>
+            <tr>
+              <td>Same-Day Expedite (optional)</td>
+              <td>$750</td>
+              <td>With Articles filing</td>
+            </tr>
+            <tr>
+              <td>Statement of Information (SI-100)</td>
+              <td>$20</td>
+              <td>Within 90 days; then biennial</td>
+            </tr>
+            <tr>
+              <td>EIN from IRS</td>
+              <td>Free</td>
+              <td>After incorporation</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📄</span>
+        <span>Tax Exemption Application Fees</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Application</th>
+              <th>Cost</th>
+              <th>Who Files</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>IRS Form 1023 (501(c)(3))</td>
+              <td>$600</td>
+              <td>Religious corps, some mutual benefit</td>
+            </tr>
+            <tr>
+              <td>IRS Form 1023-EZ</td>
+              <td>$275</td>
+              <td>Smaller religious organizations</td>
+            </tr>
+            <tr>
+              <td>IRS Form 1024 (other exemptions)</td>
+              <td>$600</td>
+              <td>Mutual benefit corps (501(c)(4)/(6)/(7))</td>
+            </tr>
+            <tr>
+              <td>IRS Form 1024-A</td>
+              <td>$50</td>
+              <td>Certain smaller organizations</td>
+            </tr>
+            <tr>
+              <td>FTB Form 3500A (California)</td>
+              <td>Free</td>
+              <td>After obtaining IRS determination</td>
+            </tr>
+            <tr>
+              <td>FTB Form 3500 (California)</td>
+              <td>Free</td>
+              <td>Without IRS determination letter</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="alert-box alert-info">
+      <strong>Churches and Automatic Exemption:</strong>
+      Churches meeting IRS Publication 1828 criteria have automatic 501(c)(3) status without filing Form 1023. However, many churches voluntarily file to obtain determination letters for donor confidence and banking relationships.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🔄</span>
+        <span>Ongoing Annual Costs</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Requirement</th>
+              <th>Cost</th>
+              <th>Frequency</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Statement of Information (SI-100)</td>
+              <td>$20</td>
+              <td>Every 2 years</td>
+            </tr>
+            <tr>
+              <td>FTB Form 199 or 199N</td>
+              <td>Free (if exempt)</td>
+              <td>Annual</td>
+            </tr>
+            <tr>
+              <td>IRS Form 990/990-EZ/990-N</td>
+              <td>Free</td>
+              <td>Annual (churches often exempt)</td>
+            </tr>
+            <tr>
+              <td>$800 Franchise Tax</td>
+              <td>$0 (if exempt)</td>
+              <td>Applies only if not tax-exempt</td>
+            </tr>
+            <tr>
+              <td>AG Form RRF-1 (if charitable assets)</td>
+              <td>$25-$50</td>
+              <td>Annual (if applicable)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formation Tab -->
+  <div id="formation" class="tab-content">
+    <div class="comparison-grid">
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">Mutual Benefit Formation</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">1. Name Search & Reservation</div>
+              <div class="timeline-text">Check availability on BizFile Online. Reserve for $10 if needed (60 days).</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">2. Appoint Registered Agent</div>
+              <div class="timeline-text">Individual or professional agent with CA street address.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">3. Draft Articles (ARTS-MU)</div>
+              <div class="timeline-text">Include purpose, member/no-member structure, dissolution clause, no private inurement.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">4. File Articles with SOS</div>
+              <div class="timeline-text">$30 fee. File via BizFile Online (2-3 days) or expedited ($350/$750).</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">5. Obtain EIN from IRS</div>
+              <div class="timeline-text">Free online application at irs.gov/ein. Immediate if during business hours.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">6. Draft Bylaws</div>
+              <div class="timeline-text">Directors, officers, meetings, membership rights, amendment procedures.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">7. File SI-100 (within 90 days)</div>
+              <div class="timeline-text">$20 fee. List officers, addresses, agent, business activity.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="comparison-card religious">
+        <div class="comparison-header">Religious Formation</div>
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">1. Name Search & Reservation</div>
+              <div class="timeline-text">Check availability on BizFile Online. Reserve for $10 if needed (60 days).</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">2. Appoint Registered Agent</div>
+              <div class="timeline-text">Individual or professional agent with CA street address.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">3. Draft Articles (ARTS-RE)</div>
+              <div class="timeline-text">Religious purpose, 501(c)(3) dissolution clause, no private gain statement.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">4. File Articles with SOS</div>
+              <div class="timeline-text">$30 fee. File via BizFile Online (2-3 days) or expedited ($350/$750).</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">5. Obtain EIN from IRS</div>
+              <div class="timeline-text">Free online. Indicate expected tax-exempt status.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">6. Draft Bylaws</div>
+              <div class="timeline-text">Board structure, officer roles, member/congregational rights, religious polity.</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">7. File SI-100 (within 90 days)</div>
+              <div class="timeline-text">$20 fee. Same form as mutual benefit corporations.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box alert-warning">
+      <strong>Critical Articles Language:</strong>
+      Your purpose clause and dissolution provisions in the Articles of Incorporation must align with your intended federal tax exemption. Don't use generic language if you're pursuing specific IRS status. Add provisions like "shall not carry on activities not permitted by organizations exempt under Section 501(c)[X]."
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📝</span>
+        <span>Bylaws Must Address</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>Number of directors (minimum one for mutual benefit/religious corps)</li>
+          <li>How directors are elected or appointed</li>
+          <li>Director term lengths and removal procedures</li>
+          <li>Officer titles and duties (President, Secretary, CFO required)</li>
+          <li>Member admission, termination, voting rights (if members)</li>
+          <li>Meeting procedures and quorum requirements</li>
+          <li>Committee structure and delegation authority</li>
+          <li>Conflict of interest policy</li>
+          <li>Bylaw amendment procedures</li>
+          <li>Fiscal year definition</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Federal Tab -->
+  <div id="federal" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🏛️</span>
+        <span>Federal Exemption Categories</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Section</th>
+              <th>Organization Type</th>
+              <th>Form</th>
+              <th>Corp Type</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>501(c)(3)</td>
+              <td>Religious, Charitable, Educational</td>
+              <td>1023 / 1023-EZ</td>
+              <td>Religious</td>
+            </tr>
+            <tr>
+              <td>501(c)(4)</td>
+              <td>Social Welfare, Civic Leagues</td>
+              <td>1024 / 1024-A</td>
+              <td>Mutual Benefit</td>
+            </tr>
+            <tr>
+              <td>501(c)(6)</td>
+              <td>Trade Associations, Business Leagues</td>
+              <td>1024 / 1024-A</td>
+              <td>Mutual Benefit</td>
+            </tr>
+            <tr>
+              <td>501(c)(7)</td>
+              <td>Social & Recreational Clubs</td>
+              <td>1024 / 1024-A</td>
+              <td>Mutual Benefit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">501(c)(6) Trade Association</div>
+        <div class="card-content">
+          <p><strong>Purpose:</strong> Promoting common business interests of industry/profession</p>
+          <p><strong>Key Requirements:</strong></p>
+          <ul class="styled-list">
+            <li>Industry-wide improvements, not individual member services</li>
+            <li>Advocacy, standard-setting, research benefiting profession</li>
+            <li>Member education related to professional development</li>
+            <li>No substantial individual business services (accounting, marketing)</li>
+          </ul>
+          <p><strong>Lobbying:</strong> Can engage in substantial lobbying (unlike 501(c)(3))</p>
+        </div>
+      </div>
+
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">501(c)(7) Social Club</div>
+        <div class="card-content">
+          <p><strong>Purpose:</strong> Pleasure, recreation, social purposes</p>
+          <p><strong>Key Requirements:</strong></p>
+          <ul class="styled-list">
+            <li>Substantially all activities for members</li>
+            <li>Nonmember income limited to 35% of gross receipts</li>
+            <li>Limited nonmember use of facilities</li>
+            <li>No substantial public benefit purpose</li>
+          </ul>
+          <p><strong>Risk:</strong> Excessive nonmember income or facility rentals jeopardize status</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box alert-success">
+      <strong>Churches & Automatic Exemption:</strong>
+      Churches meeting IRS Publication 1828 criteria (14 characteristics) receive automatic 501(c)(3) exemption under Section 508(c)(1)(A) without filing Form 1023. Churches are also exempt from Form 990 filing. However, many churches voluntarily file Form 1023 to obtain determination letters.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📊</span>
+        <span>Religious Corporation Options</span>
+      </div>
+      <div class="card-content">
+        <p><span class="badge badge-green">Churches</span> Automatic 501(c)(3), no Form 1023 required, no Form 990 required</p>
+        <p><span class="badge badge-blue">Voluntary Filing</span> Churches can file Form 1023 or 1023-EZ for determination letter</p>
+        <p><span class="badge badge-purple">Non-Church Religious</span> Ministries, religious schools, parachurch organizations should file Form 1023/1023-EZ</p>
+        <p><strong>Processing Time:</strong> Form 1023-EZ: 4-8 months | Full Form 1023: 6-12 months</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚠️</span>
+        <span>Common Federal Application Mistakes</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li><strong>501(c)(6):</strong> Describing individual member services instead of industry-wide benefits</li>
+          <li><strong>501(c)(7):</strong> Failing to demonstrate limited nonmember income and use</li>
+          <li><strong>All exemptions:</strong> Bylaws that don't match application descriptions of governance</li>
+          <li><strong>Religious corps:</strong> Insufficient explanation of religious activities vs. social fellowship</li>
+          <li><strong>Dissolution clauses:</strong> Assets not directed to qualifying organizations</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- State Tab -->
+  <div id="state" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🏛️</span>
+        <span>California Tax Exemption Process</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Critical Point:</strong> Federal tax-exempt status does not automatically create California exemption. You must separately apply to the Franchise Tax Board (FTB).</p>
+      </div>
+    </div>
+
+    <div class="comparison-grid">
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">FTB Form 3500A (Streamlined)</div>
+        <div class="card-content">
+          <p><strong>When to Use:</strong> You already have IRS determination letter for 501(c)(3), (4), (5), (6), (7), or certain other sections</p>
+          <p><strong>Process:</strong></p>
+          <ul class="styled-list">
+            <li>Submit Form 3500A with copy of IRS determination letter</li>
+            <li>FTB generally accepts IRS determination</li>
+            <li>Processing: 60-90 days typically</li>
+          </ul>
+          <p><strong>Strategy:</strong> Obtain IRS exemption first, then file FTB Form 3500A</p>
+        </div>
+      </div>
+
+      <div class="comparison-card religious">
+        <div class="comparison-header">FTB Form 3500 (Full Application)</div>
+        <div class="card-content">
+          <p><strong>When to Use:</strong> No IRS determination letter, or exemption not eligible for Form 3500A</p>
+          <p><strong>Process:</strong></p>
+          <ul class="styled-list">
+            <li>Detailed financial information required</li>
+            <li>Narrative descriptions of activities</li>
+            <li>Supporting documentation needed</li>
+          </ul>
+          <p><strong>Processing:</strong> 4-6 months; FTB may request additional information</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🗂️</span>
+        <span>California Exemption Categories (R&TC §23701)</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>CA Section</th>
+              <th>Description</th>
+              <th>Federal Parallel</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>§23701d</td>
+              <td>Religious, Charitable, Scientific</td>
+              <td>501(c)(3)</td>
+            </tr>
+            <tr>
+              <td>§23701f</td>
+              <td>Civic Leagues, Social Welfare</td>
+              <td>501(c)(4)</td>
+            </tr>
+            <tr>
+              <td>§23701g</td>
+              <td>Business Leagues, Trade Associations</td>
+              <td>501(c)(6)</td>
+            </tr>
+            <tr>
+              <td>§23701h</td>
+              <td>Social & Recreational Clubs</td>
+              <td>501(c)(7)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="alert-box alert-danger">
+      <strong>$800 Franchise Tax Trap:</strong>
+      Without California exemption, you owe the $800 annual minimum franchise tax even if you have federal exemption. File Form 100 and pay the tax until California exemption is approved. Once approved with retroactive effective date, you can file amended returns for refunds.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📋</span>
+        <span>Annual California Filing Requirements</span>
+      </div>
+      <div class="card-content">
+        <p><span class="badge badge-blue">Form 199</span> Exempt Organization Annual Information Return</p>
+        <ul class="styled-list">
+          <li>Due: 15th day of 5th month after fiscal year end (May 15 for calendar-year orgs)</li>
+          <li>Required for most exempt organizations</li>
+          <li>Reports financial information, activities, governance</li>
+          <li>No filing fee for exempt organizations</li>
+        </ul>
+
+        <p><span class="badge badge-green">Form 199N</span> Electronic Filing Requirement Notice</p>
+        <ul class="styled-list">
+          <li>Simplified alternative for orgs with gross receipts normally under $50,000</li>
+          <li>Electronic filing only; much simpler than Form 199</li>
+        </ul>
+
+        <p><span class="badge badge-red">Penalty for Non-Filing</span> Failure to file Form 199 for 3 consecutive years results in automatic loss of exemption under R&TC §23703</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚖️</span>
+        <span>Attorney General Registration</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Mutual Benefit Corporations:</strong></p>
+        <p><span class="badge badge-yellow">Generally NOT required</span> to register with Attorney General</p>
+        <p><span class="badge badge-red">EXCEPTION</span> Must register if holding assets in charitable trust</p>
+        <p>Example: Trade association creates scholarship fund with restricted donations = charitable trust requiring registration</p>
+
+        <p style="margin-top: 20px;"><strong>Religious Corporations:</strong></p>
+        <p><span class="badge badge-green">Generally EXEMPT</span> from Attorney General registration under Gov Code §12583</p>
+        <p><span class="badge badge-yellow">BUT</span> Must provide 20-day notice to AG before dissolution under Corp Code §9680</p>
+        <p>AG retains oversight over asset disposition at dissolution to ensure compliance with 501(c)(3) requirements</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Property Tab -->
+  <div id="property" class="tab-content">
+    <div class="comparison-grid">
+      <div class="comparison-card religious">
+        <div class="comparison-header">Religious Exemption (R&TC §206)</div>
+        <div class="card-content">
+          <p><strong>What Qualifies:</strong> Buildings used exclusively for religious worship + reasonable amount of land</p>
+          <p><strong>Eligible Properties:</strong></p>
+          <ul class="styled-list">
+            <li>Sanctuary used for worship services</li>
+            <li>Multi-purpose building for worship + religious education</li>
+            <li>Parsonages for ministers conducting services</li>
+          </ul>
+          <p><strong>Application:</strong> BOE-262-A (Claim for Church Exemption) filed with county assessor</p>
+          <p><strong>Continues:</strong> Automatically while use remains exclusively religious; must refile if ownership/use changes</p>
+        </div>
+      </div>
+
+      <div class="comparison-card mutual-benefit">
+        <div class="comparison-header">Welfare Exemption (R&TC §214)</div>
+        <div class="card-content">
+          <p><strong>What Qualifies:</strong> Property owned/operated by qualifying nonprofits and used exclusively for religious, hospital, scientific, or charitable purposes</p>
+          <p><strong>Requirements:</strong></p>
+          <ul class="styled-list">
+            <li>Organization must be exempt (501(c)(3) or equivalent)</li>
+            <li>Property used exclusively for exempt purposes</li>
+            <li>Irrevocable dedication to exempt use (dissolution clause)</li>
+          </ul>
+          <p><strong>Application:</strong> BOE-267 (Welfare Exemption – First Filing) with county assessor</p>
+          <p><strong>Renewal:</strong> Annual supplemental claims required to maintain</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box alert-warning">
+      <strong>Commercial Activity Warning:</strong>
+      Running bookstores, coffee shops, or gift shops on your exempt property can jeopardize property tax exemption for that portion of the property. The square footage used for commercial activities generating unrelated business income may become taxable even if the sanctuary remains exempt.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🏠</span>
+        <span>Parsonage Exemption Requirements</span>
+      </div>
+      <div class="card-content">
+        <p>Religious corporations can claim property tax exemption for parsonages (minister residences) when:</p>
+        <ul class="styled-list">
+          <li>Property is owned by the religious organization (not rented)</li>
+          <li>Occupied by a minister who conducts religious services for the organization</li>
+          <li>Provided as part of ministerial compensation</li>
+          <li>Not rented to minister at fair market rent (that would be commercial)</li>
+          <li>Not provided to non-ministerial employees</li>
+        </ul>
+        <p><span class="badge badge-red">Important:</span> Renting a house to your minister at market rent does NOT qualify for exemption—that's a commercial rental, not a parsonage.</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📝</span>
+        <span>Application Timeline</span>
+      </div>
+      <div class="card-content">
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Step 1: Determine Eligibility</div>
+              <div class="timeline-text">Confirm property is used exclusively for qualifying purposes (religious worship, charitable activities)</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Step 2: Obtain Tax Exemption</div>
+              <div class="timeline-text">Must have 501(c)(3) status or equivalent before property tax exemption</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Step 3: File Claim</div>
+              <div class="timeline-text">Submit BOE-262-A (religious) or BOE-267 (welfare) to county assessor before filing deadline (typically January-February)</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Step 4: Assessor Investigation</div>
+              <div class="timeline-text">County assessor reviews organization documents, property use, and qualification</div>
+            </div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-marker"></div>
+            <div class="timeline-content">
+              <div class="timeline-title">Step 5: Maintain Compliance</div>
+              <div class="timeline-text">Religious exemption continues automatically; welfare exemption requires annual supplemental filings</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert-box alert-info">
+      <strong>Multiple Properties:</strong>
+      If your organization owns multiple properties with different uses (worship facility, administrative office, rental property), each property must be evaluated separately. The worship facility may qualify for religious exemption while the rental property remains taxable.
+    </div>
+  </div>
+
+  <!-- Compliance Tab -->
+  <div id="compliance" class="tab-content">
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📅</span>
+        <span>Formation Phase Compliance</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Task</th>
+              <th>Deadline</th>
+              <th>Fee</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>File Articles of Incorporation (ARTS-MU or ARTS-RE)</td>
+              <td>Formation date</td>
+              <td>$30</td>
+            </tr>
+            <tr>
+              <td>Obtain EIN from IRS</td>
+              <td>Immediately after formation</td>
+              <td>Free</td>
+            </tr>
+            <tr>
+              <td>File initial Statement of Information (SI-100)</td>
+              <td>Within 90 days of formation</td>
+              <td>$20</td>
+            </tr>
+            <tr>
+              <td>File federal exemption application</td>
+              <td>Within first taxable year (recommended)</td>
+              <td>$50-$600</td>
+            </tr>
+            <tr>
+              <td>File California FTB Form 3500/3500A</td>
+              <td>After IRS approval (recommended)</td>
+              <td>Free</td>
+            </tr>
+            <tr>
+              <td>Register with Attorney General (if applicable)</td>
+              <td>Within 30 days of first charitable assets</td>
+              <td>Varies</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">🔄</span>
+        <span>Annual Compliance Requirements</span>
+      </div>
+      <div class="card-content">
+        <table class="info-table">
+          <thead>
+            <tr>
+              <th>Filing</th>
+              <th>Deadline</th>
+              <th>Who Must File</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>IRS Form 990 / 990-EZ / 990-N</td>
+              <td>15th day of 5th month after fiscal year end</td>
+              <td>Tax-exempt orgs (churches often exempt)</td>
+            </tr>
+            <tr>
+              <td>IRS Form 990-T</td>
+              <td>15th day of 5th month after fiscal year end</td>
+              <td>If unrelated business income &gt; $1,000</td>
+            </tr>
+            <tr>
+              <td>FTB Form 199 or 199N</td>
+              <td>15th day of 5th month after fiscal year end</td>
+              <td>CA exempt organizations (some churches exempt)</td>
+            </tr>
+            <tr>
+              <td>FTB Form 109</td>
+              <td>15th day of 4th month after fiscal year end</td>
+              <td>If unrelated business income in California</td>
+            </tr>
+            <tr>
+              <td>AG Form RRF-1</td>
+              <td>4.5 months after fiscal year end</td>
+              <td>If holding charitable assets (mutual benefit only)</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📆</span>
+        <span>Biennial Requirements</span>
+      </div>
+      <div class="card-content">
+        <p><strong>Statement of Information (Form SI-100)</strong></p>
+        <ul class="styled-list">
+          <li>Due every 2 years in the anniversary month of Articles filing</li>
+          <li>$20 filing fee</li>
+          <li>Updates corporate officers, addresses, agent, business activity</li>
+          <li>Secretary of State sends reminder ~60 days before, but you're responsible even without reminder</li>
+        </ul>
+        <p><span class="badge badge-red">Critical:</span> Failure to file SI-100 can result in corporate suspension and administrative dissolution</p>
+      </div>
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">⚠️</span>
+        <span>Common Compliance Failures</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li><strong>Forgetting SI-100:</strong> Missing biennial Statement of Information leads to suspension</li>
+          <li><strong>Not filing Form 199 for 3 years:</strong> Automatic loss of California exemption under R&TC §23703</li>
+          <li><strong>Ignoring UBTI:</strong> Failing to file Form 990-T when unrelated business income exceeds $1,000</li>
+          <li><strong>Officer changes not updated:</strong> SI-100 information becomes outdated, causing service of process problems</li>
+          <li><strong>501(c)(7) nonmember income:</strong> Exceeding 35% nonmember income jeopardizes social club status</li>
+          <li><strong>Charitable assets without AG registration:</strong> Mutual benefit corps holding restricted funds without registering</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="alert-box alert-info">
+      <strong>Calendar Management Strategy:</strong>
+      Assign one person (treasurer or secretary) responsibility for all compliance deadlines. Use electronic calendar reminders 30 days before each deadline. File early rather than waiting until the last day. If your organization can't manage compliance internally, engage a CPA or attorney for ongoing filing assistance.
+    </div>
+
+    <div class="info-card">
+      <div class="card-title">
+        <span class="card-icon">📋</span>
+        <span>Governance Best Practices</span>
+      </div>
+      <div class="card-content">
+        <ul class="styled-list">
+          <li>Hold annual board meetings with documented minutes</li>
+          <li>Maintain conflict of interest policy and annual disclosure statements</li>
+          <li>Document major decisions in board resolutions</li>
+          <li>Review and update bylaws periodically</li>
+          <li>Maintain document retention policy</li>
+          <li>Keep formation documents, exemption applications, determination letters permanently</li>
+          <li>File Form 990 Schedule O disclosures for material changes</li>
+          <li>Review insurance coverage annually (liability, D&O, employment practices)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- FAQ Tab -->
+  <div id="faq" class="tab-content">
+    <div class="faq-section">
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can mutual benefit corporations qualify for 501(c)(3) status?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Rarely. Mutual benefit corporations are designed to serve member interests rather than charitable classes, which conflicts with 501(c)(3) requirements. If your organization's primary purpose is charitable, educational, or religious within the 501(c)(3) definition, you should form a public benefit corporation (for charitable/educational) or religious corporation (for religious) instead. The IRS may grant 501(c)(3) status to a California mutual benefit corporation if operations genuinely serve charitable purposes, but California law typically requires public benefit status for organizations primarily serving charitable classes. If you formed as mutual benefit but later realize you qualify as 501(c)(3), you can file Articles of Amendment to convert to public benefit status.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>When does a mutual benefit corporation need to register with the Attorney General?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Mutual benefit corporations must register with the Attorney General's Registry of Charitable Trusts if they hold assets in trust for charitable purposes, even though the corporation itself is organized for member benefit. This commonly occurs when trade associations create scholarship funds, social clubs establish emergency assistance programs, or HOAs accept restricted donations for community improvements. "In trust for charitable purposes" means assets restricted to charitable use by donor designation, board resolution, or operational practice that you cannot use for general corporate purposes. Once you cross this threshold, file Form CT-1 within 30 days of receiving the first restricted assets and file annual Form RRF-1 thereafter. The practical solution is awareness before launching charitable programs—consult with counsel about whether you're crossing into charitable territory, and either register appropriately or keep charitable activities in a separate 501(c)(3) organization.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Are religious corporations completely exempt from Attorney General oversight?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            No. While religious corporations are generally exempt from registration with the Attorney General's Registry of Charitable Trusts under Government Code Section 12583, they remain subject to Attorney General oversight regarding dissolution and asset distribution under Corporations Code Section 9680. When a religious corporation dissolves, it must provide the Attorney General at least 20 days' advance notice before distributing assets and submit detailed information using procedures in Title 11, California Code of Regulations, Section 331. The Attorney General reviews proposed asset distribution to ensure assets go to qualifying 501(c)(3) organizations or governmental entities as required by dissolution clauses and federal tax exemption requirements. If you attempt to distribute assets to individuals, for-profit entities, or non-qualifying organizations, the Attorney General will object and can seek court orders preventing improper distribution. Additionally, if your religious corporation holds charitable trusts distinct from general religious activities (restricted scholarship funds, designated building funds), those specific trusts may be subject to Attorney General supervision even though your broader organization is exempt from registration.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can we form a California nonprofit if all our members live outside California?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Yes. California doesn't require that members be California residents or that activities occur primarily in California. You can form a California mutual benefit or religious corporation to serve national or international membership. However, you must maintain certain California connections: a California address for your principal office (can be a registered agent address if you don't have physical offices), a registered agent with a California street address, and California tax returns and information returns must be filed. Many national trade associations and membership organizations are formed in California for several reasons: well-developed nonprofit corporation statutes with operational flexibility, extensive California court jurisprudence interpreting nonprofit law, and favorable business climate for technology and innovation-focused associations. However, consider disadvantages: the $800 minimum franchise tax applies even after obtaining federal exemption (though properly exempt organizations are relieved once exemption is granted), California's substantial nexus rules can create tax obligations even for out-of-state organizations with significant California activities, and California's Attorney General has broad authority over nonprofits organized here regardless of where they operate. The alternative is forming in your state of primary operations—if your headquarters, staff, and activities are primarily in Texas, forming there is often simpler even with some California members.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What happens if a 501(c)(7) social club generates too much nonmember income?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            The IRS can revoke 501(c)(7) status if nonmember income exceeds approximately 35% of gross receipts or if nonmember use of facilities is excessive. This commonly occurs when country clubs, yacht clubs, or social clubs open facilities widely to nonmembers for events or generate substantial income through facility rentals. The IRS scrutinizes the member/nonmember income mix carefully because 501(c)(7) status requires that substantially all activities be for members. Revenue from nonmembers—facility rental fees, guest fees, event income from non-members—cannot be excessive. If you're planning significant outside event income, 501(c)(7) status may not work. Before jeopardizing status, track nonmember income carefully, limit nonmember facility access, consider whether certain activities should be separated into a taxable subsidiary corporation, and consult with a tax advisor if nonmember income approaches 25-30% of gross receipts. The IRS audits 501(c)(7) organizations more frequently than many people realize, primarily because of abuses involving nonmember income and using charitable activities to subsidize member benefits. If your club's activities have evolved beyond primarily member service, you may need to restructure or accept that 501(c)(7) status no longer fits.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Do we need a lawyer to form a mutual benefit or religious corporation?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            Technically no—you can file Articles of Incorporation yourself using Secretary of State forms. However, the strategic decisions involved in formation create expensive mistakes without legal guidance. Your purpose clause determines which federal tax exemptions you can pursue. Your dissolution provisions must align with IRS requirements for your target exemption category. Your bylaws must accurately reflect your governance structure and IRS operational descriptions. Your member/no-member decision affects who controls the organization and receives distribution rights on dissolution. These aren't merely administrative details—they determine whether the IRS grants exemption, whether the Attorney General asserts oversight, what property tax exemptions you qualify for, and whether your governance structure actually works. I regularly see organizations that saved $2,000 on formation legal fees spend $15,000 later restructuring or defending IRS examinations because they used generic language inappropriate for their intended exemption category. The Secretary of State reviews only whether your Articles include required elements and your name is available—they don't review whether your purpose clause aligns with 501(c)(6) requirements or whether your dissolution provisions satisfy 501(c)(3) asset distribution rules. If your organization is small, straightforward, and you're comfortable with IRS instructions, you might succeed with DIY formation. For anything more complex—national trade associations, multi-location churches, organizations with substantial assets or complex activities—invest in formation counsel. An hour of preventive legal work is far cheaper than remedial work after problems emerge.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>Can we amend our Articles after formation without affecting our tax-exempt status?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            It depends entirely on what you're amending. Routine amendments that don't affect exemption include changing registered agent or office address (typically handled through Statement of Information rather than Articles amendment), expanding or clarifying exempt purpose within the same general category, correcting errors or clarifying ambiguous language that doesn't change substance, and adding new directors or changing director terms within bylaws rather than Articles. Amendments that might require IRS notification include changing corporate purpose from religious to charitable or vice versa (potentially changing exemption category), adding or removing member structure if this affects organizational control, changing dissolution provisions affecting whether assets go to qualifying exempt organizations, adding provisions authorizing activities not described in your exemption application (commercial operations added to previously exclusively religious organization), and changing corporate structure from mutual benefit to public benefit or vice versa. For routine amendments, simply file Articles of Amendment with the Secretary of State ($30 fee) and update corporate records. For material changes, the IRS requires notification on Form 990 Schedule O. If changes are significant enough that your organization no longer matches your determination letter description, you may need a new exemption application. The IRS determination letter typically states exemption applies only as long as you operate according to facts and representations in your application—material departures can trigger re-examination. My standard advice: review proposed Articles amendments with tax counsel before filing. The $30 filing fee is modest, but consequences of inadvertently triggering exemption review or revocation are enormous.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>What insurance do mutual benefit and religious corporations need in California?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            California doesn't impose specific insurance requirements on most nonprofits, but practical risk management creates de facto requirements. Workers' compensation insurance is legally required under Labor Code Section 3700 for any organization with one or more employees, including nonprofits—no exceptions for corporations. For religious corporations operating houses of worship, essential coverage includes general liability for premises injuries, sexual misconduct and abuse coverage (often excluded without specific endorsements), directors and officers liability for governance decisions, employment practices liability for employment claims (FEHA applies to religious corps with 5+ employees), and property insurance for buildings and contents (required by mortgage lenders). For mutual benefit corporations operating facilities (country clubs, HOAs, recreational facilities), you need premises liability coverage, directors and officers liability (HOA boards face personal liability for governance decisions regarding enforcement, construction defects, reserves), and potentially professional liability depending on services provided. Religious corporations face specific workers' compensation complexity: are clergy employees or independent contractors? The analysis depends on control exercised over ministerial activities. Many denominations treat clergy as self-employed for federal tax purposes (ministers pay self-employment tax rather than FICA), but California workers' compensation law may classify them as employees requiring coverage. For mutual benefit corporations pursuing 501(c)(7) social club status, excessive insurance claims from nonmember activities can create problems with member/nonmember income and use limitations. From a risk management perspective, insurance isn't optional even if not legally mandated—I've seen small nonprofits destroyed by single liability claims from sexual abuse allegations, premises falls, or employment terminations.
+          </div>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question" onclick="toggleFaq(this)">
+          <span>How long does the entire formation and tax exemption process take?</span>
+          <span class="faq-icon">▼</span>
+        </div>
+        <div class="faq-answer">
+          <div class="faq-answer-content">
+            The timeline varies significantly based on complexity, preparation quality, and which exemption category you're pursuing. California incorporation itself is fast: Articles of Incorporation process in 2-3 business days with standard filing ($30 fee), or 24 hours with expedited processing ($350 additional), or same day with premium expedite ($750 additional). Statement of Information (SI-100) processes similarly quickly. The delay is federal and state tax exemption. For mutual benefit corporations pursuing 501(c)(4), (6), or (7), Form 1024 or 1024-A processing takes 6-12 months typically, sometimes longer if the IRS has questions. For religious corporations filing Form 1023-EZ, processing takes 4-8 months. Full Form 1023 for religious organizations takes 6-12 months. Churches claiming automatic 501(c)(3) exemption don't need to wait for IRS processing but many voluntarily file for determination letters. After obtaining federal exemption, California FTB Form 3500A (with IRS determination letter) processes in 60-90 days. Form 3500 (without IRS determination) takes 4-6 months. Realistic timeline for complete formation and exemption: 8-15 months from Articles filing to final California exemption approval. During this period, you can operate but may need to file tax returns and pay the $800 franchise tax until exemptions take effect retroactively. To minimize delays: prepare thorough, accurate exemption applications with complete supporting documentation, file federal exemption within your first taxable year, file California exemption immediately after receiving IRS approval, and respond promptly to any IRS or FTB requests for additional information.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA Section -->
+  <div class="cta-section">
+    <div class="cta-title">Need Help Forming Your California Nonprofit?</div>
+    <p class="cta-text">I'm Sergei Tokmakov, a California attorney (Bar #279869) with over 13 years of experience helping businesses and nonprofits navigate California's legal requirements.</p>
+    <a href="https://terms.law/call/" class="cta-button">Schedule a Consultation</a>
+  </div>
+
+  <!-- Calendly Embed -->
+  <div style="margin-top: 40px;">
+    <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  </div>
+</div>
+
+<script>
+function openTab(evt, tabName) {
+  var i, tabcontent, tabbuttons;
+  
+  // Hide all tab content
+  tabcontent = document.getElementsByClassName("tab-content");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].classList.remove("active");
+  }
+  
+  // Remove active class from all buttons
+  tabbuttons = document.getElementsByClassName("tab-button");
+  for (i = 0; i < tabbuttons.length; i++) {
+    tabbuttons[i].classList.remove("active");
+  }
+  
+  // Show current tab and mark button as active
+  document.getElementById(tabName).classList.add("active");
+  evt.currentTarget.classList.add("active");
+}
+
+function toggleFaq(element) {
+  var faqItem = element.parentElement;
+  var wasActive = faqItem.classList.contains('active');
+  
+  // Close all FAQ items
+  var allFaqItems = document.getElementsByClassName('faq-item');
+  for (var i = 0; i < allFaqItems.length; i++) {
+    allFaqItems[i].classList.remove('active');
+  }
+  
+  // Open clicked item if it wasn't active
+  if (!wasActive) {
+    faqItem.classList.add('active');
+  }
+}
+</script>
+
+</body>
+</html>
