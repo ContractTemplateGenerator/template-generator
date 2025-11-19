@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .demand-letter-widget {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .tab-navigation {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 16px 20px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab-button.active {
+            color: #dc3545;
+            border-bottom-color: #dc3545;
+            background: white;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .icon-danger {
+            background: #fee;
+            color: #dc3545;
+        }
+
+        .icon-success {
+            background: #d4edda;
+            color: #28a745;
+        }
+
+        .icon-warning {
+            background: #fff3cd;
+            color: #ffc107;
+        }
+
+        .icon-info {
+            background: #d1ecf1;
+            color: #17a2b8;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212529;
+        }
+
+        .card-body {
+            color: #495057;
+            line-height: 1.6;
+        }
+
+        .card-body p {
+            margin-bottom: 12px;
+        }
+
+        .card-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .comparison-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .danger-box {
+            background: #fee;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .danger-title {
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .safe-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .safe-title {
+            font-weight: 700;
+            color: #28a745;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quote {
+            background: #f8f9fa;
+            padding: 15px;
+            border-left: 4px solid #6c757d;
+            font-style: italic;
+            color: #495057;
+            margin: 15px 0;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 10px;
+        }
+
+        .checklist-icon {
+            width: 24px;
+            height: 24px;
+            background: #28a745;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        .checklist-text {
+            color: #495057;
+            line-height: 1.5;
+        }
+
+        .case-study {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .case-study-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .case-study-body {
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+
+        .action-steps {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .step:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: #ffc107;
+            color: #212529;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #856404;
+            line-height: 1.5;
+        }
+
+        .tip-box {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .tip-icon {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            background: #17a2b8;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 20px;
+            margin-right: 8px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .tip-text {
+            color: #0c5460;
+            display: inline;
+        }
+
+        strong {
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+    <div class="demand-letter-widget">
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="switchTab(0)">⚠️ Red Flags</button>
+            <button class="tab-button" onclick="switchTab(1)">✓ Safe vs ✗ Dangerous</button>
+            <button class="tab-button" onclick="switchTab(2)">⚖️ Case Studies</button>
+            <button class="tab-button" onclick="switchTab(3)">✔️ Checklist</button>
+            <button class="tab-button" onclick="switchTab(4)">🛡️ Receiving Threats</button>
+        </div>
+
+        <!-- Tab 1: Red Flags -->
+        <div class="tab-content active">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-danger">🚫</div>
+                    <div class="card-title">Never Include These Phrases</div>
+                </div>
+                <div class="card-body">
+                    <div class="danger-box">
+                        <div class="danger-title">❌ Criminal Extortion Territory</div>
+                        <p>"Pay us or we will report this to the police/DA/IRS/immigration"</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">❌ Reputation Extortion</div>
+                        <p>"Settle or we'll go to the media / launch a publicity campaign / issue press releases"</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">❌ Personal Leverage</div>
+                        <p>"Settle immediately or your employer/spouse/family will learn about [secret]"</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">❌ Career Threats</div>
+                        <p>"Your license/visa/security clearance is at risk unless you settle"</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-warning">⚠️</div>
+                    <div class="card-title">What Makes It Extortion</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>California Penal Code §518-519 defines extortion as obtaining property through wrongful use of fear, including:</strong></p>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">!</div>
+                        <div class="checklist-text"><strong>Threats to accuse someone of a crime</strong></div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">!</div>
+                        <div class="checklist-text"><strong>Threats to expose secrets or disgrace someone</strong></div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">!</div>
+                        <div class="checklist-text"><strong>Threats to report immigration status</strong></div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">!</div>
+                        <div class="checklist-text"><strong>Any threat that damages reputation in exchange for money</strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-danger">⚖️</div>
+                    <div class="card-title">California Ethics Rule 3.10</div>
+                </div>
+                <div class="card-body">
+                    <div class="quote">
+                        "A lawyer shall not threaten to present criminal, administrative, or disciplinary charges to obtain an advantage in a civil dispute."
+                    </div>
+                    <p><strong>This means you CANNOT condition reporting to authorities on whether someone settles your civil claim.</strong> Violations can result in disbarment.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Safe vs Dangerous -->
+        <div class="tab-content">
+            <div class="comparison-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-success">✓</div>
+                        <div class="card-title">Safe Approach</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="safe-box">
+                            <div class="safe-title">✓ Civil Litigation Threat</div>
+                            <p>"If we cannot resolve this matter informally, our client will file a complaint asserting claims for breach of contract, fraud under Civil Code §1709, and unfair business practices."</p>
+                        </div>
+                        <p><strong>Why it's safe:</strong> Limits threats to civil remedies through litigation. Describes what will happen in court, not external consequences.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-danger">✗</div>
+                        <div class="card-title">Dangerous Approach</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="danger-box">
+                            <div class="danger-title">✗ Extortion Pattern</div>
+                            <p>"Unless you settle for $500,000 within 10 days, we will report your conduct to the District Attorney, the State Bar, and the IRS."</p>
+                        </div>
+                        <p><strong>Why it's dangerous:</strong> Conditions reporting to authorities on payment. This is textbook extortion AND an ethics violation.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="comparison-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-success">✓</div>
+                        <div class="card-title">Acceptable Reference</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="safe-box">
+                            <div class="safe-title">✓ Non-Conditional Statement</div>
+                            <p>"Your conduct appears to violate Penal Code Section X. Our client reserves all rights to report this matter to appropriate authorities and to pursue civil remedies."</p>
+                        </div>
+                        <p><strong>Why it's safe:</strong> Acknowledges potential criminal conduct but doesn't use it as leverage. Doesn't condition reporting on settlement.</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon icon-danger">✗</div>
+                        <div class="card-title">Prohibited Leverage</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="danger-box">
+                            <div class="danger-title">✗ Conditional Threat</div>
+                            <p>"Settle this immediately or we're filing a police report about your violations of Penal Code Section X."</p>
+                        </div>
+                        <p><strong>Why it's dangerous:</strong> Explicitly conditions criminal reporting on settlement. Violates Rule 3.10 and constitutes attempted extortion.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-info">💡</div>
+                    <div class="card-title">Key Distinction</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>You CAN:</strong> Threaten civil litigation and describe remedies you'll seek through that litigation</p>
+                    <p><strong>You CANNOT:</strong> Threaten to report to authorities, expose secrets, or damage reputation UNLESS they pay you</p>
+                    <div class="tip-box">
+                        <span class="tip-icon">i</span>
+                        <span class="tip-text">The magic word that creates problems is "UNLESS" — as in "settle UNLESS you want us to [report/expose/publicize]"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 3: Case Studies -->
+        <div class="tab-content">
+            <div class="case-study">
+                <div class="case-study-title">Flatley v. Mauro (2006): The Extortion Example</div>
+                <div class="case-study-body">
+                    <p><strong>What happened:</strong> Attorney Martin Singer sent a demand letter threatening that if the defendant didn't pay a seven-figure settlement, his client would file suit AND simultaneously launch a media campaign with press releases to major news outlets.</p>
+                    <p><strong>The result:</strong> California Supreme Court held this was criminal extortion as a matter of law. The litigation privilege didn't apply. Singer's career survived, but this case became the textbook example of what NOT to do.</p>
+                    <p><strong>The lesson:</strong> Threatening publicity campaigns in exchange for payment = extortion, even if you're a high-profile attorney.</p>
+                </div>
+            </div>
+
+            <div class="case-study">
+                <div class="case-study-title">Malin v. Singer (2013): The Permissible Hardball Letter</div>
+                <div class="case-study-body">
+                    <p><strong>What happened:</strong> Another Martin Singer letter, also aggressive, also mentioning potentially embarrassing facts. But this time, everything was framed in terms of what would come out through civil litigation.</p>
+                    <p><strong>The result:</strong> Court of Appeal held the letter was protected by litigation privilege. No extortion because Singer didn't threaten independent publicity or reporting to authorities—just described what would happen in court.</p>
+                    <p><strong>The lesson:</strong> You can be aggressive about anticipated litigation. You can't use publicity or criminal prosecution as separate bargaining chips.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-warning">📋</div>
+                    <div class="card-title">The Daycare Defamation Case</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>The situation:</strong> A neighbor posted on Facebook that a licensed daycare had "10+ kids crammed in one bedroom with no background checks" and that the owner "leaves them unsupervised while she naps."</p>
+                    <p><strong>The truth:</strong> The daycare was licensed for 4 children max, owner had background checks and inspections, never left kids unsupervised.</p>
+                    <p><strong>The damage:</strong> Within 24 hours, three families withdrew children and two prospective clients canceled.</p>
+                    <p><strong>The resolution:</strong> Well-drafted cease and desist letter (focused on specific false statements, documented harm, demanded removal) led to immediate retraction without lawsuit.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-danger">💰</div>
+                    <div class="card-title">The $75,000 Yelp Review</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>The review:</strong> Former employee claimed bakery "injects old pastries with chemicals" and "uses expired cream that gave my friend food poisoning."</p>
+                    <p><strong>The facts:</strong> All false. Bakery had perfect health inspections, fresh supplier invoices, zero food poisoning reports.</p>
+                    <p><strong>The cost:</strong> Lost catering contract, 40% revenue drop over six weeks. Former employee ignored demand letter, got sued, jury awarded $75,000 plus attorneys' fees.</p>
+                    <p><strong>The lesson:</strong> Specific false factual claims (not opinions) that damage business reputation can be very expensive.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 4: Checklist -->
+        <div class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-success">✔️</div>
+                    <div class="card-title">Before You Hit Send: Required Checklist</div>
+                </div>
+                <div class="card-body">
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Every factual assertion is supported by evidence I can produce if challenged</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">All legal claims are non-frivolous with good-faith basis in law and fact</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">All threats are limited to lawful civil remedies (not criminal reporting or publicity)</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Letter does not condition silence or non-reporting on payment</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Audience is limited to parties and their counsel (no third parties)</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">I would be comfortable if this letter appeared in a published judicial opinion</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-info">📝</div>
+                    <div class="card-title">Practical Drafting Principles</div>
+                </div>
+                <div class="card-body">
+                    <div class="tip-box">
+                        <span class="tip-icon">1</span>
+                        <span class="tip-text"><strong>Lead with facts, not conclusions.</strong> Don't say "Your client is a fraud." Say: "On March 15, your client represented that [specific fact], but documents show [contradictory fact]."</span>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">2</span>
+                        <span class="tip-text"><strong>Frame through litigation lens.</strong> "If we cannot resolve this informally, we will file a complaint asserting claims for [specific legal claims with statutory citations]."</span>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">3</span>
+                        <span class="tip-text"><strong>Keep tone professional.</strong> "We believe your position is without merit" works. "Your client is a con artist" creates problems.</span>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">4</span>
+                        <span class="tip-text"><strong>Limit the audience.</strong> Send only to opposing party or their counsel. Don't CC employers, customers, media, or anyone else.</span>
+                    </div>
+                    <div class="tip-box">
+                        <span class="tip-icon">5</span>
+                        <span class="tip-text"><strong>Never use personal secrets as leverage.</strong> "Pay us or your wife finds out" = instant extortion, regardless of underlying claim merit.</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-warning">🎯</div>
+                    <div class="card-title">The Ultimate Test</div>
+                </div>
+                <div class="card-body">
+                    <div class="quote">
+                        Ask yourself: "Would I be comfortable if a judge read this letter out loud in open court while considering whether to refer me for discipline or prosecution?"
+                    </div>
+                    <p>If the answer is no, redraft until the answer is yes. The stakes are too high to gamble with gray areas.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tab 5: Receiving Threats -->
+        <div class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-warning">🛡️</div>
+                    <div class="card-title">You Received an Extortionate Letter: Now What?</div>
+                </div>
+                <div class="card-body">
+                    <div class="action-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-text"><strong>Don't panic or ignore it.</strong> Even problematic letters may be pursuing legitimate claims with bad tactics.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-text"><strong>Document everything.</strong> Save the letter, all emails, record dates and times of any verbal threats. Screenshot everything.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-text"><strong>Identify the problematic parts.</strong> Does it threaten to report you to authorities unless you pay? Threaten publicity or exposure? Use personal secrets as leverage?</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-text"><strong>Consult an attorney immediately.</strong> Don't respond yourself if the letter contains extortion threats or ethics violations.</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">5</div>
+                            <div class="step-text"><strong>Consider reporting.</strong> If the letter violates ethics rules (like threatening criminal prosecution for civil advantage), report to the state bar. If it's actual extortion, consider reporting to law enforcement.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-danger">⚠️</div>
+                    <div class="card-title">Red Flags in Letters You Receive</div>
+                </div>
+                <div class="card-body">
+                    <div class="danger-box">
+                        <div class="danger-title">🚩 "Pay or we report to authorities"</div>
+                        <p>Conditioning criminal, tax, immigration, or licensing board reporting on settlement is extortion and an ethics violation.</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">🚩 "Settle or we go public"</div>
+                        <p>Threatening press releases, social media campaigns, or contacting your employer/clients unless you pay is extortion.</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">🚩 "Pay or we expose secrets"</div>
+                        <p>Using personal information, affairs, or embarrassing facts as leverage for payment is civil and potentially criminal extortion.</p>
+                    </div>
+                    <div class="danger-box">
+                        <div class="danger-title">🚩 Sent to third parties</div>
+                        <p>If the letter was sent to your employer, customers, or other third parties (not just you), they may have lost litigation privilege and created defamation exposure.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-success">✓</div>
+                    <div class="card-title">Your Response Strategy</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>DON'T:</strong></p>
+                    <div class="checklist-item" style="background: #fee;">
+                        <div class="checklist-icon" style="background: #dc3545;">✗</div>
+                        <div class="checklist-text">Respond in kind with your own threats</div>
+                    </div>
+                    <div class="checklist-item" style="background: #fee;">
+                        <div class="checklist-icon" style="background: #dc3545;">✗</div>
+                        <div class="checklist-text">Ignore the letter completely</div>
+                    </div>
+                    <div class="checklist-item" style="background: #fee;">
+                        <div class="checklist-icon" style="background: #dc3545;">✗</div>
+                        <div class="checklist-text">Pay immediately out of fear</div>
+                    </div>
+                    <p style="margin-top: 20px;"><strong>DO:</strong></p>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Separate legitimate claims from improper threats</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Document all misconduct thoroughly</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Consult with an attorney who handles ethics/extortion issues</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">Consider whether to report ethics violations to state bar</div>
+                    </div>
+                    <div class="checklist-item">
+                        <div class="checklist-icon">✓</div>
+                        <div class="checklist-text">In egregious cases, consider reporting extortion to law enforcement</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon icon-info">💼</div>
+                    <div class="card-title">When to Take Action</div>
+                </div>
+                <div class="card-body">
+                    <p><strong>Report to State Bar if:</strong> Attorney threatens to report you to police/DA/IRS/immigration/licensing boards unless you settle (violates Rule 3.10 in California and similar rules in most states).</p>
+                    <p><strong>Report to Law Enforcement if:</strong> The letter constitutes clear extortion (e.g., "pay $X or we'll expose your affair to your spouse and employer"). Prosecutors do charge these cases when there's written evidence.</p>
+                    <p><strong>Consider Civil Action if:</strong> You paid under duress and the threats were improper. You may be able to rescind the agreement and recover your money through a civil extortion or menace claim.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(index) {
+            // Get all tabs and content
+            const tabs = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+            
+            // Remove active class from all
+            tabs.forEach(tab => tab.classList.remove('active'));
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Add active class to selected
+            tabs[index].classList.add('active');
+            contents[index].classList.add('active');
+        }
+    </script>
+</body>
+</html>
