@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>California Corporation Dissolution Widget</title>
+</head>
+<body>
+
+<style>
+  .dissolve-widget {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    max-width: 100%;
+    margin: 0 auto 40px auto;
+    color: #1a1a1a;
+    line-height: 1.6;
+  }
+  
+  .dissolve-widget * {
+    box-sizing: border-box;
+  }
+  
+  /* Hero Section */
+  .dw-hero {
+    background: linear-gradient(135deg, #c62828 0%, #e53935 100%);
+    color: white;
+    padding: 35px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .dw-hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+    pointer-events: none;
+  }
+  
+  .dw-hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+  }
+  
+  .dw-hero-title {
+    margin: 0 0 12px 0;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  
+  .dw-hero-subtitle {
+    margin: 0;
+    opacity: 0.95;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  
+  /* Warning Banner */
+  .dw-warning {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+  }
+  
+  .dw-warning-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #856404;
+    margin: 0 0 10px 0;
+  }
+  
+  .dw-warning-text {
+    color: #856404;
+    margin: 0;
+  }
+  
+  /* Tab Navigation */
+  .dw-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #e0e0e0;
+    padding-bottom: 0;
+  }
+  
+  .dw-tab {
+    background: transparent;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 600;
+    color: #666;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+    position: relative;
+    bottom: -2px;
+  }
+  
+  .dw-tab:hover {
+    color: #c62828;
+    background: rgba(198, 40, 40, 0.05);
+  }
+  
+  .dw-tab.active {
+    color: #c62828;
+    border-bottom-color: #c62828;
+  }
+  
+  /* Tab Content */
+  .dw-tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  
+  .dw-tab-content.active {
+    display: block;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  /* Section Title */
+  .dw-section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 3px solid #c62828;
+  }
+  
+  /* Cards */
+  .dw-card {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 20px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .dw-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  
+  .dw-card-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 15px 0;
+  }
+  
+  .dw-card-text {
+    color: #4a4a4a;
+    margin-bottom: 10px;
+  }
+  
+  /* Stats Grid */
+  .dw-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  
+  .dw-stat {
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  .dw-stat-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+  }
+  
+  .dw-stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #c62828;
+    margin-bottom: 5px;
+  }
+  
+  .dw-stat-label {
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+  }
+  
+  /* Risk Indicators */
+  .dw-risk-high {
+    background: #ffebee;
+    border-left: 4px solid #c62828;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+  }
+  
+  .dw-risk-medium {
+    background: #fff8e1;
+    border-left: 4px solid #f57c00;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+  }
+  
+  .dw-risk-low {
+    background: #e8f5e9;
+    border-left: 4px solid #2e7d32;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 15px;
+  }
+  
+  .dw-risk-title {
+    font-weight: 700;
+    margin: 0 0 8px 0;
+  }
+  
+  .dw-risk-high .dw-risk-title { color: #c62828; }
+  .dw-risk-medium .dw-risk-title { color: #f57c00; }
+  .dw-risk-low .dw-risk-title { color: #2e7d32; }
+  
+  .dw-risk-text {
+    margin: 0;
+    color: #4a4a4a;
+  }
+  
+  /* Timeline */
+  .dw-timeline {
+    position: relative;
+    padding-left: 30px;
+    margin: 25px 0;
+  }
+  
+  .dw-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: #e0e0e0;
+  }
+  
+  .dw-timeline-item {
+    position: relative;
+    margin-bottom: 30px;
+    padding-left: 20px;
+  }
+  
+  .dw-timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -37px;
+    top: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #c62828;
+    border: 3px solid white;
+    box-shadow: 0 0 0 2px #c62828;
+  }
+  
+  .dw-timeline-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+  }
+  
+  .dw-timeline-text {
+    color: #4a4a4a;
+    margin: 0;
+  }
+  
+  /* Checklist */
+  .dw-checklist {
+    background: #f8f9fa;
+    border-radius: 10px;
+    padding: 25px;
+  }
+  
+  .dw-checklist-item {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #dee2e6;
+  }
+  
+  .dw-checklist-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+  }
+  
+  .dw-checklist-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #c62828;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    margin-right: 15px;
+    font-size: 14px;
+  }
+  
+  .dw-checklist-text {
+    color: #4a4a4a;
+    flex: 1;
+  }
+  
+  /* Comparison Table */
+  .dw-comparison {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+  }
+  
+  .dw-comparison-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .dw-comparison-row:last-child {
+    border-bottom: none;
+  }
+  
+  .dw-comparison-cell {
+    padding: 20px;
+  }
+  
+  .dw-comparison-header {
+    background: #f8f9fa;
+    font-weight: 700;
+    text-align: center;
+    color: #1a1a1a;
+  }
+  
+  .dw-comparison-cell:not(.dw-comparison-header) {
+    border-right: 1px solid #e0e0e0;
+  }
+  
+  .dw-comparison-cell:last-child {
+    border-right: none;
+  }
+  
+  /* FAQ Accordion */
+  .dw-faq {
+    margin-bottom: 25px;
+  }
+  
+  .dw-faq-item {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  
+  .dw-faq-question {
+    width: 100%;
+    text-align: left;
+    background: white;
+    border: none;
+    padding: 20px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s ease;
+  }
+  
+  .dw-faq-question:hover {
+    background: #f8f9fa;
+  }
+  
+  .dw-faq-question::after {
+    content: '+';
+    font-size: 24px;
+    font-weight: 300;
+    color: #c62828;
+    transition: transform 0.3s ease;
+  }
+  
+  .dw-faq-question.active::after {
+    transform: rotate(45deg);
+  }
+  
+  .dw-faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+  }
+  
+  .dw-faq-answer.active {
+    max-height: 1000px;
+  }
+  
+  .dw-faq-answer-content {
+    padding: 0 20px 20px 20px;
+    color: #4a4a4a;
+  }
+  
+  /* CTA */
+  .dw-cta {
+    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    color: white;
+    padding: 35px;
+    border-radius: 12px;
+    text-align: center;
+    margin: 30px 0;
+  }
+  
+  .dw-cta-title {
+    font-size: 26px;
+    font-weight: 700;
+    margin: 0 0 15px 0;
+  }
+  
+  .dw-cta-text {
+    font-size: 16px;
+    opacity: 0.95;
+    margin: 0 0 25px 0;
+  }
+  
+  .dw-cta-button {
+    display: inline-block;
+    background: white;
+    color: #1a237e;
+    padding: 15px 35px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .dw-cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .dw-hero-title {
+      font-size: 24px;
+    }
+    
+    .dw-tab {
+      font-size: 12px;
+      padding: 10px 15px;
+    }
+    
+    .dw-comparison-row {
+      grid-template-columns: 1fr;
+    }
+    
+    .dw-comparison-cell:not(.dw-comparison-header) {
+      border-right: none;
+      border-bottom: 1px solid #e0e0e0;
+    }
+  }
+</style>
+
+<div class="dissolve-widget">
+  <!-- Hero Section -->
+  <div class="dw-hero">
+    <div class="dw-hero-badge">California Corporate Law</div>
+    <div class="dw-hero-title">Dissolving Your California Corporation</div>
+    <div class="dw-hero-subtitle">Complete guide to properly closing your corporation and stopping the $800 annual franchise tax</div>
+  </div>
+  
+  <!-- Warning Banner -->
+  <div class="dw-warning">
+    <div class="dw-warning-title">⚠️ Critical: Don't Just Walk Away</div>
+    <div class="dw-warning-text">Simply abandoning your corporation doesn't end your tax obligations. The $800 annual minimum franchise tax continues indefinitely until you properly dissolve with both the Secretary of State AND the Franchise Tax Board.</div>
+  </div>
+  
+  <!-- Quick Stats -->
+  <div class="dw-stats">
+    <div class="dw-stat">
+      <div class="dw-stat-icon">💰</div>
+      <div class="dw-stat-value">$800</div>
+      <div class="dw-stat-label">Annual Minimum Tax</div>
+    </div>
+    <div class="dw-stat">
+      <div class="dw-stat-icon">📅</div>
+      <div class="dw-stat-value">12 Mo.</div>
+      <div class="dw-stat-label">SOS Filing Deadline</div>
+    </div>
+    <div class="dw-stat">
+      <div class="dw-stat-icon">📋</div>
+      <div class="dw-stat-value">2 Filings</div>
+      <div class="dw-stat-label">Required (FTB + SOS)</div>
+    </div>
+    <div class="dw-stat">
+      <div class="dw-stat-icon">⏱️</div>
+      <div class="dw-stat-value">4-12 Wks</div>
+      <div class="dw-stat-label">Typical Timeline</div>
+    </div>
+  </div>
+  
+  <!-- Tabs -->
+  <div class="dw-tabs">
+    <button class="dw-tab active" onclick="openTab(event, 'overview')">Overview</button>
+    <button class="dw-tab" onclick="openTab(event, 'process')">6-Step Process</button>
+    <button class="dw-tab" onclick="openTab(event, 'tax')">Stop the $800 Tax</button>
+    <button class="dw-tab" onclick="openTab(event, 'pitfalls')">Common Pitfalls</button>
+    <button class="dw-tab" onclick="openTab(event, 'timeline')">Timeline & Costs</button>
+    <button class="dw-tab" onclick="openTab(event, 'faq')">FAQ</button>
+  </div>
+  
+  <!-- Tab: Overview -->
+  <div id="overview" class="dw-tab-content active">
+    <div class="dw-section-title">Understanding Corporation Dissolution</div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">What Is Dissolution?</div>
+      <div class="dw-card-text">Dissolution is the legal process of ending your corporation's existence. It requires completing "winding up" (closing business affairs) and filing specific documents with both the California Secretary of State and the Franchise Tax Board.</div>
+      <div class="dw-card-text"><strong>Key Point:</strong> Your corporation continues to exist and incur the $800 annual tax until dissolution is properly completed with BOTH agencies.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Dissolution vs. Winding Up: What's the Difference?</div>
+      <div class="dw-card-text"><strong>Winding Up</strong> is the process of closing out business affairs - paying debts, distributing assets, resolving litigation, and filing final tax returns. This happens BEFORE dissolution.</div>
+      <div class="dw-card-text"><strong>Dissolution</strong> is the legal termination of corporate existence that occurs when you file the Certificate of Dissolution with the Secretary of State AFTER winding up is complete.</div>
+      <div class="dw-card-text"><strong>Critical Mistake:</strong> Filing dissolution documents before completing winding up can create personal liability for directors and officers who certify false statements under penalty of perjury.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">When Should You Dissolve?</div>
+      <div class="dw-card-text">Consider dissolution when:</div>
+      <div class="dw-card-text">• Business operations have permanently ceased<br>
+      • Company is merging with another entity<br>
+      • Moving operations to another state<br>
+      • Entity is no longer needed (was created for specific transaction that's complete)<br>
+      • Avoiding ongoing $800/year minimum franchise tax on inactive entity</div>
+    </div>
+    
+    <div class="dw-risk-high">
+      <div class="dw-risk-title">🚨 High Risk: Abandoning Without Formal Dissolution</div>
+      <div class="dw-risk-text">Simply stopping operations and ignoring the corporation does NOT end your tax obligations. The FTB will continue assessing the $800 annual minimum tax plus penalties and interest - potentially accumulating tens of thousands of dollars over time. Suspended status doesn't stop the tax from accruing.</div>
+    </div>
+  </div>
+  
+  <!-- Tab: Process -->
+  <div id="process" class="dw-tab-content">
+    <div class="dw-section-title">The 6-Step Dissolution Process</div>
+    
+    <div class="dw-timeline">
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 1: Check for Suspensions/Forfeitures</div>
+        <div class="dw-timeline-text">Verify your corporation is in good standing with the FTB. If suspended or forfeited for unpaid taxes, you MUST revive the corporation first by filing all delinquent returns and paying all back taxes, penalties, and interest. The Secretary of State will reject dissolution filings from suspended/forfeited entities.</div>
+      </div>
+      
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 2: Board Resolution & Shareholder Vote</div>
+        <div class="dw-timeline-text">Board adopts resolution recommending dissolution. Shareholders vote to approve (typically requires majority of outstanding shares, but check your bylaws). Document everything in corporate minutes. If 100% of shareholders approve, you can skip filing the Certificate of Election (Step 3).</div>
+      </div>
+      
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 3: File Certificate of Election (If Required)</div>
+        <div class="dw-timeline-text">File Form ELEC STK with Secretary of State within required timeframe. Not required if: (1) all shareholders unanimously approved, or (2) you qualify for short-form dissolution. Fee: $30.</div>
+      </div>
+      
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 4: Complete Winding Up</div>
+        <div class="dw-timeline-text">Pay or provide for all debts and liabilities. Collect outstanding receivables. Sell or distribute all assets. Resolve pending litigation or set aside reserves. Cancel contracts and leases. Close bank accounts. Handle final employment matters and payroll. This is the most time-consuming phase and MUST be completed before Step 6.</div>
+      </div>
+      
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 5: File Final Tax Returns</div>
+        <div class="dw-timeline-text">File final Form 100 or 100S with FTB - check "Final Return" box. File final federal Form 1120 or 1120-S with IRS. File all final employment tax returns (Form 941, DE-9, W-2s, 1099s). Even short tax years owe the full $800 minimum franchise tax (no proration).</div>
+      </div>
+      
+      <div class="dw-timeline-item">
+        <div class="dw-timeline-title">Step 6: File Certificate of Dissolution</div>
+        <div class="dw-timeline-text">File Form DISS STK with Secretary of State WITHIN 12 MONTHS of filing final FTB return. You must certify under penalty of perjury that all winding-up requirements are satisfied. Once filed and accepted, corporate existence officially ceases (subject to survival for final winding-up matters). Fee: $30.</div>
+      </div>
+    </div>
+    
+    <div class="dw-checklist">
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>All creditors paid</strong> or adequate provision made for payment</div>
+      </div>
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>All assets distributed</strong> to shareholders or provision made for distribution</div>
+      </div>
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>No pending litigation</strong> or adequate provision made for defending/settling cases</div>
+      </div>
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>Final tax returns filed</strong> with FTB (Form 100/100S marked "Final")</div>
+      </div>
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>Final federal returns filed</strong> with IRS (Form 1120/1120-S)</div>
+      </div>
+      <div class="dw-checklist-item">
+        <div class="dw-checklist-icon">✓</div>
+        <div class="dw-checklist-text"><strong>Employment obligations complete</strong> - final payroll, tax returns, W-2s/1099s issued</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Tab: Tax -->
+  <div id="tax" class="dw-tab-content">
+    <div class="dw-section-title">How to Stop the $800 Annual Franchise Tax</div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Understanding the Minimum Franchise Tax</div>
+      <div class="dw-card-text">California corporations owe an $800 minimum annual franchise tax for each tax year the corporation is incorporated, qualified, or registered in California - regardless of whether the corporation has any income, conducts any business, or even has any assets.</div>
+      <div class="dw-card-text"><strong>The tax is based on existence, not activity.</strong> As long as your corporate charter exists with the Secretary of State, you owe the tax.</div>
+    </div>
+    
+    <div class="dw-risk-high">
+      <div class="dw-risk-title">🚨 Critical Rule: The 12-Month Filing Deadline</div>
+      <div class="dw-risk-text">You must file your Certificate of Dissolution (Form DISS STK) with the Secretary of State WITHIN 12 MONTHS of filing your final franchise tax return with the FTB. Miss this deadline and the FTB may continue assessing the $800 annual minimum tax indefinitely.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Two Required Filings to Stop the Tax</div>
+      <div class="dw-card-text"><strong>1. Final Tax Return with FTB:</strong> File Form 100 or 100S marked "Final Return" at the top and checking the final return box. This covers the short tax year from the beginning of your tax year through the dissolution date. You owe the full $800 for this year (no proration).</div>
+      <div class="dw-card-text"><strong>2. Dissolution Certificate with SOS:</strong> File Form DISS STK (or DSF STK for short-form) within 12 months of the final tax return. This legally terminates your corporate existence and stops future tax obligations.</div>
+      <div class="dw-card-text"><strong>Both filings are mandatory.</strong> Filing with only one agency does NOT stop the $800 tax from accruing.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Short Tax Years: No Pro-Rata Reduction</div>
+      <div class="dw-card-text">California does not prorate the minimum franchise tax. Whether you dissolve on January 5 or December 30, you owe the full $800 for that tax year.</div>
+      <div class="dw-card-text"><strong>Timing Strategy:</strong> If you're considering dissolution near year-end (October-December), completing dissolution before December 31 can save you $800 by avoiding the next tax year. However, rushing dissolution and making mistakes can cost far more than $800, so weigh the timing carefully.</div>
+    </div>
+    
+    <div class="dw-risk-medium">
+      <div class="dw-risk-title">⚠️ What About Suspended/Forfeited Corporations?</div>
+      <div class="dw-risk-text">Suspension or forfeiture by the FTB for unpaid taxes does NOT stop the annual $800 minimum tax from accruing. The tax continues year after year, plus penalties and interest. To stop the tax, you must either (1) revive and then properly dissolve, or (2) qualify for the FTB's administrative dissolution program with potential tax abatement.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Administrative Dissolution with Tax Abatement</div>
+      <div class="dw-card-text">For defunct corporations that never conducted business or ceased business years ago with no assets, California offers an administrative dissolution program with potential partial or full abatement of back taxes and penalties.</div>
+      <div class="dw-card-text"><strong>Eligibility typically requires:</strong></div>
+      <div class="dw-card-text">• Corporation has been suspended/forfeited for failure to file returns<br>
+      • No business activity for several years<br>
+      • No assets or minimal assets<br>
+      • Meeting other specific FTB criteria</div>
+      <div class="dw-card-text">Apply to FTB first for abatement consideration. If approved, FTB issues authorization to file dissolution documents with SOS.</div>
+    </div>
+  </div>
+  
+  <!-- Tab: Pitfalls -->
+  <div id="pitfalls" class="dw-tab-content">
+    <div class="dw-section-title">Common Pitfalls & How to Avoid Them</div>
+    
+    <div class="dw-risk-high">
+      <div class="dw-risk-title">Pitfall #1: Filing Dissolution Before Completing Winding Up</div>
+      <div class="dw-risk-text">The Certificate of Dissolution requires you to certify under penalty of perjury that all debts have been paid or provided for, all assets distributed, and no litigation is pending. Filing before these statements are true creates exposure to perjury charges and personal liability for unpaid debts. Always complete winding up BEFORE filing dissolution documents.</div>
+    </div>
+    
+    <div class="dw-risk-high">
+      <div class="dw-risk-title">Pitfall #2: Missing the 12-Month SOS Filing Deadline</div>
+      <div class="dw-risk-text">File your Certificate of Dissolution within 12 months of your final FTB return, or the $800 annual minimum tax may continue accruing. Set a calendar reminder immediately after filing your final tax return. Aim to file dissolution documents within 6 months to give yourself buffer room for unexpected delays.</div>
+    </div>
+    
+    <div class="dw-risk-high">
+      <div class="dw-risk-title">Pitfall #3: Attempting to Dissolve While Suspended/Forfeited</div>
+      <div class="dw-risk-text">Corporations suspended or forfeited by the FTB cannot dissolve until they revive. Always check your corporation's status on the SOS website before starting dissolution. If suspended/forfeited, budget extra time and money for revival - you'll need to file all delinquent returns and pay all back taxes, penalties, and interest.</div>
+    </div>
+    
+    <div class="dw-risk-medium">
+      <div class="dw-risk-title">Pitfall #4: Ignoring Shareholder Distribution Requirements</div>
+      <div class="dw-risk-text">After paying creditors, remaining assets must be distributed to shareholders according to ownership interests or as provided in articles/bylaws. Complete all distributions BEFORE filing dissolution, and get written receipts from shareholders. Distributing assets after dissolution is legally complicated because the corporation no longer exists except for limited winding-up purposes.</div>
+    </div>
+    
+    <div class="dw-risk-medium">
+      <div class="dw-risk-title">Pitfall #5: Not Planning for Contingent Liabilities</div>
+      <div class="dw-risk-text">Some liabilities aren't fixed at dissolution - product liability claims, contract disputes, environmental claims. The "adequately provided for" language in dissolution certificates allows you to set aside reserves, obtain insurance, or make other arrangements for potential future claims. Think carefully about contingent risks and consult legal counsel about appropriate protective measures.</div>
+    </div>
+    
+    <div class="dw-risk-medium">
+      <div class="dw-risk-title">Pitfall #6: Forgetting Federal and Employment Tax Returns</div>
+      <div class="dw-risk-text">In addition to California Form 100/100S, you must file final federal Form 1120/1120-S, final employment tax returns (Form 941, DE-9), and all year-end forms (W-2s, 1099s). Failure to file final federal returns can result in IRS collection actions years later. Close all tax accounts properly with both state and federal agencies.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Warning: Personal Liability Exposure</div>
+      <div class="dw-card-text">Directors and officers can face personal liability after dissolution if:</div>
+      <div class="dw-card-text">• They made false statements in dissolution certificates (e.g., certifying debts were paid when they weren't)<br>
+      • Assets were distributed to shareholders before paying creditors<br>
+      • Corporate veil can be pierced due to commingling, undercapitalization, or fraud<br>
+      • They personally guaranteed corporate debts (guarantees survive dissolution)</div>
+    </div>
+  </div>
+  
+  <!-- Tab: Timeline -->
+  <div id="timeline" class="dw-tab-content">
+    <div class="dw-section-title">Timeline & Cost Breakdown</div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Typical Timeline for Simple Dissolution</div>
+      <div class="dw-card-text">For a small corporation with minimal assets, no litigation, and straightforward affairs:</div>
+      <div class="dw-timeline">
+        <div class="dw-timeline-item">
+          <div class="dw-timeline-title">Week 1: Corporate Actions</div>
+          <div class="dw-timeline-text">Board resolution and shareholder vote to dissolve</div>
+        </div>
+        <div class="dw-timeline-item">
+          <div class="dw-timeline-title">Weeks 2-4: Winding Up</div>
+          <div class="dw-timeline-text">Pay creditors, distribute assets, collect receivables, close accounts</div>
+        </div>
+        <div class="dw-timeline-item">
+          <div class="dw-timeline-title">Weeks 4-6: Tax Returns</div>
+          <div class="dw-timeline-text">Prepare and file final FTB and IRS returns</div>
+        </div>
+        <div class="dw-timeline-item">
+          <div class="dw-timeline-title">Weeks 6-8: Dissolution Filing</div>
+          <div class="dw-timeline-text">File Certificate of Dissolution with Secretary of State</div>
+        </div>
+      </div>
+      <div class="dw-card-text"><strong>Total: 6-8 weeks</strong> for simple cases. Complex situations can take months or years.</div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Timeline for Complex Situations</div>
+      <div class="dw-card-text"><strong>Real Property:</strong> Add 2-6 months for sales, title work, escrow processes</div>
+      <div class="dw-card-text"><strong>Pending Litigation:</strong> Add 6-24+ months depending on case complexity (some matters take years to resolve)</div>
+      <div class="dw-card-text"><strong>Multiple Shareholders with Disputes:</strong> Add 1-6 months for negotiation and agreement on distributions</div>
+      <div class="dw-card-text"><strong>Significant Debts/Collections:</strong> Add 2-6 months for creditor negotiations and payment arrangements</div>
+      <div class="dw-card-text"><strong>Complex Contracts:</strong> Add 1-3 months to review termination rights, negotiate exits, handle residual obligations</div>
+    </div>
+    
+    <div class="dw-comparison">
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell dw-comparison-header">Fee Item</div>
+        <div class="dw-comparison-cell dw-comparison-header">Cost</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell">Certificate of Election (ELEC STK)</div>
+        <div class="dw-comparison-cell">$30</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell">Certificate of Dissolution (DISS STK)</div>
+        <div class="dw-comparison-cell">$30</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell">Final Year Franchise Tax</div>
+        <div class="dw-comparison-cell">$800</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell">Tax Preparation (if outsourced)</div>
+        <div class="dw-comparison-cell">$500-2,000+</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell">Legal Fees (if using attorney)</div>
+        <div class="dw-comparison-cell">$1,500-5,000+</div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell"><strong>Total (DIY, simple case)</strong></div>
+        <div class="dw-comparison-cell"><strong>~$860</strong></div>
+      </div>
+      <div class="dw-comparison-row">
+        <div class="dw-comparison-cell"><strong>Total (with professionals)</strong></div>
+        <div class="dw-comparison-cell"><strong>$2,500-8,000+</strong></div>
+      </div>
+    </div>
+    
+    <div class="dw-card">
+      <div class="dw-card-title">Additional Costs for Suspended/Forfeited Entities</div>
+      <div class="dw-card-text">If your corporation is suspended or forfeited, add costs for:</div>
+      <div class="dw-card-text">• Back taxes ($800 per year × number of years delinquent)<br>
+      • Penalties (25% of tax owed for each late return)<br>
+      • Interest (compounds annually on unpaid amounts)<br>
+      • Tax preparation for all delinquent years</div>
+      <div class="dw-card-text"><strong>Example:</strong> Corporation suspended 5 years = $4,000 in back taxes + ~$1,000 penalties + interest + prep fees = $5,500-7,000+ before you can even start dissolution</div>
+    </div>
+    
+    <div class="dw-risk-low">
+      <div class="dw-risk-title">💡 When Legal Assistance Is Worth It</div>
+      <div class="dw-risk-text">Consider hiring an attorney if your corporation has: significant assets to distribute, unpaid debts/liabilities, real estate or IP, pending litigation, complex contracts, multiple shareholders with potential disputes, employment issues, tax problems beyond simple minimum tax, or any situation with personal liability exposure. The cost of legal help is typically far less than fixing mistakes from improper dissolution.</div>
+    </div>
+  </div>
+  
+  <!-- Tab: FAQ -->
+  <div id="faq" class="dw-tab-content">
+    <div class="dw-section-title">Frequently Asked Questions</div>
+    
+    <div class="dw-faq">
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          Can I dissolve a corporation that has outstanding debts?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Technically yes, but not until you've paid those debts or made adequate provision for them. The Certificate of Dissolution requires you to certify that all debts have been paid or adequately provided for. "Adequately provided for" means you've set aside sufficient funds, arranged for another party to assume the obligations, or obtained creditor consent to alternative arrangements. You cannot simply dissolve and walk away from unpaid debts - that would make your dissolution certificate perjurious and potentially expose directors and officers to personal liability. If your corporation is insolvent (debts exceed assets), consider bankruptcy instead of or before dissolution.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          What happens if I just stop filing returns and let the corporation go suspended?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            This creates serious problems. When you stop filing returns and paying taxes, the FTB will suspend your corporate powers. However, suspension doesn't end the corporation's existence or stop the $800 annual minimum franchise tax from accruing. The tax continues year after year, along with penalties and interest. After enough years, the accumulated debt can reach tens of thousands of dollars. The FTB has collection powers including liens, levies, and wage garnishments. A suspended corporation also cannot defend lawsuits, enter contracts, or conduct most business transactions. The correct approach is to formally dissolve. Yes, you'll need to pay back taxes to revive if you're already suspended, but paying a few years of back taxes now is better than accumulating decades of liability. If you truly have no assets and never conducted business, look into the FTB's administrative dissolution program for potential tax abatement.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          Do I need a lawyer to dissolve my California corporation?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Not legally required, but highly advisable in many situations. Simple corporations with no assets, no debts, no ongoing contracts, and no litigation can often handle dissolution without legal assistance. The forms are publicly available from the Secretary of State and FTB. However, consult an attorney if your corporation has: significant assets to distribute, unpaid debts or liabilities, real estate or intellectual property, pending or threatened litigation, complex contracts, multiple shareholders with potential disputes, employment issues, tax problems beyond simple minimum franchise tax, or any situation where directors or officers might face personal liability exposure. An attorney can help you avoid common pitfalls, properly structure asset distributions, handle creditor claims, address shareholder disputes, coordinate tax and corporate law requirements, and protect you from personal liability. The cost of legal assistance is usually far less than fixing problems from improper dissolution.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          How long does the corporation continue to exist after filing the dissolution certificate?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Under Corporations Code Section 2010, the corporation continues to exist after dissolution for the sole purpose of winding up its affairs. This survival period has no fixed duration - it lasts as long as necessary to complete winding up. For most corporations, the entity effectively ceases to exist upon filing the dissolution certificate because winding up was completed before filing. However, if any matters remain unresolved, the corporation continues to exist for purposes of addressing those matters - defending lawsuits filed after dissolution, collecting receivables that come in later, or distributing assets that were overlooked. The corporation can sue and be sued during this period, hold property, and conduct transactions necessary to wind up. What it cannot do is resume normal business operations or start new ventures.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          Can shareholders be held liable for corporate debts after dissolution?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Generally no, if dissolution was conducted properly. The corporate form normally shields shareholders from personal liability both before and after dissolution. However, there are important exceptions. First, if the corporation made distributions to shareholders before paying all creditors, those shareholders may be liable to return the distributed funds to the extent necessary to pay unpaid creditors. This is why proper winding up requires paying or providing for all debts before distributing assets. Second, if directors or officers made fraudulent statements in the dissolution certificate, they may face personal liability for unpaid debts, extending to shareholders who participated in or authorized the fraudulent certification. Third, if creditors can pierce the corporate veil based on commingling funds, undercapitalization, or other factors, they may reach shareholders personally - dissolution doesn't cure veil-piercing issues that existed before dissolution. Finally, shareholders remain personally liable for any debts they personally guaranteed, as guarantees are separate obligations independent of the corporation.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          What if I want to dissolve a corporation with shareholders I can't locate?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Missing or unresponsive shareholders complicate dissolution because you need shareholder approval. If you can't get the required vote because shareholders are unreachable, you have several options. For corporations with minimal activity and assets, you might qualify for court-supervised dissolution under Corporations Code Sections 1800-1806 (involuntary dissolution for various circumstances including deadlock, illegal conduct, or when dissolution benefits shareholders). Alternatively, if your records show you've made reasonable efforts to contact missing shareholders at their last known addresses and you have a majority of the shares you can contact, you may be able to proceed with dissolution. Keep detailed records of your efforts including certified mail receipts showing you attempted to reach them. For any remaining assets that would have gone to missing shareholders, comply with California's unclaimed property laws by reporting and remitting those funds to the State Controller's Unclaimed Property Division. This protects you from claims by shareholders who later surface demanding their distributions.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          Can a dissolved corporation be revived?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Yes, but the process is complex and must occur within five years of dissolution under Corporations Code Section 2010. After that five-year period, revival is generally not possible. Revival requires court approval and a showing of good cause, such as discovering assets that should have been distributed, addressing litigation that arose after dissolution, or correcting errors in the original dissolution. Note that dissolution revival is different from reviving a suspended or forfeited corporation. Suspension/forfeiture revival involves paying back taxes and fees to restore corporate powers. Dissolution revival involves a court proceeding to bring back to existence a corporation that legally ceased to exist. Both are possible but involve different procedures and requirements.
+          </div>
+        </div>
+      </div>
+      
+      <div class="dw-faq-item">
+        <button class="dw-faq-question" onclick="toggleFAQ(this)">
+          What's the difference between regular dissolution and short-form dissolution?
+        </button>
+        <div class="dw-faq-answer">
+          <div class="dw-faq-answer-content">
+            Short-form dissolution (using Form DSF STK) is available only if your corporation meets ALL of the following conditions: (1) has not issued shares OR never commenced business, (2) has no debts or liabilities (or they've all been paid/discharged), and (3) has distributed or made adequate provision for distributing any remaining assets. If you qualify, you can skip filing the Certificate of Election and proceed directly to filing the short-form dissolution certificate. Regular dissolution (Form DISS STK) is required for all other corporations and typically requires filing a Certificate of Election first (unless 100% of shareholders approved dissolution). Most operating corporations will need regular dissolution rather than short-form because they've issued shares and conducted business.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- CTA -->
+  <div class="dw-cta">
+    <div class="dw-cta-title">Need Help Dissolving Your California Corporation?</div>
+    <div class="dw-cta-text">
+      Get expert legal guidance to properly close your entity and stop the $800 annual franchise tax. I've handled hundreds of corporate dissolutions over 13+ years of practice.
+    </div>
+    <a href="https://terms.law/call/" class="dw-cta-button">Schedule 30-Minute Consultation</a>
+  </div>
+  
+  <!-- Calendly inline widget begin -->
+  <div class="calendly-inline-widget" data-url="https://calendly.com/sergei-tokmakov/30-minute-zoom-meeting?hide_gdpr_banner=1" style="min-width:320px;height:700px;"></div>
+  <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  <!-- Calendly inline widget end -->
+</div>
+
+<script>
+  function openTab(evt, tabName) {
+    var i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("dw-tab-content");
+    for (i = 0; i < tabcontent.length; i++) {
+      tabcontent[i].classList.remove("active");
+    }
+    tablinks = document.getElementsByClassName("dw-tab");
+    for (i = 0; i < tablinks.length; i++) {
+      tablinks[i].classList.remove("active");
+    }
+    document.getElementById(tabName).classList.add("active");
+    evt.currentTarget.classList.add("active");
+  }
+  
+  function toggleFAQ(element) {
+    element.classList.toggle("active");
+    var answer = element.nextElementSibling;
+    answer.classList.toggle("active");
+  }
+</script>
+
+</body>
+</html>
