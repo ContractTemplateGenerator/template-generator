@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>California Corporation Annual Compliance Widget</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background: #f8f9fa;
+        }
+
+        .widget-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .intro-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .intro-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .intro-text {
+            font-size: 18px;
+            line-height: 1.8;
+            opacity: 0.95;
+        }
+
+        .tab-navigation {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 20px;
+            border: 2px solid #e9ecef;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            color: #495057;
+        }
+
+        .tab-button:hover {
+            border-color: #667eea;
+            background: #f8f9ff;
+            transform: translateY(-2px);
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .compliance-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            border-left: 5px solid;
+        }
+
+        .compliance-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+
+        .card-critical {
+            border-left-color: #dc3545;
+        }
+
+        .card-important {
+            border-left-color: #fd7e14;
+        }
+
+        .card-moderate {
+            border-left-color: #ffc107;
+        }
+
+        .card-routine {
+            border-left-color: #28a745;
+        }
+
+        .card-info {
+            border-left-color: #17a2b8;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+
+        .icon-critical {
+            background: #fff5f5;
+            color: #dc3545;
+        }
+
+        .icon-important {
+            background: #fff8f0;
+            color: #fd7e14;
+        }
+
+        .icon-moderate {
+            background: #fffbf0;
+            color: #ffc107;
+        }
+
+        .icon-routine {
+            background: #f0fdf4;
+            color: #28a745;
+        }
+
+        .icon-info {
+            background: #f0f9ff;
+            color: #17a2b8;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: #6c757d;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card-content {
+            color: #495057;
+            line-height: 1.7;
+            margin-bottom: 15px;
+        }
+
+        .card-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+        }
+
+        .detail-row {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            min-width: 120px;
+        }
+
+        .detail-value {
+            color: #6c757d;
+            flex: 1;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .badge-red {
+            background: #fff5f5;
+            color: #dc3545;
+            border: 1px solid #f8d7da;
+        }
+
+        .badge-orange {
+            background: #fff8f0;
+            color: #fd7e14;
+            border: 1px solid #ffe5cc;
+        }
+
+        .badge-yellow {
+            background: #fffbf0;
+            color: #997404;
+            border: 1px solid #fff3cd;
+        }
+
+        .badge-green {
+            background: #f0fdf4;
+            color: #28a745;
+            border: 1px solid #d1e7dd;
+        }
+
+        .badge-blue {
+            background: #f0f9ff;
+            color: #17a2b8;
+            border: 1px solid #cfe2ff;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+
+        .warning-box strong {
+            color: #856404;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .danger-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            color: #721c24;
+        }
+
+        .danger-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .success-box {
+            background: #d1e7dd;
+            border-left: 4px solid #28a745;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            color: #0f5132;
+        }
+
+        .success-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .info-box {
+            background: #cfe2ff;
+            border-left: 4px solid #0d6efd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+            color: #084298;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .checklist {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .checklist-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            transition: background 0.2s ease;
+        }
+
+        .checklist-item:hover {
+            background: #f8f9fa;
+        }
+
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .checklist-checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            margin-right: 15px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .checklist-content {
+            flex: 1;
+        }
+
+        .checklist-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .checklist-description {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .timeline {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .timeline-item {
+            display: flex;
+            padding: 20px 0;
+            border-left: 3px solid #e9ecef;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -9px;
+            top: 25px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #667eea;
+            border: 3px solid white;
+            box-shadow: 0 0 0 3px #e9ecef;
+        }
+
+        .timeline-date {
+            font-weight: 700;
+            color: #667eea;
+            min-width: 150px;
+            font-size: 15px;
+        }
+
+        .timeline-content {
+            flex: 1;
+        }
+
+        .timeline-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .timeline-description {
+            font-size: 14px;
+            color: #6c757d;
+            line-height: 1.6;
+        }
+
+        .faq-section {
+            margin-top: 40px;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 20px 25px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            color: #2c3e50;
+            transition: background 0.2s ease;
+        }
+
+        .faq-question:hover {
+            background: #f8f9fa;
+        }
+
+        .faq-icon {
+            font-size: 20px;
+            color: #667eea;
+            transition: transform 0.3s ease;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding: 0 25px;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 1000px;
+            padding: 0 25px 25px 25px;
+        }
+
+        .faq-answer-content {
+            color: #495057;
+            line-height: 1.8;
+            padding-top: 10px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .comparison-table {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+            color: #2c3e50;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #495057;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: 700;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6c757d;
+            font-weight: 600;
+        }
+
+        .cta-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .cta-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .cta-text {
+            font-size: 16px;
+            margin-bottom: 25px;
+            opacity: 0.95;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 15px 40px;
+            background: white;
+            color: #667eea;
+            font-weight: 700;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+
+        @media (max-width: 768px) {
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-button {
+                min-width: 100%;
+            }
+
+            .intro-title {
+                font-size: 24px;
+            }
+
+            .timeline-item {
+                flex-direction: column;
+            }
+
+            .timeline-date {
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="widget-container">
+        <div class="intro-section">
+            <div class="intro-title">California Corporation Annual Compliance Guide</div>
+            <div class="intro-text">
+                Maintaining your California corporation's good standing requires consistent annual compliance work. This interactive guide breaks down every requirement, explains why each matters, and provides a practical framework for staying compliant. Don't let administrative oversight compromise your limited liability protection or create vulnerabilities during due diligence.
+            </div>
+        </div>
+
+        <div class="tab-navigation">
+            <button class="tab-button active" onclick="openTab(event, 'overview')">📋 Overview</button>
+            <button class="tab-button" onclick="openTab(event, 'sos')">🏛️ SOS Filings</button>
+            <button class="tab-button" onclick="openTab(event, 'governance')">⚖️ Governance</button>
+            <button class="tab-button" onclick="openTab(event, 'taxes')">💰 Tax Compliance</button>
+            <button class="tab-button" onclick="openTab(event, 'calendar')">📅 Calendar</button>
+            <button class="tab-button" onclick="openTab(event, 'faq')">❓ FAQ</button>
+        </div>
+
+        <div id="overview" class="tab-content active">
+            <div class="stat-grid">
+                <div class="stat-card">
+                    <div class="stat-number">$800</div>
+                    <div class="stat-label">Annual Minimum Franchise Tax</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$25</div>
+                    <div class="stat-label">Statement of Information Fee</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">90 Days</div>
+                    <div class="stat-label">Initial SI Filing Deadline</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">$250</div>
+                    <div class="stat-label">Penalty for Missing SI</div>
+                </div>
+            </div>
+
+            <div class="card-grid">
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">⚠️</div>
+                        <div>
+                            <div class="card-title">Limited Liability at Risk</div>
+                            <div class="card-subtitle">Critical Foundation</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        California courts won't respect the corporate veil if you don't respect it yourself. Failure to maintain corporate formalities is one of the most common factors in "alter ego" cases where courts pierce the veil and hold shareholders personally liable.
+                    </div>
+                    <div>
+                        <span class="badge badge-red">Veil Piercing Risk</span>
+                        <span class="badge badge-red">Personal Liability</span>
+                        <span class="badge badge-red">Court Scrutiny</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-important">
+                    <div class="card-header">
+                        <div class="card-icon icon-important">📊</div>
+                        <div>
+                            <div class="card-title">Due Diligence Exposure</div>
+                            <div class="card-subtitle">Deal Breaker</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Missing statements, incomplete minutes, or gaps in tax filings are red flags that can kill deals, reduce valuations by hundreds of thousands of dollars, or force unfavorable terms during fundraising or acquisition.
+                    </div>
+                    <div>
+                        <span class="badge badge-orange">Valuation Impact</span>
+                        <span class="badge badge-orange">Failed Deals</span>
+                        <span class="badge badge-orange">Investor Concerns</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-important">
+                    <div class="card-header">
+                        <div class="card-icon icon-important">🚫</div>
+                        <div>
+                            <div class="card-title">Suspension Consequences</div>
+                            <div class="card-subtitle">Operational Paralysis</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        A suspended corporation cannot legally conduct business in California, cannot sue to enforce contracts (though it can be sued), and may find contracts entered during suspension are voidable. Public record shows your "SUSPENDED" status to anyone who checks.
+                    </div>
+                    <div>
+                        <span class="badge badge-orange">No Legal Standing</span>
+                        <span class="badge badge-orange">Public Record</span>
+                        <span class="badge badge-orange">Voidable Contracts</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-routine">
+                    <div class="card-header">
+                        <div class="card-icon icon-routine">✅</div>
+                        <div>
+                            <div class="card-title">Compliance is Investment</div>
+                            <div class="card-subtitle">Value Protection</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Corporations with clean records, current filings, and proper documentation command higher valuations, attract better investors, and maintain strong liability protection. The cost of compliance is a fraction of the cost of non-compliance.
+                    </div>
+                    <div>
+                        <span class="badge badge-green">Higher Valuations</span>
+                        <span class="badge badge-green">Investor Appeal</span>
+                        <span class="badge badge-green">Protected Assets</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="danger-box">
+                <strong>⚠️ Three Critical Reasons Compliance Matters</strong>
+                <p><strong>1. Veil Protection:</strong> Courts examine whether you maintained formalities when deciding to pierce the corporate veil. No minutes for five years? You're providing evidence the corporation wasn't truly separate from you.</p>
+                <p><strong>2. Due Diligence:</strong> Purchase prices reduced by hundreds of thousands because records are a mess. The cost of maintaining proper records is a fraction of scrambling to reconstruct them—or explaining why they don't exist.</p>
+                <p><strong>3. Suspension:</strong> Anyone can check your status through the Secretary of State's online database. Operating with "SUSPENDED" next to your name destroys credibility with clients and partners.</p>
+            </div>
+        </div>
+
+        <div id="sos" class="tab-content">
+            <div class="card-grid">
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">📄</div>
+                        <div>
+                            <div class="card-title">Statement of Information (SI-550)</div>
+                            <div class="card-subtitle">Corp Code § 1502</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        California corporations must file SI-550 both initially (within 90 days of incorporation) and annually during a six-month filing period. This public filing contains names/addresses of CEO, Secretary, CFO, principal office address, and business type.
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Initial Filing:</div>
+                            <div class="detail-value">Within 90 days of incorporation</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Annual Period:</div>
+                            <div class="detail-value">Calendar month of incorporation + 5 preceding months</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Fee:</div>
+                            <div class="detail-value">$25 (verify current fee)</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Filing Method:</div>
+                            <div class="detail-value">Online via BizFile system (recommended)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-important">
+                    <div class="card-header">
+                        <div class="card-icon icon-important">⚖️</div>
+                        <div>
+                            <div class="card-title">Non-Compliance Penalties</div>
+                            <div class="card-subtitle">Rev & Tax Code § 19141</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Failure to file triggers multiple consequences: FTB penalty ($250), potential SOS suspension/forfeiture, and cannot revive FTB suspension until all SI filings are current. The requirements stack—you can't just pay taxes and ignore SI filing.
+                    </div>
+                    <div>
+                        <span class="badge badge-orange">$250 FTB Penalty</span>
+                        <span class="badge badge-orange">SOS Suspension</span>
+                        <span class="badge badge-orange">Public Record</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-info">
+                    <div class="card-header">
+                        <div class="card-icon icon-info">🏢</div>
+                        <div>
+                            <div class="card-title">Publicly Traded Corporations</div>
+                            <div class="card-subtitle">Corp Code § 1502.1</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Corporations with equity securities registered under Exchange Act § 12 or required to file under § 15(d) have additional disclosure obligations. Must file separate "Corporate Disclosure Statement" with enhanced director, executive compensation, and governance information.
+                    </div>
+                    <div>
+                        <span class="badge badge-blue">Enhanced Disclosure</span>
+                        <span class="badge badge-blue">Additional Filing</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-routine">
+                    <div class="card-header">
+                        <div class="card-icon icon-routine">💻</div>
+                        <div>
+                            <div class="card-title">Filing Process Best Practices</div>
+                            <div class="card-subtitle">Efficiency Tips</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        File online through BizFile system for speed and immediate confirmation. Set reminders at the START of your six-month filing window. Don't rely on receiving SOS notice. Professional registered agents often track deadlines and send reminders.
+                    </div>
+                    <div>
+                        <span class="badge badge-green">Online Filing</span>
+                        <span class="badge badge-green">Set Reminders</span>
+                        <span class="badge badge-green">Professional Agent</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ Filing Period Confusion</strong>
+                Your filing period is NOT just the month you incorporated. It's that calendar month PLUS the five preceding months. If you incorporated in March, you can file anytime from October through March. File early in the window to avoid complications.
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Pro Tip: Don't Wait for Notices</strong>
+                While the Secretary of State typically sends notices, don't rely on receiving them. Set your own calendar reminders when you incorporate. Missing the 90-day initial deadline or annual period starts the penalty clock immediately.
+            </div>
+        </div>
+
+        <div id="governance" class="tab-content">
+            <div class="card-grid">
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">👥</div>
+                        <div>
+                            <div class="card-title">Annual Shareholder Meetings</div>
+                            <div class="card-subtitle">Corp Code § 600</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Every corporation must hold annual shareholder meetings for director election. Can satisfy through unanimous written consent instead of formal meetings. Cannot simply skip without documentation—this is a classic veil-piercing factor.
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Requirement:</div>
+                            <div class="detail-value">Annual election of directors</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Alternative:</div>
+                            <div class="detail-value">Unanimous written consent</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Risk if Skipped:</div>
+                            <div class="detail-value">Veil-piercing evidence, DD red flags</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">📋</div>
+                        <div>
+                            <div class="card-title">Board Meetings & Actions</div>
+                            <div class="card-subtitle">Corp Code § 307</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Board can act through meetings or unanimous written consent. Minimum annually: approve financials, ratify officer compensation, approve equity grants, review major contracts, confirm compliance. Written consents must be actually signed and maintained.
+                    </div>
+                    <div>
+                        <span class="badge badge-red">Annual Minimum</span>
+                        <span class="badge badge-red">Must Sign Consents</span>
+                        <span class="badge badge-red">Document All</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">📚</div>
+                        <div>
+                            <div class="card-title">Corporate Minutes & Records</div>
+                            <div class="card-subtitle">Corp Code § 1500</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Must keep "adequate and correct books and records" and minutes of all proceedings. This isn't a suggestion—it's a statutory mandate. Courts examining veil-piercing routinely cite inadequate recordkeeping as evidence corporation wasn't truly separate.
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Required Records:</div>
+                            <div class="detail-value">Minutes, accounting books, shareholder records</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Must Include:</div>
+                            <div class="detail-value">Who, what, when, why of major decisions</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Organization:</div>
+                            <div class="detail-value">Must be accessible and current</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-moderate">
+                    <div class="card-header">
+                        <div class="card-icon icon-moderate">📊</div>
+                        <div>
+                            <div class="card-title">Annual Report to Shareholders</div>
+                            <div class="card-subtitle">Corp Code § 1501</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Board must send annual financial report (balance sheet, income statement, cash flows) within 120 days of fiscal year end. EXCEPTION: Corporations with <100 shareholders can waive in bylaws. Most startups/closely held corps waive this requirement.
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-row">
+                            <div class="detail-label">Deadline:</div>
+                            <div class="detail-value">120 days after fiscal year end</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Waiver Option:</div>
+                            <div class="detail-value">< 100 shareholders can waive in bylaws</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">Content:</div>
+                            <div class="detail-value">Financials + accountant report or officer cert</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ What Constitutes "Adequate" Minutes</strong>
+                Minutes should document who was present, what was decided, when it occurred, and why (for non-routine actions). Not elaborate transcripts, but clear professional records that could withstand scrutiny from judges, investors, or buyers. Don't be so sparse they're meaningless or so detailed they document every internal debate.
+            </div>
+
+            <div class="checklist">
+                <div style="font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 20px;">📁 Essential Corporate Records Checklist</div>
+                
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Articles of Incorporation & Amendments</div>
+                        <div class="checklist-description">Original formation documents and any subsequent amendments filed with Secretary of State</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Bylaws & Amendments</div>
+                        <div class="checklist-description">Corporate governance rules and any modifications over time</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Board Minutes & Written Consents</div>
+                        <div class="checklist-description">All board meetings and unanimous written consents documenting major decisions</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Shareholder Minutes & Written Consents</div>
+                        <div class="checklist-description">Annual meetings and consents for director elections and major corporate actions</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Stock Certificates & Transfer Ledger</div>
+                        <div class="checklist-description">Who owns shares, tracking all issuances, transfers, and cancellations</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Material Contracts & Agreements</div>
+                        <div class="checklist-description">Key contracts, shareholder agreements, major customer/vendor agreements</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">Tax Returns & Financial Statements</div>
+                        <div class="checklist-description">All filed tax returns and annual financial statements</div>
+                    </div>
+                </div>
+
+                <div class="checklist-item">
+                    <div class="checklist-checkbox">✓</div>
+                    <div class="checklist-content">
+                        <div class="checklist-title">State Agency Correspondence</div>
+                        <div class="checklist-description">Secretary of State and Franchise Tax Board notices, filings, and communications</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Shareholder Inspection Rights (Corp Code §§ 1600-1601)</strong>
+                Shareholders can inspect and copy shareholder lists, bylaws, minutes, accounting books, and board proceedings for proper purposes. If you deny a justified request, shareholders can seek court enforcement and recover attorney's fees. You can't deny inspection because records don't exist—that's an admission of non-compliance.
+            </div>
+        </div>
+
+        <div id="taxes" class="tab-content">
+            <div class="comparison-table">
+                <div style="font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 20px;">C Corporation vs S Corporation Tax Comparison</div>
+                <table>
+                    <tr>
+                        <th>Aspect</th>
+                        <th>C Corporation (Form 100)</th>
+                        <th>S Corporation (Form 100S)</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Tax Rate</strong></td>
+                        <td>8.84% of net income</td>
+                        <td>1.5% of net income</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Minimum Tax</strong></td>
+                        <td>$800 annually (waived first year)</td>
+                        <td>$800 annually (waived first year)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Pass-Through</strong></td>
+                        <td>No (double taxation)</td>
+                        <td>Yes (+ 1.5% entity-level tax)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>First Year Exemption</strong></td>
+                        <td>$800 waived for first taxable year</td>
+                        <td>$800 waived for first taxable year</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Due Date</strong></td>
+                        <td>15th day of 4th month after year end</td>
+                        <td>15th day of 4th month after year end</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estimated Taxes</strong></td>
+                        <td>Form 100-ES (when required)</td>
+                        <td>Form 100-ES (when required)</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="card-grid">
+                <div class="compliance-card card-critical">
+                    <div class="card-header">
+                        <div class="card-icon icon-critical">💰</div>
+                        <div>
+                            <div class="card-title">$800 Minimum Franchise Tax</div>
+                            <div class="card-subtitle">Annual Fee for Corporate Status</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Not based on revenue, profit, or business activity—if you exist as a California corporation, you owe it. First taxable year exemption for corps formed after Jan 1, 2000. Starting year two: $800 due regardless of income.
+                    </div>
+                    <div>
+                        <span class="badge badge-red">Due Every Year</span>
+                        <span class="badge badge-red">No Revenue Exception</span>
+                        <span class="badge badge-yellow">First Year Waived</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-important">
+                    <div class="card-header">
+                        <div class="card-icon icon-important">🚨</div>
+                        <div>
+                            <div class="card-title">FTB Suspension Cascade</div>
+                            <div class="card-subtitle">Compounding Consequences</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        Failure to file returns or pay taxes triggers FTB suspension. Suspended corps can't conduct business, can't sue (but can be sued), may have voidable contracts. Must file all past-due returns AND pay all taxes/penalties/interest to revive.
+                    </div>
+                    <div>
+                        <span class="badge badge-orange">No Legal Standing</span>
+                        <span class="badge badge-orange">Penalties Compound</span>
+                        <span class="badge badge-orange">Interest Accrues Daily</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-moderate">
+                    <div class="card-header">
+                        <div class="card-icon icon-moderate">⏰</div>
+                        <div>
+                            <div class="card-title">First Taxable Year Confusion</div>
+                            <div class="card-subtitle">Common Misunderstanding</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        "First taxable year" = period covered by first tax return (incorporation date to Dec 31). Incorporated in January? Nearly full year exempt. Incorporated in November? Only 2 months. Year two starts Jan 1 after incorporation—$800 due even with zero income.
+                    </div>
+                    <div>
+                        <span class="badge badge-yellow">Not Calendar Year</span>
+                        <span class="badge badge-yellow">Formation Date Matters</span>
+                    </div>
+                </div>
+
+                <div class="compliance-card card-routine">
+                    <div class="card-header">
+                        <div class="card-icon icon-routine">💻</div>
+                        <div>
+                            <div class="card-title">Payment Methods</div>
+                            <div class="card-subtitle">Modernized Options</div>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        FTB Web Pay for online payment (recommended for speed and confirmation). Can pay by check with return but slower processing. Extension to file ≠ extension to pay. Estimate and pay by original deadline to avoid penalties/interest.
+                    </div>
+                    <div>
+                        <span class="badge badge-green">Online Payment</span>
+                        <span class="badge badge-green">Immediate Confirmation</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="danger-box">
+                <strong>⚠️ S Corporation Reasonable Compensation (IRS Requirement)</strong>
+                <p><strong>The Issue:</strong> S corp shareholder-employees must receive reasonable compensation as wages (subject to employment taxes). Distributions are not subject to employment taxes, creating incentive to minimize wages and maximize distributions.</p>
+                <p><strong>The Risk:</strong> IRS will reclassify distributions as wages, assess employment taxes retroactively, plus penalties and interest. The corporation faces penalties for failure to withhold and pay employment taxes when due.</p>
+                <p><strong>What's Reasonable:</strong> Approximate what you'd pay an arm's-length third party for the same role. Consider training, experience, duties, time devoted, comparable businesses, documented agreements. CEO working full-time should be paid accordingly.</p>
+                <p><strong>Annual Compliance:</strong> Board should formally approve officer compensation in minutes/consent each year, referencing reasonableness factors. Document basis for compensation level. Actually pay salary through regular payroll with proper withholdings.</p>
+                <p><strong>Additional Trap:</strong> >2% shareholders: health insurance premiums paid by corp must be included in W-2 wages (not subject to employment taxes, but subject to income tax).</p>
+            </div>
+
+            <div class="info-box">
+                <strong>💡 Revival Cost Example</strong>
+                Corporation suspended for 3 years owing $800 annually. Revival requires: $2,400 base tax + failure to file penalties (% of tax) + failure to pay penalties (% of tax) + daily compounding interest. Total can easily reach $5,000-$10,000 or more. Prevention through timely filing is far cheaper than revival.
+            </div>
+        </div>
+
+        <div id="calendar" class="tab-content">
+            <div class="timeline">
+                <div style="font-size: 20px; font-weight: 700; color: #2c3e50; margin-bottom: 30px;">📅 Annual Compliance Timeline</div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-date">Within 90 Days</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Initial SI-550 Filing</div>
+                        <div class="timeline-description">File initial Statement of Information with Secretary of State after articles of incorporation are filed. One-time requirement but critical to get right. $25 fee.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">6-Month Window</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Annual SI-550 Filing</div>
+                        <div class="timeline-description">File during designated period (incorporation month + 5 preceding months). Set reminders for START of window, not end. File online via BizFile.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">120 Days After FYE</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Annual Report to Shareholders (if applicable)</div>
+                        <div class="timeline-description">Corp Code § 1501 requires financials sent to shareholders within 120 days of fiscal year end. Waivable in bylaws if <100 shareholders (most startups waive).</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Annually</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Annual Shareholder Meeting/Consent</div>
+                        <div class="timeline-description">Hold meeting or execute unanimous written consent for director election and other annual shareholder business. Required by Corp Code § 600.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Annually</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Annual Board Meeting/Consent</div>
+                        <div class="timeline-description">Board meets or acts by written consent to approve financials, ratify officer compensation, approve equity grants, review major contracts, confirm compliance.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">April 15 (Calendar Year)</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Corporate Tax Return Due</div>
+                        <div class="timeline-description">Form 100 (C corp) or Form 100S (S corp) due 15th day of 4th month after fiscal year end. Can request extension but must pay estimated tax by original deadline.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Quarterly (If Required)</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Estimated Tax Payments</div>
+                        <div class="timeline-description">Form 100-ES payments when expected liability exceeds thresholds. Typical dates for calendar-year corps: April 15, June 15, Sept 15, Jan 15.</div>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="timeline-date">Annually (S Corps)</div>
+                    <div class="timeline-content">
+                        <div class="timeline-title">Compensation Review & Approval</div>
+                        <div class="timeline-description">Board reviews and approves officer compensation with reference to reasonableness factors. Document in minutes. Ensure salary paid through actual payroll with withholdings.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="success-box">
+                <strong>✅ Technology Tools for Compliance Tracking</strong>
+                <p><strong>Calendar Systems:</strong> Set recurring annual reminders for each requirement with advance notice (2-4 weeks) so you can actually complete the task.</p>
+                <p><strong>Cap Table Software:</strong> Platforms like Carta, Capshare, or Pulley help track ownership, manage equity grants, generate reports for taxes and due diligence. Essential for complex equity structures.</p>
+                <p><strong>Governance Platforms:</strong> Help with meeting minutes, board consents, document retention. More valuable as you grow, add investors, need professional governance demonstration.</p>
+                <p><strong>Professional Services:</strong> Attorneys and CPAs often track compliance deadlines for clients. Consider professional registered agent who monitors filing requirements.</p>
+            </div>
+
+            <div class="warning-box">
+                <strong>⚠️ When to Involve Professionals</strong>
+                <strong>DIY Appropriate:</strong> Filing SI-550 online, simple board minutes for straightforward decisions.
+                <br><br>
+                <strong>Professional Assistance Warranted:</strong> Tax compliance (multi-state operations, significant transactions, optimization), legal assistance for minutes/records that will face due diligence scrutiny, complex transactions (equity issuances, major contracts, structural changes), remediation of past compliance gaps.
+            </div>
+        </div>
+
+        <div id="faq" class="tab-content">
+            <div class="faq-section">
+                <div style="font-size: 24px; font-weight: 700; color: #2c3e50; margin-bottom: 30px; text-align: center;">Frequently Asked Questions</div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What happens if I miss the Statement of Information deadline by just a few days?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Even a brief delay can trigger consequences. The FTB can assess the $250 penalty under Revenue and Taxation Code Section 19141 for failure to file on time. While the Secretary of State may not immediately suspend your corporation for a minor delay, the filing isn't considered timely and penalty exposure exists. More importantly, if you're habitually late, it signals to potential investors or buyers that your corporate governance is lax. File during your six-month filing period—there's no reason to wait until the last day when you have months to complete it.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Do single-shareholder corporations really need to hold annual meetings and keep minutes?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes, even if you're the sole shareholder and director, corporate formalities still matter. The law doesn't exempt single-shareholder corporations from governance requirements. Courts evaluating whether to pierce the corporate veil look at whether formalities were observed regardless of shareholder count. The practical reality is that single-owner corporations can satisfy these requirements through written consents rather than formal meetings, which is much simpler. Prepare an annual written consent as the sole shareholder electing yourself as director, and a board consent approving key actions for the year. It takes minimal time but provides critical documentation that the corporation was properly maintained as a separate entity.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I backdate board minutes or shareholder consents if I realize I forgot to do them?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            No. Backdating corporate documents is not only ineffective, it's potentially fraudulent. If you discover you failed to hold required meetings or prepare consents, the proper approach is to document the situation accurately going forward. You can prepare ratification resolutions where the board or shareholders acknowledge that certain actions were taken in the past and now ratify and approve those actions as of the current date. This creates a contemporaneous record without falsifying dates. If you're facing due diligence and discover gaps in your corporate records, address them transparently with buyers or investors rather than trying to manufacture false documentation. Sophisticated parties will often discover backdating through metadata in electronic documents or inconsistencies in the records, which destroys credibility and can kill transactions.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How do I determine what's "reasonable compensation" for myself as an S corporation shareholder-employee?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Start by researching what comparable positions earn in your industry and geographic area. Look at salary data for executives with similar responsibilities, experience levels, and company sizes. Websites like Glassdoor, Salary.com, or Bureau of Labor Statistics data can provide benchmarks. Consider the amount of time you're dedicating to the business—if you're working full-time, your salary should reflect that. A reasonable approach is to ask yourself what you would need to pay an arm's-length third party to perform your role. Document your analysis in your board minutes when approving compensation. If your corporation is profitable and you're taking distributions, make sure the salary is substantial enough that it doesn't appear you're trying to avoid employment taxes. Working with a CPA who has experience with S corporation compensation issues can help you strike the right balance between tax efficiency and defensibility.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>If my corporation gets suspended by the FTB, can I just dissolve it and start a new one?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            This is a common but problematic idea. First, you can't properly dissolve a suspended corporation until you bring it back into good standing by satisfying all outstanding obligations. The Secretary of State won't accept a certificate of dissolution from a suspended entity. Second, if you form a new corporation to continue the same business while abandoning a suspended corporation with unsatisfied obligations, you risk successor liability claims and potential veil-piercing arguments that the new entity is merely a continuation of the old one designed to evade liabilities. Third, forming a new entity doesn't eliminate your personal obligations to deal with the suspended corporation's tax debts—the FTB can pursue collection against responsible officers and shareholders in some circumstances. The proper approach is to revive the suspended corporation by filing past-due returns, paying outstanding taxes and penalties, and then either maintaining it in good standing or formally dissolving it after satisfying all obligations.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>What's the difference between the Statement of Information and the annual report to shareholders?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            These are completely different requirements that serve different purposes. The Statement of Information (SI-550) is filed with the Secretary of State under Corporations Code Section 1502 and is a public regulatory filing containing basic information about your corporation's officers and business address. Everyone can access this information through the Secretary of State's business search. The annual report to shareholders under Corporations Code Section 1501 is an internal corporate governance obligation requiring the board to send financial statements to shareholders. This is not a public filing—it's sent directly to shareholders and is not filed with any government agency. Many corporations with fewer than 100 shareholders waive the Section 1501 annual report requirement in their bylaws, but the Statement of Information must always be filed regardless of shareholder count. Both are separate from your FTB tax return filing obligations.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>As a California corporation, do I need to do anything at the county level for business licenses?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Corporate formation and annual maintenance at the state level—through the Secretary of State and Franchise Tax Board—is distinct from local business licensing. Most California cities and counties require businesses operating within their jurisdiction to obtain local business licenses or permits. These are separate from your corporate status and are typically based on where you physically operate your business. Requirements vary significantly by locality—some cities charge flat annual fees, others charge based on gross receipts or number of employees. Contact your city or county business licensing office to determine what's required for your specific situation. Additionally, depending on your business type, you may need specialized permits or licenses (health permits for restaurants, professional licenses for certain services, sales permits if you sell goods, etc.). This article focuses on corporate-level compliance, but local business licenses are a separate layer of compliance you shouldn't overlook.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>How long should I retain corporate records and tax returns?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            For tax purposes, the general rule is to retain corporate tax returns and supporting documentation for at least four years from the later of the due date or the date you filed the return. California's statute of limitations for tax assessments is generally four years, though it extends to eight years if you substantially understate income. The IRS has a three-year statute for most assessments and six years for substantial omissions. However, from a corporate governance and veil protection standpoint, I recommend retaining core corporate documents indefinitely—articles of incorporation, bylaws, minutes of major decisions, stock issuance records, and material contracts should be permanent records. These documents establish the corporation's history and may be needed decades later if ownership is questioned or historical corporate actions become relevant in litigation. For routine annual minutes and consents, many corporations maintain them indefinitely simply because the storage burden is minimal and there's no compelling reason to destroy corporate governance records.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>I'm a foreign corporation qualified to do business in California—do all these requirements apply?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes, with some modifications. Foreign corporations (meaning corporations incorporated in another state but qualified to do business in California) must file annual Statements of Information using Form SI-550 (or the foreign corporation equivalent) and must file California tax returns (Form 100 or 100S) if they have sufficient California nexus. The $800 minimum franchise tax applies to qualified foreign corporations. Your corporate governance obligations—board meetings, shareholder meetings, minutes—are primarily governed by your state of incorporation, but California will still examine whether you observed corporate formalities if veil-piercing issues arise in California litigation. If you're a foreign corporation, make sure you're tracking compliance requirements in both your state of incorporation and in California. The Statement of Information filing period for foreign corporations is based on the date you qualified to do business in California, not your original incorporation date in your home state.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question" onclick="toggleFaq(this)">
+                        <span>Can I use electronic signatures for board consents and other corporate documents?</span>
+                        <span class="faq-icon">▼</span>
+                    </div>
+                    <div class="faq-answer">
+                        <div class="faq-answer-content">
+                            Yes. California law recognizes electronic signatures under the Uniform Electronic Transactions Act (California Civil Code Section 1633.1 et seq.). Electronic signatures have the same legal effect as handwritten signatures for most corporate documents, including board consents, shareholder consents, and corporate resolutions. However, there are some practical considerations. First, make sure your electronic signature process creates a reliable record that can be authenticated later—major e-signature platforms like DocuSign, Adobe Sign, or HelloSign provide audit trails and verification features that help establish authenticity. Second, ensure that your bylaws don't prohibit electronic signatures (most modern bylaws either explicitly permit them or are silent, which allows them under California's default rules). Third, keep in mind that some third parties may request original wet-signature documents for major transactions even though electronic signatures are legally valid. For routine corporate governance, electronic signatures are efficient and perfectly acceptable.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cta-box">
+            <div class="cta-title">Need Help with Corporate Compliance?</div>
+            <div class="cta-text">
+                Sergei Tokmakov, California Attorney (CA Bar #279869) | 13+ Years Experience | 1,750+ Completed Projects | 4.9/5 Client Rating
+            </div>
+            <a href="https://terms.law/call/" class="cta-button">Schedule a Consultation</a>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            var i, tabcontent, tabbuttons;
+            
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            tabbuttons = document.getElementsByClassName("tab-button");
+            for (i = 0; i < tabbuttons.length; i++) {
+                tabbuttons[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const isActive = faqItem.classList.contains('active');
+            
+            // Close all FAQ items
+            const allFaqItems = document.getElementsByClassName('faq-item');
+            for (let item of allFaqItems) {
+                item.classList.remove('active');
+            }
+            
+            // Open clicked item if it wasn't already open
+            if (!isActive) {
+                faqItem.classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
