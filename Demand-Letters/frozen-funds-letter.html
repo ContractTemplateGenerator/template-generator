@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Processor Frozen Funds Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-navigation {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 130px;
+            padding: 12px 14px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.4);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .preview-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-header h2 {
+            color: #1a1a1a;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.4);
+        }
+
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .form-group.half-width {
+            flex: 1 1 calc(50% - 0.5rem);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-warning {
+            background: #fed7aa;
+            border-color: #f97316;
+            color: #9a3412;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                position: static;
+                height: 500px;
+                border-right: none;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .form-panel {
+                height: auto;
+                border-right: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .tab-button {
+                min-width: 100%;
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .form-group.half-width {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Scrollbar styling */
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useRef, useEffect } = React;
+
+        const FrozenFundsLetter = () => {
+            const tabs = [
+                { id: 'yourinfo', label: '1. Your Info' },
+                { id: 'processor', label: '2. Processor' },
+                { id: 'account', label: '3. Account History' },
+                { id: 'hold', label: '4. The Hold' },
+                { id: 'risk', label: '5. Risk Profile' },
+                { id: 'harm', label: '6. Harm & Demands' }
+            ];
+
+            const [currentTab, setCurrentTab] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+            const previewRef = useRef(null);
+
+            const [formData, setFormData] = useState({
+                // Your info
+                yourName: '',
+                businessName: '',
+                yourAddress: '',
+                yourCity: '',
+                yourEmail: '',
+                yourPhone: '',
+
+                // Processor
+                processorName: 'Stripe',
+                accountNumber: '',
+                processorAddress: '',
+                processorCity: '',
+
+                // Account history
+                accountOpenedDate: '',
+                businessDescription: '',
+                avgMonthlyVolume: '',
+                avgTransactionSize: '',
+                accountPeriod: '',
+
+                // The hold
+                holdStartDate: '',
+                frozenAmount: '',
+                holdReason: '',
+                documentsProvided: '',
+                supportHistory: '',
+
+                // Risk profile
+                chargebackRate: '',
+                chargebackCount: '',
+                transactionCount: '',
+                disputesResolved: '',
+                businessAge: '',
+                lowRiskFactors: '',
+
+                // Harm and demands
+                specificHarm: '',
+                proposedReserve: '',
+                deadlineDays: '10'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const getDeadlineDate = (days) => {
+                const date = new Date();
+                date.setDate(date.getDate() + parseInt(days || 10));
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            };
+
+            const getProcessorTerms = () => {
+                switch(formData.processorName) {
+                    case 'Stripe':
+                        return 'Services Agreement';
+                    case 'PayPal':
+                        return 'User Agreement';
+                    case 'Square':
+                        return 'Payment Terms';
+                    case 'Shopify Payments':
+                        return 'Payment Terms';
+                    default:
+                        return 'Services Agreement';
+                }
+            };
+
+            const documentText = useMemo(() => {
+                const cd = formData;
+                const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const deadlineDate = getDeadlineDate(cd.deadlineDays);
+                const terms = getProcessorTerms();
+
+                return `${cd.yourName || '[Your Name]'}
+${cd.businessName || '[Your Business Name]'}
+${cd.yourAddress || '[Street Address]'}
+${cd.yourCity || '[City, State ZIP]'}
+${cd.yourEmail || '[Email]'}
+${cd.yourPhone || '[Phone]'}
+
+${today}
+
+VIA EMAIL AND CERTIFIED MAIL
+
+${cd.processorName || '[Payment Processor Name]'}
+Attn: Legal Department / Risk Department
+${cd.processorAddress || '[Processor Address]'}
+${cd.processorCity || '[City, State ZIP]'}
+
+Re: Demand for Release of Funds and Account Review
+Account Number: ${cd.accountNumber ? `[Last Four: ${cd.accountNumber}]` : '[Account Number]'}
+Account Holder: ${cd.businessName || '[Your Business Name]'}
+
+Dear Sir or Madam:
+
+I am writing regarding ${cd.processorName || '[Payment Processor]'}'s continuing hold on funds in my business account referenced above. Despite repeated good faith efforts to resolve this matter through your standard support channels, ${cd.processorName || '[Payment Processor]'} continues to hold ${cd.frozenAmount || '$[XX,XXX]'} in funds earned from legitimate business transactions, causing substantial and continuing harm to my business.
+
+ACCOUNT BACKGROUND AND HISTORY
+
+I opened my ${cd.processorName || '[Payment Processor]'} account on ${cd.accountOpenedDate || '[date]'} for the purpose of processing payments for ${cd.businessDescription || '[brief neutral description of business]'}. From ${cd.accountPeriod || '[month/year] through [month/year]'}, I processed an average of ${cd.avgMonthlyVolume || '$[X,XXX]'} per month through the account${cd.avgTransactionSize ? `, with an average transaction size of ${cd.avgTransactionSize}` : ''}.${cd.chargebackRate ? ` During this period, I maintained a chargeback rate of ${cd.chargebackRate}%, well below industry standards and payment network thresholds.` : ''}
+
+THE HOLD AND INADEQUATE RESPONSE
+
+On ${cd.holdStartDate || '[date]'}, I received notice that ${cd.processorName || '[Payment Processor]'} had placed a hold on my account and would not process payouts pending an account review.${cd.holdReason ? ` The notice stated that the hold was due to ${cd.holdReason}.` : ''} I immediately responded by providing ${cd.documentsProvided || '[list documents provided, such as: business formation documents, proof of product delivery, customer communications, identity verification, and any other requested documentation]'}.
+
+Despite providing all requested information, ${cd.processorName || '[Payment Processor]'} has continued to hold ${cd.frozenAmount || '$[XX,XXX]'} for ${cd.holdStartDate ? Math.floor((new Date() - new Date(cd.holdStartDate)) / (1000 * 60 * 60 * 24)) : '[X]'} days with no clear explanation of what additional information is needed, what specific risk factors justify the hold, or when I can expect a resolution.${cd.supportHistory ? ` ${cd.supportHistory}` : ' I have received only automated responses to my support requests stating that my case is "under review" or "with the appropriate team."'}
+
+CONTRACTUAL FRAMEWORK
+
+I understand that ${cd.processorName || '[Payment Processor]'}'s ${terms} grants ${cd.processorName || '[Payment Processor]'} discretion to establish reserves and delay payouts to manage risk. However, this discretion must be exercised in good faith and in a manner reasonably related to legitimate risk management purposes.
+
+${cd.processorName === 'Stripe' ? 'Section 3.3 of Stripe\'s Services Terms authorizes reserves "if Stripe determines, in its sole discretion, that there is a financial risk associated with your Stripe Account." However, any hold must be proportionate to actual risk. My account\'s demonstrated low chargeback rate, established processing history, and clear documentation of fulfilled transactions do not support a complete freeze of all funds.' : ''}${cd.processorName === 'PayPal' ? 'PayPal\'s User Agreement describes reserves and holds as tools to manage potential chargebacks and disputes. With ' + (cd.chargebackCount || '[X]') + ' chargebacks out of ' + (cd.transactionCount || '[XXX]') + ' total transactions, representing ' + (cd.chargebackRate || '[X]') + '% of volume, and with clear evidence of product/service delivery, the current hold is grossly disproportionate to any legitimate risk.' : ''}${cd.processorName === 'Square' ? 'Square\'s Payment Terms allow reserves and delayed settlements to cover potential losses. However, the current hold on ' + (cd.frozenAmount || '$[XX,XXX]') + ' is not justified by my actual risk profile given my demonstrated low-risk factors.' : ''}${cd.processorName === 'Shopify Payments' ? 'Shopify\'s Payment Terms, together with the underlying processor terms, allow holds to manage risk. However, the current hold is disproportionate to my account\'s actual risk metrics.' : ''}
+
+RISK PROFILE AND LOW-RISK FACTORS
+
+The current hold is not supported by my account's actual risk metrics:
+
+${cd.chargebackRate ? `Chargeback Rate: ${cd.chargebackRate}% over the account lifetime, well below the 1% threshold typically considered high-risk` : 'Chargeback Rate: [X%] well below standard thresholds'}
+${cd.disputesResolved ? `Dispute Resolution: ${cd.disputesResolved}` : 'Dispute Resolution: [X] disputes resolved in my favor'}
+${cd.businessAge ? `Business Age: ${cd.businessAge} of established operation` : 'Business Age: [X] months/years established'}
+${cd.lowRiskFactors || `Customer Satisfaction: [Describe evidence]
+Transaction Legitimacy: [Describe proof of delivery]`}
+
+HARM FROM CONTINUED HOLD
+
+The hold on funds has caused and continues to cause specific, quantifiable harm to my business:
+
+${cd.specificHarm || `• I have been unable to [specific example with dollar amount, such as: pay October payroll totaling $X,XXX]
+• I have [specific example: defaulted on vendor invoices totaling $X,XXX]
+• I have been forced to [specific example: cancel planned spending of $X,XXX]
+• I have [specific example: turned away X new customers representing $X,XXX in lost revenue]`}
+
+If the hold continues beyond ${getDeadlineDate(30)}, I will [specific additional harm such as: be unable to make rent, be forced to terminate employees, face breach of customer contracts].
+
+LEGAL FRAMEWORK
+
+${cd.processorName || '[Payment Processor]'}'s handling of this matter raises several legal concerns:
+
+The current hold may constitute a breach of the implied covenant of good faith and fair dealing that exists in every contract under California law. ${cd.processorName || '[Payment Processor]'}'s failure to explain what risk factors justify the hold, refusal to consider clear evidence of low risk, and maintenance of a hold far beyond what is necessary to cover potential liabilities suggests arbitrary exercise of contractual discretion inconsistent with good faith.
+
+California's Unfair Competition Law, Business and Professions Code Section 17200 et seq., prohibits unfair business practices. Maintaining disproportionate holds on merchant funds, particularly where the merchant has cooperated fully and demonstrated low risk, may constitute an unfair practice causing substantial harm without countervailing business justification.
+
+The Consumer Financial Protection Bureau has authority under 12 U.S.C. Section 5531 to prohibit unfair, deceptive, or abusive acts or practices. ${cd.processorName || '[Payment Processor]'}'s practices regarding merchant account holds may raise UDAAP concerns, particularly where holds are maintained without clear explanation or reasonable review procedures.
+
+REQUESTED RELIEF
+
+I request that ${cd.processorName || '[Payment Processor]'} take the following actions within ${cd.deadlineDays || 'ten'} (10) business days of receipt of this letter:
+
+First: Provide a written explanation of the specific risk factors that triggered and continue to justify the current hold, including any specific transactions, customer complaints, or policy violations that ${cd.processorName || '[Payment Processor]'} believes warrant restricted account access.
+
+Second: Release immediately all funds that are not reasonably necessary to cover existing or clearly anticipated chargebacks, refunds, or other liabilities.${cd.proposedReserve ? ` Based on my transaction history and demonstrated low-risk profile, a reserve of ${cd.proposedReserve} would adequately cover any reasonable contingency.` : ''} Holding the entire ${cd.frozenAmount || '$[XX,XXX]'} balance serves no legitimate business purpose and causes disproportionate harm.
+
+Third: If ${cd.processorName || '[Payment Processor]'} requires additional information to complete its review, provide a specific list of required documentation and a concrete timeline for completing the review after that documentation is provided.
+
+Fourth: Confirm in writing either that my account will be restored to normal operating status or, if ${cd.processorName || '[Payment Processor]'} determines the account cannot be restored, provide a clear schedule for releasing funds consistent with ${cd.processorName || '[Payment Processor]'}'s stated policies and applicable law.
+
+DISPUTE RESOLUTION
+
+I note that ${cd.processorName || '[Payment Processor]'}'s ${terms} requires binding arbitration of disputes and preserves the right to proceed in small claims court for claims below the jurisdictional limit. This letter constitutes formal notice of a dispute as required by the Agreement. It includes my account information, a description of the facts and legal basis for my claim, and the specific relief I am seeking.
+
+I prefer to resolve this matter without the time and expense of formal proceedings. However, if I do not receive a substantive response addressing the points raised in this letter by ${deadlineDate}, I will proceed with arbitration and/or small claims filing as appropriate.
+
+I am also prepared to file complaints with the Consumer Financial Protection Bureau, the California Department of Financial Protection and Innovation, the California Attorney General's Consumer Protection Division, and other applicable regulatory authorities if this matter cannot be resolved through direct communication.
+
+PRESERVATION OF RIGHTS
+
+Nothing in this letter should be construed as a waiver of any rights, claims, defenses, or remedies available to me under the ${terms}, applicable law, or equity. All such rights are expressly reserved.
+
+I hope we can resolve this matter promptly and constructively. Please direct your response to my email address at ${cd.yourEmail || '[your email]'} or by mail to the address above.
+
+Sincerely,
+
+
+${cd.yourName || '[Your Name]'}
+${cd.businessName ? cd.businessName : '[Your Title if Business Owner]'}
+
+Enclosures:
+• Timeline of communications with ${cd.processorName || '[Payment Processor]'}
+• Proof of business legitimacy and incorporation
+• Transaction and chargeback history
+• Evidence of product/service delivery
+• Documentation of specific harm`;
+            }, [formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                    }).catch((err) => {
+                        console.error('Failed to copy:', err);
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Please manually copy the text from the preview');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const renderTabContent = () => {
+                switch(currentTab) {
+                    case 0:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Contact Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Full Name</label>
+                                        <input
+                                            type="text"
+                                            name="yourName"
+                                            value={formData.yourName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="John Smith"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Business Name</label>
+                                        <input
+                                            type="text"
+                                            name="businessName"
+                                            value={formData.businessName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Smith Digital Services LLC"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Street Address</label>
+                                        <input
+                                            type="text"
+                                            name="yourAddress"
+                                            value={formData.yourAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="123 Main Street"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">City, State ZIP</label>
+                                        <input
+                                            type="text"
+                                            name="yourCity"
+                                            value={formData.yourCity}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="San Francisco, CA 94102"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Email</label>
+                                        <input
+                                            type="email"
+                                            name="yourEmail"
+                                            value={formData.yourEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="john@smithdigital.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="yourPhone"
+                                            value={formData.yourPhone}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1:
+                        return (
+                            <div className="form-section">
+                                <h3>Payment Processor Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Payment Processor</label>
+                                        <select
+                                            name="processorName"
+                                            value={formData.processorName}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="Stripe">Stripe</option>
+                                            <option value="PayPal">PayPal</option>
+                                            <option value="Square">Square</option>
+                                            <option value="Shopify Payments">Shopify Payments</option>
+                                            <option value="Authorize.Net">Authorize.Net</option>
+                                            <option value="Other">Other Processor</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Account Number (Last 4 digits)</label>
+                                        <input
+                                            type="text"
+                                            name="accountNumber"
+                                            value={formData.accountNumber}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="4567"
+                                            maxLength="4"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Processor Mailing Address (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="processorAddress"
+                                            value={formData.processorAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Leave blank to use default address"
+                                        />
+                                        <div className="form-hint">Optional - will use standard processor address if blank</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Processor City, State ZIP (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="processorCity"
+                                            value={formData.processorCity}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="San Francisco, CA 94103"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 2:
+                        return (
+                            <div className="form-section">
+                                <h3>Account History</h3>
+                                <div className="alert alert-info">
+                                    <strong>Establish Legitimacy:</strong> Show you're an established, legitimate merchant.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Account Opened Date</label>
+                                        <input
+                                            type="date"
+                                            name="accountOpenedDate"
+                                            value={formData.accountOpenedDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Account Period</label>
+                                        <input
+                                            type="text"
+                                            name="accountPeriod"
+                                            value={formData.accountPeriod}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="March 2023 through October 2024"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Business Description</label>
+                                        <input
+                                            type="text"
+                                            name="businessDescription"
+                                            value={formData.businessDescription}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="online coaching services for real estate professionals"
+                                        />
+                                        <div className="form-hint">Brief, neutral description of what your business does</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Average Monthly Volume</label>
+                                        <input
+                                            type="text"
+                                            name="avgMonthlyVolume"
+                                            value={formData.avgMonthlyVolume}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$8,000 - $12,000"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Avg Transaction Size (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="avgTransactionSize"
+                                            value={formData.avgTransactionSize}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$150"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 3:
+                        return (
+                            <div className="form-section">
+                                <h3>The Hold Details</h3>
+                                <div className="alert alert-warning">
+                                    <strong>Document the Freeze:</strong> When did it happen and what was their explanation?
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Hold Start Date</label>
+                                        <input
+                                            type="date"
+                                            name="holdStartDate"
+                                            value={formData.holdStartDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Amount Frozen</label>
+                                        <input
+                                            type="text"
+                                            name="frozenAmount"
+                                            value={formData.frozenAmount}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$43,000"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Reason Given for Hold (if any)</label>
+                                        <input
+                                            type="text"
+                                            name="holdReason"
+                                            value={formData.holdReason}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="'account under review' or 'unusual activity' or leave blank"
+                                        />
+                                        <div className="form-hint">What explanation did they give, if any?</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Documents You Provided</label>
+                                        <textarea
+                                            name="documentsProvided"
+                                            value={formData.documentsProvided}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="List what you sent them:
+• Business formation documents
+• Proof of product delivery and shipping confirmations
+• Customer communications and testimonials
+• Identity verification documents
+• Bank statements"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Support Ticket History (Optional)</label>
+                                        <textarea
+                                            name="supportHistory"
+                                            value={formData.supportHistory}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Optional: Describe your support interactions. Example: 'I have opened 5 support tickets since the hold began. Each time I received only automated responses saying my case is with the appropriate team.'"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 4:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Risk Profile</h3>
+                                <div className="alert alert-info">
+                                    <strong>Prove Low Risk:</strong> Show your account metrics demonstrate you're legitimate and low-risk.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Chargeback Rate (%)</label>
+                                        <input
+                                            type="text"
+                                            name="chargebackRate"
+                                            value={formData.chargebackRate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="0.5"
+                                        />
+                                        <div className="form-hint">Your chargeback rate (under 1% is low-risk)</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Business Age</label>
+                                        <input
+                                            type="text"
+                                            name="businessAge"
+                                            value={formData.businessAge}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="18 months"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Chargeback Details</label>
+                                        <input
+                                            type="text"
+                                            name="chargebackCount"
+                                            value={formData.chargebackCount}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="3 chargebacks out of 200 total transactions"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Dispute Resolution Record</label>
+                                        <input
+                                            type="text"
+                                            name="disputesResolved"
+                                            value={formData.disputesResolved}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="5 disputes, all resolved in my favor"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Other Low-Risk Factors</label>
+                                        <textarea
+                                            name="lowRiskFactors"
+                                            value={formData.lowRiskFactors}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="List other evidence of legitimacy:
+• Positive customer reviews and testimonials
+• Clear delivery confirmations for all orders
+• Transparent refund policy
+• Professional business website
+• Established customer base"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 5:
+                        return (
+                            <div className="form-section">
+                                <h3>Harm & Your Demands</h3>
+                                <div className="alert alert-success">
+                                    <strong>Quantify Damages:</strong> Be specific about harm and what you want.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Specific Harm from Hold</label>
+                                        <textarea
+                                            name="specificHarm"
+                                            value={formData.specificHarm}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="List specific, quantified harm with dollar amounts:
+
+• Unable to pay October payroll totaling $8,500 for 2 employees
+• Defaulted on vendor invoices totaling $12,000, damaging critical relationships
+• Cancelled planned advertising spending of $5,000 that would have generated estimated $25,000 in revenue
+• Turned away 15 new customers representing approximately $18,000 in lost revenue"
+                                            style={{minHeight: '150px'}}
+                                        />
+                                        <div className="form-hint">Be very specific with dates and dollar amounts</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Proposed Reserve Amount (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="proposedReserve"
+                                            value={formData.proposedReserve}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$5,000"
+                                        />
+                                        <div className="form-hint">Suggest a reasonable reserve that would cover potential chargebacks</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Response Deadline</label>
+                                        <select
+                                            name="deadlineDays"
+                                            value={formData.deadlineDays}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="5">5 Business Days</option>
+                                            <option value="7">7 Business Days</option>
+                                            <option value="10">10 Business Days (Recommended)</option>
+                                            <option value="14">14 Business Days</option>
+                                        </select>
+                                        <div className="form-hint">Deadline: {getDeadlineDate(formData.deadlineDays)}</div>
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-success" style={{marginTop: '2rem'}}>
+                                    <strong>✓ Letter Ready!</strong> Review carefully in the preview. Send via email AND certified mail. Keep all documentation and proof of delivery.
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="tab-navigation">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                onClick={() => setCurrentTab(index)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="main-content">
+                        <div className="form-panel">
+                            {renderTabContent()}
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-header">
+                                <h2>Live Preview</h2>
+                                <button className="copy-btn" onClick={copyToClipboard}>
+                                    📋 Copy Letter
+                                </button>
+                            </div>
+                            <pre className="document-preview">
+                                {documentText}
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div className={`toast ${showToast ? 'show' : ''}`}>
+                        ✓ Letter copied to clipboard!
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(
+            <FrozenFundsLetter />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
