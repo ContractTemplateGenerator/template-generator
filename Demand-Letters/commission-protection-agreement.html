@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Protection Services Agreement Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+
+        .tab-navigation {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .form-panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+        }
+
+        .preview-panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-header h2 {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .highlighted-text {
+            background: linear-gradient(120deg, #fff9c4 0%, #ffeb3b 100%);
+            padding: 3px 2px;
+            border-radius: 3px;
+            animation: pulse 1.5s ease;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: #fff9c4; }
+            50% { background: #ffeb3b; }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #1a1a1a;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .form-group.half-width {
+            flex: 1 1 calc(50% - 0.5rem);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border-color: #0284c7;
+            color: #075985;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                position: static;
+                height: 500px;
+            }
+
+            .form-panel {
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tab-button {
+                min-width: 100%;
+            }
+
+            .form-group.half-width {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Scrollbar styling */
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useRef, useEffect } = React;
+
+        const CommissionAgreementGenerator = () => {
+            const tabs = [
+                { id: 'parties', label: '1. Parties' },
+                { id: 'services', label: '2. Services & SOW' },
+                { id: 'commission', label: '3. Commission Terms' },
+                { id: 'term', label: '4. Term & Termination' },
+                { id: 'legal', label: '5. Legal Terms' }
+            ];
+
+            const [currentTab, setCurrentTab] = useState(0);
+            const [lastChanged, setLastChanged] = useState(null);
+            const previewRef = useRef(null);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Parties
+                consultantName: '',
+                consultantAddress: '',
+                clientName: '',
+                clientJurisdiction: '',
+                clientType: '',
+                clientAddress: '',
+                effectiveDate: '',
+
+                // Services
+                platforms: '',
+                serviceDescription: '',
+
+                // Commission
+                commissionableProducts: '',
+                commissionRate: '',
+                tailPeriodMonths: '',
+
+                // Attribution
+                attributionRules: '',
+
+                // Reporting
+                reportingFrequency: 'monthly',
+                auditThreshold: '',
+
+                // Payment
+                invoicingPeriod: 'monthly',
+                paymentDays: '15',
+                lateInterestRate: '1.5',
+
+                // Term
+                initialTerm: '',
+                noticePeriod: '30',
+                curePeriod: '15',
+
+                // Legal
+                governingState: '',
+                disputeResolution: 'arbitration',
+                arbitrationProvider: '',
+                liabilityCapMonths: '6',
+                auditFrequency: '12'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setLastChanged(name);
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const documentText = useMemo(() => {
+                const cd = formData;
+                const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+                return `DIGITAL ADVERTISING SERVICES AGREEMENT
+
+This Digital Advertising Services Agreement (the "Agreement") is entered into as of ${cd.effectiveDate || '[Effective Date]'} (the "Effective Date") by and between:
+
+${cd.consultantName || '[Consultant Name]'}, an independent contractor with a principal place of business at ${cd.consultantAddress || '[Consultant Address]'} ("Consultant"), and
+
+${cd.clientName || '[Client Name]'}, a ${cd.clientJurisdiction || '[jurisdiction]'} ${cd.clientType || '[entity type]'} with a principal place of business at ${cd.clientAddress || '[Client Address]'} ("Client").
+
+Consultant and Client are sometimes referred to individually as a "Party" and collectively as the "Parties."
+
+
+Section 1 – Engagement and Services
+
+Client engages Consultant to provide digital advertising, media buying, performance optimization, and related strategic consulting services in connection with Client's products and services as described in one or more statements of work executed by the Parties (each, an "SOW").
+
+Consultant shall perform the services described in the applicable SOW (the "Services"), which may include, without limitation:
+
+${cd.serviceDescription || `• Account and funnel audits, strategy development, and performance analysis
+• Campaign planning, setup, optimization, and management on agreed platforms
+• Creative and copy recommendations and testing frameworks
+• Reporting, performance reviews, and strategic recommendations`}
+
+Platforms covered: ${cd.platforms || '[Meta, Google Ads, YouTube, etc.]'}
+
+Consultant is an independent contractor and is not an employee, partner, or joint venturer of Client.
+
+
+Section 2 – Commissionable Revenue and Fees
+
+The Parties agree that Consultant will be compensated as follows, in addition to any fixed or hourly fees specified in an SOW.
+
+"Commissionable Products" means the products, services, programs, or offers identified in the applicable SOW as eligible for commissions: ${cd.commissionableProducts || '[List specific products/programs]'}.
+
+"Commissionable Revenue" means the gross amounts actually received by Client from the sale of Commissionable Products to end customers during the Term and any applicable Tail Period, less only:
+
+   • documented refunds and chargebacks
+   • sales taxes actually collected and remitted to taxing authorities
+
+Commissionable Revenue shall not be reduced by Client's internal costs, shipping costs, payment processor fees, or advertising spend, unless explicitly stated in the SOW.
+
+Consultant shall be entitled to a commission equal to ${cd.commissionRate || '[X]'}% of Commissionable Revenue (the "Commission") during the Term and any applicable Tail Period, subject to the additional terms of this Agreement and the relevant SOW.
+
+
+Section 3 – Attribution and Covered Activities
+
+Commissionable Revenue includes revenue generated through:
+
+   • digital advertising campaigns on the platforms identified in the applicable SOW that are planned, managed, or materially optimized by Consultant,
+   • funnels, landing pages, audience structures, creative frameworks, testing plans, or other strategic structures designed or materially restructured by Consultant and implemented by Client or its other vendors, and
+   • any follow-on or upsell sales reasonably attributable to the foregoing, as specified in the SOW.
+
+${cd.attributionRules || `The Parties acknowledge that Consultant's Services may be heavily analytic and strategic and that not all contributions will appear as direct "edits" in platform logs. Where Client implements Consultant's written or recorded recommendations, the Parties agree that resulting revenue from Commissionable Products shall be treated as Commissionable Revenue unless the Parties have expressly agreed otherwise in writing for a particular campaign or product.`}
+
+Each SOW may include additional attribution rules tailored to the relevant campaigns, channels, and tracking stack. In the event of conflict between this Agreement and an SOW, the SOW governs solely with respect to the specific project described therein.
+
+
+Section 4 – Reporting, Data Access, and Audit Rights
+
+Client shall provide Consultant with timely access to all advertising accounts, analytics, tracking tools, and payment systems reasonably necessary for Consultant to perform the Services and verify Commissionable Revenue, including read-only access where appropriate.
+
+Client shall:
+
+   • maintain accurate books and records relating to Commissionable Revenue for at least three years after the conclusion of the applicable Tail Period;
+   • provide Consultant with periodic written reports of Commissionable Revenue and Commission calculations at ${cd.reportingFrequency || 'monthly'} intervals; and
+   • not intentionally delete, manipulate, or conceal data in a manner that materially interferes with Consultant's ability to verify Commissionable Revenue.
+
+If Consultant reasonably disputes any report, the Parties shall cooperate in good faith to reconcile the discrepancy. If the discrepancy exceeds ${cd.auditThreshold || '[X]'}% of the reported amount in favor of Consultant and the Parties cannot resolve it within 30 days, Consultant may engage an independent certified public accountant, subject to reasonable confidentiality obligations, to audit Client's relevant records once in any ${cd.auditFrequency || '12'}-month period. If the audit reveals an underpayment of more than ${cd.auditThreshold || '[X]'}% for the audited period, Client shall promptly pay the deficiency and reimburse Consultant's reasonable audit costs.
+
+
+Section 5 – Invoicing and Payment
+
+Unless otherwise stated in an SOW, Consultant shall invoice Client for Commissions on a ${cd.invoicingPeriod || 'monthly'} basis, based on Commissionable Revenue received by Client during the preceding calendar ${cd.invoicingPeriod || 'month'}.
+
+Client shall pay all undisputed amounts within ${cd.paymentDays || '15'} days after the date of Consultant's invoice, by bank transfer, ACH, or another mutually agreed payment method. Any undisputed amount not paid when due shall accrue interest at the rate of ${cd.lateInterestRate || '1.5'}% per month, or the maximum rate permitted by law, whichever is lower.
+
+If Client disputes any portion of an invoice, Client shall notify Consultant in writing within 10 days of receipt, stating the specific grounds for dispute and providing supporting data. Client shall timely pay all undisputed portions of the invoice. Failure to dispute in writing within the 10-day period constitutes acceptance of the invoice.
+
+Consultant may suspend performance of the Services, upon notice, if any undisputed invoice remains unpaid more than ${cd.paymentDays || '15'} days after its due date, until all undisputed amounts are paid.
+
+
+Section 6 – Term, Termination, and Tail Period
+
+This Agreement commences on the Effective Date and remains in effect until terminated as provided here, or until all SOWs have expired or been terminated, whichever is later.
+
+${cd.initialTerm ? `Initial Term: ${cd.initialTerm}` : 'The Agreement continues on a month-to-month basis unless terminated.'}
+
+Either Party may terminate this Agreement or any SOW for convenience upon ${cd.noticePeriod || '30'} days' prior written notice to the other Party, unless the applicable SOW specifies a different notice period.
+
+Either Party may terminate this Agreement or any SOW for material breach by the other Party that remains uncured ${cd.curePeriod || '15'} days after written notice describing the breach.
+
+Upon termination of this Agreement or any SOW for any reason, Consultant shall be entitled to:
+
+   • all Commissions accrued but unpaid as of the effective date of termination; and
+   • continued Commissions during a post-termination tail period of ${cd.tailPeriodMonths || '[X]'} months (the "Tail Period") on Commissionable Revenue from Commissionable Products sold during the Tail Period to:
+     ○ customers acquired during the Term, and
+     ○ customers acquired during the Tail Period through continued use of funnels, campaigns, or other assets primarily designed or materially restructured by Consultant during the Term.
+
+During the Tail Period, Client shall continue to provide Consultant with reports of Commissionable Revenue sufficient to calculate Commissions. The audit and dispute-resolution mechanisms in Sections 4 and 5 continue to apply during the Tail Period.
+
+Consultant's obligation to provide transition or handover assistance, including sharing of account structures or documentation, is conditioned on Client's payment of all undisputed amounts due through the effective date of termination.
+
+
+Section 7 – Non-Circumvention
+
+Client shall not intentionally restructure, transfer, or re-label campaigns, funnels, or accounts for the primary purpose of avoiding the payment of Commissions otherwise due under this Agreement.
+
+Without limiting the foregoing, if Client or any of its affiliates:
+
+   • transfers Commissionable Products or funnels to a new account or entity, or
+   • engages a new agency or consultant to manage campaigns that are substantially based on structures, funnels, or strategies developed by Consultant,
+
+then Client's obligations to pay Commissions and to report Commissionable Revenue under this Agreement shall continue for the duration of the applicable Tail Period as if no such transfer or change of vendor had occurred.
+
+
+Section 8 – Intellectual Property and Portfolio Rights
+
+As between the Parties, Client owns all right, title, and interest in and to its pre-existing content, trademarks, products, and customer data.
+
+Consultant retains ownership of any pre-existing tools, frameworks, and methodologies used in providing the Services, including generic audience structures, testing methodologies, and reporting formats, but grants Client a non-exclusive, royalty-free license to use such items solely in connection with Client's own business.
+
+Consultant may identify Client as a client in Consultant's marketing materials and may use anonymized or aggregated performance data in case studies, provided that no Client Confidential Information is disclosed and no public use of Client's name or logo is made without Client's prior written consent, which shall not be unreasonably withheld.
+
+
+Section 9 – Confidentiality and Data Protection
+
+Each Party may have access to the other Party's non-public business information, trade secrets, and customer data ("Confidential Information"). Each Party agrees to use the other Party's Confidential Information only for purposes of performing its obligations under this Agreement and to protect such information from unauthorized disclosure using at least reasonable care.
+
+Confidential Information does not include information that is publicly available without breach, already known to the receiving Party without restriction, rightfully received from a third party, or independently developed without use of the disclosing Party's Confidential Information.
+
+Each Party shall comply with applicable data protection and privacy laws in connection with the performance of this Agreement.
+
+
+Section 10 – Limitation of Liability; Indemnification
+
+To the maximum extent permitted by law, neither Party shall be liable to the other for any indirect, incidental, consequential, special, or punitive damages, or for any loss of profits or revenue, arising out of or relating to this Agreement, whether in contract, tort, or otherwise, even if advised of the possibility of such damages.
+
+Except for payment obligations and breaches of confidentiality, each Party's aggregate liability arising out of or relating to this Agreement shall not exceed the total fees (including Commissions) paid or payable by Client to Consultant under the Agreement during the ${cd.liabilityCapMonths || '6'} months immediately preceding the event giving rise to the claim.
+
+Client shall indemnify, defend, and hold harmless Consultant and its owners, officers, and agents from and against any third-party claims, damages, losses, and expenses (including reasonable attorneys' fees) arising out of or relating to:
+
+   • Client's products, services, and business practices, including any alleged false advertising or regulatory non-compliance;
+   • Client's content, creatives, and copy; and
+   • Client's violation of applicable laws or platform policies.
+
+Consultant shall indemnify, defend, and hold harmless Client and its officers and agents from and against any third-party claims, damages, losses, and expenses arising out of or relating to:
+
+   • Consultant's infringement of third-party intellectual property rights in materials provided by Consultant and used by Client as authorized under this Agreement; or
+   • Consultant's gross negligence or willful misconduct in performing the Services.
+
+
+Section 11 – Governing Law and Dispute Resolution
+
+This Agreement is governed by and shall be construed in accordance with the laws of the State of ${cd.governingState || '[Delaware / New York / Texas]'}, without regard to its conflict-of-laws principles.
+
+Any dispute, controversy, or claim arising out of or relating to this Agreement shall be resolved by ${cd.disputeResolution === 'arbitration' ? `binding arbitration administered by ${cd.arbitrationProvider || '[American Arbitration Association]'} in accordance with its rules` : `exclusive jurisdiction of the state and federal courts located in ${cd.governingState || '[State]'}`}.
+
+The Parties consent to remote and virtual participation in any hearings, conferences, or proceedings to the fullest extent permitted by the applicable tribunal, including by video conference and electronic submission of evidence.
+
+
+Section 12 – Miscellaneous
+
+This Agreement, together with all SOWs, constitutes the entire agreement between the Parties regarding the subject matter and supersedes all prior or contemporaneous understandings, whether written or oral.
+
+No amendment or modification of this Agreement is valid unless in writing and signed or electronically accepted by both Parties.
+
+Neither Party may assign this Agreement without the other Party's prior written consent, except that either Party may assign the Agreement in connection with a merger, acquisition, or sale of substantially all of its assets, provided that the assignee assumes all obligations under the Agreement.
+
+If any provision of this Agreement is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.
+
+This Agreement may be executed in counterparts and delivered electronically. Electronic signatures are deemed original signatures for all purposes.
+
+
+IN WITNESS WHEREOF, the Parties have executed this Agreement as of the Effective Date.
+
+${cd.consultantName || '[Consultant Name]'}
+Signature: __________________________
+Name: _____________________________
+Title: ______________________________
+Date: ______________________________
+
+${cd.clientName || '[Client Name]'}
+Signature: __________________________
+Name: _____________________________
+Title: ______________________________
+Date: ______________________________`;
+            }, [formData]);
+
+            const getHighlightedDocumentText = () => {
+                if (!lastChanged) return documentText;
+
+                const patterns = {
+                    consultantName: new RegExp(`${formData.consultantName}`, 'gi'),
+                    consultantAddress: new RegExp(`${formData.consultantAddress}`, 'gi'),
+                    clientName: new RegExp(`${formData.clientName}`, 'gi'),
+                    clientJurisdiction: new RegExp(`${formData.clientJurisdiction}`, 'gi'),
+                    clientType: new RegExp(`${formData.clientType}`, 'gi'),
+                    clientAddress: new RegExp(`${formData.clientAddress}`, 'gi'),
+                    effectiveDate: new RegExp(`${formData.effectiveDate}`, 'gi'),
+                    platforms: new RegExp(`Platforms covered: ${formData.platforms}`, 'gi'),
+                    serviceDescription: new RegExp(`${formData.serviceDescription}`.substring(0, 50), 'i'),
+                    commissionableProducts: new RegExp(`${formData.commissionableProducts}`, 'gi'),
+                    commissionRate: new RegExp(`${formData.commissionRate}%`, 'g'),
+                    tailPeriodMonths: new RegExp(`${formData.tailPeriodMonths} months`, 'gi'),
+                    reportingFrequency: new RegExp(`${formData.reportingFrequency}`, 'gi'),
+                    auditThreshold: new RegExp(`${formData.auditThreshold}%`, 'g'),
+                    invoicingPeriod: new RegExp(`${formData.invoicingPeriod}`, 'gi'),
+                    paymentDays: new RegExp(`${formData.paymentDays} days`, 'gi'),
+                    lateInterestRate: new RegExp(`${formData.lateInterestRate}%`, 'g'),
+                    initialTerm: new RegExp(`Initial Term: ${formData.initialTerm}`, 'gi'),
+                    noticePeriod: new RegExp(`${formData.noticePeriod} days`, 'gi'),
+                    curePeriod: new RegExp(`${formData.curePeriod} days`, 'gi'),
+                    governingState: new RegExp(`State of ${formData.governingState}`, 'gi'),
+                    arbitrationProvider: new RegExp(`${formData.arbitrationProvider}`, 'gi'),
+                    liabilityCapMonths: new RegExp(`${formData.liabilityCapMonths} months`, 'gi'),
+                    auditFrequency: new RegExp(`${formData.auditFrequency}-month`, 'g')
+                };
+
+                if (patterns[lastChanged] && formData[lastChanged]) {
+                    try {
+                        return documentText.replace(patterns[lastChanged], match =>
+                            `<span class="highlighted-text">${match}</span>`
+                        );
+                    } catch (e) {
+                        return documentText;
+                    }
+                }
+
+                return documentText;
+            };
+
+            useEffect(() => {
+                if (previewRef.current && lastChanged) {
+                    setTimeout(() => {
+                        const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                        if (highlightedElement) {
+                            highlightedElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+                    }, 100);
+                }
+            }, [lastChanged, formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                    });
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                }
+            };
+
+            const renderTabContent = () => {
+                switch(currentTab) {
+                    case 0:
+                        return (
+                            <div className="form-section">
+                                <h3>Party Information</h3>
+                                <div className="alert alert-info">
+                                    <strong>Start Here:</strong> Enter the basic information about you (the consultant) and your client. All fields are optional but recommended for a complete agreement.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Effective Date</label>
+                                        <input
+                                            type="date"
+                                            name="effectiveDate"
+                                            value={formData.effectiveDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                        <div className="form-hint">When does this agreement become effective?</div>
+                                    </div>
+                                </div>
+
+                                <h4 style={{marginTop: '2rem', marginBottom: '1rem', color: '#667eea'}}>Consultant (You)</h4>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Full Name</label>
+                                        <input
+                                            type="text"
+                                            name="consultantName"
+                                            value={formData.consultantName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Jane Smith"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Business Address</label>
+                                        <input
+                                            type="text"
+                                            name="consultantAddress"
+                                            value={formData.consultantAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="123 Main Street, San Francisco, CA 94102"
+                                        />
+                                    </div>
+                                </div>
+
+                                <h4 style={{marginTop: '2rem', marginBottom: '1rem', color: '#764ba2'}}>Client</h4>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Client Company Name</label>
+                                        <input
+                                            type="text"
+                                            name="clientName"
+                                            value={formData.clientName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="ABC Marketing Inc."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Client State/Jurisdiction</label>
+                                        <input
+                                            type="text"
+                                            name="clientJurisdiction"
+                                            value={formData.clientJurisdiction}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Delaware"
+                                        />
+                                        <div className="form-hint">State where client is incorporated</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Client Entity Type</label>
+                                        <input
+                                            type="text"
+                                            name="clientType"
+                                            value={formData.clientType}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="LLC"
+                                        />
+                                        <div className="form-hint">LLC, Corporation, etc.</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Client Business Address</label>
+                                        <input
+                                            type="text"
+                                            name="clientAddress"
+                                            value={formData.clientAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="456 Business Ave, Los Angeles, CA 90001"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1:
+                        return (
+                            <div className="form-section">
+                                <h3>Services & Scope of Work</h3>
+                                <div className="alert alert-info">
+                                    <strong>Define Your Services:</strong> Specify what platforms you'll work on and what services you'll provide.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Platforms Covered</label>
+                                        <input
+                                            type="text"
+                                            name="platforms"
+                                            value={formData.platforms}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Meta (Facebook & Instagram), Google Ads, YouTube Ads"
+                                        />
+                                        <div className="form-hint">List all advertising platforms you'll manage</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Service Description (Optional Custom)</label>
+                                        <textarea
+                                            name="serviceDescription"
+                                            value={formData.serviceDescription}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Leave blank to use default service description, or enter your custom services here..."
+                                        />
+                                        <div className="form-hint">Optional: Customize the services section with your specific offerings</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 2:
+                        return (
+                            <div className="form-section">
+                                <h3>Commission Structure</h3>
+                                <div className="alert alert-success">
+                                    <strong>Protect Your Commissions:</strong> Define exactly what products/services earn commissions and at what rate.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Commissionable Products/Programs</label>
+                                        <textarea
+                                            name="commissionableProducts"
+                                            value={formData.commissionableProducts}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="List specific products, courses, programs, or service lines that will earn commissions. Example: 'Online Course A, Coaching Program B, All digital products sold through main website'"
+                                        />
+                                        <div className="form-hint">Be specific to avoid disputes later</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Commission Rate (%)</label>
+                                        <input
+                                            type="number"
+                                            name="commissionRate"
+                                            value={formData.commissionRate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="10"
+                                            step="0.1"
+                                        />
+                                        <div className="form-hint">Percentage of Commissionable Revenue</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Tail Period (Months)</label>
+                                        <input
+                                            type="number"
+                                            name="tailPeriodMonths"
+                                            value={formData.tailPeriodMonths}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="12"
+                                        />
+                                        <div className="form-hint">How long commissions continue after termination</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Attribution Rules (Optional Custom)</label>
+                                        <textarea
+                                            name="attributionRules"
+                                            value={formData.attributionRules}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Leave blank for default attribution language, or specify custom rules for multi-channel attribution..."
+                                        />
+                                        <div className="form-hint">Optional: Define how sales are attributed when multiple channels are involved</div>
+                                    </div>
+                                </div>
+
+                                <h4 style={{marginTop: '2rem', marginBottom: '1rem', color: '#667eea'}}>Reporting & Audit</h4>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Reporting Frequency</label>
+                                        <select
+                                            name="reportingFrequency"
+                                            value={formData.reportingFrequency}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Audit Threshold (%)</label>
+                                        <input
+                                            type="number"
+                                            name="auditThreshold"
+                                            value={formData.auditThreshold}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="5"
+                                            step="0.1"
+                                        />
+                                        <div className="form-hint">Discrepancy % that triggers audit rights</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Audit Frequency (Months)</label>
+                                        <input
+                                            type="number"
+                                            name="auditFrequency"
+                                            value={formData.auditFrequency}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="12"
+                                        />
+                                        <div className="form-hint">How often you can request an audit</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 3:
+                        return (
+                            <div className="form-section">
+                                <h3>Payment Terms</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Invoicing Period</label>
+                                        <select
+                                            name="invoicingPeriod"
+                                            value={formData.invoicingPeriod}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="weekly">Weekly</option>
+                                            <option value="monthly">Monthly</option>
+                                            <option value="quarterly">Quarterly</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Payment Due (Days)</label>
+                                        <input
+                                            type="number"
+                                            name="paymentDays"
+                                            value={formData.paymentDays}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="15"
+                                        />
+                                        <div className="form-hint">Days after invoice date</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Late Interest Rate (% per month)</label>
+                                        <input
+                                            type="number"
+                                            name="lateInterestRate"
+                                            value={formData.lateInterestRate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="1.5"
+                                            step="0.1"
+                                        />
+                                    </div>
+                                </div>
+
+                                <h3 style={{marginTop: '2rem'}}>Term & Termination</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Initial Term (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="initialTerm"
+                                            value={formData.initialTerm}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="12 months, or leave blank for month-to-month"
+                                        />
+                                        <div className="form-hint">Leave blank for ongoing month-to-month arrangement</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Notice Period (Days)</label>
+                                        <input
+                                            type="number"
+                                            name="noticePeriod"
+                                            value={formData.noticePeriod}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="30"
+                                        />
+                                        <div className="form-hint">For termination without cause</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Cure Period (Days)</label>
+                                        <input
+                                            type="number"
+                                            name="curePeriod"
+                                            value={formData.curePeriod}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="15"
+                                        />
+                                        <div className="form-hint">Time to fix breach before termination</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 4:
+                        return (
+                            <div className="form-section">
+                                <h3>Legal Terms</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Governing State Law</label>
+                                        <input
+                                            type="text"
+                                            name="governingState"
+                                            value={formData.governingState}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Delaware"
+                                        />
+                                        <div className="form-hint">Which state's laws will govern this agreement</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Dispute Resolution</label>
+                                        <select
+                                            name="disputeResolution"
+                                            value={formData.disputeResolution}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="arbitration">Binding Arbitration</option>
+                                            <option value="court">Court Litigation</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {formData.disputeResolution === 'arbitration' && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Arbitration Provider</label>
+                                            <input
+                                                type="text"
+                                                name="arbitrationProvider"
+                                                value={formData.arbitrationProvider}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="American Arbitration Association"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Liability Cap (Months of Fees)</label>
+                                        <input
+                                            type="number"
+                                            name="liabilityCapMonths"
+                                            value={formData.liabilityCapMonths}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="6"
+                                        />
+                                        <div className="form-hint">Maximum liability limited to fees from this many months</div>
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-success" style={{marginTop: '2rem'}}>
+                                    <strong>✓ Agreement Complete!</strong> Review the live preview on the right, then copy and customize as needed. Consider having an attorney review before signing.
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <div className="header-badge">Free Legal Tool</div>
+                        <h1>Commission Protection Services Agreement</h1>
+                        <p>Generate a consultant-friendly agreement that protects your commission rights</p>
+                    </div>
+
+                    <div className="tab-navigation">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                onClick={() => setCurrentTab(index)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="main-content">
+                        <div className="form-panel">
+                            {renderTabContent()}
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-header">
+                                <h2>Live Preview</h2>
+                                <button className="copy-btn" onClick={copyToClipboard}>
+                                    📋 Copy Agreement
+                                </button>
+                            </div>
+                            <pre
+                                className="document-preview"
+                                dangerouslySetInnerHTML={{ __html: getHighlightedDocumentText() }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={`toast ${showToast ? 'show' : ''}`}>
+                        ✓ Agreement copied to clipboard!
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(
+            <CommissionAgreementGenerator />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
