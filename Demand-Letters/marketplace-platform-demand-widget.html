@@ -193,8 +193,12 @@
                 <textarea id="field-performance" placeholder="5-star rating, 98% on-time delivery, refund rate 0.8% over past 12 months."></textarea>
                 <label>Evidence Summary</label>
                 <textarea id="field-evidence" placeholder="Downloads of payout/transaction history, FBA shipment IDs, buyer communications."></textarea>
+                <label>Downstream Customer/Client Impact</label>
+                <textarea id="field-downstream" placeholder="Unable to fulfill 180 Etsy orders; client contracts on Upwork placed on hold; reputational damage."></textarea>
                 <label>Downstream Harm</label>
                 <textarea id="field-harm" placeholder="Unable to fulfill 180 paid orders; forced to refund via alternate channels; marketing spend wasted."></textarea>
+                <label>Regulatory / Arbitration Notes (optional)</label>
+                <textarea id="field-regulators" placeholder="Prepared to file CFPB complaint re: frozen payouts; will initiate AAA arbitration per Terms if unresolved."></textarea>
                 <label>Requested Remedies</label>
                 <div style="border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;font-size:13px;color:var(--muted);display:grid;gap:6px;">
                     <label><input type="checkbox" id="res-reinstate"> Reinstate account / remove strikes</label>
@@ -233,12 +237,14 @@ const inputs={
     appeals:document.getElementById('field-appeals'),
     performance:document.getElementById('field-performance'),
     evidence:document.getElementById('field-evidence'),
+    downstream:document.getElementById('field-downstream'),
     harm:document.getElementById('field-harm'),
+    regulators:document.getElementById('field-regulators'),
     custom:document.getElementById('field-custom'),
     deadline:document.getElementById('field-deadline'),
     tone:document.getElementById('field-tone')
 };
-const state={platform:'Etsy',account:'',contact:'',amount:'',inventory:'',event:'',appeals:'',performance:'',evidence:'',harm:'',custom:'',deadline:'',tone:'neutral',resReinstate:false,resRelease:false,resInventory:false,resExplain:false};
+const state={platform:'Etsy',account:'',contact:'',amount:'',inventory:'',event:'',appeals:'',performance:'',evidence:'',downstream:'',harm:'',regulators:'',custom:'',deadline:'',tone:'neutral',resReinstate:false,resRelease:false,resInventory:false,resExplain:false};
 const checks={
     resReinstate:document.getElementById('res-reinstate'),
     resRelease:document.getElementById('res-release'),
@@ -268,7 +274,9 @@ const highlightMap={
     appeals:'appeals',
     performance:'performance',
     evidence:'evidence',
+    downstream:'downstream',
     harm:'harm',
+    regulators:'deadline',
     custom:'resolution',
     deadline:'deadline',
     tone:'deadline',
@@ -319,33 +327,32 @@ function resolutionSummary(){
 }
 function renderPreview(changed){
     const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
-    const introLines=[];
-    introLines.push(`Date: ${today}`);
-    introLines.push('Via Email / Written Notice');
-    const addressee=state.contact?`Attn: ${state.contact}`:'Legal Department';
-    introLines.push(addressee);
-    introLines.push(`Re: ${state.platform || 'Marketplace'} account ${state.account || ''}`.trim());
-    const eventText=state.event||'';
-    const appealsText=state.appeals||'';
-    const performanceText=state.performance||'';
-    const evidenceText=state.evidence||'';
-    const harmText=state.harm||'';
-    const amountLine=state.amount?`Frozen/withheld funds: ${formatCurrency(state.amount)}.`:'';
-    const inventoryLine=state.inventory?`Inventory/assets affected: approximately ${formatCurrency(state.inventory)}.`:'';
+    const introLines=[`Date: ${today}`,'Via Email / Written Notice',state.contact?`Attn: ${state.contact}`:'Legal Department',`Re: ${state.platform || 'Marketplace'} account ${state.account || ''}`.trim()];
+    const eventText=state.event||'Our account was disabled or restricted without concrete detail on the alleged policy breach, despite a long, compliant history.';
+    const appealsText=state.appeals||'We followed the platform’s appeal process, supplied documentation, and responded to every request, yet received no substantive review or reinstatement path.';
+    const performanceText=state.performance||'The account maintained excellent performance metrics (ratings, defect rates, fulfillment, dispute resolution) and has no history of policy evasion or off-platform payments.';
+    const evidenceText=state.evidence||'We preserved payout histories, transaction CSVs, shipment IDs, supplier invoices, customer communications, and all platform notices referenced above.';
+    const downstreamText=state.downstream||'Platform actions jeopardize our obligations to customers/clients, forcing cancellations, refunds, and reputational harm even though we complied with the platform’s obligations.';
+    const harmParts=[];
+    if(state.amount) harmParts.push(`Frozen/withheld funds: ${formatCurrency(state.amount)}.`);
+    if(state.inventory) harmParts.push(`Inventory/assets affected: approximately ${formatCurrency(state.inventory)}.`);
+    if(state.harm) harmParts.push(state.harm);
     const platformNote=platformNotes[state.platform||'Other'];
     const resLine=[resolutionSummary(),state.custom||''].filter(Boolean).join(' ');
-    const deadlineLine=state.deadline?`Please respond by ${state.deadline.trim()}.`:'Please respond within the next ten (10) days.';
+    const deadlineLine=state.deadline?`Please respond by ${state.deadline.trim()}.`:'Please provide a written response within ten (10) days.';
     const toneLine=toneMap[state.tone||'neutral'];
+    const regulatorLine=state.regulators||'If relief is not provided we will initiate arbitration under the governing Terms and consider complaints to relevant financial and consumer regulators.';
     const sections=[
         sectionHTML('', 'intro', introLines.join('\n')),
-        sectionHTML('Background', 'event', eventText || 'Our account was suspended/restricted without a specific policy citation.'),
-        sectionHTML('Appeals & Communication', 'appeals', appealsText || 'Internal appeals were submitted through platform channels with no substantive response.'),
-        sectionHTML('Performance Snapshot', 'performance', performanceText || 'The account maintained strong ratings, low defect rates, and compliant history.'),
-        sectionHTML('Damages & Impact', 'harm', [amountLine, inventoryLine, harmText].filter(Boolean).join(' ')),
-        sectionHTML('Evidence on File', 'evidence', evidenceText || 'We have preserved payout reports, inventory records, notices, and customer communications.'),
-        sectionHTML('Contract / Policy Context', 'contract', platformNote),
-        sectionHTML('Requested Resolution', 'resolution', resLine || 'Please outline a path to reinstatement or release of funds/inventory.'),
-        sectionHTML('Deadline & Next Steps', 'deadline', `${deadlineLine} ${toneLine} This letter serves as formal notice of dispute under the platform terms and we are prepared to pursue arbitration or regulatory complaints if necessary.`)
+        sectionHTML('Account History & Performance', 'performance', performanceText),
+        sectionHTML('Triggering Event', 'event', eventText),
+        sectionHTML('Internal Appeals & Communications', 'appeals', appealsText),
+        sectionHTML('Contract / Policy Framework', 'contract', platformNote),
+        sectionHTML('Evidence Preserved', 'evidence', evidenceText),
+        sectionHTML('Financial / Operational Harm', 'harm', harmParts.join(' ')||'Our business has suffered significant cash-flow disruption, lost advertising spend, and operational turmoil.'),
+        sectionHTML('Downstream Obligations', 'downstream', downstreamText),
+        sectionHTML('Requested Relief', 'resolution', resLine || 'Please outline a concrete plan to reinstate the account, release funds, and resolve the cited issues in line with platform policy.'),
+        sectionHTML('Deadline, Arbitration & Regulatory Notice', 'deadline', `${deadlineLine} ${toneLine} ${regulatorLine}`)
     ];
     preview.innerHTML=sections.filter(Boolean).join('');
     highlightField(changed);
