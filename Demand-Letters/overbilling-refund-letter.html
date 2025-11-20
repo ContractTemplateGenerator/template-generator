@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overbilling Refund Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-navigation {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .preview-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-header h2 {
+            color: #1a1a1a;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+        }
+
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .highlighted-text {
+            background: linear-gradient(120deg, #fff9c4 0%, #ffeb3b 100%);
+            padding: 3px 2px;
+            border-radius: 3px;
+            animation: pulse 1.5s ease;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: #fff9c4; }
+            50% { background: #ffeb3b; }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .form-group.half-width {
+            flex: 1 1 calc(50% - 0.5rem);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .calc-box {
+            background: #f0fdf4;
+            border: 2px solid #059669;
+            border-radius: 8px;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+
+        .calc-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #d1fae5;
+        }
+
+        .calc-row:last-child {
+            border-bottom: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #059669;
+            padding-top: 0.75rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                position: static;
+                height: 500px;
+                border-right: none;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .form-panel {
+                height: auto;
+                border-right: none;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .tab-button {
+                min-width: 100%;
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .form-group.half-width {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Scrollbar styling */
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useRef, useEffect } = React;
+
+        const OverbillingRefundLetter = () => {
+            const tabs = [
+                { id: 'yourinfo', label: '1. Your Info' },
+                { id: 'provider', label: '2. Provider Info' },
+                { id: 'contract', label: '3. Contract Details' },
+                { id: 'overbilling', label: '4. Overbilling Timeline' },
+                { id: 'demand', label: '5. Your Demand' }
+            ];
+
+            const [currentTab, setCurrentTab] = useState(0);
+            const [lastChanged, setLastChanged] = useState(null);
+            const previewRef = useRef(null);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Your info
+                yourName: '',
+                yourAddress: '',
+                yourCity: '',
+                yourEmail: '',
+                yourPhone: '',
+
+                // Provider info
+                providerName: '',
+                providerAttn: '',
+                providerAddress: '',
+                providerCity: '',
+                accountNumber: '',
+
+                // Contract details
+                contractDate: '',
+                serviceDescription: '',
+                originalPrice: '',
+                contractPricingClause: '',
+
+                // Overbilling
+                firstOverchargeDate: '',
+                newAmount: '',
+                billingTimeline: '',
+                totalOvercharge: '',
+                legalViolations: '',
+
+                // Demand
+                refundAmount: '',
+                additionalDemands: '',
+                deadlineDays: '14'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setLastChanged(name);
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const getDeadlineDate = (days) => {
+                const date = new Date();
+                date.setDate(date.getDate() + parseInt(days || 14));
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            };
+
+            const calculateOvercharge = () => {
+                if (!formData.originalPrice || !formData.newAmount) return 0;
+                const original = parseFloat(formData.originalPrice.replace(/[^0-9.]/g, '')) || 0;
+                const newAmt = parseFloat(formData.newAmount.replace(/[^0-9.]/g, '')) || 0;
+                return newAmt - original;
+            };
+
+            const documentText = useMemo(() => {
+                const cd = formData;
+                const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const deadlineDate = getDeadlineDate(cd.deadlineDays);
+                const monthlyOvercharge = calculateOvercharge();
+
+                return `${cd.yourName || '[Your Name]'}
+${cd.yourAddress || '[Your Address]'}
+${cd.yourCity || '[City, State ZIP]'}
+${cd.yourEmail || '[Your Email]'}
+${cd.yourPhone || '[Your Phone]'}
+
+${today}
+
+${cd.providerName || '[Service Provider Name]'}
+${cd.providerAttn ? `Attn: ${cd.providerAttn}` : 'Attn: [Billing Department/Legal Department/Account Manager Name]'}
+${cd.providerAddress || '[Provider Address]'}
+${cd.providerCity || '[City, State ZIP]'}
+
+Re: Demand for Refund of Unauthorized Charges${cd.accountNumber ? ` – Account #${cd.accountNumber}` : ''}
+
+Dear ${cd.providerName ? cd.providerName : 'Sir/Madam'}:
+
+I am writing to formally dispute unauthorized charges on my account and demand an immediate refund. I contracted with ${cd.providerName || '[Provider Name]'} on ${cd.contractDate || '[Date]'} for ${cd.serviceDescription || '[describe service – e.g., "monthly marketing services," "software subscription," "professional services retainer"]'} at an agreed rate of ${cd.originalPrice || '[Original Price – e.g., "$1,500 per month," "$49 per month"]'}. Beginning on ${cd.firstOverchargeDate || '[Date of First Overcharge]'}, I have been charged ${cd.newAmount || '[Higher Amount]'} without authorization or proper notice.
+
+On ${cd.contractDate || '[Date of Original Agreement]'}, I entered into a ${cd.serviceDescription ? 'service agreement' : '[written contract/online subscription agreement/services agreement]'} with your company${cd.serviceDescription ? ` for ${cd.serviceDescription}` : ''}. The agreement clearly established that I would pay ${cd.originalPrice || '[Original Price]'}${cd.serviceDescription ? ` for ${cd.serviceDescription}` : ' for the agreed services'}. I have attached supporting documentation confirming these terms.
+
+The following timeline shows the unauthorized charges:
+
+${cd.billingTimeline || `From ${cd.contractDate || '[Start Date]'} through ${cd.firstOverchargeDate || '[End of Proper Billing Period]'}: Charged ${cd.originalPrice || '[Correct Amount]'} as agreed.
+
+Beginning ${cd.firstOverchargeDate || '[Date of First Overcharge]'}: Charged ${cd.newAmount || '[Higher Amount]'}${monthlyOvercharge > 0 ? `, an increase of $${monthlyOvercharge.toFixed(2)}` : ''}.`}
+
+I have reviewed the ${cd.serviceDescription ? 'service agreement' : '[Services Agreement/Terms of Service/Subscription Agreement]'} between us. ${cd.contractPricingClause || '[The agreement establishes the pricing terms and contains no provision authorizing unilateral price changes during the contract term.]'}
+
+Your unauthorized charges constitute a breach of our contract. ${cd.legalViolations || 'By charging amounts not authorized by our agreement and not properly disclosed at the time of signup, you have violated basic contract law principles and potentially applicable consumer protection statutes, including California Civil Code Section 1770(a)(29) [if applicable] and California\'s Unfair Competition Law.'}
+
+I calculate the total overcharges as follows:
+
+${cd.totalOvercharge || `[Provide detailed breakdown by month/billing period]
+
+Month 1: Overcharge of $[X]
+Month 2: Overcharge of $[Y]
+[Continue for each affected period]
+
+Total Overcharges: $[XXX]`}
+
+I demand the following resolution within ${cd.deadlineDays || 'fourteen'} days of your receipt of this letter:
+
+1. A full refund of ${cd.refundAmount || cd.totalOvercharge || '$[XXX]'} representing all unauthorized charges from ${cd.firstOverchargeDate || '[Start Date]'} through present, issued via [check/credit to my credit card/credit to my account].
+
+2. Written confirmation that all future billing will be at the agreed rate of ${cd.originalPrice || '[Original Price]'}, with no additional fees except those explicitly agreed to in writing.
+
+${cd.additionalDemands ? `3. ${cd.additionalDemands}` : ''}
+
+Please respond by ${deadlineDate} to confirm that you will honor this demand. You may reach me at ${cd.yourEmail || '[your email]'} or ${cd.yourPhone || '[your phone number]'}.
+
+If I do not receive a satisfactory response by the deadline stated above, I will pursue all available remedies to recover the amounts owed. This may include:
+
+• Disputing the charges with my credit card issuer under federal and state consumer protection laws;
+• Filing complaints with the California Attorney General's Office, Federal Trade Commission, Consumer Financial Protection Bureau, and other relevant regulatory agencies;
+• Pursuing claims in small claims court or other appropriate forums; and
+• Seeking recovery of attorney's fees and costs to the extent provided by contract or statute.
+
+This letter serves as formal notice under our agreement and applicable law, and preserves all of my rights and remedies at law and in equity.
+
+I have enclosed copies of the following supporting documents:
+
+• Original agreement or contract dated ${cd.contractDate || '[Date]'}
+• Invoices showing original pricing and subsequent overcharges
+• [Other relevant documentation]
+
+I hope we can resolve this matter promptly. However, the overcharges must be corrected immediately.
+
+Sincerely,
+
+
+${cd.yourName || '[Your Name]'}
+
+Enclosures: [List enclosures]`;
+            }, [formData]);
+
+            const getHighlightedDocumentText = () => {
+                if (!lastChanged) return documentText;
+
+                const patterns = {
+                    yourName: new RegExp(`${formData.yourName}`, 'gi'),
+                    yourAddress: new RegExp(`${formData.yourAddress}`, 'gi'),
+                    yourCity: new RegExp(`${formData.yourCity}`, 'gi'),
+                    yourEmail: new RegExp(`${formData.yourEmail}`, 'gi'),
+                    yourPhone: new RegExp(`${formData.yourPhone}`, 'gi'),
+                    providerName: new RegExp(`${formData.providerName}`, 'gi'),
+                    providerAttn: new RegExp(`${formData.providerAttn}`, 'gi'),
+                    accountNumber: new RegExp(`Account #${formData.accountNumber}`, 'gi'),
+                    contractDate: new RegExp(`${formData.contractDate}`, 'gi'),
+                    serviceDescription: new RegExp(`${formData.serviceDescription}`.substring(0, 30), 'i'),
+                    originalPrice: new RegExp(`${formData.originalPrice}`, 'g'),
+                    newAmount: new RegExp(`${formData.newAmount}`, 'g'),
+                    firstOverchargeDate: new RegExp(`${formData.firstOverchargeDate}`, 'gi'),
+                    refundAmount: new RegExp(`${formData.refundAmount}`, 'g'),
+                    totalOvercharge: new RegExp(`${formData.totalOvercharge}`, 'g'),
+                    deadlineDays: new RegExp(getDeadlineDate(formData.deadlineDays), 'gi')
+                };
+
+                if (patterns[lastChanged] && formData[lastChanged]) {
+                    try {
+                        return documentText.replace(patterns[lastChanged], match =>
+                            `<span class="highlighted-text">${match}</span>`
+                        );
+                    } catch (e) {
+                        return documentText;
+                    }
+                }
+
+                return documentText;
+            };
+
+            useEffect(() => {
+                if (previewRef.current && lastChanged) {
+                    setTimeout(() => {
+                        const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                        if (highlightedElement) {
+                            highlightedElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+                    }, 100);
+                }
+            }, [lastChanged, formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                    });
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                }
+            };
+
+            const renderTabContent = () => {
+                switch(currentTab) {
+                    case 0:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Contact Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Full Name</label>
+                                        <input
+                                            type="text"
+                                            name="yourName"
+                                            value={formData.yourName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="John Smith"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Street Address</label>
+                                        <input
+                                            type="text"
+                                            name="yourAddress"
+                                            value={formData.yourAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="123 Main Street"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">City, State ZIP</label>
+                                        <input
+                                            type="text"
+                                            name="yourCity"
+                                            value={formData.yourCity}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="San Francisco, CA 94102"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Email Address</label>
+                                        <input
+                                            type="email"
+                                            name="yourEmail"
+                                            value={formData.yourEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="john@email.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            name="yourPhone"
+                                            value={formData.yourPhone}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1:
+                        return (
+                            <div className="form-section">
+                                <h3>Service Provider Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Provider Company Name</label>
+                                        <input
+                                            type="text"
+                                            name="providerName"
+                                            value={formData.providerName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="ABC Services LLC"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Attention To (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="providerAttn"
+                                            value={formData.providerAttn}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Billing Department or Account Manager Name"
+                                        />
+                                        <div className="form-hint">Leave blank if unsure</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Provider Street Address</label>
+                                        <input
+                                            type="text"
+                                            name="providerAddress"
+                                            value={formData.providerAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="456 Business Ave"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Provider City, State ZIP</label>
+                                        <input
+                                            type="text"
+                                            name="providerCity"
+                                            value={formData.providerCity}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Los Angeles, CA 90001"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Account Number (Optional)</label>
+                                        <input
+                                            type="text"
+                                            name="accountNumber"
+                                            value={formData.accountNumber}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="12345678"
+                                        />
+                                        <div className="form-hint">If you have an account number with the provider</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 2:
+                        return (
+                            <div className="form-section">
+                                <h3>Original Contract Details</h3>
+                                <div className="alert alert-info">
+                                    <strong>Important:</strong> Describe what you originally agreed to pay and what the service was.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Contract/Signup Date</label>
+                                        <input
+                                            type="date"
+                                            name="contractDate"
+                                            value={formData.contractDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Original Agreed Price</label>
+                                        <input
+                                            type="text"
+                                            name="originalPrice"
+                                            value={formData.originalPrice}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$1,500 per month"
+                                        />
+                                        <div className="form-hint">The price you originally agreed to</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Service Description</label>
+                                        <input
+                                            type="text"
+                                            name="serviceDescription"
+                                            value={formData.serviceDescription}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="monthly marketing services, software subscription, etc."
+                                        />
+                                        <div className="form-hint">Brief description of what service you purchased</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Contract Pricing Language (Optional)</label>
+                                        <textarea
+                                            name="contractPricingClause"
+                                            value={formData.contractPricingClause}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="If you have the actual contract, quote the section that establishes pricing. Example: 'Section 3.1 establishes that Client will pay $1,500 per month for the term. The agreement contains no provision authorizing price changes without written consent.'"
+                                        />
+                                        <div className="form-hint">Optional but strengthens your case</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 3:
+                        return (
+                            <div className="form-section">
+                                <h3>Overbilling Timeline & Amounts</h3>
+                                <div className="alert alert-info">
+                                    <strong>Document the Overcharges:</strong> When did billing change and by how much?
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Date of First Overcharge</label>
+                                        <input
+                                            type="date"
+                                            name="firstOverchargeDate"
+                                            value={formData.firstOverchargeDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">New Amount Charged</label>
+                                        <input
+                                            type="text"
+                                            name="newAmount"
+                                            value={formData.newAmount}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$1,850 per month"
+                                        />
+                                    </div>
+                                </div>
+
+                                {formData.originalPrice && formData.newAmount && calculateOvercharge() > 0 && (
+                                    <div className="calc-box">
+                                        <div className="calc-row">
+                                            <span>Original Price:</span>
+                                            <span>{formData.originalPrice}</span>
+                                        </div>
+                                        <div className="calc-row">
+                                            <span>New Amount:</span>
+                                            <span>{formData.newAmount}</span>
+                                        </div>
+                                        <div className="calc-row">
+                                            <span>Overcharge Per Period:</span>
+                                            <span>${calculateOvercharge().toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Detailed Billing Timeline</label>
+                                        <textarea
+                                            name="billingTimeline"
+                                            value={formData.billingTimeline}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Describe the billing pattern with dates. Example:
+
+From March 2024 through May 2024: Charged $1,500 per month as agreed.
+
+Beginning June 2024: Charged $1,850 per month without notice.
+
+July - October 2024: Continued charging $1,850 per month despite my complaints.
+
+Total: 5 months × $350 overcharge = $1,750 in unauthorized charges"
+                                            style={{minHeight: '150px'}}
+                                        />
+                                        <div className="form-hint">Break down the overcharges month by month</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Total Overcharge Amount</label>
+                                        <input
+                                            type="text"
+                                            name="totalOvercharge"
+                                            value={formData.totalOvercharge}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$1,750"
+                                        />
+                                        <div className="form-hint">Total of all unauthorized charges to date</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Legal Violations (Optional)</label>
+                                        <textarea
+                                            name="legalViolations"
+                                            value={formData.legalViolations}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Optional: Cite specific laws violated. Example: 'These charges violate California Civil Code Section 1770(a)(29), which prohibits advertising prices that don't include mandatory fees. Your pricing page showed $49/month but actual charges have been $79/month due to undisclosed platform fees.'"
+                                        />
+                                        <div className="form-hint">Leave blank to use general contract law language</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 4:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Demands</h3>
+                                <div className="alert alert-success">
+                                    <strong>What You Want:</strong> Specify the refund amount and any other requirements.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Refund Amount Demanded</label>
+                                        <input
+                                            type="text"
+                                            name="refundAmount"
+                                            value={formData.refundAmount}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$1,750"
+                                        />
+                                        <div className="form-hint">Should match your total overcharge calculation</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Additional Demands (Optional)</label>
+                                        <textarea
+                                            name="additionalDemands"
+                                            value={formData.additionalDemands}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Optional additional demands. Example: 'Removal of any negative marks on my credit report related to disputed charges' or 'Written apology and explanation for the billing error'"
+                                        />
+                                        <div className="form-hint">Optional: Any demands beyond the refund</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Response Deadline</label>
+                                        <select
+                                            name="deadlineDays"
+                                            value={formData.deadlineDays}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="7">7 Days</option>
+                                            <option value="10">10 Days</option>
+                                            <option value="14">14 Days (Recommended)</option>
+                                            <option value="21">21 Days</option>
+                                            <option value="30">30 Days</option>
+                                        </select>
+                                        <div className="form-hint">Deadline: {getDeadlineDate(formData.deadlineDays)}</div>
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-success" style={{marginTop: '2rem'}}>
+                                    <strong>✓ Ready to Send!</strong> Review your letter in the preview panel. Copy and send via email and certified mail. Keep all documentation.
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="tab-navigation">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                onClick={() => setCurrentTab(index)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="main-content">
+                        <div className="form-panel">
+                            {renderTabContent()}
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-header">
+                                <h2>Live Preview</h2>
+                                <button className="copy-btn" onClick={copyToClipboard}>
+                                    📋 Copy Letter
+                                </button>
+                            </div>
+                            <pre
+                                className="document-preview"
+                                dangerouslySetInnerHTML={{ __html: getHighlightedDocumentText() }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={`toast ${showToast ? 'show' : ''}`}>
+                        ✓ Letter copied to clipboard!
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(
+            <OverbillingRefundLetter />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
