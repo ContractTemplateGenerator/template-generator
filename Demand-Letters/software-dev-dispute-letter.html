@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Development Dispute Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 1.25rem 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        .header-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.75rem;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            color: #1a1a1a;
+            margin-bottom: 0.35rem;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .tab-navigation {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 20px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+        }
+
+        .form-panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+        }
+
+        .preview-panel {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-header h2 {
+            color: #1a1a1a;
+            font-size: 1.5rem;
+        }
+
+        .copy-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .highlighted-text {
+            background: linear-gradient(120deg, #fff9c4 0%, #ffeb3b 100%);
+            padding: 3px 2px;
+            border-radius: 3px;
+            animation: pulse 1.5s ease;
+            box-shadow: 0 0 0 3px rgba(255, 235, 59, 0.3);
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: #fff9c4; }
+            50% { background: #ffeb3b; }
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #1a1a1a;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .form-group.half-width {
+            flex: 1 1 calc(50% - 0.5rem);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #dc2626;
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background: #e0f2fe;
+            border-color: #0284c7;
+            color: #075985;
+        }
+
+        .alert-warning {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
+        .alert-success {
+            background: #dcfce7;
+            border-color: #16a34a;
+            color: #166534;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                position: static;
+                height: 500px;
+            }
+
+            .form-panel {
+                height: auto;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .tab-button {
+                min-width: 100%;
+            }
+
+            .form-group.half-width {
+                flex: 1 1 100%;
+            }
+        }
+
+        /* Scrollbar styling */
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useRef, useEffect } = React;
+
+        const SoftwareDevDisputeLetter = () => {
+            const tabs = [
+                { id: 'yourinfo', label: '1. Your Info' },
+                { id: 'developer', label: '2. Developer Info' },
+                { id: 'project', label: '3. Project Details' },
+                { id: 'breach', label: '4. Breach & Issues' },
+                { id: 'demand', label: '5. Your Demand' }
+            ];
+
+            const [currentTab, setCurrentTab] = useState(0);
+            const [lastChanged, setLastChanged] = useState(null);
+            const previewRef = useRef(null);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Your info
+                yourName: '',
+                yourCompany: '',
+                yourAddress: '',
+                yourEmail: '',
+                yourPhone: '',
+
+                // Developer info
+                developerName: '',
+                developerCompany: '',
+                developerAddress: '',
+                developerEmail: '',
+
+                // Project details
+                projectName: '',
+                contractDate: '',
+                projectDescription: '',
+                coreFeatures: '',
+                totalPaid: '',
+                paymentBreakdown: '',
+
+                // Breach details
+                breachType: 'bugs',
+                criticalIssues: '',
+                timelineIssues: '',
+
+                // Demand
+                demandType: 'refund',
+                refundAmount: '',
+                customDemand: '',
+                deadlineDays: '14'
+            });
+
+            const handleChange = (e) => {
+                const { name, value } = e.target;
+                setLastChanged(name);
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: value
+                }));
+            };
+
+            const getDeadlineDate = (days) => {
+                const date = new Date();
+                date.setDate(date.getDate() + parseInt(days || 14));
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            };
+
+            const documentText = useMemo(() => {
+                const cd = formData;
+                const today = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+                const deadlineDate = getDeadlineDate(cd.deadlineDays);
+
+                let demandSection = '';
+                switch(cd.demandType) {
+                    case 'refund':
+                        demandSection = `Refund ${cd.refundAmount || '$[AMOUNT]'} of the total fees paid within ten (10) days of the date of this letter; and
+
+Transfer to ${cd.yourCompany || '[Your Company Name]'} full access and ownership of all code, repositories, project files, and related documentation for the project, including administrator-level credentials to all hosting, version control, and deployment accounts currently used for the project.`;
+                        break;
+                    case 'completion':
+                        demandSection = `Substantially complete and deliver the core features listed above, in working condition, no later than ${getDeadlineDate(30)}, together with full handover of source code and documentation.`;
+                        break;
+                    case 'partial':
+                        demandSection = `Refund ${cd.refundAmount || '$[AMOUNT]'} representing the portion of services not delivered or delivered in defective condition; and
+
+Transfer full access and ownership of all code, repositories, and project files completed to date, including all hosting and deployment credentials.`;
+                        break;
+                    case 'custom':
+                        demandSection = cd.customDemand || '[Describe your specific demands here]';
+                        break;
+                    default:
+                        demandSection = '[Specify your demands]';
+                }
+
+                return `${cd.yourName || '[Your Name]'}
+${cd.yourCompany || '[Your Company Name]'}
+${cd.yourAddress || '[Street Address]\n[City, State ZIP]'}
+${cd.yourEmail || '[Email Address]'}
+${cd.yourPhone || '[Phone Number]'}
+
+${today}
+
+Via Email${cd.developerAddress ? ' and Certified Mail' : ''}
+
+${cd.developerName || '[Developer Name]'}
+${cd.developerCompany || '[Developer Company Name]'}
+${cd.developerAddress || '[Street Address]\n[City, State ZIP]'}
+${cd.developerEmail || '[Email Address]'}
+
+Re: Software Development Agreement for ${cd.projectName || '[Project Name]'} – Demand for Cure and Refund
+
+To ${cd.developerName || '[Developer Name]'},
+
+I am writing regarding the software development engagement for "${cd.projectName || '[Project Name]'}" under which you agreed to design, develop, and deliver ${cd.projectDescription || '[brief description, for example: "a web-based SaaS platform and companion mobile application"]'} for ${cd.yourCompany || '[Your Company Name]'} pursuant to our agreement dated ${cd.contractDate || '[Contract Date]'} (the "Agreement").
+
+Under the Agreement and related statements of work, you represented that you would deliver, among other things, the following core features and milestones:
+
+${cd.coreFeatures || '[Briefly describe key scope elements and promised dates, using the contract\'s own language where possible]'}
+
+Since entering into the Agreement, ${cd.yourCompany || '[Your Company Name]'} has paid you a total of ${cd.totalPaid || '$[TOTAL AMOUNT]'} in fees${cd.paymentBreakdown ? ', including the following:' : '.'}
+
+${cd.paymentBreakdown || ''}
+
+Despite these payments and the substantial time that has passed, the project remains in an unusable and incomplete state. By way of example only:
+
+${cd.criticalIssues || `[Describe key failures, such as:
+• The production checkout flow fails whenever a user attempts to submit payment
+• The 'Create Account' feature does not function on mobile devices
+• The promised integration with [system] has not been implemented]`}
+
+${cd.timelineIssues ? `\nAdditionally, the project has suffered unreasonable delays:\n\n${cd.timelineIssues}\n` : ''}
+We have repeatedly raised these issues with you and provided you with opportunities to correct them. ${cd.timelineIssues ? 'Despite multiple assurances that fixes were forthcoming,' : ''} To date, the critical defects remain unresolved and the core deliverables identified above have not been provided in working condition.
+
+The combination of ongoing critical bugs, failure to deliver the agreed-upon features, and substantial delays${cd.timelineIssues ? ' well beyond the original timelines' : ''} constitutes a material breach of the Agreement and of your obligation to perform the services in a competent and workmanlike manner. As a result, ${cd.yourCompany || '[Your Company Name]'} has not received the benefit of its bargain and has suffered losses, including but not limited to the development fees already paid and the additional costs required to engage a new developer to complete or rebuild the project.
+
+In an effort to resolve this matter without further escalation, ${cd.yourCompany || '[Your Company Name]'} demands that you take the following actions:
+
+${demandSection}
+
+Please confirm in writing by no later than ${deadlineDate} whether you will comply with the demands above and, if so, provide a specific timeline and process for doing so. If we do not receive a satisfactory response by that date, ${cd.yourCompany || '[Your Company Name]'} will consider all available options, including but not limited to initiating legal proceedings, pursuing arbitration or small claims where applicable, and asserting any claims it may have for damages and other relief.
+
+Nothing in this letter is intended as a complete statement of all facts or law, or as a waiver or limitation of any rights, remedies, claims, or defenses of ${cd.yourCompany || '[Your Company Name]'}, all of which are expressly reserved.
+
+Sincerely,
+
+
+${cd.yourName || '[Your Name]'}
+${cd.yourCompany ? `${cd.yourCompany}` : '[Your Title]'}`;
+            }, [formData]);
+
+            const getHighlightedDocumentText = () => {
+                if (!lastChanged) return documentText;
+
+                const patterns = {
+                    yourName: new RegExp(`${formData.yourName}`, 'gi'),
+                    yourCompany: new RegExp(`${formData.yourCompany}`, 'gi'),
+                    yourAddress: new RegExp(`${formData.yourAddress}`, 'gi'),
+                    yourEmail: new RegExp(`${formData.yourEmail}`, 'gi'),
+                    yourPhone: new RegExp(`${formData.yourPhone}`, 'gi'),
+                    developerName: new RegExp(`${formData.developerName}`, 'gi'),
+                    developerCompany: new RegExp(`${formData.developerCompany}`, 'gi'),
+                    developerAddress: new RegExp(`${formData.developerAddress}`, 'gi'),
+                    developerEmail: new RegExp(`${formData.developerEmail}`, 'gi'),
+                    projectName: new RegExp(`${formData.projectName}`, 'gi'),
+                    contractDate: new RegExp(`${formData.contractDate}`, 'gi'),
+                    projectDescription: new RegExp(`${formData.projectDescription}`.substring(0, 30), 'i'),
+                    totalPaid: new RegExp(`${formData.totalPaid}`, 'g'),
+                    refundAmount: new RegExp(`${formData.refundAmount}`, 'g'),
+                    deadlineDays: new RegExp(getDeadlineDate(formData.deadlineDays), 'gi')
+                };
+
+                if (patterns[lastChanged] && formData[lastChanged]) {
+                    try {
+                        return documentText.replace(patterns[lastChanged], match =>
+                            `<span class="highlighted-text">${match}</span>`
+                        );
+                    } catch (e) {
+                        return documentText;
+                    }
+                }
+
+                return documentText;
+            };
+
+            useEffect(() => {
+                if (previewRef.current && lastChanged) {
+                    setTimeout(() => {
+                        const highlightedElement = previewRef.current.querySelector('.highlighted-text');
+                        if (highlightedElement) {
+                            highlightedElement.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
+                        }
+                    }, 100);
+                }
+            }, [lastChanged, formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                    });
+                } else {
+                    const textArea = document.createElement('textarea');
+                    textArea.value = text;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                }
+            };
+
+            const renderTabContent = () => {
+                switch(currentTab) {
+                    case 0:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Information</h3>
+                                <div className="alert alert-info">
+                                    <strong>Start Here:</strong> Enter your contact information. This will appear at the top of your demand letter.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Full Name</label>
+                                        <input
+                                            type="text"
+                                            name="yourName"
+                                            value={formData.yourName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="John Smith"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Company Name</label>
+                                        <input
+                                            type="text"
+                                            name="yourCompany"
+                                            value={formData.yourCompany}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Acme Technologies Inc."
+                                        />
+                                        <div className="form-hint">Optional if you're an individual</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Address</label>
+                                        <input
+                                            type="text"
+                                            name="yourAddress"
+                                            value={formData.yourAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="123 Main Street, San Francisco, CA 94102"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Your Email</label>
+                                        <input
+                                            type="email"
+                                            name="yourEmail"
+                                            value={formData.yourEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="john@acmetech.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Your Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="yourPhone"
+                                            value={formData.yourPhone}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1:
+                        return (
+                            <div className="form-section">
+                                <h3>Developer/Agency Information</h3>
+                                <div className="alert alert-info">
+                                    <strong>Who You're Writing To:</strong> Enter the developer or agency's contact information.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Developer/Contact Name</label>
+                                        <input
+                                            type="text"
+                                            name="developerName"
+                                            value={formData.developerName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Jane Developer"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Developer Company Name</label>
+                                        <input
+                                            type="text"
+                                            name="developerCompany"
+                                            value={formData.developerCompany}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="DevShop LLC"
+                                        />
+                                        <div className="form-hint">Optional if they're an individual freelancer</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Developer Address</label>
+                                        <input
+                                            type="text"
+                                            name="developerAddress"
+                                            value={formData.developerAddress}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="456 Developer Lane, Austin, TX 78701"
+                                        />
+                                        <div className="form-hint">Optional - include if sending via certified mail</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Developer Email</label>
+                                        <input
+                                            type="email"
+                                            name="developerEmail"
+                                            value={formData.developerEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="jane@devshop.com"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 2:
+                        return (
+                            <div className="form-section">
+                                <h3>Project & Contract Details</h3>
+                                <div className="alert alert-info">
+                                    <strong>The Agreement:</strong> Describe what was contracted and what you paid.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Project Name</label>
+                                        <input
+                                            type="text"
+                                            name="projectName"
+                                            value={formData.projectName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Customer Portal SaaS Platform"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Contract Date</label>
+                                        <input
+                                            type="date"
+                                            name="contractDate"
+                                            value={formData.contractDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Total Amount Paid</label>
+                                        <input
+                                            type="text"
+                                            name="totalPaid"
+                                            value={formData.totalPaid}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$45,000"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Brief Project Description</label>
+                                        <textarea
+                                            name="projectDescription"
+                                            value={formData.projectDescription}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Example: a web-based SaaS platform and companion mobile application for customer relationship management"
+                                        />
+                                        <div className="form-hint">One or two sentences describing what they were supposed to build</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Core Features/Milestones Promised</label>
+                                        <textarea
+                                            name="coreFeatures"
+                                            value={formData.coreFeatures}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Example:
+• User authentication and account management by March 15
+• Payment processing integration by April 1
+• Mobile app beta release by April 30
+• Full production launch by May 31"
+                                        />
+                                        <div className="form-hint">List the key deliverables and dates from your contract/agreement</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Payment Breakdown (Optional)</label>
+                                        <textarea
+                                            name="paymentBreakdown"
+                                            value={formData.paymentBreakdown}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Example:
+• Initial deposit: $15,000 on January 10, 2024
+• Milestone 1 payment: $10,000 on February 15, 2024
+• Milestone 2 payment: $10,000 on March 20, 2024
+• Final payment: $10,000 on April 30, 2024"
+                                        />
+                                        <div className="form-hint">Optional but helpful: Break down when you paid what amounts</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 3:
+                        return (
+                            <div className="form-section">
+                                <h3>Breach & Critical Issues</h3>
+                                <div className="alert alert-warning">
+                                    <strong>What Went Wrong:</strong> Be specific about bugs, delays, and failures. Focus on critical issues that make the product unusable.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Primary Breach Type</label>
+                                        <select
+                                            name="breachType"
+                                            value={formData.breachType}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="bugs">Critical Bugs/Non-Functional Features</option>
+                                            <option value="delays">Unreasonable Delays/Missed Deadlines</option>
+                                            <option value="scope">Scope Not Delivered</option>
+                                            <option value="multiple">Multiple Issues (Bugs + Delays + Scope)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Critical Issues & Defects</label>
+                                        <textarea
+                                            name="criticalIssues"
+                                            value={formData.criticalIssues}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Be specific with bullet points. Example:
+
+• The production checkout flow crashes whenever a user attempts to submit payment, preventing any sales from being completed
+
+• The 'Create Account' feature returns errors on both mobile and desktop, making it impossible for new users to register
+
+• The promised Stripe payment integration has not been implemented and no payment processing is functional
+
+• The admin dashboard shows no data and returns 'database connection failed' errors
+
+Focus on critical problems that make the product unusable, not minor cosmetic issues"
+                                            style={{minHeight: '180px'}}
+                                        />
+                                        <div className="form-hint">Describe 3-5 critical issues in plain language. Be factual, not emotional.</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Timeline/Delay Issues (Optional)</label>
+                                        <textarea
+                                            name="timelineIssues"
+                                            value={formData.timelineIssues}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="If delays are a major issue, describe them here:
+
+Example: The Agreement specified a launch date of May 31, 2024. As of November 2024, the platform remains non-functional with no realistic completion date. Despite repeated promises that the project was 'nearly done,' each deadline has been missed by months."
+                                        />
+                                        <div className="form-hint">Optional: Explain missed deadlines and delays if applicable</div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 4:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Demand</h3>
+                                <div className="alert alert-success">
+                                    <strong>What You Want:</strong> Be clear about what resolution you're demanding.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Type of Demand</label>
+                                        <select
+                                            name="demandType"
+                                            value={formData.demandType}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="refund">Full Refund + Code Handover</option>
+                                            <option value="partial">Partial Refund + Code Handover</option>
+                                            <option value="completion">Complete the Project by Deadline</option>
+                                            <option value="custom">Custom Demand</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {(formData.demandType === 'refund' || formData.demandType === 'partial') && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Refund Amount Demanded</label>
+                                            <input
+                                                type="text"
+                                                name="refundAmount"
+                                                value={formData.refundAmount}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="$45,000"
+                                            />
+                                            <div className="form-hint">
+                                                {formData.demandType === 'refund' ? 'Typically the full amount paid' : 'The portion representing undelivered/defective work'}
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {formData.demandType === 'custom' && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Custom Demand Description</label>
+                                            <textarea
+                                                name="customDemand"
+                                                value={formData.customDemand}
+                                                onChange={handleChange}
+                                                className="form-textarea"
+                                                placeholder="Describe exactly what you want them to do. Be specific about amounts, dates, deliverables, and access/credentials to be transferred."
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Response Deadline</label>
+                                        <select
+                                            name="deadlineDays"
+                                            value={formData.deadlineDays}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="7">7 Days</option>
+                                            <option value="10">10 Days</option>
+                                            <option value="14">14 Days (Recommended)</option>
+                                            <option value="21">21 Days</option>
+                                            <option value="30">30 Days</option>
+                                        </select>
+                                        <div className="form-hint">Deadline will be: {getDeadlineDate(formData.deadlineDays)}</div>
+                                    </div>
+                                </div>
+
+                                <div className="alert alert-success" style={{marginTop: '2rem'}}>
+                                    <strong>✓ Letter Complete!</strong> Review the live preview on the right. When ready, copy it and send via email and/or certified mail. Keep copies of everything.
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="header">
+                        <div className="header-badge">Free Legal Tool</div>
+                        <h1>Software Development Dispute Letter</h1>
+                        <p>Generate a professional demand letter for bugs, delays, and undelivered projects</p>
+                    </div>
+
+                    <div className="tab-navigation">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                onClick={() => setCurrentTab(index)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="main-content">
+                        <div className="form-panel">
+                            {renderTabContent()}
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-header">
+                                <h2>Live Preview</h2>
+                                <button className="copy-btn" onClick={copyToClipboard}>
+                                    📋 Copy Letter
+                                </button>
+                            </div>
+                            <pre
+                                className="document-preview"
+                                dangerouslySetInnerHTML={{ __html: getHighlightedDocumentText() }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className={`toast ${showToast ? 'show' : ''}`}>
+                        ✓ Letter copied to clipboard!
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(
+            <SoftwareDevDisputeLetter />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>
