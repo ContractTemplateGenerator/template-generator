@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Breach Demand Letter Tool</title>
+    <style>
+        .demand-widget {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 100%;
+            margin: 0 auto 40px auto;
+            color: #1a1a1a;
+            line-height: 1.6;
+        }
+        
+        .demand-widget * {
+            box-sizing: border-box;
+        }
+        
+        /* Hero Section */
+        .dw-hero {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 35px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dw-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .dw-hero-badge {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+        
+        .dw-hero-title {
+            margin: 0 0 12px 0;
+            font-size: 32px;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+        
+        .dw-hero-subtitle {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 17px;
+            line-height: 1.5;
+        }
+        
+        /* Tab Navigation */
+        .dw-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 0;
+        }
+        
+        .dw-tab {
+            background: transparent;
+            border: none;
+            padding: 12px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            bottom: -2px;
+        }
+        
+        .dw-tab:hover {
+            color: #dc3545;
+            background: rgba(220, 53, 69, 0.05);
+        }
+        
+        .dw-tab.active {
+            color: #dc3545;
+            border-bottom-color: #dc3545;
+        }
+        
+        /* Tab Content */
+        .dw-tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .dw-tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Cards */
+        .dw-card {
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .dw-card-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin: 0 0 15px 0;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .dw-card-body {
+            font-size: 15px;
+            line-height: 1.7;
+        }
+        
+        /* Stats Grid */
+        .dw-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .dw-stat {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .dw-stat-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #dc3545;
+            margin: 0 0 5px 0;
+        }
+        
+        .dw-stat-label {
+            font-size: 13px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Form Elements */
+        .dw-form-group {
+            margin-bottom: 20px;
+        }
+        
+        .dw-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+            font-size: 14px;
+        }
+        
+        .dw-input,
+        .dw-textarea,
+        .dw-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        .dw-input:focus,
+        .dw-textarea:focus,
+        .dw-select:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+        
+        .dw-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .dw-hint {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        /* Letter Preview */
+        .dw-preview {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 30px;
+            margin: 25px 0;
+            font-family: 'Georgia', serif;
+            white-space: pre-wrap;
+            line-height: 1.8;
+            font-size: 14px;
+        }
+        
+        .dw-preview-highlight {
+            background: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        /* Buttons */
+        .dw-btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+        
+        .dw-btn-primary {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .dw-btn-primary:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+        
+        .dw-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .dw-btn-secondary:hover {
+            background: #5a6268;
+        }
+        
+        .dw-btn-group {
+            display: flex;
+            gap: 12px;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        
+        /* Alert Boxes */
+        .dw-alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+        
+        .dw-alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        
+        .dw-alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+        
+        .dw-alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        
+        .dw-alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+        
+        /* Checklist */
+        .dw-checklist {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .dw-checklist li {
+            padding: 12px 0;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .dw-checklist li:last-child {
+            border-bottom: none;
+        }
+        
+        .dw-checklist li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        
+        /* Timeline */
+        .dw-timeline {
+            position: relative;
+            padding-left: 30px;
+            margin: 20px 0;
+        }
+        
+        .dw-timeline::before {
+            content: '';
+            position: absolute;
+            left: 9px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e0e0e0;
+        }
+        
+        .dw-timeline-item {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .dw-timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -25px;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            border: 3px solid white;
+            box-shadow: 0 0 0 2px #dc3545;
+        }
+        
+        .dw-timeline-title {
+            font-weight: 700;
+            color: #dc3545;
+            margin-bottom: 5px;
+        }
+        
+        .dw-timeline-desc {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* Toast Notification */
+        #toast {
+            visibility: hidden;
+            min-width: 250px;
+            background-color: #28a745;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 16px;
+            position: fixed;
+            z-index: 1000;
+            left: 50%;
+            bottom: 30px;
+            transform: translateX(-50%);
+            font-size: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        #toast.show {
+            visibility: visible;
+            animation: fadein 0.5s, fadeout 0.5s 2.5s;
+        }
+        
+        @keyframes fadein {
+            from {bottom: 0; opacity: 0;}
+            to {bottom: 30px; opacity: 1;}
+        }
+        
+        @keyframes fadeout {
+            from {bottom: 30px; opacity: 1;}
+            to {bottom: 0; opacity: 0;}
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dw-hero {
+                padding: 25px;
+            }
+            
+            .dw-hero-title {
+                font-size: 24px;
+            }
+            
+            .dw-tabs {
+                gap: 5px;
+            }
+            
+            .dw-tab {
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+            
+            .dw-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .dw-btn-group {
+                flex-direction: column;
+            }
+            
+            .dw-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="demand-widget">
+        <!-- Hero Section -->
+        <div class="dw-hero">
+            <div class="dw-hero-badge">Free Legal Tool</div>
+            <div class="dw-hero-title">Service Breach Demand Letter Generator</div>
+            <div class="dw-hero-subtitle">Create professional demand letters for marketing, development, and consulting disputes in minutes</div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="dw-tabs">
+            <button class="dw-tab active" onclick="openTab(event, 'overview')">Overview</button>
+            <button class="dw-tab" onclick="openTab(event, 'generator')">Letter Generator</button>
+            <button class="dw-tab" onclick="openTab(event, 'instructions')">Instructions</button>
+            <button class="dw-tab" onclick="openTab(event, 'scenarios')">Common Scenarios</button>
+            <button class="dw-tab" onclick="openTab(event, 'guardrails')">Legal Guardrails</button>
+        </div>
+
+        <!-- Tab Content -->
+        
+        <!-- Overview Tab -->
+        <div id="overview" class="dw-tab-content active">
+            <div class="dw-stats">
+                <div class="dw-stat">
+                    <div class="dw-stat-value">60-70%</div>
+                    <div class="dw-stat-label">Settlement Rate</div>
+                </div>
+                <div class="dw-stat">
+                    <div class="dw-stat-value">10-14</div>
+                    <div class="dw-stat-label">Days Response Time</div>
+                </div>
+                <div class="dw-stat">
+                    <div class="dw-stat-value">$0</div>
+                    <div class="dw-stat-label">Cost to Send</div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">When to Use This Tool</div>
+                <div class="dw-card-body">
+                    <p>Use this demand letter generator when a service provider (marketing agency, development shop, or consultant) has breached your service agreement by:</p>
+                    <ul class="dw-checklist">
+                        <li>Taking payment but delivering little or no work</li>
+                        <li>Missing critical deadlines or milestones</li>
+                        <li>Delivering substandard or defective work</li>
+                        <li>Abandoning the project mid-stream</li>
+                        <li>Failing to transfer deliverables or access credentials</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">What This Tool Does</div>
+                <div class="dw-card-body">
+                    <p>This generator creates a professional, legally sound demand letter that:</p>
+                    <ul>
+                        <li>Clearly states the breach of contract</li>
+                        <li>Documents specific evidence of non-performance</li>
+                        <li>Quantifies your damages</li>
+                        <li>Provides a reasonable deadline for response</li>
+                        <li>References relevant contract provisions</li>
+                        <li>Stays within legal boundaries (no extortion or defamation)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dw-alert dw-alert-info">
+                <strong>Attorney Tip:</strong> A well-written demand letter resolves 60-70% of service disputes without litigation. It creates a clear record, demonstrates seriousness, and gives the vendor a face-saving way to settle before legal costs escalate.
+            </div>
+        </div>
+
+        <!-- Generator Tab -->
+        <div id="generator" class="dw-tab-content">
+            <div class="dw-alert dw-alert-warning">
+                <strong>Important:</strong> Fill out all fields below. The letter will update automatically as you type. Review carefully before copying.
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Your Information</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">Your Full Name</label>
+                        <input type="text" class="dw-input" id="clientName" oninput="updateLetter()" placeholder="John Smith">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Your Company Name</label>
+                        <input type="text" class="dw-input" id="clientCompany" oninput="updateLetter()" placeholder="Smith Enterprises LLC">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Your Address</label>
+                        <input type="text" class="dw-input" id="clientAddress" oninput="updateLetter()" placeholder="123 Main Street, Los Angeles, CA 90001">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Your Email</label>
+                        <input type="email" class="dw-input" id="clientEmail" oninput="updateLetter()" placeholder="john@smithenterprises.com">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Your Phone</label>
+                        <input type="tel" class="dw-input" id="clientPhone" oninput="updateLetter()" placeholder="(555) 123-4567">
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Vendor Information</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">Vendor Name</label>
+                        <input type="text" class="dw-input" id="vendorName" oninput="updateLetter()" placeholder="Jane Doe">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Vendor Company</label>
+                        <input type="text" class="dw-input" id="vendorCompany" oninput="updateLetter()" placeholder="ABC Marketing Agency LLC">
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Vendor Address</label>
+                        <input type="text" class="dw-input" id="vendorAddress" oninput="updateLetter()" placeholder="456 Business Ave, San Francisco, CA 94102">
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Contract Details</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">Service Type</label>
+                        <select class="dw-select" id="serviceType" onchange="updateLetter()">
+                            <option value="marketing">Marketing Services</option>
+                            <option value="development">Development/Technical Services</option>
+                            <option value="consulting">Consulting Services</option>
+                            <option value="other">Other Services</option>
+                        </select>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Contract Date</label>
+                        <input type="date" class="dw-input" id="contractDate" oninput="updateLetter()">
+                        <div class="dw-hint">When was the service agreement signed?</div>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Brief Service Description</label>
+                        <input type="text" class="dw-input" id="serviceDescription" oninput="updateLetter()" placeholder="Q4 digital marketing campaign including social media ads and content creation">
+                        <div class="dw-hint">One sentence summary of what they were supposed to do</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Breach Details</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">Type of Breach</label>
+                        <select class="dw-select" id="breachType" onchange="updateLetter()">
+                            <option value="nonperformance">Non-Performance (Little or No Work Delivered)</option>
+                            <option value="deadline">Missed Deadlines/Milestones</option>
+                            <option value="quality">Defective/Poor Quality Work</option>
+                            <option value="multiple">Multiple Issues</option>
+                        </select>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Detailed Breach Description</label>
+                        <textarea class="dw-textarea" id="breachDetails" oninput="updateLetter()" placeholder="Provide specific details about what went wrong. Include dates, specific deliverables that weren't provided, quality issues, missed deadlines, etc. Be factual and specific."></textarea>
+                        <div class="dw-hint">Be specific with dates and facts. Example: "Section 3.2 required delivery of 50 blog posts by October 1, 2025. As of November 19, 2025, only 12 posts have been delivered, and those fail to meet the 1,000-word minimum specified in Exhibit A."</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Financial Details</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">Amount Paid to Vendor</label>
+                        <input type="number" class="dw-input" id="amountPaid" oninput="updateLetter()" placeholder="15000">
+                        <div class="dw-hint">Total amount you paid them (numbers only, no commas or dollar signs)</div>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Replacement/Additional Costs (if any)</label>
+                        <input type="number" class="dw-input" id="additionalCosts" oninput="updateLetter()" placeholder="3200">
+                        <div class="dw-hint">Costs to hire replacement vendor or fix their work (optional)</div>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Other Quantifiable Damages</label>
+                        <textarea class="dw-textarea" id="otherDamages" oninput="updateLetter()" placeholder="Lost sales: approximately $8,000 due to missed holiday campaign launch"></textarea>
+                        <div class="dw-hint">Any other measurable losses (optional but strengthens your case)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Your Demand</div>
+                <div class="dw-card-body">
+                    <div class="dw-form-group">
+                        <label class="dw-label">What Resolution Do You Want?</label>
+                        <select class="dw-select" id="demandType" onchange="updateLetter()">
+                            <option value="full-refund">Full Refund</option>
+                            <option value="partial-refund">Partial Refund</option>
+                            <option value="completion">Complete the Work</option>
+                            <option value="refund-plus">Refund Plus Additional Costs</option>
+                            <option value="custom">Custom Demand</option>
+                        </select>
+                    </div>
+
+                    <div class="dw-form-group" id="customDemandField" style="display:none;">
+                        <label class="dw-label">Describe Your Specific Demand</label>
+                        <textarea class="dw-textarea" id="customDemand" oninput="updateLetter()" placeholder="Be specific about what you want them to do or pay"></textarea>
+                    </div>
+
+                    <div class="dw-form-group">
+                        <label class="dw-label">Response Deadline (Days from Today)</label>
+                        <select class="dw-select" id="deadlineDays" onchange="updateLetter()">
+                            <option value="7">7 Days</option>
+                            <option value="10">10 Days</option>
+                            <option value="14" selected>14 Days</option>
+                            <option value="21">21 Days</option>
+                            <option value="30">30 Days</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Letter Preview -->
+            <div class="dw-card">
+                <div class="dw-card-header">Your Demand Letter Preview</div>
+                <div class="dw-card-body">
+                    <div class="dw-alert dw-alert-success">
+                        <strong>Ready to Send:</strong> Review the letter below carefully. When satisfied, click "Copy to Clipboard" and paste into your email or word processor.
+                    </div>
+
+                    <div class="dw-btn-group">
+                        <button class="dw-btn dw-btn-primary" onclick="copyLetter()">📋 Copy to Clipboard</button>
+                        <a href="https://terms.law/call/" class="dw-btn dw-btn-secondary" target="_blank">📞 Get Attorney Review</a>
+                    </div>
+
+                    <div class="dw-preview" id="letterPreview">
+                        <em>Fill out the form above to generate your demand letter...</em>
+                    </div>
+
+                    <div class="dw-btn-group">
+                        <button class="dw-btn dw-btn-primary" onclick="copyLetter()">📋 Copy to Clipboard</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Tab -->
+        <div id="instructions" class="dw-tab-content">
+            <div class="dw-card">
+                <div class="dw-card-header">Step-by-Step Instructions</div>
+                <div class="dw-card-body">
+                    <div class="dw-timeline">
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 1: Gather Your Evidence</div>
+                            <div class="dw-timeline-desc">Before filling out the generator, collect: (1) Service agreement/contract documents, (2) Payment receipts, (3) Email/message communications, (4) Deliverables received (or lack thereof), (5) Evidence of damages.</div>
+                        </div>
+
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 2: Fill Out the Generator</div>
+                            <div class="dw-timeline-desc">Complete all fields in the Generator tab. Be specific and factual. The letter will automatically update as you type. Include dates, contract section references, and specific deliverables.</div>
+                        </div>
+
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 3: Review Carefully</div>
+                            <div class="dw-timeline-desc">Read the generated letter thoroughly. Check for accuracy, tone, and completeness. Make sure all amounts are correct and all facts are verifiable. Remove any language that sounds too aggressive or emotional.</div>
+                        </div>
+
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 4: Copy and Customize</div>
+                            <div class="dw-timeline-desc">Click "Copy to Clipboard" and paste into your word processor. Add today's date at the top. Attach key evidence documents. Reference specific contract sections if you have them.</div>
+                        </div>
+
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 5: Send Via Multiple Methods</div>
+                            <div class="dw-timeline-desc">Send via email (with read receipt if possible) AND certified mail with return receipt. Keep copies of everything. If your contract specifies a notice method, follow it exactly.</div>
+                        </div>
+
+                        <div class="dw-timeline-item">
+                            <div class="dw-timeline-title">Step 6: Document Everything</div>
+                            <div class="dw-timeline-desc">Keep copies of the letter, proof of delivery, and any responses. If they don't respond by the deadline, be prepared to follow through with your stated next steps (filing a claim or engaging an attorney).</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Best Practices</div>
+                <div class="dw-card-body">
+                    <ul class="dw-checklist">
+                        <li>Be specific with dates, amounts, and deliverables</li>
+                        <li>Reference your contract sections where possible</li>
+                        <li>Stick to verifiable facts, not opinions or character attacks</li>
+                        <li>Keep the tone professional and businesslike</li>
+                        <li>Set a realistic deadline (10-14 days is standard)</li>
+                        <li>State consequences if ignored, but don't make empty threats</li>
+                        <li>Offer a reasonable path to resolution</li>
+                        <li>Send to the highest-ranking person you can identify</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scenarios Tab -->
+        <div id="scenarios" class="dw-tab-content">
+            <div class="dw-card">
+                <div class="dw-card-header">Marketing Agency Breach</div>
+                <div class="dw-card-body">
+                    <p><strong>Situation:</strong> You paid a marketing agency $20,000 to run a Q4 holiday campaign. They missed the launch deadline, delivered unusable creative assets, and stopped responding to emails.</p>
+                    
+                    <p><strong>Key Points to Include:</strong></p>
+                    <ul>
+                        <li>Specific campaign launch date from contract</li>
+                        <li>List of deliverables promised vs. what was delivered</li>
+                        <li>Timeline of missed deadlines and communications</li>
+                        <li>Lost opportunity costs (missing holiday shopping season)</li>
+                        <li>Screenshots of unusable creative work</li>
+                    </ul>
+
+                    <p><strong>Typical Demand:</strong> Full refund of $20,000 plus reimbursement for replacement agency costs, plus demand for immediate transfer of ad account access and any completed materials.</p>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Development Shop Breach</div>
+                <div class="dw-card-body">
+                    <p><strong>Situation:</strong> A development shop was paid $40,000 to build a custom web application by November 1st. The delivered application crashes frequently, fails security tests, and is missing key features from the spec.</p>
+                    
+                    <p><strong>Key Points to Include:</strong></p>
+                    <ul>
+                        <li>Reference technical specifications from Statement of Work</li>
+                        <li>Detailed bug reports and test results</li>
+                        <li>List of missing features with contract references</li>
+                        <li>Security vulnerabilities discovered</li>
+                        <li>Business impact of unusable application</li>
+                    </ul>
+
+                    <p><strong>Typical Demand:</strong> Either (1) completion of work to specifications within 30 days at no additional cost, with right to inspect and test, OR (2) refund of $40,000 plus immediate transfer of all source code and credentials.</p>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Consultant Non-Performance</div>
+                <div class="dw-card-body">
+                    <p><strong>Situation:</strong> You paid a business consultant a $15,000 retainer for strategic advisory services including weekly calls and monthly reports. After an initial call, the consultant ghosted you.</p>
+                    
+                    <p><strong>Key Points to Include:</strong></p>
+                    <ul>
+                        <li>Contract terms specifying hours or deliverables</li>
+                        <li>Timeline of your attempts to reach them (with dates)</li>
+                        <li>Lack of any substantive work performed</li>
+                        <li>Simple calculation: $15,000 paid - minimal work = unjust enrichment</li>
+                    </ul>
+
+                    <p><strong>Typical Demand:</strong> Full refund of $15,000 less any hours actually worked (typically none or minimal), with detailed accounting if they claim they did work.</p>
+                </div>
+            </div>
+
+            <div class="dw-alert dw-alert-info">
+                <strong>Not Sure Which Scenario Fits?</strong> The generator handles all these situations. Just select the appropriate service type and breach type, then describe your specific facts in the detail fields.
+            </div>
+        </div>
+
+        <!-- Guardrails Tab -->
+        <div id="guardrails" class="dw-tab-content">
+            <div class="dw-alert dw-alert-danger">
+                <strong>Critical Warning:</strong> There's a line between a legitimate demand letter and illegal threats. Cross that line and you could face extortion charges or a defamation lawsuit. This tool stays well within legal boundaries, but understand these rules.
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">❌ NEVER Do This (Extortion Risk)</div>
+                <div class="dw-card-body">
+                    <p><strong>Don't explicitly condition silence about alleged crimes on payment:</strong></p>
+                    <ul>
+                        <li>"Pay me $20,000 or I'll report you to the IRS for tax fraud"</li>
+                        <li>"Settle by Friday or I'm filing criminal fraud charges with the DA"</li>
+                        <li>"Give me my money back or I'll report you to your licensing board and destroy your career"</li>
+                    </ul>
+
+                    <p><strong>Don't threaten a social media smear campaign for payment:</strong></p>
+                    <ul>
+                        <li>"Pay up or I'll post about this scam on every review site and social media platform"</li>
+                        <li>"Settle this or I'm starting a viral campaign to expose your fraud"</li>
+                    </ul>
+
+                    <p><strong>Why this is illegal:</strong> California Penal Code §518 makes it extortion to obtain property through wrongful use of force or fear. The landmark case <em>Flatley v. Mauro</em> (2006) held that an attorney's demand letter threatening to report alleged rape to authorities unless the target paid was criminal extortion, not protected legal activity.</p>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">✅ Safe Language (Legal and Effective)</div>
+                <div class="dw-card-body">
+                    <p><strong>You CAN state you'll pursue civil remedies:</strong></p>
+                    <ul>
+                        <li>"If we cannot resolve this informally, I will pursue all appropriate civil remedies, including filing a breach of contract claim in [court/arbitration]"</li>
+                        <li>"I am prepared to initiate litigation to enforce my contractual rights if this is not resolved by the deadline"</li>
+                        <li>"Under our Agreement, the prevailing party is entitled to attorney's fees, which I will seek if legal action becomes necessary"</li>
+                    </ul>
+
+                    <p><strong>You CAN mention regulatory complaints separately from payment demands:</strong></p>
+                    <ul>
+                        <li>"This letter addresses civil contractual claims only. Separate from this demand, I am evaluating whether your conduct warrants complaints to [relevant regulatory body], which I may pursue independently"</li>
+                        <li>"I reserve the right to file appropriate complaints with regulatory agencies regarding your business practices"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Defamation: Stick to Facts</div>
+                <div class="dw-card-body">
+                    <p><strong>Factual and Safe:</strong></p>
+                    <ul>
+                        <li>"You received payment of $15,000 on August 1, 2025, but have not delivered the contracted services as of November 19, 2025"</li>
+                        <li>"The application crashes when processing payments, as documented in the attached error logs"</li>
+                        <li>"Despite my emails on [dates], you have not responded"</li>
+                    </ul>
+
+                    <p><strong>Potentially Defamatory:</strong></p>
+                    <ul>
+                        <li>"You are a scam artist who deliberately defrauds clients"</li>
+                        <li>"Your company is a criminal enterprise"</li>
+                        <li>"You have a history of ripping people off"</li>
+                    </ul>
+
+                    <p><strong>The Rule:</strong> Stick to verifiable facts you can prove with documentation. Avoid character attacks, speculation about intent, or sweeping accusations. Use neutral framing: "Our records show..." "According to the attached invoices..." "The evidence indicates..."</p>
+                </div>
+            </div>
+
+            <div class="dw-card">
+                <div class="dw-card-header">Professional Tone Matters</div>
+                <div class="dw-card-body">
+                    <p>Even when you're furious (and rightfully so), keep the letter businesslike. Emotional, insulting, or threatening language:</p>
+                    <ul>
+                        <li>Weakens your legal position</li>
+                        <li>Can create defamation or harassment claims against you</li>
+                        <li>Makes settlement less likely (vendors dig in when attacked)</li>
+                        <li>Looks bad if a judge or arbitrator later reads it</li>
+                    </ul>
+
+                    <p><strong>Remember:</strong> The goal is to get paid or get your work completed, not to "win" an argument or punish the vendor. A professional, fact-based letter that offers a reasonable resolution is far more effective than an angry rant.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast">Letter copied to clipboard!</div>
+
+    <script>
+        // Tab switching function
+        function openTab(evt, tabName) {
+            var i, tabcontent, tablinks;
+            
+            tabcontent = document.getElementsByClassName("dw-tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            
+            tablinks = document.getElementsByClassName("dw-tab");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        // Show/hide custom demand field
+        document.getElementById('demandType').addEventListener('change', function() {
+            const customField = document.getElementById('customDemandField');
+            if (this.value === 'custom') {
+                customField.style.display = 'block';
+            } else {
+                customField.style.display = 'none';
+            }
+        });
+
+        // Calculate deadline date
+        function getDeadlineDate(days) {
+            const date = new Date();
+            date.setDate(date.getDate() + parseInt(days));
+            return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        // Generate demand based on type
+        function generateDemandText() {
+            const demandType = document.getElementById('demandType').value;
+            const amountPaid = document.getElementById('amountPaid').value || '[AMOUNT PAID]';
+            const additionalCosts = document.getElementById('additionalCosts').value;
+            const customDemand = document.getElementById('customDemand').value;
+
+            switch(demandType) {
+                case 'full-refund':
+                    return `A full refund of $${amountPaid} representing all amounts paid for services that were not delivered or were materially defective.`;
+                
+                case 'partial-refund':
+                    return `A partial refund of $[SPECIFY AMOUNT] representing the portion of services that were not delivered or were defective.`;
+                
+                case 'completion':
+                    return `Completion of all contracted work to the specifications in [Section/Exhibit] within [NUMBER] days, at no additional cost, with daily progress updates and my right to inspect and approve deliverables.`;
+                
+                case 'refund-plus':
+                    let text = `(1) A refund of $${amountPaid} representing amounts paid for undelivered or defective services;`;
+                    if (additionalCosts) {
+                        text += `\n   (2) Reimbursement of $${additionalCosts} in replacement vendor costs;`;
+                        text += `\n   (3) Immediate transfer of all project assets, credentials, and work product.`;
+                    } else {
+                        text += `\n   (2) Immediate transfer of all project assets, credentials, and work product.`;
+                    }
+                    return text;
+                
+                case 'custom':
+                    return customDemand || '[DESCRIBE YOUR SPECIFIC DEMAND]';
+                
+                default:
+                    return '[DESCRIBE WHAT YOU WANT THEM TO DO OR PAY]';
+            }
+        }
+
+        // Update letter preview
+        function updateLetter() {
+            const clientName = document.getElementById('clientName').value || '[YOUR NAME]';
+            const clientCompany = document.getElementById('clientCompany').value || '[YOUR COMPANY]';
+            const clientAddress = document.getElementById('clientAddress').value || '[YOUR ADDRESS]';
+            const clientEmail = document.getElementById('clientEmail').value || '[YOUR EMAIL]';
+            const clientPhone = document.getElementById('clientPhone').value || '[YOUR PHONE]';
+            
+            const vendorName = document.getElementById('vendorName').value || '[VENDOR NAME]';
+            const vendorCompany = document.getElementById('vendorCompany').value || '[VENDOR COMPANY]';
+            const vendorAddress = document.getElementById('vendorAddress').value || '[VENDOR ADDRESS]';
+            
+            const serviceType = document.getElementById('serviceType').value;
+            const serviceDescription = document.getElementById('serviceDescription').value || '[DESCRIPTION OF SERVICES]';
+            const contractDate = document.getElementById('contractDate').value || '[CONTRACT DATE]';
+            
+            const breachType = document.getElementById('breachType').value;
+            const breachDetails = document.getElementById('breachDetails').value || '[DETAILED DESCRIPTION OF BREACH]';
+            
+            const amountPaid = document.getElementById('amountPaid').value || '[AMOUNT]';
+            const additionalCosts = document.getElementById('additionalCosts').value;
+            const otherDamages = document.getElementById('otherDamages').value;
+            
+            const deadlineDays = document.getElementById('deadlineDays').value;
+            const deadlineDate = getDeadlineDate(deadlineDays);
+            
+            const demandText = generateDemandText();
+
+            // Build damages paragraph
+            let damagesPara = `As a direct result of your breach, I have suffered the following damages:\n\n   (1) $${amountPaid} paid for services that were not delivered or were materially defective;`;
+            
+            if (additionalCosts) {
+                damagesPara += `\n   (2) $${additionalCosts} in costs to engage a replacement provider to complete/redo the work;`;
+            }
+            
+            if (otherDamages) {
+                const itemNum = additionalCosts ? '(3)' : '(2)';
+                damagesPara += `\n   ${itemNum} ${otherDamages}`;
+            }
+
+            const letter = `${clientName}
+${clientCompany}
+${clientAddress}
+${clientPhone}
+${clientEmail}
+
+[DATE: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}]
+
+Via Email and Certified Mail
+
+${vendorName}
+${vendorCompany}
+${vendorAddress}
+
+Re: Demand Regarding Breach of Service Agreement dated ${contractDate}
+
+Dear ${vendorName},
+
+I am writing to address significant issues that have arisen under our Service Agreement dated ${contractDate} regarding your provision of ${serviceType.replace('-', ' ')} services. Despite multiple attempts to resolve these issues informally, your company has failed to perform its contractual obligations. This letter serves as formal notice of breach and provides a final opportunity to resolve this matter without legal action.
+
+BACKGROUND
+
+On ${contractDate}, we entered into a Service Agreement under which you agreed to provide ${serviceDescription}. In exchange, I paid $${amountPaid}.
+
+BREACH OF CONTRACT
+
+${breachDetails}
+
+This failure to perform constitutes a material breach of our Service Agreement.
+
+DAMAGES
+
+${damagesPara}
+
+DEMAND
+
+To resolve this matter without further legal action, I demand the following:
+
+${demandText}
+
+I require your response accepting this demand no later than 5:00 p.m. Pacific Time on ${deadlineDate}.
+
+NEXT STEPS
+
+If I do not receive a satisfactory response by the stated deadline, I will pursue all available legal remedies, which may include filing a breach of contract claim in [appropriate court or arbitration forum as specified in our Agreement]. I will seek all damages, costs, and attorney's fees to which I am entitled under the Agreement and applicable law.
+
+Nothing in this letter constitutes a waiver of any rights or remedies, all of which are expressly reserved.
+
+I hope we can resolve this matter quickly and professionally. Please contact me at ${clientPhone} or ${clientEmail} to discuss resolution.
+
+Sincerely,
+
+${clientName}
+
+Enclosures: [List key evidence documents]`;
+
+            document.getElementById('letterPreview').innerText = letter;
+        }
+
+        // Copy letter to clipboard
+        function copyLetter() {
+            const letterText = document.getElementById('letterPreview').innerText;
+            
+            if (letterText.includes('[YOUR NAME]') || letterText.includes('[VENDOR NAME]')) {
+                alert('Please fill out all required fields before copying the letter.');
+                return;
+            }
+
+            navigator.clipboard.writeText(letterText).then(function() {
+                showToast();
+            }, function(err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = letterText;
+                document.body.appendChild(textArea);
+                textArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    showToast();
+                } catch (err) {
+                    alert('Failed to copy. Please select and copy manually.');
+                }
+                
+                document.body.removeChild(textArea);
+            });
+        }
+
+        // Show toast notification
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Initialize letter on page load
+        window.addEventListener('load', function() {
+            updateLetter();
+        });
+    </script>
+</body>
+</html>
