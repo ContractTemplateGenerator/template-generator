@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SaaS Nonpayment Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f3f4f6;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .tab-navigation {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .tab-button {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 14px;
+            border: none;
+            background: #f8f9fa;
+            color: #666;
+            font-weight: 600;
+            font-size: 13px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button:hover {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.4);
+        }
+
+        .main-content {
+            display: flex;
+            gap: 1.5rem;
+            align-items: flex-start;
+            background: white;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            border-right: 1px solid #e5e7eb;
+        }
+
+        .preview-panel {
+            flex: 1;
+            padding: 2rem;
+            height: 700px;
+            overflow-y: auto;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .preview-header h2 {
+            color: #1a1a1a;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .copy-btn, .download-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 13px;
+        }
+
+        .copy-btn:hover, .download-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .document-preview {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            line-height: 1.8;
+            white-space: pre-wrap;
+            color: #1a1a1a;
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-section h3 {
+            color: #1a1a1a;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .form-group.full-width {
+            flex: 1 1 100%;
+        }
+
+        .form-group.half-width {
+            flex: 1 1 calc(50% - 0.5rem);
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            font-weight: 600;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 14px;
+            color: #4b5563;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 12px;
+            font-size: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #8b5cf6;
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .alert {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid;
+            font-size: 14px;
+        }
+
+        .alert-info {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .alert-success {
+            background: #ede9fe;
+            border-color: #8b5cf6;
+            color: #5b21b6;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(100px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .preview-panel {
+                position: static;
+                height: 500px;
+                border-right: none;
+                border-top: 1px solid #e5e7eb;
+            }
+
+            .form-panel {
+                height: auto;
+                border-right: none;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem 0.5rem;
+            }
+
+            .tab-button {
+                min-width: 100%;
+                font-size: 12px;
+                padding: 10px 12px;
+            }
+
+            .form-group.half-width {
+                flex: 1 1 100%;
+            }
+        }
+
+        .form-panel::-webkit-scrollbar,
+        .preview-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-panel::-webkit-scrollbar-track,
+        .preview-panel::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .form-panel::-webkit-scrollbar-thumb,
+        .preview-panel::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo, useRef } = React;
+
+        const SaaSNonpaymentLetter = () => {
+            const tabs = [
+                { id: 'provider', label: '1. Provider Info' },
+                { id: 'customer', label: '2. Customer' },
+                { id: 'service', label: '3. Service & Contract' },
+                { id: 'payment', label: '4. Payment History' },
+                { id: 'evidence', label: '5. Evidence' },
+                { id: 'demand', label: '6. Demand' }
+            ];
+
+            const [currentTab, setCurrentTab] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+            const previewRef = useRef(null);
+
+            const [formData, setFormData] = useState({
+                // Provider info
+                providerName: '',
+                providerLegalName: '',
+                providerAddress: '',
+                providerEmail: '',
+                providerPhone: '',
+                senderTitle: '',
+                letterDate: new Date().toISOString().split('T')[0],
+
+                // Customer
+                customerName: '',
+                customerCompany: '',
+                customerAddress: '',
+                customerEmail: '',
+                isBusinessCustomer: false,
+
+                // Service & Contract
+                productName: '',
+                serviceType: 'subscription',
+                signupDate: '',
+                contractType: 'clickwrap',
+                pricingModel: 'monthly',
+                monthlyFee: '',
+                annualFee: '',
+
+                // Payment History
+                lastPaymentDate: '',
+                unpaidMonths: '',
+                totalUnpaid: '',
+                invoiceNumbers: '',
+                paymentsStopped: '',
+
+                // Evidence
+                evidenceTermsAccepted: false,
+                evidenceActiveUsage: false,
+                evidencePriorPayments: false,
+                evidenceNoComplaints: false,
+                evidenceNoRefundRequest: false,
+                evidenceLoginRecords: false,
+                usageDetails: '',
+
+                // Demand
+                demandAmount: '',
+                includeLateFees: false,
+                lateFeeAmount: '',
+                paymentDeadlineDays: '14',
+                offerPaymentPlan: false,
+                mentionSmallClaims: true,
+                willSuspendAccess: true,
+                tone: 'firm'
+            });
+
+            const handleChange = (e) => {
+                const { name, value, type, checked } = e.target;
+                setFormData(prev => ({
+                    ...prev,
+                    [name]: type === 'checkbox' ? checked : value
+                }));
+            };
+
+            const getDeadlineDate = (days) => {
+                const date = new Date();
+                date.setDate(date.getDate() + parseInt(days || 14));
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            };
+
+            const formatDate = (dateStr) => {
+                if (!dateStr) return '[date]';
+                const date = new Date(dateStr);
+                return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            };
+
+            const documentText = useMemo(() => {
+                const cd = formData;
+                const today = formatDate(cd.letterDate);
+                const deadlineDate = getDeadlineDate(cd.paymentDeadlineDays);
+
+                // Build evidence paragraph
+                let evidencePoints = [];
+                if (cd.evidenceTermsAccepted) evidencePoints.push("accepted our written terms of service at signup");
+                if (cd.evidenceActiveUsage) evidencePoints.push("actively used the service during the unpaid period");
+                if (cd.evidencePriorPayments) evidencePoints.push("successfully paid for prior billing periods without issue");
+                if (cd.evidenceNoComplaints) evidencePoints.push("never raised any service quality complaints or technical issues");
+                if (cd.evidenceNoRefundRequest) evidencePoints.push("never requested a refund or attempted to cancel service");
+                if (cd.evidenceLoginRecords) evidencePoints.push("has login and usage records demonstrating ongoing use");
+
+                const evidenceText = evidencePoints.length > 0
+                    ? `Our records confirm that you ${evidencePoints.join(', ')}. ${cd.usageDetails || ''}`
+                    : cd.usageDetails || 'Our records show that you received and used our service during the period for which payment is owed.';
+
+                const serviceTypeDesc = {
+                    'subscription': 'software subscription service',
+                    'saas': 'software-as-a-service platform',
+                    'api': 'API access service',
+                    'hosting': 'hosting and infrastructure service'
+                }[cd.serviceType] || 'software service';
+
+                const pricingDesc = cd.pricingModel === 'monthly'
+                    ? `${cd.monthlyFee || '$[amount]'} per month`
+                    : cd.pricingModel === 'annual'
+                    ? `${cd.annualFee || '$[amount]'} annually`
+                    : cd.pricingModel === 'per-seat'
+                    ? `${cd.monthlyFee || '$[amount]'} per user per month`
+                    : `${cd.monthlyFee || '$[amount]'}`;
+
+                const contractDesc = cd.contractType === 'clickwrap'
+                    ? 'You accepted our Terms of Service electronically'
+                    : cd.contractType === 'signed'
+                    ? 'We entered into a written service agreement'
+                    : cd.contractType === 'email'
+                    ? 'We agreed to terms via email correspondence'
+                    : 'You accepted our service terms';
+
+                const suspensionText = cd.willSuspendAccess
+                    ? `If payment is not received by the deadline, we will be forced to suspend your access to ${cd.productName || 'the service'} and may permanently delete your account data after the suspension period specified in our Terms of Service. We do not wish to take these steps, but continued nonpayment leaves us no choice.`
+                    : 'If payment is not received by the deadline, we will need to pursue formal collection procedures.';
+
+                const smallClaimsText = cd.mentionSmallClaims
+                    ? ` This may include filing a claim in small claims court or other appropriate forum.`
+                    : '';
+
+                const lateFeeText = cd.includeLateFees && cd.lateFeeAmount
+                    ? ` This includes ${cd.lateFeeAmount} in late fees as authorized by our service agreement.`
+                    : '';
+
+                const paymentPlanText = cd.offerPaymentPlan
+                    ? ` If you are unable to pay the full amount immediately, please contact me within ${cd.paymentDeadlineDays} days to discuss a reasonable payment plan.`
+                    : '';
+
+                return `${cd.providerName || '[Your Business Name]'}
+${cd.providerLegalName ? cd.providerLegalName : ''}
+${cd.providerAddress || '[Street Address]\n[City, State ZIP]'}
+${cd.providerEmail || '[Email]'}
+${cd.providerPhone || '[Phone]'}
+
+${today}
+
+${cd.customerName || '[Customer Name]'}
+${cd.customerCompany ? cd.customerCompany : ''}
+${cd.customerAddress || '[Customer Address]\n[City, State ZIP]'}
+
+Re: Past Due Account for ${cd.productName || '[Service Name]'} - Demand for Payment
+
+Dear ${cd.customerName || '[Customer Name]'}:
+
+I am writing regarding your past due account for ${cd.productName || '[Service Name]'}, our ${serviceTypeDesc}. Despite multiple invoices and payment reminders, you have failed to pay ${cd.totalUnpaid || '$[total amount]'} owed for services already provided and used.
+
+ACCOUNT BACKGROUND
+
+${contractDesc} when you signed up for ${cd.productName || 'our service'} on ${formatDate(cd.signupDate)}. Under those terms, you agreed to pay ${pricingDesc} for access to ${cd.productName || 'the service'}.
+
+${evidenceText}
+
+NONPAYMENT AND AMOUNT OWED
+
+${cd.lastPaymentDate ? `Your last successful payment was on ${formatDate(cd.lastPaymentDate)}.` : 'You have failed to make payment as required.'} ${cd.paymentsStopped ? cd.paymentsStopped : `Since that time, you have failed to pay for ${cd.unpaidMonths || '[X]'} months of service.`}
+
+The following amounts remain unpaid:
+
+${cd.invoiceNumbers || `[List unpaid invoices by month/number and amount]`}
+
+Total Amount Due: ${cd.demandAmount || cd.totalUnpaid || '$[TOTAL]'}${lateFeeText}
+
+Despite our provision of service during this period and your continued use of that service, you have not paid these invoices or contacted us to resolve any billing concerns or service issues.
+
+LEGAL BASIS
+
+Your failure to pay constitutes a material breach of our service agreement. Under basic contract law, when one party performs its obligations and the other party accepts those services but fails to pay, the performing party is entitled to the contract price as damages.
+
+Additionally, your continued use of our service without payment may give rise to claims for unjust enrichment. It would be unjust to allow you to retain the benefits of our service while refusing to pay the agreed price.
+
+DEMAND FOR PAYMENT
+
+I demand that you remit the full amount of ${cd.demandAmount || cd.totalUnpaid || '$[TOTAL]'} by ${deadlineDate}. Payment should be made by [wire transfer/ACH/credit card/check] to the following:
+
+[Payment Instructions - wire details, check mailing address, or online payment portal link]
+
+Please reference your account or invoice numbers when making payment.${paymentPlanText}
+
+CONSEQUENCES OF NONPAYMENT
+
+${suspensionText}
+
+Beyond suspension of access, if this matter is not resolved by the deadline, I will pursue all available legal remedies to collect the amounts owed.${smallClaimsText} I will also consider engaging a collection agency to pursue this debt, which may result in additional costs being added to your balance and negative reporting to credit bureaus.
+
+I prefer to resolve this matter directly and maintain a professional relationship. However, I cannot continue to provide service without payment, and I will take the necessary steps to collect what is owed if you do not respond appropriately.
+
+Please contact me at ${cd.providerEmail || '[your email]'} or ${cd.providerPhone || '[your phone]'} immediately to arrange payment or discuss this matter.
+
+Sincerely,
+
+
+${cd.providerName || '[Your Name]'}
+${cd.senderTitle ? cd.senderTitle : '[Your Title]'}
+${cd.providerLegalName || cd.providerName || '[Business Name]'}`;
+            }, [formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        setShowToast(true);
+                        setTimeout(() => setShowToast(false), 3000);
+                    }).catch((err) => {
+                        console.error('Failed to copy:', err);
+                        fallbackCopy(text);
+                    });
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Please manually copy the text from the preview');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const downloadLetter = () => {
+                const blob = new Blob([documentText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `saas-nonpayment-demand-${formData.customerName || 'letter'}-${formData.letterDate}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            const renderTabContent = () => {
+                switch(currentTab) {
+                    case 0:
+                        return (
+                            <div className="form-section">
+                                <h3>Provider / Business Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Your Business Name</label>
+                                        <input
+                                            type="text"
+                                            name="providerName"
+                                            value={formData.providerName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="TechSaaS Inc."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Legal Entity Name (if different)</label>
+                                        <input
+                                            type="text"
+                                            name="providerLegalName"
+                                            value={formData.providerLegalName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="TechSaaS, Inc."
+                                        />
+                                        <div className="form-hint">Optional - full legal name if different from DBA</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Business Address</label>
+                                        <textarea
+                                            name="providerAddress"
+                                            value={formData.providerAddress}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="123 Tech Street
+San Francisco, CA 94102"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Email</label>
+                                        <input
+                                            type="email"
+                                            name="providerEmail"
+                                            value={formData.providerEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="billing@techsaas.com"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Phone</label>
+                                        <input
+                                            type="tel"
+                                            name="providerPhone"
+                                            value={formData.providerPhone}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="(555) 123-4567"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Your Title</label>
+                                        <input
+                                            type="text"
+                                            name="senderTitle"
+                                            value={formData.senderTitle}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Founder, CFO, Director, etc."
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Letter Date</label>
+                                        <input
+                                            type="date"
+                                            name="letterDate"
+                                            value={formData.letterDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 1:
+                        return (
+                            <div className="form-section">
+                                <h3>Customer Information</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                name="isBusinessCustomer"
+                                                checked={formData.isBusinessCustomer}
+                                                onChange={handleChange}
+                                            />
+                                            Customer is a business/company
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Customer Name</label>
+                                        <input
+                                            type="text"
+                                            name="customerName"
+                                            value={formData.customerName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="John Smith or contact person name"
+                                        />
+                                    </div>
+                                </div>
+
+                                {formData.isBusinessCustomer && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Company Name</label>
+                                            <input
+                                                type="text"
+                                                name="customerCompany"
+                                                value={formData.customerCompany}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="Acme Corp"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Customer Address</label>
+                                        <textarea
+                                            name="customerAddress"
+                                            value={formData.customerAddress}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="456 Main Street
+Los Angeles, CA 90001"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Customer Email (Optional)</label>
+                                        <input
+                                            type="email"
+                                            name="customerEmail"
+                                            value={formData.customerEmail}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="john@example.com"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 2:
+                        return (
+                            <div className="form-section">
+                                <h3>Service & Contract Details</h3>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Product/Service Name</label>
+                                        <input
+                                            type="text"
+                                            name="productName"
+                                            value={formData.productName}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="Project Management Pro, Analytics Suite, etc."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Service Type</label>
+                                        <select
+                                            name="serviceType"
+                                            value={formData.serviceType}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="subscription">Software Subscription</option>
+                                            <option value="saas">SaaS Platform</option>
+                                            <option value="api">API Service</option>
+                                            <option value="hosting">Hosting/Infrastructure</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Signup Date</label>
+                                        <input
+                                            type="date"
+                                            name="signupDate"
+                                            value={formData.signupDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Contract Type</label>
+                                        <select
+                                            name="contractType"
+                                            value={formData.contractType}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="clickwrap">Clickwrap / Online Terms</option>
+                                            <option value="signed">Signed Written Agreement</option>
+                                            <option value="email">Email Agreement</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Pricing Model</label>
+                                        <select
+                                            name="pricingModel"
+                                            value={formData.pricingModel}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="monthly">Monthly Subscription</option>
+                                            <option value="annual">Annual Subscription</option>
+                                            <option value="per-seat">Per-Seat Pricing</option>
+                                            <option value="usage">Usage-Based</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {(formData.pricingModel === 'monthly' || formData.pricingModel === 'per-seat') && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Monthly Fee</label>
+                                            <input
+                                                type="text"
+                                                name="monthlyFee"
+                                                value={formData.monthlyFee}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="$99"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {formData.pricingModel === 'annual' && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Annual Fee</label>
+                                            <input
+                                                type="text"
+                                                name="annualFee"
+                                                value={formData.annualFee}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="$999"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+
+                    case 3:
+                        return (
+                            <div className="form-section">
+                                <h3>Payment History & Amount Owed</h3>
+                                <div className="alert alert-info">
+                                    <strong>Key Details:</strong> Document payment history and exactly what's owed.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Last Successful Payment</label>
+                                        <input
+                                            type="date"
+                                            name="lastPaymentDate"
+                                            value={formData.lastPaymentDate}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                        />
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Unpaid Months/Periods</label>
+                                        <input
+                                            type="text"
+                                            name="unpaidMonths"
+                                            value={formData.unpaidMonths}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="3 months, 6 billing cycles, etc."
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Total Amount Unpaid</label>
+                                        <input
+                                            type="text"
+                                            name="totalUnpaid"
+                                            value={formData.totalUnpaid}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$297"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Invoice Numbers/Details</label>
+                                        <textarea
+                                            name="invoiceNumbers"
+                                            value={formData.invoiceNumbers}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="List unpaid invoices:
+Invoice #1234 - August 2024 - $99
+Invoice #1235 - September 2024 - $99
+Invoice #1236 - October 2024 - $99"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">When/Why Payments Stopped (Optional)</label>
+                                        <textarea
+                                            name="paymentsStopped"
+                                            value={formData.paymentsStopped}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Optional: Describe when payments stopped. Example: 'Your payment method failed on August 15, 2024, and despite multiple notifications, you have not updated it.'"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="checkbox-label">
+                                            <input
+                                                type="checkbox"
+                                                name="includeLateFees"
+                                                checked={formData.includeLateFees}
+                                                onChange={handleChange}
+                                            />
+                                            Include late fees (only if contract allows)
+                                        </label>
+                                    </div>
+                                </div>
+
+                                {formData.includeLateFees && (
+                                    <div className="form-row">
+                                        <div className="form-group full-width">
+                                            <label className="form-label">Late Fee Amount</label>
+                                            <input
+                                                type="text"
+                                                name="lateFeeAmount"
+                                                value={formData.lateFeeAmount}
+                                                onChange={handleChange}
+                                                className="form-input"
+                                                placeholder="$25"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+
+                    case 4:
+                        return (
+                            <div className="form-section">
+                                <h3>Evidence of Service Delivery & Usage</h3>
+                                <div className="alert alert-info">
+                                    <strong>Strengthen Your Case:</strong> Check all evidence that applies to your situation.
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidenceTermsAccepted"
+                                            checked={formData.evidenceTermsAccepted}
+                                            onChange={handleChange}
+                                        />
+                                        Customer accepted written terms of service at signup
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidenceActiveUsage"
+                                            checked={formData.evidenceActiveUsage}
+                                            onChange={handleChange}
+                                        />
+                                        Customer actively used the service during unpaid period
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidencePriorPayments"
+                                            checked={formData.evidencePriorPayments}
+                                            onChange={handleChange}
+                                        />
+                                        Customer successfully paid for prior periods without issue
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidenceNoComplaints"
+                                            checked={formData.evidenceNoComplaints}
+                                            onChange={handleChange}
+                                        />
+                                        Customer never raised service quality or technical complaints
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidenceNoRefundRequest"
+                                            checked={formData.evidenceNoRefundRequest}
+                                            onChange={handleChange}
+                                        />
+                                        Customer never requested refund or tried to cancel
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="evidenceLoginRecords"
+                                            checked={formData.evidenceLoginRecords}
+                                            onChange={handleChange}
+                                        />
+                                        You have detailed login/usage records showing ongoing use
+                                    </label>
+                                </div>
+
+                                <div className="form-row" style={{marginTop: '1.5rem'}}>
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Usage Details (Optional)</label>
+                                        <textarea
+                                            name="usageDetails"
+                                            value={formData.usageDetails}
+                                            onChange={handleChange}
+                                            className="form-textarea"
+                                            placeholder="Optional: Provide specific usage details. Example: 'You logged in 47 times during the unpaid period, created 23 projects, and uploaded 156 files.'"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        );
+
+                    case 5:
+                        return (
+                            <div className="form-section">
+                                <h3>Your Demand & Next Steps</h3>
+                                <div className="alert alert-success">
+                                    <strong>Final Settings:</strong> Configure your demand and consequences.
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group full-width">
+                                        <label className="form-label">Total Demand Amount</label>
+                                        <input
+                                            type="text"
+                                            name="demandAmount"
+                                            value={formData.demandAmount}
+                                            onChange={handleChange}
+                                            className="form-input"
+                                            placeholder="$297 (usually same as total unpaid)"
+                                        />
+                                        <div className="form-hint">Include late fees if applicable</div>
+                                    </div>
+                                </div>
+
+                                <div className="form-row">
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Payment Deadline</label>
+                                        <select
+                                            name="paymentDeadlineDays"
+                                            value={formData.paymentDeadlineDays}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="7">7 Days</option>
+                                            <option value="10">10 Days</option>
+                                            <option value="14">14 Days (Recommended)</option>
+                                            <option value="21">21 Days</option>
+                                        </select>
+                                        <div className="form-hint">Deadline: {getDeadlineDate(formData.paymentDeadlineDays)}</div>
+                                    </div>
+
+                                    <div className="form-group half-width">
+                                        <label className="form-label">Letter Tone</label>
+                                        <select
+                                            name="tone"
+                                            value={formData.tone}
+                                            onChange={handleChange}
+                                            className="form-select"
+                                        >
+                                            <option value="firm">Firm but Professional</option>
+                                            <option value="direct">Firm and Direct</option>
+                                            <option value="conciliatory">Conciliatory</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="checkbox-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="offerPaymentPlan"
+                                            checked={formData.offerPaymentPlan}
+                                            onChange={handleChange}
+                                        />
+                                        Offer to discuss payment plan if they can't pay in full
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="willSuspendAccess"
+                                            checked={formData.willSuspendAccess}
+                                            onChange={handleChange}
+                                        />
+                                        Will suspend/terminate account access if not paid
+                                    </label>
+
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            name="mentionSmallClaims"
+                                            checked={formData.mentionSmallClaims}
+                                            onChange={handleChange}
+                                        />
+                                        Mention potential small claims court filing
+                                    </label>
+                                </div>
+
+                                <div className="alert alert-success" style={{marginTop: '2rem'}}>
+                                    <strong>✓ Letter Ready!</strong> Review in the preview, then copy or download. Send via email and/or certified mail. Keep all records.
+                                </div>
+                            </div>
+                        );
+
+                    default:
+                        return null;
+                }
+            };
+
+            return (
+                <div className="container">
+                    <div className="tab-navigation">
+                        {tabs.map((tab, index) => (
+                            <button
+                                key={tab.id}
+                                className={`tab-button ${currentTab === index ? 'active' : ''}`}
+                                onClick={() => setCurrentTab(index)}
+                            >
+                                {tab.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="main-content">
+                        <div className="form-panel">
+                            {renderTabContent()}
+                        </div>
+
+                        <div className="preview-panel" ref={previewRef}>
+                            <div className="preview-header">
+                                <h2>Live Preview</h2>
+                                <div className="button-group">
+                                    <button className="copy-btn" onClick={copyToClipboard}>
+                                        📋 Copy
+                                    </button>
+                                    <button className="download-btn" onClick={downloadLetter}>
+                                        💾 Download
+                                    </button>
+                                </div>
+                            </div>
+                            <pre className="document-preview">
+                                {documentText}
+                            </pre>
+                        </div>
+                    </div>
+
+                    <div className={`toast ${showToast ? 'show' : ''}`}>
+                        ✓ Letter copied to clipboard!
+                    </div>
+                </div>
+            );
+        };
+
+        ReactDOM.render(
+            <SaaSNonpaymentLetter />,
+            document.getElementById('root')
+        );
+    </script>
+</body>
+</html>

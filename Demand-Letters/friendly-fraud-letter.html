@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Friendly Fraud Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: white;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 2rem;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .warning-box p {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .info-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .preview-section {
+                position: static;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                font-size: 0.85rem;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function FriendlyFraudGenerator() {
+            const [activeTab, setActiveTab] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Merchant Info
+                merchantName: '',
+                merchantAddress: '',
+                merchantCity: '',
+                merchantState: '',
+                merchantZip: '',
+                merchantEmail: '',
+                merchantPhone: '',
+
+                // Customer Info
+                customerName: '',
+                customerEmail: '',
+                customerAddress: '',
+                customerCity: '',
+                customerState: '',
+                customerZip: '',
+
+                // Transaction Details
+                orderNumber: '',
+                transactionDate: '',
+                transactionAmount: '',
+                paymentMethod: 'credit card',
+                productService: '',
+
+                // Chargeback Details
+                chargebackDate: '',
+                chargebackReason: '',
+                disputeAmount: '',
+                processorName: '',
+                caseNumber: '',
+
+                // Evidence
+                evidenceDelivery: false,
+                evidenceSignature: false,
+                evidenceUsage: false,
+                evidenceCommunication: false,
+                evidenceRefundPolicy: false,
+                evidenceTerms: false,
+                evidenceTracking: '',
+                evidenceIP: '',
+
+                // Demand
+                deadlineDays: '10',
+                letterDate: new Date().toISOString().split('T')[0]
+            });
+
+            const updateField = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const documentText = useMemo(() => {
+                const today = formData.letterDate || new Date().toISOString().split('T')[0];
+                const deadline = new Date(today);
+                deadline.setDate(deadline.getDate() + parseInt(formData.deadlineDays || 10));
+                const deadlineStr = deadline.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                let letter = `${formData.merchantName || '[Your Business Name]'}
+${formData.merchantAddress || '[Your Street Address]'}
+${formData.merchantCity || '[City]'}, ${formData.merchantState || '[State]'} ${formData.merchantZip || '[ZIP]'}
+${formData.merchantEmail || '[your@email.com]'}
+${formData.merchantPhone || '[Phone]'}
+
+${new Date(today).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+${formData.customerName || '[Customer Name]'}
+${formData.customerAddress || '[Customer Street Address]'}
+${formData.customerCity || '[City]'}, ${formData.customerState || '[State]'} ${formData.customerZip || '[ZIP]'}
+
+RE: Demand for Payment - Fraudulent Chargeback
+    Order #${formData.orderNumber || '[ORDER-NUMBER]'}
+    Transaction Date: ${formData.transactionDate ? new Date(formData.transactionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[Transaction Date]'}
+    Amount: $${formData.transactionAmount || '[Amount]'}
+
+Dear ${formData.customerName || '[Customer Name]'}:
+
+I am writing regarding a fraudulent chargeback you initiated with your ${formData.paymentMethod || 'credit card'} company for a purchase you made from ${formData.merchantName || '[Business Name]'}. You ordered ${formData.productService || '[product/service description]'} on ${formData.transactionDate ? new Date(formData.transactionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, received the ${formData.productService || 'product/service'}, and then filed a chargeback on ${formData.chargebackDate ? new Date(formData.chargebackDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'} claiming "${formData.chargebackReason || '[chargeback reason]'}."
+
+This is not a legitimate dispute. This is friendly fraud, also known as first-party fraud or chargeback fraud.
+
+EVIDENCE OF DELIVERY AND ACCEPTANCE
+
+Our records confirm that you:
+`;
+
+                if (formData.evidenceDelivery) {
+                    letter += `\n- Received the ${formData.productService || 'product/service'} as ordered`;
+                }
+                if (formData.evidenceSignature) {
+                    letter += `\n- Signed for delivery or accepted the service`;
+                }
+                if (formData.evidenceUsage) {
+                    letter += `\n- Used or consumed the product/service after delivery`;
+                }
+                if (formData.evidenceCommunication) {
+                    letter += `\n- Communicated with us after purchase confirming satisfaction`;
+                }
+                if (formData.evidenceTracking) {
+                    letter += `\n- Tracking shows delivery to your address: ${formData.evidenceTracking}`;
+                }
+                if (formData.evidenceIP) {
+                    letter += `\n- Made the purchase from IP address: ${formData.evidenceIP}`;
+                }
+
+                letter += `
+
+LEGAL CONSEQUENCES
+
+Filing a false chargeback is fraud. Under federal and state law, you can be held liable for:
+
+1. The original transaction amount: $${formData.transactionAmount || '[Amount]'}
+2. Chargeback fees and costs: $${(parseFloat(formData.transactionAmount) * 0.15).toFixed(2) || '[Fee Amount]'}
+3. Triple damages under applicable fraud statutes
+4. Attorney fees and court costs if we must sue
+5. Criminal prosecution for theft by deception
+
+Your chargeback claim of "${formData.chargebackReason || '[reason]'}" is demonstrably false. You received exactly what you ordered, in the condition promised, and you accepted it without complaint until filing this chargeback.
+
+DEMAND FOR PAYMENT
+
+You must pay ${formData.merchantName || '[Business Name]'} the full amount of $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} by ${deadlineStr}.
+
+You have three options:
+
+1. WITHDRAW YOUR CHARGEBACK: Contact ${formData.processorName || '[payment processor]'} immediately (Case #${formData.caseNumber || '[case number]'}) and withdraw your fraudulent claim.
+
+2. PAY DIRECTLY: Send payment for $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} to ${formData.merchantName || '[Business Name]'} at the address above via certified check or money order.
+
+3. DO NOTHING: If you do not resolve this by ${deadlineStr}, we will:
+   - Report this fraud to the payment processor
+   - File a police report for theft/fraud
+   - Sue you in civil court for the amount owed plus damages, fees, and costs
+   - Report the debt to credit bureaus
+   - Pursue criminal charges if appropriate
+
+REFUND POLICY
+
+${formData.evidenceRefundPolicy ? 'You agreed to our refund policy at the time of purchase. You did not request a refund through proper channels. Instead, you bypassed our merchant agreement and filed a false claim with your bank.' : 'If you had a legitimate issue with your purchase, you should have contacted us directly for a refund or resolution. Instead, you chose to commit fraud.'}
+
+SETTLEMENT OFFER
+
+If you pay the full amount of $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} by ${deadlineStr}, we will consider this matter resolved and will not pursue further legal action or criminal charges.
+
+DOCUMENTATION
+
+We have complete documentation of this transaction including:
+`;
+
+                if (formData.evidenceTerms) {
+                    letter += `\n- Your acceptance of our terms and conditions`;
+                }
+                if (formData.evidenceDelivery) {
+                    letter += `\n- Proof of delivery`;
+                }
+                if (formData.evidenceCommunication) {
+                    letter += `\n- All communications between us`;
+                }
+                letter += `\n- Payment authorization records
+- IP address and device information
+- Your chargeback claim and our rebuttal evidence
+
+All of this will be provided to law enforcement and the court if necessary.
+
+FINAL WARNING
+
+This is your only warning and opportunity to resolve this matter without legal consequences. Friendly fraud is not a victimless crime. It costs businesses billions of dollars annually and is prosecuted as theft in most jurisdictions.
+
+Make the right choice. Withdraw your chargeback or pay the amount you owe.
+
+You must respond by ${deadlineStr}.
+
+Sincerely,
+
+${formData.merchantName || '[Your Business Name]'}
+
+---
+NOTICE: This letter is not a threat. It is a statement of our legal rights and the consequences of filing a fraudulent chargeback. We have the right to pursue all legal remedies available to us under federal and state law. If you believe your chargeback was legitimate, you should consult with an attorney immediately.`;
+
+                return letter;
+            }, [formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            setShowToast(true);
+                            setTimeout(() => setShowToast(false), 3000);
+                        })
+                        .catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    alert('Please manually copy the text from the preview');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const downloadLetter = () => {
+                const blob = new Blob([documentText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `friendly-fraud-demand-${formData.customerName || 'letter'}-${formData.letterDate}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            const tabs = [
+                'Merchant Info',
+                'Customer Info',
+                'Transaction',
+                'Chargeback',
+                'Evidence',
+                'Demand'
+            ];
+
+            return (
+                <div className="container">
+                    <div className="card">
+                        <div className="tabs">
+                            {tabs.map((tab, index) => (
+                                <button
+                                    key={index}
+                                    className={`tab ${activeTab === index ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(index)}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="content-wrapper">
+                            <div className="form-section">
+                                {activeTab === 0 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Your Business Information</h2>
+
+                                        <div className="form-group">
+                                            <label>Business Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.merchantName}
+                                                onChange={(e) => updateField('merchantName', e.target.value)}
+                                                placeholder="Your Company LLC"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.merchantAddress}
+                                                onChange={(e) => updateField('merchantAddress', e.target.value)}
+                                                placeholder="123 Business St"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.merchantCity}
+                                                    onChange={(e) => updateField('merchantCity', e.target.value)}
+                                                    placeholder="New York"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.merchantState}
+                                                    onChange={(e) => updateField('merchantState', e.target.value)}
+                                                    placeholder="NY"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.merchantZip}
+                                                onChange={(e) => updateField('merchantZip', e.target.value)}
+                                                placeholder="10001"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={formData.merchantEmail}
+                                                    onChange={(e) => updateField('merchantEmail', e.target.value)}
+                                                    placeholder="contact@business.com"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Phone</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.merchantPhone}
+                                                    onChange={(e) => updateField('merchantPhone', e.target.value)}
+                                                    placeholder="(555) 123-4567"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 1 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Customer Information</h2>
+
+                                        <div className="form-group">
+                                            <label>Customer Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.customerName}
+                                                onChange={(e) => updateField('customerName', e.target.value)}
+                                                placeholder="John Smith"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Customer Email</label>
+                                            <input
+                                                type="email"
+                                                value={formData.customerEmail}
+                                                onChange={(e) => updateField('customerEmail', e.target.value)}
+                                                placeholder="customer@email.com"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.customerAddress}
+                                                onChange={(e) => updateField('customerAddress', e.target.value)}
+                                                placeholder="456 Customer Ln"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.customerCity}
+                                                    onChange={(e) => updateField('customerCity', e.target.value)}
+                                                    placeholder="Los Angeles"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.customerState}
+                                                    onChange={(e) => updateField('customerState', e.target.value)}
+                                                    placeholder="CA"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.customerZip}
+                                                onChange={(e) => updateField('customerZip', e.target.value)}
+                                                placeholder="90001"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 2 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Transaction Details</h2>
+
+                                        <div className="form-group">
+                                            <label>Order Number</label>
+                                            <input
+                                                type="text"
+                                                value={formData.orderNumber}
+                                                onChange={(e) => updateField('orderNumber', e.target.value)}
+                                                placeholder="ORD-12345"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Transaction Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.transactionDate}
+                                                    onChange={(e) => updateField('transactionDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Transaction Amount</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.transactionAmount}
+                                                    onChange={(e) => updateField('transactionAmount', e.target.value)}
+                                                    placeholder="299.99"
+                                                    step="0.01"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Payment Method</label>
+                                            <select
+                                                value={formData.paymentMethod}
+                                                onChange={(e) => updateField('paymentMethod', e.target.value)}
+                                            >
+                                                <option value="credit card">Credit Card</option>
+                                                <option value="debit card">Debit Card</option>
+                                                <option value="PayPal">PayPal</option>
+                                                <option value="Stripe">Stripe</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Product/Service Description</label>
+                                            <textarea
+                                                value={formData.productService}
+                                                onChange={(e) => updateField('productService', e.target.value)}
+                                                placeholder="Describe what the customer purchased..."
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 3 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Chargeback Details</h2>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Chargeback Date</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.chargebackDate}
+                                                    onChange={(e) => updateField('chargebackDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Dispute Amount</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.disputeAmount}
+                                                    onChange={(e) => updateField('disputeAmount', e.target.value)}
+                                                    placeholder="299.99"
+                                                    step="0.01"
+                                                />
+                                                <p className="info-text">Leave blank to use transaction amount</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Chargeback Reason Code/Description</label>
+                                            <input
+                                                type="text"
+                                                value={formData.chargebackReason}
+                                                onChange={(e) => updateField('chargebackReason', e.target.value)}
+                                                placeholder="e.g., 'Product not received' or 'Unauthorized transaction'"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Payment Processor</label>
+                                            <input
+                                                type="text"
+                                                value={formData.processorName}
+                                                onChange={(e) => updateField('processorName', e.target.value)}
+                                                placeholder="e.g., Stripe, Chase, PayPal"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Case/Reference Number</label>
+                                            <input
+                                                type="text"
+                                                value={formData.caseNumber}
+                                                onChange={(e) => updateField('caseNumber', e.target.value)}
+                                                placeholder="CB-123456"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 4 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Evidence of Fraud</h2>
+
+                                        <div className="warning-box">
+                                            <p><strong>Important:</strong> Only select evidence you actually have. False statements can expose you to legal liability.</p>
+                                        </div>
+
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="delivery"
+                                                    checked={formData.evidenceDelivery}
+                                                    onChange={(e) => updateField('evidenceDelivery', e.target.checked)}
+                                                />
+                                                <label htmlFor="delivery">Customer received the product/service as ordered</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="signature"
+                                                    checked={formData.evidenceSignature}
+                                                    onChange={(e) => updateField('evidenceSignature', e.target.checked)}
+                                                />
+                                                <label htmlFor="signature">Have signature confirmation or acceptance proof</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="usage"
+                                                    checked={formData.evidenceUsage}
+                                                    onChange={(e) => updateField('evidenceUsage', e.target.checked)}
+                                                />
+                                                <label htmlFor="usage">Customer used/consumed the product after delivery</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="communication"
+                                                    checked={formData.evidenceCommunication}
+                                                    onChange={(e) => updateField('evidenceCommunication', e.target.checked)}
+                                                />
+                                                <label htmlFor="communication">Have post-purchase communications confirming satisfaction</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="refundPolicy"
+                                                    checked={formData.evidenceRefundPolicy}
+                                                    onChange={(e) => updateField('evidenceRefundPolicy', e.target.checked)}
+                                                />
+                                                <label htmlFor="refundPolicy">Customer agreed to refund policy at purchase</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="terms"
+                                                    checked={formData.evidenceTerms}
+                                                    onChange={(e) => updateField('evidenceTerms', e.target.checked)}
+                                                />
+                                                <label htmlFor="terms">Customer accepted terms and conditions</label>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                                            <label>Tracking Number (if applicable)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.evidenceTracking}
+                                                onChange={(e) => updateField('evidenceTracking', e.target.value)}
+                                                placeholder="1Z999AA10123456784"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>IP Address (if available)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.evidenceIP}
+                                                onChange={(e) => updateField('evidenceIP', e.target.value)}
+                                                placeholder="192.168.1.1"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 5 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Payment Demand</h2>
+
+                                        <div className="warning-box">
+                                            <p><strong>Legal Notice:</strong> This generator creates a formal demand letter asserting your rights. It is not a threat, but a statement of legal remedies available under federal and state law. Consult an attorney if you're unsure about any claims made in this letter.</p>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Letter Date</label>
+                                            <input
+                                                type="date"
+                                                value={formData.letterDate}
+                                                onChange={(e) => updateField('letterDate', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Payment Deadline (days from letter date)</label>
+                                            <select
+                                                value={formData.deadlineDays}
+                                                onChange={(e) => updateField('deadlineDays', e.target.value)}
+                                            >
+                                                <option value="7">7 days</option>
+                                                <option value="10">10 days</option>
+                                                <option value="14">14 days</option>
+                                                <option value="21">21 days</option>
+                                                <option value="30">30 days</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="warning-box" style={{ background: '#fef2f2', borderColor: '#ef4444' }}>
+                                            <p style={{ color: '#7f1d1d' }}><strong>Anti-Extortion Safeguards:</strong> This letter does NOT demand payment for dropping criminal charges, threaten deportation, or make threats unrelated to the civil debt. Review the generated letter carefully to ensure compliance with FDCPA and your state's laws.</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="preview-section">
+                                <h3 style={{ marginBottom: '1rem', color: '#1a202c' }}>Preview</h3>
+                                <div className="preview-container">
+                                    <pre className="document-preview">{documentText}</pre>
+                                </div>
+                                <div className="button-group">
+                                    <button className="btn btn-primary" onClick={copyToClipboard}>
+                                        Copy to Clipboard
+                                    </button>
+                                    <button className="btn btn-secondary" onClick={downloadLetter}>
+                                        Download Letter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {showToast && (
+                        <div className="toast">
+                            ✓ Copied to clipboard!
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<FriendlyFraudGenerator />);
+    </script>
+</body>
+</html>
