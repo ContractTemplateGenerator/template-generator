@@ -292,7 +292,7 @@
                 merchantName: '',
                 merchantAddress: '',
                 merchantCity: '',
-                merchantState: '',
+                merchantState: 'CA',
                 merchantZip: '',
                 merchantEmail: '',
                 merchantPhone: '',
@@ -306,28 +306,53 @@
                 customerZip: '',
 
                 // Transaction Details
+                productType: 'digital',
                 orderNumber: '',
                 transactionDate: '',
                 transactionAmount: '',
+                chargebackFee: '',
+                processorPenalty: '',
                 paymentMethod: 'credit card',
                 productService: '',
 
                 // Chargeback Details
                 chargebackDate: '',
-                chargebackReason: '',
-                disputeAmount: '',
+                chargebackReasonCode: 'fraud',
+                chargebackReasonText: '',
                 processorName: '',
                 caseNumber: '',
+                networkOutcome: '',
+                repeatOffender: false,
+                priorTransactions: '',
 
-                // Evidence
+                // Evidence - Contract & Terms
+                evidenceTerms: false,
+                evidenceRefundPolicy: false,
+                hasForumSelection: false,
+
+                // Evidence - Delivery & Receipt
                 evidenceDelivery: false,
                 evidenceSignature: false,
-                evidenceUsage: false,
-                evidenceCommunication: false,
-                evidenceRefundPolicy: false,
-                evidenceTerms: false,
                 evidenceTracking: '',
+
+                // Evidence - Usage (Digital/Subscription)
+                evidenceLoginLogs: false,
+                evidenceUsageMetrics: false,
+                evidenceDownloads: false,
+                loginDetails: '',
+
+                // Evidence - Communications
+                evidenceCommunications: false,
+                communicationDetails: '',
+
+                // Evidence - Device/IP
                 evidenceIP: '',
+                evidenceDevice: '',
+
+                // Legal Approach
+                legalTheory: 'contract',
+                toneLevel: 'firm',
+                offerSettlement: false,
 
                 // Demand
                 deadlineDays: '10',
@@ -338,11 +363,36 @@
                 setFormData(prev => ({ ...prev, [field]: value }));
             };
 
+            const smallClaimsLimits = {
+                'CA': { individual: 12500, business: 6250 },
+                'NY': { individual: 10000, business: 10000 },
+                'TX': { individual: 20000, business: 20000 },
+                'FL': { individual: 8000, business: 8000 },
+                'IL': { individual: 10000, business: 10000 },
+                'Other': { individual: 5000, business: 5000 }
+            };
+
+            const totalDemand = useMemo(() => {
+                const trans = parseFloat(formData.transactionAmount) || 0;
+                const cbFee = parseFloat(formData.chargebackFee) || 0;
+                const penalty = parseFloat(formData.processorPenalty) || 0;
+                return (trans + cbFee + penalty).toFixed(2);
+            }, [formData.transactionAmount, formData.chargebackFee, formData.processorPenalty]);
+
             const documentText = useMemo(() => {
                 const today = formData.letterDate || new Date().toISOString().split('T')[0];
                 const deadline = new Date(today);
                 deadline.setDate(deadline.getDate() + parseInt(formData.deadlineDays || 10));
                 const deadlineStr = deadline.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                const reasonCodeMap = {
+                    'fraud': 'Fraud / Unauthorized Transaction',
+                    'not_received': 'Goods or Services Not Received',
+                    'not_as_described': 'Goods or Services Not as Described',
+                    'duplicate': 'Duplicate Processing',
+                    'credit_not_processed': 'Credit Not Processed',
+                    'other': formData.chargebackReasonText || 'Disputed Charge'
+                };
 
                 let letter = `${formData.merchantName || '[Your Business Name]'}
 ${formData.merchantAddress || '[Your Street Address]'}
@@ -363,110 +413,222 @@ RE: Demand for Payment - Fraudulent Chargeback
 
 Dear ${formData.customerName || '[Customer Name]'}:
 
-I am writing regarding a fraudulent chargeback you initiated with your ${formData.paymentMethod || 'credit card'} company for a purchase you made from ${formData.merchantName || '[Business Name]'}. You ordered ${formData.productService || '[product/service description]'} on ${formData.transactionDate ? new Date(formData.transactionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, received the ${formData.productService || 'product/service'}, and then filed a chargeback on ${formData.chargebackDate ? new Date(formData.chargebackDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'} claiming "${formData.chargebackReason || '[chargeback reason]'}."
+I am writing regarding ${formData.repeatOffender ? 'multiple fraudulent chargebacks' : 'a fraudulent chargeback'} you initiated with your ${formData.paymentMethod || 'credit card'} company for ${formData.repeatOffender ? 'purchases' : 'a purchase'} you made from ${formData.merchantName || '[Business Name]'}.
 
-This is not a legitimate dispute. This is friendly fraud, also known as first-party fraud or chargeback fraud.
+FACTUAL BACKGROUND
 
-EVIDENCE OF DELIVERY AND ACCEPTANCE
+On ${formData.transactionDate ? new Date(formData.transactionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, you ordered ${formData.productService || '[product/service description]'} from us. `;
 
-Our records confirm that you:
+                if (formData.evidenceTerms) {
+                    letter += `You reviewed and accepted our terms of service at checkout, including our refund policy and dispute resolution procedures. `;
+                }
+
+                letter += `The total charge was $${formData.transactionAmount || '[Amount]'}, which you authorized using your ${formData.paymentMethod || 'payment method'}.
+
 `;
 
-                if (formData.evidenceDelivery) {
-                    letter += `\n- Received the ${formData.productService || 'product/service'} as ordered`;
+                // Evidence of delivery based on product type
+                if (formData.productType === 'physical') {
+                    letter += `We fulfilled our obligations by shipping the product to your address`;
+                    if (formData.evidenceTracking) {
+                        letter += ` via ${formData.evidenceTracking.includes('1Z') ? 'UPS' : formData.evidenceTracking.includes('92') ? 'USPS' : 'carrier'} (Tracking: ${formData.evidenceTracking})`;
+                    }
+                    if (formData.evidenceSignature) {
+                        letter += `, with signature confirmation showing you personally received it`;
+                    }
+                    letter += `. `;
+                } else if (formData.productType === 'digital' || formData.productType === 'subscription') {
+                    letter += `We delivered the ${formData.productType === 'digital' ? 'digital product' : 'subscription service'} immediately upon purchase. `;
+                    if (formData.evidenceLoginLogs) {
+                        letter += `Our login records show you accessed your account ${formData.loginDetails || 'multiple times after purchase'}. `;
+                    }
+                    if (formData.evidenceUsageMetrics) {
+                        letter += `Our usage analytics demonstrate active engagement with the ${formData.productType === 'digital' ? 'product' : 'service'}. `;
+                    }
+                    if (formData.evidenceDownloads) {
+                        letter += `You downloaded the content immediately after purchase. `;
+                    }
                 }
-                if (formData.evidenceSignature) {
-                    letter += `\n- Signed for delivery or accepted the service`;
-                }
-                if (formData.evidenceUsage) {
-                    letter += `\n- Used or consumed the product/service after delivery`;
-                }
-                if (formData.evidenceCommunication) {
-                    letter += `\n- Communicated with us after purchase confirming satisfaction`;
-                }
-                if (formData.evidenceTracking) {
-                    letter += `\n- Tracking shows delivery to your address: ${formData.evidenceTracking}`;
-                }
-                if (formData.evidenceIP) {
-                    letter += `\n- Made the purchase from IP address: ${formData.evidenceIP}`;
+
+                if (formData.evidenceCommunications) {
+                    letter += `\n\n${formData.communicationDetails || 'You communicated with us after the purchase, confirming receipt and use of what you ordered.'}`;
                 }
 
-                letter += `
+                letter += `\n\nOn ${formData.chargebackDate ? new Date(formData.chargebackDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '[date]'}, you filed a chargeback claiming "${reasonCodeMap[formData.chargebackReasonCode]}."`;
 
-LEGAL CONSEQUENCES
+                if (formData.networkOutcome) {
+                    letter += ` ${formData.networkOutcome}`;
+                }
 
-Filing a false chargeback is fraud. Under federal and state law, you can be held liable for:
+                if (formData.priorTransactions) {
+                    letter += `\n\nThis is not your first transaction with us. ${formData.priorTransactions} Yet you chose to dispute this particular charge as "unauthorized" or "fraud," demonstrating that this is not a case of identity theft or actual fraud, but rather a deliberate misuse of the chargeback system.`;
+                }
 
-1. The original transaction amount: $${formData.transactionAmount || '[Amount]'}
-2. Chargeback fees and costs: $${(parseFloat(formData.transactionAmount) * 0.15).toFixed(2) || '[Fee Amount]'}
-3. Triple damages under applicable fraud statutes
-4. Attorney fees and court costs if we must sue
-5. Criminal prosecution for theft by deception
+                letter += `\n\nWHY THIS CHARGEBACK IS IMPROPER
 
-Your chargeback claim of "${formData.chargebackReason || '[reason]'}" is demonstrably false. You received exactly what you ordered, in the condition promised, and you accepted it without complaint until filing this chargeback.
+Your chargeback claim is demonstrably false. `;
 
-DEMAND FOR PAYMENT
+                if (formData.chargebackReasonCode === 'fraud' && (formData.evidenceIP || formData.evidenceDevice || formData.evidenceLoginLogs)) {
+                    letter += `You claimed the charge was unauthorized, but `;
+                    if (formData.evidenceIP) {
+                        letter += `the purchase was made from IP address ${formData.evidenceIP}, which matches your `;
+                    }
+                    if (formData.evidenceDevice) {
+                        letter += `usual device (${formData.evidenceDevice})`;
+                    }
+                    letter += `. `;
+                } else if (formData.chargebackReasonCode === 'not_received' && (formData.evidenceTracking || formData.evidenceLoginLogs)) {
+                    letter += `You claimed you did not receive the ${formData.productType === 'physical' ? 'product' : 'service'}, but our records prove otherwise. `;
+                }
 
-You must pay ${formData.merchantName || '[Business Name]'} the full amount of $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} by ${deadlineStr}.
+                letter += `You received exactly what you ordered, in the condition promised, and you `;
+                if (formData.productType === 'physical') {
+                    letter += `accepted delivery without complaint`;
+                } else {
+                    letter += `actively used the ${formData.productType === 'digital' ? 'product' : 'service'}`;
+                }
+                letter += ` until you decided to file this chargeback.
 
-You have three options:
+`;
 
-1. WITHDRAW YOUR CHARGEBACK: Contact ${formData.processorName || '[payment processor]'} immediately (Case #${formData.caseNumber || '[case number]'}) and withdraw your fraudulent claim.
+                if (formData.evidenceRefundPolicy && !formData.evidenceCommunications) {
+                    letter += `If you had a legitimate problem, our refund policy provided a process to request a refund. You did not contact us to report any issue or request a refund through proper channels. Instead, you bypassed our merchant agreement and filed a false claim with your bank.
 
-2. PAY DIRECTLY: Send payment for $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} to ${formData.merchantName || '[Business Name]'} at the address above via certified check or money order.
+`;
+                }
 
-3. DO NOTHING: If you do not resolve this by ${deadlineStr}, we will:
-   - Report this fraud to the payment processor
-   - File a police report for theft/fraud
-   - Sue you in civil court for the amount owed plus damages, fees, and costs
-   - Report the debt to credit bureaus
-   - Pursue criminal charges if appropriate
+                letter += `This is not a legitimate dispute. This is friendly fraud, also known as first-party fraud or chargeback fraud.
 
-REFUND POLICY
+LEGAL BASIS FOR OUR CLAIM
 
-${formData.evidenceRefundPolicy ? 'You agreed to our refund policy at the time of purchase. You did not request a refund through proper channels. Instead, you bypassed our merchant agreement and filed a false claim with your bank.' : 'If you had a legitimate issue with your purchase, you should have contacted us directly for a refund or resolution. Instead, you chose to commit fraud.'}
+`;
 
-SETTLEMENT OFFER
+                if (formData.legalTheory === 'contract') {
+                    letter += `By placing your order and accepting our terms, you entered into a binding contract. We performed our obligations under that contract by delivering the ${formData.productService || 'product/service'} as promised. Your obligation was to pay the agreed price. By obtaining a refund through false statements to your bank while retaining the benefit of what you purchased, you have breached the contract.
 
-If you pay the full amount of $${formData.disputeAmount || formData.transactionAmount || '[Amount]'} by ${deadlineStr}, we will consider this matter resolved and will not pursue further legal action or criminal charges.
+Under basic principles of contract law, you are liable for the full amount you agreed to pay, plus any additional costs we incurred as a result of your breach.`;
+                } else if (formData.legalTheory === 'unjust') {
+                    letter += `Even setting aside the formal contract, you received ${formData.productService || 'a product/service'} of value, you retained and used that value, and you obtained a refund through misrepresentations to your bank. You have been unjustly enriched at our expense.
+
+Under the doctrine of unjust enrichment, you must pay restitution for the value you received and retained.`;
+                } else if (formData.legalTheory === 'fraud') {
+                    letter += `You made specific false statements to your bank in order to obtain money—specifically, you claimed ${formData.chargebackReasonCode === 'fraud' ? 'the charge was unauthorized' : formData.chargebackReasonCode === 'not_received' ? 'you did not receive the goods' : 'the charge was invalid'} when you knew this was not true.
+
+Making intentionally false statements to obtain money constitutes fraud under both civil and criminal law. You can be held liable for:
+- The amount wrongfully obtained
+- Multiple damages under fraud statutes (commonly triple damages)
+- Attorney fees and costs of collection
+- Potential criminal prosecution for theft by deception`;
+                } else {
+                    letter += `You breached our contract by refusing to pay for goods/services you received, and you have been unjustly enriched by obtaining both the product/service and a refund. In cases involving deliberately false statements, your conduct may also constitute fraud.`;
+                }
+
+                letter += `\n\nAMOUNT OWED
+
+You must pay the following:
+
+`;
+                if (formData.transactionAmount) {
+                    letter += `- Transaction amount: $${formData.transactionAmount}\n`;
+                }
+                if (formData.chargebackFee) {
+                    letter += `- Chargeback fee: $${formData.chargebackFee}\n`;
+                }
+                if (formData.processorPenalty) {
+                    letter += `- Processor penalty: $${formData.processorPenalty}\n`;
+                }
+                letter += `\nTOTAL OWED: $${totalDemand}
+
+DEMAND AND DEADLINE
+
+You have until ${deadlineStr} to resolve this matter. You have three options:
+
+1. WITHDRAW YOUR CHARGEBACK: Contact ${formData.processorName || '[your card issuer]'} immediately`;
+                if (formData.caseNumber) {
+                    letter += ` (Case #${formData.caseNumber})`;
+                }
+                letter += ` and withdraw your fraudulent claim. Advise them you received the ${formData.productType === 'physical' ? 'goods' : 'service'} and the charge was valid.
+
+2. PAY DIRECTLY: Send payment for $${totalDemand} to ${formData.merchantName || '[Business Name]'} at the address above via certified check or money order.
+`;
+
+                if (formData.offerSettlement) {
+                    letter += `\n   If you cannot pay the full amount immediately, contact me by ${deadlineStr} to discuss a payment plan. This offer expires on the deadline date.
+`;
+                }
+
+                letter += `\n3. DO NOTHING: If we do not receive payment or a settlement proposal by ${deadlineStr}, we will file a lawsuit against you in small claims court`;
+
+                const limit = smallClaimsLimits[formData.merchantState] || smallClaimsLimits['Other'];
+                letter += ` (the ${formData.merchantState} small claims limit for businesses is $${limit.business.toLocaleString()}, and your debt of $${totalDemand} falls within that limit)`;
+
+                if (formData.hasForumSelection) {
+                    letter += `. Our terms of service require disputes to be resolved in ${formData.merchantState}, so the case will be filed there`;
+                }
+
+                letter += `.
+
+   If we obtain a judgment against you and you still do not pay, we will pursue collection through:
+   - Wage garnishment
+   - Bank account levies
+   - Credit reporting
+   - Collection agency referral with additional fees
+
+`;
+
+                if (formData.toneLevel === 'aggressive' || formData.legalTheory === 'fraud') {
+                    letter += `ADDITIONAL CONSEQUENCES
+
+Filing false chargebacks is not a victimless act. It is fraud, and it can be prosecuted criminally in most jurisdictions. We reserve all rights, including the right to report patterns of fraudulent chargeback activity to law enforcement and payment processors.
+
+We will also submit evidence of this chargeback fraud to payment processors, which may result in your card being flagged or your ability to dispute future charges being restricted.
+
+`;
+                }
+
+                letter += `SETTLEMENT
+
+If you pay the full amount of $${totalDemand} by ${deadlineStr}, we will consider this matter resolved and will not pursue litigation. This is your opportunity to resolve this matter quickly and avoid court costs, attorney fees, and a judgment on your record.
 
 DOCUMENTATION
 
-We have complete documentation of this transaction including:
+We have assembled a complete evidence file for this transaction, including:
 `;
 
-                if (formData.evidenceTerms) {
-                    letter += `\n- Your acceptance of our terms and conditions`;
-                }
-                if (formData.evidenceDelivery) {
-                    letter += `\n- Proof of delivery`;
-                }
-                if (formData.evidenceCommunication) {
-                    letter += `\n- All communications between us`;
-                }
+                if (formData.evidenceTerms) letter += `\n- Your acceptance of our terms of service at checkout`;
+                if (formData.evidenceTracking) letter += `\n- Carrier tracking and delivery confirmation`;
+                if (formData.evidenceSignature) letter += `\n- Signature confirmation showing personal receipt`;
+                if (formData.evidenceLoginLogs) letter += `\n- Login records showing account access after purchase`;
+                if (formData.evidenceUsageMetrics) letter += `\n- Usage analytics demonstrating active engagement`;
+                if (formData.evidenceDownloads) letter += `\n- Download records and timestamps`;
+                if (formData.evidenceCommunications) letter += `\n- All email and support communications with you`;
+                if (formData.evidenceIP) letter += `\n- IP address data matching your usual location`;
+                if (formData.evidenceDevice) letter += `\n- Device fingerprint information`;
                 letter += `\n- Payment authorization records
-- IP address and device information
-- Your chargeback claim and our rebuttal evidence
+- Your chargeback claim documentation
+- Our representment evidence submitted to the card network`;
 
-All of this will be provided to law enforcement and the court if necessary.
+                if (formData.priorTransactions) {
+                    letter += `\n- Records of your prior undisputed transactions with us`;
+                }
 
-FINAL WARNING
+                letter += `\n\nAll of this documentation will be presented to the court if you do not resolve this matter voluntarily.
 
-This is your only warning and opportunity to resolve this matter without legal consequences. Friendly fraud is not a victimless crime. It costs businesses billions of dollars annually and is prosecuted as theft in most jurisdictions.
+RESPONSE REQUIRED
 
-Make the right choice. Withdraw your chargeback or pay the amount you owe.
+You must respond by ${deadlineStr}. Contact me at ${formData.merchantEmail || '[email]'} or ${formData.merchantPhone || '[phone]'} to make payment arrangements or discuss resolution.
 
-You must respond by ${deadlineStr}.
+If you believe there are facts I am not aware of or if you have a legitimate reason why this charge should not have been processed, contact me immediately to discuss. However, the evidence in our file is clear and comprehensive.
 
 Sincerely,
 
 ${formData.merchantName || '[Your Business Name]'}
 
 ---
-NOTICE: This letter is not a threat. It is a statement of our legal rights and the consequences of filing a fraudulent chargeback. We have the right to pursue all legal remedies available to us under federal and state law. If you believe your chargeback was legitimate, you should consult with an attorney immediately.`;
+NOTICE: This letter is not a threat or an attempt to extort payment. It is a formal statement of our legal rights under contract law and applicable fraud statutes. We have the right to pursue all civil remedies available to us, including filing suit to collect this debt. The reference to potential criminal fraud statutes is informational; we are not conditioning any decision about criminal complaints on whether you pay this civil debt. If you believe your chargeback was legitimate, consult with an attorney immediately.`;
 
                 return letter;
-            }, [formData]);
+            }, [formData, totalDemand]);
 
             const copyToClipboard = () => {
                 const text = documentText;
@@ -514,11 +676,12 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
             };
 
             const tabs = [
-                'Merchant Info',
-                'Customer Info',
+                'Merchant',
+                'Customer',
                 'Transaction',
                 'Chargeback',
                 'Evidence',
+                'Legal',
                 'Demand'
             ];
 
@@ -570,18 +733,23 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                                     type="text"
                                                     value={formData.merchantCity}
                                                     onChange={(e) => updateField('merchantCity', e.target.value)}
-                                                    placeholder="New York"
+                                                    placeholder="Los Angeles"
                                                 />
                                             </div>
 
                                             <div className="form-group">
-                                                <label>State</label>
-                                                <input
-                                                    type="text"
+                                                <label>State (for small claims court)</label>
+                                                <select
                                                     value={formData.merchantState}
                                                     onChange={(e) => updateField('merchantState', e.target.value)}
-                                                    placeholder="NY"
-                                                />
+                                                >
+                                                    <option value="CA">California</option>
+                                                    <option value="NY">New York</option>
+                                                    <option value="TX">Texas</option>
+                                                    <option value="FL">Florida</option>
+                                                    <option value="IL">Illinois</option>
+                                                    <option value="Other">Other State</option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -591,7 +759,7 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                                 type="text"
                                                 value={formData.merchantZip}
                                                 onChange={(e) => updateField('merchantZip', e.target.value)}
-                                                placeholder="10001"
+                                                placeholder="90001"
                                             />
                                         </div>
 
@@ -660,7 +828,7 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                                     type="text"
                                                     value={formData.customerCity}
                                                     onChange={(e) => updateField('customerCity', e.target.value)}
-                                                    placeholder="Los Angeles"
+                                                    placeholder="San Francisco"
                                                 />
                                             </div>
 
@@ -681,7 +849,7 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                                 type="text"
                                                 value={formData.customerZip}
                                                 onChange={(e) => updateField('customerZip', e.target.value)}
-                                                placeholder="90001"
+                                                placeholder="94102"
                                             />
                                         </div>
                                     </div>
@@ -690,6 +858,19 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                 {activeTab === 2 && (
                                     <div>
                                         <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Transaction Details</h2>
+
+                                        <div className="form-group">
+                                            <label>Product/Service Type</label>
+                                            <select
+                                                value={formData.productType}
+                                                onChange={(e) => updateField('productType', e.target.value)}
+                                            >
+                                                <option value="physical">Physical Goods</option>
+                                                <option value="digital">Digital Product</option>
+                                                <option value="subscription">Subscription Service</option>
+                                            </select>
+                                            <p className="info-text">This affects what evidence fields are most relevant</p>
+                                        </div>
 
                                         <div className="form-group">
                                             <label>Order Number</label>
@@ -712,28 +893,52 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                             </div>
 
                                             <div className="form-group">
-                                                <label>Transaction Amount</label>
-                                                <input
-                                                    type="number"
-                                                    value={formData.transactionAmount}
-                                                    onChange={(e) => updateField('transactionAmount', e.target.value)}
-                                                    placeholder="299.99"
-                                                    step="0.01"
-                                                />
+                                                <label>Payment Method</label>
+                                                <select
+                                                    value={formData.paymentMethod}
+                                                    onChange={(e) => updateField('paymentMethod', e.target.value)}
+                                                >
+                                                    <option value="credit card">Credit Card</option>
+                                                    <option value="debit card">Debit Card</option>
+                                                    <option value="PayPal">PayPal</option>
+                                                    <option value="Apple Pay">Apple Pay</option>
+                                                </select>
                                             </div>
                                         </div>
 
                                         <div className="form-group">
-                                            <label>Payment Method</label>
-                                            <select
-                                                value={formData.paymentMethod}
-                                                onChange={(e) => updateField('paymentMethod', e.target.value)}
-                                            >
-                                                <option value="credit card">Credit Card</option>
-                                                <option value="debit card">Debit Card</option>
-                                                <option value="PayPal">PayPal</option>
-                                                <option value="Stripe">Stripe</option>
-                                            </select>
+                                            <label>Transaction Amount</label>
+                                            <input
+                                                type="number"
+                                                value={formData.transactionAmount}
+                                                onChange={(e) => updateField('transactionAmount', e.target.value)}
+                                                placeholder="299.99"
+                                                step="0.01"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Chargeback Fee (optional)</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.chargebackFee}
+                                                    onChange={(e) => updateField('chargebackFee', e.target.value)}
+                                                    placeholder="25.00"
+                                                    step="0.01"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Processor Penalty (optional)</label>
+                                                <input
+                                                    type="number"
+                                                    value={formData.processorPenalty}
+                                                    onChange={(e) => updateField('processorPenalty', e.target.value)}
+                                                    placeholder="50.00"
+                                                    step="0.01"
+                                                />
+                                            </div>
                                         </div>
 
                                         <div className="form-group">
@@ -741,9 +946,15 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                             <textarea
                                                 value={formData.productService}
                                                 onChange={(e) => updateField('productService', e.target.value)}
-                                                placeholder="Describe what the customer purchased..."
+                                                placeholder="Describe what the customer purchased (e.g., 'premium subscription to our SaaS platform' or 'Sony WH-1000XM4 headphones')"
                                             />
                                         </div>
+
+                                        {totalDemand > 0 && (
+                                            <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+                                                <strong>Total Amount Demanded: ${totalDemand}</strong>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
@@ -751,160 +962,328 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                     <div>
                                         <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Chargeback Details</h2>
 
+                                        <div className="form-group">
+                                            <label>Chargeback Reason Code</label>
+                                            <select
+                                                value={formData.chargebackReasonCode}
+                                                onChange={(e) => updateField('chargebackReasonCode', e.target.value)}
+                                            >
+                                                <option value="fraud">Fraud / Unauthorized Transaction</option>
+                                                <option value="not_received">Goods or Services Not Received</option>
+                                                <option value="not_as_described">Not as Described / Defective</option>
+                                                <option value="duplicate">Duplicate Processing</option>
+                                                <option value="credit_not_processed">Credit Not Processed</option>
+                                                <option value="other">Other (specify below)</option>
+                                            </select>
+                                        </div>
+
+                                        {formData.chargebackReasonCode === 'other' && (
+                                            <div className="form-group">
+                                                <label>Custom Reason Description</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.chargebackReasonText}
+                                                    onChange={(e) => updateField('chargebackReasonText', e.target.value)}
+                                                    placeholder="Describe the customer's stated reason"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="form-group">
+                                            <label>Chargeback Date</label>
+                                            <input
+                                                type="date"
+                                                value={formData.chargebackDate}
+                                                onChange={(e) => updateField('chargebackDate', e.target.value)}
+                                            />
+                                        </div>
+
                                         <div className="row">
                                             <div className="form-group">
-                                                <label>Chargeback Date</label>
+                                                <label>Payment Processor</label>
                                                 <input
-                                                    type="date"
-                                                    value={formData.chargebackDate}
-                                                    onChange={(e) => updateField('chargebackDate', e.target.value)}
+                                                    type="text"
+                                                    value={formData.processorName}
+                                                    onChange={(e) => updateField('processorName', e.target.value)}
+                                                    placeholder="Stripe, Chase, Visa, etc."
                                                 />
                                             </div>
 
                                             <div className="form-group">
-                                                <label>Dispute Amount</label>
+                                                <label>Case Number</label>
                                                 <input
-                                                    type="number"
-                                                    value={formData.disputeAmount}
-                                                    onChange={(e) => updateField('disputeAmount', e.target.value)}
-                                                    placeholder="299.99"
-                                                    step="0.01"
+                                                    type="text"
+                                                    value={formData.caseNumber}
+                                                    onChange={(e) => updateField('caseNumber', e.target.value)}
+                                                    placeholder="CB-123456"
                                                 />
-                                                <p className="info-text">Leave blank to use transaction amount</p>
                                             </div>
                                         </div>
 
                                         <div className="form-group">
-                                            <label>Chargeback Reason Code/Description</label>
-                                            <input
-                                                type="text"
-                                                value={formData.chargebackReason}
-                                                onChange={(e) => updateField('chargebackReason', e.target.value)}
-                                                placeholder="e.g., 'Product not received' or 'Unauthorized transaction'"
+                                            <label>Network Dispute Outcome (optional)</label>
+                                            <textarea
+                                                value={formData.networkOutcome}
+                                                onChange={(e) => updateField('networkOutcome', e.target.value)}
+                                                placeholder="Example: 'We submitted compelling evidence through our processor, but the issuing bank upheld the customer's claim.' or 'The bank reversed our representment despite clear delivery proof.'"
+                                                rows="3"
                                             />
+                                            <p className="info-text">Describe the result of your representment, if applicable</p>
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>Payment Processor</label>
+                                        <div className="checkbox-item">
                                             <input
-                                                type="text"
-                                                value={formData.processorName}
-                                                onChange={(e) => updateField('processorName', e.target.value)}
-                                                placeholder="e.g., Stripe, Chase, PayPal"
+                                                type="checkbox"
+                                                id="repeatOffender"
+                                                checked={formData.repeatOffender}
+                                                onChange={(e) => updateField('repeatOffender', e.target.checked)}
                                             />
+                                            <label htmlFor="repeatOffender">This customer has filed multiple chargebacks against us</label>
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>Case/Reference Number</label>
-                                            <input
-                                                type="text"
-                                                value={formData.caseNumber}
-                                                onChange={(e) => updateField('caseNumber', e.target.value)}
-                                                placeholder="CB-123456"
-                                            />
-                                        </div>
+                                        {formData.repeatOffender && (
+                                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                <label>Prior Undisputed Transactions (for Visa CE 3.0)</label>
+                                                <textarea
+                                                    value={formData.priorTransactions}
+                                                    onChange={(e) => updateField('priorTransactions', e.target.value)}
+                                                    placeholder="Example: 'You made three prior purchases on the same card on June 1, July 15, and August 3, totaling $847, none of which you disputed.'"
+                                                    rows="3"
+                                                />
+                                                <p className="info-text">Describe previous transactions that establish a pattern</p>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
 
                                 {activeTab === 4 && (
                                     <div>
-                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Evidence of Fraud</h2>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Evidence Documentation</h2>
 
                                         <div className="warning-box">
-                                            <p><strong>Important:</strong> Only select evidence you actually have. False statements can expose you to legal liability.</p>
+                                            <p><strong>Critical:</strong> Only check boxes for evidence you actually possess. Making false claims about evidence can expose you to sanctions and undermine your case.</p>
                                         </div>
 
+                                        <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#4a5568' }}>Contract & Terms</h3>
                                         <div className="checkbox-group">
                                             <div className="checkbox-item">
                                                 <input
                                                     type="checkbox"
-                                                    id="delivery"
-                                                    checked={formData.evidenceDelivery}
-                                                    onChange={(e) => updateField('evidenceDelivery', e.target.checked)}
-                                                />
-                                                <label htmlFor="delivery">Customer received the product/service as ordered</label>
-                                            </div>
-
-                                            <div className="checkbox-item">
-                                                <input
-                                                    type="checkbox"
-                                                    id="signature"
-                                                    checked={formData.evidenceSignature}
-                                                    onChange={(e) => updateField('evidenceSignature', e.target.checked)}
-                                                />
-                                                <label htmlFor="signature">Have signature confirmation or acceptance proof</label>
-                                            </div>
-
-                                            <div className="checkbox-item">
-                                                <input
-                                                    type="checkbox"
-                                                    id="usage"
-                                                    checked={formData.evidenceUsage}
-                                                    onChange={(e) => updateField('evidenceUsage', e.target.checked)}
-                                                />
-                                                <label htmlFor="usage">Customer used/consumed the product after delivery</label>
-                                            </div>
-
-                                            <div className="checkbox-item">
-                                                <input
-                                                    type="checkbox"
-                                                    id="communication"
-                                                    checked={formData.evidenceCommunication}
-                                                    onChange={(e) => updateField('evidenceCommunication', e.target.checked)}
-                                                />
-                                                <label htmlFor="communication">Have post-purchase communications confirming satisfaction</label>
-                                            </div>
-
-                                            <div className="checkbox-item">
-                                                <input
-                                                    type="checkbox"
-                                                    id="refundPolicy"
-                                                    checked={formData.evidenceRefundPolicy}
-                                                    onChange={(e) => updateField('evidenceRefundPolicy', e.target.checked)}
-                                                />
-                                                <label htmlFor="refundPolicy">Customer agreed to refund policy at purchase</label>
-                                            </div>
-
-                                            <div className="checkbox-item">
-                                                <input
-                                                    type="checkbox"
-                                                    id="terms"
+                                                    id="evidenceTerms"
                                                     checked={formData.evidenceTerms}
                                                     onChange={(e) => updateField('evidenceTerms', e.target.checked)}
                                                 />
-                                                <label htmlFor="terms">Customer accepted terms and conditions</label>
+                                                <label htmlFor="evidenceTerms">Customer accepted terms of service at checkout</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="evidenceRefundPolicy"
+                                                    checked={formData.evidenceRefundPolicy}
+                                                    onChange={(e) => updateField('evidenceRefundPolicy', e.target.checked)}
+                                                />
+                                                <label htmlFor="evidenceRefundPolicy">Customer agreed to refund/dispute policy</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="hasForumSelection"
+                                                    checked={formData.hasForumSelection}
+                                                    onChange={(e) => updateField('hasForumSelection', e.target.checked)}
+                                                />
+                                                <label htmlFor="hasForumSelection">Terms include forum selection clause (specifies where disputes must be litigated)</label>
                                             </div>
                                         </div>
 
-                                        <div className="form-group" style={{ marginTop: '1.5rem' }}>
-                                            <label>Tracking Number (if applicable)</label>
+                                        {formData.productType === 'physical' && (
+                                            <>
+                                                <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Delivery & Receipt (Physical Goods)</h3>
+                                                <div className="checkbox-group">
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="evidenceDelivery"
+                                                            checked={formData.evidenceDelivery}
+                                                            onChange={(e) => updateField('evidenceDelivery', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="evidenceDelivery">Carrier tracking shows delivery to customer's address</label>
+                                                    </div>
+
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="evidenceSignature"
+                                                            checked={formData.evidenceSignature}
+                                                            onChange={(e) => updateField('evidenceSignature', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="evidenceSignature">Signature confirmation or photo proof of delivery</label>
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                    <label>Tracking Number</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.evidenceTracking}
+                                                        onChange={(e) => updateField('evidenceTracking', e.target.value)}
+                                                        placeholder="1Z999AA10123456784 or tracking number"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {(formData.productType === 'digital' || formData.productType === 'subscription') && (
+                                            <>
+                                                <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Usage Evidence (Digital/Subscription)</h3>
+                                                <div className="checkbox-group">
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="evidenceLoginLogs"
+                                                            checked={formData.evidenceLoginLogs}
+                                                            onChange={(e) => updateField('evidenceLoginLogs', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="evidenceLoginLogs">Login records show customer accessed account after purchase</label>
+                                                    </div>
+
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="evidenceUsageMetrics"
+                                                            checked={formData.evidenceUsageMetrics}
+                                                            onChange={(e) => updateField('evidenceUsageMetrics', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="evidenceUsageMetrics">Usage analytics show active engagement with product/service</label>
+                                                    </div>
+
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="evidenceDownloads"
+                                                            checked={formData.evidenceDownloads}
+                                                            onChange={(e) => updateField('evidenceDownloads', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="evidenceDownloads">Download records show customer obtained digital content</label>
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                    <label>Login/Usage Details</label>
+                                                    <textarea
+                                                        value={formData.loginDetails}
+                                                        onChange={(e) => updateField('loginDetails', e.target.value)}
+                                                        placeholder="Example: 'on 47 occasions between purchase date and chargeback date' or 'accessed the platform daily for 3 weeks'"
+                                                        rows="2"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Communications</h3>
+                                        <div className="checkbox-item">
                                             <input
-                                                type="text"
-                                                value={formData.evidenceTracking}
-                                                onChange={(e) => updateField('evidenceTracking', e.target.value)}
-                                                placeholder="1Z999AA10123456784"
+                                                type="checkbox"
+                                                id="evidenceCommunications"
+                                                checked={formData.evidenceCommunications}
+                                                onChange={(e) => updateField('evidenceCommunications', e.target.checked)}
                                             />
+                                            <label htmlFor="evidenceCommunications">Post-purchase communications showing satisfaction or acknowledgment</label>
                                         </div>
 
-                                        <div className="form-group">
-                                            <label>IP Address (if available)</label>
-                                            <input
-                                                type="text"
-                                                value={formData.evidenceIP}
-                                                onChange={(e) => updateField('evidenceIP', e.target.value)}
-                                                placeholder="192.168.1.1"
-                                            />
+                                        {formData.evidenceCommunications && (
+                                            <div className="form-group" style={{ marginTop: '1rem' }}>
+                                                <label>Communication Details</label>
+                                                <textarea
+                                                    value={formData.communicationDetails}
+                                                    onChange={(e) => updateField('communicationDetails', e.target.value)}
+                                                    placeholder="Example: 'On June 5, you emailed us to say &quot;This is exactly what I needed, thank you!&quot; On June 12, you requested technical support for advanced features, confirming you were actively using the product.'"
+                                                    rows="3"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <h3 style={{ fontSize: '1.1rem', margin: '1.5rem 0 1rem', color: '#4a5568' }}>Device & IP Evidence</h3>
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>IP Address</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.evidenceIP}
+                                                    onChange={(e) => updateField('evidenceIP', e.target.value)}
+                                                    placeholder="192.168.1.1 or IP range"
+                                                />
+                                                <p className="info-text">IP used for purchase/login</p>
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Device Info</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.evidenceDevice}
+                                                    onChange={(e) => updateField('evidenceDevice', e.target.value)}
+                                                    placeholder="iPhone 13, Chrome on Windows, etc."
+                                                />
+                                            </div>
                                         </div>
                                     </div>
                                 )}
 
                                 {activeTab === 5 && (
                                     <div>
-                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Payment Demand</h2>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Legal Strategy</h2>
 
                                         <div className="warning-box">
-                                            <p><strong>Legal Notice:</strong> This generator creates a formal demand letter asserting your rights. It is not a threat, but a statement of legal remedies available under federal and state law. Consult an attorney if you're unsure about any claims made in this letter.</p>
+                                            <p><strong>Attorney Consultation Recommended:</strong> For high-value disputes or cases involving potential fraud allegations, consult with an attorney before sending this letter.</p>
                                         </div>
+
+                                        <div className="form-group">
+                                            <label>Primary Legal Theory</label>
+                                            <select
+                                                value={formData.legalTheory}
+                                                onChange={(e) => updateField('legalTheory', e.target.value)}
+                                            >
+                                                <option value="contract">Breach of Contract (safest, most straightforward)</option>
+                                                <option value="unjust">Unjust Enrichment / Restitution</option>
+                                                <option value="fraud">Fraud (strongest but requires clear false statements)</option>
+                                                <option value="all">All theories (breach + unjust enrichment + fraud)</option>
+                                            </select>
+                                            <p className="info-text">Fraud claims are powerful but riskier. Only use if customer made demonstrably false statements.</p>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Tone Level</label>
+                                            <select
+                                                value={formData.toneLevel}
+                                                onChange={(e) => updateField('toneLevel', e.target.value)}
+                                            >
+                                                <option value="firm">Firm but Professional (recommended)</option>
+                                                <option value="aggressive">Aggressive (mentions criminal consequences more prominently)</option>
+                                            </select>
+                                            <p className="info-text">Aggressive tone may be appropriate for repeat offenders or egregious fraud</p>
+                                        </div>
+
+                                        <div className="checkbox-item" style={{ marginTop: '1.5rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="offerSettlement"
+                                                checked={formData.offerSettlement}
+                                                onChange={(e) => updateField('offerSettlement', e.target.checked)}
+                                            />
+                                            <label htmlFor="offerSettlement">Offer to discuss payment plan / settlement if customer can't pay immediately</label>
+                                        </div>
+                                        <p className="info-text" style={{ marginLeft: '1.5rem' }}>Can increase response rate without weakening position</p>
+
+                                        <div className="warning-box" style={{ background: '#fef2f2', borderColor: '#ef4444', marginTop: '1.5rem' }}>
+                                            <p style={{ color: '#7f1d1d' }}><strong>Anti-Extortion Compliance:</strong> This generator is designed to comply with laws against extortion and improper debt collection threats. The letter states your civil rights and does NOT condition criminal reporting on payment. Review carefully before sending.</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 6 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Final Demand Terms</h2>
 
                                         <div className="form-group">
                                             <label>Letter Date</label>
@@ -921,23 +1300,41 @@ NOTICE: This letter is not a threat. It is a statement of our legal rights and t
                                                 value={formData.deadlineDays}
                                                 onChange={(e) => updateField('deadlineDays', e.target.value)}
                                             >
-                                                <option value="7">7 days</option>
-                                                <option value="10">10 days</option>
-                                                <option value="14">14 days</option>
-                                                <option value="21">21 days</option>
-                                                <option value="30">30 days</option>
+                                                <option value="7">7 days (urgent)</option>
+                                                <option value="10">10 days (standard)</option>
+                                                <option value="14">14 days (reasonable)</option>
+                                                <option value="21">21 days (generous)</option>
+                                                <option value="30">30 days (very flexible)</option>
                                             </select>
                                         </div>
 
-                                        <div className="warning-box" style={{ background: '#fef2f2', borderColor: '#ef4444' }}>
-                                            <p style={{ color: '#7f1d1d' }}><strong>Anti-Extortion Safeguards:</strong> This letter does NOT demand payment for dropping criminal charges, threaten deportation, or make threats unrelated to the civil debt. Review the generated letter carefully to ensure compliance with FDCPA and your state's laws.</p>
+                                        {formData.merchantState && (
+                                            <div style={{ background: '#f0f9ff', padding: '1rem', borderRadius: '8px', marginTop: '1rem' }}>
+                                                <strong>Small Claims Court Info for {formData.merchantState}:</strong>
+                                                <p style={{ marginTop: '0.5rem', fontSize: '0.9rem' }}>
+                                                    Business limit: ${smallClaimsLimits[formData.merchantState]?.business.toLocaleString() || '5,000'}
+                                                    <br />
+                                                    Individual limit: ${smallClaimsLimits[formData.merchantState]?.individual.toLocaleString() || '5,000'}
+                                                </p>
+                                            </div>
+                                        )}
+
+                                        <div className="warning-box" style={{ marginTop: '1.5rem' }}>
+                                            <p><strong>Before Sending:</strong></p>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem' }}>
+                                                <li>Review the preview carefully for accuracy</li>
+                                                <li>Ensure all evidence claims are truthful</li>
+                                                <li>Consider having an attorney review high-value cases</li>
+                                                <li>Send via certified mail with return receipt</li>
+                                                <li>Keep a copy for your records</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 )}
                             </div>
 
                             <div className="preview-section">
-                                <h3 style={{ marginBottom: '1rem', color: '#1a202c' }}>Preview</h3>
+                                <h3 style={{ marginBottom: '1rem', color: '#1a202c' }}>Letter Preview</h3>
                                 <div className="preview-container">
                                     <pre className="document-preview">{documentText}</pre>
                                 </div>
