@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace Dispute Demand Widget</title>
+<style>
+    :root{
+        --bg:#f5f6fb;
+        --panel:#ffffff;
+        --border:#dfe3f4;
+        --accent:#4d54fc;
+        --accent-soft:#eef0ff;
+        --muted:#5f6478;
+        --dark:#1f2436;
+        --teal:#32b1a3;
+        --orange:#f29b4d;
+        --pink:#ec5f8d;
+    }
+    *{box-sizing:border-box;font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+    body{margin:0;background:var(--bg);color:var(--dark);}    
+    .widget-frame{max-width:1200px;margin:0 auto;padding:24px;}
+    .panel{background:var(--panel);border:1px solid var(--border);border-radius:24px;box-shadow:0 35px 80px rgba(28,32,68,.12);overflow:hidden;}
+    .intro{padding:24px 32px;border-bottom:1px solid var(--border);color:var(--muted);line-height:1.55;font-size:15px;}
+    .tabs-bar{display:flex;flex-wrap:wrap;gap:8px;padding:18px 24px;border-bottom:1px solid var(--border);background:linear-gradient(120deg,#f9f9ff,#f2f5ff);}    
+    .tabchip{border:1px solid var(--border);background:#fff;color:var(--muted);padding:10px 16px;border-radius:999px;font-weight:600;font-size:14px;cursor:pointer;transition:.2s;}
+    .tabchip.active{background:var(--accent);color:#fff;border-color:var(--accent);box-shadow:0 10px 25px rgba(77,84,252,.32);}    
+    .tabview{display:none;padding:26px 32px;line-height:1.55;color:var(--dark);}    
+    .tabview.active{display:block;}
+    .section-note{font-size:15px;font-weight:700;margin-bottom:14px;letter-spacing:.02em;}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
+    .card{border:1px solid var(--border);border-radius:16px;background:#fff;padding:16px;box-shadow:0 12px 30px rgba(27,35,69,.08);min-height:140px;}
+    .tag{display:inline-flex;align-items:center;font-size:12px;font-weight:600;color:#fff;border-radius:999px;padding:2px 10px;margin-bottom:10px;}
+    .tag.blue{background:var(--accent);} .tag.teal{background:var(--teal);} .tag.orange{background:var(--orange);} .tag.pink{background:var(--pink);} .tag.gray{background:#8187a6;}
+    .list{margin:0;padding-left:18px;font-size:14px;color:var(--muted);}
+    .list li{margin-bottom:6px;}
+    .pill{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px dashed var(--border);border-radius:14px;background:#f7f7ff;margin-top:16px;color:var(--muted);font-size:13px;}
+    .generator-shell{display:flex;gap:20px;flex-wrap:wrap;}
+    .form-pane{flex:1 1 360px;background:var(--accent-soft);border:1px solid var(--border);border-radius:18px;padding:18px;max-height:560px;overflow:auto;}
+    .form-pane label{display:block;font-size:13px;font-weight:600;margin-top:12px;color:var(--dark);}    
+    .form-pane input,.form-pane select,.form-pane textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);font-size:14px;background:#fff;color:var(--dark);}
+    .form-pane textarea{min-height:70px;}
+    .preview-pane{flex:1 1 420px;border:1px solid var(--border);border-radius:18px;background:#fff;padding:18px;max-height:560px;display:flex;flex-direction:column;}
+    .preview-box{flex:1;border:1px solid var(--border);border-radius:14px;padding:14px;overflow-y:auto;line-height:1.55;background:#fff;}
+    .preview-section{margin-bottom:14px;}
+    .preview-label{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px;}
+    .preview-text{white-space:pre-wrap;font-size:14px;}
+    .highlight{animation:flash 1.2s ease;}
+    @keyframes flash{0%{background:#fff2c7;}100%{background:transparent;}}
+    .copy-button{margin-top:14px;border:none;background:var(--accent);color:#fff;font-weight:600;padding:10px 16px;border-radius:10px;cursor:pointer;box-shadow:0 12px 30px rgba(77,84,252,.35);}
+    #clear-btn{margin-top:12px;border:1px solid var(--border);background:#fff;border-radius:10px;padding:8px 12px;font-weight:600;color:var(--muted);cursor:pointer;}
+    @media(max-width:820px){.generator-shell{flex-direction:column;}.form-pane,.preview-pane{max-height:none;}}
+</style>
+</head>
+<body>
+<div class="widget-frame">
+<div class="panel">
+    <div class="intro">When Etsy, Amazon, Upwork, Fiverr, or similar platforms flip the suspension switch, you lose revenue, reputation, and sometimes inventory. Use these tabs to triage the dispute and generate a platform-ready demand letter backed by evidence, policy citations, and arbitration awareness.</div>
+    <div class="tabs-bar">
+        <button class="tabchip active" data-tab="map">Dispute Map</button>
+        <button class="tabchip" data-tab="contracts">Trusted Contracts</button>
+        <button class="tabchip" data-tab="evidence">Evidence & Appeals</button>
+        <button class="tabchip" data-tab="platforms">Platform Angles</button>
+        <button class="tabchip" data-tab="generator">Demand Letter Lab</button>
+    </div>
+    <div id="map" class="tabview active">
+        <div class="section-note">Marketplace disputes feel personal, but they are contract fights with automation.</div>
+        <div class="grid">
+            <div class="card">
+                <div class="tag blue">Policy Vague</div>
+                <div>Emails talk about “risk,” “integrity,” or “possible violations” without details. Your letter needs to reconstruct the facts and force specificity.</div>
+            </div>
+            <div class="card">
+                <div class="tag teal">Power Imbalance</div>
+                <div>Accounts hold your reviews, inventory, cash flow. Demand must address frozen payouts and stranded data, not just “please reinstate.”</div>
+            </div>
+            <div class="card">
+                <div class="tag orange">Stacked Terms</div>
+                <div>Every platform buries arbitration, class waivers, and broad suspension rights in the Terms. Letters that cite these clauses earn more respect.</div>
+            </div>
+            <div class="card">
+                <div class="tag gray">Think Beyond Support</div>
+                <div>Internal tickets matter, but legal notices and arbitration triggers are what move the dispute to someone who can act.</div>
+            </div>
+        </div>
+    </div>
+    <div id="contracts" class="tabview">
+        <div class="section-note">You sit inside overlapping agreements: platform terms + contracts with buyers/clients.</div>
+        <div class="grid">
+            <div class="card">
+                <div class="tag blue">Platform Terms</div>
+                <ul class="list">
+                    <li>Etsy – Terms of Use + arbitration & class waiver</li>
+                    <li>Amazon BSA – payout holds, inventory control, AAA arbitration</li>
+                    <li>Upwork User Agreement – mandatory arbitration, 30-day opt-out</li>
+                    <li>Fiverr Terms – AAA arbitration, FAA governs</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="tag teal">Downstream Contracts</div>
+                <div>While fighting the platform, you still owe customers and clients. Letters gain impact when they show how platform actions forced near-breach with buyers.</div>
+            </div>
+            <div class="card">
+                <div class="tag pink">ADR Awareness</div>
+                <div>Know the notice-of-dispute steps, addresses, and arbitration providers each platform requires. Letters often double as the required pre-arbitration notice.</div>
+            </div>
+        </div>
+        <div class="pill"><strong>Tip</strong><div>Quote or reference the specific section of the Terms that the platform invoked (or ignored). It signals you read the contract you accepted.</div></div>
+    </div>
+    <div id="evidence" class="tabview">
+        <div class="section-note">Preserve data like a litigator: CSVs, screenshots, appeals, inventory IDs.</div>
+        <div class="grid">
+            <div class="card">
+                <div class="tag blue">Financials</div>
+                <ul class="list">
+                    <li>Download payouts/orders CSVs while you can</li>
+                    <li>Note cleared vs. pending amounts in queue</li>
+                    <li>Keep refund/chargeback logs</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="tag teal">Notices & Appeals</div>
+                <ul class="list">
+                    <li>Save every suspension email, ticket ID, and support reply</li>
+                    <li>Archive appeals and “Plan of Action” submissions</li>
+                    <li>Document DMCA notices and counter-notices</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="tag orange">Performance Proof</div>
+                <ul class="list">
+                    <li>Ratings, on-time rates, defect metrics</li>
+                    <li>Customer testimonials, dispute ratios</li>
+                    <li>Proof of supplier invoices / authenticity</li>
+                </ul>
+            </div>
+            <div class="card">
+                <div class="tag pink">Inventory & Access</div>
+                <ul class="list">
+                    <li>Shipment IDs, SKUs, warehouse receipts</li>
+                    <li>Evidence of locked repos or payout dashboards</li>
+                    <li>KYC or verification records submitted</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="platforms" class="tabview">
+        <div class="section-note">Platform-specific nuances to mention.</div>
+        <div class="grid">
+            <div class="card">
+                <div class="tag teal">Etsy</div>
+                <div>Talk about artisan history, DMCA counter-notice options, sanctions or handmade authenticity context, and the arbitration clause/class waiver for the Americas.</div>
+            </div>
+            <div class="card">
+                <div class="tag orange">Amazon</div>
+                <div>Reference the BSA, AAA arbitration, limitation-of-liability, FBA inventory reimbursements, and internal Seller Performance appeals with Plan of Action chronology.</div>
+            </div>
+            <div class="card">
+                <div class="tag blue">Upwork</div>
+                <div>Discuss Upwork’s User Agreement, no off-platform payments, fixed-price escrow procedures, 30-day opt-out, and the need to complete internal reviews before arbitration.</div>
+            </div>
+            <div class="card">
+                <div class="tag pink">Fiverr</div>
+                <div>Highlight gig completion history, cleared funds in review, cooperation with KYC, and willingness to arbitrate under AAA per its Terms.</div>
+            </div>
+        </div>
+    </div>
+    <div id="generator" class="tabview">
+        <div class="section-note">Demand Letter Lab – fill what you know, skip what you do not. Sections highlight as you tweak.</div>
+        <div class="generator-shell">
+            <form class="form-pane" onsubmit="return false;">
+                <label>Platform</label>
+                <select id="field-platform">
+                    <option value="Etsy" selected>Etsy</option>
+                    <option value="Amazon">Amazon (Marketplace / FBA)</option>
+                    <option value="Upwork">Upwork</option>
+                    <option value="Fiverr">Fiverr</option>
+                    <option value="Other">Other marketplace</option>
+                </select>
+                <label>Account Name / ID</label>
+                <input type="text" id="field-account" placeholder="Shop: StellarStudio / Merchant ID">
+                <label>Contact Person</label>
+                <input type="text" id="field-contact" placeholder="Legal Dept. / Seller Performance">
+                <label>Amount Frozen / at Issue</label>
+                <input type="number" step="0.01" id="field-amount" placeholder="25000">
+                <label>Inventory or Asset Value (optional)</label>
+                <input type="number" step="0.01" id="field-inventory" placeholder="40000">
+                <label>Triggering Event</label>
+                <textarea id="field-event" placeholder="On May 3 we received a suspension notice citing 'policy violation' without details."></textarea>
+                <label>Internal Appeals / Replies</label>
+                <textarea id="field-appeals" placeholder="Appeals submitted May 4 and May 12 with supplier invoices, no response."></textarea>
+                <label>Performance Snapshot</label>
+                <textarea id="field-performance" placeholder="5-star rating, 98% on-time delivery, refund rate 0.8% over past 12 months."></textarea>
+                <label>Evidence Summary</label>
+                <textarea id="field-evidence" placeholder="Downloads of payout/transaction history, FBA shipment IDs, buyer communications."></textarea>
+                <label>Downstream Harm</label>
+                <textarea id="field-harm" placeholder="Unable to fulfill 180 paid orders; forced to refund via alternate channels; marketing spend wasted."></textarea>
+                <label>Requested Remedies</label>
+                <div style="border:1px solid var(--border);border-radius:12px;padding:10px;background:#fff;font-size:13px;color:var(--muted);display:grid;gap:6px;">
+                    <label><input type="checkbox" id="res-reinstate"> Reinstate account / remove strikes</label>
+                    <label><input type="checkbox" id="res-release"> Release cleared payouts</label>
+                    <label><input type="checkbox" id="res-inventory"> Reimburse / release inventory</label>
+                    <label><input type="checkbox" id="res-explain"> Provide detailed explanation so we can cure</label>
+                </div>
+                <label>Custom Notes</label>
+                <textarea id="field-custom" placeholder="Mutual non-disparagement + removal of risk flags; confirm DMCA counter-notice timeline."></textarea>
+                <label>Response Deadline</label>
+                <input type="text" id="field-deadline" placeholder="Example: June 10, 2025">
+                <label>Tone</label>
+                <select id="field-tone">
+                    <option value="neutral" selected>Professional / neutral</option>
+                    <option value="diplomatic">Cooperative</option>
+                    <option value="firm">Firm / escalation-ready</option>
+                </select>
+                <button type="button" id="clear-btn">Clear Form</button>
+            </form>
+            <div class="preview-pane">
+                <div id="preview" class="preview-box"></div>
+                <button class="copy-button" type="button" onclick="copyPreview()">Copy Demand Letter</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script>
+const inputs={
+    platform:document.getElementById('field-platform'),
+    account:document.getElementById('field-account'),
+    contact:document.getElementById('field-contact'),
+    amount:document.getElementById('field-amount'),
+    inventory:document.getElementById('field-inventory'),
+    event:document.getElementById('field-event'),
+    appeals:document.getElementById('field-appeals'),
+    performance:document.getElementById('field-performance'),
+    evidence:document.getElementById('field-evidence'),
+    harm:document.getElementById('field-harm'),
+    custom:document.getElementById('field-custom'),
+    deadline:document.getElementById('field-deadline'),
+    tone:document.getElementById('field-tone')
+};
+const state={platform:'Etsy',account:'',contact:'',amount:'',inventory:'',event:'',appeals:'',performance:'',evidence:'',harm:'',custom:'',deadline:'',tone:'neutral',resReinstate:false,resRelease:false,resInventory:false,resExplain:false};
+const checks={
+    resReinstate:document.getElementById('res-reinstate'),
+    resRelease:document.getElementById('res-release'),
+    resInventory:document.getElementById('res-inventory'),
+    resExplain:document.getElementById('res-explain')
+};
+const preview=document.getElementById('preview');
+const platformNotes={
+    'Etsy':'Etsy terms (“Our House Rules”) include arbitration and a class-action waiver for North/South America. Users are expected to appeal through policy channels before arbitration.',
+    'Amazon':'Amazon’s Business Solutions Agreement authorizes payout holds and AAA arbitration; sellers often submit Plans of Action before escalating.',
+    'Upwork':'Upwork User Agreement directs most disputes, including account holds, into binding arbitration with a short opt-out window.',
+    'Fiverr':'Fiverr’s Terms require AAA arbitration and compliance with KYC; cleared earnings can be held during trust reviews.',
+    'Other':'Marketplace Terms typically include broad suspension rights, arbitration, and class waivers. This notice is sent as the pre-arbitration demand.'
+};
+const toneMap={
+    neutral:'We prefer to resolve this professionally and avoid unnecessary escalation.',
+    diplomatic:'We strongly prefer a cooperative resolution so we can restore normal business operations quickly.',
+    firm:'Absent prompt relief we will pursue binding arbitration, regulatory complaints, or other remedies without further notice.'
+};
+const highlightMap={
+    platform:'intro',
+    account:'intro',
+    contact:'intro',
+    amount:'breach',
+    inventory:'breach',
+    event:'event',
+    appeals:'appeals',
+    performance:'performance',
+    evidence:'evidence',
+    harm:'harm',
+    custom:'resolution',
+    deadline:'deadline',
+    tone:'deadline',
+    'resReinstate':'resolution',
+    'resRelease':'resolution',
+    'resInventory':'resolution',
+    'resExplain':'resolution'
+};
+Object.keys(inputs).forEach(key=>{
+    inputs[key].addEventListener('input',()=>{
+        state[key]=inputs[key].value.trim();
+        persist();
+        renderPreview(key);
+    });
+});
+Object.entries(checks).forEach(([key,el])=>{
+    el.addEventListener('change',()=>{
+        state[key]=el.checked;
+        persist();
+        renderPreview(key);
+    });
+});
+document.getElementById('clear-btn').addEventListener('click',()=>{
+    Object.keys(state).forEach(k=>{state[k]=typeof state[k]==='boolean'?false:'';});
+    state.platform='Etsy';state.tone='neutral';
+    updateForm();
+    persist();
+    renderPreview();
+});
+function updateForm(){
+    Object.keys(inputs).forEach(key=>{inputs[key].value=state[key]|| (key==='platform'?'Etsy': key==='tone'?'neutral':'');});
+    Object.entries(checks).forEach(([key,el])=>{el.checked=!!state[key];});
+}
+function persist(){localStorage.setItem('mp-demand-state',JSON.stringify(state));}
+function hydrate(){
+    const saved=localStorage.getItem('mp-demand-state');
+    if(!saved) return;
+    try{Object.assign(state,JSON.parse(saved));updateForm();}catch(e){console.warn('state parse',e);}
+}
+function formatCurrency(v){if(!v) return '';const num=Number(v);return num?num.toLocaleString('en-US',{style:'currency',currency:'USD'}):'';}
+function resolutionSummary(){
+    const req=[];
+    if(state.resReinstate) req.push('reinstate the account and remove related policy strikes');
+    if(state.resRelease) req.push('release cleared payouts');
+    if(state.resInventory) req.push('reimburse or release our inventory/assets held by the platform');
+    if(state.resExplain) req.push('provide a detailed explanation so any remedies can be implemented');
+    return req.length?`Requested relief: ${req.join('; ')}.`:'';
+}
+function renderPreview(changed){
+    const today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const introLines=[];
+    introLines.push(`Date: ${today}`);
+    introLines.push('Via Email / Written Notice');
+    const addressee=state.contact?`Attn: ${state.contact}`:'Legal Department';
+    introLines.push(addressee);
+    introLines.push(`Re: ${state.platform || 'Marketplace'} account ${state.account || ''}`.trim());
+    const eventText=state.event||'';
+    const appealsText=state.appeals||'';
+    const performanceText=state.performance||'';
+    const evidenceText=state.evidence||'';
+    const harmText=state.harm||'';
+    const amountLine=state.amount?`Frozen/withheld funds: ${formatCurrency(state.amount)}.`:'';
+    const inventoryLine=state.inventory?`Inventory/assets affected: approximately ${formatCurrency(state.inventory)}.`:'';
+    const platformNote=platformNotes[state.platform||'Other'];
+    const resLine=[resolutionSummary(),state.custom||''].filter(Boolean).join(' ');
+    const deadlineLine=state.deadline?`Please respond by ${state.deadline.trim()}.`:'Please respond within the next ten (10) days.';
+    const toneLine=toneMap[state.tone||'neutral'];
+    const sections=[
+        sectionHTML('', 'intro', introLines.join('\n')),
+        sectionHTML('Background', 'event', eventText || 'Our account was suspended/restricted without a specific policy citation.'),
+        sectionHTML('Appeals & Communication', 'appeals', appealsText || 'Internal appeals were submitted through platform channels with no substantive response.'),
+        sectionHTML('Performance Snapshot', 'performance', performanceText || 'The account maintained strong ratings, low defect rates, and compliant history.'),
+        sectionHTML('Damages & Impact', 'harm', [amountLine, inventoryLine, harmText].filter(Boolean).join(' ')),
+        sectionHTML('Evidence on File', 'evidence', evidenceText || 'We have preserved payout reports, inventory records, notices, and customer communications.'),
+        sectionHTML('Contract / Policy Context', 'contract', platformNote),
+        sectionHTML('Requested Resolution', 'resolution', resLine || 'Please outline a path to reinstatement or release of funds/inventory.'),
+        sectionHTML('Deadline & Next Steps', 'deadline', `${deadlineLine} ${toneLine} This letter serves as formal notice of dispute under the platform terms and we are prepared to pursue arbitration or regulatory complaints if necessary.`)
+    ];
+    preview.innerHTML=sections.filter(Boolean).join('');
+    highlightField(changed);
+}
+function sectionHTML(label,field,text){
+    if(!text) return '';
+    const labelHTML=label?`<div class="preview-label">${label}</div>`:'';
+    const attr=field?` data-field="${field}"`:'';
+    return `<div class="preview-section">${labelHTML}<div class="preview-text"${attr}>${text}</div></div>`;
+}
+function highlightField(field){
+    if(!field) return;
+    const target=highlightMap[field];
+    if(!target) return;
+    const el=preview.querySelector(`[data-field="${target}"]`);
+    if(!el) return;
+    el.classList.add('highlight');
+    clearTimeout(highlightField.timer);
+    highlightField.timer=setTimeout(()=>el.classList.remove('highlight'),1200);
+}
+function copyPreview(){
+    const text=preview.innerText.trim();
+    if(!text){alert('Enter details before copying.');return;}
+    if(navigator.clipboard){navigator.clipboard.writeText(text).then(()=>alert('Demand letter copied.')).catch(fallback);} else fallback();
+    function fallback(){const temp=document.createElement('textarea');temp.value=text;document.body.appendChild(temp);temp.select();document.execCommand('copy');document.body.removeChild(temp);alert('Demand letter copied.');}
+}
+document.querySelectorAll('.tabchip').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+        document.querySelectorAll('.tabchip').forEach(b=>b.classList.remove('active'));
+        document.querySelectorAll('.tabview').forEach(v=>v.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+});
+hydrate();
+renderPreview();
+</script>
+</body>
+</html>
