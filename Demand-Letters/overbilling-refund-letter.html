@@ -544,21 +544,37 @@ Enclosures: [List enclosures]`;
             const copyToClipboard = () => {
                 const text = documentText;
 
-                if (navigator.clipboard) {
+                if (navigator.clipboard && navigator.clipboard.writeText) {
                     navigator.clipboard.writeText(text).then(() => {
                         setShowToast(true);
                         setTimeout(() => setShowToast(false), 3000);
+                    }).catch((err) => {
+                        console.error('Failed to copy:', err);
+                        fallbackCopy(text);
                     });
                 } else {
-                    const textArea = document.createElement('textarea');
-                    textArea.value = text;
-                    document.body.appendChild(textArea);
-                    textArea.select();
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
                     document.execCommand('copy');
-                    document.body.removeChild(textArea);
                     setShowToast(true);
                     setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Please manually copy the text from the preview');
                 }
+                document.body.removeChild(textArea);
             };
 
             const renderTabContent = () => {
@@ -979,10 +995,9 @@ Total: 5 months × $350 overcharge = $1,750 in unauthorized charges"
                                     📋 Copy Letter
                                 </button>
                             </div>
-                            <pre
-                                className="document-preview"
-                                dangerouslySetInnerHTML={{ __html: getHighlightedDocumentText() }}
-                            />
+                            <pre className="document-preview">
+                                {documentText}
+                            </pre>
                         </div>
                     </div>
 
