@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cease-and-Desist / IP Demand Letter Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .tab.active {
+            color: #4f46e5;
+            border-bottom-color: #4f46e5;
+            background: white;
+        }
+
+        .content-wrapper {
+            display: flex;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .form-section {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .preview-section {
+            flex: 1;
+            min-width: 0;
+            position: sticky;
+            top: 2rem;
+            align-self: flex-start;
+            max-height: calc(100vh - 4rem);
+            overflow: visible;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="date"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #4f46e5;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: auto;
+            margin-top: 0.25rem;
+            cursor: pointer;
+        }
+
+        .checkbox-item label {
+            margin: 0;
+            font-weight: 400;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .preview-container {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 2rem;
+            max-height: calc(100vh - 12rem);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        .preview-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .preview-container::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb {
+            background: #4f46e5;
+            border-radius: 4px;
+        }
+
+        .preview-container::-webkit-scrollbar-thumb:hover {
+            background: #6366f1;
+        }
+
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #2d3748;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            user-select: text;
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+        }
+
+        .document-preview::selection {
+            background: #c7d2fe;
+            color: #1a202c;
+        }
+
+        .document-preview::-moz-selection {
+            background: #c7d2fe;
+            color: #1a202c;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #4f46e5;
+            border: 2px solid #4f46e5;
+        }
+
+        .btn-secondary:hover {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #10b981;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            animation: slideIn 0.3s ease;
+            z-index: 1000;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .warning-box {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        .warning-box p {
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .info-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .section-divider {
+            border-top: 2px solid #e5e7eb;
+            margin: 1.5rem 0;
+            padding-top: 1.5rem;
+        }
+
+        @media (max-width: 968px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .preview-section {
+                position: static;
+            }
+
+            .row {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                font-size: 0.85rem;
+            }
+
+            .tab {
+                padding: 0.75rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useMemo } = React;
+
+        function IPLetterGenerator() {
+            const [activeTab, setActiveTab] = useState(0);
+            const [showToast, setShowToast] = useState(false);
+
+            const [formData, setFormData] = useState({
+                // Sender Info
+                senderName: '',
+                senderCompany: '',
+                senderAddress: '',
+                senderCity: '',
+                senderState: 'CA',
+                senderZip: '',
+                senderEmail: '',
+                senderPhone: '',
+                representingClient: false,
+
+                // Recipient Info
+                recipientName: '',
+                recipientCompany: '',
+                recipientAddress: '',
+                recipientCity: '',
+                recipientState: '',
+                recipientZip: '',
+
+                // Letter Type & IP Type
+                letterType: 'cease', // cease, demand, hybrid
+                ipType: 'copyright', // copyright, trademark, patent, trade-secret
+
+                // IP Details - Copyright
+                copyrightWorkTitle: '',
+                copyrightRegistrationNumber: '',
+                copyrightCreationDate: '',
+                copyrightOwnership: '',
+
+                // IP Details - Trademark
+                trademarkMark: '',
+                trademarkRegistrationNumber: '',
+                trademarkGoods: '',
+                trademarkFirstUse: '',
+
+                // IP Details - Patent
+                patentNumber: '',
+                patentTitle: '',
+                patentIssueDate: '',
+
+                // IP Details - Trade Secret
+                tradeSecretDescription: '',
+                tradeSecretAcquisitionMethod: '',
+
+                // Infringement Details
+                infringementDescription: '',
+                infringementStartDate: '',
+                infringementEvidence: '',
+                ongoingInfringement: true,
+
+                // Legal Analysis
+                includeDetailedAnalysis: false,
+                likelihoodOfConfusion: false, // for trademark
+                willfulInfringement: false,
+
+                // Tone & Strategy
+                toneLevel: 'firm', // collaborative, firm, aggressive
+                offerLicense: false,
+                licenseTerms: '',
+                inviteDiscussion: true,
+
+                // Demands
+                demandCessation: true,
+                demandDestruction: false, // for trade secrets or counterfeits
+                demandAccounting: false,
+                demandDamages: false,
+                damagesAmount: '',
+                damagesBasis: '',
+
+                // Deadline & Consequences
+                deadlineDays: '14',
+                threatenLitigation: true,
+                mentionStatutoryDamages: false, // for copyright
+                mentionAttorneyFees: false,
+                mentionInjunction: false,
+
+                // Special Considerations
+                dmcaNoticeOption: false, // for copyright
+                preservationDemand: false, // for trade secrets
+                declaratoryJudgmentWarning: false, // for patents
+
+                letterDate: new Date().toISOString().split('T')[0]
+            });
+
+            const updateField = (field, value) => {
+                setFormData(prev => ({ ...prev, [field]: value }));
+            };
+
+            const documentText = useMemo(() => {
+                const today = formData.letterDate || new Date().toISOString().split('T')[0];
+                const deadline = new Date(today);
+                deadline.setDate(deadline.getDate() + parseInt(formData.deadlineDays || 14));
+                const deadlineStr = deadline.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                const letterTypeLabels = {
+                    'cease': 'Cease-and-Desist',
+                    'demand': 'Demand for Damages',
+                    'hybrid': 'Cease-and-Desist and Demand for Damages'
+                };
+
+                const ipTypeLabels = {
+                    'copyright': 'Copyright Infringement',
+                    'trademark': 'Trademark Infringement',
+                    'patent': 'Patent Infringement',
+                    'trade-secret': 'Trade Secret Misappropriation'
+                };
+
+                let letter = `${formData.senderName || '[Your Name]'}`;
+                if (formData.senderCompany) {
+                    letter += `\n${formData.senderCompany}`;
+                }
+                letter += `\n${formData.senderAddress || '[Street Address]'}
+${formData.senderCity || '[City]'}, ${formData.senderState || '[State]'} ${formData.senderZip || '[ZIP]'}
+${formData.senderEmail || '[email@example.com]'}
+${formData.senderPhone || '[(555) 123-4567]'}
+
+${new Date(today).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+${formData.recipientName || '[Recipient Name]'}`;
+                if (formData.recipientCompany) {
+                    letter += `\n${formData.recipientCompany}`;
+                }
+                letter += `\n${formData.recipientAddress || '[Street Address]'}
+${formData.recipientCity || '[City]'}, ${formData.recipientState || '[State]'} ${formData.recipientZip || '[ZIP]'}
+
+Re: ${letterTypeLabels[formData.letterType]} – ${ipTypeLabels[formData.ipType]}
+
+Dear ${formData.recipientName || '[Recipient]'}:
+
+`;
+
+                if (formData.representingClient && formData.senderCompany) {
+                    letter += `I represent ${formData.senderCompany} `;
+                } else {
+                    letter += `I am writing `;
+                }
+
+                if (formData.letterType === 'cease') {
+                    letter += `regarding unauthorized use of ${formData.representingClient ? 'my client\'s' : 'my'} `;
+                } else if (formData.letterType === 'demand') {
+                    letter += `to demand compensation for your unauthorized use of ${formData.representingClient ? 'my client\'s' : 'my'} `;
+                } else {
+                    letter += `to demand that you immediately cease unauthorized use of ${formData.representingClient ? 'my client\'s' : 'my'} `;
+                }
+
+                if (formData.ipType === 'copyright') {
+                    letter += `copyrighted work`;
+                } else if (formData.ipType === 'trademark') {
+                    letter += `registered trademark`;
+                } else if (formData.ipType === 'patent') {
+                    letter += `patented technology`;
+                } else {
+                    letter += `confidential trade secret information`;
+                }
+
+                letter += ` and to seek appropriate remedies for the harm caused by your infringement.
+
+`;
+
+                // IP RIGHTS SECTION
+                letter += `${formData.ipType === 'copyright' ? 'COPYRIGHTED WORK' : formData.ipType === 'trademark' ? 'TRADEMARK RIGHTS' : formData.ipType === 'patent' ? 'PATENT RIGHTS' : 'TRADE SECRET INFORMATION'}
+
+`;
+
+                if (formData.ipType === 'copyright') {
+                    letter += `${formData.representingClient && formData.senderCompany ? formData.senderCompany : 'I'} ${formData.representingClient ? 'owns' : 'own'} the copyright in ${formData.copyrightWorkTitle || '[work title/description]'}`;
+
+                    if (formData.copyrightRegistrationNumber) {
+                        letter += `, which is registered with the U.S. Copyright Office under Registration Number ${formData.copyrightRegistrationNumber}`;
+                    } else if (formData.copyrightCreationDate) {
+                        letter += `, created on ${new Date(formData.copyrightCreationDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                    }
+
+                    letter += `. `;
+
+                    if (formData.copyrightOwnership) {
+                        letter += `${formData.copyrightOwnership} `;
+                    }
+
+                    letter += `This work is protected by the Copyright Act, 17 U.S.C. § 101 et seq., which grants ${formData.representingClient ? 'my client' : 'me'} exclusive rights to reproduce, distribute, display, and prepare derivative works based on the copyrighted material.
+
+`;
+
+                } else if (formData.ipType === 'trademark') {
+                    letter += `${formData.representingClient && formData.senderCompany ? formData.senderCompany : 'I'} ${formData.representingClient ? 'owns' : 'own'} the trademark ${formData.trademarkMark || '[MARK]'}`;
+
+                    if (formData.trademarkRegistrationNumber) {
+                        letter += `, registered with the United States Patent and Trademark Office under Registration Number ${formData.trademarkRegistrationNumber}`;
+                    }
+
+                    if (formData.trademarkGoods) {
+                        letter += ` for use in connection with ${formData.trademarkGoods}`;
+                    }
+
+                    if (formData.trademarkFirstUse) {
+                        letter += `. The mark has been in continuous use since ${new Date(formData.trademarkFirstUse).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                    }
+
+                    letter += `. This mark is protected by the Lanham Act, 15 U.S.C. § 1051 et seq., which prohibits unauthorized use of a registered mark in commerce in a manner likely to cause confusion, mistake, or deception as to the source of goods or services.
+
+`;
+
+                } else if (formData.ipType === 'patent') {
+                    letter += `${formData.representingClient && formData.senderCompany ? formData.senderCompany : 'I'} ${formData.representingClient ? 'owns' : 'own'} U.S. Patent No. ${formData.patentNumber || '[Patent Number]'}`;
+
+                    if (formData.patentTitle) {
+                        letter += ` titled "${formData.patentTitle}"`;
+                    }
+
+                    if (formData.patentIssueDate) {
+                        letter += `, issued on ${new Date(formData.patentIssueDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}`;
+                    }
+
+                    letter += `. This patent is valid and enforceable, and covers technology that ${formData.representingClient ? 'my client believes' : 'I believe'} is embodied in your products or services.
+
+`;
+
+                } else if (formData.ipType === 'trade-secret') {
+                    letter += `${formData.representingClient && formData.senderCompany ? formData.senderCompany : 'I'} ${formData.representingClient ? 'owns' : 'own'} valuable trade secret information consisting of ${formData.tradeSecretDescription || '[description of trade secret categories]'}. This information derives independent economic value from not being generally known or readily ascertainable by others and has been subject to reasonable efforts to maintain its secrecy. `;
+
+                    if (formData.tradeSecretAcquisitionMethod) {
+                        letter += `\n\n${formData.tradeSecretAcquisitionMethod}`;
+                    }
+
+                    letter += `\n\nTrade secrets are protected under the Defend Trade Secrets Act, 18 U.S.C. § 1836 et seq., and applicable state law, including the Uniform Trade Secrets Act as adopted in ${formData.senderState}.
+
+`;
+                }
+
+                // INFRINGEMENT SECTION
+                letter += `${formData.ipType === 'trade-secret' ? 'MISAPPROPRIATION' : 'INFRINGEMENT'}
+
+`;
+
+                if (formData.infringementDescription) {
+                    letter += formData.infringementDescription;
+                } else {
+                    letter += `You are currently ${formData.ipType === 'trade-secret' ? 'using' : 'infringing'} ${formData.representingClient ? 'my client\'s' : 'my'} ${formData.ipType === 'copyright' ? 'copyright' : formData.ipType === 'trademark' ? 'trademark' : formData.ipType === 'patent' ? 'patent' : 'trade secrets'} by [describe specific infringing conduct].`;
+                }
+
+                if (formData.infringementStartDate) {
+                    letter += ` This ${formData.ipType === 'trade-secret' ? 'misappropriation' : 'infringement'} began on or about ${new Date(formData.infringementStartDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.`;
+                }
+
+                if (formData.infringementEvidence) {
+                    letter += `\n\n${formData.infringementEvidence}`;
+                }
+
+                letter += `\n\n`;
+
+                // LEGAL ANALYSIS (optional detailed section)
+                if (formData.includeDetailedAnalysis) {
+                    letter += `LEGAL ANALYSIS
+
+`;
+
+                    if (formData.ipType === 'copyright') {
+                        letter += `Your unauthorized use constitutes copyright infringement under 17 U.S.C. § 501. ${formData.representingClient ? 'My client' : 'I'} ${formData.representingClient ? 'owns' : 'own'} valid copyright in the work, and you have exercised one or more of the exclusive rights reserved to the copyright owner without authorization. Your use does not qualify as fair use under 17 U.S.C. § 107, as it is commercial in nature, uses the work in its entirety or substantial portions thereof, and directly competes with the copyright owner's market.
+
+`;
+
+                        if (formData.willfulInfringement) {
+                            letter += `Your infringement appears to be willful. You had actual or constructive notice of ${formData.representingClient ? 'my client\'s' : 'my'} copyright ownership, yet you continued to use the work without authorization. Willful infringement can result in statutory damages up to $150,000 per work under 17 U.S.C. § 504(c).
+
+`;
+                        }
+
+                    } else if (formData.ipType === 'trademark') {
+                        letter += `Your use of a mark confusingly similar to ${formData.representingClient ? 'my client\'s' : 'my'} registered mark in connection with related goods or services creates a likelihood of confusion under 15 U.S.C. § 1114. `;
+
+                        if (formData.likelihoodOfConfusion) {
+                            letter += `The marks are similar in appearance, sound, and commercial impression. The goods are related and sold through overlapping channels of trade. Consumers are likely to believe that your products originate from or are affiliated with ${formData.representingClient && formData.senderCompany ? formData.senderCompany : 'me'}. `;
+                        }
+
+                        letter += `\n\n`;
+
+                    } else if (formData.ipType === 'patent') {
+                        letter += `${formData.representingClient ? 'My client believes' : 'I believe'} your products or processes infringe one or more claims of the '${formData.patentNumber || '[XXX]'} patent. This letter serves as notice of the patent and the alleged infringement, which may be relevant for calculating damages under 35 U.S.C. § 287.
+
+`;
+
+                        if (formData.declaratoryJudgmentWarning) {
+                            letter += `This letter is not intended as a threat of litigation, but rather as an invitation to discuss the patent and potential licensing arrangements. ${formData.representingClient ? 'My client' : 'I'} ${formData.representingClient ? 'believes' : 'believe'} there may be opportunities for mutually beneficial business relationships.
+
+`;
+                        }
+
+                    } else if (formData.ipType === 'trade-secret') {
+                        letter += `Your acquisition and use of ${formData.representingClient ? 'my client\'s' : 'my'} confidential information constitutes misappropriation under the Defend Trade Secrets Act and applicable state law. The information qualifies as trade secrets, you obtained it through improper means or breach of a duty to maintain secrecy, and you have used or disclosed it without authorization.
+
+`;
+                    }
+                }
+
+                // DEMANDS
+                letter += `DEMAND${formData.letterType === 'hybrid' || (formData.demandCessation && formData.demandDamages) ? 'S' : ''}
+
+To resolve this matter, ${formData.representingClient ? 'my client' : 'I'} demand${formData.representingClient ? 's' : ''} that you:
+
+`;
+
+                let demandNumber = 1;
+
+                if (formData.demandCessation) {
+                    letter += `${demandNumber}. Immediately cease all use of ${formData.representingClient ? 'my client\'s' : 'my'} ${formData.ipType === 'copyright' ? 'copyrighted work' : formData.ipType === 'trademark' ? 'trademark' : formData.ipType === 'patent' ? 'patented technology' : 'confidential information'}, including ${formData.ongoingInfringement ? 'removing all infringing materials from your website, products, and marketing materials' : 'refraining from any future use'}.
+
+`;
+                    demandNumber++;
+                }
+
+                if (formData.demandDestruction) {
+                    letter += `${demandNumber}. Destroy all copies of ${formData.representingClient ? 'my client\'s' : 'my'} ${formData.ipType === 'trade-secret' ? 'confidential information' : 'copyrighted work'} in your possession, custody, or control, and provide written certification under penalty of perjury that all copies have been destroyed.
+
+`;
+                    demandNumber++;
+                }
+
+                if (formData.preservationDemand && formData.ipType === 'trade-secret') {
+                    letter += `${demandNumber}. Preserve all evidence related to your acquisition, use, and disclosure of the trade secret information, including all devices, accounts, files, emails, and communications. You are under a legal duty to preserve this evidence.
+
+`;
+                    demandNumber++;
+                }
+
+                if (formData.demandAccounting) {
+                    letter += `${demandNumber}. Provide a full accounting of all uses of ${formData.representingClient ? 'my client\'s' : 'my'} ${formData.ipType === 'copyright' ? 'copyrighted work' : formData.ipType === 'trademark' ? 'mark' : formData.ipType === 'patent' ? 'patented technology' : 'trade secret information'}, including dates, quantities, revenues, and profits derived from the ${formData.ipType === 'trade-secret' ? 'misappropriation' : 'infringement'}.
+
+`;
+                    demandNumber++;
+                }
+
+                if (formData.demandDamages) {
+                    letter += `${demandNumber}. Pay ${formData.representingClient ? 'my client ' : ''}`;
+
+                    if (formData.damagesAmount) {
+                        letter += `$${formData.damagesAmount}`;
+                    } else {
+                        letter += `damages`;
+                    }
+
+                    if (formData.damagesBasis) {
+                        letter += ` ${formData.damagesBasis}`;
+                    } else if (formData.ipType === 'copyright') {
+                        letter += ` as compensation for past infringement`;
+                        if (formData.mentionStatutoryDamages) {
+                            letter += `, or statutory damages as provided by 17 U.S.C. § 504(c)`;
+                        }
+                    }
+
+                    letter += `.
+
+`;
+                    demandNumber++;
+                }
+
+                if (formData.offerLicense) {
+                    letter += `\nAlternatively, ${formData.representingClient ? 'my client is' : 'I am'} willing to discuss a licensing arrangement that would allow you to continue using ${formData.representingClient ? 'my client\'s' : 'my'} ${formData.ipType === 'copyright' ? 'copyrighted work' : formData.ipType === 'trademark' ? 'mark' : formData.ipType === 'patent' ? 'patented technology' : 'information'} under terms that fairly compensate ${formData.representingClient ? 'my client' : 'me'} and protect ${formData.representingClient ? 'my client\'s' : 'my'} rights. `;
+
+                    if (formData.licenseTerms) {
+                        letter += `${formData.licenseTerms} `;
+                    }
+
+                    letter += `\n\n`;
+                }
+
+                // DEADLINE
+                letter += `You must respond to this letter by ${deadlineStr}`;
+
+                if (formData.inviteDiscussion) {
+                    letter += `. ${formData.representingClient ? 'My client' : 'I'} ${formData.representingClient ? 'is' : 'am'} willing to discuss reasonable solutions that address ${formData.representingClient ? 'my client\'s' : 'my'} concerns and minimize disruption to your business`;
+                }
+
+                letter += `.
+
+`;
+
+                // CONSEQUENCES
+                if (formData.threatenLitigation || formData.mentionStatutoryDamages || formData.mentionAttorneyFees || formData.mentionInjunction) {
+                    letter += `CONSEQUENCES OF NON-COMPLIANCE
+
+If you do not comply with this demand by ${deadlineStr}, `;
+
+                    const consequences = [];
+
+                    if (formData.threatenLitigation) {
+                        consequences.push(`${formData.representingClient ? 'my client' : 'I'} will pursue all available legal remedies, including filing suit in federal court`);
+                    }
+
+                    if (formData.mentionInjunction) {
+                        consequences.push(`seeking preliminary and permanent injunctive relief to stop your ${formData.ipType === 'trade-secret' ? 'misappropriation' : 'infringement'}`);
+                    }
+
+                    if (formData.mentionStatutoryDamages && formData.ipType === 'copyright') {
+                        consequences.push(`seeking statutory damages of up to $150,000 per work for willful infringement under 17 U.S.C. § 504(c)`);
+                    }
+
+                    if (formData.ipType === 'patent' && formData.willfulInfringement) {
+                        consequences.push(`seeking enhanced damages up to three times the actual damages for willful infringement under 35 U.S.C. § 284`);
+                    }
+
+                    if (formData.ipType === 'trade-secret' && formData.willfulInfringement) {
+                        consequences.push(`seeking exemplary damages of up to twice the actual damages for willful and malicious misappropriation under 18 U.S.C. § 1836(b)(3)(C)`);
+                    }
+
+                    if (formData.mentionAttorneyFees) {
+                        consequences.push(`recovering attorney fees and costs`);
+                    }
+
+                    if (consequences.length > 0) {
+                        letter += consequences.join(', ') + `.`;
+                    }
+
+                    letter += `\n\n`;
+                }
+
+                // CLOSING
+                if (formData.toneLevel === 'collaborative' || formData.inviteDiscussion) {
+                    letter += `${formData.representingClient ? 'My client' : 'I'} prefer${formData.representingClient ? 's' : ''} to resolve this matter amicably and without the time and expense of litigation. Please contact ${formData.representingClient ? 'me' : 'me'} at the address or email above to discuss resolution.
+
+`;
+                }
+
+                if (formData.ipType === 'patent' && formData.declaratoryJudgmentWarning) {
+                    letter += `This letter is sent in good faith and is intended to facilitate discussion, not to threaten litigation. ${formData.representingClient ? 'My client' : 'I'} ${formData.representingClient ? 'seeks' : 'seek'} a business resolution that benefits both parties.
+
+`;
+                }
+
+                letter += `This letter is written in contemplation of litigation to protect and enforce ${formData.representingClient ? 'my client\'s' : 'my'} intellectual property rights. It is protected by the litigation privilege and related doctrines. All rights are expressly reserved.
+
+`;
+
+                if (formData.dmcaNoticeOption && formData.ipType === 'copyright') {
+                    letter += `In addition to this direct communication, ${formData.representingClient ? 'my client' : 'I'} reserve${formData.representingClient ? 's' : ''} the right to send DMCA takedown notices to any platforms hosting the infringing content.
+
+`;
+                }
+
+                letter += `Sincerely,
+
+${formData.senderName || '[Your Name]'}`;
+
+                if (formData.senderCompany && formData.representingClient) {
+                    letter += `\nCounsel for ${formData.senderCompany}`;
+                }
+
+                return letter;
+            }, [formData]);
+
+            const copyToClipboard = () => {
+                const text = documentText;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text)
+                        .then(() => {
+                            setShowToast(true);
+                            setTimeout(() => setShowToast(false), 3000);
+                        })
+                        .catch(() => fallbackCopy(text));
+                } else {
+                    fallbackCopy(text);
+                }
+            };
+
+            const fallbackCopy = (text) => {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                textArea.style.top = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    setShowToast(true);
+                    setTimeout(() => setShowToast(false), 3000);
+                } catch (err) {
+                    alert('Please manually copy the text from the preview');
+                }
+                document.body.removeChild(textArea);
+            };
+
+            const downloadLetter = () => {
+                const blob = new Blob([documentText], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${formData.letterType}-${formData.ipType}-${formData.recipientCompany || formData.recipientName || 'letter'}-${formData.letterDate}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            };
+
+            const tabs = [
+                'Sender',
+                'Recipient',
+                'IP Rights',
+                'Infringement',
+                'Strategy',
+                'Demands'
+            ];
+
+            return (
+                <div className="container">
+                    <div className="card">
+                        <div className="tabs">
+                            {tabs.map((tab, index) => (
+                                <button
+                                    key={index}
+                                    className={`tab ${activeTab === index ? 'active' : ''}`}
+                                    onClick={() => setActiveTab(index)}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+
+                        <div className="content-wrapper">
+                            <div className="form-section">
+                                {activeTab === 0 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Sender Information</h2>
+
+                                        <div className="checkbox-item" style={{ marginBottom: '1rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="representingClient"
+                                                checked={formData.representingClient}
+                                                onChange={(e) => updateField('representingClient', e.target.checked)}
+                                            />
+                                            <label htmlFor="representingClient">I am an attorney representing a client</label>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>{formData.representingClient ? 'Your Name (Attorney)' : 'Your Name / Business Name'}</label>
+                                            <input
+                                                type="text"
+                                                value={formData.senderName}
+                                                onChange={(e) => updateField('senderName', e.target.value)}
+                                                placeholder="Jane Smith, Esq. or Acme Corp"
+                                            />
+                                        </div>
+
+                                        {formData.representingClient && (
+                                            <div className="form-group">
+                                                <label>Client Name</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.senderCompany}
+                                                    onChange={(e) => updateField('senderCompany', e.target.value)}
+                                                    placeholder="Client Company Inc"
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.senderAddress}
+                                                onChange={(e) => updateField('senderAddress', e.target.value)}
+                                                placeholder="123 Main St, Suite 100"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.senderCity}
+                                                    onChange={(e) => updateField('senderCity', e.target.value)}
+                                                    placeholder="San Francisco"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <select
+                                                    value={formData.senderState}
+                                                    onChange={(e) => updateField('senderState', e.target.value)}
+                                                >
+                                                    <option value="CA">California</option>
+                                                    <option value="NY">New York</option>
+                                                    <option value="TX">Texas</option>
+                                                    <option value="FL">Florida</option>
+                                                    <option value="Other">Other State</option>
+                                                </select>
+                                                <p className="info-text">Affects trade secret law citations</p>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.senderZip}
+                                                onChange={(e) => updateField('senderZip', e.target.value)}
+                                                placeholder="94102"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Email</label>
+                                                <input
+                                                    type="email"
+                                                    value={formData.senderEmail}
+                                                    onChange={(e) => updateField('senderEmail', e.target.value)}
+                                                    placeholder="jane@lawfirm.com"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Phone</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.senderPhone}
+                                                    onChange={(e) => updateField('senderPhone', e.target.value)}
+                                                    placeholder="(555) 123-4567"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+{activeTab === 1 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Recipient Information</h2>
+
+                                        <div className="form-group">
+                                            <label>Recipient Name</label>
+                                            <input
+                                                type="text"
+                                                value={formData.recipientName}
+                                                onChange={(e) => updateField('recipientName', e.target.value)}
+                                                placeholder="John Doe"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Recipient Company (if applicable)</label>
+                                            <input
+                                                type="text"
+                                                value={formData.recipientCompany}
+                                                onChange={(e) => updateField('recipientCompany', e.target.value)}
+                                                placeholder="Competitor Inc"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Street Address</label>
+                                            <input
+                                                type="text"
+                                                value={formData.recipientAddress}
+                                                onChange={(e) => updateField('recipientAddress', e.target.value)}
+                                                placeholder="456 Business Blvd"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>City</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.recipientCity}
+                                                    onChange={(e) => updateField('recipientCity', e.target.value)}
+                                                    placeholder="Los Angeles"
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>State</label>
+                                                <input
+                                                    type="text"
+                                                    value={formData.recipientState}
+                                                    onChange={(e) => updateField('recipientState', e.target.value)}
+                                                    placeholder="CA"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>ZIP Code</label>
+                                            <input
+                                                type="text"
+                                                value={formData.recipientZip}
+                                                onChange={(e) => updateField('recipientZip', e.target.value)}
+                                                placeholder="90001"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 2 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Your IP Rights</h2>
+
+                                        <div className="form-group">
+                                            <label>Type of Intellectual Property</label>
+                                            <select
+                                                value={formData.ipType}
+                                                onChange={(e) => updateField('ipType', e.target.value)}
+                                            >
+                                                <option value="copyright">Copyright</option>
+                                                <option value="trademark">Trademark</option>
+                                                <option value="patent">Patent</option>
+                                                <option value="trade-secret">Trade Secret</option>
+                                            </select>
+                                        </div>
+
+                                        {formData.ipType === 'copyright' && (
+                                            <>
+                                                <div className="form-group">
+                                                    <label>Work Title / Description</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.copyrightWorkTitle}
+                                                        onChange={(e) => updateField('copyrightWorkTitle', e.target.value)}
+                                                        placeholder="My Photograph, Software Code, Written Work"
+                                                    />
+                                                </div>
+
+                                                <div className="row">
+                                                    <div className="form-group">
+                                                        <label>Registration Number (if registered)</label>
+                                                        <input
+                                                            type="text"
+                                                            value={formData.copyrightRegistrationNumber}
+                                                            onChange={(e) => updateField('copyrightRegistrationNumber', e.target.value)}
+                                                            placeholder="VA 1-234-567"
+                                                        />
+                                                        <p className="info-text">Required for statutory damages</p>
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Creation Date</label>
+                                                        <input
+                                                            type="date"
+                                                            value={formData.copyrightCreationDate}
+                                                            onChange={(e) => updateField('copyrightCreationDate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Ownership Details (optional)</label>
+                                                    <textarea
+                                                        value={formData.copyrightOwnership}
+                                                        onChange={(e) => updateField('copyrightOwnership', e.target.value)}
+                                                        placeholder="I am the original author. OR: I acquired rights via assignment from..."
+                                                        rows="2"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {formData.ipType === 'trademark' && (
+                                            <>
+                                                <div className="form-group">
+                                                    <label>Trademark / Mark</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.trademarkMark}
+                                                        onChange={(e) => updateField('trademarkMark', e.target.value)}
+                                                        placeholder="BRAND NAME or logo description"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Registration Number (if registered)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.trademarkRegistrationNumber}
+                                                        onChange={(e) => updateField('trademarkRegistrationNumber', e.target.value)}
+                                                        placeholder="Reg. No. 1,234,567"
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Goods / Services</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.trademarkGoods}
+                                                        onChange={(e) => updateField('trademarkGoods', e.target.value)}
+                                                        placeholder="software, clothing, consulting services, etc."
+                                                    />
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>First Use Date (if known)</label>
+                                                    <input
+                                                        type="date"
+                                                        value={formData.trademarkFirstUse}
+                                                        onChange={(e) => updateField('trademarkFirstUse', e.target.value)}
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {formData.ipType === 'patent' && (
+                                            <>
+                                                <div className="row">
+                                                    <div className="form-group">
+                                                        <label>Patent Number</label>
+                                                        <input
+                                                            type="text"
+                                                            value={formData.patentNumber}
+                                                            onChange={(e) => updateField('patentNumber', e.target.value)}
+                                                            placeholder="10,123,456"
+                                                        />
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Issue Date</label>
+                                                        <input
+                                                            type="date"
+                                                            value={formData.patentIssueDate}
+                                                            onChange={(e) => updateField('patentIssueDate', e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>Patent Title</label>
+                                                    <input
+                                                        type="text"
+                                                        value={formData.patentTitle}
+                                                        onChange={(e) => updateField('patentTitle', e.target.value)}
+                                                        placeholder="Method and System for..."
+                                                    />
+                                                </div>
+
+                                                <div className="warning-box">
+                                                    <p><strong>Declaratory Judgment Risk:</strong> Be cautious with patent letters. Aggressive threats can allow the recipient to sue you first in their preferred forum.</p>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        {formData.ipType === 'trade-secret' && (
+                                            <>
+                                                <div className="form-group">
+                                                    <label>Trade Secret Description</label>
+                                                    <textarea
+                                                        value={formData.tradeSecretDescription}
+                                                        onChange={(e) => updateField('tradeSecretDescription', e.target.value)}
+                                                        placeholder="customer lists, pricing information, proprietary formulas, technical specifications, etc. (Be specific but don't disclose the actual secrets)"
+                                                        rows="3"
+                                                    />
+                                                    <p className="info-text">Describe categories without disclosing the secrets themselves</p>
+                                                </div>
+
+                                                <div className="form-group">
+                                                    <label>How Recipient Obtained Information</label>
+                                                    <textarea
+                                                        value={formData.tradeSecretAcquisitionMethod}
+                                                        onChange={(e) => updateField('tradeSecretAcquisitionMethod', e.target.value)}
+                                                        placeholder="You obtained this information through your employment with us under a confidentiality agreement dated [date]. OR: You obtained this information from [third party] who misappropriated it from us."
+                                                        rows="3"
+                                                    />
+                                                </div>
+                                            </>
+                                        )}
+                                    </div>
+                                )}
+
+                                {activeTab === 3 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Infringement Details</h2>
+
+                                        <div className="form-group">
+                                            <label>Description of Infringing Conduct</label>
+                                            <textarea
+                                                value={formData.infringementDescription}
+                                                onChange={(e) => updateField('infringementDescription', e.target.value)}
+                                                placeholder="You are using my copyrighted photographs on your website at [URL] without authorization. OR: Your product [Product Name] uses a mark confusingly similar to my registered trademark. OR: You have disclosed my confidential customer list to competitors."
+                                                rows="4"
+                                            />
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Evidence of Infringement</label>
+                                            <textarea
+                                                value={formData.infringementEvidence}
+                                                onChange={(e) => updateField('infringementEvidence', e.target.value)}
+                                                placeholder="I have screenshots of your website showing my copyrighted images. OR: I have purchased your product and can provide samples. OR: I have emails you sent to my customers using confidential information."
+                                                rows="3"
+                                            />
+                                        </div>
+
+                                        <div className="row">
+                                            <div className="form-group">
+                                                <label>Infringement Start Date (if known)</label>
+                                                <input
+                                                    type="date"
+                                                    value={formData.infringementStartDate}
+                                                    onChange={(e) => updateField('infringementStartDate', e.target.value)}
+                                                />
+                                            </div>
+
+                                            <div className="form-group">
+                                                <label>Infringement Status</label>
+                                                <select
+                                                    value={formData.ongoingInfringement}
+                                                    onChange={(e) => updateField('ongoingInfringement', e.target.value === 'true')}
+                                                >
+                                                    <option value="true">Ongoing</option>
+                                                    <option value="false">Past (already stopped)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <div className="checkbox-item">
+                                            <input
+                                                type="checkbox"
+                                                id="includeDetailedAnalysis"
+                                                checked={formData.includeDetailedAnalysis}
+                                                onChange={(e) => updateField('includeDetailedAnalysis', e.target.checked)}
+                                            />
+                                            <label htmlFor="includeDetailedAnalysis">Include detailed legal analysis section</label>
+                                        </div>
+
+                                        {formData.ipType === 'trademark' && (
+                                            <div className="checkbox-item" style={{ marginTop: '1rem' }}>
+                                                <input
+                                                    type="checkbox"
+                                                    id="likelihoodOfConfusion"
+                                                    checked={formData.likelihoodOfConfusion}
+                                                    onChange={(e) => updateField('likelihoodOfConfusion', e.target.checked)}
+                                                />
+                                                <label htmlFor="likelihoodOfConfusion">Add likelihood of confusion analysis (for trademark)</label>
+                                            </div>
+                                        )}
+
+                                        <div className="checkbox-item" style={{ marginTop: '1rem' }}>
+                                            <input
+                                                type="checkbox"
+                                                id="willfulInfringement"
+                                                checked={formData.willfulInfringement}
+                                                onChange={(e) => updateField('willfulInfringement', e.target.checked)}
+                                            />
+                                            <label htmlFor="willfulInfringement">Assert willful infringement (increases damages exposure)</label>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 4 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Letter Strategy</h2>
+
+                                        <div className="form-group">
+                                            <label>Letter Type</label>
+                                            <select
+                                                value={formData.letterType}
+                                                onChange={(e) => updateField('letterType', e.target.value)}
+                                            >
+                                                <option value="cease">Cease-and-Desist (focus on stopping conduct)</option>
+                                                <option value="demand">Demand for Damages (focus on payment)</option>
+                                                <option value="hybrid">Hybrid (stop + pay)</option>
+                                            </select>
+                                        </div>
+
+                                        <div className="form-group">
+                                            <label>Tone Level</label>
+                                            <select
+                                                value={formData.toneLevel}
+                                                onChange={(e) => updateField('toneLevel', e.target.value)}
+                                            >
+                                                <option value="collaborative">Collaborative (invites discussion)</option>
+                                                <option value="firm">Firm but Professional (standard)</option>
+                                                <option value="aggressive">Aggressive (maximizes pressure)</option>
+                                            </select>
+                                            <p className="info-text">Collaborative tone reduces trademark bullying risk</p>
+                                        </div>
+
+                                        <div className="checkbox-group" style={{ marginTop: '1.5rem' }}>
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="offerLicense"
+                                                    checked={formData.offerLicense}
+                                                    onChange={(e) => updateField('offerLicense', e.target.checked)}
+                                                />
+                                                <label htmlFor="offerLicense">Offer licensing option</label>
+                                            </div>
+
+                                            {formData.offerLicense && (
+                                                <div className="form-group" style={{ marginLeft: '1.5rem' }}>
+                                                    <label>License Terms Description (optional)</label>
+                                                    <textarea
+                                                        value={formData.licenseTerms}
+                                                        onChange={(e) => updateField('licenseTerms', e.target.value)}
+                                                        placeholder="We are open to discussing reasonable licensing fees. OR: A retroactive license covering past use plus ongoing royalties may be appropriate."
+                                                        rows="2"
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="inviteDiscussion"
+                                                    checked={formData.inviteDiscussion}
+                                                    onChange={(e) => updateField('inviteDiscussion', e.target.checked)}
+                                                />
+                                                <label htmlFor="inviteDiscussion">Invite discussion of reasonable solutions</label>
+                                            </div>
+
+                                            {formData.ipType === 'copyright' && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="dmcaNoticeOption"
+                                                        checked={formData.dmcaNoticeOption}
+                                                        onChange={(e) => updateField('dmcaNoticeOption', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="dmcaNoticeOption">Mention DMCA takedown notice option (for copyright)</label>
+                                                </div>
+                                            )}
+
+                                            {formData.ipType === 'patent' && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="declaratoryJudgmentWarning"
+                                                        checked={formData.declaratoryJudgmentWarning}
+                                                        onChange={(e) => updateField('declaratoryJudgmentWarning', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="declaratoryJudgmentWarning">Use cautious language to reduce declaratory judgment risk</label>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {activeTab === 5 && (
+                                    <div>
+                                        <h2 style={{ marginBottom: '1.5rem', color: '#1a202c' }}>Your Demands</h2>
+
+                                        <div className="checkbox-group">
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demandCessation"
+                                                    checked={formData.demandCessation}
+                                                    onChange={(e) => updateField('demandCessation', e.target.checked)}
+                                                />
+                                                <label htmlFor="demandCessation">Demand immediate cessation of infringing conduct</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demandDestruction"
+                                                    checked={formData.demandDestruction}
+                                                    onChange={(e) => updateField('demandDestruction', e.target.checked)}
+                                                />
+                                                <label htmlFor="demandDestruction">Demand destruction of infringing materials / confidential info</label>
+                                            </div>
+
+                                            {formData.ipType === 'trade-secret' && (
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="preservationDemand"
+                                                        checked={formData.preservationDemand}
+                                                        onChange={(e) => updateField('preservationDemand', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="preservationDemand">Demand preservation of evidence (for trade secrets)</label>
+                                                </div>
+                                            )}
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demandAccounting"
+                                                    checked={formData.demandAccounting}
+                                                    onChange={(e) => updateField('demandAccounting', e.target.checked)}
+                                                />
+                                                <label htmlFor="demandAccounting">Demand accounting of uses and profits</label>
+                                            </div>
+
+                                            <div className="checkbox-item">
+                                                <input
+                                                    type="checkbox"
+                                                    id="demandDamages"
+                                                    checked={formData.demandDamages}
+                                                    onChange={(e) => updateField('demandDamages', e.target.checked)}
+                                                />
+                                                <label htmlFor="demandDamages">Demand payment for damages</label>
+                                            </div>
+                                        </div>
+
+                                        {formData.demandDamages && (
+                                            <>
+                                                <div className="row" style={{ marginTop: '1rem' }}>
+                                                    <div className="form-group">
+                                                        <label>Damages Amount (optional)</label>
+                                                        <input
+                                                            type="number"
+                                                            value={formData.damagesAmount}
+                                                            onChange={(e) => updateField('damagesAmount', e.target.value)}
+                                                            placeholder="10000"
+                                                            step="0.01"
+                                                        />
+                                                        <p className="info-text">Leave blank to request unspecified damages</p>
+                                                    </div>
+
+                                                    <div className="form-group">
+                                                        <label>Damages Basis</label>
+                                                        <input
+                                                            type="text"
+                                                            value={formData.damagesBasis}
+                                                            onChange={(e) => updateField('damagesBasis', e.target.value)}
+                                                            placeholder="based on normal licensing fees OR representing lost profits"
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </>
+                                        )}
+
+                                        <div className="section-divider">
+                                            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', color: '#4a5568' }}>Consequences & Threats</h3>
+
+                                            <div className="form-group">
+                                                <label>Response Deadline (days)</label>
+                                                <select
+                                                    value={formData.deadlineDays}
+                                                    onChange={(e) => updateField('deadlineDays', e.target.value)}
+                                                >
+                                                    <option value="7">7 days</option>
+                                                    <option value="10">10 days</option>
+                                                    <option value="14">14 days (recommended)</option>
+                                                    <option value="21">21 days</option>
+                                                    <option value="30">30 days</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="checkbox-group">
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="threatenLitigation"
+                                                        checked={formData.threatenLitigation}
+                                                        onChange={(e) => updateField('threatenLitigation', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="threatenLitigation">Threaten litigation if demands not met</label>
+                                                </div>
+
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="mentionInjunction"
+                                                        checked={formData.mentionInjunction}
+                                                        onChange={(e) => updateField('mentionInjunction', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="mentionInjunction">Mention seeking injunctive relief</label>
+                                                </div>
+
+                                                {formData.ipType === 'copyright' && (
+                                                    <div className="checkbox-item">
+                                                        <input
+                                                            type="checkbox"
+                                                            id="mentionStatutoryDamages"
+                                                            checked={formData.mentionStatutoryDamages}
+                                                            onChange={(e) => updateField('mentionStatutoryDamages', e.target.checked)}
+                                                        />
+                                                        <label htmlFor="mentionStatutoryDamages">Mention statutory damages up to $150,000 (copyright)</label>
+                                                    </div>
+                                                )}
+
+                                                <div className="checkbox-item">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="mentionAttorneyFees"
+                                                        checked={formData.mentionAttorneyFees}
+                                                        onChange={(e) => updateField('mentionAttorneyFees', e.target.checked)}
+                                                    />
+                                                    <label htmlFor="mentionAttorneyFees">Mention recovering attorney fees and costs</label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="form-group" style={{ marginTop: '1.5rem' }}>
+                                            <label>Letter Date</label>
+                                            <input
+                                                type="date"
+                                                value={formData.letterDate}
+                                                onChange={(e) => updateField('letterDate', e.target.value)}
+                                            />
+                                        </div>
+
+                                        <div className="warning-box" style={{ background: '#fef2f2', borderColor: '#ef4444' }}>
+                                            <p style={{ color: '#7f1d1d' }}><strong>Before Sending:</strong></p>
+                                            <ul style={{ marginLeft: '1.5rem', marginTop: '0.5rem', color: '#7f1d1d' }}>
+                                                <li>Ensure all facts are accurate and you have evidence</li>
+                                                <li>Avoid threatening criminal prosecution or regulatory action</li>
+                                                <li>Consider reputational risk if letter becomes public</li>
+                                                <li>Send via certified mail with return receipt</li>
+                                                <li>Consult an attorney for high-value matters</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="preview-section">
+                                <h3 style={{ marginBottom: '1rem', color: '#1a202c' }}>Letter Preview</h3>
+                                <div className="preview-container">
+                                    <pre className="document-preview">{documentText}</pre>
+                                </div>
+                                <div className="button-group">
+                                    <button className="btn btn-primary" onClick={copyToClipboard}>
+                                        Copy to Clipboard
+                                    </button>
+                                    <button className="btn btn-secondary" onClick={downloadLetter}>
+                                        Download Letter
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {showToast && (
+                        <div className="toast">
+                            ✓ Copied to clipboard!
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<IPLetterGenerator />);
+    </script>
+</body>
+</html>
